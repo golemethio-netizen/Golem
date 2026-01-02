@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemi Store | Capstone Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">GemiStore</div>
+        <div class="cart-status" onclick="toggleCart()">
+            🛒 Cart: <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <div class="controls">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search products...">
+        </div>
+
+        <div class="filter-container">
+            <button class="filter-btn" onclick="filterCategory('all')">All</button>
+            <button class="filter-btn" onclick="filterCategory('Electronics')">Electronics</button>
+            <button class="filter-btn" onclick="filterCategory('Tech')">Tech</button>
+            <button class="filter-btn" onclick="filterCategory('Accessories')">Accessories</button>
+        </div>
+    </div>
+
+    <div id="product-grid" class="grid-container"></div>
+
+    <div id="cart-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>Your Cart</h2>
+            <button class="close-btn" onclick="toggleCart()">×</button>
+        </div>
+        <div id="cart-items-container"></div>
+        <div class="sidebar-footer">
+            <div class="total-price">Total: $<span id="total-amount">0</span></div>
+            <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
+        </div>
+    </div>
+
+    <div id="overlay" onclick="toggleCart()"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
