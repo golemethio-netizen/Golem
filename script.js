@@ -15,7 +15,7 @@ const products = [
 ];
 
 const translations = {
-    en: { title: "Modern Electronics", cart: "Cart", addToCart: "Add to Cart", searchPlaceholder: "Search...", catAll: "All", catPhones: "Phones", catLaptops: "Laptops", catFurniture: "Furniture",orderTitle: "Place Order", namePlaceholder: "Name", locPlaceholder: "Location", sendOrderTelegram: "Send via Telegram", p1: "Smartphone X", p2: "Laptop Pro", p3: "iPhone 3 GS",p4: "Kichin Cabinate", p5: "Door",orderMsg: "Order from [NAME]:\n[ITEMS]\nTo: [LOC]" },
+    en: { title: "Modern Electronics", cart: "Cart", addToCart: "Add to Cart", searchPlaceholder: "Search...", catAll: "All", catphones: "Phones", catLaptops: "Laptops", catFurniture: "Furniture",orderTitle: "Place Order", namePlaceholder: "Name", locPlaceholder: "Location", sendOrderTelegram: "Send via Telegram", p1: "Smartphone X", p2: "Laptop Pro", p3: "iPhone 3 GS",p4: "Kichin Cabinate", p5: "Door",orderMsg: "Order from [NAME]:\n[ITEMS]\nTo: [LOC]" },
     am: { title: "ዘመናዊ ኤሌክትሮኒክስ", cart: "ጋሪ", addToCart: "ወደ ጋሪ አስገባ", searchPlaceholder: "ፈልግ...", catAll: "ሁሉም", catPhones: "ስልኮች", catLaptops: "ላፕቶፖች", catFurniture: "ፈርኒቸር", orderTitle: "ትዕዛዝ ይላኩ", namePlaceholder: "ስም", locPlaceholder: "አድራሻ", sendOrderTelegram: "በቴሌግራም ይላኩ", p1: "ስማርት ስልክ X", p2: "ላፕቶፕ ፕሮ", p3: "አይፎን 3", orderMsg: "ትዕዛዝ ከ [NAME]:\n[ITEMS]\nአድራሻ: [LOC]" }
 };
 
@@ -88,3 +88,4 @@ function handleFormSubmit(e) {
 
 
 window.onload = () => changeLanguage(localStorage.getItem('lang') || 'en');
+
