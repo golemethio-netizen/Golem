@@ -29,47 +29,13 @@
         </div>
     </nav>
 
-<div class="payment-methods">
-    <h4 data-i18n="paymentTitle">Accepted Payments / የክፍያ አማራጮች</h4>
-    <div class="payment-icons">
-        <div class="pay-item">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Telebirr_logo.png" alt="Telebirr" onerror="this.src='https://via.placeholder.com/40?text=TB'">
-            <span>Telebirr</span>
-        </div>
-        <div class="pay-item">
-            <img src="https://www.combanketh.et/img/logo.png" alt="CBE" onerror="this.src='https://via.placeholder.com/40?text=CBE'">
-            <span>CBE Birr</span>
-        </div>
-        <div class="pay-item">
-            <img src="https://logowik.com/content/uploads/images/t_mobile-money5856.logowik.com.webp" alt="M-Pesa" onerror="this.src='https://via.placeholder.com/40?text=MP'">
-            <span>M-Pesa</span>
-        </div>
-    </div>
-</div>
-
-<div id="admin-dashboard" style="display:none;">
-    <h3>Add New Product / አዲስ ዕቃ ይጨምሩ</h3>
-    <form id="add-product-form" onsubmit="handleNewProduct(event)">
-        <input type="text" id="new-p-name-en" placeholder="Product Name (English)" required>
-        <input type="text" id="new-p-name-am" placeholder="የዕቃው ስም (በአማርኛ)" required>
-        <input type="number" id="new-p-price" placeholder="Price in USD ($)" required>
-        <select id="new-p-category">
-            <option value="phones">Phones</option>
-            <option value="laptops">Laptops</option>
-        </select>
-        <input type="text" id="new-p-img" placeholder="Image Filename (e.g., galaxy.jpg)">
-        <button type="submit" class="filter-btn active">Add Product / ዕቃውን ጨምር</button>
-    </form>
-</div>
-
-
-
     <div class="search-filter-bar">
         <input type="text" id="product-search" data-i18n-placeholder="searchPlaceholder" placeholder="Search..." oninput="handleSearch()">
         <div class="filter-container">
             <button class="filter-btn active" onclick="filterProducts('all')" data-i18n="catAll">All</button>
             <button class="filter-btn" onclick="filterProducts('phones')" data-i18n="catPhones">Phones</button>
             <button class="filter-btn" onclick="filterProducts('laptops')" data-i18n="catLaptops">Laptops</button>
+			 <button class="filter-btn" onclick="filterProducts('Furniture')" data-i18n="catFurniture">Furniture</button>
         </div>
     </div>
 
@@ -97,7 +63,7 @@
                 <p>Sunday: Closed / እሁድ ዝግ ነው</p>
             </div>
             <div class="social-links">
-                <a href="https://t.me/JohnYoEt" target="_blank" class="social-icon">Telegram</a>
+                <a href="https://t.me/allInOneEthiopia1" target="_blank" class="social-icon">Telegram</a>
                 <a href="#" class="social-icon">Facebook</a>
             </div>
             <div class="footer-bottom">
@@ -117,17 +83,5 @@
     </div>
 
     <script src="script.js"></script>
-	
-	
-	<div id="offer-modal" class="modal" style="display:none;">
-    <div class="modal-content offer-box">
-        <span class="close-offer" onclick="closeModal('offer-modal')">&times;</span>
-        <div class="offer-icon">🎁</div>
-        <h2 data-i18n="offerTitle">Special Gift!</h2>
-        <p data-i18n="offerBody">Order within the next 30 minutes and get 10% off your first delivery!</p>
-        <div class="promo-code">PROMO: MODERN10</div>
-        <button onclick="closeModal('offer-modal')" class="filter-btn active" style="width:100%">Claim Now / አሁን ተጠቀም</button>
-    </div>
-</div>
 </body>
 </html>
