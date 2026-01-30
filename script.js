@@ -8,14 +8,14 @@ let searchQuery = "";
 
 const products = [
     { id: 1, usdPrice: 400, i18nKey: "p1", category: "phones", img: "phone.jpg", featured: true },
-    { id: 2, usdPrice: 900, i18nKey: "p2", category: "laptops", img: "/images/laptop.jpg", featured: false },
-    { id: 3, usdPrice: 200, i18nKey: "p3", category: "phones", img: "images/iphone3.jpg", featured: false },
-	{ id: 4, usdPrice: 400, i18nKey: "p4", category: "Furniture", img: "images/furniture.jpg", featured: false },
-	{ id: 5, usdPrice: 200, i18nKey: "p5", category: "Furniture", img: "images/door.jpg", featured: false }
+    { id: 2, usdPrice: 900, i18nKey: "p2", category: "laptops", img: "laptop.jpg", featured: false },
+    { id: 3, usdPrice: 200, i18nKey: "p3", category: "phones", img: "iphone3.jpg", featured: false },
+	{ id: 4, usdPrice: 400, i18nKey: "p4", category: "Furniture", img: "Furniture.jpg", featured: false },
+	{ id: 5, usdPrice: 200, i18nKey: "p5", category: "Furniture", img: "door.jpg", featured: false }
 ];
 
 const translations = {
-    en: { title: "Modern Electronics", cart: "Cart", addToCart: "Add to Cart", searchPlaceholder: "Search...", catAll: "All", catphones: "Phones", catLaptops: "Laptops", catFurniture: "Furniture",orderTitle: "Place Order", namePlaceholder: "Name", locPlaceholder: "Location", sendOrderTelegram: "Send via Telegram", p1: "Smartphone X", p2: "Laptop Pro", p3: "iPhone 3 GS",p4: "Kichin Cabinate", p5: "Door",orderMsg: "Order from [NAME]:\n[ITEMS]\nTo: [LOC]" },
+    en: { title: "Modern Electronics", cart: "Cart", addToCart: "Add to Cart", searchPlaceholder: "Search...", catAll: "All", catPhones: "Phones", catLaptops: "Laptops", catFurniture: "Furniture",orderTitle: "Place Order", namePlaceholder: "Name", locPlaceholder: "Location", sendOrderTelegram: "Send via Telegram", p1: "Smartphone X", p2: "Laptop Pro", p3: "iPhone 3 GS",p4: "Kichin Cabinate", p5: "Door",orderMsg: "Order from [NAME]:\n[ITEMS]\nTo: [LOC]" },
     am: { title: "ዘመናዊ ኤሌክትሮኒክስ", cart: "ጋሪ", addToCart: "ወደ ጋሪ አስገባ", searchPlaceholder: "ፈልግ...", catAll: "ሁሉም", catPhones: "ስልኮች", catLaptops: "ላፕቶፖች", catFurniture: "ፈርኒቸር", orderTitle: "ትዕዛዝ ይላኩ", namePlaceholder: "ስም", locPlaceholder: "አድራሻ", sendOrderTelegram: "በቴሌግራም ይላኩ", p1: "ስማርት ስልክ X", p2: "ላፕቶፕ ፕሮ", p3: "አይፎን 3", orderMsg: "ትዕዛዝ ከ [NAME]:\n[ITEMS]\nአድራሻ: [LOC]" }
 };
 
@@ -43,7 +43,7 @@ function renderProducts() {
             const price = lang === 'am' ? `${(p.usdPrice * exchangeRate).toLocaleString()} ብር` : `$${p.usdPrice}`;
             grid.innerHTML += `
                 <div class="product-card">
-                    <img src="images/${p.img}" onerror="this.src='<img src={images} />'" style="width:100%; height:150px; object-fit:cover;">
+                    <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/150'" style="width:100%; height:150px; object-fit:cover;">
                     <h3>${translations[lang][p.i18nKey]}</h3>
                     <p>${price}</p>
                     <button onclick="addToCart(${p.id})" class="filter-btn active" style="width:100%">${translations[lang].addToCart}</button>
@@ -86,9 +86,4 @@ function handleFormSubmit(e) {
     window.open(`https://t.me/${allInOneEthiopia1}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-
 window.onload = () => changeLanguage(localStorage.getItem('lang') || 'en');
-
-
-
-
