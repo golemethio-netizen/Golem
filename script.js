@@ -8,7 +8,7 @@ let searchQuery = "";
 
 const products = [
     { id: 1, usdPrice: 400, i18nKey: "p1", category: "phones", img: "phone.jpg", featured: true },
-    { id: 2, usdPrice: 900, i18nKey: "p2", category: "laptops", img: "laptop.jpg", featured: false },
+    { id: 2, usdPrice: 900, i18nKey: "p2", category: "laptops", img: "/images/laptop.jpg", featured: false },
     { id: 3, usdPrice: 200, i18nKey: "p3", category: "phones", img: "iphone3.jpg", featured: false },
 	{ id: 4, usdPrice: 400, i18nKey: "p4", category: "Furniture", img: "Furniture.jpg", featured: false },
 	{ id: 5, usdPrice: 200, i18nKey: "p5", category: "Furniture", img: "door.jpg", featured: false }
@@ -85,5 +85,6 @@ function handleFormSubmit(e) {
     const msg = translations[lang].orderMsg.replace("[NAME]", name).replace("[ITEMS]", items).replace("[LOC]", loc);
     window.open(`https://t.me/${allInOneEthiopia1}?text=${encodeURIComponent(msg)}`, '_blank');
 }
+
 
 window.onload = () => changeLanguage(localStorage.getItem('lang') || 'en');
