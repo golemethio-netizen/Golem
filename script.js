@@ -43,8 +43,8 @@ function renderProducts() {
             const price = lang === 'am' ? `${(p.usdPrice * exchangeRate).toLocaleString()} ብር` : `$${p.usdPrice}`;
             grid.innerHTML += `
                 <div class="product-card">
-                    <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/150'" style="width:100%; height:150px; object-fit:cover;">
-                    <h3>${translations[lang][p.i18nKey]}</h3>
+<img src="/Golem/images/${p.img}" onerror="this.src='https://via.placeholder.com/150'" ...>                 
+<h3>${translations[lang][p.i18nKey]}</h3>
                     <p>${price}</p>
                     <button onclick="addToCart(${p.id})" class="filter-btn active" style="width:100%">${translations[lang].addToCart}</button>
                 </div>`;
@@ -85,5 +85,6 @@ function handleFormSubmit(e) {
     const msg = translations[lang].orderMsg.replace("[NAME]", name).replace("[ITEMS]", items).replace("[LOC]", loc);
     window.open(`https://t.me/${allInOneEthiopia1}?text=${encodeURIComponent(msg)}`, '_blank');
 }
+
 
 window.onload = () => changeLanguage(localStorage.getItem('lang') || 'en');
