@@ -1,49 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemi Store | Capstone Project</title>
+    <title data-i18n="title">Modern Electronics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="logo">GemiStore</div>
-        <div class="cart-status" onclick="toggleCart()">
-            🛒 Cart: <span id="cart-count">0</span>
+    <nav class="main-header">
+        <div class="header-left">
+            <h2 data-i18n="title">Modern Electronics</h2>
+            <div class="status-indicator">
+                <span id="shop-status-dot"></span>
+                <span id="shop-status-text">...</span>
+            </div>
         </div>
-    </header>
-
-    <div class="controls">
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search products...">
+        <div class="nav-controls">
+            <div class="lang-switcher">
+                <button onclick="changeLanguage('en')">EN</button>
+                <button onclick="changeLanguage('am')">አማርኛ</button>
+            </div>
+            <button id="theme-toggle" onclick="toggleDarkMode()"><span id="theme-icon">🌙</span></button>
+            <div class="cart-status">
+                <span data-i18n="cart">Cart</span>: <span id="cart-count">0</span>
+            </div>
         </div>
+    </nav>
 
+<div class="payment-methods">
+    <h4 data-i18n="paymentTitle">Accepted Payments / የክፍያ አማራጮች</h4>
+    <div class="payment-icons">
+        <div class="pay-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Telebirr_logo.png" alt="Telebirr" onerror="this.src='https://via.placeholder.com/40?text=TB'">
+            <span>Telebirr</span>
+        </div>
+        <div class="pay-item">
+            <img src="https://www.combanketh.et/img/logo.png" alt="CBE" onerror="this.src='https://via.placeholder.com/40?text=CBE'">
+            <span>CBE Birr</span>
+        </div>
+        <div class="pay-item">
+            <img src="https://logowik.com/content/uploads/images/t_mobile-money5856.logowik.com.webp" alt="M-Pesa" onerror="this.src='https://via.placeholder.com/40?text=MP'">
+            <span>M-Pesa</span>
+        </div>
+    </div>
+</div>
+
+<div id="admin-dashboard" style="display:none;">
+    <h3>Add New Product / አዲስ ዕቃ ይጨምሩ</h3>
+    <form id="add-product-form" onsubmit="handleNewProduct(event)">
+        <input type="text" id="new-p-name-en" placeholder="Product Name (English)" required>
+        <input type="text" id="new-p-name-am" placeholder="የዕቃው ስም (በአማርኛ)" required>
+        <input type="number" id="new-p-price" placeholder="Price in USD ($)" required>
+        <select id="new-p-category">
+            <option value="phones">Phones</option>
+            <option value="laptops">Laptops</option>
+        </select>
+        <input type="text" id="new-p-img" placeholder="Image Filename (e.g., galaxy.jpg)">
+        <button type="submit" class="filter-btn active">Add Product / ዕቃውን ጨምር</button>
+    </form>
+</div>
+
+
+
+    <div class="search-filter-bar">
+        <input type="text" id="product-search" data-i18n-placeholder="searchPlaceholder" placeholder="Search..." oninput="handleSearch()">
         <div class="filter-container">
-            <button class="filter-btn" onclick="filterCategory('all')">All</button>
-            <button class="filter-btn" onclick="filterCategory('Electronics')">Electronics</button>
-            <button class="filter-btn" onclick="filterCategory('Tech')">Tech</button>
-            <button class="filter-btn" onclick="filterCategory('Accessories')">Accessories</button>
+            <button class="filter-btn active" onclick="filterProducts('all')" data-i18n="catAll">All</button>
+            <button class="filter-btn" onclick="filterProducts('phones')" data-i18n="catPhones">Phones</button>
+            <button class="filter-btn" onclick="filterProducts('laptops')" data-i18n="catLaptops">Laptops</button>
         </div>
     </div>
 
-    <div id="product-grid" class="grid-container"></div>
+    <main id="product-grid"></main>
 
-    <div id="cart-sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h2>Your Cart</h2>
-            <button class="close-btn" onclick="toggleCart()">×</button>
+    <section id="order-section">
+        <h2 data-i18n="orderTitle">Order Details</h2>
+        <form id="contact-form" name="orders" data-netlify="true" action="/success.html" onsubmit="handleFormSubmit(event)">
+            <input type="hidden" name="form-name" value="orders">
+            <input type="text" name="customer_name" id="customer-name" data-i18n-placeholder="namePlaceholder" placeholder="Your Name" required>
+            <input type="text" name="location" id="customer-location" data-i18n-placeholder="locPlaceholder" placeholder="Delivery Location" required>
+            <input type="hidden" name="order_items" id="hidden-items-input">
+            <div id="order-summary"></div>
+            <button type="submit" id="telegram-btn">
+                <span data-i18n="sendOrderTelegram">Send Order via Telegram</span>
+            </button>
+        </form>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="business-hours">
+                <h4 data-i18n="hoursTitle">Business Hours / የስራ ሰዓት</h4>
+                <p>Mon - Sat: 9:00 AM - 7:00 PM (3:00 - 1:00 Local Time)</p>
+                <p>Sunday: Closed / እሁድ ዝግ ነው</p>
+            </div>
+            <div class="social-links">
+                <a href="https://t.me/JohnYoEt" target="_blank" class="social-icon">Telegram</a>
+                <a href="#" class="social-icon">Facebook</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Modern Electronics Ethiopia. All rights reserved.</p>
+                <a href="javascript:void(0)" onclick="showLogin()" class="admin-link">Owner Access</a>
+            </div>
         </div>
-        <div id="cart-items-container"></div>
-        <div class="sidebar-footer">
-            <div class="total-price">Total: $<span id="total-amount">0</span></div>
-            <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
+    </footer>
+
+    <div id="login-modal" style="display:none;" class="modal">
+        <div class="modal-content">
+            <h3 data-i18n="adminLogin">Owner Login</h3>
+            <input type="password" id="admin-pass" placeholder="Password">
+            <button onclick="checkPassword()">Unlock</button>
+            <button onclick="document.getElementById('login-modal').style.display='none'">Cancel</button>
         </div>
     </div>
-
-    <div id="overlay" onclick="toggleCart()"></div>
 
     <script src="script.js"></script>
+	
+	
+	<div id="offer-modal" class="modal" style="display:none;">
+    <div class="modal-content offer-box">
+        <span class="close-offer" onclick="closeModal('offer-modal')">&times;</span>
+        <div class="offer-icon">🎁</div>
+        <h2 data-i18n="offerTitle">Special Gift!</h2>
+        <p data-i18n="offerBody">Order within the next 30 minutes and get 10% off your first delivery!</p>
+        <div class="promo-code">PROMO: MODERN10</div>
+        <button onclick="closeModal('offer-modal')" class="filter-btn active" style="width:100%">Claim Now / አሁን ተጠቀም</button>
+    </div>
+</div>
 </body>
 </html>
