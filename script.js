@@ -7,7 +7,7 @@ let currentCategory = 'all';
 let searchQuery = "";
 
 const products = [
-    { id: 1, usdPrice: 400, i18nKey: "p1", category: "phones", img: "images\phone.jpg", featured: true },
+    { id: 1, usdPrice: 400, i18nKey: "p1", category: "phones", img: "phone.jpg", featured: true },
     { id: 2, usdPrice: 900, i18nKey: "p2", category: "laptops", img: "/images/laptop.jpg", featured: false },
     { id: 3, usdPrice: 200, i18nKey: "p3", category: "phones", img: "images/iphone3.jpg", featured: false },
 	{ id: 4, usdPrice: 400, i18nKey: "p4", category: "Furniture", img: "images/furniture.jpg", featured: false },
@@ -43,7 +43,7 @@ function renderProducts() {
             const price = lang === 'am' ? `${(p.usdPrice * exchangeRate).toLocaleString()} ብር` : `$${p.usdPrice}`;
             grid.innerHTML += `
                 <div class="product-card">
-                    <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/150'" style="width:100%; height:150px; object-fit:cover;">
+                    <img src="images/${p.img}" onerror="this.src='<img src={images} />'" style="width:100%; height:150px; object-fit:cover;">
                     <h3>${translations[lang][p.i18nKey]}</h3>
                     <p>${price}</p>
                     <button onclick="addToCart(${p.id})" class="filter-btn active" style="width:100%">${translations[lang].addToCart}</button>
@@ -88,6 +88,7 @@ function handleFormSubmit(e) {
 
 
 window.onload = () => changeLanguage(localStorage.getItem('lang') || 'en');
+
 
 
 
