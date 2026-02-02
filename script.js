@@ -1,5 +1,5 @@
 const products = [
-    { id: 1, name: "Golem Core V1", price: 299, desc: "The ultimate processing unit.", image: "assets/images/p1.jpg" },
+    { id: 1, name: "Golem Core V1", price: 299, desc: "The ultimate processing unit.", image: "assets/images/product1.jpg" },
     { id: 2, name: "Neural Link", price: 150, desc: "Connect your mind to the web.", image: "assets/images/p2.jpg" },
     { id: 3, name: "Titan Shell", price: 500, desc: "Indestructible exterior casing.", image: "assets/images/p3.jpg" }
 ];
@@ -100,3 +100,4 @@ function toggleCart() {
 
 // Start everything
 init();
+
