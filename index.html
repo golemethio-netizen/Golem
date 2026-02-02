@@ -1,88 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">Modern Electronics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
+    <title>Golem E-Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header>
+        <h1>Golem E-Commerce</h1>
+        <div id="cart-count">Cart: 0</div>
+    </header>
 
-    <nav class="main-header">
-        <div class="header-left">
-            <h2 data-i18n="title">Modern Electronics</h2>
-            <div class="status-indicator">
-                <span id="shop-status-dot"></span>
-                <span id="shop-status-text">...</span>
-            </div>
-        </div>
-        <div class="nav-controls">
-            <div class="lang-switcher">
-                <button onclick="changeLanguage('en')">EN</button>
-                <button onclick="changeLanguage('am')">አማርኛ</button>
-            </div>
-            <button id="theme-toggle" onclick="toggleDarkMode()"><span id="theme-icon">🌙</span></button>
-            <div class="cart-status">
-                <span data-i18n="cart">Cart</span>: <span id="cart-count">0</span>
-            </div>
-        </div>
-    </nav>
-
-    <div class="search-filter-bar">
-        <input type="text" id="product-search" data-i18n-placeholder="searchPlaceholder" placeholder="Search..." oninput="handleSearch()">
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="filterProducts('all')" data-i18n="catAll">All</button>
-            <button class="filter-btn" onclick="filterProducts('phones')" data-i18n="catPhones">Phones</button>
-            <button class="filter-btn" onclick="filterProducts('laptops')" data-i18n="catLaptops">Laptops</button>
-			 <button class="filter-btn" onclick="filterProducts('furniture')" data-i18n="catFurniture">Furniture</button>
-        </div>
-    </div>
-
-    <main id="product-grid"></main>
-
-    <section id="order-section">
-        <h2 data-i18n="orderTitle">Order Details</h2>
-        <form id="contact-form" name="orders" data-netlify="true" action="/success.html" onsubmit="handleFormSubmit(event)">
-            <input type="hidden" name="form-name" value="orders">
-            <input type="text" name="customer_name" id="customer-name" data-i18n-placeholder="namePlaceholder" placeholder="Your Name" required>
-            <input type="text" name="location" id="customer-location" data-i18n-placeholder="locPlaceholder" placeholder="Delivery Location" required>
-            <input type="hidden" name="order_items" id="hidden-items-input">
-            <div id="order-summary"></div>
-            <button type="submit" id="telegram-btn">
-                <span data-i18n="sendOrderTelegram">Send Order via Telegram</span>
-            </button>
-        </form>
-    </section>
-
-    <footer class="main-footer">
-        <div class="footer-content">
-            <div class="business-hours">
-                <h4 data-i18n="hoursTitle">Business Hours / የስራ ሰዓት</h4>
-                <p>Mon - Sat: 9:00 AM - 7:00 PM (3:00 - 1:00 Local Time)</p>
-                <p>Sunday: Closed / እሁድ ዝግ ነው</p>
-            </div>
-            <div class="social-links">
-                <a href="https://t.me/allInOneEthiopia1" target="_blank" class="social-icon">Telegram</a>
-                <a href="#" class="social-icon">Facebook</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Modern Electronics Ethiopia. All rights reserved.</p>
-                <a href="javascript:void(0)" onclick="showLogin()" class="admin-link">Owner Access</a>
-            </div>
-        </div>
-    </footer>
-
-    <div id="login-modal" style="display:none;" class="modal">
-        <div class="modal-content">
-            <h3 data-i18n="adminLogin">Owner Login</h3>
-            <input type="password" id="admin-pass" placeholder="Password">
-            <button onclick="checkPassword()">Unlock</button>
-            <button onclick="document.getElementById('login-modal').style.display='none'">Cancel</button>
-        </div>
-    </div>
+    <main id="product-list">
+        </main>
 
     <script src="script.js"></script>
 </body>
-
 </html>
