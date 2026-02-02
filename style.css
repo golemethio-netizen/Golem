@@ -1,26 +1,51 @@
-body { font-family: sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
-header { display: flex; justify-content: space-between; align-items: center; }
+:root {
+    --primary: #00ff88;
+    --dark: #1a1a1a;
+    --light: #ffffff;
+}
 
+body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #121212; color: var(--light); }
+.container { max-width: 1200px; margin: auto; padding: 20px; }
+
+header { 
+    display: flex; justify-content: space-between; padding: 20px 5%; 
+    background: var(--dark); border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100;
+}
+
+.hero { text-align: center; padding: 60px 20px; background: linear-gradient(45deg, #1a1a1a, #000); }
+
+/* Responsive Grid */
 #product-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
 }
 
 .product-card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    text-align: center;
+    background: #222; padding: 15px; border-radius: 12px; transition: 0.3s;
+    border: 1px solid #333; cursor: pointer;
+}
+.product-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+.product-card img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; }
+
+/* Modals & Sidebar */
+.modal, .sidebar { 
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+    width: 100%; height: 100%; background: rgba(0,0,0,0.8); 
+}
+.sidebar { 
+    left: auto; right: 0; width: 350px; background: #1a1a1a; 
+    border-left: 2px solid var(--primary); padding: 20px;
+}
+.modal-content { 
+    background: #222; margin: 10% auto; padding: 30px; 
+    width: 80%; max-width: 600px; border-radius: 15px; position: relative;
 }
 
-/* Crucial for image display */
-.product-card img {
-    max-width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 4px;
-}
+.close { position: absolute; right: 20px; top: 10px; font-size: 30px; cursor: pointer; }
 
-button { background: #28a745; color: white; border: none; padding: 10px; cursor: pointer; }
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .sidebar { width: 100%; }
+    .modal-content { width: 95%; margin: 20% auto; }
+}

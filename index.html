@@ -3,17 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem E-Store</title>
+    <title>Golem E-Store | Premium Tech</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Golem E-Commerce</h1>
-        <div id="cart-count">Cart: 0</div>
+        <div class="logo">GOLEM</div>
+        <nav>
+            <button id="cart-btn" onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</button>
+        </nav>
     </header>
 
-    <main id="product-list">
+    <section class="hero">
+        <h1>Future Tech, Today.</h1>
+        <p>Explore the Golem collection.</p>
+    </section>
+
+    <main id="product-list" class="container">
         </main>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="cart-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>Your Cart</h2>
+            <button onclick="toggleCart()">Close</button>
+        </div>
+        <div id="cart-items"></div>
+        <div class="cart-total">
+            <strong>Total: $<span id="total-price">0</span></strong>
+        </div>
+        <button class="checkout-btn">Checkout</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
