@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem E-Store | Premium Tech</title>
+    <title>Golem | Premium Tech Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <header>
         <div class="logo">GOLEM</div>
         <nav>
+            <button id="theme-toggle" onclick="toggleTheme()">🌓 Mode</button>
             <button id="cart-btn" onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</button>
         </nav>
     </header>
 
     <section class="hero">
         <h1>Future Tech, Today.</h1>
-        <p>Explore the Golem collection.</p>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search Golem products..." onkeyup="filterProducts()">
+        </div>
     </section>
 
     <main id="product-list" class="container">
@@ -38,7 +42,15 @@
         <div class="cart-total">
             <strong>Total: $<span id="total-price">0</span></strong>
         </div>
-        <button class="checkout-btn">Checkout</button>
+        <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
+    </div>
+
+    <div id="chat-widget" class="chat-closed" onclick="toggleChat()">
+        <div id="chat-header">🤖 Golem Support</div>
+        <div id="chat-body">
+            <p>Hello! How can Golem assist your upgrades today?</p>
+        </div>
+        <input type="text" id="chat-input" placeholder="Type a message..." onclick="event.stopPropagation()">
     </div>
 
     <script src="script.js"></script>
