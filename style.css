@@ -1,51 +1,61 @@
 :root {
+    --bg: #0f0f0f;
+    --card: #1a1a1a;
+    --text: #ffffff;
     --primary: #00ff88;
-    --dark: #1a1a1a;
-    --light: #ffffff;
+    --accent: #333;
 }
 
-body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #121212; color: var(--light); }
+[data-theme="light"] {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --primary: #008855;
+    --accent: #ddd;
+}
+
+body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; }
 .container { max-width: 1200px; margin: auto; padding: 20px; }
 
 header { 
-    display: flex; justify-content: space-between; padding: 20px 5%; 
-    background: var(--dark); border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 15px 5%; background: var(--card); border-bottom: 1px solid var(--accent);
+    position: sticky; top: 0; z-index: 1000;
 }
 
-.hero { text-align: center; padding: 60px 20px; background: linear-gradient(45deg, #1a1a1a, #000); }
-
-/* Responsive Grid */
-#product-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
+.hero { text-align: center; padding: 50px 20px; background: linear-gradient(to bottom, var(--card), var(--bg)); }
+#search-bar { 
+    width: 60%; padding: 12px; border-radius: 25px; border: 1px solid var(--primary); 
+    background: var(--bg); color: var(--text); margin-top: 20px; outline: none;
 }
 
-.product-card {
-    background: #222; padding: 15px; border-radius: 12px; transition: 0.3s;
-    border: 1px solid #333; cursor: pointer;
+/* Product Grid */
+#product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+.product-card { 
+    background: var(--card); padding: 15px; border-radius: 12px; 
+    border: 1px solid var(--accent); transition: 0.3s; cursor: pointer; text-align: center;
 }
 .product-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-.product-card img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; }
+.product-card img { width: 100%; height: 230px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
 
-/* Modals & Sidebar */
+/* Buttons */
+button { cursor: pointer; transition: 0.2s; border-radius: 5px; border: none; }
+.add-btn { background: var(--primary); color: black; padding: 10px 15px; font-weight: bold; width: 100%; }
+
+/* Modal & Sidebar */
 .modal, .sidebar { 
-    display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
-    width: 100%; height: 100%; background: rgba(0,0,0,0.8); 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.8); z-index: 2000; 
 }
-.sidebar { 
-    left: auto; right: 0; width: 350px; background: #1a1a1a; 
-    border-left: 2px solid var(--primary); padding: 20px;
-}
-.modal-content { 
-    background: #222; margin: 10% auto; padding: 30px; 
-    width: 80%; max-width: 600px; border-radius: 15px; position: relative;
-}
+.sidebar { left: auto; right: 0; width: 350px; background: var(--card); padding: 20px; border-left: 2px solid var(--primary); }
+.modal-content { background: var(--card); margin: 10% auto; padding: 30px; width: 90%; max-width: 500px; border-radius: 15px; position: relative; }
+.close { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; }
 
-.close { position: absolute; right: 20px; top: 10px; font-size: 30px; cursor: pointer; }
+/* Chat */
+#chat-widget { position: fixed; bottom: 20px; right: 20px; width: 280px; background: var(--card); border: 1px solid var(--primary); border-radius: 10px; z-index: 3000; cursor: pointer; transition: 0.3s; }
+.chat-closed { height: 45px; overflow: hidden; }
+#chat-header { background: var(--primary); color: black; padding: 10px; font-weight: bold; }
+#chat-body { height: 150px; padding: 10px; font-size: 13px; }
+#chat-input { width: 100%; padding: 10px; background: var(--accent); color: var(--text); border: none; }
 
-/* Responsive Adjustments */
-@media (max-width: 600px) {
-    .sidebar { width: 100%; }
-    .modal-content { width: 95%; margin: 20% auto; }
-}
+@media (max-width: 600px) { .sidebar { width: 100%; } #search-bar { width: 90%; } }
