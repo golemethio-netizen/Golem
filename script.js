@@ -9,6 +9,16 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+// TEST CONNECTION IMMEDIATELY
+db.collection('test').add({
+    message: "Connection check",
+    time: Date.now()
+}).then(() => {
+    console.log("✅ CONNECTION SUCCESS: Firebase is receiving data!");
+}).catch((error) => {
+    console.error("❌ CONNECTION FAILED:", error.code, error.message);
+});
 const db = firebase.firestore();
 const productsCol = db.collection('products');
 
@@ -91,4 +101,5 @@ function filterProducts() {
 
 // THEME & CART (Logic from previous steps remains the same)
 init();
+
 
