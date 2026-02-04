@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem | Premium Tech Store</title>
+    <title>Golem | Cloud Powered Tech</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,54 +11,38 @@
     <header>
         <div class="logo">GOLEM</div>
         <nav>
-            <button id="theme-toggle" onclick="toggleTheme()">🌓 Mode</button>
-            <button id="cart-btn" onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</button>
+            <button onclick="toggleTheme()">🌓 Mode</button>
+            <button onclick="openAdmin()">⚙️ Admin</button>
+            <button onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</button>
         </nav>
     </header>
 
-    <section class="hero">
-        <h1>Future Tech, Today.</h1>
+    <main class="container">
         <div class="search-container">
-            <input type="text" id="search-bar" placeholder="Search Golem products..." onkeyup="filterProducts()">
+            <input type="text" id="search-bar" placeholder="Search tech..." onkeyup="filterProducts()">
         </div>
-    </section>
+        <div id="product-list"></div>
+    </main>
 
-    <main id="product-list" class="container">
-        </main>
-
-    <div id="product-modal" class="modal">
+    <div id="admin-modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modal-body"></div>
+            <span class="close" onclick="closeAdmin()">&times;</span>
+            <h2>Cloud Inventory</h2>
+            <form id="product-form">
+                <input type="text" id="admin-name" placeholder="Name" required>
+                <input type="number" id="admin-price" placeholder="Price" required>
+                <input type="text" id="admin-img" placeholder="Image URL">
+                <button type="button" class="add-btn" onclick="addNewProduct()">Upload to Cloud</button>
+            </form>
+            <div id="admin-list"></div>
         </div>
     </div>
 
-    <div id="cart-sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h2>Your Cart</h2>
-            <button onclick="toggleCart()">Close</button>
-        </div>
-        <div id="cart-items"></div>
-        <div class="cart-total">
-            <strong>Total: $<span id="total-price">0</span></strong>
-        </div>
-        <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
-    </div>
+    <div id="cart-sidebar" class="sidebar">...</div>
 
-    <div id="chat-widget" class="chat-closed" onclick="toggleChat()">
-        <div id="chat-header">🤖 Golem Support</div>
-        <div id="chat-body">
-            <p>Hello! How can Golem assist your upgrades today?</p>
-        </div>
-        <input type="text" id="chat-input" placeholder="Type a message..." onclick="event.stopPropagation()">
-    </div>
-
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
     <script src="script.js"></script>
 </body>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
-<script src="script.js"></script>
-    
 </html>
-
