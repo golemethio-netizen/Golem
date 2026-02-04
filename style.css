@@ -1,61 +1,13 @@
-:root {
-    --bg: #0f0f0f;
-    --card: #1a1a1a;
-    --text: #ffffff;
-    --primary: #00ff88;
-    --accent: #333;
-}
+:root { --primary: #00ff88; --bg: #0f0f0f; --text: #fff; --card: #1a1a1a; }
+[data-theme="light"] { --bg: #f4f4f4; --text: #1a1a1a; --card: #fff; }
 
-[data-theme="light"] {
-    --bg: #f0f2f5;
-    --card: #ffffff;
-    --text: #1a1a1a;
-    --primary: #008855;
-    --accent: #ddd;
-}
-
-body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; }
+body { background: var(--bg); color: var(--text); font-family: sans-serif; transition: 0.3s; }
 .container { max-width: 1200px; margin: auto; padding: 20px; }
 
-header { 
-    display: flex; justify-content: space-between; align-items: center; 
-    padding: 15px 5%; background: var(--card); border-bottom: 1px solid var(--accent);
-    position: sticky; top: 0; z-index: 1000;
-}
+#product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+.product-card { background: var(--card); padding: 15px; border-radius: 10px; border: 1px solid #333; text-align: center; }
+.product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; }
 
-.hero { text-align: center; padding: 50px 20px; background: linear-gradient(to bottom, var(--card), var(--bg)); }
-#search-bar { 
-    width: 60%; padding: 12px; border-radius: 25px; border: 1px solid var(--primary); 
-    background: var(--bg); color: var(--text); margin-top: 20px; outline: none;
-}
-
-/* Product Grid */
-#product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-.product-card { 
-    background: var(--card); padding: 15px; border-radius: 12px; 
-    border: 1px solid var(--accent); transition: 0.3s; cursor: pointer; text-align: center;
-}
-.product-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-.product-card img { width: 100%; height: 230px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
-
-/* Buttons */
-button { cursor: pointer; transition: 0.2s; border-radius: 5px; border: none; }
-.add-btn { background: var(--primary); color: black; padding: 10px 15px; font-weight: bold; width: 100%; }
-
-/* Modal & Sidebar */
-.modal, .sidebar { 
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.8); z-index: 2000; 
-}
-.sidebar { left: auto; right: 0; width: 350px; background: var(--card); padding: 20px; border-left: 2px solid var(--primary); }
-.modal-content { background: var(--card); margin: 10% auto; padding: 30px; width: 90%; max-width: 500px; border-radius: 15px; position: relative; }
-.close { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; }
-
-/* Chat */
-#chat-widget { position: fixed; bottom: 20px; right: 20px; width: 280px; background: var(--card); border: 1px solid var(--primary); border-radius: 10px; z-index: 3000; cursor: pointer; transition: 0.3s; }
-.chat-closed { height: 45px; overflow: hidden; }
-#chat-header { background: var(--primary); color: black; padding: 10px; font-weight: bold; }
-#chat-body { height: 150px; padding: 10px; font-size: 13px; }
-#chat-input { width: 100%; padding: 10px; background: var(--accent); color: var(--text); border: none; }
-
-@media (max-width: 600px) { .sidebar { width: 100%; } #search-bar { width: 90%; } }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; }
+.modal-content { background: var(--card); margin: 5% auto; padding: 20px; width: 90%; max-width: 500px; border-radius: 10px; }
+#admin-list { max-height: 200px; overflow-y: auto; margin-top: 20px; border-top: 1px solid #444; }
