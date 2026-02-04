@@ -70,7 +70,16 @@ function renderAdminList(items) {
     `).join('');
 }
 
-function openAdmin() { document.getElementById('admin-modal').style.display = 'block'; }
+function openAdmin() {
+    console.log("Admin panel opening..."); // This helps you see if the button is working in the console
+    const modal = document.getElementById('admin-modal');
+    if (modal) {
+        modal.style.display = 'block';
+        renderAdminList(); // Refresh the list when opening
+    } else {
+        console.error("Admin modal element not found!");
+    }
+}
 function closeAdmin() { document.getElementById('admin-modal').style.display = 'none'; }
 
 // 5. SEARCH LOGIC
@@ -82,3 +91,4 @@ function filterProducts() {
 
 // THEME & CART (Logic from previous steps remains the same)
 init();
+
