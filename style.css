@@ -60,3 +60,27 @@ body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+
+
+.filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border: 2px solid var(--primary);
+    background: white;
+    color: var(--primary);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: var(--primary);
+    color: white;
+}
