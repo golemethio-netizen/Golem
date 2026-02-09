@@ -32,6 +32,15 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
     renderProducts(filtered);
 });
 
+// Inside the 'submit' listener in admin.html:
+const newProduct = {
+    id: Date.now(),
+    name: document.getElementById('name').value,
+    price: parseFloat(document.getElementById('price').value),
+    image: document.getElementById('image').value,
+    category: document.getElementById('category').value // Added this line
+};
+
 // Cart Management
 function addToCart(id) {
     const item = products.find(p => p.id === id);
@@ -150,3 +159,4 @@ function toggleCart() {
 }
 
 init();
+
