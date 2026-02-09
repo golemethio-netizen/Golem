@@ -1,1 +1,16 @@
-
+<html>
+<form id="addProductForm" class="admin-form">
+    <input type="text" id="name" placeholder="Product Name" required>
+    <input type="number" id="price" placeholder="Price" step="0.01" required>
+    <input type="text" id="image" placeholder="Image Filename" required>
+    
+    <select id="category" required style="padding: 12px; border-radius: 4px; border: 1px solid #ddd;">
+        <option value="">Select Category</option>
+        <option value="tech">Tech</option>
+        <option value="home">Home</option>
+        <option value="fashion">Fashion</option>
+    </select>
+    
+    <button type="submit" class="btn-add">Add Product</button>
+</form>
+</html>
