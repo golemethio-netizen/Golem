@@ -1,105 +1,72 @@
-// 1. REPLACE WITH YOUR ACTUAL CONFIG
-const firebaseConfig = {
-    apiKey: "AIzaSy...", 
-    authDomain: "golem-project.firebaseapp.com",
-    projectId: "golem-project",
-    storageBucket: "golem-project.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef"
-};
+const products = [
+    { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg", category: "home" },
+    { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg", category: "tech" },
+    // Add more items here based on your images
+];
 
-firebase.initializeApp(firebaseConfig);
+let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
 
-// TEST CONNECTION IMMEDIATELY
-db.collection('test').add({
-    message: "Connection check",
-    time: Date.now()
-}).then(() => {
-    console.log("✅ CONNECTION SUCCESS: Firebase is receiving data!");
-}).catch((error) => {
-    console.error("❌ CONNECTION FAILED:", error.code, error.message);
-});
-const db = firebase.firestore();
-const productsCol = db.collection('products');
-
-let allProducts = []; // Local copy for searching
-
-// 2. LIVE SYNC WITH FIREBASE
+// Initialize Page
 function init() {
-    // onSnapshot updates the UI automatically when the database changes!
-    productsCol.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
-        allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderProducts(allProducts);
-        renderAdminList(allProducts);
-    });
+    renderProducts(products);
+    updateCartUI();
 }
 
+// Render Products to Grid
 function renderProducts(items) {
-    const list = document.getElementById('product-list');
-    list.innerHTML = items.map(p => `
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = items.map(product => `
         <div class="product-card">
-            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/300'">
-            <h3>${p.name}</h3>
-            <p>$${p.price}</p>
-            <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>$${product.price}</p>
+            <button class="btn-add" onclick="addToCart(${product.id})">Add to Cart</button>
         </div>
     `).join('');
 }
 
-// 3. CLOUD ADMIN FUNCTIONS
-async function addNewProduct() {
-    const name = document.getElementById('admin-name').value;
-    const price = document.getElementById('admin-price').value;
-    const img = document.getElementById('admin-img').value;
-
-    if(!name || !price) return alert("Fill in details!");
-
-    await productsCol.add({
-        name: name,
-        price: Number(price),
-        image: img || "https://via.placeholder.com/300",
-        createdAt: Date.now()
-    });
-    document.getElementById('product-form').reset();
-}
-
-async function deleteProduct(id) {
-    if(confirm("Remove this item from the cloud?")) {
-        await productsCol.doc(id).delete();
-    }
-}
-
-// 4. ADMIN UI
-function renderAdminList(items) {
-    const div = document.getElementById('admin-list');
-    div.innerHTML = items.map(p => `
-        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #444;">
-            <span>${p.name} ($${p.price})</span>
-            <button onclick="deleteProduct('${p.id}')" style="background:none; color:red;">Delete</button>
-        </div>
-    `).join('');
-}
-
-function openAdmin() {
-    console.log("Admin panel opening..."); // This helps you see if the button is working in the console
-    const modal = document.getElementById('admin-modal');
-    if (modal) {
-        modal.style.display = 'block';
-        renderAdminList(); // Refresh the list when opening
-    } else {
-        console.error("Admin modal element not found!");
-    }
-}
-function closeAdmin() { document.getElementById('admin-modal').style.display = 'none'; }
-
-// 5. SEARCH LOGIC
-function filterProducts() {
-    const val = document.getElementById('search-bar').value.toLowerCase();
-    const filtered = allProducts.filter(p => p.name.toLowerCase().includes(val));
+// Search Logic
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term));
     renderProducts(filtered);
+});
+
+// Cart Management
+function addToCart(id) {
+    const item = products.find(p => p.id === id);
+    cart.push(item);
+    saveCart();
 }
 
-// THEME & CART (Logic from previous steps remains the same)
+function toggleCart() {
+    document.getElementById('cartDrawer').classList.toggle('active');
+}
+
+function saveCart() {
+    localStorage.setItem('golem_cart', JSON.stringify(cart));
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const cartItems = document.getElementById('cartItems');
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    
+    document.getElementById('cartCount').innerText = cart.length;
+    document.getElementById('cartTotal').innerText = total.toFixed(2);
+    
+    cartItems.innerHTML = cart.map((item, index) => `
+        <div class="cart-item">
+            <span>${item.name}</span>
+            <span>$${item.price}</span>
+            <button onclick="removeFromCart(${index})">x</button>
+        </div>
+    `).join('');
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+}
+
 init();
-
-
