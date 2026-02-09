@@ -12,6 +12,36 @@ function init() {
     updateCartUI();
 }
 
+
+
+// Update your default products to include categories
+let defaultProducts = [
+    { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg", category: "home" },
+    { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg", category: "tech" }
+];
+
+// Add this function to script.js
+function filterByCategory(category) {
+    // 1. Update UI: Change active button style
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText.toLowerCase() === category) btn.classList.add('active');
+    });
+
+    // 2. Filter Logic
+    if (category === 'all') {
+        renderProducts(products);
+    } else {
+        const filtered = products.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
+}
+
+
+
+
+
 // Render Products to Grid
 function renderProducts(items) {
     const grid = document.getElementById('productGrid');
@@ -159,4 +189,5 @@ function toggleCart() {
 }
 
 init();
+
 
