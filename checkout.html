@@ -1,1 +1,71 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golem | Checkout</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="navbar">
+        <h1 class="logo">GOLEM</h1>
+        <a href="index.html" style="color: white; text-decoration: none;">Back to Shop</a>
+    </header>
+
+    <main class="checkout-container">
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div id="checkoutItems"></div>
+            <hr>
+            <h3>Total: $<span id="checkoutTotal">0.00</span></h3>
+        </div>
+
+        <div class="shipping-info">
+            <h2>Shipping Details</h2>
+            <form id="checkoutForm">
+                <input type="text" placeholder="Full Name" required>
+                <input type="email" placeholder="Email Address" required>
+                <input type="text" placeholder="Shipping Address" required>
+                <div class="payment-mock">
+                    <p><strong>Payment:</strong> Cash on Delivery (Mock)</p>
+                </div>
+                <button type="submit" class="btn-add" style="width: 100%; margin-top: 20px;">Place Order</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Specific logic for Checkout Page
+        function renderCheckout() {
+            const container = document.getElementById('checkoutItems');
+            const totalDisplay = document.getElementById('checkoutTotal');
+            
+            if (cart.length === 0) {
+                container.innerHTML = "<p>Your cart is empty!</p>";
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            totalDisplay.innerText = total.toFixed(2);
+
+            container.innerHTML = cart.map(item => `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span>${item.name}</span>
+                    <span>$${item.price}</span>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert("Thank you for your order! Golem is processing your request.");
+            localStorage.removeItem('golem_cart'); // Clear cart after order
+            window.location.href = "index.html"; // Redirect home
+        });
+
+        renderCheckout();
+    </script>
+</body>
+</html>
