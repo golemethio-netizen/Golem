@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://ryeylhawdmykbbmnfrrh.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
+const supabaseKey = process.env.sb_publishable__XhkM93G4uNhdKhDKa6osQ_PPpIPO6m
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const products = [
@@ -194,6 +194,7 @@ function toggleCart() {
 }
 
 init();
+
 
 
 
