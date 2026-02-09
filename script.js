@@ -1,5 +1,8 @@
-https://ryeylhawdmykbbmnfrrh.supabase.co
-https://ryeylhawdmykbbmnfrrh.supabase.co
+import { createClient } from '@supabase/supabase-js'
+const supabaseUrl = 'https://ryeylhawdmykbbmnfrrh.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+
 const products = [
     { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg", category: "home" },
     { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg", category: "tech" },
@@ -191,6 +194,7 @@ function toggleCart() {
 }
 
 init();
+
 
 
 
