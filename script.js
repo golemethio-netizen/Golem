@@ -1,3 +1,5 @@
+https://ryeylhawdmykbbmnfrrh.supabase.co
+https://ryeylhawdmykbbmnfrrh.supabase.co
 const products = [
     { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg", category: "home" },
     { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg", category: "tech" },
@@ -189,5 +191,6 @@ function toggleCart() {
 }
 
 init();
+
 
 
