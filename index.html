@@ -33,6 +33,19 @@
         <p style="text-align:center; grid-column: 1/-1;">Loading products...</p>
     </main>
 
+
+<div id="checkoutModal" class="login-overlay" style="display: none;">
+    <div class="login-box" style="max-width: 400px;">
+        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
+        <h2>Order Confirmed!</h2>
+        <p>Thank you for shopping with <strong>GOLEM</strong>.</p>
+        <p id="orderSummary" style="margin: 15px 0; font-size: 0.9rem; color: #555;"></p>
+        <button onclick="closeCheckout()" class="add-btn">Back to Store</button>
+    </div>
+</div>
+
+    <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
     <script src="script.js"></script>
 </body>
 </html>
+
