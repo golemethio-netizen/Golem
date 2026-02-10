@@ -6,100 +6,50 @@ const SUPABASE_KEY = 'sb_publishable__XhkM93G4uNhdKhDKa6osQ_PPpIPO6m';
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let products = [];
-let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+// ... keep your SUPABASE_URL and SUPABASE_KEY at the top ...
 
-// ADMIN AUTH
-function checkAdminKey() {
-    if(document.getElementById('adminKeyInput').value === 'golem_admin_2026') {
-        sessionStorage.setItem('isAdmin', 'true');
-        location.reload();
-    }
-}
+let products = []; // This stores the full list from the cloud
 
-// INITIALIZE
 async function init() {
-    const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
-    if(isAdmin && document.getElementById('adminContent')) {
-        document.getElementById('adminLogin').style.display = 'none';
-        document.getElementById('adminContent').style.display = 'block';
-        renderAdminList();
-    }
-
     try {
         const { data, error } = await _supabase.from('products').select('*');
         if (error) throw error;
-        products = data;
-        if(document.getElementById('productGrid')) renderProducts(products);
+        products = data; // Save the cloud data to our local list
+        renderProducts(products); // Show all products initially
     } catch (err) {
-        console.error("Fetch Error:", err);
-        const grid = document.getElementById('productGrid');
-        if(grid) grid.innerHTML = `<p style="color:red">Error: ${err.message}. Check your Supabase URL/Key.</p>`;
+        document.getElementById('productGrid').innerHTML = `<p>Error loading: ${err.message}</p>`;
     }
-    updateCartUI();
+}
+
+// THE FILTER FUNCTION
+function filterByCategory(category) {
+    // 1. Update button styling
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // 2. Filter the data
+    if (category === 'all') {
+        renderProducts(products);
+    } else {
+        const filtered = products.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
 }
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
-    if(!grid) return;
-    if(list.length === 0) {
-        grid.innerHTML = "<p>No products found in database.</p>";
+    if (list.length === 0) {
+        grid.innerHTML = "<p>No products found in this category.</p>";
         return;
     }
     grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=Image+Not+Found'">
             <h3>${p.name}</h3>
             <p>$${p.price}</p>
             <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
         </div>
     `).join('');
-}
-
-async function renderAdminList() {
-    const { data } = await _supabase.from('products').select('*');
-    const listDiv = document.getElementById('adminProductList');
-    if(!listDiv) return;
-    listDiv.innerHTML = data.map(p => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee;">
-            <span>${p.name}</span>
-            <button onclick="deleteProduct('${p.id}')" style="color:red; cursor:pointer; background:none; border:none;">Delete</button>
-        </div>
-    `).join('');
-}
-
-async function deleteProduct(id) {
-    await _supabase.from('products').delete().eq('id', id);
-    location.reload();
-}
-
-if(document.getElementById('addProductForm')) {
-    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const newItem = {
-            name: document.getElementById('pName').value,
-            price: document.getElementById('pPrice').value,
-            image: document.getElementById('pImage').value
-        };
-        await _supabase.from('products').insert([newItem]);
-        location.reload();
-    });
-}
-
-function addToCart(id) {
-    const item = products.find(p => p.id === id);
-    cart.push(item);
-    localStorage.setItem('golem_cart', JSON.stringify(cart));
-    updateCartUI();
-}
-
-function updateCartUI() {
-    const count = document.getElementById('cartCount');
-    if(count) count.innerText = cart.length;
-}
-
-function toggleCart() {
-    document.getElementById('cartDrawer').classList.toggle('active');
 }
 
 init();
