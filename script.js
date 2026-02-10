@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // REPLACE THESE TWO LINES WITH YOUR REAL SUPABASE DATA
 const SUPABASE_URL = 'https://ryeylhawdmykbbmnfrrh.supabase.co'; 
-const SUPABASE_KEY = 'process.env.sb_publishable__XhkM93G4uNhdKhDKa6osQ_PPpIPO6m'; 
+const SUPABASE_KEY = 'sb_publishable__XhkM93G4uNhdKhDKa6osQ_PPpIPO6m'; 
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -144,6 +144,7 @@ function toggleCart() {
 }
 
 init();
+
 
 
 
