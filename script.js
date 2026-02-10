@@ -242,7 +242,12 @@ async function confirmOrder() {
         return;
     }
 
-    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    // --- FIX: Define 'total' inside this function ---
+    const total = cart.reduce((sum, item) => {
+        const price = typeof item.price === 'string' ? item.price.replace('$', '') : item.price;
+        return sum + parseFloat(price || 0);
+    }, 0);
+    // ------------------------------------------------
 
     // Format the Telegram Message
     let message = `<b>🚀 NEW ORDER RECEIVED</b>\n`;
@@ -264,6 +269,8 @@ async function confirmOrder() {
     // Switch UI to Success
     document.getElementById('checkoutFields').style.display = 'none';
     document.getElementById('successMessage').style.display = 'block';
+    
+    // Now 'total' is defined, so this line won't crash anymore!
     document.getElementById('orderSummary').innerText = `Total: $${total.toFixed(2)}`;
 
     // Clear Cart
@@ -366,6 +373,7 @@ document.addEventListener('input', (e) => {
         renderProducts(filtered);
     }
 });
+
 
 
 
