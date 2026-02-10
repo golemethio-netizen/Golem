@@ -184,15 +184,31 @@ function updateCartUI() {
 
 /////
 async function sendToTelegram(message) {
-    const botToken = 'YOUR_BOT_TOKEN'; // Paste your Token here
-    const chatId = 'YOUR_CHAT_ID';     // Paste your Chat ID here
+    const botToken = 'YOUR_BOT_TOKEN'; // Make sure this is your real token
+    const chatId = 'YOUR_CHAT_ID';     // Make sure this is your real ID
+    
+    // We build the URL with the message inside it
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-    await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
+    
+    const params = new URLSearchParams({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'HTML'
     });
+
+    try {
+        // We use a simple GET or a standard POST without 'application/json'
+        const response = await fetch(`${url}?${params.toString()}`);
+        
+        if (!response.ok) {
+            throw new Error(`Telegram API Error: ${response.statusText}`);
+        }
+        
+        console.log("Telegram message sent successfully!");
+    } catch (err) {
+        console.error("Failed to send to Telegram:", err);
+        // Fallback: still show the success modal to the user even if notification fails
+    }
 }
 
 
@@ -254,6 +270,7 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
 
 
