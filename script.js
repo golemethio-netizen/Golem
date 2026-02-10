@@ -25,34 +25,45 @@ async function init() {
 function filterByCategory(category) {
     // 1. Update button styling
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    
+    // Find the button that was clicked and highlight it
+    if(event) event.target.classList.add('active');
 
-    // 2. Filter the data
+    // 2. Filter logic (Case Insensitive)
     if (category === 'all') {
         renderProducts(products);
     } else {
-        const filtered = products.filter(p => p.category === category);
+        const filtered = products.filter(p => {
+            // This handles cases where category might be null or undefined
+            const pCat = (p.category || "").toLowerCase().trim();
+            return pCat === category.toLowerCase();
+        });
         renderProducts(filtered);
     }
 }
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
+    if (!grid) return;
+
     if (list.length === 0) {
-        grid.innerHTML = "<p>No products found in this category.</p>";
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                <i class="fas fa-search" style="font-size: 3rem; color: #ccc;"></i>
+                <p style="margin-top: 10px; color: #888;">No products found here.</p>
+            </div>`;
         return;
     }
+
     grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=Image+Not+Found'">
+            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
             <h3>${p.name}</h3>
             <p>$${p.price}</p>
             <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
         </div>
     `).join('');
 }
-
-init();
 
 //////////////////
 
@@ -338,6 +349,7 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
 
 
