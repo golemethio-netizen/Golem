@@ -180,32 +180,52 @@ function updateCartUI() {
     }
 }
 
+
+
+/////
+async function sendToTelegram(message) {
+    const botToken = 'YOUR_BOT_TOKEN'; // Paste your Token here
+    const chatId = 'YOUR_CHAT_ID';     // Paste your Chat ID here
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+    await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
+    });
+}
+
+
+
+
+
+
+
 // THE CHECKOUT FUNCTION
-function processCheckout() {
-    if (cart.length === 0) {
-        alert("Please add items to your cart first!");
-        return;
-    }
+async function processCheckout() {
+    if (cart.length === 0) return alert("Cart empty!");
+
+    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
     
-    // Show the modal we created earlier
-    const modal = document.getElementById('checkoutModal');
-    if (modal) {
-        const total = cart.reduce((sum, item) => {
-            const price = typeof item.price === 'string' ? item.price.replace('$', '') : item.price;
-            return sum + parseFloat(price || 0);
-        }, 0);
-        
-        document.getElementById('orderSummary').innerText = `Paid: $${total.toFixed(2)} for ${cart.length} item(s).`;
-        modal.style.display = 'flex';
-        
-        // Reset Cart
-        cart = [];
-        localStorage.removeItem('golem_cart');
-        updateCartUI();
-        toggleCart(); // Closes the drawer
-    } else {
-        alert("Checkout Successful! (Modal element missing in HTML)");
-    }
+    // Create the message for Telegram/Email
+    let orderDetails = `<b>New Order from GOLEM Store!</b>\n\n`;
+    cart.forEach((item, i) => {
+        orderDetails += `${i+1}. ${item.name} - $${item.price}\n`;
+    });
+    orderDetails += `\n<b>Total: $${total.toFixed(2)}</b>`;
+
+    // Send the notification
+    await sendToTelegram(orderDetails);
+
+    // Show success UI
+    document.getElementById('orderSummary').innerText = `Order sent to staff! Total: $${total.toFixed(2)}`;
+    document.getElementById('checkoutModal').style.display = 'flex';
+
+    // Clear cart
+    cart = [];
+    localStorage.removeItem('golem_cart');
+    updateCartUI();
+    toggleCart();
 }
 
 
@@ -225,4 +245,5 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
