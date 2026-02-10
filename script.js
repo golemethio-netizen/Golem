@@ -53,3 +53,52 @@ function renderProducts(list) {
 }
 
 init();
+
+
+////////////////////////////////////////
+// --- ADMIN AUTH LOGIC ---
+function checkAdminKey() {
+    const enteredPass = document.getElementById('adminKeyInput').value;
+    const correctPass = 'golem_admin_2026';
+
+    if (enteredPass === correctPass) {
+        sessionStorage.setItem('isAdmin', 'true');
+        alert("Access Granted!");
+        // Refresh to show the dashboard
+        location.reload(); 
+    } else {
+        const errorMsg = document.getElementById('loginError');
+        if (errorMsg) errorMsg.style.display = 'block';
+        alert("Incorrect Password!");
+    }
+}
+
+// --- INITIALIZE FUNCTION ---
+async function init() {
+    // 1. Check if the user is logged in
+    const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    
+    // 2. Control visibility if we are on the admin page
+    const adminContent = document.getElementById('adminContent');
+    const loginOverlay = document.getElementById('adminLogin');
+
+    if (isAdmin) {
+        if (adminContent) adminContent.style.display = 'block';
+        if (loginOverlay) loginOverlay.style.display = 'none';
+        
+        // Load the special admin list if the element exists
+        if (document.getElementById('adminProductList')) {
+            renderAdminList();
+        }
+    }
+
+    // 3. Load the products from Supabase for everyone
+    try {
+        const { data, error } = await _supabase.from('products').select('*');
+        if (error) throw error;
+        products = data;
+        if (document.getElementById('productGrid')) renderProducts(products);
+    } catch (err) {
+        console.error("Supabase Error:", err.message);
+    }
+}
