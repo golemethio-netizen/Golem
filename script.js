@@ -262,7 +262,17 @@ cart.forEach((item, i) => {
 orderText += `----------------------------\n`;
 orderText += `<b>💰 Total: $${total.toFixed(2)}</b>`;
 
-
+// return to site after checkout
+function closeCheckout() {
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        modal.style.display = 'none';
+        // Optional: Scroll to the top of the page so they see the products again
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        console.error("Could not find the checkoutModal element.");
+    }
+}
 
 function removeFromCart(index) {
     cart.splice(index, 1);
@@ -276,6 +286,7 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
 
 
