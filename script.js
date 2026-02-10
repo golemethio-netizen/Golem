@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-
 
 // REPLACE THESE TWO LINES WITH YOUR REAL SUPABASE DATA
 const SUPABASE_URL = 'https://ryeylhawdmykbbmnfrrh.supabase.co'; 
@@ -143,6 +141,7 @@ function toggleCart() {
 }
 
 init();
+
 
 
 
