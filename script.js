@@ -203,6 +203,15 @@ async function sendToTelegram(message) {
 
 // THE CHECKOUT FUNCTION
 async function processCheckout() {
+
+
+    function sendEmail(orderDetails) {
+    emailjs.init("YOUR_PUBLIC_KEY");
+    emailjs.send("SERVICE_ID", "TEMPLATE_ID", {
+        order_data: orderDetails,
+        to_name: "Admin",
+    });
+}
     if (cart.length === 0) return alert("Cart empty!");
 
     const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
@@ -245,5 +254,6 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
 
