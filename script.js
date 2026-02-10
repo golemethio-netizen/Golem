@@ -151,24 +151,67 @@ function updateCartUI() {
     const itemsContainer = document.getElementById('cartItems');
     const totalElement = document.getElementById('cartTotal');
 
-    // Update the red/orange number on the icon
-    countElement.innerText = cart.length;
+    if (countElement) countElement.innerText = cart.length;
 
-    // Show items in the drawer
     if (itemsContainer) {
-        itemsContainer.innerHTML = cart.map((item, index) => `
-            <div class="cart-item">
-                <span>${item.name}</span>
-                <span>$${item.price}</span>
-                <button onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
-            </div>
-        `).join('');
+        if (cart.length === 0) {
+            itemsContainer.innerHTML = "<p style='text-align:center; padding:20px;'>Your cart is empty.</p>";
+        } else {
+            itemsContainer.innerHTML = cart.map((item, index) => {
+                // Clean the price in case it has a '$'
+                const price = typeof item.price === 'string' ? item.price.replace('$', '') : item.price;
+                return `
+                    <div class="cart-item" style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                        <span>${item.name}</span>
+                        <span>$${parseFloat(price).toFixed(2)}</span>
+                        <button onclick="removeFromCart(${index})" style="color:red; border:none; background:none; cursor:pointer;">&times;</button>
+                    </div>
+                `;
+            }).join('');
+        }
     }
 
-    // Calculate Total
-    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
-    if (totalElement) totalElement.innerText = total.toFixed(2);
+    if (totalElement) {
+        const total = cart.reduce((sum, item) => {
+            const price = typeof item.price === 'string' ? item.price.replace('$', '') : item.price;
+            return sum + parseFloat(price || 0);
+        }, 0);
+        totalElement.innerText = total.toFixed(2);
+    }
 }
+
+// THE CHECKOUT FUNCTION
+function processCheckout() {
+    if (cart.length === 0) {
+        alert("Please add items to your cart first!");
+        return;
+    }
+    
+    // Show the modal we created earlier
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        const total = cart.reduce((sum, item) => {
+            const price = typeof item.price === 'string' ? item.price.replace('$', '') : item.price;
+            return sum + parseFloat(price || 0);
+        }, 0);
+        
+        document.getElementById('orderSummary').innerText = `Paid: $${total.toFixed(2)} for ${cart.length} item(s).`;
+        modal.style.display = 'flex';
+        
+        // Reset Cart
+        cart = [];
+        localStorage.removeItem('golem_cart');
+        updateCartUI();
+        toggleCart(); // Closes the drawer
+    } else {
+        alert("Checkout Successful! (Modal element missing in HTML)");
+    }
+}
+
+
+
+
+
 
 function removeFromCart(index) {
     cart.splice(index, 1);
@@ -182,3 +225,4 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
