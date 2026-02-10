@@ -211,7 +211,59 @@ async function sendToTelegram(message) {
     }
 }
 
+//collect data and send ro telegram
 
+// STEP 1: Just open the modal
+function processCheckout() {
+    if (cart.length === 0) return alert("Your cart is empty!");
+    document.getElementById('checkoutFields').style.display = 'block';
+    document.getElementById('successMessage').style.display = 'none';
+    document.getElementById('checkoutModal').style.display = 'flex';
+}
+
+// STEP 2: Collect data and send
+async function confirmOrder() {
+    const name = document.getElementById('custName').value;
+    const phone = document.getElementById('custPhone').value;
+
+    if (!name || !phone) {
+        alert("Please fill in your name and phone number.");
+        return;
+    }
+
+    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+
+    // Format the Telegram Message
+    let message = `<b>🚀 NEW ORDER RECEIVED</b>\n`;
+    message += `----------------------------\n`;
+    message += `👤 <b>Customer:</b> ${name}\n`;
+    message += `📞 <b>Phone:</b> ${phone}\n`;
+    message += `----------------------------\n`;
+    
+    cart.forEach((item, i) => {
+        message += `${i + 1}. ${item.name} - $${item.price}\n`;
+    });
+
+    message += `----------------------------\n`;
+    message += `💰 <b>Total: $${total.toFixed(2)}</b>`;
+
+    // Send it
+    await sendToTelegram(message);
+
+    // Switch UI to Success
+    document.getElementById('checkoutFields').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'block';
+    document.getElementById('orderSummary').innerText = `Total: $${total.toFixed(2)}`;
+
+    // Clear Cart
+    cart = [];
+    localStorage.removeItem('golem_cart');
+    updateCartUI();
+}
+
+function closeCheckout() {
+    document.getElementById('checkoutModal').style.display = 'none';
+}
 
 
 
@@ -286,6 +338,7 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
 
 
