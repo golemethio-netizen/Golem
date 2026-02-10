@@ -130,3 +130,48 @@ async function init() {
     }
 }
 
+///////////////
+let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+
+function addToCart(productId) {
+    const item = products.find(p => p.id === productId);
+    if (item) {
+        cart.push(item);
+        // Save to browser memory so it stays if they refresh
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        updateCartUI();
+        
+        // Optional: Open the cart automatically to show it was added
+        document.getElementById('cartDrawer').classList.add('active');
+    }
+}
+
+function updateCartUI() {
+    const countElement = document.getElementById('cartCount');
+    const itemsContainer = document.getElementById('cartItems');
+    const totalElement = document.getElementById('cartTotal');
+
+    // Update the red/orange number on the icon
+    countElement.innerText = cart.length;
+
+    // Show items in the drawer
+    if (itemsContainer) {
+        itemsContainer.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+                <span>${item.name}</span>
+                <span>$${item.price}</span>
+                <button onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+        `).join('');
+    }
+
+    // Calculate Total
+    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    if (totalElement) totalElement.innerText = total.toFixed(2);
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    localStorage.setItem('golem_cart', JSON.stringify(cart));
+    updateCartUI();
+}
