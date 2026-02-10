@@ -3,57 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem | E-commerce</title>
+    <title>Golem | Store</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <h1 class="logo">GOLEM</h1>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search products...">
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="admin.html" class="admin-access-btn">ADMIN PANEL</a>
+            <h1 class="logo" onclick="location.href='index.html'">GOLEM</h1>
+        </div>
+        <div class="nav-right">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <div class="cart-trigger" onclick="toggleCart()">
+                <i class="fas fa-shopping-cart"></i> <span id="cartCount">0</span>
             </div>
-            <div class="cart-icon" onclick="toggleCart()">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="cartCount">0</span>
-            </div>
-        </nav>
+        </div>
     </header>
 
-    <main>
-        <section class="products-container" id="productGrid">
-            </section>
+    <main class="products-container" id="productGrid">
+        <p style="text-align:center; grid-column: 1/-1;">Connecting to cloud...</p>
     </main>
 
     <div id="cartDrawer" class="cart-drawer">
         <div class="cart-header">
             <h2>Your Cart</h2>
-            <button onclick="toggleCart()">Close</button>
+            <button onclick="toggleCart()">×</button>
         </div>
         <div id="cartItems"></div>
         <div class="cart-footer">
             <h3>Total: $<span id="cartTotal">0.00</span></h3>
-            <button class="checkout-btn">Checkout</button>
         </div>
     </div>
-<div class="filter-bar">
-    <button class="filter-btn active" onclick="filterByCategory('all')">All</button>
-    <button class="filter-btn" onclick="filterByCategory('tech')">Tech</button>
-    <button class="filter-btn" onclick="filterByCategory('home')">Home</button>
-    <button class="filter-btn" onclick="filterByCategory('fashion')">Fashion</button>
-</div>
 
-<div class="cart-footer">
-    <h3>Total: $<span id="cartTotal">0.00</span></h3>
-    <button class="checkout-btn" onclick="location.href='checkout.html'">Proceed to Checkout</button>
-</div>
-
-    
     <script src="script.js"></script>
-
-    
 </body>
 </html>
-
-
