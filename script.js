@@ -41,10 +41,26 @@ async function init() {
 }
 
 async function loadProducts() {
-    const { data, error } = await _supabase.from('products').select('*');
-    if(!error) {
+    console.log("Attempting to load products...");
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*');
+
+    if (error) {
+        console.error("Supabase Error:", error.message);
+        alert("Database Error: " + error.message); // This will pop up on your site to tell you the error
+        return;
+    }
+
+    if (data) {
+        console.log("Data received:", data);
         products = data;
-        if(document.getElementById('productGrid')) renderProducts(products);
+        const grid = document.getElementById('productGrid');
+        if (grid) {
+            renderProducts(products);
+        } else {
+            console.error("Could not find productGrid element in HTML");
+        }
     }
 }
 
@@ -128,6 +144,7 @@ function toggleCart() {
 }
 
 init();
+
 
 
 
