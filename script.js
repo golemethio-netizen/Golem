@@ -54,6 +54,33 @@ function renderProducts(list) {
 
 init();
 
+//////////////////
+
+
+
+if(document.getElementById('addProductForm')) {
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Collect all 4 pieces of data
+        const newItem = {
+            name: document.getElementById('pName').value,
+            price: parseFloat(document.getElementById('pPrice').value),
+            image: document.getElementById('pImage').value,
+            category: document.getElementById('pCategory').value // This must match your column name!
+        };
+
+        // Send to Supabase
+        const { error } = await _supabase.from('products').insert([newItem]);
+
+        if (error) {
+            alert("Error adding product: " + error.message);
+        } else {
+            alert("Product added successfully!");
+            location.reload(); // Refresh to show the new item
+        }
+    });
+}
 
 ////////////////////////////////////////
 // --- ADMIN AUTH LOGIC ---
@@ -102,3 +129,4 @@ async function init() {
         console.error("Supabase Error:", err.message);
     }
 }
+
