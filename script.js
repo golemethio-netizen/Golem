@@ -254,7 +254,13 @@ async function processCheckout() {
 }
 
 
-
+let orderText = `<b>🛍️ New Order - GOLEM Store</b>\n`;
+orderText += `----------------------------\n`;
+cart.forEach((item, i) => {
+    orderText += `${i + 1}. 📦 <b>${item.name}</b> - $${item.price}\n`;
+});
+orderText += `----------------------------\n`;
+orderText += `<b>💰 Total: $${total.toFixed(2)}</b>`;
 
 
 
@@ -270,6 +276,7 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
+
 
 
 
