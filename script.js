@@ -1,164 +1,104 @@
 import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://ryeylhawdmykbbmnfrrh.supabase.co'
-const supabaseKey = process.env.sb_publishable__XhkM93G4uNhdKhDKa6osQ_PPpIPO6m
-const supabase = createClient(supabaseUrl, supabaseKey)
 
-const products = [
-    { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg", category: "home" },
-    { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg", category: "tech" },
-    // Add more items here based on your images
-];
 
+// REPLACE THESE TWO LINES WITH YOUR REAL SUPABASE DATA
+const SUPABASE_URL = 'https://ryeylhawdmykbbmnfrrh.supabase.co'; 
+const SUPABASE_KEY = 'process.env.sb_publishable__XhkM93G4uNhdKhDKa6osQ_PPpIPO6m'; 
+
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let products = [];
 let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
 
-// Initialize Page
-function init() {
-    renderProducts(products);
-    updateCartUI();
-}
-
-
-
-// Update your default products to include categories
-let defaultProducts = [
-    { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg", category: "home" },
-    { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg", category: "tech" }
-];
-
-// Add this function to script.js
-function filterByCategory(category) {
-    // 1. Update UI: Change active button style
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.innerText.toLowerCase() === category) btn.classList.add('active');
-    });
-
-    // 2. Filter Logic
-    if (category === 'all') {
-        renderProducts(products);
+// --- LOGIN LOGIC ---
+function checkAdminKey() {
+    const key = document.getElementById('adminKeyInput').value;
+    if(key === 'golem_admin_2026') {
+        sessionStorage.setItem('isAdmin', 'true');
+        location.reload();
     } else {
-        const filtered = products.filter(p => p.category === category);
-        renderProducts(filtered);
+        document.getElementById('loginError').style.display = 'block';
     }
 }
 
-
-
-
-
-// Render Products to Grid
-function renderProducts(items) {
-    const grid = document.getElementById('productGrid');
-    grid.innerHTML = items.map(product => `
-        <div class="product-card">
-            <img src="${product.image}" alt="${product.name}">
-            <h3>${product.name}</h3>
-            <p>$${product.price}</p>
-            <button class="btn-add" onclick="addToCart(${product.id})">Add to Cart</button>
-        </div>
-    `).join('');
+function adminLogout() {
+    sessionStorage.removeItem('isAdmin');
+    location.href = 'index.html';
 }
 
-// Search Logic
-document.getElementById('searchInput').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-    renderProducts(filtered);
-});
-
-// Inside the 'submit' listener in admin.html:
-const newProduct = {
-    id: Date.now(),
-    name: document.getElementById('name').value,
-    price: parseFloat(document.getElementById('price').value),
-    image: document.getElementById('image').value,
-    category: document.getElementById('category').value // Added this line
-};
-
-// Cart Management
-function addToCart(id) {
-    const item = products.find(p => p.id === id);
-    cart.push(item);
-    saveCart();
-}
-
-function toggleCart() {
-    document.getElementById('cartDrawer').classList.toggle('active');
-}
-
-function saveCart() {
-    localStorage.setItem('golem_cart', JSON.stringify(cart));
+// --- STARTUP ---
+async function init() {
+    await loadProducts();
     updateCartUI();
+
+    // Check Admin View
+    const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    if(isAdmin && document.getElementById('adminContent')) {
+        document.getElementById('adminLogin').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        renderAdminList();
+    }
 }
 
-function updateCartUI() {
-    const cartItems = document.getElementById('cartItems');
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    
-    document.getElementById('cartCount').innerText = cart.length;
-    document.getElementById('cartTotal').innerText = total.toFixed(2);
-    
-    cartItems.innerHTML = cart.map((item, index) => `
-        <div class="cart-item">
-            <span>${item.name}</span>
-            <span>$${item.price}</span>
-            <button onclick="removeFromCart(${index})">x</button>
-        </div>
-    `).join('');
+async function loadProducts() {
+    const { data, error } = await _supabase.from('products').select('*');
+    if(!error) {
+        products = data;
+        if(document.getElementById('productGrid')) renderProducts(products);
+    }
 }
 
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    saveCart();
-}
-
-init();
-
-// 1. Initialize Products from LocalStorage or use defaults if empty
-let defaultProducts = [
-    { id: 1, name: "Premium Furniture", price: 599.99, image: "furniture.jpg" },
-    { id: 2, name: "iPhone 3 Classic", price: 199.99, image: "iphone3.jpg" }
-];
-
-let products = JSON.parse(localStorage.getItem('golem_products')) || defaultProducts;
-let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
-
-// Save Products globally
-function saveProducts() {
-    localStorage.setItem('golem_products', JSON.stringify(products));
-}
-
-// 2. Initialize UI
-function init() {
-    const productGrid = document.getElementById('productGrid');
-    if (productGrid) renderProducts(products); // Only run on index.html
-    updateCartUI();
-}
-
-function renderProducts(items) {
+// --- UI RENDERING ---
+function renderProducts(list) {
     const grid = document.getElementById('productGrid');
-    grid.innerHTML = items.map(product => `
+    grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${product.image}" alt="${product.name}">
-            <h3>${product.name}</h3>
-            <p>$${product.price}</p>
-            <button class="btn-add" onclick="addToCart(${product.id})">Add to Cart</button>
+            <img src="${p.image}">
+            <h3>${p.name}</h3>
+            <p>$${p.price}</p>
+            <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
         </div>
     `).join('');
 }
 
-// 3. Search Logic
-const searchInput = document.getElementById('searchInput');
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-        renderProducts(filtered);
+async function renderAdminList() {
+    const { data } = await _supabase.from('products').select('*');
+    const listDiv = document.getElementById('adminProductList');
+    listDiv.innerHTML = data.map(p => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>${p.name}</span>
+            <button onclick="deleteProduct(${p.id})" style="color:red; background:none; border:none; cursor:pointer;">Delete</button>
+        </div>
+    `).join('');
+}
+
+// --- ACTIONS ---
+async function deleteProduct(id) {
+    await _supabase.from('products').delete().eq('id', id);
+    location.reload();
+}
+
+if(document.getElementById('addProductForm')) {
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newItem = {
+            name: document.getElementById('pName').value,
+            price: document.getElementById('pPrice').value,
+            image: document.getElementById('pImage').value,
+            category: document.getElementById('pCategory').value
+        };
+        await _supabase.from('products').insert([newItem]);
+        location.reload();
     });
 }
 
-// 4. Cart Logic
+function filterByCategory(cat) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+    renderProducts(filtered);
+}
+
 function addToCart(id) {
     const item = products.find(p => p.id === id);
     cart.push(item);
@@ -167,24 +107,18 @@ function addToCart(id) {
 }
 
 function updateCartUI() {
-    const cartCount = document.getElementById('cartCount');
-    const cartItems = document.getElementById('cartItems');
-    if (cartCount) cartCount.innerText = cart.length;
-    
-    if (cartItems) {
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const count = document.getElementById('cartCount');
+    if(count) count.innerText = cart.length;
+    const itemsDiv = document.getElementById('cartItems');
+    if(itemsDiv) {
+        itemsDiv.innerHTML = cart.map((it, i) => `<div>${it.name} <button onclick="removeFromCart(${i})">x</button></div>`).join('');
+        const total = cart.reduce((s, it) => s + parseFloat(it.price), 0);
         document.getElementById('cartTotal').innerText = total.toFixed(2);
-        cartItems.innerHTML = cart.map((item, index) => `
-            <div class="cart-item">
-                <span>${item.name}</span>
-                <button onclick="removeFromCart(${index})">x</button>
-            </div>
-        `).join('');
     }
 }
 
-function removeFromCart(index) {
-    cart.splice(index, 1);
+function removeFromCart(i) {
+    cart.splice(i, 1);
     localStorage.setItem('golem_cart', JSON.stringify(cart));
     updateCartUI();
 }
@@ -194,8 +128,6 @@ function toggleCart() {
 }
 
 init();
-
-
 
 
 
