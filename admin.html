@@ -25,11 +25,19 @@
             <div class="admin-card">
                 <h3>Add Product</h3>
                 <form id="addProductForm">
-                    <input type="text" id="pName" placeholder="Name" required>
-                    <input type="number" id="pPrice" placeholder="Price" step="0.01" required>
-                    <input type="text" id="pImage" placeholder="Image URL (use https://)" required>
-                    <button type="submit" class="add-btn">Save to Database</button>
-                </form>
+    <input type="text" id="pName" placeholder="Product Name" required>
+    <input type="number" id="pPrice" placeholder="Price" step="0.01" required>
+    <input type="text" id="pImage" placeholder="Image URL (https://...)" required>
+    
+    <select id="pCategory" required style="padding: 10px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 10px;">
+        <option value="">Select Category</option>
+        <option value="tech">Tech</option>
+        <option value="home">Home</option>
+        <option value="fashion">Fashion</option>
+    </select>
+    
+    <button type="submit" class="add-btn">Save to Database</button>
+</form>
             </div>
             <div class="admin-card">
                 <h3>Live Inventory</h3>
