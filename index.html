@@ -50,19 +50,30 @@
 </div>
 
 <div id="checkoutModal" class="login-overlay" style="display: none;">
-    <div class="login-box" style="max-width: 400px;">
-        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
-        <h2>Order Confirmed!</h2>
-        <p>Thank you for shopping with <strong>GOLEM</strong>.</p>
-        <p id="orderSummary" style="margin: 15px 0; font-size: 0.9rem; color: #555;"></p>
-        <button onclick="closeCheckout()" class="add-btn">Back to Store</button>
+    <div class="login-box">
+        <i class="fas fa-paper-plane" style="font-size: 2.5rem; color: #3498db;"></i>
+        <h2>Order Submitted!</h2>
+        <p id="orderSummary"></p>
+        
+        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <h4>Need Help? Contact Us:</h4>
+        <div style="text-align: left; font-size: 0.9rem;">
+            <p><i class="fab fa-telegram"></i> @YourTelegramUsername</p>
+            <p><i class="fas fa-envelope"></i> support@golem.com</p>
+            <p><i class="fas fa-phone"></i> +251 9XX XXX XXX</p>
+        </div>
+        
+        <button onclick="closeCheckout()" class="add-btn" style="margin-top:20px;">Return to Shop</button>
     </div>
+</div>
 </div>
 
    
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
