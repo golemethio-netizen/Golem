@@ -351,6 +351,21 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
 });
 
 
+// lisining serche or filter buten
+// This waits for the user to type in the search box
+document.addEventListener('input', (e) => {
+    if (e.target.id === 'searchInput') {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        
+        const filtered = products.filter(p => {
+            const name = (p.name || "").toLowerCase();
+            const cat = (p.category || "").toLowerCase();
+            return name.includes(searchTerm) || cat.includes(searchTerm);
+        });
+        
+        renderProducts(filtered);
+    }
+});
 
 
 
