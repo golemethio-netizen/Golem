@@ -63,7 +63,6 @@ async function loadProducts() {
         }
     }
 }
-
 // --- UI RENDERING ---
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
@@ -144,6 +143,7 @@ function toggleCart() {
 }
 
 init();
+
 
 
 
