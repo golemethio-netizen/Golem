@@ -336,13 +336,7 @@ function removeFromCart(index) {
     localStorage.setItem('golem_cart', JSON.stringify(cart));
     updateCartUI();
 }
-document.getElementById('searchInput')?.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm)
-    );
-    renderProducts(filteredProducts);
-});
+
 
 
 // Search Functionality
@@ -357,6 +351,7 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     
     renderProducts(filtered);
 });
+
 
 
 
