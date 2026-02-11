@@ -232,8 +232,8 @@ function initFilters() {
 }
 /////
 async function sendToTelegram(message) {
-    const botToken = 'YOUR_BOT_TOKEN'; // Make sure this is your real token
-    const chatId = 'YOUR_CHAT_ID';     // Make sure this is your real ID
+    const botToken = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o'; // Make sure this is your real token
+    const chatId = '6792892909';     // Make sure this is your real ID
     
     // We build the URL with the message inside it
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
@@ -492,6 +492,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
