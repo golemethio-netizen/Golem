@@ -8,26 +8,68 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ... keep your SUPABASE_URL and SUPABASE_KEY at the top ...
 
-let products = []; // This stores the full list from the cloud
+let products = [];
+let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
 
-async function init() {
+// 1. Fetch from Supabase
+async function fetchProducts() {
     try {
-        const { data, error } = await _supabase.from('products').select('*');
+        const { data, error } = await _supabase
+            .from('products')
+            .select('*');
+
         if (error) throw error;
-        products = data; // Save the cloud data to our local list
-        renderProducts(products); // Show all products initially
+        
+        products = data;
+        renderProducts(products);
     } catch (err) {
-        document.getElementById('productGrid').innerHTML = `<p>Error loading: ${err.message}</p>`;
+        console.error("Error loading products:", err.message);
+        document.getElementById('productGrid').innerHTML = "<p>Error loading products. Check console.</p>";
     }
+}
+// 2. Render Products (The "Clean" Version)
+function renderProducts(list) {
+    const grid = document.getElementById('productGrid');
+    if (!grid) return;
+
+    grid.innerHTML = list.map(p => `
+        <div class="product-card">
+            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p class="price">$${parseFloat(p.price).toFixed(2)}</p>
+                <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 // THE FILTER FUNCTION
+// 3. Simple Filtering
 function filterByCategory(category) {
-    // 1. Update button styling
+    // Update active button UI
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // Find the button that was clicked and highlight it
-    if(event) event.target.classList.add('active');
+    event.target.classList.add('active');
+
+    if (category === 'all') {
+        renderProducts(products);
+    } else {
+        const filtered = products.filter(p => p.category?.toLowerCase() === category.toLowerCase());
+        renderProducts(filtered);
+    }
+}
+
+
+
+// 4. Simple Search
+document.getElementById('searchInput')?.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term));
+    renderProducts(filtered);
+});
+
+// Initialize
+window.onload = fetchProducts;
 
     // 2. Filter logic (Case Insensitive)
     if (category === 'all') {
@@ -42,28 +84,6 @@ function filterByCategory(category) {
     }
 }
 
-function renderProducts(list) {
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
-
-    if (list.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                <i class="fas fa-search" style="font-size: 3rem; color: #ccc;"></i>
-                <p style="margin-top: 10px; color: #888;">No products found here.</p>
-            </div>`;
-        return;
-    }
-
-    grid.innerHTML = list.map(p => `
-        <div class="product-card">
-            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
-            <h3>${p.name}</h3>
-            <p>$${p.price}</p>
-            <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
-        </div>
-    `).join('');
-}
 
 //////////////////
 
@@ -373,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
 
 
