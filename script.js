@@ -340,17 +340,28 @@ function removeFromCart(index) {
 
 
 // Search Functionality
-document.getElementById('searchInput')?.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    
-    // 'products' must be the global array where you stored your Supabase data
-    const filtered = products.filter(p => {
-        const name = (p.name || "").toLowerCase();
-        return name.includes(searchTerm);
-    });
-    
-    renderProducts(filtered);
+// Add this to the bottom of script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const searchBox = document.getElementById('searchInput');
+
+    if (searchBox) {
+        searchBox.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            
+            // This filters the global 'products' array
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                (p.category && p.category.toLowerCase().includes(term))
+            );
+            
+            renderProducts(filtered);
+        });
+        console.log("Search listener attached successfully!");
+    } else {
+        console.error("Search input with ID 'searchInput' not found!");
+    }
 });
+
 
 
 
