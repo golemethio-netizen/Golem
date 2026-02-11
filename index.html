@@ -15,7 +15,7 @@
             <h1 class="logo" onclick="location.href='index.html'">GOLEM</h1>
         </div>
         <div class="nav-right">
-            <input type="text" id="searchInput" placeholder="Search...">
+          <input type="text" id="searchInput" placeholder="Search...">
             <div class="cart-trigger" onclick="toggleCart()">
                 <i class="fas fa-shopping-cart"></i> <span id="cartCount">0</span>
 
@@ -30,7 +30,11 @@
         <button class="filter-btn" onclick="filterByCategory('home')">Home</button>
         <button class="filter-btn" onclick="filterByCategory('fashion')">Fashion</button>
     </nav>
-
+//Here is a small Debug Tool you can temporarily add to your index.html. This will help us see if the website is actually "seeing" your data or if it's getting lost.
+    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
+    <button onclick="debugSearch()" style="padding: 5px 10px;">Check Search Data</button>
+    <span id="debugStatus">Click to check if data is loaded.</span>
+</div>
     <main class="products-container" id="productGrid">
         <p style="text-align:center; grid-column: 1/-1;">Loading products...</p>
     </main>
@@ -86,6 +90,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
