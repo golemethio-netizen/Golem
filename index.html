@@ -24,19 +24,12 @@
         </div>
     </header>
 
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Search products...">
-</div>
-
-<div class="filter-menu">
-    <button class="filter-btn active" onclick="filterByCategory('all')">All</button>
-    <button class="filter-btn" onclick="filterByCategory('tech')">Tech</button>
-    <button class="filter-btn" onclick="filterByCategory('home')">Home</button>
-    <button class="filter-btn" onclick="filterByCategory('fashion')">Fashion</button>
-</div>
-
-<div id="productGrid" class="product-grid">
-    </div>
+    <nav class="filter-bar">
+        <button class="filter-btn active" onclick="filterByCategory('all')">All</button>
+        <button class="filter-btn" onclick="filterByCategory('tech')">Tech</button>
+        <button class="filter-btn" onclick="filterByCategory('home')">Home</button>
+        <button class="filter-btn" onclick="filterByCategory('fashion')">Fashion</button>
+    </nav>
 
     <main class="products-container" id="productGrid">
         <p style="text-align:center; grid-column: 1/-1;">Loading products...</p>
@@ -93,7 +86,6 @@
     <script src="script.js"></script>
 </body>
 </html>
-
 
 
 

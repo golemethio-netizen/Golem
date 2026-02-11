@@ -8,82 +8,51 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ... keep your SUPABASE_URL and SUPABASE_KEY at the top ...
 
-let products = [];
-let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+let products = []; // This stores the full list from the cloud
 
-// 1. Fetch from Supabase
-async function fetchProducts() {
+async function init() {
     try {
-        const { data, error } = await _supabase
-            .from('products')
-            .select('*');
-
+        const { data, error } = await _supabase.from('products').select('*');
         if (error) throw error;
-        
-        products = data;
-        renderProducts(products);
+        products = data; // Save the cloud data to our local list
+        renderProducts(products); // Show all products initially
     } catch (err) {
-        console.error("Error loading products:", err.message);
-        document.getElementById('productGrid').innerHTML = "<p>Error loading products. Check console.</p>";
+        document.getElementById('productGrid').innerHTML = `<p>Error loading: ${err.message}</p>`;
     }
 }
-// 2. Render Products (The "Clean" Version)
+
+// THE FILTER FUNCTION
+function filterByCategory(category) {
+    // 1. Update button styling
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // 2. Filter the data
+    if (category === 'all') {
+        renderProducts(products);
+    } else {
+        const filtered = products.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
+}
+
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
-    if (!grid) return;
-
+    if (list.length === 0) {
+        grid.innerHTML = "<p>No products found in this category.</p>";
+        return;
+    }
     grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p class="price">$${parseFloat(p.price).toFixed(2)}</p>
-                <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
-            </div>
+            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=Image+Not+Found'">
+            <h3>${p.name}</h3>
+            <p>$${p.price}</p>
+            <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
         </div>
     `).join('');
 }
 
-// THE FILTER FUNCTION
-// 3. Simple Filtering
-function filterByCategory(category) {
-    // Update active button UI
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-
-    if (category === 'all') {
-        renderProducts(products);
-    } else {
-        const filtered = products.filter(p => p.category?.toLowerCase() === category.toLowerCase());
-        renderProducts(filtered);
-    }
-}
-
-
-
-// 4. Simple Search
-document.getElementById('searchInput')?.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-    renderProducts(filtered);
-});
-
-// Initialize
-window.onload = fetchProducts;
-
-    // 2. Filter logic (Case Insensitive)
-    if (category === 'all') {
-        renderProducts(products);
-    } else {
-        const filtered = products.filter(p => {
-            // This handles cases where category might be null or undefined
-            const pCat = (p.category || "").toLowerCase().trim();
-            return pCat === category.toLowerCase();
-        });
-        renderProducts(filtered);
-    }
-}
-
+init();
 
 //////////////////
 
@@ -262,12 +231,7 @@ async function confirmOrder() {
         return;
     }
 
-    // --- FIX: Define 'total' inside this function ---
-    const total = cart.reduce((sum, item) => {
-        const price = typeof item.price === 'string' ? item.price.replace('$', '') : item.price;
-        return sum + parseFloat(price || 0);
-    }, 0);
-    // ------------------------------------------------
+    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
 
     // Format the Telegram Message
     let message = `<b>🚀 NEW ORDER RECEIVED</b>\n`;
@@ -289,8 +253,6 @@ async function confirmOrder() {
     // Switch UI to Success
     document.getElementById('checkoutFields').style.display = 'none';
     document.getElementById('successMessage').style.display = 'block';
-    
-    // Now 'total' is defined, so this line won't crash anymore!
     document.getElementById('orderSummary').innerText = `Total: $${total.toFixed(2)}`;
 
     // Clear Cart
@@ -376,25 +338,6 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
     );
     renderProducts(filteredProducts);
 });
-
-
-// lisining serche or filter buten
-// This waits for the user to type in the search box
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            const filtered = products.filter(p => {
-                const name = (p.name || "").toLowerCase();
-                return name.includes(searchTerm);
-            });
-            renderProducts(filtered);
-        });
-    }
-});
-
-
 
 
 
