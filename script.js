@@ -379,8 +379,34 @@ function removeFromCart(index) {
     localStorage.setItem('golem_cart', JSON.stringify(cart));
     updateCartUI();
 }
+//Use this safe test function to verify your connection:
+async function testTelegram() {
+    const botToken = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o';
+    const chatId = '6792892909';
+    const testMessage = "<b>🔔 Golem Test</b>\nConnection is working!";
 
-
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: testMessage,
+                parse_mode: 'HTML'
+            })
+        });
+        const result = await response.json();
+        if (result.ok) {
+            alert("Notification Sent! Check your Telegram.");
+        } else {
+            alert("Telegram Error: " + result.description);
+        }
+    } catch (err) {
+        console.error("Fetch Error:", err);
+    }
+}
 
 // Search Functionality
 // Add this to the bottom of script.js
@@ -433,6 +459,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
