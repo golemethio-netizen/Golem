@@ -23,15 +23,19 @@ async function init() {
 
 // THE FILTER FUNCTION
 function filterByCategory(category) {
-    // 1. Update button styling
+    // 1. Handle the "Active" button UI
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    // This finds the button that was clicked to highlight it
     event.target.classList.add('active');
 
-    // 2. Filter the data
+    // 2. Filter the products
     if (category === 'all') {
         renderProducts(products);
     } else {
-        const filtered = products.filter(p => p.category === category);
+        const filtered = products.filter(p => {
+            const pCat = (p.category || "").toLowerCase();
+            return pCat === category.toLowerCase();
+        });
         renderProducts(filtered);
     }
 }
@@ -42,14 +46,15 @@ function renderProducts(list) {
         grid.innerHTML = "<p>No products found in this category.</p>";
         return;
     }
-    grid.innerHTML = list.map(p => `
-        <div class="product-card">
-            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/200?text=Image+Not+Found'">
-            <h3>${p.name}</h3>
-            <p>$${p.price}</p>
-            <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
-        </div>
-    `).join('');
+   // Find your renderProducts function and update the <img> tag
+grid.innerHTML = list.map(p => `
+    <div class="product-card">
+        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+        <h3>${p.name}</h3>
+        <p>$${p.price}</p>
+        <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
+    </div>
+`).join('');
 }
 
 init();
@@ -340,6 +345,18 @@ document.getElementById('searchInput')?.addEventListener('input', (e) => {
 });
 
 
+// Search Functionality
+document.getElementById('searchInput')?.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    // 'products' must be the global array where you stored your Supabase data
+    const filtered = products.filter(p => {
+        const name = (p.name || "").toLowerCase();
+        return name.includes(searchTerm);
+    });
+    
+    renderProducts(filtered);
+});
 
 
 
