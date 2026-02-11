@@ -185,7 +185,45 @@ function updateCartUI() {
     }
 }
 
+//
+async function fetchProducts() {
+    try {
+        const { data, error } = await _supabase.from('products').select('*');
+        if (error) throw error;
+        
+        products = data; 
+        renderProducts(products);
+        
+        // --- ADD THIS LINE HERE ---
+        initSearch(); 
+        
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}
 
+// Create this separate function to handle the search logic
+function initSearch() {
+    const searchBox = document.getElementById('searchInput');
+    if (!searchBox) return;
+
+    // We remove any old listeners first to prevent "double-searching"
+    searchBox.replaceWith(searchBox.cloneNode(true)); 
+    
+    // Get the fresh reference
+    const activeSearchBox = document.getElementById('searchInput');
+
+    activeSearchBox.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        const filtered = products.filter(p => 
+            p.name.toLowerCase().includes(term) || 
+            (p.category && p.category.toLowerCase().includes(term))
+        );
+        renderProducts(filtered);
+    });
+    
+    console.log("Search is now live and listening!");
+}
 
 /////
 async function sendToTelegram(message) {
@@ -390,6 +428,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
