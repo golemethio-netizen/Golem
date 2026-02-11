@@ -194,37 +194,42 @@ async function fetchProducts() {
         products = data; 
         renderProducts(products);
         
-        // --- ADD THIS LINE HERE ---
+        // Activate everything now that data is ready
         initSearch(); 
+        initFilters(); // <--- Add this
         
     } catch (err) {
         console.error("Error:", err);
     }
 }
 
-// Create this separate function to handle the search logic
-function initSearch() {
-    const searchBox = document.getElementById('searchInput');
-    if (!searchBox) return;
-
-    // We remove any old listeners first to prevent "double-searching"
-    searchBox.replaceWith(searchBox.cloneNode(true)); 
+function initFilters() {
+    const buttons = document.querySelectorAll('.filter-btn');
     
-    // Get the fresh reference
-    const activeSearchBox = document.getElementById('searchInput');
+    buttons.forEach(btn => {
+        // Remove any old 'onclick' from HTML to prevent conflicts
+        btn.onclick = null; 
+        
+        btn.addEventListener('click', (e) => {
+            const category = e.target.getAttribute('data-category') || e.target.innerText.toLowerCase();
+            
+            // UI: Update active class
+            buttons.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
 
-    activeSearchBox.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        const filtered = products.filter(p => 
-            p.name.toLowerCase().includes(term) || 
-            (p.category && p.category.toLowerCase().includes(term))
-        );
-        renderProducts(filtered);
+            // Logic: Filter
+            if (category === 'all') {
+                renderProducts(products);
+            } else {
+                const filtered = products.filter(p => 
+                    p.category && p.category.toLowerCase() === category.toLowerCase()
+                );
+                renderProducts(filtered);
+            }
+        });
     });
-    
-    console.log("Search is now live and listening!");
+    console.log("Filters are now live!");
 }
-
 /////
 async function sendToTelegram(message) {
     const botToken = 'YOUR_BOT_TOKEN'; // Make sure this is your real token
@@ -428,6 +433,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
