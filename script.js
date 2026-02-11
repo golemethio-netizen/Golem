@@ -362,8 +362,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+//This function will tell us exactly why the search isn't responding.
 
+function debugSearch() {
+    const searchBox = document.getElementById('searchInput');
+    const status = document.getElementById('debugStatus');
 
+    // Check 1: Does the search box exist?
+    if (!searchBox) {
+        status.innerText = "❌ Error: ID 'searchInput' not found in HTML!";
+        status.style.color = "red";
+        return;
+    }
+
+    // Check 2: Is the products array empty?
+    if (!products || products.length === 0) {
+        status.innerText = "❌ Error: The 'products' list is empty!";
+        status.style.color = "red";
+        return;
+    }
+
+    // Check 3: Is it working?
+    status.innerText = `✅ Success! Found ${products.length} products. Search is ready.`;
+    status.style.color = "green";
+    
+    // Force a test search for the letter 'a'
+    const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
+    console.log("Debug Test Search for 'a' found:", testFilter);
+}
 
 
 
