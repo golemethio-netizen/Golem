@@ -430,6 +430,39 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Search input with ID 'searchInput' not found!");
     }
 });
+//test telegram button
+
+async function testTelegramLink() {
+    const status = document.getElementById('telegramStatus');
+    const token = 'YOUR_BOT_TOKEN_HERE'; // Replace this
+    const cid = 'YOUR_CHAT_ID_HERE';     // Replace this
+    
+    status.innerText = "Sending test message...";
+    status.style.color = "blue";
+
+    const text = encodeURIComponent("<b>✅ Golem Store Online!</b>\nYour Telegram integration is working perfectly.");
+    const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${cid}&text=${text}&parse_mode=HTML`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.ok) {
+            status.innerText = "🚀 Success! Check your Telegram.";
+            status.style.color = "green";
+        } else {
+            status.innerText = "❌ Error: " + data.description;
+            status.style.color = "red";
+            console.error("Telegram error:", data);
+        }
+    } catch (err) {
+        status.innerText = "❌ Connection failed. Check Console.";
+        status.style.color = "red";
+        console.error(err);
+    }
+}
+
+
 
 //This function will tell us exactly why the search isn't responding.
 
@@ -459,6 +492,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
