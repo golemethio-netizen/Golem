@@ -434,8 +434,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function testTelegramLink() {
     const status = document.getElementById('telegramStatus');
-    const token = 'YOUR_BOT_TOKEN_HERE'; // Replace this
-    const cid = 'YOUR_CHAT_ID_HERE';     // Replace this
+    const token = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o'; // Replace this
+    const cid = '6792892909';     // Replace this
     
     status.innerText = "Sending test message...";
     status.style.color = "blue";
@@ -492,6 +492,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
