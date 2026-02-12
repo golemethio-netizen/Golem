@@ -187,19 +187,14 @@ function updateCartUI() {
 
 //
 async function fetchProducts() {
-    try {
-        const { data, error } = await _supabase.from('products').select('*');
-        if (error) throw error;
-        
-        products = data; 
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved'); // <--- ONLY get approved items
+
+    if (!error) {
+        products = data;
         renderProducts(products);
-        
-        // Activate everything now that data is ready
-        initSearch(); 
-        initFilters(); // <--- Add this
-        
-    } catch (err) {
-        console.error("Error:", err);
     }
 }
 
@@ -492,6 +487,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
