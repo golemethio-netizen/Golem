@@ -29,3 +29,30 @@ form.addEventListener('submit', async (e) => {
         notifyAdminOfNewSubmission(productData.name);
     }
 });
+
+
+async function notifyAdminOfSubmission(productName, userName) {
+    const token = 'YOUR_BOT_TOKEN'; // Use the token from BotFather
+    const chatId = 'YOUR_CHAT_ID';   // Use your ID from userinfobot
+    
+    const message = `🔔 <b>New Submission!</b>\n\n` +
+                    `<b>Product:</b> ${productName}\n` +
+                    `<b>User:</b> ${userName}\n` +
+                    `<i>Check the Admin Panel to approve it.</i>`;
+
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        });
+    } catch (err) {
+        console.error("Telegram notification failed:", err);
+    }
+}
