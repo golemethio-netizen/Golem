@@ -187,10 +187,11 @@ function updateCartUI() {
 
 //
 async function fetchProducts() {
+    // Only get products where status is 'approved'
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('status', 'approved'); // <--- ONLY get approved items
+        .eq('status', 'approved'); 
 
     if (!error) {
         products = data;
@@ -487,6 +488,7 @@ function debugSearch() {
     const testFilter = products.filter(p => p.name.toLowerCase().includes('a'));
     console.log("Debug Test Search for 'a' found:", testFilter);
 }
+
 
 
 
