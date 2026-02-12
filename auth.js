@@ -1,28 +1,43 @@
 let isLoginMode = true;
 
 function toggleAuthMode() {
+    console.log("Toggle clicked!"); // Check if this shows in console
     isLoginMode = !isLoginMode;
-    document.getElementById('authTitle').innerText = isLoginMode ? "Login" : "Register";
-    document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Register";
-    document.getElementById('toggleMsg').innerText = isLoginMode 
-        ? "Need an account? Register here." 
-        : "Already have an account? Login here.";
+    
+    const title = document.getElementById('authTitle');
+    const btn = document.getElementById('authBtn');
+    const msg = document.getElementById('toggleMsg');
+
+    if (isLoginMode) {
+        title.innerText = "Login";
+        btn.innerText = "Login";
+        msg.innerText = "Need an account? Register here.";
+    } else {
+        title.innerText = "Register";
+        btn.innerText = "Register";
+        msg.innerText = "Already have an account? Login here.";
+    }
 }
 
 async function handleAuth() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const errorMsg = document.getElementById('authError');
-
+    
     if (isLoginMode) {
-        // LOGIN
         const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) errorMsg.innerText = error.message;
-        else window.location.href = 'index.html'; // Redirect to shop
+        if (error) {
+            alert("Login Failed: " + error.message);
+        } else {
+            console.log("Login Success:", data);
+            window.location.href = 'index.html'; // Direct redirect
+        }
     } else {
-        // REGISTER
         const { data, error } = await _supabase.auth.signUp({ email, password });
-        if (error) errorMsg.innerText = error.message;
-        else alert("Registration successful! You can now login.");
+        if (error) {
+            alert("Registration Failed: " + error.message);
+        } else {
+            alert("Registration successful! Now try to Login.");
+            toggleAuthMode(); // Switch them back to login mode automatically
+        }
     }
 }
