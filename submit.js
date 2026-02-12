@@ -24,7 +24,15 @@ form.addEventListener('submit', async (e) => {
     } else {
         msg.innerHTML = `<p style="color:green">Success! Your product is under review.</p>`;
         form.reset();
-        
+        // ... inside the successful Supabase insert ...
+if (!error) {
+    msg.innerHTML = `<p style="color:green">Success! Your product is under review.</p>`;
+    
+    // 🔥 TRIGGER THE NOTIFICATION HERE
+    notifyAdminOfSubmission(productData.name, productData.submitted_by);
+    
+    form.reset();
+}
         // 3. Optional: Notify Admin via Telegram
         notifyAdminOfNewSubmission(productData.name);
     }
