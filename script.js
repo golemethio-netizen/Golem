@@ -86,7 +86,29 @@ if(document.getElementById('addProductForm')) {
         }
     });
 }
+/////
+async function updateNavUI() {
+    const { data: { user } } = await _supabase.auth.getUser();
 
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginLink = document.getElementById('loginLink');
+    const submitLink = document.getElementById('submitLink');
+
+    if (user) {
+        // User is logged in
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        if (loginLink) loginLink.style.display = 'none';
+        if (submitLink) submitLink.style.display = 'inline-block';
+    } else {
+        // User is logged out
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (loginLink) loginLink.style.display = 'inline-block';
+        if (submitLink) submitLink.style.display = 'none'; // Hide "Sell" if not logged in
+    }
+}
+
+// Call this function whenever the page loads
+updateNavUI();
 ////////////////////////////////////////
 // --- ADMIN AUTH LOGIC ---
 function checkAdminKey() {
@@ -505,6 +527,7 @@ async function logout() {
         window.location.href = 'index.html';
     }
 }
+
 
 
 
