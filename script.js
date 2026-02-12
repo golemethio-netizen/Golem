@@ -493,10 +493,18 @@ function debugSearch() {
 
 
 
+////
 
 
-
-
+async function logout() {
+    const { error } = await _supabase.auth.signOut();
+    if (error) {
+        console.error("Error logging out:", error.message);
+    } else {
+        // Redirect to home and refresh to update the UI
+        window.location.href = 'index.html';
+    }
+}
 
 
 
