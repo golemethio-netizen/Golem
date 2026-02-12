@@ -1,3 +1,24 @@
+async function checkUser() {
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    if (!user) {
+        alert("You must be logged in to submit a product!");
+        window.location.href = 'login.html';
+    } else {
+        // Auto-fill the "submitted_by" with their email
+        document.getElementById('userName').value = user.email;
+        document.getElementById('userName').disabled = true;
+    }
+}
+
+// Run this as soon as the page loads
+checkUser();
+
+
+
+
+
+//
 const form = document.getElementById('userSubmitForm');
 
 form.addEventListener('submit', async (e) => {
