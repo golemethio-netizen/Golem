@@ -1,1 +1,20 @@
+<div class="submission-container">
+    <h2>Submit Your Product</h2>
+    <p>Your item will be reviewed by our team before going live.</p>
+    
+    <form id="userSubmitForm">
+        <input type="text" id="userName" placeholder="Your Name" required>
+        <input type="text" id="pName" placeholder="Product Name" required>
+        <input type="number" id="pPrice" placeholder="Price (USD)" required>
+        <input type="text" id="pImage" placeholder="Image URL (e.g., https://...)" required>
+        
+        <select id="pCategory">
+            <option value="tech">Tech</option>
+            <option value="home">Home</option>
+            <option value="fashion">Fashion</option>
+        </select>
 
+        <button type="submit">Submit for Approval</button>
+    </form>
+    <div id="msg"></div>
+</div>
