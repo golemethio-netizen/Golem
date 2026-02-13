@@ -2,56 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Admin</title>
+    <title>Admin Panel - Golem</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<div id="adminLogin" class="login-overlay">
-    <div class="login-box">
-        <h2>Admin Login</h2>
-        <input type="password" id="adminKeyInput" placeholder="Password: golem_admin_2026">
-        <button onclick="checkAdminKey()" class="add-btn">Unlock</button>
-        <p id="loginError" style="color:red; display:none; margin-top:10px;">Incorrect Password!</p>
+<body>
+    <h1>Admin Moderation</h1>
+    <div id="pendingSection">
+        <h2>📥 Pending Approval</h2>
+        <div id="pendingGrid" class="grid"></div>
     </div>
-</div>
-
-    <div id="adminContent" style="display:none;">
-        <header class="navbar">
-            <h1 class="logo">GOLEM ADMIN</h1>
-            <a href="index.html" style="color:white;">Back to Store</a>
-        </header>
-        <main class="admin-container">
-            <div class="admin-card">
-                <h3>Add Product</h3>
-                <form id="addProductForm">
-    <input type="text" id="pName" placeholder="Product Name" required>
-    <input type="number" id="pPrice" placeholder="Price" step="0.01" required>
-    <input type="text" id="pImage" placeholder="Image URL (https://...)" required>
     
-    <select id="pCategory" required style="padding: 10px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 10px;">
-        <option value="">Select Category</option>
-        <option value="tech">Tech</option>
-        <option value="home">Home</option>
-        <option value="fashion">Fashion</option>
-    </select>
+    <hr>
     
-    <button type="submit" class="add-btn">Save to Database</button>
-</form>
-            </div>
-            <div class="admin-card">
-                <h3>Live Inventory</h3>
-                <div id="adminProductList"></div>
-            </div>
-        </main>
+    <div id="activeSection">
+        <h2>✅ Live Products</h2>
+        <div id="activeGrid" class="grid"></div>
     </div>
 
-<section id="review-section" style="margin-top: 50px; border-top: 2px solid #ccc; padding-top: 20px;">
-    <h2>📥 Pending Submissions</h2>
-    <div id="pendingGrid" class="admin-product-grid">
-        </div>
-</section>
-    
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
