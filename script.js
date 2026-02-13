@@ -1,15 +1,16 @@
-let allApprovedProducts = []; // The Master List
+let allApprovedProducts = [];
 
-// 1. Run this as soon as the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Shop Loading...");
+    console.log("System Initialized...");
     fetchProducts();
     updateNavUI();
 });
 
 async function fetchProducts() {
+    const grid = document.getElementById('productGrid');
+    if (grid) grid.innerHTML = "<p>Loading products...</p>";
+
     try {
-        // Fetch only approved items
         const { data, error } = await _supabase
             .from('products')
             .select('*')
@@ -18,23 +19,22 @@ async function fetchProducts() {
         if (error) throw error;
 
         allApprovedProducts = data || [];
-        console.log("Products Loaded:", allApprovedProducts.length);
-        
+        console.log("Products found in DB:", allApprovedProducts); // Check your console (F12) for this!
+
         renderProducts(allApprovedProducts);
     } catch (err) {
-        console.error("Database Error:", err.message);
-        document.getElementById('productGrid').innerHTML = "<p>Failed to load products. Check console.</p>";
+        console.error("Fetch error:", err.message);
+        if (grid) grid.innerHTML = "<p style='color:red'>Error loading products. Check Database status.</p>";
     }
 }
 
 
-// 2. Render Products to UI
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
     if (list.length === 0) {
-        grid.innerHTML = "<p>No products found in this category.</p>";
+        grid.innerHTML = "<p>No approved products found. Check if status is set to 'approved' in Supabase.</p>";
         return;
     }
 
@@ -42,10 +42,22 @@ function renderProducts(list) {
         <div class="product-card">
             <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
             <h3>${p.name}</h3>
-            <p class="price">$${p.price}</p>
+            <p>$${p.price}</p>
             <button onclick="addToCart(${p.id})">Add to Cart</button>
         </div>
     `).join('');
+}
+
+
+// Ensure addToCart exists so the buttons don't crash
+function addToCart(id) {
+    const item = allApprovedProducts.find(p => p.id === id);
+    if (item) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.push(item);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert(item.name + " added to cart!");
+    }
 }
 
 // 3. UI: Update Nav based on Login Status
@@ -114,3 +126,4 @@ function filterCat(category) {
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
