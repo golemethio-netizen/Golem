@@ -1,71 +1,45 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem | Checkout</title>
+    <title>Checkout - Golem Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="navbar">
-        <h1 class="logo">GOLEM</h1>
-        <a href="index.html" style="color: white; text-decoration: none;">Back to Shop</a>
-    </header>
+    <nav>
+        <div class="logo">Golem Store</div>
+        <a href="index.html">← Back to Shop</a>
+    </nav>
 
-    <main class="checkout-container">
-        <div class="order-summary">
-            <h2>Order Summary</h2>
-            <div id="checkoutItems"></div>
-            <hr>
-            <h3>Total: $<span id="checkoutTotal">0.00</span></h3>
-        </div>
+    <div class="checkout-container" style="max-width: 600px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px;">
+        <h2>Complete Your Order</h2>
+        
+        <div id="orderSummary" style="border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
+            </div>
 
-        <div class="shipping-info">
-            <h2>Shipping Details</h2>
-            <form id="checkoutForm">
-                <input type="text" placeholder="Full Name" required>
-                <input type="email" placeholder="Email Address" required>
-                <input type="text" placeholder="Shipping Address" required>
-                <div class="payment-mock">
-                    <p><strong>Payment:</strong> Cash on Delivery (Mock)</p>
-                </div>
-                <button type="submit" class="btn-add" style="width: 100%; margin-top: 20px;">Place Order</button>
-            </form>
-        </div>
-    </main>
+        <form id="checkoutForm">
+            <label>Full Name</label>
+            <input type="text" id="custName" placeholder="Enter your name" required>
 
-    <script src="script.js"></script>
-    <script>
-        // Specific logic for Checkout Page
-        function renderCheckout() {
-            const container = document.getElementById('checkoutItems');
-            const totalDisplay = document.getElementById('checkoutTotal');
-            
-            if (cart.length === 0) {
-                container.innerHTML = "<p>Your cart is empty!</p>";
-                return;
-            }
+            <label>Phone Number (for Delivery)</label>
+            <input type="tel" id="custPhone" placeholder="+251..." required>
 
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            totalDisplay.innerText = total.toFixed(2);
+            <label>Delivery Address</label>
+            <textarea id="custAddress" placeholder="Enter your city/neighborhood" required style="width:100%; height:80px; margin: 10px 0; padding:10px;"></textarea>
 
-            container.innerHTML = cart.map(item => `
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span>${item.name}</span>
-                    <span>$${item.price}</span>
-                </div>
-            `).join('');
-        }
+            <div id="totalPriceDisplay" style="font-size: 1.2rem; font-weight: bold; margin: 20px 0;">
+                Total: $0.00
+            </div>
 
-        document.getElementById('checkoutForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert("Thank you for your order! Golem is processing your request.");
-            localStorage.removeItem('golem_cart'); // Clear cart after order
-            window.location.href = "index.html"; // Redirect home
-        });
+            <button type="submit" id="confirmBtn" style="background: #28a745; color: white; font-size: 1.1rem;">
+                Confirm Order via Telegram
+            </button>
+        </form>
+    </div>
 
-        renderCheckout();
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="checkout.js"></script>
 </body>
 </html>
