@@ -1,58 +1,75 @@
-let products = [];
+let allApprovedProducts = []; // The Master List
 
+// 1. Run this as soon as the page loads
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Shop Loading...");
     fetchProducts();
     updateNavUI();
 });
 
-// 1. Fetch Approved Products
-// This holds the full list of approved products
-let allApprovedProducts = []; 
-
 async function fetchProducts() {
     try {
+        // Fetch only approved items
         const { data, error } = await _supabase
             .from('products')
             .select('*')
-            .eq('status', 'approved'); 
+            .eq('status', 'approved');
 
         if (error) throw error;
+
+        allApprovedProducts = data || [];
+        console.log("Products Loaded:", allApprovedProducts.length);
         
-        allApprovedProducts = data; // Save the full list here
-        renderProducts(allApprovedProducts); // Show all by default
+        renderProducts(allApprovedProducts);
     } catch (err) {
-        console.error("Fetch Error:", err);
+        console.error("Database Error:", err.message);
+        document.getElementById('productGrid').innerHTML = "<p>Failed to load products. Check console.</p>";
     }
 }
-
-// THE FILTER FUNCTION
+// 2. FIXED Filter Function
 function filterCat(category) {
-    // 1. Remove 'active' class from all buttons
+    console.log("Filtering for:", category);
+    
+    // Safety check: if no products loaded yet, stop
+    if (allApprovedProducts.length === 0) return;
+
+    // Update Button UI (Active State)
     const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText.toLowerCase() === category.toLowerCase() || (category === 'all' && btn.innerText === 'All')) {
+            btn.classList.add('active');
+        }
+    });
 
-    // 2. Add 'active' class to the clicked button
-    event.target.classList.add('active');
-
-    // 3. Filter the logic
+    // Filter Logic
     if (category === 'all') {
         renderProducts(allApprovedProducts);
     } else {
-        const filtered = allApprovedProducts.filter(p => p.category.toLowerCase() === category.toLowerCase());
+        const filtered = allApprovedProducts.filter(p => 
+            p.category && p.category.toLowerCase() === category.toLowerCase()
+        );
         renderProducts(filtered);
     }
 }
+
+// ... Keep your logout and updateNavUI functions below ...
 
 // 2. Render Products to UI
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
-    
+
+    if (list.length === 0) {
+        grid.innerHTML = "<p>No products found in this category.</p>";
+        return;
+    }
+
     grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${p.image}" alt="${p.name}">
+            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
             <h3>${p.name}</h3>
-            <p>$${p.price}</p>
+            <p class="price">$${p.price}</p>
             <button onclick="addToCart(${p.id})">Add to Cart</button>
         </div>
     `).join('');
@@ -94,4 +111,5 @@ function initSearch() {
         renderProducts(filtered);
     });
 }
+
 
