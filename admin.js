@@ -1,52 +1,42 @@
-// 1. Fetch only pending products
-async function fetchPendingProducts() {
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'pending');
+document.addEventListener('DOMContentLoaded', () => {
+    loadAdminProducts();
+});
 
-    if (error) {
-        console.error("Error fetching pending items:", error);
-        return;
-    }
+async function loadAdminProducts() {
+    const { data, error } = await _supabase.from('products').select('*');
+    if (error) return console.error(error);
 
-    renderPendingItems(data);
+    const pending = data.filter(p => p.status === 'pending');
+    const approved = data.filter(p => p.status === 'approved');
+
+    renderAdminGrid('pendingGrid', pending, true);
+    renderAdminGrid('activeGrid', approved, false);
 }
 
-// 2. Display them with Approve/Reject buttons
-function renderPendingItems(list) {
-    const container = document.getElementById('pendingGrid');
-    if (list.length === 0) {
-        container.innerHTML = "<p>No new submissions to review.</p>";
-        return;
-    }
-
+function renderAdminGrid(elementId, list, isPending) {
+    const container = document.getElementById(elementId);
     container.innerHTML = list.map(p => `
-        <div class="admin-card" style="border: 1px solid #ffa500; padding: 10px; margin: 10px;">
+        <div class="card">
             <img src="${p.image}" width="100">
             <h4>${p.name}</h4>
-            <p>Price: $${p.price} | Cat: ${p.category}</p>
-            <p><small>Submitted by: ${p.submitted_by || 'Unknown'}</small></p>
-            <button onclick="updateStatus(${p.id}, 'approved')" style="background:green; color:white;">Approve</button>
-            <button onclick="deleteProduct(${p.id})" style="background:red; color:white;">Reject/Delete</button>
+            <p>By: ${p.submitted_by || 'Admin'}</p>
+            ${isPending ? 
+                `<button onclick="updateStatus(${p.id}, 'approved')" style="background:green;color:white">Approve</button>` : 
+                `<button onclick="updateStatus(${p.id}, 'pending')" style="background:orange">Hide</button>`
+            }
+            <button onclick="deleteItem(${p.id})" style="background:red;color:white">Delete</button>
         </div>
     `).join('');
 }
 
-// 3. The Approval Function
 async function updateStatus(id, newStatus) {
-    const { error } = await _supabase
-        .from('products')
-        .update({ status: newStatus })
-        .eq('id', id);
-
-    if (error) {
-        alert("Action failed: " + error.message);
-    } else {
-        alert("Product is now LIVE on the shop!");
-        fetchPendingProducts(); // Refresh the list
-    }
+    await _supabase.from('products').update({ status: newStatus }).eq('id', id);
+    loadAdminProducts();
 }
 
-// Call this when the admin page loads
-fetchPendingProducts();
+async function deleteItem(id) {
+    if(confirm("Permanently delete?")) {
+        await _supabase.from('products').delete().eq('id', id);
+        loadAdminProducts();
+    }
+}
