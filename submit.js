@@ -1,87 +1,31 @@
-async function checkUser() {
-    const { data: { user } } = await _supabase.auth.getUser();
-
-    if (!user) {
-        alert("You must be logged in to submit a product!");
-        window.location.href = 'login.html';
-    } else {
-        // Auto-fill the "submitted_by" with their email
-        document.getElementById('userName').value = user.email;
-        document.getElementById('userName').disabled = true;
-    }
-}
-
-// Run this as soon as the page loads
-checkUser();
-
-
-
-
-
-//
-const form = document.getElementById('userSubmitForm');
+const form = document.getElementById('productForm');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const msg = document.getElementById('msg');
+    const { data: { user } } = await _supabase.auth.getUser();
 
-    // 1. Gather Data
-    const productData = {
+    if (!user) {
+        alert("Please login first!");
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const newProduct = {
         name: document.getElementById('pName').value,
         price: document.getElementById('pPrice').value,
         image: document.getElementById('pImage').value,
         category: document.getElementById('pCategory').value,
-        status: 'pending', // <--- Crucial: Hidden from shop
-        submitted_by: document.getElementById('userName').value // Optional: track who sent it
+        status: 'pending',
+        submitted_by: user.email
     };
 
-    // 2. Insert to Supabase
-    const { data, error } = await _supabase
-        .from('products')
-        .insert([productData]);
+    const { error } = await _supabase.from('products').insert([newProduct]);
 
-    if (error) {
-        msg.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
-    } else {
-        msg.innerHTML = `<p style="color:green">Success! Your product is under review.</p>`;
+    if (!error) {
+        document.getElementById('statusMsg').innerText = "Sent! Waiting for admin approval.";
         form.reset();
-        // ... inside the successful Supabase insert ...
-if (!error) {
-    msg.innerHTML = `<p style="color:green">Success! Your product is under review.</p>`;
-    
-    // 🔥 TRIGGER THE NOTIFICATION HERE
-    notifyAdminOfSubmission(productData.name, productData.submitted_by);
-    
-    form.reset();
-}
-        // 3. Optional: Notify Admin via Telegram
-        notifyAdminOfNewSubmission(productData.name);
+        // Here you would call your Telegram notify function
+    } else {
+        alert(error.message);
     }
 });
-
-
-async function notifyAdminOfSubmission(productName, userName) {
-    const token = 'YOUR_BOT_TOKEN'; // Use the token from BotFather
-    const chatId = 'YOUR_CHAT_ID';   // Use your ID from userinfobot
-    
-    const message = `🔔 <b>New Submission!</b>\n\n` +
-                    `<b>Product:</b> ${productName}\n` +
-                    `<b>User:</b> ${userName}\n` +
-                    `<i>Check the Admin Panel to approve it.</i>`;
-
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-    try {
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'HTML'
-            })
-        });
-    } catch (err) {
-        console.error("Telegram notification failed:", err);
-    }
-}
