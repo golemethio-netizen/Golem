@@ -1,32 +1,18 @@
 let isLoginMode = true;
-// At the top of auth.js
-document.addEventListener('DOMContentLoaded', () => {
-    const toggleLink = document.getElementById('toggleMsg');
-    const authBtn = document.getElementById('authBtn');
 
-    if (toggleLink) {
-        toggleLink.addEventListener('click', toggleAuthMode);
-    }
+// Wait for DOM to load to attach listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const authBtn = document.getElementById('authBtn');
+    const toggleLink = document.getElementById('toggleMsg');
+
+    if (authBtn) authBtn.addEventListener('click', handleAuth);
+    if (toggleLink) toggleLink.addEventListener('click', toggleAuthMode);
     
-    if (authBtn) {
-        authBtn.addEventListener('click', handleAuth);
-    }
-    console.log("Listeners attached!");
+    console.log("Auth System Ready");
 });
 
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
-    // ... the rest of your toggle code ...
-}
-
-alert("Auth.js is loaded!"); 
-console.log("Auth script is active.");
-
-
-function toggleAuthMode() {
-    console.log("Toggle clicked!"); // Check if this shows in console
-    isLoginMode = !isLoginMode;
-    
     const title = document.getElementById('authTitle');
     const btn = document.getElementById('authBtn');
     const msg = document.getElementById('toggleMsg');
@@ -45,22 +31,25 @@ function toggleAuthMode() {
 async function handleAuth() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const errorDisplay = document.getElementById('authError');
     
-    if (isLoginMode) {
-        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert("Login Failed: " + error.message);
+    errorDisplay.innerText = ""; // Clear old errors
+
+    try {
+        if (isLoginMode) {
+            // LOGIN LOGIC
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            window.location.href = 'index.html'; 
         } else {
-            console.log("Login Success:", data);
-            window.location.href = 'index.html'; // Direct redirect
+            // REGISTER LOGIC
+            const { data, error } = await _supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            alert("Registration successful! You can now log in.");
+            toggleAuthMode();
         }
-    } else {
-        const { data, error } = await _supabase.auth.signUp({ email, password });
-        if (error) {
-            alert("Registration Failed: " + error.message);
-        } else {
-            alert("Registration successful! Now try to Login.");
-            toggleAuthMode(); // Switch them back to login mode automatically
-        }
+    } catch (err) {
+        errorDisplay.innerText = err.message;
+        console.error("Auth Error:", err);
     }
 }
