@@ -26,34 +26,7 @@ async function fetchProducts() {
         document.getElementById('productGrid').innerHTML = "<p>Failed to load products. Check console.</p>";
     }
 }
-// 2. FIXED Filter Function
-function filterCat(category) {
-    console.log("Filtering for:", category);
-    
-    // Safety check: if no products loaded yet, stop
-    if (allApprovedProducts.length === 0) return;
 
-    // Update Button UI (Active State)
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.innerText.toLowerCase() === category.toLowerCase() || (category === 'all' && btn.innerText === 'All')) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Filter Logic
-    if (category === 'all') {
-        renderProducts(allApprovedProducts);
-    } else {
-        const filtered = allApprovedProducts.filter(p => 
-            p.category && p.category.toLowerCase() === category.toLowerCase()
-        );
-        renderProducts(filtered);
-    }
-}
-
-// ... Keep your logout and updateNavUI functions below ...
 
 // 2. Render Products to UI
 function renderProducts(list) {
@@ -113,3 +86,31 @@ function initSearch() {
 }
 
 
+// 2. FIXED Filter Function
+function filterCat(category) {
+    console.log("Filtering for:", category);
+    
+    // Safety check: if no products loaded yet, stop
+    if (allApprovedProducts.length === 0) return;
+
+    // Update Button UI (Active State)
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText.toLowerCase() === category.toLowerCase() || (category === 'all' && btn.innerText === 'All')) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Filter Logic
+    if (category === 'all') {
+        renderProducts(allApprovedProducts);
+    } else {
+        const filtered = allApprovedProducts.filter(p => 
+            p.category && p.category.toLowerCase() === category.toLowerCase()
+        );
+        renderProducts(filtered);
+    }
+}
+
+// ... Keep your logout and updateNavUI functions below ...
