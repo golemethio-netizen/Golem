@@ -1,20 +1,30 @@
-<div class="submission-container">
-    <h2>Submit Your Product</h2>
-    <p>Your item will be reviewed by our team before going live.</p>
-    
-    <form id="userSubmitForm">
-        <input type="text" id="userName" placeholder="Your Name" required>
-        <input type="text" id="pName" placeholder="Product Name" required>
-        <input type="number" id="pPrice" placeholder="Price (USD)" required>
-        <input type="text" id="pImage" placeholder="Image URL (e.g., https://...)" required>
-        
-        <select id="pCategory">
-            <option value="tech">Tech</option>
-            <option value="home">Home</option>
-            <option value="fashion">Fashion</option>
-        </select>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sell Item - Golem</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Submit Product</h2>
+        <form id="productForm">
+            <input type="text" id="pName" placeholder="Product Name" required>
+            <input type="number" id="pPrice" placeholder="Price" required>
+            <input type="text" id="pImage" placeholder="Image URL" required>
+            <select id="pCategory">
+                <option value="tech">Tech</option>
+                <option value="home">Home</option>
+                <option value="fashion">Fashion</option>
+            </select>
+            <button type="submit">Submit for Review</button>
+        </form>
+        <p id="statusMsg"></p>
+        <a href="index.html">Back to Shop</a>
+    </div>
 
-        <button type="submit">Submit for Approval</button>
-    </form>
-    <div id="msg"></div>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="submit.js"></script>
+</body>
+</html>
