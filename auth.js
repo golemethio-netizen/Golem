@@ -1,4 +1,27 @@
 let isLoginMode = true;
+// At the top of auth.js
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleLink = document.getElementById('toggleMsg');
+    const authBtn = document.getElementById('authBtn');
+
+    if (toggleLink) {
+        toggleLink.addEventListener('click', toggleAuthMode);
+    }
+    
+    if (authBtn) {
+        authBtn.addEventListener('click', handleAuth);
+    }
+    console.log("Listeners attached!");
+});
+
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    // ... the rest of your toggle code ...
+}
+
+alert("Auth.js is loaded!"); 
+console.log("Auth script is active.");
+
 
 function toggleAuthMode() {
     console.log("Toggle clicked!"); // Check if this shows in console
