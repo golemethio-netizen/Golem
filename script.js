@@ -6,19 +6,40 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 1. Fetch Approved Products
+// This holds the full list of approved products
+let allApprovedProducts = []; 
+
 async function fetchProducts() {
     try {
         const { data, error } = await _supabase
             .from('products')
             .select('*')
-            .eq('status', 'approved'); // Only show approved
+            .eq('status', 'approved'); 
 
         if (error) throw error;
-        products = data;
-        renderProducts(products);
-        initSearch(); // Link search after data loads
+        
+        allApprovedProducts = data; // Save the full list here
+        renderProducts(allApprovedProducts); // Show all by default
     } catch (err) {
         console.error("Fetch Error:", err);
+    }
+}
+
+// THE FILTER FUNCTION
+function filterCat(category) {
+    // 1. Remove 'active' class from all buttons
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // 2. Add 'active' class to the clicked button
+    event.target.classList.add('active');
+
+    // 3. Filter the logic
+    if (category === 'all') {
+        renderProducts(allApprovedProducts);
+    } else {
+        const filtered = allApprovedProducts.filter(p => p.category.toLowerCase() === category.toLowerCase());
+        renderProducts(filtered);
     }
 }
 
@@ -73,3 +94,4 @@ function initSearch() {
         renderProducts(filtered);
     });
 }
+
