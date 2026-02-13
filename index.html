@@ -3,110 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem | Store</title>
+    <title>Golem Store</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <header class="navbar">
-        <div class="nav-left">
-            <a href="admin.html" class="admin-access-btn">ADMIN PANEL</a>
-            <h1 class="logo" onclick="location.href='index.html'">GOLEM</h1>
-        </div>
-        <div class="nav-right">
-          <input type="text" id="searchInput" placeholder="Search...">
-            <div class="cart-trigger" onclick="toggleCart()">
-                <i class="fas fa-shopping-cart"></i> <span id="cartCount">0</span>
-
-
-            </div>
-        </div>
+    <nav>
+        <div class="logo">Golem Store</div>
         <div class="nav-links">
-    <a href="index.html">Shop</a>
-    <a href="submit.html" id="submitLink">Sell Item</a>
-    <button id="logoutBtn" onclick="logout()" style="display: none;">Logout</button>
-    <a href="login.html" id="loginLink">Login</a>
-</div>
-    </header>
-
-    <nav class="filter-bar">
-        <button class="filter-btn active" onclick="filterByCategory('all')">All</button>
-        <button class="filter-btn" onclick="filterByCategory('tech')">Tech</button>
-        <button class="filter-btn" onclick="filterByCategory('home')">Home</button>
-        <button class="filter-btn" onclick="filterByCategory('fashion')">Fashion</button>
+            <a href="index.html">Shop</a>
+            <a href="submit.html" id="submitLink" style="display:none;">Sell Item</a>
+            <a href="login.html" id="loginLink">Login</a>
+            <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+        </div>
     </nav>
 
-    <main class="products-container" id="productGrid">
-        <p style="text-align:center; grid-column: 1/-1;">Loading products...</p>
-    </main>
-<!--<button class="checkout-btn" onclick="processCheckout()">Checkout///</button> -->
-    <div id="cartDrawer" class="cart-drawer">
-    <div class="cart-header">
-        <h2>Your Cart</h2>
-        <button onclick="toggleCart()">×</button>
-    </div>
-    
-    <div id="cartItems"></div> 
-    
-    <div class="cart-footer">
-        <h3>Total: $<span id="cartTotal">0.00</span></h3>
-         <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
-    </div>
-</div>
-
-<div id="checkoutModal" class="login-overlay" style="display: none;">
-    <div class="login-box" style="max-width: 400px; width: 90%;">
-        <i class="fas fa-shopping-bag" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
-        <h2>Complete Your Order</h2>
-        
-        <div id="checkoutFields">
-            <p>Enter your details so we can contact you.</p>
-            <input type="text" id="custName" placeholder="Full Name" required style="width:100%; padding:10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
-            <input type="tel" id="custPhone" placeholder="Phone Number" required style="width:100%; padding:10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
-            <button onclick="confirmOrder()" class="add-btn" style="margin-top: 10px;">Send Order via Telegram</button>
+    <header>
+        <input type="text" id="searchInput" placeholder="Search products...">
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterCat('all')">All</button>
+            <button class="filter-btn" onclick="filterCat('tech')">Tech</button>
+            <button class="filter-btn" onclick="filterCat('home')">Home</button>
         </div>
+    </header>
 
-<h4>Need Help? Contact Us:</h4>
-        <div style="text-align: left; font-size: 0.9rem;">
-            <p><i class="fab fa-telegram"></i> @allInOneEthiopia1e</p>
-            <p><i class="fas fa-envelope"></i> golemethio@gmail.com</p>
-            <p><i class="fas fa-phone"></i> +251 707022845</p>
-        </div>
+    <main id="productGrid" class="grid"></main>
 
-
-
-        
-        <div id="successMessage" style="display: none;">
-            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent);"></i>
-            <h3>Order Sent!</h3>
-            <p id="orderSummary"></p>
-            <p>Our team will contact you shortly.</p>
-            <button onclick="closeCheckout()" class="add-btn" style="margin-top:20px; background: var(--dark);">Return to Shop</button>
-        </div>
-    </div>
-</div>
-</div>
-
-   
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
