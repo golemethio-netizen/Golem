@@ -1,13 +1,18 @@
+// 1. Global Variables
 let allApprovedProducts = [];
+let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
 
-// 1. Initialize the cart count when the page loads
+// 2. Initialize on Page Load
 document.addEventListener('DOMContentLoaded', () => {
-    updateCartCount(); 
+    fetchProducts();
+    updateCartCount();
+    updateNavUI();
 });
 
+// 3. Fetch Products from Supabase
 async function fetchProducts() {
     const grid = document.getElementById('productGrid');
-    console.log("Starting fetch...");
+    if (grid) grid.innerHTML = "<p>Loading products...</p>";
 
     try {
         const { data, error } = await _supabase
@@ -15,84 +20,74 @@ async function fetchProducts() {
             .select('*')
             .eq('status', 'approved');
 
-        if (error) {
-            console.error("Supabase API Error:", error.message);
-            return;
-        }
+        if (error) throw error;
 
-        if (!data || data.length === 0) {
-            console.warn("Connected to Supabase, but 0 products found with status 'approved'");
-            grid.innerHTML = "<p>No approved products found in database.</p>";
-            return;
-        }
-
-        allApprovedProducts = data;
-        console.log("Success! Items loaded:", allApprovedProducts.length);
+        allApprovedProducts = data || [];
+        console.log("Database Sync Success. Items:", allApprovedProducts.length);
+        
         renderProducts(allApprovedProducts);
-
     } catch (err) {
-        console.error("Unexpected Script Error:", err);
+        console.error("Fetch Error:", err.message);
+        if (grid) grid.innerHTML = "<p style='color:red'>Connection error. Please refresh.</p>";
     }
 }
-
+// 4. Render Products to UI
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // Change the error message logic here
     if (list.length === 0) {
-        // If the WHOLE database is empty
-        if (allApprovedProducts.length === 0) {
-            grid.innerHTML = "<p>No approved products yet. Make sure status is 'approved' in Supabase.</p>";
-        } else {
-            // If the database has items, but the FILTER (Tech/Home) found nothing
-            grid.innerHTML = "<p>No items found in this specific category.</p>";
-        }
+        grid.innerHTML = "<p>No products found in this category.</p>";
         return;
     }
 
     grid.innerHTML = list.map(p => `
         <div class="product-card">
             <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
-            <h3>${p.name}</h3>
-            <p>$${p.price}</p>
-            <button onclick="addToCart(${p.id})">Add to Cart</button>
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p class="price">$${p.price}</p>
+                <button onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
         </div>
     `).join('');
 }
 
-// 2. The Add to Cart Function
+// 5. Add to Cart Logic
 function addToCart(productId) {
-    // Find the product data from our loaded list
+    // Find item in our already loaded list
     const product = allApprovedProducts.find(p => p.id === productId);
     
     if (product) {
-        // Get existing cart or empty array
-        let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
-        
-        // Add the new product
         cart.push(product);
-        
-        // Save back to localStorage
         localStorage.setItem('golem_cart', JSON.stringify(cart));
-        
-        // Update the UI
         updateCartCount();
         
-        // Optional: Visual feedback
-        alert(`${product.name} added to cart!`);
-    } else {
-        console.error("Product not found!");
+        // Visual feedback (optional)
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Added!";
+        setTimeout(() => btn.innerText = originalText, 1000);
     }
 }
 
-
-// 3. Function to update the number shown in the Nav
+// 6. Update UI Counter
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
     const countElement = document.getElementById('cartCount');
     if (countElement) {
         countElement.innerText = cart.length;
+    }
+}
+
+// 7. Filtering Logic
+function filterCat(category) {
+    if (category === 'all') {
+        renderProducts(allApprovedProducts);
+    } else {
+        const filtered = allApprovedProducts.filter(p => 
+            p.category && p.category.toLowerCase().trim() === category.toLowerCase()
+        );
+        renderProducts(filtered);
     }
 }
 
@@ -136,19 +131,9 @@ function initSearch() {
 }
 
 
-// 2. FIXED Filter Function
-function filterCat(category) {
-    if (category === 'all') {
-        renderProducts(allApprovedProducts);
-    } else {
-        const filtered = allApprovedProducts.filter(p => 
-            p.category && p.category.toLowerCase().trim() === category.toLowerCase().trim()
-        );
-        renderProducts(filtered);
-    }
-}
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
