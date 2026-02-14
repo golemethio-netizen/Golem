@@ -1,16 +1,16 @@
 let allApprovedProducts = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("System Initialized...");
     fetchProducts();
     updateNavUI();
 });
 
 async function fetchProducts() {
     const grid = document.getElementById('productGrid');
-    if (grid) grid.innerHTML = "<p>Loading products...</p>";
+    if (grid) grid.innerHTML = "<h3>Loading Golem Store...</h3>";
 
     try {
+        // We fetch everything and log it to the console for debugging
         const { data, error } = await _supabase
             .from('products')
             .select('*')
@@ -19,12 +19,12 @@ async function fetchProducts() {
         if (error) throw error;
 
         allApprovedProducts = data || [];
-        console.log("Products found in DB:", allApprovedProducts); // Check your console (F12) for this!
+        console.log("Success! Products loaded:", allApprovedProducts);
 
         renderProducts(allApprovedProducts);
     } catch (err) {
-        console.error("Fetch error:", err.message);
-        if (grid) grid.innerHTML = "<p style='color:red'>Error loading products. Check Database status.</p>";
+        console.error("Supabase Error:", err.message);
+        if (grid) grid.innerHTML = `<p style="color:red">Error: ${err.message}. Check RLS Policies.</p>`;
     }
 }
 
@@ -34,20 +34,22 @@ function renderProducts(list) {
     if (!grid) return;
 
     if (list.length === 0) {
-        grid.innerHTML = "<p>No approved products found. Check if status is set to 'approved' in Supabase.</p>";
+        grid.innerHTML = "<p>No approved products yet. Make sure status is 'approved' in Supabase.</p>";
         return;
     }
 
     grid.innerHTML = list.map(p => `
         <div class="product-card">
             <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
-            <h3>${p.name}</h3>
-            <p>$${p.price}</p>
-            <button onclick="addToCart(${p.id})">Add to Cart</button>
+            <div class="card-info">
+                <h3>${p.name}</h3>
+                <p class="category-tag">${p.category}</p>
+                <p class="price">$${p.price}</p>
+                <button onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
         </div>
     `).join('');
 }
-
 
 // Ensure addToCart exists so the buttons don't crash
 function addToCart(id) {
@@ -100,30 +102,20 @@ function initSearch() {
 
 // 2. FIXED Filter Function
 function filterCat(category) {
-    console.log("Filtering for:", category);
+    // 1. Visual feedback
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     
-    // Safety check: if no products loaded yet, stop
-    if (allApprovedProducts.length === 0) return;
-
-    // Update Button UI (Active State)
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.innerText.toLowerCase() === category.toLowerCase() || (category === 'all' && btn.innerText === 'All')) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Filter Logic
+    // 2. Logic
     if (category === 'all') {
         renderProducts(allApprovedProducts);
     } else {
         const filtered = allApprovedProducts.filter(p => 
-            p.category && p.category.toLowerCase() === category.toLowerCase()
+            p.category && p.category.toLowerCase().trim() === category.toLowerCase()
         );
         renderProducts(filtered);
     }
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
