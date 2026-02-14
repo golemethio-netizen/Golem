@@ -1,8 +1,8 @@
 let allApprovedProducts = [];
 
+// 1. Initialize the cart count when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    fetchProducts();
-    updateNavUI();
+    updateCartCount(); 
 });
 
 async function fetchProducts() {
@@ -51,16 +51,42 @@ function renderProducts(list) {
     `).join('');
 }
 
-// Ensure addToCart exists so the buttons don't crash
-function addToCart(id) {
-    const item = allApprovedProducts.find(p => p.id === id);
-    if (item) {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart.push(item);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        alert(item.name + " added to cart!");
+// 2. The Add to Cart Function
+function addToCart(productId) {
+    // Find the product data from our loaded list
+    const product = allApprovedProducts.find(p => p.id === productId);
+    
+    if (product) {
+        // Get existing cart or empty array
+        let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+        
+        // Add the new product
+        cart.push(product);
+        
+        // Save back to localStorage
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        
+        // Update the UI
+        updateCartCount();
+        
+        // Optional: Visual feedback
+        alert(`${product.name} added to cart!`);
+    } else {
+        console.error("Product not found!");
     }
 }
+
+
+// 3. Function to update the number shown in the Nav
+function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+    const countElement = document.getElementById('cartCount');
+    if (countElement) {
+        countElement.innerText = cart.length;
+    }
+}
+
+
 
 // 3. UI: Update Nav based on Login Status
 async function updateNavUI() {
@@ -117,6 +143,7 @@ function filterCat(category) {
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
