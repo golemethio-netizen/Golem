@@ -1,12 +1,11 @@
-// 1. Global Variables
+// 1. Setup the cart and data holders
 let allApprovedProducts = [];
 let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
 
-// 2. Initialize on Page Load
+// 2. Update the counter as soon as the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    fetchProducts();
     updateCartCount();
-    updateNavUI();
+    fetchProducts();
 });
 
 // 3. Fetch Products from Supabase
@@ -54,35 +53,32 @@ function renderProducts(list) {
     `).join('');
 }
 
-// 5. Add to Cart Logic
+// 3. Add to Cart Function (The specific one for your buttons)
 function addToCart(productId, event) {
-    // 1. Find the item
-    const product = allApprovedProducts.find(p => p.id === productId);
+    if (event) event.preventDefault(); // Stop page from jumping
+
+    const product = allApprovedProducts.find(p => p.id == productId);
     
     if (product) {
-        // 2. Update the Cart Array
         cart.push(product);
         localStorage.setItem('golem_cart', JSON.stringify(cart));
-        
-        // 3. Update the Counter in Nav
         updateCartCount();
         
-        // 4. Visual Feedback (The Button Change)
+        // Button Feedback
         if (event && event.target) {
             const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "✅ Added!";
-            btn.style.backgroundColor = "#27ae60"; // Turn green
-            
+            btn.innerText = "✅ Added";
+            btn.disabled = true;
             setTimeout(() => {
-                btn.innerText = originalText;
-                btn.style.backgroundColor = ""; // Reset color
-            }, 800);
+                btn.innerText = "Add to Cart";
+                btn.disabled = false;
+            }, 1000);
         }
+    } else {
+        console.error("Could not find product with ID:", productId);
     }
 }
 
-// 6. Update UI Counter
 function updateCartCount() {
     const countElement = document.getElementById('cartCount');
     if (countElement) {
@@ -144,6 +140,7 @@ function initSearch() {
 
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
