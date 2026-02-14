@@ -6,28 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchProducts() {
-    const grid = document.getElementById('productGrid');
-    if (grid) grid.innerHTML = "<h3>Loading Golem Store...</h3>";
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved');
 
-    try {
-        // We fetch everything and log it to the console for debugging
-        const { data, error } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('status', 'approved');
-
-        if (error) throw error;
-
-        allApprovedProducts = data || [];
-        console.log("Success! Products loaded:", allApprovedProducts);
-
+    if (error) {
+        console.error("Database Error:", error.message);
+    } else {
+        console.log("Found these items:", data); // THIS IS THE KEY TEST
+        allApprovedProducts = data;
         renderProducts(allApprovedProducts);
-    } catch (err) {
-        console.error("Supabase Error:", err.message);
-        if (grid) grid.innerHTML = `<p style="color:red">Error: ${err.message}. Check RLS Policies.</p>`;
     }
 }
-
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
@@ -117,5 +108,6 @@ function filterCat(category) {
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
