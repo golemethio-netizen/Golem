@@ -6,16 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchProducts() {
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'approved');
+    try {
+        const { data, error } = await _supabase
+            .from('products')
+            .select('*')
+            .eq('status', 'approved');
 
-    console.log("DATA FROM DATABASE:", data); // <--- ADD THIS LINE
-    
-    if (error) console.error(error);
-    allApprovedProducts = data || [];
-    renderProducts(allApprovedProducts);
+        if (error) {
+            // This will tell us if it's an API key issue or an RLS issue
+            console.error("Supabase Error Detail:", error);
+            document.getElementById('productGrid').innerHTML = `<p>Auth Error: ${error.message}</p>`;
+            return;
+        }
+
+        allApprovedProducts = data || [];
+        renderProducts(allApprovedProducts);
+        
+    } catch (err) {
+        console.error("System Crash:", err);
+    }
 }
 
 
@@ -108,6 +117,7 @@ function filterCat(category) {
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
