@@ -11,14 +11,14 @@ async function fetchProducts() {
         .select('*')
         .eq('status', 'approved');
 
-    if (error) {
-        console.error("Database Error:", error.message);
-    } else {
-        console.log("Found these items:", data); // THIS IS THE KEY TEST
-        allApprovedProducts = data;
-        renderProducts(allApprovedProducts);
-    }
+    console.log("DATA FROM DATABASE:", data); // <--- ADD THIS LINE
+    
+    if (error) console.error(error);
+    allApprovedProducts = data || [];
+    renderProducts(allApprovedProducts);
 }
+
+
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
@@ -108,6 +108,7 @@ function filterCat(category) {
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
