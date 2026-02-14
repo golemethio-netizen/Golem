@@ -47,7 +47,8 @@ function renderProducts(list) {
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <p class="price">$${p.price}</p>
-                <button onclick="addToCart(${p.id})">Add to Cart</button>
+                // Change this line inside your .map() loop:
+<button onclick="addToCart(${p.id}, window.event)">Add to Cart</button>
             </div>
         </div>
     `).join('');
@@ -143,6 +144,7 @@ function initSearch() {
 
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
