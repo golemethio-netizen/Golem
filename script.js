@@ -7,29 +7,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchProducts() {
     const grid = document.getElementById('productGrid');
-    
+    console.log("Starting fetch...");
+
     try {
         const { data, error } = await _supabase
             .from('products')
             .select('*')
             .eq('status', 'approved');
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase API Error:", error.message);
+            return;
+        }
 
-        // Store the data globally
-        allApprovedProducts = data || [];
-        
-        console.log("DB sync successful. Items found:", allApprovedProducts.length);
-        
-        // Render the products
+        if (!data || data.length === 0) {
+            console.warn("Connected to Supabase, but 0 products found with status 'approved'");
+            grid.innerHTML = "<p>No approved products found in database.</p>";
+            return;
+        }
+
+        allApprovedProducts = data;
+        console.log("Success! Items loaded:", allApprovedProducts.length);
         renderProducts(allApprovedProducts);
 
     } catch (err) {
-        console.error("Fetch error:", err.message);
-        grid.innerHTML = `<p style="color:red">Connection lost. Please refresh.</p>`;
+        console.error("Unexpected Script Error:", err);
     }
 }
-
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
@@ -145,6 +149,7 @@ function filterCat(category) {
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
