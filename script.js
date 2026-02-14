@@ -6,47 +6,53 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchProducts() {
+    const grid = document.getElementById('productGrid');
+    
     try {
         const { data, error } = await _supabase
             .from('products')
             .select('*')
             .eq('status', 'approved');
 
-        if (error) {
-            // This will tell us if it's an API key issue or an RLS issue
-            console.error("Supabase Error Detail:", error);
-            document.getElementById('productGrid').innerHTML = `<p>Auth Error: ${error.message}</p>`;
-            return;
-        }
+        if (error) throw error;
 
+        // Store the data globally
         allApprovedProducts = data || [];
-        renderProducts(allApprovedProducts);
         
+        console.log("DB sync successful. Items found:", allApprovedProducts.length);
+        
+        // Render the products
+        renderProducts(allApprovedProducts);
+
     } catch (err) {
-        console.error("System Crash:", err);
+        console.error("Fetch error:", err.message);
+        grid.innerHTML = `<p style="color:red">Connection lost. Please refresh.</p>`;
     }
 }
-
 
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
+    // Change the error message logic here
     if (list.length === 0) {
-        grid.innerHTML = "<p>No approved products yet. Make sure status is 'approved' in Supabase.</p>";
+        // If the WHOLE database is empty
+        if (allApprovedProducts.length === 0) {
+            grid.innerHTML = "<p>No approved products yet. Make sure status is 'approved' in Supabase.</p>";
+        } else {
+            // If the database has items, but the FILTER (Tech/Home) found nothing
+            grid.innerHTML = "<p>No items found in this specific category.</p>";
+        }
         return;
     }
 
     grid.innerHTML = list.map(p => `
         <div class="product-card">
             <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
-            <div class="card-info">
-                <h3>${p.name}</h3>
-                <p class="category-tag">${p.category}</p>
-                <p class="price">$${p.price}</p>
-                <button onclick="addToCart(${p.id})">Add to Cart</button>
-            </div>
+            <h3>${p.name}</h3>
+            <p>$${p.price}</p>
+            <button onclick="addToCart(${p.id})">Add to Cart</button>
         </div>
     `).join('');
 }
@@ -128,21 +134,18 @@ function initSearch() {
 
 // 2. FIXED Filter Function
 function filterCat(category) {
-    // 1. Visual feedback
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // 2. Logic
     if (category === 'all') {
         renderProducts(allApprovedProducts);
     } else {
         const filtered = allApprovedProducts.filter(p => 
-            p.category && p.category.toLowerCase().trim() === category.toLowerCase()
+            p.category && p.category.toLowerCase().trim() === category.toLowerCase().trim()
         );
         renderProducts(filtered);
     }
 }
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
