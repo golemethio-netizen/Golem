@@ -54,20 +54,30 @@ function renderProducts(list) {
 }
 
 // 5. Add to Cart Logic
-function addToCart(productId) {
-    // Find item in our already loaded list
+function addToCart(productId, event) {
+    // 1. Find the item
     const product = allApprovedProducts.find(p => p.id === productId);
     
     if (product) {
+        // 2. Update the Cart Array
         cart.push(product);
         localStorage.setItem('golem_cart', JSON.stringify(cart));
+        
+        // 3. Update the Counter in Nav
         updateCartCount();
         
-        // Visual feedback (optional)
-        const btn = event.target;
-        const originalText = btn.innerText;
-        btn.innerText = "✅ Added!";
-        setTimeout(() => btn.innerText = originalText, 1000);
+        // 4. Visual Feedback (The Button Change)
+        if (event && event.target) {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "✅ Added!";
+            btn.style.backgroundColor = "#27ae60"; // Turn green
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = ""; // Reset color
+            }, 800);
+        }
     }
 }
 
@@ -133,6 +143,7 @@ function initSearch() {
 
 
 // ... Keep your logout and updateNavUI functions below ...
+
 
 
 
