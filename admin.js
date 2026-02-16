@@ -1,17 +1,48 @@
 // THE GATEKEEPER
 async function checkAdmin() {
-    const { data: { user } } = await _supabase.auth.getUser();
+    // 1. Get the current session
+    const { data: { session }, error } = await _supabase.auth.getSession();
 
-    // If no one is logged in, or the email doesn't match yours
-    if (!user || user.email !== 'golemethio@gmail.com') {
-        alert("Access Denied. Admins only!");
-        window.location.href = 'login.html'; // Kick them out to login
+    // 2. Wait a split second if the session is still null (loading state)
+    if (!session) {
+        // If truly no session after checking, kick them out
+        console.log("No session found, checking again...");
+        const { data: { user } } = await _supabase.auth.getUser();
+        
+        if (!user) {
+            alert("Access Denied. Please login first.");
+            window.location.href = 'login.html';
+            return;
+        }
+    }
+
+    // 3. Precise Email Check (Convert both to lowercase to avoid typos)
+    const adminEmail = 'YOUR_EMAIL@GMAIL.COM'.toLowerCase().trim();
+    const loggedInEmail = session.user.email.toLowerCase().trim();
+
+    if (loggedInEmail !== adminEmail) {
+        alert("Access Denied. You are logged in as " + loggedInEmail + ", which is not an admin.");
+        window.location.href = 'index.html';
+    } else {
+        console.log("Welcome, Admin!");
+        fetchPendingProducts(); // Only load data if they are the admin
     }
 }
 
-// Run the check immediately
+// Start the check
 checkAdmin();
+// 3. Precise Email Check (Convert both to lowercase to avoid typos)
+    const adminEmail = 'YOUR_EMAIL@GMAIL.COM'.toLowerCase().trim();
+    const loggedInEmail = session.user.email.toLowerCase().trim();
 
+    if (loggedInEmail !== adminEmail) {
+        alert("Access Denied. You are logged in as " + loggedInEmail + ", which is not an admin.");
+        window.location.href = 'index.html';
+    } else {
+        console.log("Welcome, Admin!");
+        fetchPendingProducts(); // Only load data if they are the admin
+    }
+}
 // Your existing fetchPendingProducts() and other code goes BELOW this...
 
 document.addEventListener('DOMContentLoaded', () => {
