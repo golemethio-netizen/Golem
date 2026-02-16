@@ -118,3 +118,4 @@ function searchProducts() {
     renderProducts(filtered);
 }
 
+
