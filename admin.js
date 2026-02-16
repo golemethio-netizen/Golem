@@ -3,7 +3,7 @@ async function checkAdmin() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     // If no one is logged in, or the email doesn't match yours
-    if (!user || user.email !== 'yohannes.suerafel@gmail.com') {
+    if (!user || user.email !== 'golemethio@gmail.com') {
         alert("Access Denied. Admins only!");
         window.location.href = 'login.html'; // Kick them out to login
     }
