@@ -3,43 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Golem Store</title>
+    <title>Checkout | Golem Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <nav>
         <div class="logo">Golem Store</div>
-        <a href="index.html">← Back to Shop</a>
+        <div class="nav-links">
+            <a href="index.html">Return to Shop</a>
+        </div>
     </nav>
 
-    <div class="checkout-container" style="max-width: 600px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px;">
-        <h2>Complete Your Order</h2>
+    <main class="checkout-container">
+        <h1>Your Shopping Cart</h1>
+        <div id="cartItems">
+            </div>
         
-        <div id="orderSummary" style="border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
-            </div>
+        <div class="cart-summary">
+            <h3>Total: $<span id="totalPrice">0</span></h3>
+            <button onclick="clearCart()" class="clear-btn">Empty Cart</button>
+            <button onclick="processOrder()" class="checkout-btn">Complete Purchase</button>
+        </div>
+    </main>
 
-        <form id="checkoutForm">
-            <label>Full Name</label>
-            <input type="text" id="custName" placeholder="Enter your name" required>
-
-            <label>Phone Number (for Delivery)</label>
-            <input type="tel" id="custPhone" placeholder="+251..." required>
-
-            <label>Delivery Address</label>
-            <textarea id="custAddress" placeholder="Enter your city/neighborhood" required style="width:100%; height:80px; margin: 10px 0; padding:10px;"></textarea>
-
-            <div id="totalPriceDisplay" style="font-size: 1.2rem; font-weight: bold; margin: 20px 0;">
-                Total: $0.00
-            </div>
-
-            <button type="submit" id="confirmBtn" style="background: #28a745; color: white; font-size: 1.1rem;">
-                Confirm Order via Telegram
-            </button>
-        </form>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
     <script src="checkout.js"></script>
 </body>
 </html>
