@@ -3,53 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Store</title>
+    <title>Golem Store | Modern Marketplace</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <nav>
-    <div class="logo">Golem Store</div>
-    <div class="nav-links">
-        <a href="index.html">Shop</a>
-        <a href="checkout.html" id="cartLink">🛒 Cart (<span id="cartCount">0</span>)</a>
-        <a href="submit.html" id="submitLink" style="display:none;">Sell Item</a>
-        <a href="login.html" id="loginLink">Login</a>
-        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
-    </div>
-</nav>
+        <div class="logo">Golem Store</div>
+        <div class="nav-links">
+            <a href="index.html">Shop</a>
+            <a href="submit.html">Sell Item</a>
+            <a href="checkout.html" id="cartLink">🛒 Cart (<span id="cartCount">0</span>)</a>
+            <a href="login.html" id="loginLink">Login</a>
+        </div>
+    </nav>
 
-    <header>
-        <input type="text" id="searchInput" placeholder="Search products...">
-      
-
-
-<div class="filters">
-    <button class="filter-btn active" onclick="filterCat('all')">All</button>
-    <button class="filter-btn" onclick="filterCat('tech')">Tech</button>
-    <button class="filter-btn" onclick="filterCat('home')">Home</button>
-    <button class="filter-btn" onclick="filterCat('fashion')">Fashion</button>
-</div>
-
-
-
+    <section class="controls">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search products..." oninput="searchProducts()">
+        </div>
         
-    </header>
+        <div class="filters">
+            <button onclick="filterCat('all')">All</button>
+            <button onclick="filterCat('tech')">Tech</button>
+            <button onclick="filterCat('home')">Home</button>
+            <button onclick="filterCat('fashion')">Fashion</button>
+        </div>
+    </section>
 
-    <main id="productGrid" class="grid"></main>
+    <main>
+        <div id="productGrid">
+            <p>Loading the Golem marketplace...</p>
+        </div>
+    </main>
 
-    
+    <footer>
+        <p>&copy; 2026 Golem Store. All rights reserved.</p>
+    </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
 
-<script src="config.js"></script>
+    <script src="script.js"></script>
 
-<script src="script.js"></script>
-
-    
 </body>
 </html>
-
-
-
-
