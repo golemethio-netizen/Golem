@@ -1,19 +1,20 @@
-// 1. Setup the cart and data holders
+// 1. GLOBAL VARIABLES
 let allApprovedProducts = [];
 let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
 
-// 2. Update the counter as soon as the page loads
+// 2. INITIALIZE ON LOAD
 document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     fetchProducts();
 });
 
-// 3. Fetch Products from Supabase
+// 3. FETCH DATA FROM SUPABASE
 async function fetchProducts() {
     const grid = document.getElementById('productGrid');
-    if (grid) grid.innerHTML = "<p>Loading products...</p>";
+    if (grid) grid.innerHTML = "<p>Loading products from Golem database...</p>";
 
     try {
+        // We use the _supabase client created in config.js
         const { data, error } = await _supabase
             .from('products')
             .select('*')
@@ -22,55 +23,65 @@ async function fetchProducts() {
         if (error) throw error;
 
         allApprovedProducts = data || [];
-        console.log("Database Sync Success. Items:", allApprovedProducts.length);
+        console.log("Success! Items found:", allApprovedProducts.length);
         
         renderProducts(allApprovedProducts);
+
     } catch (err) {
         console.error("Fetch Error:", err.message);
-        if (grid) grid.innerHTML = "<p style='color:red'>Connection error. Please refresh.</p>";
+        if (grid) grid.innerHTML = `<p style="color:red">Connection Error: ${err.message}</p>`;
     }
 }
-// 4. Render Products to UI
+
+// 4. RENDER PRODUCTS TO THE GRID
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
     if (list.length === 0) {
-        grid.innerHTML = "<p>No products found in this category.</p>";
+        grid.innerHTML = "<p>No products found. Please check back later!</p>";
         return;
     }
 
     grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
+            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
             <div class="product-info">
                 <h3>${p.name}</h3>
+                <p class="category-tag">${p.category}</p>
                 <p class="price">$${p.price}</p>
-              
-<button onclick="addToCart(${p.id}, window.event)">Add to Cart</button>
+                <button class="add-btn" onclick="addToCart('${p.id}', event)">Add to Cart</button>
             </div>
         </div>
     `).join('');
 }
 
-// 3. Add to Cart Function (The specific one for your buttons)
+// 5. ADD TO CART LOGIC
 function addToCart(productId, event) {
-    if (event) event.preventDefault(); // Stop page from jumping
-
+    // Find the product in our local list (using == to handle both string and number IDs)
     const product = allApprovedProducts.find(p => p.id == productId);
-    
+
     if (product) {
+        // Add to local cart array
         cart.push(product);
-        localStorage.setItem('golem_cart', JSON.stringify(cart));
-        updateCartCount();
         
-        // Button Feedback
+        // Save to browser memory
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        
+        // Update the number in the navigation bar
+        updateCartCount();
+
+        // Visual Feedback: Change button temporarily
         if (event && event.target) {
             const btn = event.target;
-            btn.innerText = "✅ Added";
+            const originalText = btn.innerText;
+            btn.innerText = "✅ Added!";
+            btn.style.backgroundColor = "#27ae60";
             btn.disabled = true;
+
             setTimeout(() => {
-                btn.innerText = "Add to Cart";
+                btn.innerText = originalText;
+                btn.style.backgroundColor = "";
                 btn.disabled = false;
             }, 1000);
         }
@@ -79,6 +90,7 @@ function addToCart(productId, event) {
     }
 }
 
+// 6. UPDATE CART COUNTER UI
 function updateCartCount() {
     const countElement = document.getElementById('cartCount');
     if (countElement) {
@@ -86,71 +98,24 @@ function updateCartCount() {
     }
 }
 
-// 7. Filtering Logic
+// 7. CATEGORY FILTERING
 function filterCat(category) {
     if (category === 'all') {
         renderProducts(allApprovedProducts);
     } else {
         const filtered = allApprovedProducts.filter(p => 
-            p.category && p.category.toLowerCase().trim() === category.toLowerCase()
+            p.category && p.category.toLowerCase() === category.toLowerCase()
         );
         renderProducts(filtered);
     }
 }
 
-
-
-// 3. UI: Update Nav based on Login Status
-async function updateNavUI() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    const logoutBtn = document.getElementById('logoutBtn');
-    const loginLink = document.getElementById('loginLink');
-    const sellLink = document.getElementById('submitLink');
-
-    if (user) {
-        if (logoutBtn) logoutBtn.style.display = 'inline-block';
-        if (loginLink) loginLink.style.display = 'none';
-        if (sellLink) sellLink.style.display = 'inline-block';
-    } else {
-        if (logoutBtn) logoutBtn.style.display = 'none';
-        if (loginLink) loginLink.style.display = 'inline-block';
-        if (sellLink) sellLink.style.display = 'none';
-    }
+// 8. SEARCH LOGIC
+function searchProducts() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allApprovedProducts.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.category.toLowerCase().includes(query)
+    );
+    renderProducts(filtered);
 }
-
-// 4. Logout Function
-async function logout() {
-    await _supabase.auth.signOut();
-    window.location.href = 'index.html';
-}
-
-// 5. Search Logic
-function initSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-        renderProducts(filtered);
-    });
-}
-
-
-
-// ... Keep your logout and updateNavUI functions below ...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
