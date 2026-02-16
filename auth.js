@@ -1,22 +1,33 @@
+// Function to handle User Registration
 async function handleSignup() {
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    
+    const msg = document.getElementById('authMsg');
+
+    if (!email || !password) {
+        msg.innerText = "Please fill in all fields.";
+        return;
+    }
+
     const { data, error } = await _supabase.auth.signUp({
         email: email,
         password: password,
     });
 
     if (error) {
-        document.getElementById('authMsg').innerText = error.message;
+        msg.style.color = "red";
+        msg.innerText = error.message;
     } else {
-        document.getElementById('authMsg').innerText = "Success! Check your email or try logging in.";
+        msg.style.color = "green";
+        msg.innerText = "Success! Please check your email for a confirmation link.";
     }
 }
 
+// Function to handle Login
 async function handleLogin() {
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
+    const msg = document.getElementById('authMsg');
 
     const { data, error } = await _supabase.auth.signInWithPassword({
         email: email,
@@ -24,25 +35,21 @@ async function handleLogin() {
     });
 
     if (error) {
-        document.getElementById('authMsg').innerText = error.message;
+        msg.style.color = "red";
+        msg.innerText = error.message;
     } else {
-        // AUTOMATIC REDIRECT
-        if (data.user.email === 'golemethio@gmail.com') {
+        const user = data.user;
+        const adminEmail = 'YOUR_EMAIL@GMAIL.COM'.toLowerCase(); // CHANGE THIS
+
+        if (user.email.toLowerCase() === adminEmail) {
             window.location.href = 'admin.html';
         } else {
             window.location.href = 'index.html';
         }
     }
 }
-    // Inside handleLogin after success:
-if (data.user.email === 'YOUR_ADMIN_EMAIL@gmail.com') {
-    alert("Welcome Boss!");
-    window.location.href = 'admin.html'; // Create this page for approvals
-} else {
-    window.location.href = 'index.html';
-}
-}
 
+// General Logout Function
 async function logout() {
     await _supabase.auth.signOut();
     window.location.href = 'login.html';
