@@ -1,3 +1,19 @@
+// THE GATEKEEPER
+async function checkAdmin() {
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    // If no one is logged in, or the email doesn't match yours
+    if (!user || user.email !== 'yohannes.suerafel@gmail.com') {
+        alert("Access Denied. Admins only!");
+        window.location.href = 'login.html'; // Kick them out to login
+    }
+}
+
+// Run the check immediately
+checkAdmin();
+
+// Your existing fetchPendingProducts() and other code goes BELOW this...
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchPendingProducts();
 });
@@ -55,5 +71,11 @@ async function deleteItem(id) {
             .eq('id', id);
         
         if (!error) fetchPendingProducts();
+    }
+}
+async function logout() {
+    const { error } = await _supabase.auth.signOut();
+    if (!error) {
+        window.location.href = 'login.html';
     }
 }
