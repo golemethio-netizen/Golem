@@ -39,23 +39,21 @@ function renderProducts(list) {
     if (!grid) return;
 
     if (list.length === 0) {
-        grid.innerHTML = "<p>No products found. Please check back later!</p>";
+        grid.innerHTML = "<p>No approved products found. Check status in DB!</p>";
         return;
     }
 
     grid.innerHTML = list.map(p => `
         <div class="product-card">
-            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
+            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name || 'Product'}">
             <div class="product-info">
-                <h3>${p.name}</h3>
-                <p class="category-tag">${p.category}</p>
-                <p class="price">$${p.price}</p>
-                <button class="add-btn" onclick="addToCart('${p.id}', event)">Add to Cart</button>
+                <h3>${p.name || 'Unnamed Item'}</h3>
+                <p class="price">$${p.price || '0.00'}</p>
+                <button onclick="addToCart('${p.id}', event)">Add to Cart</button>
             </div>
         </div>
     `).join('');
 }
-
 // 5. ADD TO CART LOGIC
 function addToCart(productId, event) {
     // Find the product in our local list (using == to handle both string and number IDs)
@@ -119,3 +117,4 @@ function searchProducts() {
     );
     renderProducts(filtered);
 }
+
