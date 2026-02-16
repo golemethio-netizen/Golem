@@ -1,83 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
-    renderSummary();
-    prefillUserData();
+    displayCart();
 });
 
-// 1. Show the user what they are buying
-function renderSummary() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const container = document.getElementById('orderSummary');
-    let total = 0;
-
+function displayCart() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+    const container = document.getElementById('cartItems');
+    const totalElement = document.getElementById('totalPrice');
+    
     if (cart.length === 0) {
-        container.innerHTML = "<p>Your cart is empty!</p>";
-        document.getElementById('confirmBtn').disabled = true;
+        container.innerHTML = "<p>Your cart is empty.</p>";
+        totalElement.innerText = "0";
         return;
     }
 
-    container.innerHTML = cart.map(item => {
+    let total = 0;
+    container.innerHTML = cart.map((item, index) => {
         total += parseFloat(item.price);
-        return `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span>${item.name}</span>
-                    <span>$${item.price}</span>
-                </div>`;
+        return `
+            <div class="checkout-item">
+                <img src="${item.image}" width="50">
+                <div class="item-info">
+                    <h4>${item.name}</h4>
+                    <p>$${item.price}</p>
+                </div>
+                <button onclick="removeItem(${index})">Remove</button>
+            </div>
+        `;
     }).join('');
 
-    document.getElementById('totalPriceDisplay').innerText = `Total: $${total.toFixed(2)}`;
+    totalElement.innerText = total.toFixed(2);
 }
 
-// 2. Pre-fill name/email if logged in
-async function prefillUserData() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (user) {
-        document.getElementById('custName').value = user.email.split('@')[0]; // Simple nickname from email
-    }
+function removeItem(index) {
+    let cart = JSON.parse(localStorage.getItem('golem_cart')) || [];
+    cart.splice(index, 1); // Remove 1 item at that position
+    localStorage.setItem('golem_cart', JSON.stringify(cart));
+    displayCart();
 }
 
-// 3. Send the order to Telegram
-document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+function clearCart() {
+    localStorage.removeItem('golem_cart');
+    displayCart();
+}
 
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const name = document.getElementById('custName').value;
-    const phone = document.getElementById('custPhone').value;
-    const address = document.getElementById('custAddress').value;
-
-    // Format the items for the Telegram message
-    const itemDetails = cart.map(item => `- ${item.name} ($${item.price})`).join('\n');
-    const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
-
-    const message = `🛍️ **NEW ORDER RECEIVED**\n\n` +
-                    `👤 **Customer:** ${name}\n` +
-                    `📞 **Phone:** ${phone}\n` +
-                    `📍 **Address:** ${address}\n\n` +
-                    `📦 **Items:**\n${itemDetails}\n\n` +
-                    `💰 **Total: $${total.toFixed(2)}**`;
-
-    // TELEGRAM CONFIG (Use your verified details here)
-    const token = 'YOUR_BOT_TOKEN'; 
-    const chatId = 'YOUR_CHAT_ID';
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'Markdown'
-            })
-        });
-
-        if (response.ok) {
-            alert("Order Sent Successfully! We will contact you soon.");
-            localStorage.removeItem('cart'); // Clear cart
-            window.location.href = 'index.html'; // Go home
-        } else {
-            alert("Failed to send order. Please try again.");
-        }
-    } catch (err) {
-        console.error("Error:", err);
-    }
-});
+function processOrder() {
+    alert("Thank you for your order! Your items are being processed.");
+    clearCart();
+    window.location.href = 'index.html';
+}
