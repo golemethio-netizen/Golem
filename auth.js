@@ -39,7 +39,7 @@ async function handleLogin() {
         msg.innerText = error.message;
     } else {
         const user = data.user;
-        const adminEmail = 'YOUR_EMAIL@GMAIL.COM'.toLowerCase(); // CHANGE THIS
+        const adminEmail = 'golemethio@gmail.com'.toLowerCase(); // CHANGE THIS
 
         if (user.email.toLowerCase() === adminEmail) {
             window.location.href = 'admin.html';
