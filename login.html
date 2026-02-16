@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Golem Store</title>
+    <title>Login | Golem Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="auth-container" style="max-width: 400px; margin: 100px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-        <h2 id="authTitle">Login</h2>
-        
-        <div style="margin-bottom: 15px;">
-            <input type="email" id="email" placeholder="Email" style="width: 100%; padding: 10px; margin-bottom: 10px;">
-            <input type="password" id="password" placeholder="Password" style="width: 100%; padding: 10px;">
-        </div>
+    <nav>
+        <div class="logo">Golem Store</div>
+        <div class="nav-links"><a href="index.html">Back to Shop</a></div>
+    </nav>
 
-        <button id="authBtn" style="width: 100%; padding: 10px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
+    <div class="auth-container">
+        <h2 id="authTitle">Login to Golem</h2>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
         
-        <p id="toggleMsg" style="margin-top: 15px; color: blue; cursor: pointer; text-decoration: underline;">
-            Need an account? Register here.
-        </p>
-        <p id="authError" style="color: red; margin-top: 10px;"></p>
-        <a href="index.html" style="display: block; margin-top: 20px; color: #666;">← Back to Shop</a>
+        <div class="auth-buttons">
+            <button onclick="handleLogin()" id="loginBtn">Login</button>
+            <button onclick="handleSignup()" id="signupBtn">Create Account</button>
+        </div>
+        <p id="authMsg"></p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script> 
+    <script src="config.js"></script>
     <script src="auth.js"></script>
 </body>
 </html>
