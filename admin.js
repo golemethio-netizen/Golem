@@ -5,10 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchPendingProducts() {
     const tableBody = document.getElementById('pendingTable');
     
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'pending');
+    // Correct way:
+const { error } = await _supabase
+    .from('products')
+    .update({ status: 'approved' })
+    .eq('id', id);
 
     if (error) {
         console.error("Error fetching pending:", error.message);
