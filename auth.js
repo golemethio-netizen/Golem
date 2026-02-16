@@ -26,9 +26,13 @@ async function handleLogin() {
     if (error) {
         document.getElementById('authMsg').innerText = error.message;
     } else {
-        // Redirect to shop on success
-        window.location.href = 'index.html';
-   
+        // AUTOMATIC REDIRECT
+        if (data.user.email === 'golemethio@gmail.com') {
+            window.location.href = 'admin.html';
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
 }
     // Inside handleLogin after success:
 if (data.user.email === 'YOUR_ADMIN_EMAIL@gmail.com') {
