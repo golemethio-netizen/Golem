@@ -2,22 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel - Golem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Golem Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Admin Moderation</h1>
-    <div id="pendingSection">
-        <h2>📥 Pending Approval</h2>
-        <div id="pendingGrid" class="grid"></div>
-    </div>
-    
-    <hr>
-    
-    <div id="activeSection">
-        <h2>✅ Live Products</h2>
-        <div id="activeGrid" class="grid"></div>
-    </div>
+    <nav>
+        <div class="logo">Golem Admin</div>
+        <div class="nav-links">
+            <a href="index.html">View Store</a>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <main class="admin-container">
+        <h1>Pending Approvals</h1>
+        <div class="admin-table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingTable">
+                    </tbody>
+            </table>
+        </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
