@@ -28,7 +28,15 @@ async function handleLogin() {
     } else {
         // Redirect to shop on success
         window.location.href = 'index.html';
-    }
+   
+}
+    // Inside handleLogin after success:
+if (data.user.email === 'YOUR_ADMIN_EMAIL@gmail.com') {
+    alert("Welcome Boss!");
+    window.location.href = 'admin.html'; // Create this page for approvals
+} else {
+    window.location.href = 'index.html';
+}
 }
 
 async function logout() {
