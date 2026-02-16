@@ -1,42 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
-    loadAdminProducts();
+    fetchPendingProducts();
 });
 
-async function loadAdminProducts() {
-    const { data, error } = await _supabase.from('products').select('*');
-    if (error) return console.error(error);
+async function fetchPendingProducts() {
+    const tableBody = document.getElementById('pendingTable');
+    
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'pending');
 
-    const pending = data.filter(p => p.status === 'pending');
-    const approved = data.filter(p => p.status === 'approved');
+    if (error) {
+        console.error("Error fetching pending:", error.message);
+        return;
+    }
 
-    renderAdminGrid('pendingGrid', pending, true);
-    renderAdminGrid('activeGrid', approved, false);
-}
+    if (data.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='5'>No pending products to approve.</td></tr>";
+        return;
+    }
 
-function renderAdminGrid(elementId, list, isPending) {
-    const container = document.getElementById(elementId);
-    container.innerHTML = list.map(p => `
-        <div class="card">
-            <img src="${p.image}" width="100">
-            <h4>${p.name}</h4>
-            <p>By: ${p.submitted_by || 'Admin'}</p>
-            ${isPending ? 
-                `<button onclick="updateStatus(${p.id}, 'approved')" style="background:green;color:white">Approve</button>` : 
-                `<button onclick="updateStatus(${p.id}, 'pending')" style="background:orange">Hide</button>`
-            }
-            <button onclick="deleteItem(${p.id})" style="background:red;color:white">Delete</button>
-        </div>
+    tableBody.innerHTML = data.map(p => `
+        <tr>
+            <td><img src="${p.image}" width="50" style="border-radius:5px"></td>
+            <td>${p.name}</td>
+            <td>$${p.price}</td>
+            <td>${p.category}</td>
+            <td>
+                <button class="approve-btn" onclick="approveItem('${p.id}')">Approve</button>
+                <button class="reject-btn" onclick="deleteItem('${p.id}')">Delete</button>
+            </td>
+        </tr>
     `).join('');
 }
 
-async function updateStatus(id, newStatus) {
-    await _supabase.from('products').update({ status: newStatus }).eq('id', id);
-    loadAdminProducts();
+async function approveItem(id) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: 'approved' })
+        .eq('id', id);
+
+    if (!error) {
+        alert("Product Approved!");
+        fetchPendingProducts(); // Refresh list
+    }
 }
 
 async function deleteItem(id) {
-    if(confirm("Permanently delete?")) {
-        await _supabase.from('products').delete().eq('id', id);
-        loadAdminProducts();
+    if (confirm("Are you sure you want to delete this submission?")) {
+        const { error } = await _supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+        
+        if (!error) fetchPendingProducts();
     }
 }
