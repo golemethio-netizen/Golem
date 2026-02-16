@@ -144,4 +144,30 @@ nav {
 #searchInput:focus {
     border-color: var(--accent);
 }
+.auth-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.auth-container input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#loginBtn { background: var(--accent); color: white; flex: 1; border: none; padding: 12px; cursor: pointer; border-radius: 5px; }
+#signupBtn { background: #eee; color: #333; flex: 1; border: none; padding: 12px; cursor: pointer; border-radius: 5px; }
 
