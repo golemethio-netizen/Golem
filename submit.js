@@ -88,3 +88,12 @@ async function handleSubmit(event) {
         alert("Upload failed: " + err.message);
     }
 }
+
+document.getElementById('productImage').onchange = function (evt) {
+    const [file] = this.files;
+    if (file) {
+        const preview = document.getElementById('preview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+}
