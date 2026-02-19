@@ -2,27 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sell Item - Golem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Product | Golem Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="form-container">
-        <h2>Submit Product</h2>
-        <form id="productForm">
-            <input type="text" id="pName" placeholder="Product Name" required>
-            <input type="number" id="pPrice" placeholder="Price" required>
-           <input type="file" id="productImage" accept="image/*">
-            <select id="pCategory">
-                <option value="tech">Tech</option>
-                <option value="home">Home</option>
-                <option value="fashion">Fashion</option>
-            </select>
-<img id="preview" src="#" alt="Preview" style="display:none; width: 100px; margin-top: 10px; border-radius: 8px;">
+    <nav>
+        <div class="logo">Golem Store</div>
+        <div class="nav-links">
+            <a href="index.html">Back to Shop</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <form id="productForm" class="auth-form">
+            <h2>Submit New Product</h2>
+            <p>Fill out the details below to list your item.</p>
+
+            <input type="text" id="productName" placeholder="Product Name" required>
+            <input type="number" id="productPrice" placeholder="Price (USD)" required>
             
-            <button type="submit">Submit for Review</button>
+            <select id="productCategory">
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Art">Art</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <textarea id="productDescription" placeholder="Tell us more about this item..." rows="4"></textarea>
+
+            <label for="productImage" class="file-label">Upload Product Image</label>
+            <input type="file" id="productImage" accept="image/*" required>
+            
+            <img id="preview" src="#" alt="Preview" style="display:none; width: 100%; max-width: 200px; margin: 10px auto; border-radius: 8px; border: 1px solid #ddd;">
+
+            <button type="submit" id="submitBtn">Submit for Approval</button>
+            <p id="statusMsg"></p>
         </form>
-        <p id="statusMsg"></p>
-        <a href="index.html">Back to Shop</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
