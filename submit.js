@@ -51,16 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const publicImageUrl = urlData.publicUrl;
 
             // STEP C: Insert record into 'products' table
-            const { error: dbError } = await _supabase
-                .from('products')
-                .insert([{
-                    name: name,
-                    price: parseFloat(price),
-                    category: category,
-                    description: description,
-                    image: publicImageUrl,
-                    status: 'pending' // Admin must approve this
-                }]);
+            // Remove 'status' from the code and let the Database handle it automatically
+const { error: dbError } = await _supabase
+    .from('products')
+    .insert([{
+        name: name,
+        price: parseFloat(price),
+        category: category,
+        description: description,
+        image: publicImageUrl
+        // status: 'pending' <-- Try removing this line
+    }]);
 
             if (dbError) throw dbError;
 
