@@ -1,99 +1,79 @@
-const form = document.getElementById('productForm');
+document.addEventListener('DOMContentLoaded', () => {
+    const productForm = document.getElementById('productForm');
+    const imageInput = document.getElementById('productImage');
+    const preview = document.getElementById('preview');
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const { data: { user } } = await _supabase.auth.getUser();
-
-    if (!user) {
-        alert("Please login first!");
-        window.location.href = 'login.html';
-        return;
-    }
-
-    const newProduct = {
-        name: document.getElementById('pName').value,
-        price: document.getElementById('pPrice').value,
-        image: document.getElementById('pImage').value,
-        category: document.getElementById('pCategory').value,
-        status: 'pending',
-        submitted_by: user.email
+    // 1. Image Preview Logic
+    imageInput.onchange = function () {
+        const [file] = this.files;
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        }
     };
 
-    const { error } = await _supabase.from('products').insert([newProduct]);
+    // 2. Form Submission Logic
+    productForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    if (!error) {
-        document.getElementById('statusMsg').innerText = "Sent! Waiting for admin approval.";
-        form.reset();
-        // Here you would call your Telegram notify function
-    } else {
-        alert(error.message);
-    }
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        
+        // Grab values
+        const name = document.getElementById('productName').value;
+        const price = document.getElementById('productPrice').value;
+        const category = document.getElementById('productCategory').value;
+        const description = document.getElementById('productDescription').value;
+        const imageFile = imageInput.files[0];
+
+        // UI Feedback
+        submitBtn.innerText = "Uploading... Please wait";
+        submitBtn.disabled = true;
+        statusMsg.innerText = "Processing your request...";
+
+        try {
+            // STEP A: Upload Image to Storage Bucket
+            const fileExt = imageFile.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`; // Unique filename
+            const filePath = `${fileName}`;
+
+            const { data: uploadData, error: uploadError } = await _supabase.storage
+                .from('product-images')
+                .upload(filePath, imageFile);
+
+            if (uploadError) throw uploadError;
+
+            // STEP B: Get the Public URL for the image
+            const { data: urlData } = _supabase.storage
+                .from('product-images')
+                .getPublicUrl(filePath);
+
+            const publicImageUrl = urlData.publicUrl;
+
+            // STEP C: Insert record into 'products' table
+            const { error: dbError } = await _supabase
+                .from('products')
+                .insert([{
+                    name: name,
+                    price: parseFloat(price),
+                    category: category,
+                    description: description,
+                    image: publicImageUrl,
+                    status: 'pending' // Admin must approve this
+                }]);
+
+            if (dbError) throw dbError;
+
+            // SUCCESS
+            alert("Success! Your product is pending admin approval.");
+            window.location.href = 'index.html';
+
+        } catch (err) {
+            console.error("Submission Error:", err);
+            statusMsg.innerText = "Error: " + err.message;
+            statusMsg.style.color = "red";
+            submitBtn.innerText = "Submit for Approval";
+            submitBtn.disabled = false;
+        }
+    });
 });
-
-
-///////////////////We need to change how the form handles the image. It now has to "Upload" the file first, get the URL, and then save the product.
-async function handleSubmit(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('productName').value;
-    const price = document.getElementById('productPrice').value;
-    const category = document.getElementById('productCategory').value;
-    const description = document.getElementById('productDescription').value;
-    const imageFile = document.getElementById('productImage').files[0]; // Get the file
-
-    if (!imageFile) {
-        alert("Please select an image!");
-        return;
-    }
-
-    try {
-        // 1. Generate a unique name for the image
-        const fileExt = imageFile.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${fileName}`;
-
-        // 2. Upload the file to Supabase Storage
-        const { data: uploadData, error: uploadError } = await _supabase.storage
-            .from('product-images')
-            .upload(filePath, imageFile);
-
-        if (uploadError) throw uploadError;
-
-        // 3. Get the Public URL of the uploaded image
-        const { data: urlData } = _supabase.storage
-            .from('product-images')
-            .getPublicUrl(filePath);
-
-        const publicImageUrl = urlData.publicUrl;
-
-        // 4. Save the product to the Database with the new Image URL
-        const { error: dbError } = await _supabase
-            .from('products')
-            .insert([{
-                name: name,
-                price: price,
-                category: category,
-                description: description,
-                image: publicImageUrl, // This is the link we just created
-                status: 'pending'
-            }]);
-
-        if (dbError) throw dbError;
-
-        alert("Product submitted for approval!");
-        window.location.href = 'index.html';
-
-    } catch (err) {
-        console.error("Error:", err.message);
-        alert("Upload failed: " + err.message);
-    }
-}
-
-document.getElementById('productImage').onchange = function (evt) {
-    const [file] = this.files;
-    if (file) {
-        const preview = document.getElementById('preview');
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-    }
-}
