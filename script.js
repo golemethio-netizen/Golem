@@ -38,21 +38,38 @@ function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    if (list.length === 0) {
-        grid.innerHTML = "<p>No approved products found. Check status in DB!</p>";
-        return;
-    }
-
     grid.innerHTML = list.map(p => `
-        <div class="product-card">
-            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name || 'Product'}">
+        <div class="product-card" onclick="openProductDetail('${p.id}')">
+            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
             <div class="product-info">
-                <h3>${p.name || 'Unnamed Item'}</h3>
-                <p class="price">$${p.price || '0.00'}</p>
-                <button onclick="addToCart('${p.id}', event)">Add to Cart</button>
+                <h3>${p.name}</h3>
+                <p class="price">$${p.price}</p>
+                <button onclick="event.stopPropagation(); addToCart('${p.id}', event)">Add to Cart</button>
             </div>
         </div>
     `).join('');
+}
+
+// Function to open the detail modal
+function openProductDetail(productId) {
+    const product = allApprovedProducts.find(p => p.id == productId);
+    if (!product) return;
+
+    const modal = document.getElementById('productModal');
+    document.getElementById('modalImg').src = product.image;
+    document.getElementById('modalName').innerText = product.name;
+    document.getElementById('modalPrice').innerText = `$${product.price}`;
+    document.getElementById('modalDesc').innerText = product.description || "No description provided.";
+    
+    // Setup the cart button inside the modal
+    const modalCartBtn = document.getElementById('modalAddToCart');
+    modalCartBtn.onclick = () => addToCart(product.id);
+
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById('productModal').style.display = "none";
 }
 // 5. ADD TO CART LOGIC
 function addToCart(productId, event) {
@@ -117,5 +134,6 @@ function searchProducts() {
     );
     renderProducts(filtered);
 }
+
 
 
