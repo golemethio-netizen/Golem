@@ -31,7 +31,7 @@ form.addEventListener('submit', async (e) => {
 });
 
 
-///////////////////
+///////////////////We need to change how the form handles the image. It now has to "Upload" the file first, get the URL, and then save the product.
 async function handleSubmit(event) {
     event.preventDefault();
     
