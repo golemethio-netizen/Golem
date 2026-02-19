@@ -2,7 +2,7 @@
 async function checkAdmin() {
     // Get the current session status
     const { data: { session } } = await _supabase.auth.getSession();
-    const adminEmail = 'golemethio@gmail.com'.toLowerCase(); // CHANGE THIS
+    const adminEmail = 'jojo@gmail.com'.toLowerCase(); // CHANGE THIS
 
     if (!session) {
         // If not logged in at all
