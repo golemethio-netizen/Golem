@@ -134,14 +134,37 @@ function checkout() {
         return;
     }
 
-    const total = document.getElementById('cartTotal').innerText;
-    
-    // Example: Simple Alert (We can replace this with WhatsApp logic next!)
-    alert(`Thank you for your order of $${total}! We will contact you soon.`);
-    
-    // Clear the cart
+    // 1. Your Telegram Username (Change 'YOUR_TELEGRAM_USERNAME' to yours)
+    const myTelegramUser = "YOUR_TELEGRAM_USERNAME"; 
+
+    // 2. Build the order list text
+    let orderList = "🚀 *New Order from Golem Store* \n\n";
+    let total = 0;
+
+    cart.forEach((itemId, index) => {
+        const product = allApprovedProducts.find(p => p.id == itemId);
+        if (product) {
+            orderList += `${index + 1}. ${product.name} - $${product.price}\n`;
+            total += parseFloat(product.price);
+        }
+    });
+
+    orderList += `\n💰 *Total: $${total.toFixed(2)}*`;
+    orderList += `\n\nIs this item available?`;
+
+    // 3. Encode the text for a URL
+    const encodedText = encodeURIComponent(orderList);
+
+    // 4. Create the Telegram Link
+    const telegramUrl = `https://t.me/${myTelegramUser}?text=${encodedText}`;
+
+    // 5. Open Telegram
+    window.open(telegramUrl, '_blank');
+
+    // 6. Optional: Clear cart after sending
     cart = [];
     updateCartUI();
-    toggleCart(); // Close the sidebar
+    toggleCart();
 }
+
 
