@@ -148,8 +148,8 @@ function toggleCart() {
 async function checkout() {
     if (cart.length === 0) return;
 
-    const botToken = "YOUR_BOT_TOKEN"; 
-    const chatId = "YOUR_CHAT_ID";
+    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o"; 
+    const chatId = "6792892909";
 
     let orderList = "🛍️ **New Order!**\n\n";
     let total = 0;
@@ -181,3 +181,4 @@ async function checkout() {
 
 // START THE APP
 fetchProducts();
+
