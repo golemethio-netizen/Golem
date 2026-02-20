@@ -3,42 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell Product | Golem Store</title>
+    <title>Sell an Item | Golem</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav>
-        <div class="logo">Golem Store</div>
-        <div class="nav-links"><a href="index.html">Back to Shop</a></div>
-    </nav>
-
-    <div class="auth-container">
-        <form id="productForm" class="auth-form">
-            <h2>List Your Item</h2>
-            <input type="text" id="productName" placeholder="Product Name" required>
-            <input type="number" id="productPrice" placeholder="Price (USD)" required>
-            
-            <select id="productCategory" required>
-                <option value="" disabled selected>Select Category</option>
+    <div class="admin-container">
+        <h2>Post New Product</h2>
+        <form id="productForm">
+            <input type="text" id="name" placeholder="Product Name" required>
+            <input type="number" id="price" placeholder="Price (USD)" required>
+            <select id="category">
                 <option value="Electronics">Electronics</option>
                 <option value="Clothing">Clothing</option>
                 <option value="Art">Art</option>
                 <option value="Other">Other</option>
             </select>
-
-            <textarea id="productDescription" placeholder="Description..." rows="3"></textarea>
-            
-            <label class="file-label">Product Image:</label>
-            <input type="file" id="productImage" accept="image/*" required>
-            <img id="preview" src="#" style="display:none; width: 100px; margin: 10px auto; border-radius: 5px;">
-
-            <button type="submit" id="submitBtn">Submit Product</button>
-            <p id="statusMsg"></p>
+            <input type="url" id="image" placeholder="Image URL (e.g., Postimg or Imgur link)" required>
+            <textarea id="description" placeholder="Short Description"></textarea>
+            <button type="submit" id="submitBtn">Post for Approval</button>
         </form>
+        <br>
+        <a href="index.html">← Back to Shop</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="submit.js"></script>
+    <script>
+        const form = document.getElementById('productForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 1. Get the current logged-in user
+            const { data: { user } } = await _supabase.auth.getUser();
+            
+            if (!user) {
+                alert("You must be logged in!");
+                window.location.href = "index.html";
+                return;
+            }
+
+            const product = {
+                name: document.getElementById('name').value,
+                price: document.getElementById('price').value,
+                category: document.getElementById('category').value,
+                image: document.getElementById('image').value,
+                description: document.getElementById('description').value,
+                status: 'pending', // Items start as pending for admin review
+                user_id: user.id   // Link the product to the user
+            };
+
+            const { error } = await _supabase.from('products').insert([product]);
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                alert("Success! Your item is waiting for admin approval.");
+                window.location.href = "index.html";
+            }
+        });
+    </script>
 </body>
 </html>
