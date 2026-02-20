@@ -1,3 +1,6 @@
+html {
+    scroll-behavior: smooth;
+}
 body { font-family: 'Inter', sans-serif; margin: 0; background: #f4f7f6; }
 nav { background: #333; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
 .hero { text-align: center; padding: 50px 20px; background: white; }
@@ -133,4 +136,5 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
     transform: rotate(-15deg); /* Tilts the badge for a "sticker" look */
     font-family: 'Black Ops One', cursive; /* A bold, military-style font looks cool here */
 }
+
 
