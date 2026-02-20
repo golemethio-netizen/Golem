@@ -128,43 +128,54 @@ function toggleCart() {
     const sidebar = document.getElementById('cartSidebar');
     sidebar.classList.toggle('active');
 }
-function checkout() {
+async function checkout() {
     if (cart.length === 0) {
         alert("Your cart is empty!");
         return;
     }
 
-    // 1. Your Telegram Username (Change 'YOUR_TELEGRAM_USERNAME' to yours)
-    const myTelegramUser = "@allInOneEthiopia1"; 
+    // --- CONFIGURATION ---
+    const botToken = "YOUR_BOT_TOKEN_HERE"; // Put your token from BotFather
+    const chatId = "YOUR_CHAT_ID_HERE";     // Put your ID from userinfobot
+    // ---------------------
 
-    // 2. Build the order list text
-    let orderList = "🚀 *New Order from Golem Store* \n\n";
+    let orderList = "🛍️ **New Order Received!**\n\n";
     let total = 0;
 
     cart.forEach((itemId, index) => {
         const product = allApprovedProducts.find(p => p.id == itemId);
         if (product) {
-            orderList += `${index + 1}. ${product.name} - $${product.price}\n`;
+            orderList += `${index + 1}. ${product.name} — $${product.price}\n`;
             total += parseFloat(product.price);
         }
     });
 
-    orderList += `\n💰 *Total: $${total.toFixed(2)}*`;
-    orderList += `\n\nIs this item available?`;
+    orderList += `\n💰 **Total: $${total.toFixed(2)}**`;
+    orderList += `\n\nCheck the dashboard to process this order.`;
 
-    // 3. Encode the text for a URL
-    const encodedText = encodeURIComponent(orderList);
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: orderList,
+                parse_mode: "Markdown" // Makes the text look nice (bolding, etc.)
+            })
+        });
 
-    // 4. Create the Telegram Link
-    const telegramUrl = `https://t.me/${myTelegramUser}?text=${encodedText}`;
-
-    // 5. Open Telegram
-    window.open(telegramUrl, '_blank');
-
-    // 6. Optional: Clear cart after sending
-    cart = [];
-    updateCartUI();
-    toggleCart();
+        if (response.ok) {
+            alert("Order sent successfully! We will contact you soon.");
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        } else {
+            throw new Error("Failed to send to Telegram");
+        }
+    } catch (error) {
+        console.error("Checkout Error:", error);
+        alert("There was an error sending your order. Please try again.");
+    }
 }
 
 
