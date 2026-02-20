@@ -135,7 +135,7 @@ function checkout() {
     }
 
     // 1. Your Telegram Username (Change 'YOUR_TELEGRAM_USERNAME' to yours)
-    const myTelegramUser = "YOUR_TELEGRAM_USERNAME"; 
+    const myTelegramUser = "@allInOneEthiopia1"; 
 
     // 2. Build the order list text
     let orderList = "🚀 *New Order from Golem Store* \n\n";
@@ -166,5 +166,6 @@ function checkout() {
     updateCartUI();
     toggleCart();
 }
+
 
 
