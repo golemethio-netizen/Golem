@@ -57,10 +57,7 @@ grid.innerHTML = list.map(p => {
                 ? '<button disabled class="sold-out-btn">Sold Out</button>' 
                 : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
             }
-            // Inside the product-info div in your render loop:
-<p class="stock-text">
-    ${p.stock > 0 && p.stock < 5 ? `<span style="color:red; font-size:0.8rem;">🔥 Only ${p.stock} left!</span>` : ''}
-</p>
+           
         </div>
     </div>`;
 }).join('');
@@ -193,6 +190,7 @@ async function checkout() {
 
 // START THE APP
 fetchProducts();
+
 
 
 
