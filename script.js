@@ -135,8 +135,8 @@ async function checkout() {
     }
 
     // --- CONFIGURATION ---
-    const botToken = "YOUR_BOT_TOKEN_HERE"; // Put your token from BotFather
-    const chatId = "YOUR_CHAT_ID_HERE";     // Put your ID from userinfobot
+    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o"; // Put your token from BotFather
+    const chatId = "6792892909";     // Put your ID from userinfobot
     // ---------------------
 
     let orderList = "🛍️ **New Order Received!**\n\n";
@@ -177,6 +177,7 @@ async function checkout() {
         alert("There was an error sending your order. Please try again.");
     }
 }
+
 
 
 
