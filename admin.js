@@ -55,22 +55,7 @@ async function fetchPendingProducts() {
         </tr>
     `).join('');
 }
-// Inside your render function for the Admin panel:
-grid.innerHTML = list.map(p => `
-    <div class="admin-card">
-        <img src="${p.image}" width="100">
-        <div class="admin-info">
-            <h4>${p.name}</h4>
-            <p>Status: <strong>${p.status}</strong></p>
-            
-            <div class="admin-actions">
-                ${p.status === 'pending' ? `<button class="approve-btn" onclick="approveProduct('${p.id}')">Approve</button>` : ''}
-                <button class="sold-btn" onclick="markAsSold('${p.id}')">Mark Sold</button>
-                <button class="delete-btn" onclick="deleteProduct('${p.id}')">Delete</button>
-            </div>
-        </div>
-    </div>
-`).join('');
+
 // 3. APPROVE ITEM
 async function approveItem(id) {
     const { error } = await _supabase
