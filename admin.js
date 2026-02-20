@@ -1,145 +1,79 @@
-// 1. THE GATEKEEPER - Runs immediately
-async function checkAdmin() {
-    // Get the current session status
-    const { data: { session } } = await _supabase.auth.getSession();
-    const adminEmail = 'jojo@gmail.com'.toLowerCase(); // CHANGE THIS
-
-    if (!session) {
-        // If not logged in at all
-        alert("Access Denied. Please login.");
-        window.location.href = 'login.html';
-        return;
-    }
-
-    if (session.user.email.toLowerCase() !== Email) {
-        // If logged in as a normal user
-        alert("Access Denied. Admins only.");
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // If we passed both checks, load the data
-    console.log("Admin verified. Loading products...");
-    fetchPendingProducts();
-}
-
-// 2. FETCH PENDING PRODUCTS
-async function fetchPendingProducts() {
-    const tableBody = document.getElementById('pendingTable');
+// 1. Fetch ALL products (regardless of status)
+async function fetchAdminProducts() {
+    const listContainer = document.getElementById('adminProductList');
     
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('status', 'pending');
+        .order('created_at', { ascending: false });
 
     if (error) {
-        console.error("Fetch error:", error.message);
+        listContainer.innerHTML = "Error loading products.";
         return;
     }
 
-    if (!data || data.length === 0) {
-        tableBody.innerHTML = "<tr><td colspan='5'>No pending items found.</td></tr>";
+    if (data.length === 0) {
+        listContainer.innerHTML = "No products found.";
         return;
     }
 
-   // This is likely inside a function like 'renderAdminProducts'
-grid.innerHTML = list.map(p => `
-    <div class="admin-card">
-        <img src="${p.image}" width="80">
-        <div class="admin-info">
-            <h4>${p.name}</h4>
-            <p>Current Status: <strong>${p.status}</strong></p>
-            
+    renderAdminList(data);
+}
+
+// 2. Draw the list with buttons
+function renderAdminList(products) {
+    const listContainer = document.getElementById('adminProductList');
+    
+    listContainer.innerHTML = products.map(p => `
+        <div class="admin-card">
+            <img src="${p.image}" alt="">
+            <div class="admin-info">
+                <h4>${p.name}</h4>
+                <p>$${p.price} | Category: ${p.category}</p>
+                <span class="status-badge status-${p.status}">${p.status}</span>
+            </div>
             <div class="admin-actions">
-                ${p.status === 'pending' ? `<button class="approve-btn" onclick="approveProduct('${p.id}')">Approve</button>` : ''}
+                ${p.status === 'pending' ? 
+                    `<button class="approve-btn" onclick="updateStatus('${p.id}', 'approved')">Approve</button>` : ''}
                 
-                <button class="sold-btn" onclick="markAsSold('${p.id}')">Mark Sold</button>
+                ${p.status === 'approved' ? 
+                    `<button class="sold-btn" onclick="updateStatus('${p.id}', 'sold')">Mark Sold</button>` : ''}
                 
                 <button class="delete-btn" onclick="deleteProduct('${p.id}')">Delete</button>
             </div>
         </div>
-    </div>
-`).join('');
-    
-// 3. APPROVE ITEM
-async function approveItem(id) {
+    `).join('');
+}
+
+// 3. UNIVERSAL UPDATE FUNCTION (For Approve and Sold)
+async function updateStatus(id, newStatus) {
     const { error } = await _supabase
         .from('products')
-        .update({ status: 'approved' })
+        .update({ status: newStatus })
         .eq('id', id);
 
     if (error) {
         alert("Update failed: " + error.message);
     } else {
-        alert("Product Approved!");
-        fetchPendingProducts(); // Refresh list
+        fetchAdminProducts(); // Refresh list
     }
 }
 
-// 4. DELETE/REJECT ITEM
-async function deleteItem(id) {
-    if (confirm("Delete this submission?")) {
-        const { error } = await _supabase
-            .from('products')
-            .delete()
-            .eq('id', id);
-        
-        if (error) {
-            alert("Delete failed: " + error.message);
-        } else {
-            fetchPendingProducts();
-        }
-    }
-}
-
-// Function to delete a product
+// 4. DELETE FUNCTION
 async function deleteProduct(id) {
-    const confirmation = confirm("Are you sure you want to delete this product? This cannot be undone.");
-    
-    if (confirmation) {
-        const { error } = await _supabase
-            .from('products')
-            .delete()
-            .eq('id', id);
+    if (!confirm("Are you sure you want to delete this?")) return;
 
-        if (error) {
-            alert("Error deleting product: " + error.message);
-        } else {
-            alert("Product removed from store.");
-            fetchAdminProducts(); // Refresh the list automatically
-        }
+    const { error } = await _supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        alert("Delete failed.");
+    } else {
+        fetchAdminProducts(); // Refresh list
     }
 }
 
-// Function to mark as Sold (Optional alternative to deleting)
-async function markAsSold(id) {
-    // 1. Ask for confirmation
-    const confirmation = confirm("Mark this item as Sold? It will stay on the site but cannot be bought.");
-    
-    if (confirmation) {
-        // 2. Update Supabase
-        const { data, error } = await _supabase
-            .from('products')
-            .update({ status: 'sold' }) 
-            .eq('id', id);
-
-        if (error) {
-            alert("Error updating status: " + error.message);
-        } else {
-            alert("Item marked as SOLD!");
-            // 3. Refresh the page or the list to see the change
-            location.reload(); 
-        }
-    }
-}
-
-
-
-// 5. LOGOUT
-async function logout() {
-    await _supabase.auth.signOut();
-    window.location.href = 'login.html';
-}
-
-// INITIALIZE
-checkAdmin();
+// Run on load
+fetchAdminProducts();
