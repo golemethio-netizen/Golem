@@ -1,35 +1,36 @@
 let allApprovedProducts = [];
 
+// 1. FETCH DATA FROM DATABASE
 async function fetchProducts() {
-    console.log("1. Fetching started...");
+    console.log("Fetching started...");
     const grid = document.getElementById('productGrid');
     
     try {
         const { data, error } = await _supabase
             .from('products')
-            .select('*'); // Removing the filter temporarily to see if data exists
+            .select('*'); 
 
         if (error) throw error;
 
-        console.log("2. Data received:", data);
+        console.log("Data received:", data);
 
-        // Filter for approved or sold items in JavaScript instead of SQL to be safe
+        // Filter for approved or sold items
         allApprovedProducts = data.filter(p => p.status === 'approved' || p.status === 'sold');
         
-        console.log("3. Filtered items:", allApprovedProducts);
         renderProducts(allApprovedProducts);
 
     } catch (err) {
-        console.error("CRITICAL ERROR:", err.message);
-        grid.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+        console.error("Fetch Error:", err.message);
+        if(grid) grid.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
     }
 }
 
-unction renderProducts(list) {
+// 2. RENDER PRODUCTS TO THE SCREEN
+function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // Clear the loading message
+    // Clear loading text
     grid.innerHTML = "";
 
     if (list.length === 0) {
@@ -47,7 +48,7 @@ unction renderProducts(list) {
                 <h3>${p.name}</h3>
                 <p class="price">$${p.price}</p>
                 ${isSold 
-                    ? '<button disabled style="background: #888;">Sold Out</button>' 
+                    ? '<button disabled style="background: #888; cursor: not-allowed;">Sold Out</button>' 
                     : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
                 }
             </div>
@@ -55,8 +56,15 @@ unction renderProducts(list) {
     }).join('');
 }
 
-// Call the function
-fetchProducts();
+// 3. SEARCH AND FILTER FUNCTIONS
+function searchProducts() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allApprovedProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.description.toLowerCase().includes(term)
+    );
+    renderProducts(filtered);
+}
 
 function filterByCategory(category) {
     const buttons = document.querySelectorAll('.filter-btn');
@@ -68,6 +76,7 @@ function filterByCategory(category) {
     renderProducts(filtered);
 }
 
+// 4. PRODUCT DETAIL MODAL
 function openProductDetail(id) {
     const p = allApprovedProducts.find(item => item.id == id);
     if (!p) return;
@@ -83,35 +92,22 @@ function closeModal() {
     document.getElementById('productModal').style.display = "none";
 }
 
-// Simple Cart Logic
+// 5. CART LOGIC
 let cart = [];
+
 function addToCart(id) {
     cart.push(id);
-    document.getElementById('cartCount').innerText = cart.length;
-    alert("Added to cart!");
+    updateCartUI();
+    document.getElementById('cartSidebar').classList.add('active');
 }
 
-fetchProducts();
-// 1. Updated Add to Cart Function
-function addToCart(id) {
-    cart.push(id);
-    updateCartUI(); // Refresh the visual list
-    
-    // Optional: Open the sidebar automatically when an item is added
-    const sidebar = document.getElementById('cartSidebar');
-    if(sidebar) sidebar.classList.add('active'); 
-}
-
-// 2. The function that actually DISPLAYS the items
 function updateCartUI() {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartCount = document.getElementById('cartCount');
     const cartTotal = document.getElementById('cartTotal');
 
-    // Update the counter bubble
     cartCount.innerText = cart.length;
 
-    // If cart is empty
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = "<p style='padding:20px;'>Your cart is empty.</p>";
         cartTotal.innerText = "0";
@@ -119,7 +115,6 @@ function updateCartUI() {
     }
 
     let total = 0;
-    // Map through the IDs in the cart and find the product info from our main list
     cartItemsContainer.innerHTML = cart.map((itemId, index) => {
         const product = allApprovedProducts.find(p => p.id == itemId);
         if (product) {
@@ -140,29 +135,23 @@ function updateCartUI() {
     cartTotal.innerText = total.toFixed(2);
 }
 
-// 3. Remove item function
 function removeFromCart(index) {
-    cart.splice(index, 1); // Remove 1 item at that position
+    cart.splice(index, 1);
     updateCartUI();
 }
 
-// 4. Toggle Sidebar Visibility
 function toggleCart() {
-    const sidebar = document.getElementById('cartSidebar');
-    sidebar.classList.toggle('active');
+    document.getElementById('cartSidebar').classList.toggle('active');
 }
+
+// 6. TELEGRAM CHECKOUT
 async function checkout() {
-    if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-    }
+    if (cart.length === 0) return;
 
-    // --- CONFIGURATION ---
-    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o"; // Put your token from BotFather
-    const chatId = "6792892909";     // Put your ID from userinfobot
-    // ---------------------
+    const botToken = "YOUR_BOT_TOKEN"; 
+    const chatId = "YOUR_CHAT_ID";
 
-    let orderList = "🛍️ **New Order Received!**\n\n";
+    let orderList = "🛍️ **New Order!**\n\n";
     let total = 0;
 
     cart.forEach((itemId, index) => {
@@ -174,48 +163,21 @@ async function checkout() {
     });
 
     orderList += `\n💰 **Total: $${total.toFixed(2)}**`;
-    orderList += `\n\nCheck the dashboard to process this order.`;
 
     try {
-        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: orderList,
-                parse_mode: "Markdown" // Makes the text look nice (bolding, etc.)
-            })
+            body: JSON.stringify({ chat_id: chatId, text: orderList, parse_mode: "Markdown" })
         });
-
-        if (response.ok) {
-            alert("Order sent successfully! We will contact you soon.");
-            cart = [];
-            updateCartUI();
-            toggleCart();
-        } else {
-            throw new Error("Failed to send to Telegram");
-        }
-    } catch (error) {
-        console.error("Checkout Error:", error);
-        alert("There was an error sending your order. Please try again.");
+        alert("Order sent!");
+        cart = [];
+        updateCartUI();
+        toggleCart();
+    } catch (e) {
+        alert("Error sending order.");
     }
 }
 
-
-function searchProducts() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    
-    const filtered = allApprovedProducts.filter(p => 
-        p.name.toLowerCase().includes(term) || 
-        p.description.toLowerCase().includes(term)
-    );
-    
-    renderProducts(filtered);
-}
-
-
-
-
-
-
-
+// START THE APP
+fetchProducts();
