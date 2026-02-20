@@ -200,4 +200,45 @@ fetchProducts();
 
 
 
+let isSignUp = false;
+
+// 1. Check if user is logged in before allowing them to sell
+function checkAuthToSell() {
+    const user = _supabase.auth.user(); // Checks for active session
+    if (user) {
+        window.location.href = "submit.html"; // Go to sell page
+    } else {
+        document.getElementById('authModal').style.display = 'flex'; // Show login
+    }
+}
+
+function closeAuth() {
+    document.getElementById('authModal').style.display = 'none';
+}
+
+function toggleAuthMode() {
+    isSignUp = !isSignUp;
+    document.getElementById('authTitle').innerText = isSignUp ? "Create Account" : "Login to Golem";
+    document.getElementById('authBtn').innerText = isSignUp ? "Register" : "Sign In";
+    document.getElementById('toggleText').innerText = isSignUp ? "Already have an account? Login." : "Don't have an account? Register.";
+}
+
+// 2. Handle the actual Login/Register with Supabase
+async function handleAuth() {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+
+    if (isSignUp) {
+        const { error } = await _supabase.auth.signUp({ email, password });
+        if (error) alert(error.message);
+        else alert("Check your email for the confirmation link!");
+    } else {
+        const { error } = await _supabase.auth.signIn({ email, password });
+        if (error) alert(error.message);
+        else {
+            alert("Logged in successfully!");
+            location.reload(); // Refresh to update UI
+        }
+    }
+}
 
