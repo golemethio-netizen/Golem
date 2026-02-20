@@ -14,16 +14,19 @@
 <body>
 
     <nav>
-        <div class="logo">Golem Store</div>
-        <div class="nav-links">
-            <a href="index.html">Shop</a>
-            <a href="submit.html">Sell Product</a>
-            <a href="login.html">Admin</a>
-            <div class="cart-icon" onclick="toggleCart()">
-                🛒 <span id="cartCount">0</span>
+    <div class="logo">GOLEM</div>
+    
+    <div class="nav-links">
+        <button class="sell-btn" onclick="checkAuthToSell()">+ Sell an Item</button>
+        
+        <div id="userMenu">
             </div>
+        
+        <div class="cart-icon" onclick="toggleCart()">
+            🛒 <span id="cartCount">0</span>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <header class="hero">
         <h1>Discover Unique Items</h1>
@@ -95,6 +98,7 @@
     </div>
 </div>
 </html>
+
 
 
 
