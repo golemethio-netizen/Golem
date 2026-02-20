@@ -47,15 +47,18 @@ function renderAdminList(products) {
 
 // 3. UNIVERSAL UPDATE FUNCTION (For Approve and Sold)
 async function updateStatus(id, newStatus) {
-    const { error } = await _supabase
+    const { data, error } = await _supabase
         .from('products')
         .update({ status: newStatus })
-        .eq('id', id);
+        .eq('id', id)
+        .select(); // Adding .select() helps confirm the update happened
 
     if (error) {
-        alert("Update failed: " + error.message);
+        console.error("Supabase Error:", error);
+        alert("Error: " + error.message);
     } else {
-        fetchAdminProducts(); // Refresh list
+        console.log("Success:", data);
+        fetchAdminProducts(); // This reloads the list
     }
 }
 
