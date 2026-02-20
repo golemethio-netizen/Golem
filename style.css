@@ -267,3 +267,26 @@ th, td {
     .modal-body { flex-direction: column; }
     .modal-body img { width: 100%; }
 }
+.filter-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border: 2px solid #007bff;
+    background: transparent;
+    color: #007bff;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+}
+
+.filter-btn.active, .filter-btn:hover {
+    background: #007bff;
+    color: white;
+}
