@@ -18,7 +18,9 @@
                 <option value="Art">Art</option>
                 <option value="Other">Other</option>
             </select>
-            <input type="url" id="image" placeholder="Image URL (e.g., Postimg or Imgur link)" required>
+           <label for="imageFile">Product Photo:</label>
+<input type="file" id="imageFile" accept="image/*" required>
+<div id="uploadStatus" style="font-size: 0.8rem; color: #666;"></div>
             <textarea id="description" placeholder="Short Description"></textarea>
             <button type="submit" id="submitBtn">Post for Approval</button>
         </form>
