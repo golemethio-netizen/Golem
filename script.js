@@ -69,3 +69,62 @@ function addToCart(id) {
 }
 
 fetchProducts();
+// 1. Updated Add to Cart Function
+function addToCart(id) {
+    cart.push(id);
+    updateCartUI(); // Refresh the visual list
+    
+    // Optional: Open the sidebar automatically when an item is added
+    const sidebar = document.getElementById('cartSidebar');
+    if(sidebar) sidebar.classList.add('active'); 
+}
+
+// 2. The function that actually DISPLAYS the items
+function updateCartUI() {
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartCount = document.getElementById('cartCount');
+    const cartTotal = document.getElementById('cartTotal');
+
+    // Update the counter bubble
+    cartCount.innerText = cart.length;
+
+    // If cart is empty
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = "<p style='padding:20px;'>Your cart is empty.</p>";
+        cartTotal.innerText = "0";
+        return;
+    }
+
+    let total = 0;
+    // Map through the IDs in the cart and find the product info from our main list
+    cartItemsContainer.innerHTML = cart.map((itemId, index) => {
+        const product = allApprovedProducts.find(p => p.id == itemId);
+        if (product) {
+            total += parseFloat(product.price);
+            return `
+                <div class="cart-item">
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="cart-item-info">
+                        <h4>${product.name}</h4>
+                        <p>$${product.price}</p>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromCart(${index})">&times;</button>
+                </div>
+            `;
+        }
+    }).join('');
+
+    cartTotal.innerText = total.toFixed(2);
+}
+
+// 3. Remove item function
+function removeFromCart(index) {
+    cart.splice(index, 1); // Remove 1 item at that position
+    updateCartUI();
+}
+
+// 4. Toggle Sidebar Visibility
+function toggleCart() {
+    const sidebar = document.getElementById('cartSidebar');
+    sidebar.classList.toggle('active');
+}
