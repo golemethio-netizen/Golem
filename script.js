@@ -26,23 +26,20 @@ async function fetchProducts() {
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
+    
+    // If the list is empty after fetching
+    if (!list || list.length === 0) {
+        grid.innerHTML = `
+            <div style="text-align:center; padding: 50px; width:100%;">
+                <p>No products available yet. Check back soon!</p>
+            </div>`;
+        return;
+    }
+
+    // Otherwise, render the cards...
     grid.innerHTML = list.map(p => {
-        const isSold = p.status === 'sold';
-        
-        return `
-        <div class="product-card ${isSold ? 'sold-out' : ''}" onclick="openProductDetail('${p.id}')">
-            ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
-            <img src="${p.image}" alt="${p.name}" style="${isSold ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p class="price">$${p.price}</p>
-                ${isSold 
-                    ? '<button disabled style="background: #888; cursor: not-allowed;">Out of Stock</button>' 
-                    : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
-                }
-            </div>
-        </div>
-    `}).join('');
+        // ... (your existing card mapping code)
+    }).join('');
 }
 
 function filterByCategory(category) {
@@ -199,6 +196,7 @@ function searchProducts() {
     
     renderProducts(filtered);
 }
+
 
 
 
