@@ -8,30 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
 });
 
-// 3. FETCH DATA FROM SUPABASE
-async function fetchProducts() {
-    const grid = document.getElementById('productGrid');
-    if (grid) grid.innerHTML = "<p>Loading products from Golem database...</p>";
 
-    try {
-        // We use the _supabase client created in config.js
-        const { data, error } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('status', 'approved');
-
-        if (error) throw error;
-
-        allApprovedProducts = data || [];
-        console.log("Success! Items found:", allApprovedProducts.length);
-        
-        renderProducts(allApprovedProducts);
-
-    } catch (err) {
-        console.error("Fetch Error:", err.message);
-        if (grid) grid.innerHTML = `<p style="color:red">Connection Error: ${err.message}</p>`;
-    }
-}
 
 // 4. RENDER PRODUCTS TO THE GRID
 function renderProducts(list) {
@@ -170,4 +147,5 @@ function filterByCategory(category) {
         renderProducts(filtered);
     }
 }
+
 
