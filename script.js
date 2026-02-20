@@ -1,46 +1,62 @@
 let allApprovedProducts = [];
 
 async function fetchProducts() {
+    console.log("1. Fetching started...");
     const grid = document.getElementById('productGrid');
     
-    // 1. Fetch from Supabase
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .or('status.eq.approved,status.eq.sold'); 
+    try {
+        const { data, error } = await _supabase
+            .from('products')
+            .select('*'); // Removing the filter temporarily to see if data exists
 
-    if (error) {
-        console.error(error);
-        grid.innerHTML = "<p>Error loading products. Please refresh.</p>";
-        return;
+        if (error) throw error;
+
+        console.log("2. Data received:", data);
+
+        // Filter for approved or sold items in JavaScript instead of SQL to be safe
+        allApprovedProducts = data.filter(p => p.status === 'approved' || p.status === 'sold');
+        
+        console.log("3. Filtered items:", allApprovedProducts);
+        renderProducts(allApprovedProducts);
+
+    } catch (err) {
+        console.error("CRITICAL ERROR:", err.message);
+        grid.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
     }
-
-    // 2. Clear the "Loading..." message immediately
-    grid.innerHTML = ""; 
-
-    // 3. Save and Render
-    allApprovedProducts = data;
-    renderProducts(data);
 }
 
-
-function renderProducts(list) {
+unction renderProducts(list) {
     const grid = document.getElementById('productGrid');
-    
-    // If the list is empty after fetching
-    if (!list || list.length === 0) {
-        grid.innerHTML = `
-            <div style="text-align:center; padding: 50px; width:100%;">
-                <p>No products available yet. Check back soon!</p>
-            </div>`;
+    if (!grid) return;
+
+    // Clear the loading message
+    grid.innerHTML = "";
+
+    if (list.length === 0) {
+        grid.innerHTML = "<p>No products found in the database.</p>";
         return;
     }
 
-    // Otherwise, render the cards...
     grid.innerHTML = list.map(p => {
-        // ... (your existing card mapping code)
+        const isSold = p.status === 'sold';
+        return `
+        <div class="product-card" onclick="openProductDetail('${p.id}')">
+            ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
+            <img src="${p.image}" alt="${p.name}" style="${isSold ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p class="price">$${p.price}</p>
+                ${isSold 
+                    ? '<button disabled style="background: #888;">Sold Out</button>' 
+                    : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
+                }
+            </div>
+        </div>`;
     }).join('');
 }
+
+// Call the function
+fetchProducts();
 
 function filterByCategory(category) {
     const buttons = document.querySelectorAll('.filter-btn');
@@ -196,6 +212,7 @@ function searchProducts() {
     
     renderProducts(filtered);
 }
+
 
 
 
