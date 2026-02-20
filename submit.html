@@ -7,85 +7,96 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="admin-container">
-        <h2>Post New Product</h2>
+    <nav>
+        <div class="logo">GOLEM</div>
+        <div class="nav-links"><a href="index.html">Cancel</a></div>
+    </nav>
+
+    <div class="admin-container" style="max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center;">Post a New Product</h2>
         <form id="productForm">
-            <input type="text" id="name" placeholder="Product Name" required>
-            <input type="number" id="price" placeholder="Price (USD)" required>
-            <select id="category">
+            <label>Product Name</label>
+            <input type="text" id="name" placeholder="What are you selling?" required style="width:100%; padding:10px; margin:10px 0;">
+            
+            <label>Price (USD)</label>
+            <input type="number" id="price" placeholder="Enter price" required style="width:100%; padding:10px; margin:10px 0;">
+            
+            <label>Category</label>
+            <select id="category" style="width:100%; padding:10px; margin:10px 0;">
                 <option value="Electronics">Electronics</option>
                 <option value="Clothing">Clothing</option>
                 <option value="Art">Art</option>
                 <option value="Other">Other</option>
             </select>
-           <label for="imageFile">Product Photo:</label>
-<input type="file" id="imageFile" accept="image/*" required>
-<div id="uploadStatus" style="font-size: 0.8rem; color: #666;"></div>
-            <textarea id="description" placeholder="Short Description"></textarea>
-            <button type="submit" id="submitBtn">Post for Approval</button>
+            
+            <label>Product Image</label>
+            <input type="file" id="imageFile" accept="image/*" required style="margin:10px 0;">
+            
+            <label>Description</label>
+            <textarea id="description" placeholder="Tell buyers more about it..." style="width:100%; padding:10px; margin:10px 0; height:80px;"></textarea>
+            
+            <button type="submit" id="submitBtn" style="width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Post for Approval</button>
+            <p id="uploadStatus" style="text-align:center; font-size:0.8rem; color:#666; margin-top:10px;"></p>
         </form>
-        <br>
-        <a href="index.html">← Back to Shop</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-       const form = document.getElementById('productForm');
+        const form = document.getElementById('productForm');
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitBtn = document.getElementById('submitBtn');
-    const statusDiv = document.getElementById('uploadStatus');
-    
-    // 1. Get User
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return alert("Please log in first!");
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return alert("Please log in first!");
 
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Uploading Image...";
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Uploading Image...";
 
-    try {
-        const file = document.getElementById('imageFile').files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${user.id}/${fileName}`;
+            try {
+                const file = document.getElementById('imageFile').files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Math.random()}.${fileExt}`;
+                const filePath = `${user.id}/${fileName}`;
 
-        // 2. Upload to Supabase Storage
-        const { error: uploadError } = await _supabase.storage
-            .from('product-images')
-            .upload(filePath, file);
+                // 1. Upload to Storage
+                const { error: uploadError } = await _supabase.storage
+                    .from('product-images')
+                    .upload(filePath, file);
 
-        if (uploadError) throw uploadError;
+                if (uploadError) throw uploadError;
 
-        // 3. Get the Public URL
-        const { data: { publicUrl } } = _supabase.storage
-            .from('product-images')
-            .getPublicUrl(filePath);
+                // 2. Get Public URL
+                const { data: { publicUrl } } = _supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
 
-        // 4. Save Product to Database
-        statusDiv.innerText = "Saving product details...";
-        const product = {
-            name: document.getElementById('name').value,
-            price: document.getElementById('price').value,
-            category: document.getElementById('category').value,
-            image: publicUrl, // Using the new storage link!
-            description: document.getElementById('description').value,
-            status: 'pending',
-            user_id: user.id
-        };
+                // 3. Insert into Database
+                statusDiv.innerText = "Finalizing post...";
+                const { error: dbError } = await _supabase.from('products').insert([{
+                    name: document.getElementById('name').value,
+                    price: document.getElementById('price').value,
+                    category: document.getElementById('category').value,
+                    image: publicUrl,
+                    description: document.getElementById('description').value,
+                    status: 'pending',
+                    user_id: user.id
+                }]);
 
-        const { error: dbError } = await _supabase.from('products').insert([product]);
-        if (dbError) throw dbError;
+                if (dbError) throw dbError;
 
-        alert("Success! Your item is live once approved.");
-        window.location.href = "index.html";
+                alert("Success! Item sent for approval.");
+                window.location.href = "my-items.html";
 
-    } catch (err) {
-        alert(err.message);
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Post for Approval";
-    }
-});
+            } catch (err) {
+                alert("Error: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Post for Approval";
+            }
+        });
+    </script>
 </body>
 </html>
