@@ -87,6 +87,42 @@ async function deleteItem(id) {
     }
 }
 
+// Function to delete a product
+async function deleteProduct(id) {
+    const confirmation = confirm("Are you sure you want to delete this product? This cannot be undone.");
+    
+    if (confirmation) {
+        const { error } = await _supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert("Error deleting product: " + error.message);
+        } else {
+            alert("Product removed from store.");
+            fetchAdminProducts(); // Refresh the list automatically
+        }
+    }
+}
+
+// Function to mark as Sold (Optional alternative to deleting)
+async function markAsSold(id) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: 'sold' }) // Change status to 'sold' instead of 'approved'
+        .eq('id', id);
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("Product marked as SOLD!");
+        fetchAdminProducts();
+    }
+}
+
+
+
 // 5. LOGOUT
 async function logout() {
     await _supabase.auth.signOut();
