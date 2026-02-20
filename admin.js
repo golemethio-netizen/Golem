@@ -108,16 +108,22 @@ async function deleteProduct(id) {
 
 // Function to mark as Sold (Optional alternative to deleting)
 async function markAsSold(id) {
-    const { error } = await _supabase
-        .from('products')
-        .update({ status: 'sold' }) // Change status to 'sold' instead of 'approved'
-        .eq('id', id);
+    const confirmation = confirm("Mark this item as Sold? It will still show on the site but cannot be added to cart.");
+    
+    if (confirmation) {
+        const { data, error } = await _supabase
+            .from('products')
+            .update({ status: 'sold' }) // Updates the 'status' column to 'sold'
+            .eq('id', id);
 
-    if (error) {
-        alert("Error: " + error.message);
-    } else {
-        alert("Product marked as SOLD!");
-        fetchAdminProducts();
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("Item marked as Sold!");
+            // Refresh the admin list to see the change
+            if (typeof fetchAdminProducts === "function") fetchAdminProducts();
+            else location.reload(); 
+        }
     }
 }
 
