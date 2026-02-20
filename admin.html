@@ -3,43 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Golem Store</title>
+    <title>Admin Dashboard | Golem</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="https://img.icons8.com/color/48/golem.png">
-    <style>
-        /* Admin-specific layout tweaks */
-        .admin-container { padding: 20px; max-width: 1200px; margin: auto; }
-        .admin-card { 
-            display: flex; align-items: center; gap: 20px; 
-            background: white; padding: 15px; margin-bottom: 10px; 
-            border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-        }
-        .admin-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; }
-        .admin-info { flex: 1; }
-        .admin-actions { display: flex; gap: 10px; }
-        
-        .approve-btn { background: #28a745; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; }
-        .sold-btn { background: #ffa500; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; }
-        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; text-transform: uppercase; }
-        .status-pending { background: #ffeeba; color: #856404; }
-        .status-approved { background: #d4edda; color: #155724; }
-        .status-sold { background: #f8d7da; color: #721c24; }
-    </style>
 </head>
 <body>
     <nav>
-        <div class="logo">Golem Admin</div>
+        <div class="logo">GOLEM ADMIN</div>
         <div class="nav-links"><a href="index.html">View Shop</a></div>
     </nav>
 
-    <div class="admin-container">
-        <h2>Product Management</h2>
-        <div id="adminProductList">Loading products...</div>
+    <div class="admin-container" style="padding: 20px; max-width: 900px; margin: auto;">
+        <h2>Pending Approvals & Inventory</h2>
+        <div id="adminProductList">Loading...</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="admin.js"></script>
+    <script>
+        async function fetchAdminProducts() {
+            const listContainer = document.getElementById('adminProductList');
+            const { data, error } = await _supabase.from('products').select('*').order('created_at', { ascending: false });
+
+            if (error) { listContainer.innerHTML = "Error."; return; }
+
+            listContainer.innerHTML = data.map(p => `
+                <div class="admin-card" style="display:flex; align-items:center; background:white; margin-bottom:10px; padding:15px; border-radius:10px; gap:20px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                    <img src="${p.image}" width="70" height="70" style="object-fit:cover; border-radius:5px;">
+                    <div style="flex:1;">
+                        <h4 style="margin:0;">${p.name}</h4>
+                        <p style="margin:5px 0; font-size:0.9rem;">$${p.price} | <b>${p.status}</b></p>
+                    </div>
+                    <div class="admin-actions" style="display:flex; gap:10px;">
+                        ${p.status === 'pending' ? `<button onclick="updateStatus('${p.id}', 'approved')" style="background:#28a745; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Approve</button>` : ''}
+                        ${p.status === 'approved' ? `<button onclick="updateStatus('${p.id}', 'sold')" style="background:#ffa500; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Mark Sold</button>` : ''}
+                        <button onclick="deleteProduct('${p.id}')" style="background:#dc3545; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updateStatus(id, newStatus) {
+            await _supabase.from('products').update({ status: newStatus }).eq('id', id);
+            fetchAdminProducts();
+        }
+
+        async function deleteProduct(id) {
+            if(confirm("Delete this item?")) {
+                await _supabase.from('products').delete().eq('id', id);
+                fetchAdminProducts();
+            }
+        }
+
+        fetchAdminProducts();
+    </script>
 </body>
 </html>
