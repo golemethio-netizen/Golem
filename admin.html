@@ -5,37 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Golem Store</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Admin-specific layout tweaks */
+        .admin-container { padding: 20px; max-width: 1200px; margin: auto; }
+        .admin-card { 
+            display: flex; align-items: center; gap: 20px; 
+            background: white; padding: 15px; margin-bottom: 10px; 
+            border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        .admin-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; }
+        .admin-info { flex: 1; }
+        .admin-actions { display: flex; gap: 10px; }
+        
+        .approve-btn { background: #28a745; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; }
+        .sold-btn { background: #ffa500; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; }
+        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; text-transform: uppercase; }
+        .status-pending { background: #ffeeba; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-sold { background: #f8d7da; color: #721c24; }
+    </style>
 </head>
 <body>
     <nav>
         <div class="logo">Golem Admin</div>
-        <div class="nav-links">
-            <a href="index.html">View Store</a>
-            <button onclick="logout()">Logout</button>
-        </div>
+        <div class="nav-links"><a href="index.html">View Shop</a></div>
     </nav>
 
-    <main class="admin-container">
-        <h1>Pending Approvals</h1>
-        <div class="admin-table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Category</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="pendingTable">
-                    </tbody>
-            </table>
-        </div>
-    </main>
+    <div class="admin-container">
+        <h2>Product Management</h2>
+        <div id="adminProductList">Loading products...</div>
+    </div>
 
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script> <script src="admin.js"></script> ```
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
