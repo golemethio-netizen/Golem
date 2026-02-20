@@ -242,3 +242,33 @@ async function handleAuth() {
     }
 }
 
+// Run this function every time the page loads
+async function updateUserMenu() {
+    const userMenu = document.getElementById('userMenu');
+    const user = _supabase.auth.user(); // Get current logged-in user
+
+    if (user) {
+        // If logged in: Show email and Sign Out button
+        userMenu.innerHTML = `
+            <span class="user-email">${user.email.split('@')[0]}</span>
+            <button class="auth-link" onclick="handleSignOut()">Sign Out</button>
+        `;
+    } else {
+        // If logged out: Show Login link
+        userMenu.innerHTML = `
+            <button class="auth-link" onclick="openAuthModal()">Login</button>
+        `;
+    }
+}
+
+async function handleSignOut() {
+    await _supabase.auth.signOut();
+    location.reload(); // Refresh to clear user data
+}
+
+function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+}
+
+// Call this at the very bottom of your script.js
+updateUserMenu();
