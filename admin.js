@@ -11,7 +11,7 @@ async function checkAdmin() {
         return;
     }
 
-    if (session.user.email.toLowerCase() !== adminEmail) {
+    if (session.user.email.toLowerCase() !== Email) {
         // If logged in as a normal user
         alert("Access Denied. Admins only.");
         window.location.href = 'index.html';
@@ -42,20 +42,25 @@ async function fetchPendingProducts() {
         return;
     }
 
-    tableBody.innerHTML = data.map(p => `
-        <tr>
-            <td><img src="${p.image || 'https://via.placeholder.com/50'}" width="50" style="border-radius:4px"></td>
-            <td>${p.name}</td>
-            <td>$${p.price}</td>
-            <td>${p.category}</td>
-            <td>
-                <button class="approve-btn" onclick="approveItem('${p.id}')">Approve</button>
-                <button class="reject-btn" onclick="deleteItem('${p.id}')">Delete</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
+   // This is likely inside a function like 'renderAdminProducts'
+grid.innerHTML = list.map(p => `
+    <div class="admin-card">
+        <img src="${p.image}" width="80">
+        <div class="admin-info">
+            <h4>${p.name}</h4>
+            <p>Current Status: <strong>${p.status}</strong></p>
+            
+            <div class="admin-actions">
+                ${p.status === 'pending' ? `<button class="approve-btn" onclick="approveProduct('${p.id}')">Approve</button>` : ''}
+                
+                <button class="sold-btn" onclick="markAsSold('${p.id}')">Mark Sold</button>
+                
+                <button class="delete-btn" onclick="deleteProduct('${p.id}')">Delete</button>
+            </div>
+        </div>
+    </div>
+`).join('');
+    
 // 3. APPROVE ITEM
 async function approveItem(id) {
     const { error } = await _supabase
