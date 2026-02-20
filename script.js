@@ -128,3 +128,20 @@ function toggleCart() {
     const sidebar = document.getElementById('cartSidebar');
     sidebar.classList.toggle('active');
 }
+function checkout() {
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    const total = document.getElementById('cartTotal').innerText;
+    
+    // Example: Simple Alert (We can replace this with WhatsApp logic next!)
+    alert(`Thank you for your order of $${total}! We will contact you soon.`);
+    
+    // Clear the cart
+    cart = [];
+    updateCartUI();
+    toggleCart(); // Close the sidebar
+}
+
