@@ -30,38 +30,43 @@ function renderProducts(list) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // Clear loading text
     grid.innerHTML = "";
 
     if (list.length === 0) {
-        grid.innerHTML = "<p>No products found in the database.</p>";
+        grid.innerHTML = "<p>No products found.</p>";
         return;
     }
 
-    // Inside your renderProducts loop:
-grid.innerHTML = list.map(p => {
-    const isSold = p.status === 'sold';
-    // Create a special share message
-    const shareText = encodeURIComponent(`🔥 Check out this ${p.name} on Golem Store!\n💰 Price: $${p.price}\n\nView it here: ${window.location.href}`);
-    const telegramShareUrl = `https://t.me/share/url?url=${window.location.href}&text=${shareText}`;
+    grid.innerHTML = list.map(p => {
+        const isSold = p.status === 'sold';
+        
+        // 1. Create the Share Link
+        // This takes the current page URL and adds a message
+        const pageUrl = window.location.href;
+        const message = `Check out this ${p.name} on Golem Store!\nPrice: $${p.price}`;
+        const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(message)}`;
 
-    return `
-    <div class="product-card">
-        ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
-        <div class="share-btn" onclick="event.stopPropagation(); window.open('${telegramShareUrl}', '_blank')">🔗</div>
-        <img src="${p.image}" alt="${p.name}" onclick="openProductDetail('${p.id}')">
-        <div class="product-info">
-            <h3>${p.name}</h3>
-            <p class="price">$${p.price}</p>
-            ${isSold 
-                ? '<button disabled class="sold-out-btn">Sold Out</button>' 
-                : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
-            }
-           
-        </div>
-    </div>`;
-}).join('');
+        return `
+        <div class="product-card">
+            ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
+            
+            <div class="share-btn" title="Share to Telegram" onclick="event.stopPropagation(); window.open('${telegramShareUrl}', '_blank')">
+                ✈️
+            </div>
 
+            <img src="${p.image}" alt="${p.name}" onclick="openProductDetail('${p.id}')" style="${isSold ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
+            
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p class="price">$${p.price}</p>
+                ${isSold 
+                    ? '<button disabled style="background: #888;">Sold Out</button>' 
+                    : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
+                }
+            </div>
+        </div>`;
+    }).join('');
+}
 // 3. SEARCH AND FILTER FUNCTIONS
 function searchProducts() {
     const term = document.getElementById('searchInput').value.toLowerCase();
@@ -190,6 +195,7 @@ async function checkout() {
 
 // START THE APP
 fetchProducts();
+
 
 
 
