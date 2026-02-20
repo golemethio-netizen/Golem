@@ -22,12 +22,13 @@
             <input type="text" id="productName" placeholder="Product Name" required>
             <input type="number" id="productPrice" placeholder="Price (USD)" required>
             
-            <select id="productCategory">
-                <option value="Electronics">Electronics</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Art">Art</option>
-                <option value="Other">Other</option>
-            </select>
+      <select id="productCategory" required>
+    <option value="" disabled selected>Select a Category</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Clothing">Clothing</option>
+    <option value="Art">Art</option>
+    <option value="Other">Other</option>
+</select>
 
             <textarea id="productDescription" placeholder="Tell us more about this item..." rows="4"></textarea>
 
