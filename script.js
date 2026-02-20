@@ -136,4 +136,38 @@ function searchProducts() {
 }
 
 
+let allApprovedProducts = []; // To store the original list
+
+// Update your fetch function to save the data
+async function fetchProducts() {
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved');
+
+    if (error) {
+        console.error(error);
+    } else {
+        allApprovedProducts = data; // Save the full list
+        renderProducts(data); // Render everything initially
+    }
+}
+
+// THE FILTER FUNCTION
+function filterByCategory(category) {
+    // 1. Update Button Styles
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+        if (btn.innerText === category) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+
+    // 2. Filter the Data
+    if (category === 'All') {
+        renderProducts(allApprovedProducts);
+    } else {
+        const filtered = allApprovedProducts.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
+}
 
