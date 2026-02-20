@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Items | Golem</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .item-list { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .item-row { 
+            display: flex; align-items: center; justify-content: space-between;
+            background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .item-row img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .pending { background: #fff3cd; color: #856404; }
+        .approved { background: #d4edda; color: #155724; }
+        .sold { background: #e2e3e5; color: #383d41; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">GOLEM</div>
+        <div class="nav-links"><a href="index.html">Back to Shop</a></div>
+    </nav>
+
+    <div class="item-list">
+        <h2>My Uploaded Items</h2>
+        <div id="userItems">Loading your items...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        async function loadUserItems() {
+            const container = document.getElementById('userItems');
+            
+            // 1. Get logged in user
+            const { data: { user } } = await _supabase.auth.getUser();
+            
+            if (!user) {
+                container.innerHTML = "<p>Please <a href='index.html'>login</a> to view your items.</p>";
+                return;
+            }
+
+            // 2. Fetch products where user_id matches
+            const { data, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('user_id', user.id);
+
+            if (error) {
+                container.innerHTML = "Error loading items.";
+                return;
+            }
+
+            if (data.length === 0) {
+                container.innerHTML = "<p>You haven't uploaded any items yet.</p>";
+                return;
+            }
+
+            // 3. Render items
+            container.innerHTML = data.map(p => `
+                <div class="item-row">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="${p.image}" alt="">
+                        <div>
+                            <h4 style="margin:0;">${p.name}</h4>
+                            <small>$${p.price}</small>
+                        </div>
+                    </div>
+                    <span class="status-pill ${p.status}">${p.status.toUpperCase()}</span>
+                </div>
+            `).join('');
+        }
+
+        loadUserItems();
+    </script>
+</body>
+</html>
