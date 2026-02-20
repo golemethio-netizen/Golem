@@ -11,7 +11,7 @@ async function fetchProducts() {
         console.error(error);
     } else {
         allApprovedProducts = data;
-        renderProducts(data);
+        Products(data);
     }
 }
 
@@ -19,21 +19,23 @@ async function fetchProducts() {
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
-    if (list.length === 0) {
-        grid.innerHTML = "<p>No items found.</p>";
-        return;
-    }
-
-    grid.innerHTML = list.map(p => `
-        <div class="product-card" onclick="openProductDetail('${p.id}')">
-            <img src="${p.image}" alt="${p.name}">
+    grid.innerHTML = list.map(p => {
+        const isSold = p.status === 'sold';
+        
+        return `
+        <div class="product-card ${isSold ? 'sold-out' : ''}" onclick="openProductDetail('${p.id}')">
+            ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
+            <img src="${p.image}" alt="${p.name}" style="${isSold ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <p class="price">$${p.price}</p>
-                <button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>
+                ${isSold 
+                    ? '<button disabled style="background: #888; cursor: not-allowed;">Out of Stock</button>' 
+                    : `<button onclick="event.stopPropagation(); addToCart('${p.id}')">Add to Cart</button>`
+                }
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function filterByCategory(category) {
@@ -190,6 +192,7 @@ function searchProducts() {
     
     renderProducts(filtered);
 }
+
 
 
 
