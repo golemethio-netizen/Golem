@@ -59,11 +59,14 @@ function renderProducts(list) {
 // 3. SEARCH AND FILTER FUNCTIONS
 function searchProducts() {
     const term = document.getElementById('searchInput').value.toLowerCase();
+    
+    // Filter the global array we created earlier
     const filtered = allApprovedProducts.filter(p => 
         p.name.toLowerCase().includes(term) || 
-        p.description.toLowerCase().includes(term)
+        (p.description && p.description.toLowerCase().includes(term))
     );
-    renderProducts(filtered);
+    
+    renderProducts(filtered); // Re-draw the grid with only matched items
 }
 
 function filterByCategory(category) {
@@ -181,4 +184,5 @@ async function checkout() {
 
 // START THE APP
 fetchProducts();
+
 
