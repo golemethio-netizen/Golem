@@ -113,8 +113,12 @@ async function handleSignOut() {
 async function updateUserMenu() {
     const userMenu = document.getElementById('userMenu');
     const { data: { user } } = await _supabase.auth.getUser();
+    
     if (user && userMenu) {
-        userMenu.innerHTML = `<button class="auth-link" onclick="handleSignOut()">Logout (${user.email.split('@')[0]})</button>`;
+        userMenu.innerHTML = `
+            <a href="my-items.html" style="margin-right:15px; text-decoration:none; color:var(--primary); font-size:0.9rem;">My Items</a>
+            <button class="auth-link" onclick="handleSignOut()">Logout</button>
+        `;
     }
 }
 
@@ -174,3 +178,4 @@ async function checkout() {
 // --- STARTUP ---
 fetchProducts();
 updateUserMenu();
+
