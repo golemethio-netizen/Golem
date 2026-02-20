@@ -1,20 +1,21 @@
 let allApprovedProducts = [];
 
 async function fetchProducts() {
-    const grid = document.getElementById('productGrid');
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('status', 'approved');
+        // Change this line to include both approved and sold
+        .or('status.eq.approved,status.eq.sold'); 
 
     if (error) {
-        grid.innerHTML = "<p>Error loading products.</p>";
-        return;
+        console.error(error);
+    } else {
+        allApprovedProducts = data;
+        renderProducts(data);
     }
-
-    allApprovedProducts = data;
-    renderProducts(data);
 }
+
+
 
 function renderProducts(list) {
     const grid = document.getElementById('productGrid');
@@ -189,5 +190,6 @@ function searchProducts() {
     
     renderProducts(filtered);
 }
+
 
 
