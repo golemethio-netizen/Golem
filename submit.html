@@ -31,39 +31,61 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        const form = document.getElementById('productForm');
+       const form = document.getElementById('productForm');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // 1. Get the current logged-in user
-            const { data: { user } } = await _supabase.auth.getUser();
-            
-            if (!user) {
-                alert("You must be logged in!");
-                window.location.href = "index.html";
-                return;
-            }
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('submitBtn');
+    const statusDiv = document.getElementById('uploadStatus');
+    
+    // 1. Get User
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return alert("Please log in first!");
 
-            const product = {
-                name: document.getElementById('name').value,
-                price: document.getElementById('price').value,
-                category: document.getElementById('category').value,
-                image: document.getElementById('image').value,
-                description: document.getElementById('description').value,
-                status: 'pending', // Items start as pending for admin review
-                user_id: user.id   // Link the product to the user
-            };
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Uploading Image...";
 
-            const { error } = await _supabase.from('products').insert([product]);
+    try {
+        const file = document.getElementById('imageFile').files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
 
-            if (error) {
-                alert("Error: " + error.message);
-            } else {
-                alert("Success! Your item is waiting for admin approval.");
-                window.location.href = "index.html";
-            }
-        });
-    </script>
+        // 2. Upload to Supabase Storage
+        const { error: uploadError } = await _supabase.storage
+            .from('product-images')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // 3. Get the Public URL
+        const { data: { publicUrl } } = _supabase.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+        // 4. Save Product to Database
+        statusDiv.innerText = "Saving product details...";
+        const product = {
+            name: document.getElementById('name').value,
+            price: document.getElementById('price').value,
+            category: document.getElementById('category').value,
+            image: publicUrl, // Using the new storage link!
+            description: document.getElementById('description').value,
+            status: 'pending',
+            user_id: user.id
+        };
+
+        const { error: dbError } = await _supabase.from('products').insert([product]);
+        if (dbError) throw dbError;
+
+        alert("Success! Your item is live once approved.");
+        window.location.href = "index.html";
+
+    } catch (err) {
+        alert(err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Post for Approval";
+    }
+});
 </body>
 </html>
