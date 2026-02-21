@@ -196,38 +196,84 @@ fetchProducts();
 updateUserMenu();
 
 
+// --- UPDATED CHECKOUT LOGIC ---
 async function checkout() {
-    const name = document.getElementById('buyerName').value;
-    const phone = document.getElementById('buyerPhone').value;
+    const nameInput = document.getElementById('buyerName');
+    const phoneInput = document.getElementById('buyerPhone');
 
-    if (!name || !phone) {
-        alert("Please enter your name and phone number.");
+    // 1. Validation
+    if (!nameInput || !phoneInput || !nameInput.value || !phoneInput.value) {
+        alert("Please enter your name and phone number to continue.");
         return;
     }
 
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    const name = nameInput.value;
+    const phone = phoneInput.value;
+
+    // 2. Get Seller Info
     const firstItemId = cart[0];
     const product = allApprovedProducts.find(p => p.id == firstItemId);
     
-    // Format the phone number (Remove spaces, +, etc. for the WhatsApp API)
-    // WhatsApp needs the number like 251911223344
-    const cleanSellerPhone = product.seller_contact.replace(/\D/g, ''); 
+    if (!product) {
+        alert("Product details not found.");
+        return;
+    }
 
-    // Create the pre-filled message
-    const waMessage = encodeURIComponent(`Hello! My name is ${name}. I am interested in buying your "${product.name}" for $${product.price} that I saw on Golem Store.`);
-    const waLink = `https://wa.me/${cleanSellerPhone}?text=${waMessage}`;
-
-    // 1. Update the UI to show the WhatsApp Button
+    // 3. Show WhatsApp Button
     const contactBox = document.getElementById('sellerContactInfo');
     const sellerDetail = document.getElementById('sellerDetail');
     
-    sellerDetail.innerHTML = `
-        <p style="margin-bottom:10px;">Order generated for <strong>${product.name}</strong></p>
-        <a href="${waLink}" target="_blank" class="whatsapp-btn">
-            💬 Chat with Seller on WhatsApp
-        </a>
-    `;
-    contactBox.style.display = 'block';
+    if (contactBox && sellerDetail) {
+        // Prepare WhatsApp Link
+        const cleanPhone = product.seller_contact ? product.seller_contact.replace(/\D/g, '') : "251900000000";
+        const waMessage = encodeURIComponent(`Hello! My name is ${name}. I want to buy your "${product.name}" for $${product.price} seen on Golem.`);
+        const waLink = `https://wa.me/${cleanPhone}?text=${waMessage}`;
 
-    // 2. Send the Order to your Admin Telegram Bot (same as before)
+        sellerDetail.innerHTML = `
+            <p style="margin-bottom:10px; color:#333;">Order prepared for <b>${product.name}</b></p>
+            <a href="${waLink}" target="_blank" class="whatsapp-btn">
+                💬 Chat with Seller on WhatsApp
+            </a>
+        `;
+        contactBox.style.display = 'block';
+    }
+
+    // 4. Send Notification to Admin (Telegram)
     sendOrderToTelegram(name, phone, cart);
+}
+// --- HELPER: TELEGRAM NOTIFICATION ---
+async function sendOrderToTelegram(buyerName, buyerPhone, items) {
+    // Replace with your actual Bot Token and Chat ID
+    const botToken = "YOUR_BOT_TOKEN_HERE"; 
+    const chatId = "YOUR_CHAT_ID_HERE";
+
+    let message = `🛍️ **NEW ORDER**\n\n`;
+    message += `👤 **Buyer:** ${buyerName}\n`;
+    message += `📞 **Phone:** ${buyerPhone}\n\n`;
+    message += `📦 **Items:**\n`;
+    
+    items.forEach(id => {
+        const p = allApprovedProducts.find(item => item.id == id);
+        if(p) message += `- ${p.name} ($${p.price})\n`;
+    });
+
+    try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: "Markdown"
+            })
+        });
+        console.log("Admin notified via Telegram");
+    } catch (e) {
+        console.error("Telegram Error:", e);
+    }
 }
