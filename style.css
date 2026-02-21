@@ -45,3 +45,19 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
     .product-card img { height: 150px; }
 }
+/* Style for the active category button */
+.category-filters button.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.category-filters button {
+    transition: all 0.2s ease;
+    border: 1px solid #ddd;
+    background: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
