@@ -104,6 +104,27 @@
                 submitBtn.innerText = "Post for Approval";
             }
         });
+
+
+
+
+
+// Inside your form submit listener in submit.html
+const product = {
+    name: document.getElementById('name').value,
+    price: document.getElementById('price').value,
+    category: document.getElementById('category').value,
+    image: publicUrl,
+    description: document.getElementById('description').value,
+    seller_contact: document.getElementById('sellerContact').value, // NEW FIELD
+    status: 'pending',
+    user_id: user.id
+};
+        
     </script>
+
+
+
+    
 </body>
 </html>
