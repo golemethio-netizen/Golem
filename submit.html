@@ -3,129 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell an Item | Golem</title>
+    <title>Sell an Item - Golem</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav>
-        <div class="logo">GOLEM</div>
-        <div class="nav-links"><a href="index.html">Cancel</a></div>
+        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
+        <div id="userMenu"></div>
     </nav>
 
-    <div class="admin-container" style="max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <h2 style="text-align: center;">Post a New Product</h2>
-        <form id="productForm">
-            <label>Product Name</label>
-            <input type="text" id="name" placeholder="What are you selling?" required style="width:100%; padding:10px; margin:10px 0;">
-            
-            <label>Price (USD)</label>
-            <input type="number" id="price" placeholder="Enter price" required style="width:100%; padding:10px; margin:10px 0;">
-            
-            <label>Category</label>
-            <select id="category" style="width:100%; padding:10px; margin:10px 0;">
-                <option value="Electronics">Electronics</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Art">Art</option>
-                <option value="Other">Other</option>
-            </select>
-            
-            <label>Product Image</label>
-            <input type="file" id="imageFile" accept="image/*" required style="margin:10px 0;">
-            
-            <label>Description</label>
-            <textarea id="description" placeholder="Tell buyers more about it..." style="width:100%; padding:10px; margin:10px 0; height:80px;"></textarea>
-            
-            <button type="submit" id="submitBtn" style="width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Post for Approval</button>
-            <p id="uploadStatus" style="text-align:center; font-size:0.8rem; color:#666; margin-top:10px;"></p>
-        </form>
+    <div class="container">
+        <div class="form-card">
+            <h2>Post New Product</h2>
+            <form id="productForm">
+                <label>Product Name</label>
+                <input type="text" id="name" required placeholder="e.g., iPhone 13">
+
+                <label>Price ($)</label>
+                <input type="number" id="price" required placeholder="e.g., 599">
+
+                <label>Category</label>
+                <select id="category">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Art">Art</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label>Product Description</label>
+                <textarea id="description" rows="3" placeholder="Tell buyers about your item..."></textarea>
+
+                <label>WhatsApp Number (Must start with 251)</label>
+                <input type="text" id="sellerContact" placeholder="2519..." required onkeyup="validatePhone()">
+                <div id="phoneChecklist" class="checklist">
+                    <div id="check1">✘ Starts with 251</div>
+                    <div id="check2">✘ Numbers only (No spaces/+)</div>
+                    <div id="check3">✘ Exactly 12 digits</div>
+                </div>
+
+                <label>Product Image</label>
+                <input type="file" id="imageInput" accept="image/*" required>
+
+                <button type="submit" id="submitBtn" disabled>List Product</button>
+            </form>
+        </div>
     </div>
 
-
-<label>Your Telegram or Phone (for Buyers)</label>
-<label>WhatsApp Number (Include country code, e.g., 251911...)</label>
-<input type="text" id="sellerContact" placeholder="251707022845" required ...>
-
-
-
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        const form = document.getElementById('productForm');
+        function validatePhone() {
+            const phone = document.getElementById('sellerContact').value;
+            const c1 = document.getElementById('check1');
+            const c2 = document.getElementById('check2');
+            const c3 = document.getElementById('check3');
+            const btn = document.getElementById('submitBtn');
 
-        form.addEventListener('submit', async (e) => {
+            const starts = phone.startsWith('251');
+            const nums = /^\d+$/.test(phone);
+            const len = phone.length === 12;
+
+            c1.style.color = starts ? "green" : "red"; c1.innerText = starts ? "✔ Starts with 251" : "✘ Starts with 251";
+            c2.style.color = nums ? "green" : "red"; c2.innerText = nums ? "✔ Numbers only" : "✘ Numbers only";
+            c3.style.color = len ? "green" : "red"; c3.innerText = len ? "✔ 12 digits" : "✘ 12 digits";
+
+            btn.disabled = !(starts && nums && len);
+        }
+
+        document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
-            const statusDiv = document.getElementById('uploadStatus');
-            
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) return alert("Please log in first!");
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Uploading Image...";
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Uploading...";
+            btn.disabled = true;
 
             try {
-                const file = document.getElementById('imageFile').files[0];
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Math.random()}.${fileExt}`;
-                const filePath = `${user.id}/${fileName}`;
+                const { data: { user } } = await _supabase.auth.getUser();
+                const file = document.getElementById('imageInput').files[0];
+                const fileName = Date.now() + "_" + file.name;
 
-                // 1. Upload to Storage
-                const { error: uploadError } = await _supabase.storage
+                // 1. Upload to Supabase Storage
+                const { data: uploadData, error: uploadError } = await _supabase.storage
                     .from('product-images')
-                    .upload(filePath, file);
+                    .upload(fileName, file);
 
                 if (uploadError) throw uploadError;
 
-                // 2. Get Public URL
                 const { data: { publicUrl } } = _supabase.storage
                     .from('product-images')
-                    .getPublicUrl(filePath);
+                    .getPublicUrl(fileName);
 
-                // 3. Insert into Database
-                statusDiv.innerText = "Finalizing post...";
-                const { error: dbError } = await _supabase.from('products').insert([{
+                // 2. Insert into Database
+                const { error } = await _supabase.from('products').insert([{
                     name: document.getElementById('name').value,
                     price: document.getElementById('price').value,
                     category: document.getElementById('category').value,
-                    image: publicUrl,
                     description: document.getElementById('description').value,
+                    seller_contact: document.getElementById('sellerContact').value,
+                    image: publicUrl,
                     status: 'pending',
                     user_id: user.id
                 }]);
 
-                if (dbError) throw dbError;
-
-                alert("Success! Item sent for approval.");
-                window.location.href = "my-items.html";
-
+                if (error) throw error;
+                alert("Product submitted for approval!");
+                location.href = 'index.html';
             } catch (err) {
-                alert("Error: " + err.message);
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Post for Approval";
+                alert(err.message);
+                btn.innerText = "List Product";
+                btn.disabled = false;
             }
-        });
-
-
-
-
-
-// Inside your form submit listener in submit.html
-const product = {
-    name: document.getElementById('name').value,
-    price: document.getElementById('price').value,
-    category: document.getElementById('category').value,
-    image: publicUrl,
-    description: document.getElementById('description').value,
-    seller_contact: document.getElementById('sellerContact').value, // NEW FIELD
-    status: 'pending',
-    user_id: user.id
-};
-        
+        };
     </script>
-
-
-
-    
 </body>
 </html>
