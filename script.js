@@ -196,4 +196,56 @@ fetchProducts();
 updateUserMenu();
 
 
+async function checkout() {
+    const name = document.getElementById('buyerName').value;
+    const phone = document.getElementById('buyerPhone').value;
+
+    if (!name || !phone) {
+        alert("Please enter your name and phone number to continue.");
+        return;
+    }
+
+    if (cart.length === 0) return;
+
+    // Get the first item to show the seller's contact (assuming one seller per checkout for now)
+    const firstItemId = cart[0];
+    const product = allApprovedProducts.find(p => p.id == firstItemId);
+
+    // 1. Show the seller's contact info to the buyer immediately
+    const contactBox = document.getElementById('sellerContactInfo');
+    const sellerText = document.getElementById('sellerDetail');
+    
+    sellerText.innerHTML = `<strong>Contact:</strong> ${product.seller_contact || 'Contact Admin'}<br>Mention your order for: ${product.name}`;
+    contactBox.style.display = 'block';
+
+    // 2. Send the Buyer's details to your Telegram Bot
+    const botToken = "YOUR_BOT_TOKEN";
+    const chatId = "YOUR_CHAT_ID";
+
+    let message = `🛍️ **NEW ORDER RECEIVED**\n\n`;
+    message += `👤 **Buyer:** ${name}\n`;
+    message += `📞 **Phone:** ${phone}\n\n`;
+    message += `📦 **Items:**\n`;
+    
+    cart.forEach(id => {
+        const p = allApprovedProducts.find(item => item.id == id);
+        message += `- ${p.name} ($${p.price})\n`;
+    });
+
+    try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: "Markdown"
+            })
+        });
+        
+        alert("Order details sent! Please contact the seller below to finish the purchase.");
+    } catch (e) {
+        alert("There was an error sending the order.");
+    }
+}
 
