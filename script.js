@@ -67,7 +67,17 @@ async function updateUserMenu() {
             <a href="my-items.html" style="margin-right:15px; text-decoration:none; color:#007bff;">My Items</a>
             <button class="auth-link" onclick="_supabase.auth.signOut().then(()=>location.reload())">Logout</button>
         `;
+   
     }
+
+    // Add inside updateUserMenu()
+const currentPath = window.location.pathname;
+document.querySelectorAll('.nav-item').forEach(link => {
+    if (link.getAttribute('href') === currentPath.split('/').pop()) {
+        link.style.color = 'var(--primary)';
+        link.style.fontWeight = 'bold';
+    }
+});
 }
 
 // 4. SEARCH
@@ -102,5 +112,6 @@ function filterByCategory(category) {
         renderProducts(filtered);
     }
 }
+
 
 
