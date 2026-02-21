@@ -87,8 +87,9 @@ function toggleAuthMode() {
 }
 function filterByCategory(category) {
     // Remove 'active' class from all buttons
-    document.querySelectorAll('.category-filters button').forEach(btn => {
-        btn.classList.remove('active');
+  const buttons = document.querySelectorAll('.category-filters button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (event) event.target.classList.add('active');
     });
     
     // Add 'active' class to the button that was just clicked
@@ -101,4 +102,5 @@ function filterByCategory(category) {
         renderProducts(filtered);
     }
 }
+
 
