@@ -249,8 +249,8 @@ async function checkout() {
 // --- HELPER: TELEGRAM NOTIFICATION ---
 async function sendOrderToTelegram(buyerName, buyerPhone, items) {
     // Replace with your actual Bot Token and Chat ID
-    const botToken = "YOUR_BOT_TOKEN_HERE"; 
-    const chatId = "YOUR_CHAT_ID_HERE";
+    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o"; 
+    const chatId = "6792892909";
 
     let message = `🛍️ **NEW ORDER**\n\n`;
     message += `👤 **Buyer:** ${buyerName}\n`;
@@ -277,3 +277,4 @@ async function sendOrderToTelegram(buyerName, buyerPhone, items) {
         console.error("Telegram Error:", e);
     }
 }
+
