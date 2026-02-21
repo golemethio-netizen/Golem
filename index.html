@@ -37,13 +37,12 @@
         
     </header>
 
-    <div class="filter-container">
-        <button class="filter-btn active" onclick="filterByCategory('All')">All</button>
-        <button class="filter-btn" onclick="filterByCategory('Electronics')">Electronics</button>
-        <button class="filter-btn" onclick="filterByCategory('Clothing')">Clothing</button>
-        <button class="filter-btn" onclick="filterByCategory('Art')">Art</button>
-        <button class="filter-btn" onclick="filterByCategory('Other')">Other</button>
-    </div>
+   <div class="category-filters">
+    <button onclick="filterByCategory('All')">All</button>
+    <button onclick="filterByCategory('Electronics')">Electronics</button>
+    <button onclick="filterByCategory('Clothing')">Clothing</button>
+    <button onclick="filterByCategory('Art')">Art</button>
+</div>
 
     <main>
         <div id="productGrid" class="product-grid">
@@ -98,6 +97,7 @@
     </div>
 </div>
 </html>
+
 
 
 
