@@ -44,7 +44,8 @@ function renderProducts(list) {
             ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
             <div class="share-btn" title="Share" onclick="event.stopPropagation(); window.open('${telegramShareUrl}', '_blank')">✈️</div>
             
-            <img src="${p.image}" alt="${p.name}" onclick="window.open('${p.image}', '_blank')" style="${isSold ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
+            // Inside the .map() function of renderProducts
+<img src="${p.image}" alt="${p.name}" onclick="window.open('${p.image}', '_blank')" ...>
             
             <div class="product-info">
                 <h3>${p.name}</h3>
@@ -192,3 +193,4 @@ function toggleCart() {
 // --- 7. RUN ON LOAD ---
 fetchProducts();
 updateUserMenu();
+
