@@ -79,8 +79,8 @@ async function checkout() {
     document.getElementById('sellerContactInfo').style.display = 'block';
 
     // CORS Safe Telegram Call
-    const botToken = "YOUR_BOT_TOKEN";
-    const chatId = "YOUR_CHAT_ID";
+    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
+    const chatId = "6792892909";
     const msg = `🛍️ Order: ${product.name}\n👤 Buyer: ${name}\n📞 Phone: ${phone}`;
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
 }
@@ -89,3 +89,4 @@ function toggleCart() { document.getElementById('cartSidebar').classList.toggle(
 function removeFromCart(i) { cart.splice(i, 1); updateCartUI(); }
 
 fetchProducts();
+
