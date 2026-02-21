@@ -86,20 +86,19 @@ function toggleAuthMode() {
     document.getElementById('authBtn').innerText = isSignUp ? "Register" : "Sign In";
 }
 function filterByCategory(category) {
-    // 1. If 'All' is selected, show everything
+    // Remove 'active' class from all buttons
+    document.querySelectorAll('.category-filters button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add 'active' class to the button that was just clicked
+    event.target.classList.add('active');
+
     if (category === 'All') {
         renderProducts(allApprovedProducts);
-        return;
+    } else {
+        const filtered = allApprovedProducts.filter(p => p.category === category);
+        renderProducts(filtered);
     }
-
-    // 2. Otherwise, filter the list based on the category string
-    const filtered = allApprovedProducts.filter(p => p.category === category);
-    renderProducts(filtered);
-    
-    // 3. Optional: Smooth scroll back to top to see results
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-// START
-fetchProducts();
-updateUserMenu();
 
