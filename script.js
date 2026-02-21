@@ -201,51 +201,33 @@ async function checkout() {
     const phone = document.getElementById('buyerPhone').value;
 
     if (!name || !phone) {
-        alert("Please enter your name and phone number to continue.");
+        alert("Please enter your name and phone number.");
         return;
     }
 
-    if (cart.length === 0) return;
-
-    // Get the first item to show the seller's contact (assuming one seller per checkout for now)
     const firstItemId = cart[0];
     const product = allApprovedProducts.find(p => p.id == firstItemId);
-
-    // 1. Show the seller's contact info to the buyer immediately
-    const contactBox = document.getElementById('sellerContactInfo');
-    const sellerText = document.getElementById('sellerDetail');
     
-    sellerText.innerHTML = `<strong>Contact:</strong> ${product.seller_contact || 'Contact Admin'}<br>Mention your order for: ${product.name}`;
+    // Format the phone number (Remove spaces, +, etc. for the WhatsApp API)
+    // WhatsApp needs the number like 251911223344
+    const cleanSellerPhone = product.seller_contact.replace(/\D/g, ''); 
+
+    // Create the pre-filled message
+    const waMessage = encodeURIComponent(`Hello! My name is ${name}. I am interested in buying your "${product.name}" for $${product.price} that I saw on Golem Store.`);
+    const waLink = `https://wa.me/${cleanSellerPhone}?text=${waMessage}`;
+
+    // 1. Update the UI to show the WhatsApp Button
+    const contactBox = document.getElementById('sellerContactInfo');
+    const sellerDetail = document.getElementById('sellerDetail');
+    
+    sellerDetail.innerHTML = `
+        <p style="margin-bottom:10px;">Order generated for <strong>${product.name}</strong></p>
+        <a href="${waLink}" target="_blank" class="whatsapp-btn">
+            💬 Chat with Seller on WhatsApp
+        </a>
+    `;
     contactBox.style.display = 'block';
 
-    // 2. Send the Buyer's details to your Telegram Bot
-    const botToken = "YOUR_BOT_TOKEN";
-    const chatId = "YOUR_CHAT_ID";
-
-    let message = `🛍️ **NEW ORDER RECEIVED**\n\n`;
-    message += `👤 **Buyer:** ${name}\n`;
-    message += `📞 **Phone:** ${phone}\n\n`;
-    message += `📦 **Items:**\n`;
-    
-    cart.forEach(id => {
-        const p = allApprovedProducts.find(item => item.id == id);
-        message += `- ${p.name} ($${p.price})\n`;
-    });
-
-    try {
-        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: "Markdown"
-            })
-        });
-        
-        alert("Order details sent! Please contact the seller below to finish the purchase.");
-    } catch (e) {
-        alert("There was an error sending the order.");
-    }
+    // 2. Send the Order to your Admin Telegram Bot (same as before)
+    sendOrderToTelegram(name, phone, cart);
 }
-
