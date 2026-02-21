@@ -245,6 +245,18 @@ async function checkout() {
 
     // 4. Send Notification to Admin (Telegram)
     sendOrderToTelegram(name, phone, cart);
+
+
+// ... (rest of your checkout code) ...
+
+    // Clear the cart after 2 seconds so they have time to see the WhatsApp button
+    setTimeout(() => {
+        cart = [];
+        updateCartUI();
+        document.getElementById('buyerName').value = "";
+        document.getElementById('buyerPhone').value = "";
+    }, 2000);
+    
 }
 // --- HELPER: TELEGRAM NOTIFICATION ---
 async function sendOrderToTelegram(buyerName, buyerPhone, items) {
@@ -277,4 +289,5 @@ async function sendOrderToTelegram(buyerName, buyerPhone, items) {
         console.error("Telegram Error:", e);
     }
 }
+
 
