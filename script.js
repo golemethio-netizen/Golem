@@ -59,16 +59,25 @@ async function handleAuth() {
     } catch (e) { alert(e.message); }
 }
 
+// --- UPDATED AUTH & USER MENU ---
 async function updateUserMenu() {
     const menu = document.getElementById('userMenu');
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (user && menu) {
-        menu.innerHTML = `
-            <a href="my-items.html" style="margin-right:15px; text-decoration:none; color:#007bff;">My Items</a>
-            <button class="auth-link" onclick="_supabase.auth.signOut().then(()=>location.reload())">Logout</button>
-        `;
-   
+    if (!menu) return;
+
+    try {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (user) {
+            menu.innerHTML = `
+                <a href="my-items.html" style="margin-right:15px; text-decoration:none; color:#007bff;">My Items</a>
+                <button class="auth-link" onclick="handleSignOut()">Logout</button>
+            `;
+        } else {
+            menu.innerHTML = `<button class="auth-link" onclick="openAuthModal()">Login</button>`;
+        }
+    } catch (e) {
+        console.error("User menu error:", e);
     }
+}
 
     // Add inside updateUserMenu()
 const currentPath = window.location.pathname;
@@ -80,10 +89,26 @@ document.querySelectorAll('.nav-item').forEach(link => {
 });
 }
 
-// 4. SEARCH
+async function handleSignOut() {
+    const { error } = await _supabase.auth.signOut();
+    if (error) alert(error.message);
+    else location.reload();
+}
+
+
+
+
+
+// --- SEARCH FUNCTION (Restored) ---
 function searchProducts() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allApprovedProducts.filter(p => p.name.toLowerCase().includes(term));
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const term = searchInput.value.toLowerCase();
+    const filtered = allApprovedProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        (p.description && p.description.toLowerCase().includes(term))
+    );
     renderProducts(filtered);
 }
 
@@ -112,6 +137,7 @@ function filterByCategory(category) {
         renderProducts(filtered);
     }
 }
+
 
 
 
