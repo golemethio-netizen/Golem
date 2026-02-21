@@ -45,7 +45,7 @@ function renderProducts(list) {
             <div class="share-btn" title="Share" onclick="event.stopPropagation(); window.open('${telegramShareUrl}', '_blank')">✈️</div>
             
             
-// Inside the .map() function of renderProducts
+
 <img src="${p.image}" alt="${p.name}" onclick="window.open('${p.image}', '_blank')" ...>
             
             <div class="product-info">
@@ -194,5 +194,6 @@ function toggleCart() {
 // --- 7. RUN ON LOAD ---
 fetchProducts();
 updateUserMenu();
+
 
 
