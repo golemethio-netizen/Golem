@@ -66,3 +66,12 @@ nav { background: white; padding: 15px 5%; display: flex; justify-content: space
 .signout-btn:hover {
     background: #cc0000;
 }
+.status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+.status-badge.pending { background: #ffeeba; color: #856404; }
+.status-badge.approved { background: #d4edda; color: #155724; }
+.status-badge.sold { background: #f8d7da; color: #721c24; }
