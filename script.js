@@ -25,17 +25,17 @@ async function fetchProducts() {
 
 function displayProducts(products) {
     const grid = document.getElementById('productGrid');
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <img src="${p.image}" alt="${p.name}">
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p class="price">$${p.price}</p>
-                <button onclick="addToCart('${p.id}')">Add to Cart</button>
-            </div>
+   // Inside displayProducts(products)
+grid.innerHTML = products.map(p => `
+    <div class="product-card">
+        <img src="${p.image}" alt="${p.name}">
+        <div class="product-info">
+            <h3>${p.name}</h3>
+            <p class="price">$${p.price}</p>
+            <button onclick="addToCart('${p.id}')">Add to Cart</button>
         </div>
-    `).join('');
-}
+    </div>
+`).join('');
 
 // --- AUTH UI & NOTIFICATIONS ---
 async function updateUIForUser() {
@@ -146,5 +146,6 @@ function updateCartUI() {
         el.innerText = cart.length;
     });
 }
+
 
 
