@@ -97,7 +97,16 @@ function toggleAuthMode() {
     document.getElementById('authBtn').innerText = isSignUp ? "Register" : "Sign In";
 }
 
-function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+function openAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error("Error: Could not find the element with ID 'authModal'");
+    }
+}
+
+
 function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
 
 function filterByCategory(category) {
@@ -114,4 +123,5 @@ function filterByCategory(category) {
         displayProducts(filtered);
     }
 }
+
 
