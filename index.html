@@ -112,15 +112,26 @@
 </div>
 
 </body>
-    <div id="authModal" class="modal">
-    <div class="modal-content auth-box">
-        <span class="close" onclick="closeAuth()">&times;</span>
+    <div id="authModal" class="modal" style="display:none;">
+    <div class="auth-card">
+        <span class="close-btn" onclick="closeAuth()">&times;</span>
         <h2 id="authTitle">Login to Golem</h2>
-       <input type="email" id="authEmail" placeholder="Email">
-       <input type="password" id="authPassword" placeholder="Password">
+        
+        <div id="registerFields" style="display:none;">
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="tel" id="regPhone" placeholder="Phone (251...)">
+        </div>
+
+        <input type="email" id="authEmail" placeholder="Email">
+        <input type="password" id="authPassword" placeholder="Password">
+        
         <button id="authBtn" onclick="handleAuth()">Sign In</button>
-        <p onclick="toggleAuthMode()" id="toggleText">Don't have an account? Register here.</p>
+        
+        <p id="toggleText" onclick="toggleAuthMode()" style="cursor:pointer; text-align:center; margin-top:10px; font-size:0.8rem;">
+            Don't have an account? Register
+        </p>
     </div>
+</div>
 </div>
 
 
@@ -135,6 +146,7 @@
 
 
 </html>
+
 
 
 
