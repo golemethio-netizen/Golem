@@ -102,8 +102,8 @@ async function checkout() {
     document.getElementById('sellerContactInfo').style.display = 'block';
 
     // Send Telegram Notification (CORS-safe)
-    const botToken = "YOUR_BOT_TOKEN";
-    const chatId = "YOUR_CHAT_ID";
+    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
+    const chatId = "6792892909";
     const msg = `🛍️ NEW ORDER\n📦 Item: ${product.name}\n👤 Buyer: ${name}\n📞 Phone: ${phone}`;
     
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
@@ -242,6 +242,7 @@ async function handleSignOut() {
         alert("Error signing out: " + e.message);
     }
 }
+
 
 
 
