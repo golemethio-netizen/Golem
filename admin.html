@@ -1,60 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Golem</title>
+    <meta charset="UTF-8"><title>Admin - Golem</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav>
-        <div class="logo">GOLEM ADMIN</div>
-        <div class="nav-links"><a href="index.html">View Shop</a></div>
-    </nav>
-
-    <div class="admin-container" style="padding: 20px; max-width: 900px; margin: auto;">
-        <h2>Pending Approvals & Inventory</h2>
-        <div id="adminProductList">Loading...</div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <h2>Admin Approval Queue</h2>
+    <div id="adminGrid" class="product-grid"></div>
     <script src="config.js"></script>
     <script>
-        async function fetchAdminProducts() {
-            const listContainer = document.getElementById('adminProductList');
-            const { data, error } = await _supabase.from('products').select('*').order('created_at', { ascending: false });
-
-            if (error) { listContainer.innerHTML = "Error."; return; }
-
-            listContainer.innerHTML = data.map(p => `
-                <div class="admin-card" style="display:flex; align-items:center; background:white; margin-bottom:10px; padding:15px; border-radius:10px; gap:20px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                    <img src="${p.image}" width="70" height="70" style="object-fit:cover; border-radius:5px;">
-                    <div style="flex:1;">
-                        <h4 style="margin:0;">${p.name}</h4>
-                        <p style="margin:5px 0; font-size:0.9rem;">$${p.price} | <b>${p.status}</b></p>
-                    </div>
-                    <div class="admin-actions" style="display:flex; gap:10px;">
-                        ${p.status === 'pending' ? `<button onclick="updateStatus('${p.id}', 'approved')" style="background:#28a745; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Approve</button>` : ''}
-                        ${p.status === 'approved' ? `<button onclick="updateStatus('${p.id}', 'sold')" style="background:#ffa500; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Mark Sold</button>` : ''}
-                        <button onclick="deleteProduct('${p.id}')" style="background:#dc3545; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Delete</button>
-                    </div>
+        async function loadAdmin() {
+            const { data: prods } = await _supabase.from('products').select('*').eq('status', 'pending');
+            document.getElementById('adminGrid').innerHTML = prods.map(p => `
+                <div class="product-card">
+                    <img src="${p.image}">
+                    <h3>${p.name}</h3>
+                    <button onclick="setStatus('${p.id}', 'approved')" style="background:green">Approve</button>
+                    <button onclick="setStatus('${p.id}', 'rejected')" style="background:red">Reject</button>
                 </div>
             `).join('');
         }
-
-        async function updateStatus(id, newStatus) {
-            await _supabase.from('products').update({ status: newStatus }).eq('id', id);
-            fetchAdminProducts();
+        async function setStatus(id, s) {
+            await _supabase.from('products').update({status: s}).eq('id', id);
+            location.reload();
         }
-
-        async function deleteProduct(id) {
-            if(confirm("Delete this item?")) {
-                await _supabase.from('products').delete().eq('id', id);
-                fetchAdminProducts();
-            }
-        }
-
-        fetchAdminProducts();
+        loadAdmin();
     </script>
 </body>
 </html>
