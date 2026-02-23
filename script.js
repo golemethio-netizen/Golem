@@ -1,3 +1,6 @@
+
+
+
 let isSignUp = false;
 let allApprovedProducts = [];
 
@@ -123,5 +126,6 @@ function filterByCategory(category) {
         displayProducts(filtered);
     }
 }
+
 
 
