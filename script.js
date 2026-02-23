@@ -145,3 +145,12 @@ function addToCart(productId) {
         alert("Item is already in your cart!");
     }
 }
+
+function searchProducts() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allApprovedProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.description.toLowerCase().includes(term)
+    );
+    displayProducts(filtered);
+}
