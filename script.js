@@ -127,5 +127,24 @@ function filterByCategory(category) {
     }
 }
 
+let cart = []; // Make sure this is at the top of your script
+
+function addToCart(productId) {
+    // Check if the product is already in the cart
+    if (!cart.includes(productId)) {
+        cart.push(productId);
+        updateCartUI();
+        alert("Item added to cart!");
+    } else {
+        alert("This item is already in your cart.");
+    }
+}
+
+function updateCartUI() {
+    const cartCountElements = document.querySelectorAll('.cart-count, #cartCount');
+    cartCountElements.forEach(el => {
+        el.innerText = cart.length;
+    });
+}
 
 
