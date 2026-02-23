@@ -1,29 +1,16 @@
-.nav-badge {
-    background: #ff4d4d;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 5px;
-    animation: pulse 2s infinite;
-}
+:root { --primary: #007bff; --success: #28a745; --danger: #ff4d4d; }
+body { font-family: sans-serif; margin: 0; background: #f4f4f9; }
 
-.nav-badge.mobile {
-    position: absolute;
-    top: 5px;
-    right: 20%;
-}
+nav { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+.product-card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.product-card img { width: 100%; border-radius: 8px; }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
-}
+/* Badge Styles */
+.nav-badge { background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px; animation: pulse 2s infinite; }
+.nav-badge.mobile { position: absolute; top: 5px; right: 15%; }
 
-.order-item {
-    background: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+.mobile-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; }
+.order-item { background: #fff; padding: 15px; margin-top: 10px; border-radius: 8px; border-left: 5px solid var(--primary); }
