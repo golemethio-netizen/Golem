@@ -128,38 +128,44 @@ function toggleAuthMode() {
 async function handleAuth() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
-    const fullName = document.getElementById('regName').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-
-    if (!email || !password) return alert("Email and Password required!");
-
     const btn = document.getElementById('authBtn');
+
+    if (!email || !password) return alert("Please enter email and password!");
+
     btn.disabled = true;
+    btn.innerText = "Connecting...";
 
     try {
         if (isSignUp) {
-            if (!fullName || !phone) return alert("Name and Phone required for registration!");
-            
-            // 1. Sign Up User
-            const { data, error } = await _supabase.auth.signUp({
+            const fullName = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+
+            if (!fullName || !phone) return alert("Name and Phone are required!");
+
+            // Use .auth.signUp
+            const { error } = await _supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    data: { full_name: fullName, phone: phone } // Stores in user metadata
+                    data: { full_name: fullName, phone: phone }
                 }
             });
             if (error) throw error;
-            alert("Registration successful! Check your email.");
+            alert("Registration successful! Check your email for a link.");
         } else {
-            // 2. Login
-            const { error } = await _supabase.signInWithPassword({ email, password });
+            // Use .auth.signInWithPassword
+            const { error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
             if (error) throw error;
-            location.reload();
+            location.reload(); // Success!
         }
     } catch (e) {
-        alert(e.message);
+        alert("Error: " + e.message);
     } finally {
         btn.disabled = false;
+        btn.innerText = isSignUp ? "Register" : "Sign In";
     }
 }
 
@@ -197,3 +203,4 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchProducts(); // Load your items
     updateUIForUser(); // Load your login/logout button
 });
+
