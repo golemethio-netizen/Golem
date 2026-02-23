@@ -208,9 +208,11 @@ async function updateUIForUser() {
             const userName = user.user_metadata?.full_name || user.email.split('@')[0];
             userMenu.innerHTML = `
                 <div class="user-profile">
-                    <span class="user-name">👤 ${userName}</span>
-                    <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
-                </div>
+        <span class="user-name" onclick="location.href='my-items.html'" style="cursor:pointer;">
+            👤 ${userName}
+        </span>
+        <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
+    </div>
             `;
         } else {
             // No user: Ensure the Sign In button is visible
@@ -242,6 +244,7 @@ async function handleSignOut() {
         alert("Error signing out: " + e.message);
     }
 }
+
 
 
 
