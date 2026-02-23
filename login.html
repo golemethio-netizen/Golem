@@ -3,30 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Golem Store</title>
+    <title>Golem Marketplace</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="https://img.icons8.com/color/48/golem.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
     <nav>
-        <div class="logo">Golem Store</div>
-        <div class="nav-links"><a href="index.html">Back to Shop</a></div>
+        <div class="logo" onclick="location.reload()">GOLEM</div>
+        <div id="userMenu">
+            <button onclick="openAuthModal()" id="loginNavBtn">Sign In</button>
+        </div>
     </nav>
 
-    <div class="auth-container">
-        <h2 id="authTitle">have acount ?Login if not Click Create Acount</h2>
-        <input type="email" id="email" placeholder="Email Address">
-        <input type="password" id="password" placeholder="Password">
-        
-        <div class="auth-buttons">
-            <button onclick="handleLogin()" id="loginBtn">Login</button>
-            <button onclick="handleSignup()" id="signupBtn">Create Account</button>
+    <div class="controls">
+        <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search items...">
+        <div class="category-filters">
+            <button onclick="filterByCategory('All')" class="active">All</button>
+            <button onclick="filterByCategory('Electronics')">Electronics</button>
+            <button onclick="filterByCategory('Clothing')">Clothing</button>
+            <button onclick="filterByCategory('Art')">Art</button>
         </div>
-        <p id="authMsg"></p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <div id="productGrid" class="product-grid">
+        </div>
+
+    <div class="mobile-nav">
+        <div class="nav-item" onclick="location.reload()">🏠<p>Home</p></div>
+        <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p></div>
+        <div class="nav-item" onclick="toggleCart()">🛒<p>Cart</p></div>
+    </div>
+
+    <div id="authModal" class="modal" style="display:none;">
+        <div class="auth-card">
+            <span class="close-btn" onclick="closeAuth()">&times;</span>
+            <h2 id="authTitle">Login to Golem</h2>
+            <input type="email" id="authEmail" placeholder="Email">
+            <input type="password" id="authPassword" placeholder="Password">
+            <button id="authBtn" onclick="handleAuth()">Sign In</button>
+            <p onclick="toggleAuthMode()" style="cursor:pointer; text-align:center; margin-top:10px; font-size:0.8rem;">
+                Don't have an account? Register
+            </p>
+        </div>
+    </div>
+
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button onclick="toggleCart()">&times;</button>
+        </div>
+        <div id="cartItems"></div>
+        <div class="checkout-form">
+            <h3>Checkout Details</h3>
+            <input type="text" id="buyerName" placeholder="Your Name">
+            <input type="tel" id="buyerPhone" placeholder="Your Phone">
+            <p>Total: $<span id="cartTotal">0.00</span></p>
+            <button onclick="checkout()" class="checkout-btn">Confirm Order</button>
+        </div>
+        <div id="sellerContactInfo" style="display:none; border-top:2px solid #eee; margin-top:15px; padding-top:15px;">
+            <div id="sellerDetail"></div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
-    <script src="auth.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
