@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell an Item - Golem</title>
+    <title>Sell Item - Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav>
         <div class="logo" onclick="location.href='index.html'">GOLEM</div>
-        <div id="userMenu"></div>
+        <button onclick="location.href='index.html'">Back to Shop</button>
     </nav>
 
-    <div class="container">
-        <div class="form-card">
-            <h2>Post New Product</h2>
+    <div class="container" style="padding: 20px;">
+        <div class="form-card" style="max-width:500px; margin:auto; background:white; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h2>List a New Product</h2>
             <form id="productForm">
                 <label>Product Name</label>
-                <input type="text" id="name" required placeholder="e.g., iPhone 13">
+                <input type="text" id="name" required placeholder="iPhone 13">
 
                 <label>Price ($)</label>
-                <input type="number" id="price" required placeholder="e.g., 599">
+                <input type="number" id="price" required placeholder="500">
 
                 <label>Category</label>
                 <select id="category">
@@ -31,27 +31,30 @@
                     <option value="Other">Other</option>
                 </select>
 
-                <label>Product Description</label>
-                <textarea id="description" rows="3" placeholder="Tell buyers about your item..."></textarea>
+                <label>Description</label>
+                <textarea id="description" rows="3" required></textarea>
 
                 <label>WhatsApp Number (Must start with 251)</label>
-                <input type="text" id="sellerContact" placeholder="2519..." required onkeyup="validatePhone()">
-                <div id="phoneChecklist" class="checklist">
-                    <div id="check1">✘ Starts with 251</div>
-                    <div id="check2">✘ Numbers only (No spaces/+)</div>
-                    <div id="check3">✘ Exactly 12 digits</div>
+                <input type="text" id="sellerContact" placeholder="251911..." required onkeyup="validatePhone()">
+                <div id="phoneChecklist" class="checklist" style="font-size:0.8rem; margin:10px 0;">
+                    <div id="check1" style="color:red;">✘ Starts with 251</div>
+                    <div id="check2" style="color:red;">✘ No spaces or + signs</div>
+                    <div id="check3" style="color:red;">✘ Exactly 12 digits</div>
                 </div>
 
                 <label>Product Image</label>
                 <input type="file" id="imageInput" accept="image/*" required>
 
-                <button type="submit" id="submitBtn" disabled>List Product</button>
+                <button type="submit" id="submitBtn" disabled style="width:100%; padding:12px; background:#007bff; color:white; border:none; border-radius:5px; cursor:not-allowed; opacity:0.5;">
+                    Submit Product
+                </button>
             </form>
         </div>
     </div>
 
     <script src="config.js"></script>
     <script>
+        // Real-time Phone Validation
         function validatePhone() {
             const phone = document.getElementById('sellerContact').value;
             const c1 = document.getElementById('check1');
@@ -67,9 +70,18 @@
             c2.style.color = nums ? "green" : "red"; c2.innerText = nums ? "✔ Numbers only" : "✘ Numbers only";
             c3.style.color = len ? "green" : "red"; c3.innerText = len ? "✔ 12 digits" : "✘ 12 digits";
 
-            btn.disabled = !(starts && nums && len);
+            if(starts && nums && len) {
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.cursor = "pointer";
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                btn.style.cursor = "not-allowed";
+            }
         }
 
+        // Handle Product Submission
         document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -78,22 +90,23 @@
 
             try {
                 const { data: { user } } = await _supabase.auth.getUser();
-                const file = document.getElementById('imageInput').files[0];
-                const fileName = Date.now() + "_" + file.name;
+                if(!user) throw new Error("Please log in first!");
 
-                // 1. Upload to Supabase Storage
-                const { data: uploadData, error: uploadError } = await _supabase.storage
+                const file = document.getElementById('imageInput').files[0];
+                const fileName = `${Date.now()}_${file.name}`;
+
+                // 1. Upload Image
+                const { error: uploadError } = await _supabase.storage
                     .from('product-images')
                     .upload(fileName, file);
-
                 if (uploadError) throw uploadError;
 
                 const { data: { publicUrl } } = _supabase.storage
                     .from('product-images')
                     .getPublicUrl(fileName);
 
-                // 2. Insert into Database
-                const { error } = await _supabase.from('products').insert([{
+                // 2. Save to Database
+                const { error: dbError } = await _supabase.from('products').insert([{
                     name: document.getElementById('name').value,
                     price: document.getElementById('price').value,
                     category: document.getElementById('category').value,
@@ -104,12 +117,13 @@
                     user_id: user.id
                 }]);
 
-                if (error) throw error;
-                alert("Product submitted for approval!");
-                location.href = 'index.html';
+                if (dbError) throw dbError;
+
+                alert("Product sent for approval!");
+                window.location.href = "index.html";
             } catch (err) {
                 alert(err.message);
-                btn.innerText = "List Product";
+                btn.innerText = "Submit Product";
                 btn.disabled = false;
             }
         };
