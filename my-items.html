@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>My Dashboard - Golem</title>
+    <meta charset="UTF-8"><title>My Items - Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav><div class="logo" onclick="location.href='index.html'">GOLEM</div><div id="userMenu"></div></nav>
+    <nav><div class="logo" onclick="location.href='index.html'">GOLEM</div></nav>
     <div class="container">
-        <h2>📦 My Active Items</h2>
+        <h2>My Products</h2>
         <div id="myProductGrid" class="product-grid"></div>
         <hr>
-        <h2>💰 Sales History (Buyer Clicks)</h2>
-        <div id="orderHistory" class="order-list-card"></div>
+        <h2>Recent Sales Leads</h2>
+        <div id="orderHistory"></div>
     </div>
     <script src="config.js"></script>
-    <script src="script.js"></script>
     <script>
-        async function loadData() {
+        async function load() {
             const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) return window.location.href = "index.html";
-
-            // Load Products
+            
             const { data: prods } = await _supabase.from('products').select('*').eq('user_id', user.id);
             document.getElementById('myProductGrid').innerHTML = prods.map(p => `
                 <div class="product-card">
                     <img src="${p.image}">
-                    <h3>${p.name}</h3>
+                    <h3>${p.name} (${p.status})</h3>
                     <button onclick="markSold('${p.id}')">Mark Sold</button>
                 </div>
             `).join('');
 
-            // Load Orders
-            const { data: ords } = await _supabase.from('orders').select('*').eq('seller_id', user.id);
-            document.getElementById('orderHistory').innerHTML = ords.map(o => `
+            const { data: orders } = await _supabase.from('orders').select('*').eq('seller_id', user.id);
+            document.getElementById('orderHistory').innerHTML = orders.map(o => `
                 <div class="order-item">
                     <b>${o.product_name}</b> - Buyer: ${o.buyer_name} (${o.buyer_phone})
                 </div>
             `).join('');
         }
-        document.addEventListener('DOMContentLoaded', loadData);
+        async function markSold(id) {
+            await _supabase.from('products').update({status:'sold'}).eq('id', id);
+            location.reload();
+        }
+        load();
     </script>
 </body>
 </html>
