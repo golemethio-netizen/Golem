@@ -166,28 +166,28 @@ async function handleAuth() {
 
 
 
-
 async function updateUIForUser() {
-    const { data: { user } } = await _supabase.auth.getUser();
     const userMenu = document.getElementById('userMenu');
+    if (!userMenu) return; // Stop if the ID doesn't exist
 
-    if (user) {
-        // Get name from metadata
-        const userName = user.user_metadata.full_name || user.email;
-        
-        userMenu.innerHTML = `
-            <div class="user-profile">
-                <span class="user-name">👤 ${userName}</span>
-                <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
-            </div>
-        `;
+    try {
+        const { data: { user }, error } = await _supabase.auth.getUser();
+
+        if (user && !error) {
+            // User is logged in: Show Name and Sign Out
+            const userName = user.user_metadata?.full_name || user.email.split('@')[0];
+            userMenu.innerHTML = `
+                <div class="user-profile">
+                    <span class="user-name">👤 ${userName}</span>
+                    <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
+                </div>
+            `;
+        } else {
+            // No user: Ensure the Sign In button is visible
+            userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn" class="login-btn">Sign In</button>`;
+        }
+    } catch (err) {
+        // Fallback: If Supabase fails, show the Sign In button anyway
+        userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn" class="login-btn">Sign In</button>`;
     }
 }
-
-async function handleSignOut() {
-    await _supabase.auth.signOut();
-    location.reload();
-}
-
-// Call this at the bottom of script.js
-updateUIForUser();
