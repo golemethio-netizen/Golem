@@ -218,3 +218,38 @@ async function handleSignOut() {
         alert("Error signing out: " + e.message);
     }
 }
+
+
+
+
+// Add this inside the <script> tag of submit.html
+async function autoFillSellerInfo() {
+    try {
+        const { data: { user }, error } = await _supabase.auth.getUser();
+
+        if (error) throw error;
+
+        if (user) {
+            // Get the phone number we saved in metadata during registration
+            const savedPhone = user.user_metadata?.phone;
+            
+            if (savedPhone) {
+                const phoneInput = document.getElementById('sellerContact');
+                phoneInput.value = savedPhone;
+                
+                // Run the validation function once so the button enables automatically
+                validatePhone(); 
+            }
+        } else {
+            // If someone tries to access this page without logging in
+            alert("Please log in to sell items.");
+            window.location.href = "index.html";
+        }
+    } catch (err) {
+        console.error("Auto-fill error:", err);
+    }
+}
+
+// Run it on page load
+document.addEventListener('DOMContentLoaded', autoFillSellerInfo);
+
