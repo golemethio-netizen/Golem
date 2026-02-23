@@ -20,7 +20,7 @@
     </div>
 
     <script src="config.js"></script>
-   <script>
+
     async function loadUserProducts() {
         const { data: { user } } = await _supabase.auth.getUser();
         if (!user) {
@@ -64,6 +64,6 @@
 
 
         
-    </script>
+ 
 </body>
 </html>
