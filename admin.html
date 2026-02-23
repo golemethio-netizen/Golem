@@ -6,26 +6,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h2>Admin Approval Queue</h2>
-    <div id="adminGrid" class="product-grid"></div>
+    <div class="container">
+        <h2>Admin Queue</h2>
+        <div id="adminGrid" class="product-grid"></div>
+    </div>
     <script src="config.js"></script>
     <script>
-        async function loadAdmin() {
+        async function load() {
             const { data: prods } = await _supabase.from('products').select('*').eq('status', 'pending');
             document.getElementById('adminGrid').innerHTML = prods.map(p => `
                 <div class="product-card">
                     <img src="${p.image}">
                     <h3>${p.name}</h3>
-                    <button onclick="setStatus('${p.id}', 'approved')" style="background:green">Approve</button>
-                    <button onclick="setStatus('${p.id}', 'rejected')" style="background:red">Reject</button>
+                    <button onclick="update('${p.id}', 'approved')" style="background:green">Approve</button>
                 </div>
             `).join('');
         }
-        async function setStatus(id, s) {
+        async function update(id, s) {
             await _supabase.from('products').update({status: s}).eq('id', id);
             location.reload();
         }
-        loadAdmin();
+        load();
     </script>
 </body>
 </html>
