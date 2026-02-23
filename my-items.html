@@ -1,69 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Items - Golem</title>
+    <meta charset="UTF-8"><title>My Dashboard - Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav>
-        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
-        <div id="userMenu"></div>
-    </nav>
-
+    <nav><div class="logo" onclick="location.href='index.html'">GOLEM</div><div id="userMenu"></div></nav>
     <div class="container">
-        <h2 style="padding: 20px;">My Listings</h2>
-        <div id="myProductGrid" class="product-grid">
-            </div>
+        <h2>📦 My Active Items</h2>
+        <div id="myProductGrid" class="product-grid"></div>
+        <hr>
+        <h2>💰 Sales History (Buyer Clicks)</h2>
+        <div id="orderHistory" class="order-list-card"></div>
     </div>
-
     <script src="config.js"></script>
-<script>
-    async function loadUserProducts() {
-        const { data: { user } } = await _supabase.auth.getUser();
-        if (!user) {
-            alert("Please log in first!");
-            window.location.href = "index.html";
-            return;
-        }
+    <script src="script.js"></script>
+    <script>
+        async function loadData() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return window.location.href = "index.html";
 
-        const { data, error } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('user_id', user.id); // This ensures you only see YOUR items
-
-        const grid = document.getElementById('myProductGrid'); // Ensure this ID exists in your HTML
-        if (data && data.length > 0) {
-            grid.innerHTML = data.map(p => `
+            // Load Products
+            const { data: prods } = await _supabase.from('products').select('*').eq('user_id', user.id);
+            document.getElementById('myProductGrid').innerHTML = prods.map(p => `
                 <div class="product-card">
-                    <span class="status-badge ${p.status}">${p.status}</span>
                     <img src="${p.image}">
-                    <div class="product-info">
-                        <h3>${p.name}</h3>
-                        <p class="price">$${p.price}</p>
-                        <button onclick="deleteItem('${p.id}')" style="background:red;">Delete</button>
-                    </div>
+                    <h3>${p.name}</h3>
+                    <button onclick="markSold('${p.id}')">Mark Sold</button>
                 </div>
             `).join('');
-        } else {
-            grid.innerHTML = "<p style='padding:20px;'>You haven't listed any items yet.</p>";
+
+            // Load Orders
+            const { data: ords } = await _supabase.from('orders').select('*').eq('seller_id', user.id);
+            document.getElementById('orderHistory').innerHTML = ords.map(o => `
+                <div class="order-item">
+                    <b>${o.product_name}</b> - Buyer: ${o.buyer_name} (${o.buyer_phone})
+                </div>
+            `).join('');
         }
-    }
-    
-    async function deleteItem(id) {
-        if(confirm("Delete this item?")) {
-            await _supabase.from('products').delete().eq('id', id);
-            location.reload();
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadUserProducts);
-</script>
-
-
-        
- 
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
 </body>
 </html>
