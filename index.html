@@ -6,6 +6,28 @@
     <title>Golem Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+
+    <div id="cartModal" class="modal" style="display:none;">
+    <div class="auth-card">
+        <span class="close-btn" onclick="toggleCart()">&times;</span>
+        <h2>Your Cart</h2>
+        <div id="cartItemsList">
+            </div>
+        <hr>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; margin: 15px 0;">
+            <span>Total:</span>
+            <span><span id="cartTotal">0.00</span> ETB</span>
+        </div>
+        
+        <div id="checkoutFields">
+            <input type="text" id="buyerName" placeholder="Your Name" style="width:100%; margin-bottom:10px;">
+            <input type="tel" id="buyerPhone" placeholder="Your Phone (251...)" style="width:100%; margin-bottom:10px;">
+            <button onclick="checkout()" style="width:100%; background:var(--success); color:white;">Confirm Order (WhatsApp)</button>
+        </div>
+    </div>
+</div>
 </head>
 <body>
     <nav>
@@ -53,5 +75,6 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
 
