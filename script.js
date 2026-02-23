@@ -122,32 +122,40 @@ function toggleAuthMode() {
 }
 
 async function handleAuth() {
-    const email = document.getElementById('authEmail').value;
-    const password = document.getElementById('authPassword').value;
-    const btn = document.getElementById('authBtn');
+    // We use .value to get the text inside the boxes
+    const emailInput = document.getElementById('authEmail');
+    const passwordInput = document.getElementById('authPassword');
 
+    if (!emailInput || !passwordInput) {
+        console.error("HTML inputs not found! Check your IDs in index.html.");
+        return;
+    }
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    // Check if they are empty
     if (!email || !password) {
         alert("Please enter both email and password.");
         return;
     }
 
+    const btn = document.getElementById('authBtn');
     btn.innerText = "Processing...";
     btn.disabled = true;
 
     try {
         if (isSignUp) {
-            // Register New User
             const { error } = await _supabase.auth.signUp({ email, password });
             if (error) throw error;
-            alert("Success! Check your email for a confirmation link.");
+            alert("Registration successful! Please check your email for the confirmation link.");
         } else {
-            // Login Existing User
             const { error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            location.reload(); // Refresh to show the "My Items" menu
+            location.reload(); 
         }
     } catch (e) {
-        alert(e.message);
+        alert("Auth Error: " + e.message);
     } finally {
         btn.innerText = isSignUp ? "Register" : "Sign In";
         btn.disabled = false;
@@ -159,3 +167,4 @@ async function handleSignOut() {
     await _supabase.auth.signOut();
     location.reload();
 }
+
