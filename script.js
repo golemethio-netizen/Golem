@@ -166,3 +166,28 @@ async function handleAuth() {
 
 
 
+
+async function updateUIForUser() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const userMenu = document.getElementById('userMenu');
+
+    if (user) {
+        // Get name from metadata
+        const userName = user.user_metadata.full_name || user.email;
+        
+        userMenu.innerHTML = `
+            <div class="user-profile">
+                <span class="user-name">👤 ${userName}</span>
+                <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
+            </div>
+        `;
+    }
+}
+
+async function handleSignOut() {
+    await _supabase.auth.signOut();
+    location.reload();
+}
+
+// Call this at the bottom of script.js
+updateUIForUser();
