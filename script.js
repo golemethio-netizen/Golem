@@ -191,3 +191,9 @@ async function updateUIForUser() {
         userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn" class="login-btn">Sign In</button>`;
     }
 }
+
+// This ensures the script waits for the HTML to be ready
+document.addEventListener('DOMContentLoaded', () => {
+    fetchProducts(); // Load your items
+    updateUIForUser(); // Load your login/logout button
+});
