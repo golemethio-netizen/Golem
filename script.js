@@ -207,3 +207,51 @@ async function checkout() {
         console.error("Order error:", err);
     }
 }
+
+// --- CART UI TOGGLE ---
+function toggleCart() {
+    const cartModal = document.getElementById('cartModal');
+    if (cartModal) {
+        const isVisible = cartModal.style.display === 'flex';
+        cartModal.style.display = isVisible ? 'none' : 'flex';
+        if (!isVisible) renderCartItems(); // Refresh the list when opening
+    } else {
+        alert("Cart is empty! Add some items first.");
+    }
+}
+
+function renderCartItems() {
+    const cartList = document.getElementById('cartItemsList');
+    const cartTotal = document.getElementById('cartTotal');
+    if (!cartList) return;
+
+    if (cart.length === 0) {
+        cartList.innerHTML = "<p>Your cart is empty.</p>";
+        if (cartTotal) cartTotal.innerText = "0.00";
+        return;
+    }
+
+    // Filter allApprovedProducts to find only the ones in the cart
+    const itemsInCart = allApprovedProducts.filter(p => cart.includes(p.id));
+    
+    let total = 0;
+    cartList.innerHTML = itemsInCart.map(p => {
+        total += parseFloat(p.price);
+        return `
+            <div class="cart-item" style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                <span>${p.name}</span>
+                <b>${p.price} ETB</b>
+                <button onclick="removeFromCart('${p.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
+            </div>
+        `;
+    }).join('');
+
+    if (cartTotal) cartTotal.innerText = total.toFixed(2);
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(id => id !== productId);
+    const countEl = document.getElementById('cartCount');
+    if (countEl) countEl.innerText = cart.length;
+    renderCartItems();
+}
