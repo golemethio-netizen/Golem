@@ -92,26 +92,16 @@
             </div>
         </div>
     </div>
-<div class="mobile-nav">
-    <a href="index.html" class="nav-item">
-        <span>🏠</span>
-        <p>Home</p>
-    </a>
-    <div class="nav-item" onclick="checkAuthToSell()">
-    <div class="mobile-sell-btn">+</div>
-    <p>Sell</p>
-</div>
-    <a href="my-items.html" class="nav-item">
-        <span>📦</span>
-        <p>My Items</p>
-    </a>
 
-
-
-
-
+    <div class="mobile-nav">
+    <div class="nav-item" onclick="location.href='index.html'">🏠<p>Home</p></div>
+    <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p></div>
+    <div class="nav-item" onclick="location.href='my-items.html'">📦<p>My Items</p></div>
+    <div class="nav-item" onclick="toggleCart()">🛒<p>Cart</p></div>
 </div>
 
+
+    
 </body>
     <div id="authModal" class="modal" style="display:none;">
     <div class="auth-card">
@@ -147,6 +137,7 @@
 
 
 </html>
+
 
 
 
