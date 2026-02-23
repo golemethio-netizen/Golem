@@ -63,25 +63,49 @@ function updateCartUI() {
     document.getElementById('cartTotal').innerText = total.toFixed(2);
 }
 
+
 async function checkout() {
     const name = document.getElementById('buyerName').value;
     const phone = document.getElementById('buyerPhone').value;
-    if(!name || !phone) return alert("Enter your details!");
+    
+    if(!name || !phone) {
+        alert("Please enter your name and phone number!");
+        return;
+    }
 
-    const product = allApprovedProducts.find(p => p.id == cart[0]);
+    // Ensure there is something in the cart
+    if (cart.length === 0) return alert("Cart is empty!");
+
+    const productId = cart[0];
+    const product = allApprovedProducts.find(p => p.id == productId);
+
+    // --- THE SAFETY FIX ---
+    if (!product || !product.seller_contact) {
+        console.error("Product or Seller Contact missing:", product);
+        alert("Error: This item doesn't have a valid seller phone number associated with it.");
+        return; 
+    }
+
+    // Now it's safe to use .replace()
     const cleanPhone = product.seller_contact.replace(/\D/g, '');
     const waMsg = encodeURIComponent(`Hi! I'm ${name}. I want to buy your ${product.name} on Golem.`);
     const waLink = `https://wa.me/${cleanPhone}?text=${waMsg}`;
 
-    document.getElementById('sellerDetail').innerHTML = `
-        <a href="${waLink}" target="_blank" class="whatsapp-btn">💬 Chat with Seller</a>
+    // Show the WhatsApp button
+    const sellerDetail = document.getElementById('sellerDetail');
+    sellerDetail.innerHTML = `
+        <p style="color: #333; margin-bottom: 10px;">Order prepared for <b>${product.name}</b></p>
+        <a href="${waLink}" target="_blank" class="whatsapp-btn">
+            💬 Chat with Seller on WhatsApp
+        </a>
     `;
     document.getElementById('sellerContactInfo').style.display = 'block';
 
-    // CORS Safe Telegram Call
-    const botToken = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
-    const chatId = "6792892909";
-    const msg = `🛍️ Order: ${product.name}\n👤 Buyer: ${name}\n📞 Phone: ${phone}`;
+    // Send Telegram Notification (CORS-safe)
+    const botToken = "YOUR_BOT_TOKEN";
+    const chatId = "YOUR_CHAT_ID";
+    const msg = `🛍️ NEW ORDER\n📦 Item: ${product.name}\n👤 Buyer: ${name}\n📞 Phone: ${phone}`;
+    
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
 }
 
@@ -218,6 +242,7 @@ async function handleSignOut() {
         alert("Error signing out: " + e.message);
     }
 }
+
 
 
 
