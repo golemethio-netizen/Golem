@@ -122,19 +122,17 @@ function toggleAuthMode() {
 }
 
 async function handleAuth() {
-    // We use .value to get the text inside the boxes
-    const emailInput = document.getElementById('authEmail');
-    const passwordInput = document.getElementById('authPassword');
+    // We target the inputs directly by their ID
+    const emailField = document.querySelector('#authEmail');
+    const passwordField = document.querySelector('#authPassword');
 
-    if (!emailInput || !passwordInput) {
-        console.error("HTML inputs not found! Check your IDs in index.html.");
-        return;
-    }
+    // Debugging: This will show in your console (F12) if the fields are found
+    console.log("Email Found:", !!emailField, "Value:", emailField?.value);
+    console.log("Password Found:", !!passwordField, "Value:", passwordField?.value);
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    const email = emailField ? emailField.value.trim() : "";
+    const password = passwordField ? passwordField.value.trim() : "";
 
-    // Check if they are empty
     if (!email || !password) {
         alert("Please enter both email and password.");
         return;
@@ -148,23 +146,18 @@ async function handleAuth() {
         if (isSignUp) {
             const { error } = await _supabase.auth.signUp({ email, password });
             if (error) throw error;
-            alert("Registration successful! Please check your email for the confirmation link.");
+            alert("Check your email for the confirmation link!");
         } else {
             const { error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
             location.reload(); 
         }
     } catch (e) {
-        alert("Auth Error: " + e.message);
+        alert(e.message);
     } finally {
         btn.innerText = isSignUp ? "Register" : "Sign In";
         btn.disabled = false;
     }
 }
 
-// Add a logout function while we're at it
-async function handleSignOut() {
-    await _supabase.auth.signOut();
-    location.reload();
-}
 
