@@ -204,3 +204,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser(); // Load your login/logout button
 });
 
+async function handleSignOut() {
+    try {
+        const { error } = await _supabase.auth.signOut();
+        if (error) throw error;
+        
+        // Clear local session storage to be safe
+        localStorage.clear();
+        
+        // Refresh the page to show the "Sign In" button again
+        window.location.reload();
+    } catch (e) {
+        alert("Error signing out: " + e.message);
+    }
+}
