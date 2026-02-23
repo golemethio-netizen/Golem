@@ -113,12 +113,16 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+
+
 let isSignUp = false;
 
 function toggleAuthMode() {
     isSignUp = !isSignUp;
     document.getElementById('authTitle').innerText = isSignUp ? "Create Account" : "Login to Golem";
     document.getElementById('authBtn').innerText = isSignUp ? "Register" : "Sign In";
+    document.getElementById('registerFields').style.display = isSignUp ? "block" : "none";
+    document.getElementById('toggleText').innerText = isSignUp ? "Already have an account? Login" : "Don't have an account? Register";
 }
 
 async function handleAuth() {
@@ -159,5 +163,6 @@ async function handleAuth() {
         btn.disabled = false;
     }
 }
+
 
 
