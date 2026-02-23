@@ -196,56 +196,60 @@ async function handleAuth() {
 
 
 
+// --- USER AUTH UI UPDATE ---
 async function updateUIForUser() {
     const userMenu = document.getElementById('userMenu');
-    if (!userMenu) return; // Stop if the ID doesn't exist
+    // We also want to update the mobile nav "My Items" visibility
+    const mobileMyItems = document.querySelector('.nav-item[onclick*="my-items.html"]');
 
     try {
         const { data: { user }, error } = await _supabase.auth.getUser();
 
-       // Inside updateUIForUser() in script.js
-if (user && !error) {
-    const userName = user.user_metadata?.full_name || user.email.split('@')[0];
-    userMenu.innerHTML = `
-        <div class="user-profile">
-            <a href="my-items.html" style="text-decoration:none; color:inherit; margin-right:10px;">
-                👤 <b>${userName}</b>
-            </a>
-            <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
-        </div>
-    `;
-} else {
-            // No user: Ensure the Sign In button is visible
-            userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn" class="login-btn">Sign In</button>`;
+        if (user && !error) {
+            const userName = user.user_metadata?.full_name || user.email.split('@')[0];
+            
+            // 1. Update Desktop Nav
+            if (userMenu) {
+                userMenu.innerHTML = `
+                    <div class="user-profile" style="display:flex; align-items:center; gap:10px;">
+                        <a href="my-items.html" style="text-decoration:none; color:var(--primary); font-weight:bold;">👤 ${userName}</a>
+                        <button onclick="handleSignOut()" class="signout-btn" style="padding:5px 10px; font-size:12px;">Sign Out</button>
+                    </div>
+                `;
+            }
+            
+            // 2. Ensure Mobile "My Items" is visible
+            if (mobileMyItems) mobileMyItems.style.display = "flex";
+
+        } else {
+            // No User logged in
+            if (userMenu) {
+                userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn">Sign In</button>`;
+            }
+            // Hide My Items from mobile nav if not logged in (optional)
+            if (mobileMyItems) mobileMyItems.style.display = "none";
         }
     } catch (err) {
-        // Fallback: If Supabase fails, show the Sign In button anyway
-        userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn" class="login-btn">Sign In</button>`;
+        console.error("UI Update Error:", err);
     }
 }
 
-// This ensures the script waits for the HTML to be ready
-document.addEventListener('DOMContentLoaded', () => {
-    fetchProducts(); // Load your items
-    updateUIForUser(); // Load your login/logout button
-});
 
+
+// --- SIGN OUT LOGIC ---
 async function handleSignOut() {
-    try {
-        const { error } = await _supabase.auth.signOut();
-        if (error) throw error;
-        
-        // Clear local session storage to be safe
-        localStorage.clear();
-        
-        // Refresh the page to show the "Sign In" button again
-        window.location.reload();
-    } catch (e) {
-        alert("Error signing out: " + e.message);
-    }
+    const { error } = await _supabase.auth.signOut();
+    if (error) alert(error.message);
+    window.location.href = "index.html"; // Redirect to home
 }
 
 
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Run these when the page loads
+    if (typeof fetchProducts === "function") fetchProducts();
+    updateUIForUser();
+});
 
 
 
