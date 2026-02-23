@@ -126,43 +126,43 @@ function toggleAuthMode() {
 }
 
 async function handleAuth() {
-    // We target the inputs directly by their ID
-    const emailField = document.querySelector('#authEmail');
-    const passwordField = document.querySelector('#authPassword');
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    const fullName = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
 
-    // Debugging: This will show in your console (F12) if the fields are found
-    console.log("Email Found:", !!emailField, "Value:", emailField?.value);
-    console.log("Password Found:", !!passwordField, "Value:", passwordField?.value);
-
-    const email = emailField ? emailField.value.trim() : "";
-    const password = passwordField ? passwordField.value.trim() : "";
-
-    if (!email || !password) {
-        alert("Please enter both email and password.");
-        return;
-    }
+    if (!email || !password) return alert("Email and Password required!");
 
     const btn = document.getElementById('authBtn');
-    btn.innerText = "Processing...";
     btn.disabled = true;
 
     try {
         if (isSignUp) {
-            const { error } = await _supabase.auth.signUp({ email, password });
+            if (!fullName || !phone) return alert("Name and Phone required for registration!");
+            
+            // 1. Sign Up User
+            const { data, error } = await _supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { full_name: fullName, phone: phone } // Stores in user metadata
+                }
+            });
             if (error) throw error;
-            alert("Check your email for the confirmation link!");
+            alert("Registration successful! Check your email.");
         } else {
-            const { error } = await _supabase.auth.signInWithPassword({ email, password });
+            // 2. Login
+            const { error } = await _supabase.signInWithPassword({ email, password });
             if (error) throw error;
-            location.reload(); 
+            location.reload();
         }
     } catch (e) {
         alert(e.message);
     } finally {
-        btn.innerText = isSignUp ? "Register" : "Sign In";
         btn.disabled = false;
     }
 }
+
 
 
 
