@@ -104,6 +104,23 @@
         <span>📦</span>
         <p>My Items</p>
     </a>
+
+<div id="authModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+    <div class="auth-card" style="background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; position:relative;">
+        <span onclick="closeAuth()" style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:1.5rem;">&times;</span>
+        <h2 id="authTitle">Login to Golem</h2>
+        <input type="email" id="authEmail" placeholder="Email" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd;">
+        <input type="password" id="authPassword" placeholder="Password" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd;">
+        <button id="authBtn" onclick="handleAuth()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">Sign In</button>
+        <p style="text-align:center; margin-top:15px; font-size:0.9rem;">
+            <a href="#" onclick="toggleAuthMode()">Don't have an account? Register</a>
+        </p>
+    </div>
+</div>
+
+
+
+
 </div>
     <footer>
         <p>&copy; 2026 Golem Marketplace. All rights reserved.</p>
@@ -125,6 +142,7 @@
     </div>
 </div>
 </html>
+
 
 
 
