@@ -90,3 +90,26 @@ function removeFromCart(i) { cart.splice(i, 1); updateCartUI(); }
 
 fetchProducts();
 
+
+// Function to open the modal
+function openAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+// Function to close the modal
+function closeAuth() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Function to check if user can sell
+async function checkAuthToSell() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) {
+        window.location.href = "submit.html";
+    } else {
+        alert("Please login first to sell items!");
+        openAuthModal();
+    }
+}
