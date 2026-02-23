@@ -203,18 +203,18 @@ async function updateUIForUser() {
     try {
         const { data: { user }, error } = await _supabase.auth.getUser();
 
-        if (user && !error) {
-            // User is logged in: Show Name and Sign Out
-            const userName = user.user_metadata?.full_name || user.email.split('@')[0];
-            userMenu.innerHTML = `
-                <div class="user-profile">
-        <span class="user-name" onclick="location.href='my-items.html'" style="cursor:pointer;">
-            👤 ${userName}
-        </span>
-        <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
-    </div>
-            `;
-        } else {
+       // Inside updateUIForUser() in script.js
+if (user && !error) {
+    const userName = user.user_metadata?.full_name || user.email.split('@')[0];
+    userMenu.innerHTML = `
+        <div class="user-profile">
+            <a href="my-items.html" style="text-decoration:none; color:inherit; margin-right:10px;">
+                👤 <b>${userName}</b>
+            </a>
+            <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
+        </div>
+    `;
+} else {
             // No user: Ensure the Sign In button is visible
             userMenu.innerHTML = `<button onclick="openAuthModal()" id="loginNavBtn" class="login-btn">Sign In</button>`;
         }
@@ -244,6 +244,7 @@ async function handleSignOut() {
         alert("Error signing out: " + e.message);
     }
 }
+
 
 
 
