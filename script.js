@@ -99,3 +99,19 @@ function toggleAuthMode() {
 
 function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
 function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
+
+function filterByCategory(category) {
+    // 1. Update the UI buttons (Visual)
+    const buttons = document.querySelectorAll('.category-filters button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // 2. Filter the data (Logic)
+    if (category === 'All') {
+        displayProducts(allApprovedProducts);
+    } else {
+        const filtered = allApprovedProducts.filter(p => p.category === category);
+        displayProducts(filtered);
+    }
+}
+
