@@ -113,3 +113,49 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+let isSignUp = false;
+
+function toggleAuthMode() {
+    isSignUp = !isSignUp;
+    document.getElementById('authTitle').innerText = isSignUp ? "Create Account" : "Login to Golem";
+    document.getElementById('authBtn').innerText = isSignUp ? "Register" : "Sign In";
+}
+
+async function handleAuth() {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authBtn');
+
+    if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+    }
+
+    btn.innerText = "Processing...";
+    btn.disabled = true;
+
+    try {
+        if (isSignUp) {
+            // Register New User
+            const { error } = await _supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            alert("Success! Check your email for a confirmation link.");
+        } else {
+            // Login Existing User
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            location.reload(); // Refresh to show the "My Items" menu
+        }
+    } catch (e) {
+        alert(e.message);
+    } finally {
+        btn.innerText = isSignUp ? "Register" : "Sign In";
+        btn.disabled = false;
+    }
+}
+
+// Add a logout function while we're at it
+async function handleSignOut() {
+    await _supabase.auth.signOut();
+    location.reload();
+}
