@@ -112,13 +112,18 @@ function openAuthModal() {
 
 function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
 
+
+// 1. Filter Logic
 function filterByCategory(category) {
-    // 1. Update the UI buttons (Visual)
+    console.log("Filtering by:", category); // Debugging line
+    
+    // Update active button style
     const buttons = document.querySelectorAll('.category-filters button');
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    
+    // Use the event to find which button was clicked
+    if (event) event.target.classList.add('active');
 
-    // 2. Filter the data (Logic)
     if (category === 'All') {
         displayProducts(allApprovedProducts);
     } else {
@@ -127,25 +132,16 @@ function filterByCategory(category) {
     }
 }
 
-let cart = []; // Make sure this is at the top of your script
-
+// 2. Add to Cart Logic
+let cart = []; 
 function addToCart(productId) {
-    // Check if the product is already in the cart
     if (!cart.includes(productId)) {
         cart.push(productId);
-        updateCartUI();
+        // Update the cart count UI
+        const cartCount = document.getElementById('cartCount');
+        if (cartCount) cartCount.innerText = cart.length;
         alert("Item added to cart!");
     } else {
-        alert("This item is already in your cart.");
+        alert("Item is already in your cart!");
     }
 }
-
-function updateCartUI() {
-    const cartCountElements = document.querySelectorAll('.cart-count, #cartCount');
-    cartCountElements.forEach(el => {
-        el.innerText = cart.length;
-    });
-}
-
-
-
