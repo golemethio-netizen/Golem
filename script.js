@@ -161,3 +161,13 @@ async function handleSignOut() {
         location.reload();
     }
 }
+
+async function checkAuthToSell() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) {
+        window.location.href = 'submit.html';
+    } else {
+        alert("Please sign in to post an item!");
+        openAuthModal();
+    }
+}
