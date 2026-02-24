@@ -152,3 +152,12 @@ function filterCategory(category) {
     }
 }
 
+async function handleSignOut() {
+    const { error } = await _supabase.auth.signOut();
+    if (error) {
+        alert("Error signing out: " + error.message);
+    } else {
+        // Refresh the page to show the "Sign In" button again
+        location.reload();
+    }
+}
