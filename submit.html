@@ -38,11 +38,15 @@
                     </select>
                 </div>
 
-                <div class="input-group">
-                    <label>WhatsApp Phone Number</label>
-                    <input type="tel" id="sellerContact" placeholder="2519..." required>
-                    <small>Include country code (e.g., 251911...)</small>
-                </div>
+              <div class="form-group">
+    <label>📞 WhatsApp Number (e.g. 251911...)</label>
+    <input type="text" id="whatsappNumber" placeholder="Enter phone number">
+</div>
+
+<div class="form-group">
+    <label>✈️ Telegram Username (without @)</label>
+    <input type="text" id="telegramUser" placeholder="Enter username">
+</div>
 
                 <div class="input-group" style="margin-top:15px;">
                     <label>Product Image</label>
@@ -132,6 +136,58 @@
                 submitBtn.innerText = "Post Item for Approval";
             }
         };
+
+
+
+async function submitItem() {
+    const name = document.getElementById('itemName').value;
+    const price = document.getElementById('itemPrice').value;
+    const whatsapp = document.getElementById('whatsappNumber').value;
+    const telegram = document.getElementById('telegramUser').value;
+    const imageFile = document.getElementById('itemImage').files[0];
+
+    if (!name || !price || (!whatsapp && !telegram) || !imageFile) {
+        return alert("Please provide a name, price, image, and at least one contact method!");
+    }
+
+    try {
+        // 1. Upload Image (Same as before)
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await _supabase.storage
+            .from('product-images')
+            .upload(fileName, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = _supabase.storage
+            .from('product-images')
+            .getPublicUrl(fileName);
+
+        // 2. Save Product with both contact methods
+        const { data: { user } } = await _supabase.auth.getUser();
+        const { error } = await _supabase.from('products').insert([{
+            name: name,
+            price: parseFloat(price),
+            whatsapp_number: whatsapp,
+            telegram_username: telegram,
+            image: publicUrlData.publicUrl,
+            user_id: user.id,
+            status: 'pending'
+        }]);
+
+        if (error) throw error;
+
+        alert("Item submitted for review!");
+        window.location.href = 'index.html';
+
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+}
+
+
+        
     </script>
 
     <style>
