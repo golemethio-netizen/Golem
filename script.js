@@ -107,3 +107,51 @@ function filterByCategory(category) {
     const filtered = category === 'All' ? allApprovedProducts : allApprovedProducts.filter(p => p.category === category);
     displayProducts(filtered);
 }
+
+// --- CART UI TOGGLE ---
+function toggleCart() {
+    const modal = document.getElementById('cartModal');
+    if (!modal) {
+        console.error("Cart Modal not found in HTML!");
+        return;
+    }
+    const isVisible = modal.style.display === 'flex';
+    modal.style.display = isVisible ? 'none' : 'flex';
+    
+    if (!isVisible) renderCartItems(); // Refresh items when opening
+}
+
+function renderCartItems() {
+    const list = document.getElementById('cartItemsList');
+    const totalEl = document.getElementById('cartTotal');
+    if (!list) return;
+
+    if (cart.length === 0) {
+        list.innerHTML = "<p style='padding:10px;'>Your cart is empty.</p>";
+        if (totalEl) totalEl.innerText = "0.00";
+        return;
+    }
+
+    // Filter approved products to find what's in the cart
+    const items = allApprovedProducts.filter(p => cart.includes(p.id));
+    let total = 0;
+
+    list.innerHTML = items.map(p => {
+        total += parseFloat(p.price);
+        return `
+            <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                <span>${p.name}</span>
+                <b>${p.price} ETB</b>
+                <button onclick="removeFromCart('${p.id}')" style="background:none; border:none; color:red; cursor:pointer;">❌</button>
+            </div>
+        `;
+    }).join('');
+    
+    if (totalEl) totalEl.innerText = total.toFixed(2);
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(cid => cid !== id);
+    document.getElementById('cartCount').innerText = cart.length;
+    renderCartItems();
+}
