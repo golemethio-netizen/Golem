@@ -6,133 +6,54 @@
     <title>Golem Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-
-   <div id="cartModal" class="modal">
-    <div class="modal-content">
-        <h2>Your Cart</h2>
-        <div id="cartItems"></div>
-        
-        <div class="buyer-info" style="margin-top: 20px;">
-            <label>Your Name:</label>
-            <input type="text" id="buyerName" placeholder="Enter your name" style="width:100%; padding:10px; margin-bottom:10px;">
-            
-            <label>Your Phone Number:</label>
-            <input type="text" id="buyerPhone" placeholder="Enter your phone" style="width:100%; padding:10px; margin-bottom:10px;">
-        </div>
-
-        <div class="checkout-buttons">
-            <button onclick="checkout('whatsapp')" class="btn-wa">Order via WhatsApp</button>
-            <button onclick="checkout('telegram')" class="btn-tg">Order via Telegram</button>
-        </div>
-    </div>
-</div>
-
-
-<div class="nav-item" onclick="toggleCart()">
-    🛒<span id="cartCount" class="nav-badge" style="margin-left:-5px;">0</span>
-    <p>Cart</p>
-</div>
-    
 </head>
 <body>
-   <nav>
-    <div class="logo" onclick="location.href='index.html'">GOLEM</div>
-    <div id="userMenu">
-        <button onclick="openAuthModal()" class="login-btn">Sign In</button>
-    </div>
-</nav>
-
-    <div class="controls">
-        <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search items...">
-        <div class="category-filters">
-            <button onclick="filterByCategory('All')" class="active">All</button>
-            <button onclick="filterByCategory('Electronics')">Electronics</button>
-            <button onclick="filterByCategory('Clothing')">Clothing</button>
-            <button onclick="filterByCategory('Art')">Art</button>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
+        <div id="userMenu">
+            <button onclick="openAuthModal()">Sign In</button>
         </div>
+        <div class="cart-icon" onclick="toggleCart()">
+            🛒<span id="cartCount">0</span>
+        </div>
+    </nav>
+
+    <div class="filter-bar">
+        <button onclick="filterCategory('all')">All</button>
+        <button onclick="filterCategory('Electronics')">Electronics</button>
+        <button onclick="filterCategory('Clothing')">Clothing</button>
     </div>
 
     <div id="productGrid" class="product-grid"></div>
 
-    <div class="mobile-nav">
-        <div class="nav-item" onclick="location.href='index.html'">🏠<p>Home</p></div>
-       <div class="nav-item" onclick="checkAuthToSell()">
-    <i class="fas fa-plus-circle"></i>
-    <p>Sell</p>
-</div>
-        <div class="nav-item" onclick="location.href='my-items.html'" id="mobileMyItems">📦<p>My Items</p></div>
-        <div class="nav-item" onclick="toggleCart()">🛒<p>Cart</p></div>
-    </div>
-
-   
-
-    <script src="config.js"></script>
-<script src="script.js"></script>
-<script>
-// Inside your admin.html loadPending() function:
-async function loadPending() {
-    // 1. You MUST define grid inside the function first
-    const grid = document.getElementById('adminGrid'); 
-    
-    // 2. Safety check: stop if the grid isn't on this page
-    if (!grid) return; 
-
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'pending');
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    // 3. Now you can safely use grid.innerHTML
-    grid.innerHTML = data.length ? data.map(p => `
-        <div class="product-card">
-            <img src="${p.image}" style="width:100%; height:150px; object-fit:cover;">
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p>${p.price} ETB</p>
-                <button class="btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve</button>
-                <button class="btn-reject" onclick="updateStatus('${p.id}', 'rejected')">Reject</button>
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleCart()">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cartItems"></div>
+            <div class="buyer-info">
+                <input type="text" id="buyerName" placeholder="Your Name">
+                <input type="text" id="buyerPhone" placeholder="Your Phone (251...)">
+            </div>
+            <div class="checkout-btns">
+                <button onclick="checkout('whatsapp')" class="wa-btn">WhatsApp Order</button>
+                <button onclick="checkout('telegram')" class="tg-btn">Telegram Order</button>
             </div>
         </div>
-    `).join('') : "<p>No pending items.</p>";
-}
-</script>
-<div id="authModal" class="modal">
-    <div class="auth-card">
-        <span class="close-btn" onclick="closeAuth()">&times;</span>
-        <h2 id="authTitle">Login</h2>
-        
-        <input type="email" id="authEmail" placeholder="Email">
-        <input type="password" id="authPassword" placeholder="Password">
-        
-        <p id="forgotPasswordLink" style="text-align: right; margin-top: -10px;">
-            <a href="#" onclick="handleForgotPassword()" style="font-size: 0.8rem; color: var(--primary);">Forgot Password?</a>
-        </p>
-
-        <button onclick="handleAuth()" class="main-btn" id="authBtn">Sign In</button>
-        <p onclick="toggleAuthMode()" id="toggleText" style="cursor:pointer; text-align:center; margin-top:15px;">
-            Don't have an account? Sign Up
-        </p>
     </div>
-</div>
-    
+
+    <div id="authModal" class="modal">
+        <div class="auth-card">
+            <h2 id="authTitle">Login</h2>
+            <input type="email" id="authEmail" placeholder="Email">
+            <input type="password" id="authPassword" placeholder="Password">
+            <div id="forgotPasswordLink"><a href="#" onclick="handleForgotPassword()">Forgot Password?</a></div>
+            <button onclick="handleAuth()" id="authBtn">Proceed</button>
+            <p onclick="toggleAuthMode()" id="toggleText" style="cursor:pointer;">New here? Sign Up</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
