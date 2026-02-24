@@ -256,4 +256,23 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+async function updateStatus(id, newStatus) {
+    const confirmMsg = newStatus === 'approved' 
+        ? "Approve this item for the shop?" 
+        : "Reject this item? It will not be shown to buyers.";
+        
+    if (!confirm(confirmMsg)) return;
+
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+    if (error) {
+        alert("Error updating status: " + error.message);
+    } else {
+        alert(`Success: Item has been ${newStatus}.`);
+        location.reload(); // Refresh the list
+    }
+}
 
