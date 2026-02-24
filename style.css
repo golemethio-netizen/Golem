@@ -42,3 +42,52 @@ nav { background: #fff; padding: 15px; display: flex; justify-content: space-bet
     cursor: pointer;
 }
 
+
+/* Admin specific button styling */
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-approve {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex: 1;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-approve:hover {
+    background-color: #218838;
+}
+
+.btn-reject {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex: 1;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-reject:hover {
+    background-color: #c82333;
+}
+
+/* Badge for pending items */
+.badge-pending {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
