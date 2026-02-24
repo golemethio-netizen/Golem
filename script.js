@@ -189,4 +189,43 @@ async function handleAuth() {
     }
 }
 
+async function checkout() {
+    const name = document.getElementById('buyerName').value;
+    const phone = document.getElementById('buyerPhone').value;
+    
+    if (!name || !phone) return alert("Please enter your name and phone number!");
+
+    // For this example, we'll take the first item in the cart
+    const productId = cart[0]; 
+    const product = allApprovedProducts.find(p => p.id === productId);
+
+    try {
+        // 1. Save order to Supabase so the seller sees it in "My Items"
+        const { error } = await _supabase.from('orders').insert([{
+            product_id: product.id,
+            seller_id: product.user_id,
+            buyer_name: name,
+            buyer_phone: phone,
+            product_name: product.name,
+            price: product.price
+        }]);
+
+        if (error) throw error;
+
+        // 2. Open WhatsApp for the direct chat
+        const message = `Hello, I'm ${name}. I want to buy your ${product.name} for ${product.price} ETB.`;
+        const whatsappUrl = `https://wa.me/${product.seller_contact.replace(/\D/g,'')}?text=${encodeURIComponent(message)}`;
+        
+        window.open(whatsappUrl, '_blank');
+        
+        // 3. Clear cart and close
+        cart = [];
+        document.getElementById('cartCount').innerText = "0";
+        toggleCart();
+        alert("Order placed! Redirecting to WhatsApp...");
+
+    } catch (err) {
+        alert("Checkout error: " + err.message);
+    }
+}
 
