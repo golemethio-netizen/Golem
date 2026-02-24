@@ -25,6 +25,14 @@
             const file = document.getElementById('imageInput').files[0];
             const fileName = `${Date.now()}_${file.name}`;
 
+ const { error } = await _supabase.from('products').insert([{
+    name: itemName,
+    price: itemPrice,
+    image: imageUrl,
+    user_id: user.id, // <--- EXTREMELY IMPORTANT
+    status: 'pending' 
+}]);
+
             // Upload Image
             await _supabase.storage.from('product-images').upload(fileName, file);
             const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
