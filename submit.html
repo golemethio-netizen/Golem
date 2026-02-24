@@ -1,55 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Sell - Golem</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Item - Golem Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>List an Item</h2>
-        <form id="productForm">
-            <input type="text" id="name" placeholder="Item Name" required>
-            <input type="number" id="price" placeholder="Price" required>
-            <input type="text" id="sellerContact" placeholder="251..." required>
-            <input type="file" id="imageInput" accept="image/*" required>
-            <button type="submit" id="submitBtn">Post Item</button>
-        </form>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <button onclick="location.href='index.html'" class="nav-link">Back to Shop</button>
+    </nav>
+
+    <div class="container" style="max-width: 500px; margin-top: 50px; padding: 20px;">
+        <div class="auth-card" style="width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 style="text-align: center; margin-bottom: 20px;">List Your Item</h2>
+            
+            <form id="productForm">
+                <div class="input-group">
+                    <label>Item Name</label>
+                    <input type="text" id="name" placeholder="e.g. Vintage Camera" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Price (ETB)</label>
+                    <input type="number" id="price" placeholder="Amount in ETB" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Category</label>
+                    <select id="category" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Art">Art</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>WhatsApp Phone Number</label>
+                    <input type="tel" id="sellerContact" placeholder="2519..." required>
+                    <small>Include country code (e.g., 251911...)</small>
+                </div>
+
+                <div class="input-group" style="margin-top:15px;">
+                    <label>Product Image</label>
+                    <input type="file" id="imageInput" accept="image/*" required>
+                </div>
+
+                <button type="submit" id="submitBtn" class="main-btn" style="width: 100%; margin-top: 20px; background: #28a745; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer;">
+                    Post Item for Approval
+                </button>
+            </form>
+        </div>
     </div>
 
     <script src="config.js"></script>
     <script>
+        // Ensure user is logged in immediately on page load
+        async function checkUser() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) {
+                alert("You must be logged in to sell items!");
+                window.location.href = 'index.html';
+            }
+        }
+        checkUser();
+
         document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
             const { data: { user } } = await _supabase.auth.getUser();
+
+            // 1. Grab values from the form
+            const itemName = document.getElementById('name').value;
+            const itemPrice = document.getElementById('price').value;
+            const itemCategory = document.getElementById('category').value;
+            const sellerContact = document.getElementById('sellerContact').value;
             const file = document.getElementById('imageInput').files[0];
-            const fileName = `${Date.now()}_${file.name}`;
 
- const { error } = await _supabase.from('products').insert([{
-    name: itemName,
-    price: itemPrice,
-    image: imageUrl,
-    user_id: user.id, // <--- EXTREMELY IMPORTANT
-    status: 'pending' 
-}]);
+            if (!file) return alert("Please upload an image!");
 
-            // Upload Image
-            await _supabase.storage.from('product-images').upload(fileName, file);
-            const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+            // 2. Start Loading State
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Uploading Image...";
 
-            // Insert Product
-            await _supabase.from('products').insert([{
-                name: document.getElementById('name').value,
-                price: document.getElementById('price').value,
-                seller_contact: document.getElementById('sellerContact').value,
-                image: publicUrl,
-                user_id: user.id,
-                status: 'pending'
-            }]);
+            try {
+                // 3. Upload Image to Supabase Storage
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${user.id}/${fileName}`;
 
-            alert("Posted! Waiting for Admin approval.");
-            location.href = 'index.html';
+                const { error: uploadError } = await _supabase.storage
+                    .from('product-images')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                // 4. Get the Public URL of the uploaded image
+                const { data: { publicUrl } } = _supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+
+                submitBtn.innerText = "Saving Product...";
+
+                // 5. Insert Product Data into Table
+                const { error: dbError } = await _supabase
+                    .from('products')
+                    .insert([{
+                        name: itemName,
+                        price: itemPrice,
+                        category: itemCategory,
+                        seller_contact: sellerContact,
+                        image: publicUrl,
+                        user_id: user.id,
+                        status: 'pending' // Admin must approve this
+                    }]);
+
+                if (dbError) throw dbError;
+
+                // 6. Success!
+                alert("Success! Your item has been sent to the admin for approval.");
+                window.location.href = 'index.html';
+
+            } catch (err) {
+                alert("Error: " + err.message);
+                console.error(err);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Post Item for Approval";
+            }
         };
     </script>
+
+    <style>
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        small { color: #666; font-size: 0.75rem; }
+    </style>
 </body>
 </html>
