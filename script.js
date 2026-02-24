@@ -193,17 +193,19 @@ async function handleAuth() {
     }
 }
 
-async function checkout() {
-    const name = document.getElementById('buyerName').value;
-    const phone = document.getElementById('buyerPhone').value;
+async function checkout(provider) {
+    const name = document.getElementById('buyerName').value.trim();
+    const phone = document.getElementById('buyerPhone').value.trim();
     
     if (!name || !phone) return alert("Please enter your name and phone number!");
+    if (cart.length === 0) return alert("Your cart is empty!");
 
     const productId = cart[0]; 
     const product = allApprovedProducts.find(p => p.id === productId);
+    const message = `🚀 New Order: ${product.name}\nPrice: ${product.price} ETB\nBuyer: ${name}\nPhone: ${phone}`;
 
     try {
-        // 1. Save to Supabase (for your "My Items" dashboard)
+        // 1. Always save to Supabase first for the Seller Dashboard
         const { error } = await _supabase.from('orders').insert([{
             product_id: product.id,
             seller_id: product.user_id,
@@ -215,46 +217,34 @@ async function checkout() {
 
         if (error) throw error;
 
-        // 2. Prepare Telegram Message
-        const botToken = "YOUR_BOT_TOKEN_HERE";
-        const chatId = "YOUR_CHAT_ID_HERE"; // Your personal Telegram ID
-        
-        const message = `
-🚀 **New Order on Golem!**
---------------------------
-📦 **Item:** ${product.name}
-💰 **Price:** ${product.price} ETB
-👤 **Buyer:** ${name}
-📞 **Phone:** ${phone}
---------------------------
-Check your dashboard for details!
-        `;
+        // 2. Route to the chosen app
+        if (provider === 'whatsapp') {
+            const waUrl = `https://wa.me/${product.seller_contact.replace(/\D/g,'')}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+        } 
+        else if (provider === 'telegram') {
+            // Option A: Send to your Bot (Automated)
+            const botToken = "YOUR_BOT_TOKEN";
+            const chatId = "YOUR_CHAT_ID";
+            const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            
+            await fetch(telegramApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: message })
+            });
+            alert("Order sent to seller via Telegram Bot!");
+        }
 
-        // 3. Send to Telegram via API
-        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-        
-        await fetch(telegramUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'Markdown'
-            })
-        });
-
-        // 4. Cleanup
+        // 3. Cleanup
         cart = [];
         document.getElementById('cartCount').innerText = "0";
         toggleCart();
-        alert("Order sent successfully via Telegram!");
-
+        
     } catch (err) {
-        console.error(err);
-        alert("Error sending order. Please try again.");
+        alert("Checkout error: " + err.message);
     }
 }
-
 
 /**
  * Redirects to submit page if logged in, otherwise opens login modal
@@ -302,5 +292,6 @@ function toggleAuthMode() {
     // Hide forgot password link if signing up
     document.getElementById('forgotPasswordLink').style.display = isSignUp ? "none" : "block";
 }
+
 
 
