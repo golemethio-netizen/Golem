@@ -133,4 +133,22 @@ function searchProducts() {
     renderProducts(filtered);
 }
 
+function filterCategory(category) {
+    // 1. Highlight the active button
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText.toLowerCase() === category.toLowerCase()) {
+            btn.classList.add('active');
+        }
+    });
+
+    // 2. Filter the products
+    if (category === 'all') {
+        renderProducts(allApprovedProducts);
+    } else {
+        const filtered = allApprovedProducts.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
+}
 
