@@ -26,21 +26,29 @@
 
     <div id="productGrid" class="product-grid"></div>
 
-    <div id="cartModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="toggleCart()">&times;</span>
-            <h2>Your Cart</h2>
-            <div id="cartItems"></div>
-            <div class="buyer-info">
-                <input type="text" id="buyerName" placeholder="Your Name">
-                <input type="text" id="buyerPhone" placeholder="Your Phone (251...)">
-            </div>
-            <div class="checkout-btns">
-                <button onclick="checkout('whatsapp')" class="wa-btn">WhatsApp Order</button>
-                <button onclick="checkout('telegram')" class="tg-btn">Telegram Order</button>
-            </div>
+   <div id="cartModal" class="modal">
+    <div class="modal-content" style="max-width: 400px; padding: 25px;">
+        <span class="close" onclick="toggleCart()">&times;</span>
+        <h2 style="margin-bottom: 15px;">🛒 Your Cart</h2>
+        
+        <div id="cartItems"></div>
+        
+        <div class="buyer-info" style="border-top: 1px solid #eee; padding-top: 15px;">
+            <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">Enter details to notify seller:</p>
+            <input type="text" id="buyerName" placeholder="Full Name">
+            <input type="text" id="buyerPhone" placeholder="Phone Number (e.g. 0911...)">
+        </div>
+
+        <div class="checkout-btns">
+            <button onclick="checkout('whatsapp')" class="wa-btn">
+                <span>💬</span> Order via WhatsApp
+            </button>
+            <button onclick="checkout('telegram')" class="tg-btn">
+                <span>✈️</span> Order via Telegram
+            </button>
         </div>
     </div>
+</div>
 
     <div id="authModal" class="modal">
         <div class="auth-card">
@@ -57,3 +65,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
