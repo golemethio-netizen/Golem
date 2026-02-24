@@ -53,24 +53,27 @@ async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        console.log("User logged in:", user.email);
-
-        // Fetch the admin flag
-        const { data: profile, error } = await _supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', user.id)
-            .maybeSingle(); // maybeSingle() prevents crashes if row is missing
-
-        if (error) console.error("Profile fetch error:", error);
+        // 1. Check for Admin status
+        const { data: profile } = await _supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
+        
+        // 2. Check for Orders (to show notification badge)
+        const { count, error } = await _supabase
+            .from('orders')
+            .select('*', { count: 'exact', head: true })
+            .eq('seller_id', user.id);
 
         const isAdmin = profile?.is_admin || false;
-        console.log("Is Admin?:", isAdmin);
+        const orderCount = count || 0;
+        
+        // The badge HTML - only shows if count > 0
+        const badge = orderCount > 0 ? `<span class="notify-badge">${orderCount}</span>` : "";
 
         userMenu.innerHTML = `
             <div class="user-profile">
-                ${isAdmin ? '<button onclick="location.href=\'admin.html\'" class="admin-btn-nav">🛠️ Admin Panel</button>' : ''}
-                <a href="my-items.html" class="nav-link">📦 My Items</a>
+                ${isAdmin ? '<button onclick="location.href=\'admin.html\'" class="admin-btn-nav">🛠️ Admin</button>' : ''}
+                <a href="my-items.html" class="nav-link" style="position:relative;">
+                    📦 My Items ${badge}
+                </a>
                 <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
             </div>
         `;
@@ -228,4 +231,5 @@ async function checkout() {
         alert("Checkout error: " + err.message);
     }
 }
+
 
