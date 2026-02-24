@@ -55,11 +55,11 @@ async function updateUIForUser() {
 
     if (user) {
         // Fetch Admin Flag from Profiles table
-        const { data: profile } = await _supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', user.id)
-            .single();
+       const { data: profile, error: profileError } = await _supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .maybeSingle(); // Using .maybeSingle() prevents errors if profile isn't found
 
         const isAdmin = profile?.is_admin || false;
         const name = user.user_metadata?.full_name || user.email.split('@')[0];
@@ -186,3 +186,4 @@ async function handleAuth() {
         alert("Auth Error: " + e.message); 
     }
 }
+
