@@ -50,6 +50,14 @@ async function loadPendingItems() {
     `).join('');
 }
 
+
+
+
+
+
+
+
+
 async function updateStatus(productId, newStatus) {
     const { error } = await _supabase
         .from('products')
@@ -70,3 +78,55 @@ async function updateStatus(productId, newStatus) {
         }
     }
 }
+
+
+
+// Inside your data.map loop in admin.js
+<div class="product-info">
+    <h3>${p.name}</h3>
+    <p>${p.price} ETB</p>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:5px;">
+            <button onclick="updateStatus('${p.id}', 'approved')" style="background:#28a745; color:white; border:none; padding:8px; flex:1; border-radius:4px; cursor:pointer;">Approve</button>
+            <button onclick="updateStatus('${p.id}', 'rejected')" style="background:#ffc107; color:black; border:none; padding:8px; flex:1; border-radius:4px; cursor:pointer;">Reject</button>
+        </div>
+        <button onclick="deleteProduct('${p.id}')" style="background:#dc3545; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer; font-weight:bold;">
+            🗑️ Delete Permanently
+        </button>
+    </div>
+</div>
+
+
+
+
+
+
+
+// --- ADMIN DELETE LOGIC ---
+
+async function deleteProduct(productId) {
+    // 1. Ask for confirmation
+    const confirmDelete = confirm("Are you sure you want to PERMANENTLY delete this item?");
+    
+    if (confirmDelete) {
+        try {
+            const { error } = await _supabase
+                .from('products')
+                .delete()
+                .eq('id', productId);
+
+            if (error) throw error;
+
+            alert("Item deleted successfully.");
+            
+            // 2. Remove the card from the UI immediately
+            const card = document.getElementById(`card-${productId}`);
+            if (card) card.remove();
+
+        } catch (err) {
+            console.error("Delete Error:", err.message);
+            alert("Could not delete item: " + err.message);
+        }
+    }
+}
+
