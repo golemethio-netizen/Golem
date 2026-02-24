@@ -126,4 +126,17 @@ nav { background: #fff; padding: 15px; display: flex; justify-content: space-bet
 .btn-small:hover {
     background: #f8f9fa;
 }
+.notify-badge {
+    background-color: #ff4757; /* Red */
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    font-weight: bold;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
