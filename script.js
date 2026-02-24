@@ -194,11 +194,22 @@ async function handleAuth() {
 }
 
 async function checkout(provider) {
-    const name = document.getElementById('buyerName').value.trim();
-    const phone = document.getElementById('buyerPhone').value.trim();
+    // 1. Safely grab the elements
+    const nameInput = document.getElementById('buyerName');
+    const phoneInput = document.getElementById('buyerPhone');
     
-    if (!name || !phone) return alert("Please enter your name and phone number!");
-    if (cart.length === 0) return alert("Your cart is empty!");
+   // 2. Check if they actually exist on the page
+    if (!nameInput || !phoneInput) {
+        console.error("Error: Buyer input fields (buyerName or buyerPhone) are missing from the HTML!");
+        return alert("System Error: Checkout fields not found.");
+    }
+
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    if (!name || !phone) {
+        return alert("Please enter your name and phone number before ordering!");
+    }
 
     const productId = cart[0]; 
     const product = allApprovedProducts.find(p => p.id === productId);
@@ -292,6 +303,7 @@ function toggleAuthMode() {
     // Hide forgot password link if signing up
     document.getElementById('forgotPasswordLink').style.display = isSignUp ? "none" : "block";
 }
+
 
 
 
