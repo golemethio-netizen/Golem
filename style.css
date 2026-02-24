@@ -140,3 +140,28 @@ nav { background: #fff; padding: 15px; display: flex; justify-content: space-bet
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+
+
+.btn-sold {
+    background-color: #6c757d; /* Grey color */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+.btn-sold:hover {
+    background-color: #5a6268;
+}
+
+/* Style for the sold status badge */
+.status-badge.sold {
+    background: #000;
+    color: #fff;
+}
+
