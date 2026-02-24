@@ -90,29 +90,28 @@ grid.innerHTML = data.map(p => `
     </div>
 `).join('');
 </script>
-<div id="authModal" class="modal" style="display:none;">
+<div id="authModal" class="modal">
     <div class="auth-card">
         <span class="close-btn" onclick="closeAuth()">&times;</span>
-        <h2 id="authTitle">Login to Golem</h2>
+        <h2 id="authTitle">Login</h2>
         
-        <div id="registerFields" style="display:none;">
-            <input type="text" id="regName" placeholder="Full Name">
-            <input type="tel" id="regPhone" placeholder="Phone (251...)">
-        </div>
-
         <input type="email" id="authEmail" placeholder="Email">
         <input type="password" id="authPassword" placeholder="Password">
         
-        <button id="authBtn" onclick="handleAuth()" class="main-btn">Sign In</button>
-        
-        <p id="toggleText" onclick="toggleAuthMode()" style="cursor:pointer; margin-top:15px; font-size:0.9rem; color:var(--primary);">
-            Don't have an account? Register
+        <p id="forgotPasswordLink" style="text-align: right; margin-top: -10px;">
+            <a href="#" onclick="handleForgotPassword()" style="font-size: 0.8rem; color: var(--primary);">Forgot Password?</a>
+        </p>
+
+        <button onclick="handleAuth()" class="main-btn" id="authBtn">Sign In</button>
+        <p onclick="toggleAuthMode()" id="toggleText" style="cursor:pointer; text-align:center; margin-top:15px;">
+            Don't have an account? Sign Up
         </p>
     </div>
 </div>
     
 </body>
 </html>
+
 
 
 
