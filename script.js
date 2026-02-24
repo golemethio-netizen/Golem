@@ -119,3 +119,12 @@ function toggleAuthMode() {
     isSignUp = !isSignUp;
     document.getElementById('authTitle').innerText = isSignUp ? "Sign Up" : "Login";
 }
+function searchProducts() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allApprovedProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.category.toLowerCase().includes(term)
+    );
+    renderProducts(filtered);
+}
+
