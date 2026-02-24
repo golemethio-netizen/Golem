@@ -249,4 +249,35 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+// --- PASSWORD RESET LOGIC ---
+
+async function handleForgotPassword() {
+    const email = document.getElementById('authEmail').value.trim();
+    
+    if (!email) {
+        alert("Please enter your email address first!");
+        return;
+    }
+
+    const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password.html',
+    });
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("Password reset link sent! Check your inbox.");
+    }
+}
+
+// Update your existing toggleAuthMode function to show/hide the link
+function toggleAuthMode() {
+    isSignUp = !isSignUp;
+    document.getElementById('authTitle').innerText = isSignUp ? "Create Account" : "Login";
+    document.getElementById('authBtn').innerText = isSignUp ? "Register" : "Sign In";
+    document.getElementById('toggleText').innerText = isSignUp ? "Already have an account? Login" : "Don't have an account? Sign Up";
+    
+    // Hide forgot password link if signing up
+    document.getElementById('forgotPasswordLink').style.display = isSignUp ? "none" : "block";
+}
 
