@@ -234,4 +234,19 @@ async function checkout() {
 }
 
 
+/**
+ * Redirects to submit page if logged in, otherwise opens login modal
+ */
+async function checkAuthToSell() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    if (user) {
+        // User is logged in, let them sell
+        window.location.href = 'submit.html';
+    } else {
+        // Not logged in, show the login modal
+        alert("Please sign in to post an item for sale.");
+        openAuthModal();
+    }
+}
 
