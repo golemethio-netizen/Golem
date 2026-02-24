@@ -58,7 +58,10 @@
 
     <div class="mobile-nav">
         <div class="nav-item" onclick="location.href='index.html'">🏠<p>Home</p></div>
-        <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p></div>
+       <div class="nav-item" onclick="checkAuthToSell()">
+    <i class="fas fa-plus-circle"></i>
+    <p>Sell</p>
+</div>
         <div class="nav-item" onclick="location.href='my-items.html'" id="mobileMyItems">📦<p>My Items</p></div>
         <div class="nav-item" onclick="toggleCart()">🛒<p>Cart</p></div>
     </div>
@@ -110,6 +113,7 @@ grid.innerHTML = data.map(p => `
     
 </body>
 </html>
+
 
 
 
