@@ -1,17 +1,24 @@
-// --- GLOBAL VARIABLES ---
+/**
+ * GOLEM MARKETPLACE - CORE SCRIPT
+ * Features: Auth, Admin Check, Categories, Search, Cart, & Order Tracking
+ */
+
+// --- 1. CONFIGURATION & STATE ---
+const YOUR_ADMIN_EMAIL = "your-email@example.com"; // 👈 CHANGE THIS
 let allApprovedProducts = [];
 let cart = [];
 let isSignUp = false;
 
-// --- INITIALIZATION ---
+// Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
 });
 
-// --- PRODUCT LOGIC ---
+// --- 2. PRODUCT FETCHING & DISPLAY ---
 async function fetchProducts() {
     try {
+        // Only fetch items that you (the admin) have approved
         const { data, error } = await _supabase
             .from('products')
             .select('*')
@@ -34,7 +41,7 @@ function displayProducts(products) {
     if (!grid) return;
 
     if (products.length === 0) {
-        grid.innerHTML = "<p style='padding:20px;'>No items found.</p>";
+        grid.innerHTML = "<p style='padding:20px;'>No items found in this category.</p>";
         return;
     }
 
@@ -50,12 +57,11 @@ function displayProducts(products) {
     `).join('');
 }
 
-// --- SEARCH & FILTER ---
+// --- 3. SEARCH & CATEGORIES ---
 function searchProducts() {
     const term = document.getElementById('searchInput').value.toLowerCase();
     const filtered = allApprovedProducts.filter(p => 
-        p.name.toLowerCase().includes(term) || 
-        (p.description && p.description.toLowerCase().includes(term))
+        p.name.toLowerCase().includes(term)
     );
     displayProducts(filtered);
 }
@@ -64,6 +70,7 @@ function filterByCategory(category) {
     const buttons = document.querySelectorAll('.category-filters button');
     buttons.forEach(btn => btn.classList.remove('active'));
     
+    // Set clicked button to active
     if (event) event.target.classList.add('active');
 
     if (category === 'All') {
@@ -74,7 +81,7 @@ function filterByCategory(category) {
     }
 }
 
-// --- AUTHENTICATION ---
+// --- 4. AUTHENTICATION LOGIC ---
 function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
 function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
 
@@ -90,12 +97,8 @@ function toggleAuthMode() {
 async function handleAuth() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
-    const btn = document.getElementById('authBtn');
 
     if (!email || !password) return alert("Please fill all fields!");
-
-    btn.disabled = true;
-    btn.innerText = "Processing...";
 
     try {
         if (isSignUp) {
@@ -106,18 +109,13 @@ async function handleAuth() {
                 email, password, options: { data: { full_name: fullName, phone: phone } }
             });
             if (error) throw error;
-            alert("Registration successful! Check your email.");
+            alert("Registration successful! Verify your email.");
         } else {
             const { error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
             location.reload();
         }
-    } catch (e) {
-        alert(e.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = isSignUp ? "Register" : "Sign In";
-    }
+    } catch (e) { alert(e.message); }
 }
 
 async function updateUIForUser() {
@@ -127,25 +125,31 @@ async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        // Fetch order notification count
+        // 1. Check for Order Notifications
         const { count } = await _supabase
             .from('orders')
             .select('*', { count: 'exact', head: true })
             .eq('seller_id', user.id);
 
         const badge = count > 0 ? `<span class="nav-badge">${count}</span>` : '';
-        const name = user.user_metadata?.full_name || user.email.split('@')[0];
+        const name = user.user_metadata?.full_name || "Account";
+
+        // 2. Check if this user is the Admin
+        const adminLink = (user.email === YOUR_ADMIN_EMAIL) 
+            ? `<a href="admin.html" style="color:red; font-weight:bold; margin-right:15px;">🛠️ ADMIN</a>` 
+            : "";
 
         if (userMenu) {
             userMenu.innerHTML = `
                 <div class="user-profile">
-                    <a href="my-items.html" style="text-decoration:none; color:inherit; font-weight:bold;">📦 My Items ${badge}</a>
-                    <span style="margin: 0 10px;">👤 ${name}</span>
+                    ${adminLink}
+                    <a href="my-items.html" class="nav-link">📦 My Items ${badge}</a>
                     <button onclick="handleSignOut()" class="signout-btn">Sign Out</button>
                 </div>
             `;
         }
-
+        
+        // Update Mobile Nav
         if (mobileMyItems && count > 0) {
             mobileMyItems.innerHTML += `<span class="nav-badge mobile">${count}</span>`;
         }
@@ -157,17 +161,7 @@ async function handleSignOut() {
     location.href = 'index.html';
 }
 
-async function checkAuthToSell() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (user) {
-        location.href = 'submit.html';
-    } else {
-        alert("Please login to sell items!");
-        openAuthModal();
-    }
-}
-
-// --- CART & CHECKOUT ---
+// --- 5. CART & CHECKOUT ---
 function addToCart(productId) {
     if (!cart.includes(productId)) {
         cart.push(productId);
@@ -175,20 +169,61 @@ function addToCart(productId) {
         if (countEl) countEl.innerText = cart.length;
         alert("Added to cart!");
     } else {
-        alert("Already in cart!");
+        alert("Already in your cart!");
     }
+}
+
+function toggleCart() {
+    const modal = document.getElementById('cartModal');
+    if (!modal) return;
+    const isVisible = modal.style.display === 'flex';
+    modal.style.display = isVisible ? 'none' : 'flex';
+    if (!isVisible) renderCartItems();
+}
+
+function renderCartItems() {
+    const list = document.getElementById('cartItemsList');
+    const totalEl = document.getElementById('cartTotal');
+    if (!list) return;
+
+    if (cart.length === 0) {
+        list.innerHTML = "<p>Your cart is empty.</p>";
+        totalEl.innerText = "0.00";
+        return;
+    }
+
+    const items = allApprovedProducts.filter(p => cart.includes(p.id));
+    let total = 0;
+
+    list.innerHTML = items.map(p => {
+        total += parseFloat(p.price);
+        return `
+            <div class="cart-item">
+                <span>${p.name}</span>
+                <b>${p.price} ETB</b>
+                <button onclick="removeFromCart('${p.id}')">❌</button>
+            </div>
+        `;
+    }).join('');
+    totalEl.innerText = total.toFixed(2);
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(cid => cid !== id);
+    document.getElementById('cartCount').innerText = cart.length;
+    renderCartItems();
 }
 
 async function checkout() {
     const name = document.getElementById('buyerName').value;
     const phone = document.getElementById('buyerPhone').value;
-    if (!name || !phone) return alert("Please enter your details!");
+    if (!name || !phone) return alert("Please fill in your details!");
 
+    // Get the first item in cart for WhatsApp redirect
     const product = allApprovedProducts.find(p => p.id == cart[0]);
-    if (!product) return alert("Product not found!");
 
     try {
-        // Log the order in Supabase
+        // Record the intent in the 'orders' table
         await _supabase.from('orders').insert([{
             product_id: product.id,
             seller_id: product.user_id,
@@ -198,60 +233,18 @@ async function checkout() {
             price: product.price
         }]);
 
-        // WhatsApp redirect
-        const cleanPhone = product.seller_contact.replace(/\D/g, '');
-        const waMsg = encodeURIComponent(`Hi! I'm ${name}. I want to buy your ${product.name}.`);
-        window.open(`https://wa.me/${cleanPhone}?text=${waMsg}`, '_blank');
-        
-    } catch (err) {
-        console.error("Order error:", err);
-    }
+        // WhatsApp Redirect
+        const msg = encodeURIComponent(`Hello! I am ${name}. I am interested in buying your ${product.name}.`);
+        window.open(`https://wa.me/${product.seller_contact.replace(/\D/g,'')}?text=${msg}`);
+    } catch (e) { alert("Checkout error!"); }
 }
 
-// --- CART UI TOGGLE ---
-function toggleCart() {
-    const cartModal = document.getElementById('cartModal');
-    if (cartModal) {
-        const isVisible = cartModal.style.display === 'flex';
-        cartModal.style.display = isVisible ? 'none' : 'flex';
-        if (!isVisible) renderCartItems(); // Refresh the list when opening
+async function checkAuthToSell() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) {
+        location.href = 'submit.html';
     } else {
-        alert("Cart is empty! Add some items first.");
+        alert("Login required to sell items.");
+        openAuthModal();
     }
-}
-
-function renderCartItems() {
-    const cartList = document.getElementById('cartItemsList');
-    const cartTotal = document.getElementById('cartTotal');
-    if (!cartList) return;
-
-    if (cart.length === 0) {
-        cartList.innerHTML = "<p>Your cart is empty.</p>";
-        if (cartTotal) cartTotal.innerText = "0.00";
-        return;
-    }
-
-    // Filter allApprovedProducts to find only the ones in the cart
-    const itemsInCart = allApprovedProducts.filter(p => cart.includes(p.id));
-    
-    let total = 0;
-    cartList.innerHTML = itemsInCart.map(p => {
-        total += parseFloat(p.price);
-        return `
-            <div class="cart-item" style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
-                <span>${p.name}</span>
-                <b>${p.price} ETB</b>
-                <button onclick="removeFromCart('${p.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
-            </div>
-        `;
-    }).join('');
-
-    if (cartTotal) cartTotal.innerText = total.toFixed(2);
-}
-
-function removeFromCart(productId) {
-    cart = cart.filter(id => id !== productId);
-    const countEl = document.getElementById('cartCount');
-    if (countEl) countEl.innerText = cart.length;
-    renderCartItems();
 }
