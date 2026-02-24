@@ -3,75 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Admin - Approval</title>
+    <title>Golem Admin Panel</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-section { margin-bottom: 40px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .badge-admin { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        .btn-approve { background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; }
+        .btn-reject { background: #dc3545; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; margin-left: 5px; }
+    </style>
 </head>
 <body>
     <nav>
         <div class="logo" onclick="location.href='index.html'">GOLEM ADMIN</div>
-        <div id="adminStatus">Verifying Admin...</div>
+        <button onclick="location.href='index.html'">Back to Shop</button>
     </nav>
 
-    <div class="container" style="padding:20px;">
-        <h2 style="border-bottom: 2px solid var(--primary); padding-bottom:10px;">🛠️ Pending Items</h2>
-        <div id="adminGrid" class="product-grid">
-            </div>
+    <div class="container">
+        <div class="admin-section">
+            <h2>📦 Pending Approval</h2>
+            <div id="adminGrid" class="product-grid"></div>
+        </div>
+
+        <div class="admin-section">
+            <h2>👥 User Management</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userList"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="config.js"></script>
     <script>
-        const MY_ADMIN_EMAIL = "your-email@example.com"; // 👈 REPLACE WITH YOUR ACTUAL EMAIL
-
         async function checkAdmin() {
             const { data: { user } } = await _supabase.auth.getUser();
-            if (!user || user.email !== MY_ADMIN_EMAIL) {
-                alert("Access Denied.");
-                window.location.href = "index.html";
+            if (!user) return window.location.href = 'index.html';
+
+            const { data: profile } = await _supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+            if (!profile?.is_admin) {
+                alert("Access Denied");
+                window.location.href = 'index.html';
                 return;
             }
-            document.getElementById('adminStatus').innerText = `Logged in as Admin: ${user.email}`;
             loadPending();
+            loadUsers();
         }
 
         async function loadPending() {
-            const { data, error } = await _supabase
-                .from('products')
-                .select('*')
-                .eq('status', 'pending');
-
+            const { data } = await _supabase.from('products').select('*').eq('status', 'pending');
             const grid = document.getElementById('adminGrid');
-            if (data && data.length > 0) {
-                grid.innerHTML = data.map(p => `
-                    <div class="product-card">
-                        <img src="${p.image}">
-                        <div class="product-info">
-                            <h3>${p.name}</h3>
-                            <p>Price: ${p.price} ETB</p>
-                            <p><small>Seller: ${p.seller_contact}</small></p>
-                            <div style="display:flex; gap:10px; margin-top:10px;">
-                                <button onclick="updateStatus('${p.id}', 'approved')" style="background:var(--success); color:white; flex:1;">Approve</button>
-                                <button onclick="updateStatus('${p.id}', 'rejected')" style="background:var(--danger); color:white; flex:1;">Reject</button>
-                            </div>
-                        </div>
+            grid.innerHTML = data.length ? data.map(p => `
+                <div class="product-card">
+                    <img src="${p.image}" style="width:100%; height:150px; object-fit:cover;">
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <p>${p.price} ETB</p>
+                        <button class="btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve</button>
+                        <button class="btn-reject" onclick="updateStatus('${p.id}', 'rejected')">Reject</button>
                     </div>
-                `).join('');
-            } else {
-                grid.innerHTML = "<p>No items pending approval.</p>";
-            }
+                </div>
+            `).join('') : "<p>No pending items.</p>";
         }
 
-        async function updateStatus(id, newStatus) {
-            const { error } = await _supabase
-                .from('products')
-                .update({ status: newStatus })
-                .eq('id', id);
+        async function updateStatus(id, status) {
+            await _supabase.from('products').update({ status }).eq('id', id);
+            location.reload();
+        }
 
-            if (error) alert(error.message);
-            else {
-                alert(`Item ${newStatus}!`);
-                location.reload();
-            }
+        async function loadUsers() {
+            const { data } = await _supabase.from('profiles').select('*');
+            document.getElementById('userList').innerHTML = data.map(u => `
+                <tr>
+                    <td>${u.full_name || 'User'}</td>
+                    <td>${u.email}</td>
+                    <td><span class="${u.is_admin ? 'badge-admin' : ''}">${u.is_admin ? 'Admin' : 'Seller'}</span></td>
+                    <td>
+                        <button onclick="toggleAdmin('${u.id}', ${u.is_admin})">
+                            ${u.is_admin ? 'Revoke Admin' : 'Make Admin'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function toggleAdmin(id, current) {
+            await _supabase.from('profiles').update({ is_admin: !current }).eq('id', id);
+            loadUsers();
         }
 
         document.addEventListener('DOMContentLoaded', checkAdmin);
