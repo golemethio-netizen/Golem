@@ -78,23 +78,36 @@
 <script src="script.js"></script>
 <script>
 // Inside your admin.html loadPending() function:
-grid.innerHTML = data.map(p => `
-    <div class="product-card">
-        <span class="badge-pending">PENDING APPROVAL</span>
-        <img src="${p.image}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
-        <div class="product-info">
-            <h3>${p.name}</h3>
-            <p><strong>Price:</strong> ${p.price} ETB</p>
-            <p><strong>Category:</strong> ${p.category}</p>
-            <p><small>Seller Contact: ${p.seller_contact}</small></p>
-            
-            <div class="admin-actions">
+async function loadPending() {
+    // 1. You MUST define grid inside the function first
+    const grid = document.getElementById('adminGrid'); 
+    
+    // 2. Safety check: stop if the grid isn't on this page
+    if (!grid) return; 
+
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'pending');
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    // 3. Now you can safely use grid.innerHTML
+    grid.innerHTML = data.length ? data.map(p => `
+        <div class="product-card">
+            <img src="${p.image}" style="width:100%; height:150px; object-fit:cover;">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p>${p.price} ETB</p>
                 <button class="btn-approve" onclick="updateStatus('${p.id}', 'approved')">Approve</button>
                 <button class="btn-reject" onclick="updateStatus('${p.id}', 'rejected')">Reject</button>
             </div>
         </div>
-    </div>
-`).join('');
+    `).join('') : "<p>No pending items.</p>";
+}
 </script>
 <div id="authModal" class="modal">
     <div class="auth-card">
@@ -117,6 +130,7 @@ grid.innerHTML = data.map(p => `
     
 </body>
 </html>
+
 
 
 
