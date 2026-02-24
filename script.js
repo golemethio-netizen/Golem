@@ -108,14 +108,16 @@ async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        // Show Dashboard/Sign Out buttons
+        // Change this to YOUR admin email
+        const isAdmin = user.email === 'your-email@example.com'; 
+
         userMenu.innerHTML = `
+            ${isAdmin ? '<button onclick="location.href=\'admin.html\'" style="background:#ffc107; color:black;">Admin Dashboard</button>' : ''}
             <button onclick="location.href='my-items.html'">My Items</button>
             <button onclick="handleSignOut()">Sign Out</button>
         `;
     } else {
-        // Just show the Sign In button. No pop-ups!
-        userMenu.innerHTML = `<button onclick="openAuthModal()">Sign In</button>`;
+        userMenu.innerHTML = `<button onclick="openAuthModal()" class="login-btn">Sign In</button>`;
     }
 }
 
@@ -171,3 +173,4 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+
