@@ -15,11 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- PRODUCT LOGIC ---
 async function fetchProducts() {
     try {
+        
         const { data, error } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('status', 'approved')
-            .order('created_at', { ascending: false });
+    .from('products')
+    .select('*')
+    .eq('status', 'approved') // 👈 This ensures 'sold' items disappear from the shop automatically!
+    .order('created_at', { ascending: false });
 
         if (error) throw error;
         allApprovedProducts = data;
@@ -231,5 +232,6 @@ async function checkout() {
         alert("Checkout error: " + err.message);
     }
 }
+
 
 
