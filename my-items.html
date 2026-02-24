@@ -1,45 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>My Items - Golem</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Items - Golem Marketplace</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav><div class="logo" onclick="location.href='index.html'">GOLEM</div></nav>
-    <div class="container">
-        <h2>My Products</h2>
-        <div id="myProductGrid" class="product-grid"></div>
-        <hr>
-        <h2>Recent Sales Leads</h2>
-        <div id="orderHistory"></div>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
+        <button onclick="location.href='index.html'">Back to Shop</button>
+    </nav>
+
+    <div class="container" style="padding:20px;">
+        <div class="dashboard-section">
+            <h2>📦 My Products</h2>
+            <div id="myProductsGrid" class="product-grid">
+                <p>Loading your items...</p>
+            </div>
+        </div>
+
+        <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
+
+        <div class="dashboard-section">
+            <h2>🔔 Recent Sales Leads</h2>
+            <p style="color: #666; margin-bottom: 15px;">People who clicked "Buy" on your items:</p>
+            <div id="orderList">
+                <p>No orders yet.</p>
+            </div>
+        </div>
     </div>
+
     <script src="config.js"></script>
     <script>
-        async function load() {
+        async function loadDashboard() {
             const { data: { user } } = await _supabase.auth.getUser();
-            
-            const { data: prods } = await _supabase.from('products').select('*').eq('user_id', user.id);
-            document.getElementById('myProductGrid').innerHTML = prods.map(p => `
-                <div class="product-card">
-                    <img src="${p.image}">
-                    <h3>${p.name} (${p.status})</h3>
-                    <button onclick="markSold('${p.id}')">Mark Sold</button>
-                </div>
-            `).join('');
+            if (!user) return window.location.href = 'index.html';
 
-            const { data: orders } = await _supabase.from('orders').select('*').eq('seller_id', user.id);
-            document.getElementById('orderHistory').innerHTML = orders.map(o => `
-                <div class="order-item">
-                    <b>${o.product_name}</b> - Buyer: ${o.buyer_name} (${o.buyer_phone})
-                </div>
-            `).join('');
+            // 1. Fetch User's Products
+            const { data: products } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('user_id', user.id);
+
+            const grid = document.getElementById('myProductsGrid');
+            if (products && products.length > 0) {
+                grid.innerHTML = products.map(p => `
+                    <div class="product-card" style="opacity: ${p.status === 'pending' ? '0.7' : '1'}">
+                        <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
+                        <img src="${p.image}" style="width:100%; height:150px; object-fit:cover;">
+                        <div class="product-info">
+                            <h3>${p.name}</h3>
+                            <p>${p.price} ETB</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.innerHTML = "<p>You haven't listed any items yet.</p>";
+            }
+
+            // 2. Fetch Orders (Leads) for this seller
+            const { data: orders } = await _supabase
+                .from('orders')
+                .select('*')
+                .eq('seller_id', user.id)
+                .order('created_at', { ascending: false });
+
+            const orderDiv = document.getElementById('orderList');
+            if (orders && orders.length > 0) {
+                orderDiv.innerHTML = orders.map(o => `
+                    <div class="order-card" style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:10px; border-left: 5px solid var(--primary);">
+                        <p><strong>Item:</strong> ${o.product_name}</p>
+                        <p><strong>Buyer:</strong> ${o.buyer_name}</p>
+                        <p><strong>Phone:</strong> <a href="tel:${o.buyer_phone}">${o.buyer_phone}</a></p>
+                        <p><small>Date: ${new Date(o.created_at).toLocaleDateString()}</small></p>
+                    </div>
+                `).join('');
+            }
         }
-        async function markSold(id) {
-            await _supabase.from('products').update({status:'sold'}).eq('id', id);
-            location.reload();
-        }
-        load();
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
     </script>
+
+    <style>
+        .status-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; }
+        .status-badge.pending { background: #ffc107; color: #000; }
+        .status-badge.approved { background: #28a745; }
+        .status-badge.rejected { background: #dc3545; }
+        .dashboard-section h2 { margin-bottom: 20px; color: var(--primary); }
+    </style>
 </body>
 </html>
