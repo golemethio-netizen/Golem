@@ -21,13 +21,17 @@
             <span><span id="cartTotal">0.00</span> ETB</span>
         </div>
         
-        <div id="checkoutFields">
-            <input type="text" id="buyerName" placeholder="Your Name" style="width:100%; margin-bottom:10px;">
-            <input type="tel" id="buyerPhone" placeholder="Your Phone (251...)" style="width:100%; margin-bottom:10px;">
-           <button onclick="checkout()" class="main-btn" style="width:100%; margin-top:10px;">
-    🚀 Confirm Order via Telegram
-</button>
-        </div>
+       <div class="checkout-options" style="margin-top: 15px;">
+    <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Choose how to send your order:</p>
+    
+    <button onclick="checkout('whatsapp')" class="btn-whatsapp" style="width:100%; margin-bottom: 10px; background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        💬 Send via WhatsApp
+    </button>
+    
+    <button onclick="checkout('telegram')" class="btn-telegram" style="width:100%; background: #0088cc; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        ✈️ Send via Telegram
+    </button>
+</div>
     </div>
 </div>
 
@@ -113,6 +117,7 @@ grid.innerHTML = data.map(p => `
     
 </body>
 </html>
+
 
 
 
