@@ -3,9 +3,11 @@ let allApprovedProducts = [];
 let isSignUp = false;
 
 // Initialize UI
+// ✅ DO THIS INSTEAD:
 document.addEventListener('DOMContentLoaded', async () => {
-    fetchProducts();
-    updateUIForUser();
+    // Only load the products. Do NOT call anything that opens the modal.
+    fetchProducts(); 
+    updateUIForUser(); // This just changes the buttons, it doesn't force a login.
 });
 
 async function fetchProducts() {
@@ -104,13 +106,16 @@ async function handleAuth() {
 async function updateUIForUser() {
     const userMenu = document.getElementById('userMenu');
     const { data: { user } } = await _supabase.auth.getUser();
+
     if (user) {
-        const { data: profile } = await _supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
+        // Show Dashboard/Sign Out buttons
         userMenu.innerHTML = `
-            ${profile?.is_admin ? '<button onclick="location.href=\'admin.html\'">Admin</button>' : ''}
             <button onclick="location.href='my-items.html'">My Items</button>
-            <button onclick="_supabase.auth.signOut().then(()=>location.reload())">Sign Out</button>
+            <button onclick="handleSignOut()">Sign Out</button>
         `;
+    } else {
+        // Just show the Sign In button. No pop-ups!
+        userMenu.innerHTML = `<button onclick="openAuthModal()">Sign In</button>`;
     }
 }
 
@@ -127,4 +132,5 @@ function searchProducts() {
     );
     renderProducts(filtered);
 }
+
 
