@@ -164,4 +164,59 @@ nav { background: #fff; padding: 15px; display: flex; justify-content: space-bet
     background: #000;
     color: #fff;
 }
+/* Container for the checkout buttons */
+.checkout-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Base style for messaging buttons */
+.wa-btn, .tg-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* WhatsApp Green */
+.wa-btn {
+    background-color: #25D366;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+}
+
+/* Telegram Blue */
+.tg-btn {
+    background-color: #0088cc;
+    box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3);
+}
+
+/* Hover effects */
+.wa-btn:hover, .tg-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.wa-btn:active, .tg-btn:active {
+    transform: translateY(0);
+}
+
+/* Buyer info inputs in the cart */
+.buyer-info input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box; /* Ensures padding doesn't break layout */
+}
 
