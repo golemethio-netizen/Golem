@@ -1,8 +1,10 @@
+// Inside admin.js at the very top
 document.addEventListener('DOMContentLoaded', async () => {
-    // Safety check: Ensure only logged in users are here
     const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) {
-        alert("Access Denied");
+    
+    // Add your email here too
+    if (!user || user.email !== 'your-email@example.com') {
+        alert("Admin Access Required");
         window.location.href = 'index.html';
         return;
     }
