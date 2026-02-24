@@ -1,32 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Admin - Golem</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golem Admin - Approval</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>Admin Queue</h2>
-        <div id="adminGrid" class="product-grid"></div>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'">GOLEM ADMIN</div>
+        <div id="adminStatus">Verifying Admin...</div>
+    </nav>
+
+    <div class="container" style="padding:20px;">
+        <h2 style="border-bottom: 2px solid var(--primary); padding-bottom:10px;">🛠️ Pending Items</h2>
+        <div id="adminGrid" class="product-grid">
+            </div>
     </div>
+
     <script src="config.js"></script>
     <script>
-        async function load() {
-            const { data: prods } = await _supabase.from('products').select('*').eq('status', 'pending');
-            document.getElementById('adminGrid').innerHTML = prods.map(p => `
-                <div class="product-card">
-                    <img src="${p.image}">
-                    <h3>${p.name}</h3>
-                    <button onclick="update('${p.id}', 'approved')" style="background:green">Approve</button>
-                </div>
-            `).join('');
+        const MY_ADMIN_EMAIL = "your-email@example.com"; // 👈 REPLACE WITH YOUR ACTUAL EMAIL
+
+        async function checkAdmin() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user || user.email !== MY_ADMIN_EMAIL) {
+                alert("Access Denied.");
+                window.location.href = "index.html";
+                return;
+            }
+            document.getElementById('adminStatus').innerText = `Logged in as Admin: ${user.email}`;
+            loadPending();
         }
-        async function update(id, s) {
-            await _supabase.from('products').update({status: s}).eq('id', id);
-            location.reload();
+
+        async function loadPending() {
+            const { data, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('status', 'pending');
+
+            const grid = document.getElementById('adminGrid');
+            if (data && data.length > 0) {
+                grid.innerHTML = data.map(p => `
+                    <div class="product-card">
+                        <img src="${p.image}">
+                        <div class="product-info">
+                            <h3>${p.name}</h3>
+                            <p>Price: ${p.price} ETB</p>
+                            <p><small>Seller: ${p.seller_contact}</small></p>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button onclick="updateStatus('${p.id}', 'approved')" style="background:var(--success); color:white; flex:1;">Approve</button>
+                                <button onclick="updateStatus('${p.id}', 'rejected')" style="background:var(--danger); color:white; flex:1;">Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.innerHTML = "<p>No items pending approval.</p>";
+            }
         }
-        load();
+
+        async function updateStatus(id, newStatus) {
+            const { error } = await _supabase
+                .from('products')
+                .update({ status: newStatus })
+                .eq('id', id);
+
+            if (error) alert(error.message);
+            else {
+                alert(`Item ${newStatus}!`);
+                location.reload();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAdmin);
     </script>
 </body>
 </html>
