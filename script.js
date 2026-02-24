@@ -155,3 +155,34 @@ function removeFromCart(id) {
     document.getElementById('cartCount').innerText = cart.length;
     renderCartItems();
 }
+async function handleAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+
+    if (!email || !password) return alert("Please fill all fields!");
+
+    // Check if we are in Sign Up mode or Login mode
+    // (You need a global variable 'isSignUp' defined at the top of script.js)
+    try {
+        if (isSignUp) {
+            const fullName = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            
+            const { error } = await _supabase.auth.signUp({
+                email, 
+                password, 
+                options: { 
+                    data: { full_name: fullName, phone: phone } 
+                }
+            });
+            if (error) throw error;
+            alert("Registration successful! Please check your email for a verification link.");
+        } else {
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            location.reload(); // Refresh to update the UI
+        }
+    } catch (e) { 
+        alert("Auth Error: " + e.message); 
+    }
+}
