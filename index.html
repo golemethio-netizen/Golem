@@ -8,64 +8,90 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
     <nav>
-        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
-        <div id="userMenu">
-            <button onclick="openAuthModal()">Sign In</button>
-        </div>
-        <div class="cart-icon" onclick="toggleCart()">
-            🛒<span id="cartCount">0</span>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        
+        <div class="nav-right">
+            <div id="userMenu">
+                <button onclick="openAuthModal()" class="login-btn">Sign In</button>
+            </div>
+            <div class="cart-icon" onclick="toggleCart()" style="cursor:pointer; position:relative;">
+                🛒 <span id="cartCount">0</span>
+            </div>
         </div>
     </nav>
-<div class="search-container" style="padding: 20px; max-width: 1200px; margin: auto;">
-    <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="🔍 Search for items (e.g. iPhone, Sofa...)" style="width: 100%; padding: 15px; border-radius: 25px; border: 1px solid #ddd; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-</div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="🔍 Search for items (e.g. iPhone, Sofa...)">
+    </div>
+
     <div class="filter-bar">
-        <button onclick="filterCategory('all')">All</button>
-        <button onclick="filterCategory('Electronics')">Electronics</button>
-        <button onclick="filterCategory('Clothing')">Clothing</button>
+        <button onclick="filterCategory('all')" class="filter-btn active">All</button>
+        <button onclick="filterCategory('Electronics')" class="filter-btn">Electronics</button>
+        <button onclick="filterCategory('Clothing')" class="filter-btn">Clothing</button>
+        <button onclick="filterCategory('Art')" class="filter-btn">Art</button>
     </div>
 
-    <div id="productGrid" class="product-grid"></div>
+    <main id="productGrid" class="product-grid">
+        </main>
 
-   <div id="cartModal" class="modal">
-    <div class="modal-content" style="max-width: 400px; padding: 25px;">
-        <span class="close" onclick="toggleCart()">&times;</span>
-        <h2 style="margin-bottom: 15px;">🛒 Your Cart</h2>
-        
-        <div id="cartItems"></div>
-        
-        <div class="buyer-info" style="border-top: 1px solid #eee; padding-top: 15px;">
-            <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">Enter details to notify seller:</p>
-            <input type="text" id="buyerName" placeholder="Full Name">
-            <input type="text" id="buyerPhone" placeholder="Phone Number (e.g. 0911...)">
-        </div>
+    <div class="footer-nav">
+        <div class="nav-item" onclick="location.href='index.html'">🏠<p>Home</p></div>
+        <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p></div>
+        <div class="nav-item" onclick="location.href='my-items.html'">📦<p>My Items</p></div>
+        <div class="nav-item" onclick="toggleCart()">🛒<p>Cart</p></div>
+    </div>
 
-        <div class="checkout-btns">
-            <button onclick="checkout('whatsapp')" class="wa-btn">
-                <span>💬</span> Order via WhatsApp
-            </button>
-            <button onclick="checkout('telegram')" class="tg-btn">
-                <span>✈️</span> Order via Telegram
-            </button>
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleCart()">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cartItems">
+                </div>
+            
+            <div class="buyer-info">
+                <p>Enter your details to notify the seller:</p>
+                <input type="text" id="buyerName" placeholder="Full Name">
+                <input type="text" id="buyerPhone" placeholder="Phone Number (e.g. 09...)">
+            </div>
+
+            <div class="checkout-btns">
+                <button onclick="checkout('whatsapp')" class="wa-btn">💬 Order via WhatsApp</button>
+                <button onclick="checkout('telegram')" class="tg-btn">✈️ Order via Telegram</button>
+            </div>
         </div>
     </div>
-</div>
 
     <div id="authModal" class="modal">
         <div class="auth-card">
+            <span class="close" onclick="closeAuth()">&times;</span>
             <h2 id="authTitle">Login</h2>
+            
             <input type="email" id="authEmail" placeholder="Email">
             <input type="password" id="authPassword" placeholder="Password">
-            <div id="forgotPasswordLink"><a href="#" onclick="handleForgotPassword()">Forgot Password?</a></div>
-            <button onclick="handleAuth()" id="authBtn">Proceed</button>
-            <p onclick="toggleAuthMode()" id="toggleText" style="cursor:pointer;">New here? Sign Up</p>
+            
+            <div id="forgotPasswordLink">
+                <a href="#" onclick="handleForgotPassword()">Forgot Password?</a>
+            </div>
+
+            <button onclick="handleAuth()" id="authBtn" class="main-btn">Proceed</button>
+            
+            <p onclick="toggleAuthMode()" id="toggleText">
+                Don't have an account? Sign Up
+            </p>
         </div>
     </div>
 
     <script src="config.js"></script>
     <script src="script.js"></script>
+
+    <script>
+        // Inline safety check for the modals
+        function closeAuth() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+    </script>
+
 </body>
 </html>
-
-
