@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user } } = await _supabase.auth.getUser();
     
     // Add your email here too
-    if (!user || user.email !== 'your-email@example.com') {
+    if (!user || user.email !== 'yohannes.surafel@gmail.com') {
         alert("Admin Access Required");
         window.location.href = 'index.html';
         return;
