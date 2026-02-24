@@ -1,82 +1,72 @@
-// 1. Fetch ALL products (regardless of status)
-async function fetchAdminProducts() {
-    const listContainer = document.getElementById('adminProductList');
-    
+document.addEventListener('DOMContentLoaded', async () => {
+    // Safety check: Ensure only logged in users are here
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        alert("Access Denied");
+        window.location.href = 'index.html';
+        return;
+    }
+    loadPendingItems();
+});
+
+async function loadPendingItems() {
+    const grid = document.getElementById('adminGrid');
+    grid.innerHTML = "<p>Loading pending items...</p>";
+
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .order('created_at', { ascending: false });
+        .eq('status', 'pending');
 
     if (error) {
-        listContainer.innerHTML = "Error loading products.";
+        console.error(error);
+        grid.innerHTML = "Error loading data.";
         return;
     }
 
     if (data.length === 0) {
-        listContainer.innerHTML = "No products found.";
+        grid.innerHTML = "<h3>✅ All caught up! No pending items.</h3>";
         return;
     }
 
-    renderAdminList(data);
-}
-
-// 2. Draw the list with buttons
-function renderAdminList(products) {
-    const listContainer = document.getElementById('adminProductList');
-    
-    listContainer.innerHTML = products.map(p => `
-        <div class="admin-card">
-            <img src="${p.image}" alt="">
-            <div class="admin-info">
-                <h4>${p.name}</h4>
-                <p>$${p.price} | Category: ${p.category}</p>
-                <span class="status-badge status-${p.status}">${p.status}</span>
-            </div>
-            <div class="admin-actions">
-                ${p.status === 'pending' ? 
-                    `<button class="approve-btn" onclick="updateStatus('${p.id}', 'approved')">Approve</button>` : ''}
-                
-                ${p.status === 'approved' ? 
-                    `<button class="sold-btn" onclick="updateStatus('${p.id}', 'sold')">Mark Sold</button>` : ''}
-                
-                <button class="delete-btn" onclick="deleteProduct('${p.id}')">Delete</button>
+    grid.innerHTML = data.map(p => `
+        <div class="product-card" id="card-${p.id}">
+            <img src="${p.image}" alt="${p.name}">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p>${p.price} ETB</p>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="updateStatus('${p.id}', 'approved')" 
+                            style="background: #28a745; color:white; border:none; padding:10px; flex:1; border-radius:5px; cursor:pointer;">
+                        Approve
+                    </button>
+                    <button onclick="updateStatus('${p.id}', 'rejected')" 
+                            style="background: #dc3545; color:white; border:none; padding:10px; flex:1; border-radius:5px; cursor:pointer;">
+                        Reject
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
 }
 
-// 3. UNIVERSAL UPDATE FUNCTION (For Approve and Sold)
-async function updateStatus(id, newStatus) {
-    const { data, error } = await _supabase
-        .from('products')
-        .update({ status: newStatus })
-        .eq('id', id)
-        .select(); // Adding .select() helps confirm the update happened
-
-    if (error) {
-        console.error("Supabase Error:", error);
-        alert("Error: " + error.message);
-    } else {
-        console.log("Success:", data);
-        fetchAdminProducts(); // This reloads the list
-    }
-}
-
-// 4. DELETE FUNCTION
-async function deleteProduct(id) {
-    if (!confirm("Are you sure you want to delete this?")) return;
-
+async function updateStatus(productId, newStatus) {
     const { error } = await _supabase
         .from('products')
-        .delete()
-        .eq('id', id);
+        .update({ status: newStatus })
+        .eq('id', productId);
 
     if (error) {
-        alert("Delete failed.");
+        alert("Update failed: " + error.message);
     } else {
-        fetchAdminProducts(); // Refresh list
+        alert("Product " + newStatus);
+        // Remove the card from view
+        document.getElementById(`card-${productId}`).remove();
+        
+        // Refresh list if empty
+        const grid = document.getElementById('adminGrid');
+        if (grid.children.length === 0) {
+            grid.innerHTML = "<h3>✅ All caught up!</h3>";
+        }
     }
 }
-
-// Run on load
-fetchAdminProducts();
