@@ -82,7 +82,15 @@ function filterByCategory(category) {
 }
 
 // --- 4. AUTHENTICATION LOGIC ---
-function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+function openAuthModal() {
+    console.log("Opening Modal..."); // Check your browser console to see if this fires
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error("Modal element not found!");
+    }
+}
 function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
 
 function toggleAuthMode() {
@@ -248,3 +256,4 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+
