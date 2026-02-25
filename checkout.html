@@ -54,29 +54,22 @@
 
             // 3. Display the data
            // Inside your loadProductDetails function in checkout.html
-// The final render part of loadProductDetails
+// Inside your loadProductDetails function in checkout.html
 display.innerHTML = `
-    <img src="${p.image}" class="detail-img">
-    <div class="product-info">
+    <img src="${p.image}" style="width:100%; border-radius:10px;">
+    <div class="product-info" style="padding:20px;">
         <h2>${p.name}</h2>
-        <p class="price-large">${p.price} ETB</p>
+        <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold;">${p.price} ETB</p>
         
-        <div class="contact-grid">
-            <a href="tel:${p.phone_number}" class="btn-call">📞 Call Seller</a>
-            <a href="https://wa.me/${p.whatsapp_number}" class="btn-wa">💬 WhatsApp</a>
-        </div>
-
-        <div class="safety-box">
-            <h4>🛡️ Golem Safety Tips</h4>
-            <ul>
-                <li>Meet in a safe, public location.</li>
-                <li>Verify the item's condition in person.</li>
-                <li>Avoid advance payments at all costs.</li>
-            </ul>
-        </div>
-        
-        <div class="share-row">
-            <button onclick="window.open('https://t.me/share/url?url='+encodeURIComponent(window.location.href))">Share to Telegram</button>
+        <div style="display:grid; gap:12px; margin-top:20px;">
+            <a href="tel:${p.phone_number}" class="main-btn" style="background:#007bff; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+               📞 Call Seller
+            </a>
+            
+            <a href="https://wa.me/251${p.phone_number.startsWith('0') ? p.phone_number.substring(1) : p.phone_number}" 
+               class="main-btn" style="background:#25D366; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+               💬 WhatsApp
+            </a>
         </div>
     </div>
 `;
