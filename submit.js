@@ -11,16 +11,17 @@ document.getElementById('uploadForm').onsubmit = async (e) => {
     }
 
     // 2. Prepare product data
-    const productData = {
-        name: document.getElementById('pName').value,
-        price: parseFloat(document.getElementById('pPrice').value),
-        image: document.getElementById('pImg').value,
-        category: document.getElementById('pCat').value,
-        whatsapp_number: document.getElementById('pWhatsApp').value,
-        telegram_username: document.getElementById('pTelegram').value,
-        user_id: user.id,
-        status: 'pending' // Admin must approve this
-    };
+   // Inside your uploadForm.onsubmit in submit.js
+const productData = {
+    name: document.getElementById('pName').value,
+    price: parseFloat(document.getElementById('pPrice').value),
+    image: document.getElementById('pImg').value,
+    category: document.getElementById('pCat').value,
+    phone_number: document.getElementById('pPhone').value, // NEW: Direct Call
+    whatsapp_number: document.getElementById('pWhatsApp').value, // WhatsApp
+    user_id: user.id,
+    status: 'pending'
+};
 
     // 3. Insert into Supabase
     const { error } = await _supabase
