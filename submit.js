@@ -49,5 +49,12 @@ document.getElementById('uploadForm').onsubmit = async (e) => {
 };
 
   
-
+document.getElementById('pImageFile').onchange = function (evt) {
+    const [file] = this.files;
+    if (file) {
+        const preview = document.getElementById('imagePreview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+};
    
