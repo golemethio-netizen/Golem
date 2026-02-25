@@ -79,3 +79,17 @@ async function loadEditData(id) {
         // Store image in a hidden way if you don't want to re-upload
     }
 }
+// Inside the success block of your submit.js
+const { error: dbError } = await _supabase.from('products').insert([productData]);
+
+if (!dbError) {
+    // SEND EMAIL TO ADMIN
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        product_name: productData.name,
+        price: productData.price,
+        phone: productData.phone_number
+    }).then(() => {
+        alert("Success! Your item is sent to the Admin for approval.");
+        window.location.href = 'index.html';
+    });
+}
