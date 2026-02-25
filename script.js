@@ -96,16 +96,14 @@ async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        // Change 'your-email@gmail.com' to your actual admin email
-        const isAdmin = user.email === 'yohannes.surafel@gmail.com'; 
-
+        // User is logged in
         userMenu.innerHTML = `
-            ${isAdmin ? '<button onclick="location.href=\'admin.html\'" class="filter-btn">Admin</button>' : ''}
             <button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
             <button onclick="handleSignOut()" class="login-btn">Sign Out</button>
         `;
     } else {
-        userMenu.innerHTML = `<button onclick="openAuthModal()" class="login-btn">Sign In</button>`;
+        // User is NOT logged in - link directly to login.html
+        userMenu.innerHTML = `<button onclick="location.href='login.html'" class="login-btn">Sign In</button>`;
     }
 }
 
@@ -147,4 +145,5 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
 
