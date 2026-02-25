@@ -11,14 +11,13 @@ document.getElementById('uploadForm').onsubmit = async (e) => {
     }
 
     // 2. Prepare product data
-   // Inside your uploadForm.onsubmit in submit.js
+// Inside your uploadForm.onsubmit in submit.js
 const productData = {
     name: document.getElementById('pName').value,
     price: parseFloat(document.getElementById('pPrice').value),
     image: document.getElementById('pImg').value,
     category: document.getElementById('pCat').value,
-    phone_number: document.getElementById('pPhone').value, // NEW: Direct Call
-    whatsapp_number: document.getElementById('pWhatsApp').value, // WhatsApp
+    phone_number: document.getElementById('pPhone').value, // This is the only one we need
     user_id: user.id,
     status: 'pending'
 };
