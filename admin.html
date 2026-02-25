@@ -12,7 +12,15 @@
         <div class="logo" onclick="location.href='index.html'">GOLEM ADMIN</div>
         <button onclick="location.href='index.html'" class="filter-btn">Exit Admin</button>
     </nav>
-
+<div class="admin-section" style="background:#f4f4f4; padding:20px; border-radius:10px; margin-bottom:30px;">
+    <h3>📂 Category Manager</h3>
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <input type="text" id="newCatName" placeholder="New Category Name">
+        <button onclick="addCategory()" class="sold-btn" style="width:auto;">Add</button>
+    </div>
+    <div id="categoryList" style="display:flex; flex-wrap:wrap; gap:10px;">
+        </div>
+</div>
     <div class="container">
         <h2 style="margin-bottom: 20px;">Pending Approvals</h2>
         <div id="adminGrid" class="product-grid">
