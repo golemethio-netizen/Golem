@@ -44,3 +44,40 @@ async function updateStatus(id, status) {
     await _supabase.from('products').update({ status }).eq('id', id);
     location.reload();
 }
+
+
+// Load categories on start
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPendingItems();
+    fetchCategories();
+});
+
+async function fetchCategories() {
+    const list = document.getElementById('categoryList');
+    const { data: cats } = await _supabase.from('categories').select('*').order('name');
+    
+    list.innerHTML = cats.map(c => `
+        <span class="category-tag" style="background:#ddd; padding:5px 10px; border-radius:15px; font-size:0.8rem;">
+            ${c.name} <b onclick="deleteCategory('${c.id}')" style="cursor:pointer; color:red; margin-left:5px;">×</b>
+        </span>
+    `).join('');
+}
+
+async function addCategory() {
+    const name = document.getElementById('newCatName').value;
+    if (!name) return;
+
+    const { error } = await _supabase.from('categories').insert([{ name }]);
+    if (error) alert("Error: Category might already exist.");
+    else {
+        document.getElementById('newCatName').value = '';
+        fetchCategories();
+    }
+}
+
+async function deleteCategory(id) {
+    if (confirm("Delete this category? Items already in this category won't be deleted.")) {
+        await _supabase.from('categories').delete().eq('id', id);
+        fetchCategories();
+    }
+}
