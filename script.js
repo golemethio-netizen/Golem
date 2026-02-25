@@ -103,7 +103,7 @@ async function handleAuth() {
     } catch (e) { alert(e.message); }
 }
 
-async function updateUIForUser() {
+aasync function updateUIForUser() {
     const userMenu = document.getElementById('userMenu');
     const { data: { user } } = await _supabase.auth.getUser();
 
@@ -173,6 +173,7 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+
 
 
 
