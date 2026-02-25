@@ -35,25 +35,27 @@ function renderProducts(products) {
     const productGrid = document.getElementById('productGrid');
     if (!productGrid) return;
 
-    if (products.length === 0) {
-        productGrid.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No items found.</p>`;
-        return;
-    }
+    productGrid.innerHTML = products.map(p => {
+        // Log the product to the console so you can see what data is coming back
+        console.log("Product Data:", p); 
 
-    productGrid.innerHTML = products.map(p => `
+        // Check if image exists, if not use a placeholder
+        const imageSrc = p.image || 'https://via.placeholder.com/300x200?text=No+Image+Available';
 
-<div class="product-info">
-    <h3>${p.name}</h3>
-    <p class="price">${p.price} ETB</p>
-    <div style="display:flex; gap:5px;">
-        <button class="main-btn" onclick="addToCart('${p.id}')">🛒 Add</button>
-        <button class="filter-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy</button>
-    </div>
-</div>
-        
-    `).join('');
+        return `
+            <div class="product-card">
+                <div class="img-container">
+                    <img src="${imageSrc}" alt="${p.name}" loading="lazy">
+                </div>
+                <div class="product-info">
+                    <h3>${p.name}</h3>
+                    <p class="price">${p.price} ETB</p>
+                    <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">View Item</button>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
-
 // 5. Category Filtering (Fixes your specific error)
 function filterCategory(category) {
     // UI Update
@@ -145,3 +147,4 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
