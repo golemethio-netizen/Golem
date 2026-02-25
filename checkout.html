@@ -54,35 +54,30 @@
 
             // 3. Display the data
            // Inside your loadProductDetails function in checkout.html
+// The final render part of loadProductDetails
 display.innerHTML = `
-    <img src="${p.image}" style="width:100%; border-radius:10px;">
-    <div class="product-info" style="padding:20px;">
+    <img src="${p.image}" class="detail-img">
+    <div class="product-info">
         <h2>${p.name}</h2>
-        <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold;">${p.price} ETB</p>
+        <p class="price-large">${p.price} ETB</p>
         
-        <div style="display:grid; gap:12px; margin-top:20px;">
-            <a href="tel:${p.phone_number}" class="main-btn" style="background:#007bff; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
-               📞 Call Seller
-            </a>
-            
-            <a href="https://wa.me/${p.whatsapp_number}?text=Hello, I am interested in your ${p.name} on Golem." 
-               class="main-btn" style="background:#25D366; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
-               💬 WhatsApp
-            </a>
+        <div class="contact-grid">
+            <a href="tel:${p.phone_number}" class="btn-call">📞 Call Seller</a>
+            <a href="https://wa.me/${p.whatsapp_number}" class="btn-wa">💬 WhatsApp</a>
         </div>
 
-// Add this below the buttons in checkout.html
-display.innerHTML += `
-    <div class="safety-box">
-        <h4>🛡️ Golem Safety Tips</h4>
-        <ul>
-            <li>Meet the seller in a <strong>public place</strong>.</li>
-            <li><strong>Inspect the item</strong> thoroughly before paying.</li>
-            <li>Never send money via mobile transfer <strong>before</strong> receiving the item.</li>
-        </ul>
-    </div>
-`;
+        <div class="safety-box">
+            <h4>🛡️ Golem Safety Tips</h4>
+            <ul>
+                <li>Meet in a safe, public location.</li>
+                <li>Verify the item's condition in person.</li>
+                <li>Avoid advance payments at all costs.</li>
+            </ul>
+        </div>
         
+        <div class="share-row">
+            <button onclick="window.open('https://t.me/share/url?url='+encodeURIComponent(window.location.href))">Share to Telegram</button>
+        </div>
     </div>
 `;
 
