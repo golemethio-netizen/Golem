@@ -102,3 +102,14 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     background: #546e7a;
     color: white;
 }
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.views-count {
+    font-size: 0.75rem;
+    color: #888;
+}
