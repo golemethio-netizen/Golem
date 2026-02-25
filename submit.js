@@ -65,7 +65,15 @@ const urlParams = new URLSearchParams(window.location.search);
 const editId = urlParams.get('edit');
 
 if (editId) {
-    loadEditData(editId);
+    // UPDATE EXISTING ITEM
+    const { error } = await _supabase
+        .from('products')
+        .update(productData)
+        .eq('id', editId);
+    
+    if (!error) alert("Item updated!");
+} else {
+    // INSERT NEW ITEM (with the email logic above)
 }
 
 async function loadEditData(id) {
