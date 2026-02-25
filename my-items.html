@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+    // Add this inside fetchMyItems after fetching 'products'
+const totalViews = products.reduce((sum, p) => sum + (p.views || 0), 0);
+document.getElementById('statsSummary').innerHTML = `
+    <div style="background:white; padding:15px; border-radius:10px; margin-bottom:20px; display:flex; justify-content:space-around; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+        <div><p style="margin:0; font-size:0.8rem; color:#666;">Active Items</p><strong>${products.length}</strong></div>
+        <div><p style="margin:0; font-size:0.8rem; color:#666;">Total Interest</p><strong>👁️ ${totalViews}</strong></div>
+    </div>
+`;
 <head>
     <meta charset="UTF-8">
     <title>My Items</title>
