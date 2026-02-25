@@ -156,6 +156,19 @@ window.onclick = function(event) {
     }
 }
 
+// Function to check if user is logged in before allowing them to sell
+async function checkAuthToSell() {
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    if (user) {
+        // If logged in, go to the submit page
+        window.location.href = 'submit.html';
+    } else {
+        // If not logged in, alert them and go to login
+        alert("Please Sign In to post an item.");
+        window.location.href = 'login.html';
+    }
+}
 
 
 
