@@ -2,16 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sell Item - Golem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Item | Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<form id="uploadForm">
-    <input type="text" id="pName" placeholder="Product Name" required>
-    <input type="number" id="pPrice" placeholder="Price (ETB)" required>
-    <input type="text" id="pImg" placeholder="Image URL" required>
-    <select id="pCat"><option>Electronics</option><option>Clothing</option></select>
-    <button type="submit" class="main-btn">Post Item</button>
-</form>
+<body>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+    </nav>
 
+    <div class="container" style="padding: 20px; max-width: 500px; margin: auto;">
+        <h2 style="text-align: center;">Sell Your Item</h2>
+        <form id="uploadForm">
+            <input type="text" id="pName" placeholder="Product Name (e.g. iPhone 13)" required>
+            <input type="number" id="pPrice" placeholder="Price in ETB" required>
+            <input type="text" id="pImg" placeholder="Image URL (Paste link here)" required>
+            
+            <select id="pCat">
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Home">Home</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <div style="margin-top: 15px; padding: 10px; background: #eee; border-radius: 8px;">
+                <p style="font-size: 0.8rem; margin-bottom: 5px;">Contact Info (Required for Buyers)</p>
+                <input type="text" id="pWhatsApp" placeholder="WhatsApp Number (e.g. 2519...)" required>
+                <input type="text" id="pTelegram" placeholder="Telegram Username (e.g. @yourname)" required>
+            </div>
+
+            <button type="submit" class="main-btn" style="margin-top: 20px;">Post for Approval</button>
+        </form>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="submit.js"></script>
+</body>
 </html>
