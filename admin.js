@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user } } = await _supabase.auth.getUser();
-    if (!user || user.email !== 'your-admin@email.com') { // CHANGE THIS
+    if (!user || user.email !== 'yohannes.surafel@gmail.com') { // CHANGE THIS
         window.location.href = 'index.html';
         return;
     }
