@@ -93,7 +93,7 @@ async function updateUIForUser() {
 
     if (user) {
         // Change 'your-email@gmail.com' to your actual admin email
-        const isAdmin = user.email === 'your-email@gmail.com'; 
+        const isAdmin = user.email === 'yohannes.surafel@gmail.com'; 
 
         userMenu.innerHTML = `
             ${isAdmin ? '<button onclick="location.href=\'admin.html\'" class="filter-btn">Admin</button>' : ''}
@@ -119,3 +119,4 @@ function openAuthModal() {
 function closeAuthModal() {
     document.getElementById('authModal').style.display = 'none';
 }
+
