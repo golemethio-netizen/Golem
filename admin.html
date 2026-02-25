@@ -2,30 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Approval | Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    
 </head>
 <body>
-    <nav><div class="logo">ADMIN PANEL</div></nav>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'">GOLEM ADMIN</div>
+        <button onclick="location.href='index.html'" class="filter-btn">Exit Admin</button>
+    </nav>
+
     <div class="container">
-        <div id="adminGrid" class="product-grid"></div>
-    </div>
-
-
-<div id="authModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeAuthModal()">&times;</span>
-        <div id="auth-ui">
-            <h2>Welcome to Golem</h2>
-            <p>Please sign in to continue</p>
-            <button class="main-btn" onclick="location.href='login.html'">Go to Login Page</button>
+        <h2 style="margin-bottom: 20px;">Pending Approvals</h2>
+        <div id="adminGrid" class="product-grid">
+            <p>Checking for new items...</p>
         </div>
     </div>
-</div>
-     <script src="script.js"></script>
+
     <script src="config.js"></script>
     <script src="admin.js"></script>
 </body>
