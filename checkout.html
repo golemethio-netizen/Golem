@@ -98,7 +98,19 @@ display.innerHTML = `
 
         // Run the function when the page loads
         document.addEventListener('DOMContentLoaded', loadProductDetails);
-    
+    // Inside checkout.html, right after you successfully fetch the product 'p'
+async function incrementViews(productId, currentViews) {
+    await _supabase
+        .from('products')
+        .update({ views: currentViews + 1 })
+        .eq('id', productId);
+}
+
+// Call it after data is loaded
+if (p) {
+    incrementViews(p.id, p.views || 0);
+    // ... rest of your display logic
+}
     </script>
 
      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
