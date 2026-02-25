@@ -53,28 +53,25 @@
             }
 
             // 3. Display the data
-            display.innerHTML = `
-                <img src="${p.image}" style="width:100%; border-radius:10px;">
-                <div class="product-info" style="padding:20px;">
-                    <h2 style="color:var(--secondary);">${p.name}</h2>
-                    <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold;">${p.price} ETB</p>
-                    <p style="color:#666; margin-bottom:20px;">Category: ${p.category}</p>
-                    
-                    <div style="display:grid; gap:10px;">
-                        <a href="https://wa.me/${p.whatsapp_number}?text=I want to buy ${p.name}" 
-                           class="main-btn" style="background:#25D366; text-decoration:none;">
-                           Chat on WhatsApp
-                        </a>
-                        <a href="https://t.me/${p.telegram_username?.replace('@','')}" 
-                           class="main-btn" style="background:#0088cc; text-decoration:none;">
-                           Chat on Telegram
-                        </a>
-                    </div>
-
-
-                    
-                </div>
-
+           // Inside your loadProductDetails function in checkout.html
+display.innerHTML = `
+    <img src="${p.image}" style="width:100%; border-radius:10px;">
+    <div class="product-info" style="padding:20px;">
+        <h2>${p.name}</h2>
+        <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold;">${p.price} ETB</p>
+        
+        <div style="display:grid; gap:12px; margin-top:20px;">
+            <a href="tel:${p.phone_number}" class="main-btn" style="background:#007bff; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+               📞 Call Seller
+            </a>
+            
+            <a href="https://wa.me/${p.whatsapp_number}?text=Hello, I am interested in your ${p.name} on Golem." 
+               class="main-btn" style="background:#25D366; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+               💬 WhatsApp
+            </a>
+        </div>
+    </div>
+`;
 
                 // Add this inside the innerHTML template in checkout.html
 <div class="share-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
