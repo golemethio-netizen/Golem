@@ -3,70 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Marketplace</title>
+    <title>Login | Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f4f7f6;">
 
-    <nav>
-        <div class="logo" onclick="location.reload()">GOLEM</div>
-        <div id="userMenu">
-            <button onclick="openAuthModal()" id="loginNavBtn">Sign In</button>
-        </div>
-    </nav>
+    <div class="auth-card" style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px;">
+        <h2 id="authTitle" style="text-align: center; color: #ff4b2b;">Sign In</h2>
+        
+        <form id="authForm">
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" id="submitBtn" class="main-btn">Login</button>
+        </form>
 
-    <div class="controls">
-        <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search items...">
-        <div class="category-filters">
-            <button onclick="filterByCategory('All')" class="active">All</button>
-            <button onclick="filterByCategory('Electronics')">Electronics</button>
-            <button onclick="filterByCategory('Clothing')">Clothing</button>
-            <button onclick="filterByCategory('Art')">Art</button>
-        </div>
-    </div>
-
-    <div id="productGrid" class="product-grid">
-        </div>
-
-    <div class="mobile-nav">
-        <div class="nav-item" onclick="location.reload()">🏠<p>Home</p></div>
-        <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p></div>
-        <div class="nav-item" onclick="toggleCart()">🛒<p>Cart</p></div>
-    </div>
-
-    <div id="authModal" class="modal" style="display:none;">
-        <div class="auth-card">
-            <span class="close-btn" onclick="closeAuth()">&times;</span>
-            <h2 id="authTitle">Login to Golem</h2>
-            <input type="email" id="authEmail" placeholder="Email">
-            <input type="password" id="authPassword" placeholder="Password">
-            <button id="authBtn" onclick="handleAuth()">Sign In</button>
-            <p onclick="toggleAuthMode()" style="cursor:pointer; text-align:center; margin-top:10px; font-size:0.8rem;">
-                Don't have an account? Register
-            </p>
-        </div>
-    </div>
-
-    <div id="cartSidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h2>Your Cart</h2>
-            <button onclick="toggleCart()">&times;</button>
-        </div>
-        <div id="cartItems"></div>
-        <div class="checkout-form">
-            <h3>Checkout Details</h3>
-            <input type="text" id="buyerName" placeholder="Your Name">
-            <input type="tel" id="buyerPhone" placeholder="Your Phone">
-            <p>Total: $<span id="cartTotal">0.00</span></p>
-            <button onclick="checkout()" class="checkout-btn">Confirm Order</button>
-        </div>
-        <div id="sellerContactInfo" style="display:none; border-top:2px solid #eee; margin-top:15px; padding-top:15px;">
-            <div id="sellerDetail"></div>
+        <div style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+            <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuth()">Sign Up</a></p>
+            <p><a href="reset-password.html" style="color: #666;">Forgot Password?</a></p>
         </div>
     </div>
 
     <script src="config.js"></script>
-    <script src="script.js"></script>
+    <script>
+        let isLogin = true;
+
+        function toggleAuth() {
+            isLogin = !isLogin;
+            document.getElementById('authTitle').innerText = isLogin ? 'Sign In' : 'Create Account';
+            document.getElementById('submitBtn').innerText = isLogin ? 'Login' : 'Join Golem';
+            document.getElementById('toggleText').innerHTML = isLogin ? 
+                'Don\'t have an account? <a href="#" onclick="toggleAuth()">Sign Up</a>' : 
+                'Already have an account? <a href="#" onclick="toggleAuth()">Sign In</a>';
+        }
+
+        document.getElementById('authForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (isLogin) {
+                const { error } = await _supabase.auth.signInWithPassword({ email, password });
+                if (error) alert(error.message);
+                else window.location.href = 'index.html';
+            } else {
+                const { error } = await _supabase.auth.signUp({ email, password });
+                if (error) alert(error.message);
+                else alert("Check your email for the confirmation link!");
+            }
+        };
+    </script>
 </body>
 </html>
