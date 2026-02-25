@@ -26,3 +26,13 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     object-fit: cover; /* This keeps images from stretching */
     border-bottom: 1px solid #eee;
 }
+
+.checkout-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
