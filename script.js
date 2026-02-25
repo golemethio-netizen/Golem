@@ -109,7 +109,7 @@ async function updateUIForUser() {
 
     if (user) {
         // Change this to YOUR admin email
-        const isAdmin = user.email === 'golemethio@gmail.com'; 
+        const isAdmin = user.email === 'yohannes.surafel@gmail.com'; 
 
         userMenu.innerHTML = `
             ${isAdmin ? '<button onclick="location.href=\'admin.html\'" style="background:#ffc107; color:black;">Admin Dashboard</button>' : ''}
@@ -173,5 +173,6 @@ async function checkAuthToSell() {
         openAuthModal();
     }
 }
+
 
 
