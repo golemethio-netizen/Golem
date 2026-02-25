@@ -36,3 +36,30 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
+
+.safety-box {
+    margin-top: 25px;
+    padding: 15px;
+    background: #fff9e6; /* Soft warning yellow */
+    border: 1px solid #ffeeba;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.safety-box h4 {
+    margin: 0 0 10px 0;
+    color: #856404;
+    font-size: 0.9rem;
+}
+
+.safety-box ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.8rem;
+    color: #665c33;
+    line-height: 1.5;
+}
+
+.safety-box li {
+    margin-bottom: 5px;
+}
