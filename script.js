@@ -49,6 +49,18 @@ function renderProducts(products) {
                 <button class="main-btn" onclick="openDetails('${p.id}')">View Details</button>
             </div>
         </div>
+
+
+// Inside your renderProducts map loop
+<div class="product-info">
+    <h3>${p.name}</h3>
+    <p class="price">${p.price} ETB</p>
+    <div style="display:flex; gap:5px;">
+        <button class="main-btn" onclick="addToCart('${p.id}')">🛒 Add</button>
+        <button class="filter-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy</button>
+    </div>
+</div>
+        
     `).join('');
 }
 
@@ -119,4 +131,5 @@ function openAuthModal() {
 function closeAuthModal() {
     document.getElementById('authModal').style.display = 'none';
 }
+
 
