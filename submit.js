@@ -1,55 +1,37 @@
-document.getElementById('uploadForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const submitBtn = e.target.querySelector('button');
-    submitBtn.innerText = "Uploading...";
-    submitBtn.disabled = true;
+// 1. Initialize variables for Edit Mode
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('edit');
+const form = document.getElementById('uploadForm');
+const submitBtn = form.querySelector('button[type="submit"]');
 
-    const file = document.getElementById('pImageFile').files[0];
-    const { data: { user } } = await _supabase.auth.getUser();
+// 2. If in Edit Mode, load existing data
+if (editId) {
+    loadEditData(editId);
+}
 
-    try {
-        // 1. Generate a unique file name
-        const fileName = `${Date.now()}_${file.name}`;
-        const filePath = `uploads/${fileName}`;
+async function loadEditData(id) {
+    const { data: p, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-        // 2. Upload to Supabase Storage
-        const { error: uploadError } = await _supabase.storage
-            .from('product-images')
-            .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        // 3. Get the Public URL
-        const { data: { publicUrl } } = _supabase.storage
-            .from('product-images')
-            .getPublicUrl(filePath);
-
-        // 4. Save Product to Database
-        const productData = {
-            name: document.getElementById('pName').value,
-            price: parseFloat(document.getElementById('pPrice').value),
-            image: publicUrl, // The link to the file we just uploaded
-            category: document.getElementById('pCat').value,
-            phone_number: document.getElementById('pPhone').value,
-            user_id: user.id,
-            status: 'pending'
-        };
-
-        const { error: dbError } = await _supabase.from('products').insert([productData]);
-        if (dbError) throw dbError;
-
-        alert("Item posted successfully for approval!");
-        window.location.href = 'index.html';
-
-    } catch (err) {
-        alert("Error: " + err.message);
-        submitBtn.innerText = "Post for Approval";
-        submitBtn.disabled = false;
+    if (p) {
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pPrice').value = p.price;
+        document.getElementById('pPhone').value = p.phone_number;
+        document.getElementById('pCat').value = p.category;
+        submitBtn.innerText = "Update Item";
+        
+        // Show existing image preview
+        const preview = document.getElementById('imagePreview');
+        preview.src = p.image;
+        preview.style.display = 'block';
     }
-};
+}
 
-  
-document.getElementById('pImageFile').onchange = function (evt) {
+// 3. Image Preview Logic (Mobile Friendly)
+document.getElementById('pImageFile').onchange = function () {
     const [file] = this.files;
     if (file) {
         const preview = document.getElementById('imagePreview');
@@ -58,46 +40,75 @@ document.getElementById('pImageFile').onchange = function (evt) {
     }
 };
 
-
-
-// Check if we are editing an item
-const urlParams = new URLSearchParams(window.location.search);
-const editId = urlParams.get('edit');
-
-if (editId) {
-    // UPDATE EXISTING ITEM
-    const { error } = await _supabase
-        .from('products')
-        .update(productData)
-        .eq('id', editId);
+// 4. Main Submit Logic (Handles both New and Edit)
+form.onsubmit = async (e) => {
+    e.preventDefault();
     
-    if (!error) alert("Item updated!");
-} else {
-    // INSERT NEW ITEM (with the email logic above)
-}
+    // Disable button to prevent double clicks
+    submitBtn.innerText = "Processing...";
+    submitBtn.disabled = true;
 
-async function loadEditData(id) {
-    const { data: p } = await _supabase.from('products').select('*').eq('id', id).single();
-    if (p) {
-        document.getElementById('pName').value = p.name;
-        document.getElementById('pPrice').value = p.price;
-        document.getElementById('pPhone').value = p.phone_number;
-        document.getElementById('pCat').value = p.category;
-        document.querySelector('button[type="submit"]').innerText = "Update Item";
-        // Store image in a hidden way if you don't want to re-upload
+    try {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) throw new Error("Please login first!");
+
+        const fileInput = document.getElementById('pImageFile');
+        let imageUrl = document.getElementById('imagePreview').src;
+
+        // A. If a new file is selected, upload it to Supabase Storage
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileName = `${Date.now()}_${file.name}`;
+            const filePath = `uploads/${fileName}`;
+
+            const { error: uploadError } = await _supabase.storage
+                .from('product-images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = _supabase.storage
+                .from('product-images')
+                .getPublicUrl(filePath);
+            
+            imageUrl = publicUrl;
+        }
+
+        // B. Prepare the data object
+        const productData = {
+            name: document.getElementById('pName').value,
+            price: parseFloat(document.getElementById('pPrice').value),
+            image: imageUrl,
+            category: document.getElementById('pCat').value,
+            phone_number: document.getElementById('pPhone').value,
+            user_id: user.id,
+            status: editId ? undefined : 'pending' // Only reset to pending for new items
+        };
+
+        // C. Database Action: Update or Insert
+        let result;
+        if (editId) {
+            result = await _supabase
+                .from('products')
+                .update(productData)
+                .eq('id', editId);
+        } else {
+            result = await _supabase
+                .from('products')
+                .insert([productData]);
+        }
+
+        if (result.error) throw result.error;
+
+        // D. Optional: Send EmailJS notification here for new items
+        // if (!editId) { sendEmailNotification(productData); }
+
+        alert(editId ? "Item updated!" : "Success! Item sent for approval.");
+        window.location.href = 'my-items.html';
+
+    } catch (err) {
+        alert("Error: " + err.message);
+        submitBtn.innerText = editId ? "Update Item" : "Post for Approval";
+        submitBtn.disabled = false;
     }
-}
-// Inside the success block of your submit.js
-const { error: dbError } = await _supabase.from('products').insert([productData]);
-
-if (!dbError) {
-    // SEND EMAIL TO ADMIN
-    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        product_name: productData.name,
-        price: productData.price,
-        phone: productData.phone_number
-    }).then(() => {
-        alert("Success! Your item is sent to the Admin for approval.");
-        window.location.href = 'index.html';
-    });
-}
+};
