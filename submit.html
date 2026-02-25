@@ -17,7 +17,11 @@
         <form id="uploadForm">
             <input type="text" id="pName" placeholder="Product Name (e.g. iPhone 13)" required>
             <input type="number" id="pPrice" placeholder="Price in ETB" required>
-            <input type="text" id="pImg" placeholder="Image URL (Paste link here)" required>
+           <div style="margin-top: 15px;">
+    <label style="font-size: 0.85rem; font-weight: bold;">Product Image</label>
+    <input type="file" id="pImageFile" accept="image/*" required style="margin-top: 5px;">
+    <img id="imagePreview" style="display:none; width:100%; margin-top:10px; border-radius:8px;">
+</div>
             
             <select id="pCat">
                 <option value="Electronics">Electronics</option>
