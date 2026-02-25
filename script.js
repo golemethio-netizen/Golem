@@ -135,44 +135,33 @@ function searchProducts() {
     renderProducts(filtered);
 }
 
+// This variable should be at the very top of script.js
+let allApprovedProducts = []; 
+
+// Add this function to handle the category filtering
 function filterCategory(category) {
-    // 1. Highlight the active button
+    console.log("Filtering by:", category); // Debugging line
+    
+    // 1. Update the UI buttons
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => {
         btn.classList.remove('active');
-        if(btn.innerText.toLowerCase() === category.toLowerCase()) {
+        if (btn.innerText.toLowerCase() === category.toLowerCase()) {
             btn.classList.add('active');
         }
     });
 
-    // 2. Filter the products
+    // 2. Logic to filter the list
     if (category === 'all') {
         renderProducts(allApprovedProducts);
     } else {
-        const filtered = allApprovedProducts.filter(p => p.category === category);
+        const filtered = allApprovedProducts.filter(p => 
+            p.category && p.category.toLowerCase() === category.toLowerCase()
+        );
         renderProducts(filtered);
     }
 }
 
-async function handleSignOut() {
-    const { error } = await _supabase.auth.signOut();
-    if (error) {
-        alert("Error signing out: " + error.message);
-    } else {
-        // Refresh the page to show the "Sign In" button again
-        location.reload();
-    }
-}
-
-async function checkAuthToSell() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (user) {
-        window.location.href = 'submit.html';
-    } else {
-        alert("Please sign in to post an item!");
-        openAuthModal();
-    }
-}
 
 
 
