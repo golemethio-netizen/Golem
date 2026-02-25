@@ -86,3 +86,19 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
 }
 .status-badge.pending { background: #fff3e0; color: #ef6c00; }
 .status-badge.approved { background: #e8f5e9; color: #2e7d32; }
+
+
+.sold-btn {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.status-badge.sold {
+    background: #546e7a;
+    color: white;
+}
