@@ -2,42 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav><div class="logo" onclick="location.href='index.html'">GOLEM</div></nav>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+    </nav>
     
     <div class="container" style="padding: 20px; text-align: center;">
-        <div id="itemDetail" class="product-card" style="max-width: 500px; margin: auto; float: none;">
-            </div>
+        <div id="checkoutDetails" class="product-card" style="max-width: 500px; margin: auto;">
+            <p>Gathering item details...</p>
+        </div>
     </div>
 
     <script src="config.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+        async function loadProductDetails() {
+            const display = document.getElementById('checkoutDetails');
+            
+            // 1. Get ID from the URL bar (e.g., checkout.html?id=123)
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('id');
 
-        async function loadDetail() {
-            const { data: p } = await _supabase.from('products').select('*').eq('id', productId).single();
-            if (!p) return;
+            if (!productId) {
+                display.innerHTML = "<h3>Product not found.</h3><a href='index.html'>Back to Shop</a>";
+                return;
+            }
 
-            document.getElementById('itemDetail').innerHTML = `
-                <img src="${p.image}" style="height: 300px;">
-                <div class="product-info">
-                    <h2>${p.name}</h2>
-                    <p style="font-size: 1.5rem; color: #ff4b2b;">${p.price} ETB</p>
-                    <hr>
-                    <p>Contact Seller to Buy:</p>
-                    <div class="checkout-btns">
-                        <a href="https://wa.me/${p.whatsapp_number}?text=I am interested in ${p.name}" class="wa-btn" style="display:block; text-decoration:none; margin-bottom:10px;">Message on WhatsApp</a>
-                        <a href="https://t.me/${p.telegram_username.replace('@','')}" class="tg-btn" style="display:block; text-decoration:none;">Message on Telegram</a>
+            // 2. Fetch specific product from Supabase
+            const { data: p, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('id', productId)
+                .single();
+
+            if (error || !p) {
+                display.innerHTML = "<h3>Error loading product.</h3>";
+                return;
+            }
+
+            // 3. Display the data
+            display.innerHTML = `
+                <img src="${p.image}" style="width:100%; border-radius:10px;">
+                <div class="product-info" style="padding:20px;">
+                    <h2 style="color:var(--secondary);">${p.name}</h2>
+                    <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold;">${p.price} ETB</p>
+                    <p style="color:#666; margin-bottom:20px;">Category: ${p.category}</p>
+                    
+                    <div style="display:grid; gap:10px;">
+                        <a href="https://wa.me/${p.whatsapp_number}?text=I want to buy ${p.name}" 
+                           class="main-btn" style="background:#25D366; text-decoration:none;">
+                           Chat on WhatsApp
+                        </a>
+                        <a href="https://t.me/${p.telegram_username?.replace('@','')}" 
+                           class="main-btn" style="background:#0088cc; text-decoration:none;">
+                           Chat on Telegram
+                        </a>
                     </div>
                 </div>
             `;
         }
-        loadDetail();
+
+        // Run the function when the page loads
+        document.addEventListener('DOMContentLoaded', loadProductDetails);
     </script>
 </body>
 </html>
