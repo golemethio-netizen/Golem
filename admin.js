@@ -1,134 +1,89 @@
-// Inside admin.js at the very top
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Security Check
     const { data: { user } } = await _supabase.auth.getUser();
     
-    // Add your email here too
-    if (!user || user.email !== 'yohannes.surafel@gmail.com') {
-        alert("Admin Access Required");
+    // Change this to YOUR email
+    if (!user || user.email !== 'your-admin-email@gmail.com') {
+        alert("Restricted Access: Admins Only");
         window.location.href = 'index.html';
         return;
     }
-    loadPendingItems();
+
+    loadDashboard();
 });
 
-async function loadPendingItems() {
+async function loadDashboard() {
     const grid = document.getElementById('adminGrid');
     grid.innerHTML = "<p>Loading pending items...</p>";
 
-    const { data, error } = await _supabase
+    // 2. Fetch Stats
+    const { count: pendingCount } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+    const { count: approvedCount } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+    
+    document.getElementById('pendingCount').innerText = pendingCount || 0;
+    document.getElementById('approvedCount').innerText = approvedCount || 0;
+
+    // 3. Fetch Pending Items
+    const { data: products, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('status', 'pending');
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
 
     if (error) {
-        console.error(error);
-        grid.innerHTML = "Error loading data.";
+        grid.innerHTML = "Error loading products.";
         return;
     }
 
-    if (data.length === 0) {
-        grid.innerHTML = "<h3>✅ All caught up! No pending items.</h3>";
+    if (products.length === 0) {
+        grid.innerHTML = "<div style='grid-column: 1/-1; text-align: center; padding: 50px;'><h3>🎉 No pending items to review!</h3></div>";
         return;
     }
 
-    grid.innerHTML = data.map(p => `
-        <div class="product-card" id="card-${p.id}">
+    // 4. Render Items
+    grid.innerHTML = products.map(p => `
+        <div class="product-card" id="row-${p.id}">
             <img src="${p.image}" alt="${p.name}">
             <div class="product-info">
                 <h3>${p.name}</h3>
-                <p>${p.price} ETB</p>
-                <div style="display:flex; gap:10px;">
-                    <button onclick="updateStatus('${p.id}', 'approved')" 
-                            style="background: #28a745; color:white; border:none; padding:10px; flex:1; border-radius:5px; cursor:pointer;">
-                        Approve
-                    </button>
-                    <button onclick="updateStatus('${p.id}', 'rejected')" 
-                            style="background: #dc3545; color:white; border:none; padding:10px; flex:1; border-radius:5px; cursor:pointer;">
-                        Reject
-                    </button>
+                <p><strong>Price:</strong> ${p.price} ETB</p>
+                <p><strong>Category:</strong> ${p.category}</p>
+                <p style="font-size: 0.8rem; color: #666;">Seller: ${p.whatsapp_number || 'N/A'}</p>
+                
+                <div class="admin-actions" style="display:flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                    <button onclick="updateStatus('${p.id}', 'approved')" style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">✅ Approve</button>
+                    <button onclick="updateStatus('${p.id}', 'rejected')" style="background: #ffc107; color: black; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">❌ Reject</button>
+                    <button onclick="deleteForever('${p.id}')" style="background: #dc3545; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">🗑️ Delete Permanently</button>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-
-
-
-
-
-
-
-
-async function updateStatus(productId, newStatus) {
+async function updateStatus(id, newStatus) {
     const { error } = await _supabase
         .from('products')
         .update({ status: newStatus })
-        .eq('id', productId);
+        .eq('id', id);
 
     if (error) {
-        alert("Update failed: " + error.message);
+        alert("Error: " + error.message);
     } else {
-        alert("Product " + newStatus);
-        // Remove the card from view
-        document.getElementById(`card-${productId}`).remove();
-        
-        // Refresh list if empty
-        const grid = document.getElementById('adminGrid');
-        if (grid.children.length === 0) {
-            grid.innerHTML = "<h3>✅ All caught up!</h3>";
-        }
+        alert("Item " + newStatus);
+        loadDashboard(); // Refresh
     }
 }
 
-
-
-// Inside your data.map loop in admin.js
-<div class="product-info">
-    <h3>${p.name}</h3>
-    <p>${p.price} ETB</p>
-    <div style="display:flex; flex-direction:column; gap:8px;">
-        <div style="display:flex; gap:5px;">
-            <button onclick="updateStatus('${p.id}', 'approved')" style="background:#28a745; color:white; border:none; padding:8px; flex:1; border-radius:4px; cursor:pointer;">Approve</button>
-            <button onclick="updateStatus('${p.id}', 'rejected')" style="background:#ffc107; color:black; border:none; padding:8px; flex:1; border-radius:4px; cursor:pointer;">Reject</button>
-        </div>
-        <button onclick="deleteProduct('${p.id}')" style="background:#dc3545; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer; font-weight:bold;">
-            🗑️ Delete Permanently
-        </button>
-    </div>
-</div>
-
-
-
-
-
-
-
-// --- ADMIN DELETE LOGIC ---
-
-async function deleteProduct(productId) {
-    // 1. Ask for confirmation
-    const confirmDelete = confirm("Are you sure you want to PERMANENTLY delete this item?");
-    
-    if (confirmDelete) {
-        try {
-            const { error } = await _supabase
-                .from('products')
-                .delete()
-                .eq('id', productId);
-
-            if (error) throw error;
-
-            alert("Item deleted successfully.");
-            
-            // 2. Remove the card from the UI immediately
-            const card = document.getElementById(`card-${productId}`);
-            if (card) card.remove();
-
-        } catch (err) {
-            console.error("Delete Error:", err.message);
-            alert("Could not delete item: " + err.message);
-        }
+async function deleteForever(id) {
+    if (confirm("Are you sure? This cannot be undone.")) {
+        const { error } = await _supabase.from('products').delete().eq('id', id);
+        if (error) alert(error.message);
+        else loadDashboard();
     }
 }
 
+// Global Sign Out for Admin
+async function handleSignOut() {
+    await _supabase.auth.signOut();
+    window.location.href = 'index.html';
+}
