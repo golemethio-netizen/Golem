@@ -113,3 +113,55 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     font-size: 0.75rem;
     color: #888;
 }
+
+/* Stats Bar */
+#statsSummary {
+    display: flex;
+    justify-content: space-around;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Status Badges */
+.status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    z-index: 2;
+}
+.status-badge.pending { background: #fff3e0; color: #ef6c00; }
+.status-badge.approved { background: #e8f5e9; color: #2e7d32; }
+.status-badge.sold { background: #37474f; color: white; }
+
+/* Management Buttons */
+.manage-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 15px;
+}
+.sold-btn { background: #4caf50; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; }
+.edit-btn { background: #e3f2fd; color: #1976d2; border: none; padding: 8px; border-radius: 6px; cursor: pointer; }
+.delete-btn { background: #ffebee; color: #d32f2f; border: none; padding: 8px; border-radius: 6px; cursor: pointer; grid-column: span 2; }
+
+/* Sold State */
+.product-card.is-sold {
+    filter: grayscale(0.5);
+    opacity: 0.8;
+}
