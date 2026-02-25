@@ -14,13 +14,17 @@ async function fetchProducts() {
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('status', 'approved');
-    
-    if (error) return console.error(error);
-    allApprovedProducts = data;
-    renderProducts(data);
-}
+        .eq('status', 'approved'); // Only show approved items
 
+    if (error) {
+        console.error("Error fetching products:", error);
+        return;
+    }
+
+    // IMPORTANT: Save the data globally so filterCategory can use it
+    allApprovedProducts = data; 
+    renderProducts(allApprovedProducts);
+}
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     grid.innerHTML = products.map(p => `
@@ -161,6 +165,7 @@ function filterCategory(category) {
         renderProducts(filtered);
     }
 }
+
 
 
 
