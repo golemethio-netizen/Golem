@@ -31,31 +31,40 @@ async function fetchProducts() {
 }
 
 // 4. Render Products to HTML
+
+
 function renderProducts(products) {
     const productGrid = document.getElementById('productGrid');
     if (!productGrid) return;
 
     productGrid.innerHTML = products.map(p => {
-        // Log the product to the console so you can see what data is coming back
-        console.log("Product Data:", p); 
+        // Log data to console to help us debug
+        console.log("Loading product:", p);
 
-        // Check if image exists, if not use a placeholder
-        const imageSrc = p.image || 'https://via.placeholder.com/300x200?text=No+Image+Available';
+        // Map database columns to variables (handles case-sensitivity)
+        const name = p.name || p.Name || "Unnamed Item";
+        const price = p.price || p.Price || "0";
+        const image = p.image || p.Image || 'https://via.placeholder.com/300x200?text=No+Image';
+        const category = p.category || p.Category || "General";
 
         return `
             <div class="product-card">
-                <div class="img-container">
-                    <img src="${imageSrc}" alt="${p.name}" loading="lazy">
-                </div>
+                <div class="category-tag">${category}</div>
+                <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/300x200?text=Error+Loading+Image'">
                 <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <p class="price">${p.price} ETB</p>
-                    <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">View Item</button>
+                    <h3>${name}</h3>
+                    <p class="price">${price} ETB</p>
+                    <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>
                 </div>
             </div>
         `;
     }).join('');
 }
+
+
+
+
+
 // 5. Category Filtering (Fixes your specific error)
 function filterCategory(category) {
     // UI Update
@@ -145,5 +154,6 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
 
 
