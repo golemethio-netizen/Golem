@@ -124,3 +124,24 @@ function closeAuthModal() {
 
 
 
+function openAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        // If modal doesn't exist, just go to login page
+        window.location.href = 'login.html';
+    }
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+}
+
+// Close modal if user clicks outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById('authModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
