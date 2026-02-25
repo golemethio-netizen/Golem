@@ -1,104 +1,66 @@
-// 1. Global State
-let allApprovedProducts = [];
-
-// 2. Initialize App
+// 1. Initial UI Setup on Page Load
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
 });
 
-// 3. Fetch Data from Supabase
-async function fetchProducts() {
+// 2. Fetch Approved Products from Supabase
+async function fetchProducts(category = 'All') {
     const productGrid = document.getElementById('productGrid');
     if (!productGrid) return;
 
-    try {
-       const { data, error } = await _supabase
-    .from('products')
-    .select('*')
-    .eq('status', 'approved') // This automatically hides 'pending' AND 'sold' items
-    .order('created_at', { ascending: false });
+    productGrid.innerHTML = '<p class="loading">Loading amazing items...</p>';
 
-        if (error) throw error;
+    let query = _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved') // Only show items approved by Admin
+        .order('created_at', { ascending: false });
 
-        allApprovedProducts = data;
-        renderProducts(allApprovedProducts);
-
-    } catch (err) {
-        console.error("Fetch Error:", err.message);
-        productGrid.innerHTML = `<p style="text-align:center;">Error loading items. Please try again.</p>`;
+    // Apply category filter if not 'All'
+    if (category !== 'All') {
+        query = query.eq('category', category);
     }
+
+    const { data: products, error } = await query;
+
+    if (error) {
+        console.error("Database Error:", error.message);
+        productGrid.innerHTML = '<p>Error loading products. Please refresh.</p>';
+        return;
+    }
+
+    if (products.length === 0) {
+        productGrid.innerHTML = '<p>No items found in this category.</p>';
+        return;
+    }
+
+    renderProducts(products);
 }
 
-// 4. Render Products to HTML
-
-
+// 3. Render Product Cards to HTML
 function renderProducts(products) {
     const productGrid = document.getElementById('productGrid');
-    if (!productGrid) return;
-
-    productGrid.innerHTML = products.map(p => {
-        // Log data to console to help us debug
-        console.log("Loading product:", p);
-
-        // Map database columns to variables (handles case-sensitivity)
-        const name = p.name || p.Name || "Unnamed Item";
-        const price = p.price || p.Price || "0";
-        const image = p.image || p.Image || 'https://via.placeholder.com/300x200?text=No+Image';
-        const category = p.category || p.Category || "General";
-
-        return `
-            <div class="product-card">
-                <div class="category-tag">${category}</div>
-                <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/300x200?text=Error+Loading+Image'">
-                <div class="product-info">
-                    <h3>${name}</h3>
-                    <p class="price">${price} ETB</p>
-                   
-<button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>
-                </div>
+    
+    productGrid.innerHTML = products.map(p => `
+        <div class="product-card">
+            <div class="category-tag">${p.category}</div>
+            <div class="img-container">
+                <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
             </div>
-        `;
-    }).join('');
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <div class="price-row">
+                    <p class="price">${p.price} ETB</p>
+                    <span class="views-count">👁️ ${p.views || 0}</span>
+                </div>
+                <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>
+            </div>
+        </div>
+    `).join('');
 }
 
-
-
-
-
-// 5. Category Filtering (Fixes your specific error)
-function filterCategory(category) {
-    // UI Update
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.toLowerCase() === category.toLowerCase()) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Filtering Logic
-    if (category === 'all') {
-        renderProducts(allApprovedProducts);
-    } else {
-        const filtered = allApprovedProducts.filter(p => 
-            p.category && p.category.toLowerCase() === category.toLowerCase()
-        );
-        renderProducts(filtered);
-    }
-}
-
-// 6. Search Logic
-function searchProducts() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allApprovedProducts.filter(p => 
-        p.name.toLowerCase().includes(query) || 
-        (p.category && p.category.toLowerCase().includes(query))
-    );
-    renderProducts(filtered);
-}
-
-// 7. User Authentication UI Updates
+// 4. Update Navigation UI (Login/Logout/My Items)
 async function updateUIForUser() {
     const userMenu = document.getElementById('userMenu');
     if (!userMenu) return;
@@ -106,71 +68,41 @@ async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        // User is logged in
+        // Logged in: Show My Items and Sign Out
         userMenu.innerHTML = `
             <button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
             <button onclick="handleSignOut()" class="login-btn">Sign Out</button>
         `;
     } else {
-        // User is NOT logged in - link directly to login.html
+        // Not logged in: Show Sign In
         userMenu.innerHTML = `<button onclick="location.href='login.html'" class="login-btn">Sign In</button>`;
     }
 }
 
-// 8. Sign Out Logic
+// 5. Handle Sign Out
 async function handleSignOut() {
-    await _supabase.auth.signOut();
-    location.reload();
+    const { error } = await _supabase.auth.signOut();
+    if (!error) window.location.reload();
 }
 
-// 9. Auth Modal Toggle (Ensure these IDs exist in your HTML)
-function openAuthModal() {
-    document.getElementById('authModal').style.display = 'flex';
-}
-
-function closeAuthModal() {
-    document.getElementById('authModal').style.display = 'none';
-}
-
-
-
-function openAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    } else {
-        // If modal doesn't exist, just go to login page
-        window.location.href = 'login.html';
-    }
-}
-
-function closeAuthModal() {
-    document.getElementById('authModal').style.display = 'none';
-}
-
-// Close modal if user clicks outside of it
-window.onclick = function(event) {
-    const modal = document.getElementById('authModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-
-// Function to check if user is logged in before allowing them to sell
+// 6. Security Check for the "Sell" Button (index.html:33 fix)
 async function checkAuthToSell() {
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        // If logged in, go to the submit page
         window.location.href = 'submit.html';
     } else {
-        // If not logged in, alert them and go to login
         alert("Please Sign In to post an item.");
         window.location.href = 'login.html';
     }
 }
 
+// 7. Category Filter Logic for Buttons
+function filterCategory(cat) {
+    // Optional: add "active" class to clicked button
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
 
-
-
-
+    fetchProducts(cat);
+}
