@@ -2,30 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | Golem Store</title>
+    <title>Checkout | Golem</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav>
-        <div class="logo">Golem Store</div>
-        <div class="nav-links">
-            <a href="index.html">Return to Shop</a>
-        </div>
-    </nav>
-
-    <main class="checkout-container">
-        <h1>Your Shopping Cart</h1>
-        <div id="cartItems">
+    <nav><div class="logo" onclick="location.href='index.html'">GOLEM</div></nav>
+    
+    <div class="container" style="padding: 20px; text-align: center;">
+        <div id="itemDetail" class="product-card" style="max-width: 500px; margin: auto; float: none;">
             </div>
-        
-        <div class="cart-summary">
-            <h3>Total: $<span id="totalPrice">0</span></h3>
-            <button onclick="clearCart()" class="clear-btn">Empty Cart</button>
-            <button onclick="processOrder()" class="checkout-btn">Complete Purchase</button>
-        </div>
-    </main>
+    </div>
 
-    <script src="checkout.js"></script>
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function loadDetail() {
+            const { data: p } = await _supabase.from('products').select('*').eq('id', productId).single();
+            if (!p) return;
+
+            document.getElementById('itemDetail').innerHTML = `
+                <img src="${p.image}" style="height: 300px;">
+                <div class="product-info">
+                    <h2>${p.name}</h2>
+                    <p style="font-size: 1.5rem; color: #ff4b2b;">${p.price} ETB</p>
+                    <hr>
+                    <p>Contact Seller to Buy:</p>
+                    <div class="checkout-btns">
+                        <a href="https://wa.me/${p.whatsapp_number}?text=I am interested in ${p.name}" class="wa-btn" style="display:block; text-decoration:none; margin-bottom:10px;">Message on WhatsApp</a>
+                        <a href="https://t.me/${p.telegram_username.replace('@','')}" class="tg-btn" style="display:block; text-decoration:none;">Message on Telegram</a>
+                    </div>
+                </div>
+            `;
+        }
+        loadDetail();
+    </script>
 </body>
 </html>
