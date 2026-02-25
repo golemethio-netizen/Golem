@@ -57,4 +57,25 @@ document.getElementById('pImageFile').onchange = function (evt) {
         preview.style.display = 'block';
     }
 };
-   
+
+
+
+// Check if we are editing an item
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('edit');
+
+if (editId) {
+    loadEditData(editId);
+}
+
+async function loadEditData(id) {
+    const { data: p } = await _supabase.from('products').select('*').eq('id', id).single();
+    if (p) {
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pPrice').value = p.price;
+        document.getElementById('pPhone').value = p.phone_number;
+        document.getElementById('pCat').value = p.category;
+        document.querySelector('button[type="submit"]').innerText = "Update Item";
+        // Store image in a hidden way if you don't want to re-upload
+    }
+}
