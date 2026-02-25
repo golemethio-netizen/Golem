@@ -13,11 +13,11 @@ async function fetchProducts() {
     if (!productGrid) return;
 
     try {
-        const { data, error } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('status', 'approved') // Important: Only shows items approved by admin
-            .order('created_at', { ascending: false });
+       const { data, error } = await _supabase
+    .from('products')
+    .select('*')
+    .eq('status', 'approved') // This automatically hides 'pending' AND 'sold' items
+    .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -169,6 +169,7 @@ async function checkAuthToSell() {
         window.location.href = 'login.html';
     }
 }
+
 
 
 
