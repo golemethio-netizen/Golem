@@ -106,3 +106,14 @@ function filterCategory(cat) {
 
     fetchProducts(cat);
 }
+
+async function loadDynamicFilters() {
+    const filterContainer = document.querySelector('.filter-container'); // Ensure you have this class in HTML
+    const { data: cats } = await _supabase.from('categories').select('name');
+    
+    let html = `<button class="filter-btn active" onclick="filterCategory('All')">All</button>`;
+    cats.forEach(c => {
+        html += `<button class="filter-btn" onclick="filterCategory('${c.name}')">${c.name}</button>`;
+    });
+    filterContainer.innerHTML = html;
+}
