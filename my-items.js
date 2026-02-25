@@ -20,23 +20,26 @@ async function fetchMyItems() {
         return;
     }
 
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
-            <img src="${p.image}" alt="${p.name}">
-            <div class="product-info">
-                <h3>${p.name}</h3>
+    // Inside the mapping in my-items.js
+grid.innerHTML = products.map(p => `
+    <div class="product-card">
+        <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
+        <img src="${p.image}">
+        <div class="product-info">
+            <h3>${p.name}</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
                 <p class="price">${p.price} ETB</p>
-                
-                <div class="manage-btns">
-                    <button class="edit-btn" onclick="editItem('${p.id}')">✏️ Edit</button>
-                    <button class="delete-btn" onclick="deleteItem('${p.id}', '${p.image}')">🗑️ Delete</button>
-                    <button class="share-btn" onclick="shareItem('${p.id}', '${p.name}')">🔗 Share</button>
-                </div>
+                <span style="font-size:0.8rem; color:#666;">👁️ ${p.views || 0} views</span>
+            </div>
+            
+            <div class="manage-btns">
+                <button class="edit-btn" onclick="editItem('${p.id}')">✏️ Edit</button>
+                <button class="delete-btn" onclick="deleteItem('${p.id}')">🗑️ Delete</button>
+                <button class="share-btn" onclick="shareItem('${p.id}')">🔗 Share</button>
             </div>
         </div>
-    `).join('');
-}
+    </div>
+`).join('');
 
 // DELETE FUNCTION
 async function deleteItem(id, imageUrl) {
