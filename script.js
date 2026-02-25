@@ -41,17 +41,7 @@ function renderProducts(products) {
     }
 
     productGrid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p class="price">${p.price} ETB</p>
-                <button class="main-btn" onclick="openDetails('${p.id}')">View Details</button>
-            </div>
-        </div>
 
-
-// Inside your renderProducts map loop
 <div class="product-info">
     <h3>${p.name}</h3>
     <p class="price">${p.price} ETB</p>
@@ -131,5 +121,6 @@ function openAuthModal() {
 function closeAuthModal() {
     document.getElementById('authModal').style.display = 'none';
 }
+
 
 
