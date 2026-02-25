@@ -1,3 +1,23 @@
+
+// Add this to the very top of admin.js
+async function checkAdmin() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    // Replace with YOUR actual email address
+    const adminEmail = "your-email@example.com"; 
+
+    if (!user || user.email !== adminEmail) {
+        alert("Access Denied. Admins only.");
+        window.location.href = 'index.html';
+    }
+}
+checkAdmin();
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user || user.email !== 'yohannes.surafel@gmail.com') { // CHANGE THIS
