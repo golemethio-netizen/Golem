@@ -1,17 +1,15 @@
+// Inside admin.js at the very top
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Security Check
     const { data: { user } } = await _supabase.auth.getUser();
     
-    // Change this to YOUR email
-    if (!user || user.email !== 'your-admin-email@gmail.com') {
-        alert("Restricted Access: Admins Only");
+    // Add your email here too
+    if (!user || user.email !== 'yohannes.surafel@gmail.com') {
+        alert("Admin Access Required");
         window.location.href = 'index.html';
         return;
     }
-
-    loadDashboard();
+    loadPendingItems();
 });
-
 async function loadDashboard() {
     const grid = document.getElementById('adminGrid');
     grid.innerHTML = "<p>Loading pending items...</p>";
