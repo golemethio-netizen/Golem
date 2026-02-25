@@ -54,7 +54,7 @@ function renderProducts(products) {
                 <div class="product-info">
                     <h3>${name}</h3>
                     <p class="price">${price} ETB</p>
-                   // Inside your renderProducts function
+                   
 <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>
                 </div>
             </div>
@@ -155,6 +155,7 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
 
 
 
