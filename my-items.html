@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-    // Add this inside fetchMyItems after fetching 'products'
-const totalViews = products.reduce((sum, p) => sum + (p.views || 0), 0);
-document.getElementById('statsSummary').innerHTML = `
-    <div style="background:white; padding:15px; border-radius:10px; margin-bottom:20px; display:flex; justify-content:space-around; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-        <div><p style="margin:0; font-size:0.8rem; color:#666;">Active Items</p><strong>${products.length}</strong></div>
-        <div><p style="margin:0; font-size:0.8rem; color:#666;">Total Interest</p><strong>👁️ ${totalViews}</strong></div>
-    </div>
-`;
 <head>
     <meta charset="UTF-8">
-    <title>My Items</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage My Items | Golem</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav><div class="logo">MY LISTINGS</div></nav>
-    <div id="myItemsGrid" class="product-grid"></div>
 
-<div class="header-actions" style="padding: 15px; text-align: center;">
-    <h2>Manage My Listings</h2>
-    <button onclick="location.href='submit.html'" class="main-btn" style="max-width: 200px;">
-        ➕ Post New Item
-    </button>
-</div>
+    <nav>
+        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
+        <div id="userMenu">
+            <button onclick="location.href='index.html'" class="filter-btn">Back to Shop</button>
+        </div>
+    </nav>
 
-<div id="myItemsGrid" class="product-grid"></div>
+    <div class="container">
+        <div id="statsSummary">
+            </div>
 
+        <div class="header-row">
+            <h2>My Listings</h2>
+            <button onclick="location.href='submit.html'" class="main-btn" style="width: auto; padding: 10px 20px;">
+                ➕ Sell New Item
+            </button>
+        </div>
 
+        <div id="myItemsGrid" class="product-grid">
+            <p class="loading">Loading your items...</p>
+        </div>
+    </div>
 
-    
+    <footer class="bottom-nav">
+        <div class="nav-item" onclick="location.href='index.html'">🏠 Home</div>
+        <div class="nav-item active" onclick="location.href='my-items.html'">📦 My Items</div>
+        <div class="nav-item" onclick="checkAuthToSell()">➕ Sell</div>
+    </footer>
+
     <script src="config.js"></script>
     <script src="my-items.js"></script>
 </body>
