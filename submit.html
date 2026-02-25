@@ -6,53 +6,12 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>Post New Item</h2>
-        <input type="text" id="itemName" placeholder="Item Name">
-        <input type="number" id="itemPrice" placeholder="Price (ETB)">
-        <select id="itemCategory">
-            <option value="Electronics">Electronics</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Art">Art</option>
-        </select>
-        <input type="text" id="waNum" placeholder="WhatsApp (251...)">
-        <input type="text" id="tgUser" placeholder="Telegram Username">
-        <input type="file" id="itemImage" accept="image/*">
-        <button onclick="submitItem()">Submit for Approval</button>
-    </div>
+<form id="uploadForm">
+    <input type="text" id="pName" placeholder="Product Name" required>
+    <input type="number" id="pPrice" placeholder="Price (ETB)" required>
+    <input type="text" id="pImg" placeholder="Image URL" required>
+    <select id="pCat"><option>Electronics</option><option>Clothing</option></select>
+    <button type="submit" class="main-btn">Post Item</button>
+</form>
 
-    <script src="config.js"></script>
-    <script>
-        async function submitItem() {
-            const imageFile = document.getElementById('itemImage').files[0];
-            const name = document.getElementById('itemName').value;
-            const wa = document.getElementById('waNum').value;
-            
-            if (!imageFile || !name || !wa) return alert("Missing fields!");
-
-            const { data: auth } = await _supabase.auth.getUser();
-            const fileName = `${Date.now()}_${imageFile.name}`;
-            
-            // Upload Image
-            await _supabase.storage.from('product-images').upload(fileName, imageFile);
-            const { data: url } = _supabase.storage.from('product-images').getPublicUrl(fileName);
-
-            // Save to DB
-            const { error } = await _supabase.from('products').insert([{
-                name,
-                price: document.getElementById('itemPrice').value,
-                category: document.getElementById('itemCategory').value,
-                whatsapp_number: wa,
-                telegram_username: document.getElementById('tgUser').value,
-                image: url.publicUrl,
-                user_id: auth.user.id,
-                status: 'pending'
-            }]);
-
-            if (error) alert(error.message);
-            else { alert("Success! Pending admin review."); location.href='index.html'; }
-        }
-    </script>
-</body>
 </html>
