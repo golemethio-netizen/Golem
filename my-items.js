@@ -37,6 +37,24 @@ grid.innerHTML = products.map(p => `
                 <button class="delete-btn" onclick="deleteItem('${p.id}')">🗑️ Delete</button>
                 <button class="share-btn" onclick="shareItem('${p.id}')">🔗 Share</button>
             </div>
+
+
+<div class="product-card" style="${isSold ? 'opacity: 0.6;' : ''}">
+        <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
+        <img src="${p.image}">
+        <div class="product-info">
+            <h3>${p.name} ${isSold ? '(SOLD)' : ''}</h3>
+            <p class="price">${p.price} ETB</p>
+            
+            <div class="manage-btns">
+                ${!isSold ? `<button class="sold-btn" onclick="markAsSold('${p.id}')">✅ Sold</button>` : ''}
+                <button class="edit-btn" onclick="editItem('${p.id}')">✏️ Edit</button>
+                <button class="delete-btn" onclick="deleteItem('${p.id}')">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+            
         </div>
     </div>
 `).join('');
@@ -70,4 +88,37 @@ function shareItem(id, name) {
 // EDIT FUNCTION (Simple version: redirects to a form)
 function editItem(id) {
     window.location.href = `submit.html?edit=${id}`;
+}
+
+
+// Inside the mapping in my-items.js
+const isSold = p.status === 'sold';
+
+grid.innerHTML = products.map(p => `
+    <div class="product-card" style="${isSold ? 'opacity: 0.6;' : ''}">
+        <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
+        <img src="${p.image}">
+        <div class="product-info">
+            <h3>${p.name} ${isSold ? '(SOLD)' : ''}</h3>
+            <p class="price">${p.price} ETB</p>
+            
+            <div class="manage-btns">
+                ${!isSold ? `<button class="sold-btn" onclick="markAsSold('${p.id}')">✅ Sold</button>` : ''}
+                <button class="edit-btn" onclick="editItem('${p.id}')">✏️ Edit</button>
+                <button class="delete-btn" onclick="deleteItem('${p.id}')">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+`).join('');
+
+// THE FUNCTION
+async function markAsSold(id) {
+    if (confirm("Mark this item as sold? It will stop appearing on the home page.")) {
+        const { error } = await _supabase
+            .from('products')
+            .update({ status: 'sold' })
+            .eq('id', id);
+
+        if (!error) location.reload();
+    }
 }
