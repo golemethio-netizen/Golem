@@ -112,3 +112,11 @@ form.onsubmit = async (e) => {
         submitBtn.disabled = false;
     }
 };
+
+
+async function loadCategoryOptions() {
+    const select = document.getElementById('pCat');
+    const { data: cats } = await _supabase.from('categories').select('name');
+    
+    select.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+}
