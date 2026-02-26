@@ -221,3 +221,30 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
 .reject-btn:hover {
     background: #ffccc7;
 }
+/* The container for the image needs to be relative */
+.img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+/* The Sold Ribbon */
+.sold-watermark {
+    position: absolute;
+    top: 20px;
+    left: -35px;
+    background: rgba(220, 53, 69, 0.9); /* Red */
+    color: white;
+    padding: 5px 40px;
+    transform: rotate(-45deg);
+    font-weight: bold;
+    font-size: 0.8rem;
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+}
+
+/* Make the sold card look slightly faded */
+.product-card.is-sold img {
+    filter: grayscale(80%) blur(1px);
+    opacity: 0.7;
+}
