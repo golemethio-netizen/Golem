@@ -200,18 +200,20 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     z-index: 5;
 }
 
+/* Force the share button to stay on top */
 .share-btn {
+    position: relative;
+    z-index: 10; /* High number to stay above image */
     background: #f0f2f5;
     border: 1px solid #ddd;
-    color: #555;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 8px 15px;
+    margin-top: 10px;
     cursor: pointer;
-    transition: 0.3s;
+    display: block !important; /* Ensure it's not hidden */
 }
 
 .share-btn:hover {
     background: #e4e6e9;
 }
+
 
