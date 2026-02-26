@@ -1,8 +1,53 @@
-// 1. Initial UI Setup on Page Load
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
+
+
+// Search Listener
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            filterSearch(term);
+        });
+    }
 });
+
+// 2. The Filter Function (No database call needed, it filters the current view)
+function filterSearch(term) {
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        // Check if title contains the search term
+        if (title.includes(term)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+
+// Optional: Show "No items found" message if all are hidden
+    const visibleCards = Array.from(cards).filter(c => c.style.display !== 'none');
+    const grid = document.getElementById('productGrid');
+    const existingNoMatch = document.getElementById('noMatchMsg');
+
+    if (visibleCards.length === 0) {
+        if (!existingNoMatch) {
+            const msg = document.createElement('p');
+            msg.id = 'noMatchMsg';
+            msg.innerText = "No items match your search.";
+            msg.style.textAlign = "center";
+            grid.appendChild(msg);
+        }
+    } else if (existingNoMatch) {
+        existingNoMatch.remove();
+    }
+}
+
+
 
 // 2. Fetch Approved Products from Supabase
 async function fetchProducts(category = 'All') {
@@ -117,3 +162,4 @@ async function loadDynamicFilters() {
     });
     filterContainer.innerHTML = html;
 }
+
