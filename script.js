@@ -113,6 +113,16 @@ function renderProducts(products) {
                        <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">Buy Now</button>
                     }
                 </div>
+
+// In the mapping loop
+const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
+
+// Inside the HTML return string
+`<a href="${telegramLink}" target="_blank" class="tg-btn">
+    ✈️ Message on Telegram
+</a>`
+
+                
             </div>
         `;
     }).join('');
@@ -229,4 +239,5 @@ function handleViewAndBuy(id) {
     incrementView(id); // Count the view in the background
     location.href = `checkout.html?id=${id}`; // Move to checkout
 }
+
 
