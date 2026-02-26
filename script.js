@@ -211,5 +211,16 @@ async function shareItem(name, price, id) {
     }
 }
 
+async function incrementView(productId) {
+    // This uses a special Supabase trick to increment a number safely
+    const { error } = await _supabase.rpc('increment_views', { row_id: productId });
+
+    // If you haven't set up the RPC function yet, use this simpler method:
+    if (error) {
+        // Fallback: Fetch current views, add 1, then update
+        const { data } = await _supabase.from('products').select('views').eq('id', productId).single();
+        await _supabase.from('products').update({ views: (data.views || 0) + 1 }).eq('id', productId);
+    }
+}
 
 
