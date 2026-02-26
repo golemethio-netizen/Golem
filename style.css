@@ -206,3 +206,18 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
 .share-btn:hover {
     background: #e4e6e9;
 }
+
+.reject-btn {
+    background: #fff1f0;
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.reject-btn:hover {
+    background: #ffccc7;
+}
