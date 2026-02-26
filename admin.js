@@ -108,3 +108,13 @@ async function rejectItem(id, imageUrl) {
         }
     }
 }
+
+
+async function toggleSponsored(id, currentStatus) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ is_sponsored: !currentStatus })
+        .eq('id', id);
+
+    if (!error) fetchPendingItems(); // or wherever you are viewing the list
+}
