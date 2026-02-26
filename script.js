@@ -95,12 +95,27 @@ async function fetchProducts(category = 'All') {
 // 3. Render Product Cards to HTML
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
-    grid.innerHTML = products.map(p => `
-        <div class="product-card ${p.is_sponsored ? 'sponsored-card' : ''}">
-            ${p.is_sponsored ? '<div class="sponsored-tag">⭐ SPONSORED</div>' : ''}
-            <img src="${p.image}">
+    grid.innerHTML = products.map(p => {
+        const isSold = p.status === 'sold';
+        
+        return `
+            <div class="product-card ${isSold ? 'is-sold' : ''}">
+                <div class="img-wrapper">
+                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                    <img src="${p.image}" alt="${p.name}">
+                </div>
+                <div class="product-info">
+                    <h3>${p.name}</h3>
+                    <p class="price">${p.price} ETB</p>
+                    ${isSold ? 
+                        `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
+                        `<button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>`
+                    }
+                </div>
             </div>
-    `).join('');
+        `;
+    }).join('');
+}
 
 
     // Add this inside your renderProducts mapping
@@ -195,5 +210,6 @@ async function shareItem(name, price, id) {
         alert("Link copied to clipboard! Share it on Telegram or WhatsApp.");
     }
 }
+
 
 
