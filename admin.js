@@ -118,3 +118,38 @@ async function toggleSponsored(id, currentStatus) {
 
     if (!error) fetchPendingItems(); // or wherever you are viewing the list
 }
+// Inside your admin.js render loop
+grid.innerHTML = products.map(p => `
+    <div class="admin-card">
+        <img src="${p.image}" style="width:100px;">
+        <div class="info">
+            <h3>${p.name}</h3>
+            <p>${p.price} ETB</p>
+            <div class="admin-actions">
+                <button class="approve-btn" onclick="approveItem('${p.id}')">✅ Approve</button>
+                <button class="reject-btn" onclick="rejectItem('${p.id}', '${p.image}')">❌ Reject</button>
+            </div>
+        </div>
+    </div>
+`).join('');
+
+async function rejectItem(id, imageUrl) {
+    const reason = prompt("Why are you rejecting this item?");
+    
+    if (reason === null) return; // User clicked Cancel
+
+    const { error } = await _supabase
+        .from('products')
+        .update({ 
+            status: 'rejected',
+            rejection_reason: reason 
+        })
+        .eq('id', id);
+
+    if (!error) {
+        alert("Item rejected.");
+        fetchPendingItems(); // Refresh the list
+    } else {
+        alert("Error: " + error.message);
+    }
+}
