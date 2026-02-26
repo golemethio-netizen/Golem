@@ -21,6 +21,22 @@
         <input type="text" id="searchInput" placeholder="Search for items (e.g. iPhone, Sofa...)" 
                style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 1rem;">
     </div>
+<div class="sort-container" style="padding: 10px 15px; display: flex; justify-content: flex-end;">
+    <select id="sortSelect" onchange="fetchProducts()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd; outline: none; background: #fff;">
+        <option value="newest">🆕 Newest First</option>
+        <option value="price_low">💰 Price: Low to High</option>
+        <option value="price_high">💎 Price: High to Low</option>
+        <option value="popular">🔥 Most Viewed</option>
+    </select>
+</div>
+
+<div style="display: flex; gap: 10px; justify-content: center; padding: 0 15px 15px;">
+    <input type="number" id="minPrice" placeholder="Min Price" style="width: 100px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+    <input type="number" id="maxPrice" placeholder="Max Price" style="width: 100px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+    <button onclick="applyPriceFilter()" class="filter-btn" style="padding: 5px 15px;">Apply</button>
+</div>
+
+        
 </div>
 
     <div class="filter-bar">
@@ -48,6 +64,7 @@
 
 </body>
 </html>
+
 
 
 
