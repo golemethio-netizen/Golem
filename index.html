@@ -15,9 +15,13 @@
             </div>
     </nav>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search items..." onkeyup="searchProducts()">
+    <div class="search-container" style="padding: 15px; max-width: 800px; margin: 0 auto;">
+    <div style="position: relative; display: flex; align-items: center;">
+        <span style="position: absolute; left: 15px; color: #888;">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search for items (e.g. iPhone, Sofa...)" 
+               style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 1rem;">
     </div>
+</div>
 
     <div class="filter-bar">
      <button class="filter-btn active" onclick="filterCategory('All')">All</button>
@@ -44,6 +48,7 @@
 
 </body>
 </html>
+
 
 
 
