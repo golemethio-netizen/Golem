@@ -175,5 +175,25 @@ async function loadDynamicFilters() {
 }
 
 
+async function shareItem(name, price, id) {
+    const shareUrl = `${window.location.origin}/checkout.html?id=${id}`;
+    const shareText = `Check out this ${name} for ${price} ETB on Golem Marketplace!`;
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Golem Marketplace',
+                text: shareText,
+                url: shareUrl,
+            });
+        } catch (err) {
+            console.log("Share cancelled");
+        }
+    } else {
+        // Fallback: Copy to clipboard if Web Share isn't supported (on some PCs)
+        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        alert("Link copied to clipboard! Share it on Telegram or WhatsApp.");
+    }
+}
 
 
