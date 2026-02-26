@@ -109,7 +109,8 @@ function renderProducts(products) {
                     <p class="price">${p.price} ETB</p>
                     ${isSold ? 
                         `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
-                        `<button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>`
+                     
+                       <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">Buy Now</button>
                     }
                 </div>
             </div>
@@ -222,5 +223,6 @@ async function incrementView(productId) {
         await _supabase.from('products').update({ views: (data.views || 0) + 1 }).eq('id', productId);
     }
 }
+
 
 
