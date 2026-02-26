@@ -52,6 +52,19 @@
                 return;
             }
 
+
+function shareToTelegram() {
+    const text = encodeURIComponent(`Check this out on Golem: ${window.location.href}`);
+    window.open(`https://t.me/share/url?url=${window.location.href}&text=${text}`, '_blank');
+}
+
+function shareToWhatsApp() {
+    const text = encodeURIComponent(`Check this out on Golem: ${window.location.href}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+
+            
             // 3. Display the data
            // Inside your loadProductDetails function in checkout.html
 // Inside your loadProductDetails function in checkout.html
@@ -92,6 +105,20 @@ display.innerHTML = `
            </div>
         </a>
     </div>
+
+
+
+<div class="share-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+    <button onclick="shareToTelegram()" style="background: #0088cc; color: white; flex: 1; border: none; padding: 10px; border-radius: 8px;">
+        ✈️ Telegram
+    </button>
+    <button onclick="shareToWhatsApp()" style="background: #25D366; color: white; flex: 1; border: none; padding: 10px; border-radius: 8px;">
+        💬 WhatsApp
+    </button>
+</div>
+
+
+               
 </div>
             `;
         }
