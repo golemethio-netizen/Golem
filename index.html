@@ -2,74 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Golem Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Golem Marketplace | Ethiopia</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    
 </head>
 <body>
+
     <nav>
-        <div class="logo">GOLEM</div>
-        <div class="nav-right" id="userMenu">
+        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
+        <div id="userMenu">
             </div>
     </nav>
 
-    <div class="search-container" style="padding: 15px; max-width: 800px; margin: 0 auto;">
-    <div style="position: relative; display: flex; align-items: center;">
-        <span style="position: absolute; left: 15px; color: #888;">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search for items (e.g. iPhone, Sofa...)" 
-               style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 1rem;">
-    </div>
-<div class="sort-container" style="padding: 10px 15px; display: flex; justify-content: flex-end;">
-    <select id="sortSelect" onchange="fetchProducts()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd; outline: none; background: #fff;">
-        <option value="newest">🆕 Newest First</option>
-        <option value="price_low">💰 Price: Low to High</option>
-        <option value="price_high">💎 Price: High to Low</option>
-        <option value="popular">🔥 Most Viewed</option>
-    </select>
-</div>
+    <div class="container">
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="searchInput" placeholder="Search items...">
+            </div>
+        </div>
 
-<div style="display: flex; gap: 10px; justify-content: center; padding: 0 15px 15px;">
-    <input type="number" id="minPrice" placeholder="Min Price" style="width: 100px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
-    <input type="number" id="maxPrice" placeholder="Max Price" style="width: 100px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
-    <button onclick="applyPriceFilter()" class="filter-btn" style="padding: 5px 15px;">Apply</button>
-</div>
+        <div class="action-bar">
+            <div class="filter-container" id="categoryFilters">
+                </div>
+            <select id="sortSelect" onchange="fetchProducts()">
+                <option value="newest">🆕 Newest</option>
+                <option value="price_low">💰 Price: Low</option>
+                <option value="price_high">💎 Price: High</option>
+                <option value="popular">🔥 Popular</option>
+            </select>
+        </div>
 
-        
-</div>
-
-    <div class="filter-bar">
-     <button class="filter-btn active" onclick="filterCategory('All')">All</button>
-<button class="filter-btn" onclick="filterCategory('Electronics')">Electronics</button>
-<button class="filter-btn" onclick="filterCategory('Clothing')">Clothing</button>
+        <div id="productGrid" class="product-grid">
+            <p class="loading">Loading marketplace...</p>
+        </div>
     </div>
 
+    <button class="fab-sell" onclick="checkAuthToSell()">➕ Sell</button>
 
-
-    <div id="productGrid" class="product-grid"></div>
-
-    <div class="footer-nav">
-        <div class="nav-item" onclick="location.href='index.html'">🏠<p>Home</p></div>
-        <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p></div>
-        <div class="nav-item" onclick="location.href='my-items.html'">📦<p>My Items</p></div>
-    </div>
-
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="config.js"></script>
-
-<script src="script.js"></script>
-
-
+    <script src="config.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
