@@ -248,3 +248,15 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     filter: grayscale(80%) blur(1px);
     opacity: 0.7;
 }
+
+.tg-btn {
+    display: block;
+    background: #0088cc;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 5px;
+}
