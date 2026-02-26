@@ -225,4 +225,8 @@ async function incrementView(productId) {
 }
 
 
+function handleViewAndBuy(id) {
+    incrementView(id); // Count the view in the background
+    location.href = `checkout.html?id=${id}`; // Move to checkout
+}
 
