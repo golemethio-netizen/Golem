@@ -191,3 +191,18 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     border-radius: 4px;
     z-index: 5;
 }
+
+.share-btn {
+    background: #f0f2f5;
+    border: 1px solid #ddd;
+    color: #555;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.share-btn:hover {
+    background: #e4e6e9;
+}
