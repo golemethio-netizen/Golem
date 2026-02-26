@@ -101,6 +101,19 @@ function renderProducts(products) {
             <img src="${p.image}">
             </div>
     `).join('');
+
+
+    // Add this inside your renderProducts mapping
+const shareData = {
+    title: p.name,
+    text: `Check out this ${p.name} for ${p.price} ETB on Golem!`,
+    url: window.location.origin + '/checkout.html?id=' + p.id
+};
+
+// Add this button HTML inside your product-card
+`<button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')">
+    📤 Share
+</button>`
 }
 
 // 4. Update Navigation UI (Login/Logout/My Items)
@@ -160,6 +173,7 @@ async function loadDynamicFilters() {
     });
     filterContainer.innerHTML = html;
 }
+
 
 
 
