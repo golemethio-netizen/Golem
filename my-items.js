@@ -133,3 +133,30 @@ grid.innerHTML = products.map(p => `
             </div>
     </div>
 `).join('');
+
+
+
+
+// Inside the mapping in my-items.js
+const isRejected = p.status === 'rejected';
+
+grid.innerHTML = products.map(p => `
+    <div class="product-card ${isRejected ? 'rejected-border' : ''}">
+        <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
+        <img src="${p.image}">
+        <div class="product-info">
+            <h3>${p.name}</h3>
+            
+            ${isRejected ? `
+                <div style="background:#fff1f0; padding:10px; border-radius:5px; margin:10px 0; border:1px solid #ffa39e;">
+                    <p style="color:#cf1322; font-size:0.8rem; margin:0;">
+                        <strong>Rejected:</strong> ${p.rejection_reason || 'No reason provided.'}
+                    </p>
+                    <p style="font-size:0.75rem; color:#666; margin-top:5px;">Click 'Edit' to fix and resubmit.</p>
+                </div>
+            ` : ''}
+
+            <p class="price">${p.price} ETB</p>
+            </div>
+    </div>
+`).join('');
