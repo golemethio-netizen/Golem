@@ -4,7 +4,7 @@ async function checkAdmin() {
     const { data: { user } } = await _supabase.auth.getUser();
     
     // Replace with YOUR actual email address
-    const adminEmail = "your-email@example.com"; 
+    const adminEmail = "yohannes.surafel@gmail.com"; 
 
     if (!user || user.email !== adminEmail) {
         alert("Access Denied. Admins only.");
