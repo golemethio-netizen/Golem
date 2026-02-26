@@ -1,10 +1,9 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
+    loadDynamicFilters();
 
-
-// Search Listener
+    // Search Listener
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -14,230 +13,147 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 2. The Filter Function (No database call needed, it filters the current view)
-function filterSearch(term) {
-    const cards = document.querySelectorAll('.product-card');
-    
-    cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        // Check if title contains the search term
-        if (title.includes(term)) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    
-//The code above filters what is already on the screen. If you want to search through all approved products in your database
-async function searchDatabase(term) {
-    const { data: products, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'approved')
-        .ilike('name', `%${term}%`); // 'ilike' makes it case-insensitive search
-
-    if (!error) renderProducts(products);
-}
-// Optional: Show "No items found" message if all are hidden
-    const visibleCards = Array.from(cards).filter(c => c.style.display !== 'none');
-    const grid = document.getElementById('productGrid');
-    const existingNoMatch = document.getElementById('noMatchMsg');
-
-    if (visibleCards.length === 0) {
-        if (!existingNoMatch) {
-            const msg = document.createElement('p');
-            msg.id = 'noMatchMsg';
-            msg.innerText = "No items match your search.";
-            msg.style.textAlign = "center";
-            grid.appendChild(msg);
-        }
-    } else if (existingNoMatch) {
-        existingNoMatch.remove();
-    }
-}
-
-
-
-// 2. Fetch Approved Products from Supabase
+// 1. Fetch Approved Products
 async function fetchProducts(category = 'All') {
-    const grid = document.getElementById('productGrid');
-    const sortOrder = document.getElementById('sortSelect').value;
+    const sortSelect = document.getElementById('sortSelect');
+    const sortOrder = sortSelect ? sortSelect.value : 'newest';
 
-    let query = _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'approved');
+    let query = _supabase.from('products').select('*').eq('status', 'approved');
 
-    // Filter by Category
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    // APPLY SORTING LOGIC
-    // We always put 'is_sponsored' (true) at the top first
+    // Sort: Sponsored items always stay at the top
     query = query.order('is_sponsored', { ascending: false });
 
-    if (sortOrder === 'newest') {
-        query = query.order('created_at', { ascending: false });
-    } else if (sortOrder === 'price_low') {
-        query = query.order('price', { ascending: true });
-    } else if (sortOrder === 'price_high') {
-        query = query.order('price', { ascending: false });
-    } else if (sortOrder === 'popular') {
-        query = query.order('views', { ascending: false });
-    }
+    if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
+    else if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
+    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+    else if (sortOrder === 'popular') query = query.order('views', { ascending: false });
 
     const { data: products, error } = await query;
     if (!error) renderProducts(products);
 }
 
-// 3. Render Product Cards to HTML
+// 2. Render Products (Fixed Syntax & Integrated Buttons)
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
+    if (!grid) return;
+
     grid.innerHTML = products.map(p => {
         const isSold = p.status === 'sold';
+        const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
         
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''}">
                 <div class="img-wrapper">
                     ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    <img src="${p.image}" alt="${p.name}">
+                    <img src="${p.image}" alt="${p.name}" loading="lazy">
                 </div>
                 <div class="product-info">
                     <h3>${p.name}</h3>
                     <p class="price">${p.price} ETB</p>
-                    ${isSold ? 
-                        `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
-                     
-                       <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">Buy Now</button>
-                    }
+                    
+                    <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
+                        ${isSold ? 
+                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
+                            `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>`
+                        }
+                        
+                        <div style="display: flex; gap: 5px;">
+                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none;">✈️ Telegram</a>
+                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤 Share</button>
+                        </div>
+                    </div>
                 </div>
-
-// In the mapping loop
-const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
-
-// Inside the HTML return string
-`<a href="${telegramLink}" target="_blank" class="tg-btn">
-    ✈️ Message on Telegram
-</a>`
-
-                
             </div>
         `;
     }).join('');
 }
 
+// 3. Search Filter (Local UI filtering)
+function filterSearch(term) {
+    const cards = document.querySelectorAll('.product-card');
+    let visibleCount = 0;
 
-    // Add this inside your renderProducts mapping
-const shareData = {
-    title: p.name,
-    text: `Check out this ${p.name} for ${p.price} ETB on Golem!`,
-    url: window.location.origin + '/checkout.html?id=' + p.id
-};
+    cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        if (title.includes(term)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
 
-// Add this button HTML inside your product-card
-`<button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')">
-    📤 Share
-</button>`
+    const grid = document.getElementById('productGrid');
+    const existingMsg = document.getElementById('noMatchMsg');
+    
+    if (visibleCount === 0 && !existingMsg) {
+        const msg = document.createElement('p');
+        msg.id = 'noMatchMsg';
+        msg.innerText = "No items match your search.";
+        msg.style.cssText = "text-align:center; grid-column:1/-1; padding:20px;";
+        grid.appendChild(msg);
+    } else if (visibleCount > 0 && existingMsg) {
+        existingMsg.remove();
+    }
 }
 
-// 4. Update Navigation UI (Login/Logout/My Items)
+// 4. View Counter & Navigation
+async function incrementView(productId) {
+    await _supabase.rpc('increment_views', { row_id: productId });
+}
+
+function handleViewAndBuy(id) {
+    incrementView(id);
+    location.href = `checkout.html?id=${id}`;
+}
+
+async function shareItem(name, price, id) {
+    const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html','')}checkout.html?id=${id}`;
+    const shareText = `Check out this ${name} for ${price} ETB on Golem Marketplace!`;
+
+    if (navigator.share) {
+        try { await navigator.share({ title: 'Golem', text: shareText, url: shareUrl }); } 
+        catch (err) { console.log("Share cancelled"); }
+    } else {
+        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        alert("Link copied to clipboard!");
+    }
+}
+
+// 5. Auth & Category UI
 async function updateUIForUser() {
     const userMenu = document.getElementById('userMenu');
     if (!userMenu) return;
 
     const { data: { user } } = await _supabase.auth.getUser();
-
-    if (user) {
-        // Logged in: Show My Items and Sign Out
-        userMenu.innerHTML = `
-            <button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
-            <button onclick="handleSignOut()" class="login-btn">Sign Out</button>
-        `;
-    } else {
-        // Not logged in: Show Sign In
-        userMenu.innerHTML = `<button onclick="location.href='login.html'" class="login-btn">Sign In</button>`;
-    }
+    userMenu.innerHTML = user ? 
+        `<button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
+         <button onclick="handleSignOut()" class="login-btn">Sign Out</button>` : 
+        `<button onclick="location.href='login.html'" class="login-btn">Sign In</button>`;
 }
 
-// 5. Handle Sign Out
 async function handleSignOut() {
-    const { error } = await _supabase.auth.signOut();
-    if (!error) window.location.reload();
-}
-
-// 6. Security Check for the "Sell" Button (index.html:33 fix)
-async function checkAuthToSell() {
-    const { data: { user } } = await _supabase.auth.getUser();
-
-    if (user) {
-        window.location.href = 'submit.html';
-    } else {
-        alert("Please Sign In to post an item.");
-        window.location.href = 'login.html';
-    }
-}
-
-// 7. Category Filter Logic for Buttons
-function filterCategory(cat) {
-    // Optional: add "active" class to clicked button
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-
-    fetchProducts(cat);
+    await _supabase.auth.signOut();
+    window.location.reload();
 }
 
 async function loadDynamicFilters() {
-    const filterContainer = document.querySelector('.filter-container'); // Ensure you have this class in HTML
+    const container = document.querySelector('.filter-container');
+    if (!container) return;
+
     const { data: cats } = await _supabase.from('categories').select('name');
-    
-    let html = `<button class="filter-btn active" onclick="filterCategory('All')">All</button>`;
-    cats.forEach(c => {
-        html += `<button class="filter-btn" onclick="filterCategory('${c.name}')">${c.name}</button>`;
-    });
-    filterContainer.innerHTML = html;
-}
-
-
-async function shareItem(name, price, id) {
-    const shareUrl = `${window.location.origin}/checkout.html?id=${id}`;
-    const shareText = `Check out this ${name} for ${price} ETB on Golem Marketplace!`;
-
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: 'Golem Marketplace',
-                text: shareText,
-                url: shareUrl,
-            });
-        } catch (err) {
-            console.log("Share cancelled");
-        }
-    } else {
-        // Fallback: Copy to clipboard if Web Share isn't supported (on some PCs)
-        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-        alert("Link copied to clipboard! Share it on Telegram or WhatsApp.");
+    if (cats) {
+        container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>` + 
+            cats.map(c => `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`).join('');
     }
 }
 
-async function incrementView(productId) {
-    // This uses a special Supabase trick to increment a number safely
-    const { error } = await _supabase.rpc('increment_views', { row_id: productId });
-
-    // If you haven't set up the RPC function yet, use this simpler method:
-    if (error) {
-        // Fallback: Fetch current views, add 1, then update
-        const { data } = await _supabase.from('products').select('views').eq('id', productId).single();
-        await _supabase.from('products').update({ views: (data.views || 0) + 1 }).eq('id', productId);
-    }
+function filterCategory(cat, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fetchProducts(cat);
 }
-
-
-function handleViewAndBuy(id) {
-    incrementView(id); // Count the view in the background
-    location.href = `checkout.html?id=${id}`; // Move to checkout
-}
-
-
