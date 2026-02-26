@@ -120,3 +120,32 @@ async function loadCategoryOptions() {
     
     select.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 }
+
+
+
+async function notifyTelegram(productName, price, category) {
+    const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; // 🚩 Put your token here
+    const CHAT_ID = 'YOUR_CHAT_ID_HERE';     // 🚩 Put your ID here
+    
+    const message = `🔔 *New Item Pending Approval!* \n\n` +
+                    `📦 *Product:* ${productName}\n` +
+                    `💰 *Price:* ${price} ETB\n` +
+                    `📂 *Category:* ${category}\n\n` +
+                    `🔗 [Review in Admin Dashboard](https://golemethio-netizen.github.io/Golem/admin.html)`;
+
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        });
+    } catch (err) {
+        console.error("Telegram notification failed", err);
+    }
+}
