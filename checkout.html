@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Golem</title>
-   
-
-
-<meta property="og:title" content="Golem Marketplace">
-<meta property="og:description" content="Buy and sell items easily on Golem.">
-<meta property="og:image" content="https://grand-sawine-a63bc3.netlify.app/logo.png">
-<meta property="og:type" content="website">
-
     
-   
+    <meta property="og:title" content="Golem Marketplace">
+    <meta property="og:description" content="Check out this item on Golem!">
+    <meta property="og:image" content="https://grand-sawine-a63bc3.netlify.app/logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav>
@@ -21,26 +19,46 @@
     </nav>
     
     <div class="container" style="padding: 20px; text-align: center;">
-        <div id="checkoutDetails" class="product-card" style="max-width: 500px; margin: auto;">
-            <p>Gathering item details...</p>
+        <div id="checkoutDetails" class="product-card" style="max-width: 500px; margin: auto; background: white; padding: 0; overflow: hidden;">
+            <div style="padding: 50px;">
+                <p>Gathering item details...</p>
+            </div>
         </div>
     </div>
 
-   
+    <script src="config.js"></script>
+
     <script>
+        // 1. Share Functions
+        function shareToTelegram(url, name) {
+            const text = encodeURIComponent(`Check out this ${name} on Golem!`);
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${text}`, '_blank');
+        }
+
+        function shareToWhatsApp(url) {
+            const text = encodeURIComponent(`Check this out on Golem: ${url}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        }
+
+        // 2. View Increment Logic
+        async function incrementViews(productId, currentViews) {
+            await _supabase
+                .from('products')
+                .update({ views: (currentViews || 0) + 1 })
+                .eq('id', productId);
+        }
+
+        // 3. Main Loader
         async function loadProductDetails() {
             const display = document.getElementById('checkoutDetails');
-            
-            // 1. Get ID from the URL bar (e.g., checkout.html?id=123)
             const params = new URLSearchParams(window.location.search);
             const productId = params.get('id');
 
             if (!productId) {
-                display.innerHTML = "<h3>Product not found.</h3><a href='index.html'>Back to Shop</a>";
+                display.innerHTML = "<div style='padding:40px;'><h3>Product not found.</h3><a href='index.html'>Back to Shop</a></div>";
                 return;
             }
 
-            // 2. Fetch specific product from Supabase
             const { data: p, error } = await _supabase
                 .from('products')
                 .select('*')
@@ -48,104 +66,47 @@
                 .single();
 
             if (error || !p) {
-                display.innerHTML = "<h3>Error loading product.</h3>";
+                display.innerHTML = "<div style='padding:40px;'><h3>Error loading product.</h3></div>";
                 return;
             }
 
+            // Trigger view increment
+            incrementViews(p.id, p.views);
 
-function shareToTelegram() {
-    const text = encodeURIComponent(`Check this out on Golem: ${window.location.href}`);
-    window.open(`https://t.me/share/url?url=${window.location.href}&text=${text}`, '_blank');
-}
+            const currentUrl = window.location.href;
 
-function shareToWhatsApp() {
-    const text = encodeURIComponent(`Check this out on Golem: ${window.location.href}`);
-    window.open(`https://wa.me/?text=${text}`, '_blank');
-}
+            // 4. Render UI
+            display.innerHTML = `
+                <img src="${p.image}" style="width:100%; height:300px; object-fit:cover;">
+                <div class="product-info" style="padding:20px; text-align:left;">
+                    <h2 style="margin-bottom:5px;">${p.name}</h2>
+                    <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold; margin-bottom:15px;">${p.price} ETB</p>
+                    
+                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">${p.description || 'No description provided.'}</p>
 
+                    <div style="display:grid; gap:12px; margin-top:20px;">
+                        <a href="tel:${p.phone_number}" class="main-btn" style="background:#007bff; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; color:white; padding:12px; border-radius:8px;">
+                           📞 Call Seller
+                        </a>
+                        
+                        <a href="https://wa.me/251${p.phone_number.startsWith('0') ? p.phone_number.substring(1) : p.phone_number}" 
+                           target="_blank" class="main-btn" style="background:#25D366; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; color:white; padding:12px; border-radius:8px;">
+                           💬 WhatsApp
+                        </a>
+                    </div>
 
-            
-            // 3. Display the data
-           // Inside your loadProductDetails function in checkout.html
-// Inside your loadProductDetails function in checkout.html
-display.innerHTML = `
-    <img src="${p.image}" style="width:100%; border-radius:10px;">
-    <div class="product-info" style="padding:20px;">
-        <h2>${p.name}</h2>
-        <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold;">${p.price} ETB</p>
-        
-        <div style="display:grid; gap:12px; margin-top:20px;">
-            <a href="tel:${p.phone_number}" class="main-btn" style="background:#007bff; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
-               📞 Call Seller
-            </a>
-            
-            <a href="https://wa.me/251${p.phone_number.startsWith('0') ? p.phone_number.substring(1) : p.phone_number}" 
-               class="main-btn" style="background:#25D366; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
-               💬 WhatsApp
-            </a>
-        </div>
-    </div>
-`;
-
-                // Add this inside the innerHTML template in checkout.html
-<div class="share-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-    <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Share this item:</p>
-    <div style="display: flex; justify-content: center; gap: 15px;">
-        <a href="https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Check out this ' + p.name + ' on Golem!')}" 
-           target="_blank" style="text-decoration: none;">
-           <div style="background: #0088cc; color: white; padding: 10px 15px; border-radius: 5px; font-size: 0.9rem;">
-              ✈️ Telegram
-           </div>
-        </a>
-
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" 
-           target="_blank" style="text-decoration: none;">
-           <div style="background: #3b5998; color: white; padding: 10px 15px; border-radius: 5px; font-size: 0.9rem;">
-              🔵 Facebook
-           </div>
-        </a>
-    </div>
-
-
-
-<div class="share-actions" style="margin-top: 20px; display: flex; gap: 10px;">
-    <button onclick="shareToTelegram()" style="background: #0088cc; color: white; flex: 1; border: none; padding: 10px; border-radius: 8px;">
-        ✈️ Telegram
-    </button>
-    <button onclick="shareToWhatsApp()" style="background: #25D366; color: white; flex: 1; border: none; padding: 10px; border-radius: 8px;">
-        💬 WhatsApp
-    </button>
-</div>
-
-
-               
-</div>
+                    <div class="share-section" style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; text-align:center;">
+                        <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Share this item:</p>
+                        <div style="display: flex; justify-content: center; gap: 10px;">
+                            <button onclick="shareToTelegram('${currentUrl}', '${p.name}')" style="background: #0088cc; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor:pointer; flex:1;">✈️ Telegram</button>
+                            <button onclick="shareToWhatsApp('${currentUrl}')" style="background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor:pointer; flex:1;">💬 WhatsApp</button>
+                        </div>
+                    </div>
+                </div>
             `;
         }
 
-        // Run the function when the page loads
         document.addEventListener('DOMContentLoaded', loadProductDetails);
-    // Inside checkout.html, right after you successfully fetch the product 'p'
-async function incrementViews(productId, currentViews) {
-    await _supabase
-        .from('products')
-        .update({ views: currentViews + 1 })
-        .eq('id', productId);
-}
-
-// Call it after data is loaded
-if (p) {
-    incrementViews(p.id, p.views || 0);
-    // ... rest of your display logic
-}
     </script>
-
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-<link rel="stylesheet" href="style.css">
-<script src="config.js"></script>
-<script src="script.js"></script>
-    
 </body>
 </html>
