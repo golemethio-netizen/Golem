@@ -28,7 +28,17 @@ function filterSearch(term) {
         }
     });
 
+    
+//The code above filters what is already on the screen. If you want to search through all approved products in your database
+async function searchDatabase(term) {
+    const { data: products, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved')
+        .ilike('name', `%${term}%`); // 'ilike' makes it case-insensitive search
 
+    if (!error) renderProducts(products);
+}
 // Optional: Show "No items found" message if all are hidden
     const visibleCards = Array.from(cards).filter(c => c.style.display !== 'none');
     const grid = document.getElementById('productGrid');
@@ -162,4 +172,5 @@ async function loadDynamicFilters() {
     });
     filterContainer.innerHTML = html;
 }
+
 
