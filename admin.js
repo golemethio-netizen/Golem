@@ -81,3 +81,30 @@ async function deleteCategory(id) {
         fetchCategories();
     }
 }
+
+
+
+async function rejectItem(id, imageUrl) {
+    const reason = prompt("Why are you rejecting this item? (e.g., Low quality image, duplicate, etc.)");
+    
+    // If they click cancel, stop the function
+    if (reason === null) return; 
+
+    if (confirm("Confirm rejection? This will notify the seller on their dashboard.")) {
+        // Instead of deleting, we change status to 'rejected' and save the reason
+        const { error } = await _supabase
+            .from('products')
+            .update({ 
+                status: 'rejected',
+                rejection_reason: reason 
+            })
+            .eq('id', id);
+
+        if (!error) {
+            alert("Item rejected and seller notified.");
+            fetchPendingItems();
+        } else {
+            alert("Error: " + error.message);
+        }
+    }
+}
