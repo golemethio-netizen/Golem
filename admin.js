@@ -1,31 +1,104 @@
 
 // Add this to the very top of admin.js
+// 1. SECURITY CHECK (Change this to your actual email)
+const ADMIN_EMAIL = "yohannes.surafel@gmail.com"; 
+
 async function checkAdmin() {
     const { data: { user } } = await _supabase.auth.getUser();
-    
-    // Replace with YOUR actual email address
-    const adminEmail = "yohannes.surafel@gmail.com"; 
-
-    if (!user || user.email !== adminEmail) {
-        alert("Access Denied. Admins only.");
+    if (!user || user.email !== ADMIN_EMAIL) {
+        alert("Access Denied.");
         window.location.href = 'index.html';
     }
 }
 checkAdmin();
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPendingItems();
+	fetchCategories();
+	
+});
 
+// 2. FETCH PENDING ITEMS
+async function fetchPendingItems() {
+    const grid = document.getElementById('adminGrid');
+    
+    const { data: products, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true });
 
-
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user || user.email !== 'yohannes.surafel@gmail.com') { // CHANGE THIS
-        window.location.href = 'index.html';
+    if (error) {
+        grid.innerHTML = `<p>Error: ${error.message}</p>`;
         return;
     }
-    loadPending();
-});
+
+    if (products.length === 0) {
+        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:50px;">
+            <h3>🎉 No pending items!</h3>
+        </div>`;
+        return;
+    }
+
+
+
+// 3. RENDER CARDS WITH BOTH BUTTONS
+    grid.innerHTML = products.map(p => `
+        <div class="product-card">
+            <img src="${p.image}" style="width:100%; height:150px; object-fit:cover; border-radius:8px;">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p class="price">${p.price} ETB</p>
+                <p style="font-size:0.8rem; color:#666;">Seller: ${p.phone_number}</p>
+                
+                <div class="manage-btns" style="display: flex; gap: 10px; margin-top:10px;">
+                    <button class="sold-btn" onclick="approveItem('${p.id}')" style="background:#2e7d32; flex:1;">✔️ Approve</button>
+                    <button class="reject-btn" onclick="rejectItem('${p.id}')" style="background:#d32f2f; color:white; border:none; padding:10px; border-radius:5px; flex:1; cursor:pointer;">❌ Reject</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+// 4. APPROVE FUNCTION
+async function approveItem(id) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: 'approved' })
+        .eq('id', id);
+
+    if (!error) {
+        alert("Item Approved!");
+        fetchPendingItems();
+    }
+}
+
+// 5. REJECT FUNCTION (With Reason)
+async function rejectItem(id) {
+    const reason = prompt("Enter the reason for rejection (e.g., Price too high, blurry photo):");
+    
+    if (reason === null) return; // If they click cancel
+
+    const { error } = await _supabase
+        .from('products')
+        .update({ 
+            status: 'rejected', 
+            rejection_reason: reason 
+        })
+        .eq('id', id);
+
+    if (!error) {
+        alert("Item Rejected.");
+        fetchPendingItems();
+    } else {
+        alert("Error rejecting item: " + error.message);
+    }
+
+
+
+
 
 async function loadPending() {
     const { data } = await _supabase.from('products').select('*').eq('status', 'pending');
@@ -46,11 +119,7 @@ async function updateStatus(id, status) {
 }
 
 
-// Load categories on start
-document.addEventListener('DOMContentLoaded', () => {
-    fetchPendingItems();
-    fetchCategories();
-});
+
 
 async function fetchCategories() {
     const list = document.getElementById('categoryList');
@@ -118,20 +187,7 @@ async function toggleSponsored(id, currentStatus) {
 
     if (!error) fetchPendingItems(); // or wherever you are viewing the list
 }
-// Inside your admin.js render loop
-grid.innerHTML = products.map(p => `
-    <div class="admin-card">
-        <img src="${p.image}" style="width:100px;">
-        <div class="info">
-            <h3>${p.name}</h3>
-            <p>${p.price} ETB</p>
-            <div class="admin-actions">
-                <button class="approve-btn" onclick="approveItem('${p.id}')">✅ Approve</button>
-                <button class="reject-btn" onclick="rejectItem('${p.id}', '${p.image}')">❌ Reject</button>
-            </div>
-        </div>
-    </div>
-`).join('');
+
 
 async function rejectItem(id, imageUrl) {
     const reason = prompt("Why are you rejecting this item?");
