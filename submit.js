@@ -110,7 +110,21 @@ form.onsubmit = async (e) => {
         alert("Error: " + err.message);
         submitBtn.innerText = editId ? "Update Item" : "Post for Approval";
         submitBtn.disabled = false;
+    
     }
+
+// Inside your product submission logic
+const { error } = await _supabase.from('products').insert([productData]);
+
+if (!error) {
+    // 🚩 Add this line right here!
+    notifyTelegram(productData.name, productData.price, productData.category);
+    
+    alert("Item submitted for approval!");
+    location.href = 'index.html';
+}
+
+    
 };
 
 
