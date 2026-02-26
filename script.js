@@ -146,14 +146,31 @@ async function loadDynamicFilters() {
     if (!container) return;
 
     const { data: cats } = await _supabase.from('categories').select('name');
+    
     if (cats) {
+        // Added 'this' as the second argument below 🚩
         container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>` + 
-            cats.map(c => `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`).join('');
+            cats.map(c => `
+                <button class="filter-btn" onclick="filterCategory('${c.name}', this)">
+                    ${c.name}
+                </button>
+            `).join('');
     }
 }
 
 function filterCategory(cat, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    // 1. Safety Check: If btn is undefined, find the button using the text content
+    if (!btn) {
+        const allBtns = document.querySelectorAll('.filter-btn');
+        btn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
+    }
+
+    // 2. Only run classList logic if we actually found a button
+    if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    
+    // 3. This part will now run perfectly!
     fetchProducts(cat);
 }
