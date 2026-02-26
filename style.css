@@ -2,17 +2,8 @@
 body { font-family: sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
 nav { display: flex; justify-content: space-between; padding: 15px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
-.product-card {
-    position: relative;
-    overflow: visible; /* Changed from hidden to show badges/buttons */
-    display: flex;
-    flex-direction: column;
-}
-/* Make sure the image doesn't cover the buttons */
-.product-card img {
-    width: 100%;
-    z-index: 1;
-}
+.product-card { background: white; border-radius: 10px; overflow: hidden; position: relative; }
+.product-card img { width: 100%; height: 150px; object-fit: cover; }
 .main-btn { background: var(--primary); color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
 .footer-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #ddd; }
 
@@ -29,10 +20,11 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     z-index: 5;
 }
 
-/* Make sure the image doesn't cover the buttons */
 .product-card img {
     width: 100%;
-    z-index: 1;
+    height: 200px;
+    object-fit: cover; /* This keeps images from stretching */
+    border-bottom: 1px solid #eee;
 }
 
 .checkout-details {
@@ -200,20 +192,17 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     z-index: 5;
 }
 
-/* Force the share button to stay on top */
 .share-btn {
-    position: relative;
-    z-index: 10; /* High number to stay above image */
     background: #f0f2f5;
     border: 1px solid #ddd;
-    padding: 8px 15px;
-    margin-top: 10px;
+    color: #555;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
     cursor: pointer;
-    display: block !important; /* Ensure it's not hidden */
+    transition: 0.3s;
 }
 
 .share-btn:hover {
     background: #e4e6e9;
 }
-
-
