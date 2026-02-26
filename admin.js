@@ -22,25 +22,35 @@ document.addEventListener('DOMContentLoaded', () => {
 // 2. FETCH PENDING ITEMS
 async function fetchPendingItems() {
     const grid = document.getElementById('adminGrid');
-    
+    console.log("Admin: Fetching pending items..."); // Check your browser console (F12) for this!
+
     const { data: products, error } = await _supabase
         .from('products')
         .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: true });
+        .eq('status', 'pending');
 
     if (error) {
         grid.innerHTML = `<p>Error: ${error.message}</p>`;
         return;
     }
 
-    if (products.length === 0) {
-        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:50px;">
-            <h3>🎉 No pending items!</h3>
-        </div>`;
+    if (!products || products.length === 0) {
+        grid.innerHTML = "<h3>No items to approve right now.</h3>";
         return;
     }
 
+    grid.innerHTML = products.map(p => `
+        <div class="product-card" style="border: 1px solid #ddd; padding: 10px; border-radius: 10px;">
+            <img src="${p.image}" style="width:100%; height:150px; object-fit:cover;">
+            <h3>${p.name}</h3>
+            <p>${p.price} ETB</p>
+            <div class="admin-actions-container">
+                <button class="approve-btn" onclick="approveItem('${p.id}')">Approve</button>
+                <button class="reject-btn" onclick="rejectItem('${p.id}')">Reject</button>
+            </div>
+        </div>
+    `).join('');
+}
 
 
 // 3. RENDER CARDS WITH BOTH BUTTONS
