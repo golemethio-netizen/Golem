@@ -174,3 +174,20 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
 .rejected-border {
     border: 2px solid #ff4d4f !important;
 }
+
+.sponsored-card {
+    border: 2px solid #ffd700; /* Gold border */
+    background: #fffdf0;
+}
+.sponsored-tag {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: #ffd700;
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 5;
+}
