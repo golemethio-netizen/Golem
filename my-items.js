@@ -38,7 +38,8 @@ async function fetchMyItems() {
                 <strong style="font-size:1.2rem;">${products.length}</strong>
             </div>
             <div style="border-left: 1px solid #ddd; border-right: 1px solid #ddd; padding: 0 20px;">
-                <p style="margin:0; font-size:0.8rem; color:#666;">Total Views</p>
+               
+<p style="font-size:0.8rem; color:#666; margin-bottom:10px;">👁️ ${p.views || 0} views</p>
                 <strong style="font-size:1.2rem;">👁️ ${totalViews}</strong>
             </div>
             <div>
