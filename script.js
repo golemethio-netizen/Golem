@@ -93,9 +93,22 @@ function filterUI(term) {
     });
 }
 
+
+
+
 async function loadCategories() {
-    const { data: cats } = await _supabase.from('categories').select('name');
     const container = document.getElementById('categoryFilters');
+    
+    // Safety Check: If the container doesn't exist on this page, stop here.
+    if (!container) return; 
+
+    const { data: cats, error } = await _supabase.from('categories').select('name');
+    
+    if (error) {
+        console.error("Error loading categories:", error);
+        return;
+    }
+
     if (cats) {
         container.innerHTML = `<button class="filter-btn active" onclick="fetchProducts('All')">All</button>` + 
             cats.map(c => `<button class="filter-btn" onclick="fetchProducts('${c.name}')">${c.name}</button>`).join('');
