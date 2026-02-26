@@ -61,57 +61,45 @@ async function searchDatabase(term) {
 
 // 2. Fetch Approved Products from Supabase
 async function fetchProducts(category = 'All') {
-    const productGrid = document.getElementById('productGrid');
-    if (!productGrid) return;
-
-    productGrid.innerHTML = '<p class="loading">Loading amazing items...</p>';
+    const grid = document.getElementById('productGrid');
+    const sortOrder = document.getElementById('sortSelect').value;
 
     let query = _supabase
         .from('products')
         .select('*')
-        .eq('status', 'approved') // Only show items approved by Admin
-        .order('created_at', { ascending: false });
+        .eq('status', 'approved');
 
-    // Apply category filter if not 'All'
+    // Filter by Category
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
+    // APPLY SORTING LOGIC
+    // We always put 'is_sponsored' (true) at the top first
+    query = query.order('is_sponsored', { ascending: false });
+
+    if (sortOrder === 'newest') {
+        query = query.order('created_at', { ascending: false });
+    } else if (sortOrder === 'price_low') {
+        query = query.order('price', { ascending: true });
+    } else if (sortOrder === 'price_high') {
+        query = query.order('price', { ascending: false });
+    } else if (sortOrder === 'popular') {
+        query = query.order('views', { ascending: false });
+    }
+
     const { data: products, error } = await query;
-
-    if (error) {
-        console.error("Database Error:", error.message);
-        productGrid.innerHTML = '<p>Error loading products. Please refresh.</p>';
-        return;
-    }
-
-    if (products.length === 0) {
-        productGrid.innerHTML = '<p>No items found in this category.</p>';
-        return;
-    }
-
-    renderProducts(products);
+    if (!error) renderProducts(products);
 }
 
 // 3. Render Product Cards to HTML
 function renderProducts(products) {
-    const productGrid = document.getElementById('productGrid');
-    
-    productGrid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <div class="category-tag">${p.category}</div>
-            <div class="img-container">
-                <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = products.map(p => `
+        <div class="product-card ${p.is_sponsored ? 'sponsored-card' : ''}">
+            ${p.is_sponsored ? '<div class="sponsored-tag">⭐ SPONSORED</div>' : ''}
+            <img src="${p.image}">
             </div>
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <div class="price-row">
-                    <p class="price">${p.price} ETB</p>
-                    <span class="views-count">👁️ ${p.views || 0}</span>
-                </div>
-                <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>
-            </div>
-        </div>
     `).join('');
 }
 
@@ -172,5 +160,6 @@ async function loadDynamicFilters() {
     });
     filterContainer.innerHTML = html;
 }
+
 
 
