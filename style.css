@@ -165,3 +165,12 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     filter: grayscale(0.5);
     opacity: 0.8;
 }
+
+.status-badge.rejected {
+    background: #ff4d4f;
+    color: white;
+}
+
+.rejected-border {
+    border: 2px solid #ff4d4f !important;
+}
