@@ -50,7 +50,8 @@ function renderProducts(products) {
                     <span class="price">${p.price} ETB</span>
                     <span class="views">👁️ ${p.views || 0}</span>
                 </div>
-                <button class="main-btn" onclick="location.href='checkout.html?id=${p.id}'">Buy Now</button>
+               
+<button class="main-btn" onclick="window.location.href='checkout.html?id=${p.id}'">Buy Now</button>
             </div>
         </div>
     `).join('');
@@ -114,3 +115,4 @@ async function loadCategories() {
             cats.map(c => `<button class="filter-btn" onclick="fetchProducts('${c.name}')">${c.name}</button>`).join('');
     }
 }
+
