@@ -27,7 +27,36 @@
             <p>Checking for new items...</p>
         </div>
     </div>
+<div id="adminGrid" class="product-grid">
+    </div>
 
+<style>
+    /* Add this directly in admin.html to force the buttons to show */
+    .admin-actions-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .approve-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        flex: 1;
+        cursor: pointer;
+    }
+    .reject-btn {
+        background-color: #dc3545 !important; /* Force Red */
+        color: white !important;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        flex: 1;
+        cursor: pointer;
+        display: inline-block !important; /* Force visibility */
+    }
+</style>
     <script src="config.js"></script>
     <script src="admin.js"></script>
 </body>
