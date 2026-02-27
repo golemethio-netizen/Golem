@@ -282,3 +282,25 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     pointer-events: none;
     opacity: 0.7;
 }
+
+.filter-container {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.filter-btn.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
