@@ -70,6 +70,11 @@ function renderProducts(products) {
             </div>
         `;
     }).join('');
+
+
+const loader = document.getElementById('pageLoader');
+    if (loader) loader.style.display = 'none';
+    
 }
 
 // 3. Search Filter (Local UI filtering)
@@ -191,3 +196,4 @@ window.checkAuthToSell = async function() {
     // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
+
