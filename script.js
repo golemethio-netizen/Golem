@@ -150,17 +150,24 @@ async function loadDynamicFilters() {
     const container = document.querySelector('.filter-container');
     if (!container) return;
 
-    const { data: cats } = await _supabase.from('categories').select('name');
+    const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
     
-    if (cats) {
-        // Added 'this' as the second argument below 🚩
-        container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>` + 
-            cats.map(c => `
-                <button class="filter-btn" onclick="filterCategory('${c.name}', this)">
-                    ${c.name}
-                </button>
-            `).join('');
+    if (error) {
+        console.error("Category Load Error:", error);
+        return;
     }
+
+    // Start with the 'All' button
+    let html = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    
+    // Add each category from your database
+    if (cats) {
+        cats.forEach(c => {
+            html += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+        });
+    }
+    
+    container.innerHTML = html;
 }
 
 function filterCategory(cat, btn) {
@@ -196,4 +203,5 @@ window.checkAuthToSell = async function() {
     // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
+
 
