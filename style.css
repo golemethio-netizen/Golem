@@ -1,4 +1,34 @@
-:root { --primary: #ff4b2b; --bg: #f4f7f6; }
+.img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.condition-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #2563eb; /* Blue badge */
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    z-index: 5;
+}
+
+.description-preview {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 8px 0;
+    line-height: 1.4;
+    /* This creates the '...' effect after 2 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.4em; 
+}:root { --primary: #ff4b2b; --bg: #f4f7f6; }
 body { font-family: sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
 nav { display: flex; justify-content: space-between; padding: 15px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
@@ -342,3 +372,4 @@ button:hover {
     position: relative;
     overflow: hidden;
 }
+
