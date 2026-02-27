@@ -199,3 +199,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // ... your existing admin check code ...
     loadAdminCategories();
 });
+
+async function handleSubmit(e) {
+    e.preventDefault();
+    
+    // 1. Get the values from the form
+    const itemName = document.getElementById('itemName').value;
+    const itemPrice = document.getElementById('itemPrice').value;
+    const itemCategory = document.getElementById('itemCategory').value;
+    const itemCondition = document.getElementById('itemCondition').value; // New
+    const itemDescription = document.getElementById('itemDescription').value; // New
+
+    // ... (Your image upload code here) ...
+
+    // 2. Send to Supabase
+    const { data, error } = await _supabase.from('products').insert([
+        {
+            name: itemName,
+            price: itemPrice,
+            category: itemCategory,
+            condition: itemCondition,      // Must match column name in Supabase
+            description: itemDescription,  // Must match column name in Supabase
+            image: imageUrl,
+            status: 'pending'              // Or 'approved' if you don't use moderation
+        }
+    ]);
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("Product listed successfully!");
+        window.location.href = 'index.html';
+    }
+}
