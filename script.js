@@ -165,9 +165,12 @@ async function loadDynamicFilters() {
         return;
     }
 
-    let html = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+   let html = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    
     cats.forEach(c => {
-        html += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+        if (c.name) { // 🚩 Only add if name is not null/empty
+            html += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+        }
     });
     
     container.innerHTML = html;
@@ -208,6 +211,7 @@ window.checkAuthToSell = async function() {
     // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
+
 
 
 
