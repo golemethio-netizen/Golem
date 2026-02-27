@@ -103,20 +103,30 @@ async function fetchCategories() {
 }
 
 async function addCategory() {
-    const name = document.getElementById('newCatInput').value;
-    if (!name) return;
+    const input = document.getElementById('newCatInput');
+    
+    // Safety check: if input doesn't exist, stop here
+    if (!input) {
+        console.error("Error: Could not find the input field 'newCatInput'");
+        return;
+    }
+
+    const name = input.value.trim(); // .trim() removes accidental spaces
+    if (!name) {
+        alert("Please enter a category name.");
+        return;
+    }
 
     const { error } = await _supabase
         .from('categories')
         .insert([{ name: name }]);
 
     if (error) {
-        // This will tell you if it's a 403 (Permission) or 409 (Duplicate)
-        console.error("Supabase Admin Error:", error);
-        alert(`Error: ${error.message}`); 
+        alert("Error adding category: " + error.message);
     } else {
-        alert("Category added successfully!");
-        location.reload();
+        alert("Category '" + name + "' added successfully!");
+        input.value = ''; // Clear the input
+        location.reload(); // Refresh to show new category
     }
 }
 
