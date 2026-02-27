@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser();
     loadDynamicFilters();
 
-    // Search Listener
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -24,7 +23,6 @@ async function fetchProducts(category = 'All') {
         query = query.eq('category', category);
     }
 
-    // Sort: Sponsored items always stay at the top
     query = query.order('is_sponsored', { ascending: false });
 
     if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
@@ -36,7 +34,7 @@ async function fetchProducts(category = 'All') {
     if (!error) renderProducts(products);
 }
 
-// 2. Render Products (Fixed Syntax & Integrated Buttons)
+// 2. Render Products
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -54,13 +52,11 @@ function renderProducts(products) {
                 <div class="product-info">
                     <h3>${p.name}</h3>
                     <p class="price">${p.price} ETB</p>
-                    
                     <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
                         ${isSold ? 
                             `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
                             `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>`
                         }
-                        
                         <div style="display: flex; gap: 5px;">
                             <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none;">✈️ Telegram</a>
                             <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤 Share</button>
@@ -71,13 +67,11 @@ function renderProducts(products) {
         `;
     }).join('');
 
-
-const loader = document.getElementById('pageLoader');
+    const loader = document.getElementById('pageLoader');
     if (loader) loader.style.display = 'none';
-    
 }
 
-// 3. Search Filter (Local UI filtering)
+// 3. Filters & Search
 function filterSearch(term) {
     const cards = document.querySelectorAll('.product-card');
     let visibleCount = 0;
@@ -106,7 +100,46 @@ function filterSearch(term) {
     }
 }
 
-// 4. View Counter & Navigation
+async function loadDynamicFilters() {
+    const container = document.querySelector('.filter-container');
+    if (!container) return;
+
+    const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
+    if (error) return;
+
+    container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    if (cats) {
+        cats.forEach(c => {
+            container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+        });
+    }
+}
+
+window.filterCategory = function(cat, btn) {
+    if (!btn) {
+        const allBtns = document.querySelectorAll('.filter-btn');
+        btn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
+    }
+    if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    fetchProducts(cat);
+};
+
+window.applyPriceFilter = function() {
+    const min = parseFloat(document.getElementById('minPrice').value) || 0;
+    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const priceText = card.querySelector('.price').innerText;
+        const price = parseFloat(priceText.replace(' ETB', ''));
+        card.style.display = (price >= min && price <= max) ? 'block' : 'none';
+    });
+};
+
+// 4. Navigation & Auth
 async function incrementView(productId) {
     await _supabase.rpc('increment_views', { row_id: productId });
 }
@@ -119,7 +152,6 @@ function handleViewAndBuy(id) {
 async function shareItem(name, price, id) {
     const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html','')}checkout.html?id=${id}`;
     const shareText = `Check out this ${name} for ${price} ETB on Golem Marketplace!`;
-
     if (navigator.share) {
         try { await navigator.share({ title: 'Golem', text: shareText, url: shareUrl }); } 
         catch (err) { console.log("Share cancelled"); }
@@ -129,11 +161,9 @@ async function shareItem(name, price, id) {
     }
 }
 
-// 5. Auth & Category UI
 async function updateUIForUser() {
     const userMenu = document.getElementById('userMenu');
     if (!userMenu) return;
-
     const { data: { user } } = await _supabase.auth.getUser();
     userMenu.innerHTML = user ? 
         `<button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
@@ -146,99 +176,12 @@ async function handleSignOut() {
     window.location.reload();
 }
 
-
-
-// ... (Top part of your script.js remains the same)
-
-async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-container');
-    if (!container) return;
-
-    const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
-    
-    if (error) {
-        console.error("Supabase Error:", error.message);
-        return;
-    }
-
-    container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
-    
-    if (cats) {
-        cats.forEach(c => {
-            container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
-        });
-    }
-} // <--- Matches 'async function loadDynamicFilters() {'
-
-window.applyPriceFilter = function() {
-    const min = parseFloat(document.getElementById('minPrice').value) || 0;
-    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-    const cards = document.querySelectorAll('.product-card');
-    
-    cards.forEach(card => {
-        const priceText = card.querySelector('.price').innerText;
-        const price = parseFloat(priceText.replace(' ETB', ''));
-        card.style.display = (price >= min && price <= max) ? 'block' : 'none';
-    });
-}; // <--- Matches 'window.applyPriceFilter = fu
-
-
-
-
-function filterCategory(cat, btn) {
-    // 1. Safety Check: If btn is undefined, find the button using the text content
-    if (!btn) {
-        const allBtns = document.querySelectorAll('.filter-btn');
-        btn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
-    }
-
-    // 2. Only run classList logic if we actually found a button
-    if (btn) {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-    
-    // 3. This part will now run perfectly!
-    fetchProducts(cat);
-}
-
-
-// 1. Make the function Global by attaching it to 'window'
 window.checkAuthToSell = async function() {
-    console.log("Checking authentication...");
-    
     const { data: { user }, error } = await _supabase.auth.getUser();
-
     if (error || !user) {
         alert("Please Sign In to post an item.");
         window.location.href = 'login.html';
         return;
     }
-
-    // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
-
-
-
-
-
-window.applyPriceFilter = function() {
-    const min = parseFloat(document.getElementById('minPrice').value) || 0;
-    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-    
-    const cards = document.querySelectorAll('.product-card');
-    
-    cards.forEach(card => {
-        const priceText = card.querySelector('.price').innerText;
-        const price = parseFloat(priceText.replace(' ETB', ''));
-        
-        if (price >= min && price <= max) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-};
-
-
