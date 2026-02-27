@@ -21,6 +21,10 @@ async function loadEditData(id) {
         document.getElementById('pPrice').value = p.price;
         document.getElementById('pPhone').value = p.phone_number;
         document.getElementById('pCat').value = p.category;
+
+         document.getElementById('pcondition').value = p.condition;
+        document.getElementById('pdescription').value = p.description;
+        
         submitBtn.innerText = "Update Item";
         
         // Show existing image preview
