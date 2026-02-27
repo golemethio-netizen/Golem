@@ -107,7 +107,8 @@ async function addCategory() {
     const name = input.value.trim();
     if (!name) return;
 
-    const { error } = await _supabase.from('categories').insert([{ name }]);
+  
+const { error } = await _supabase.from('categories').insert([{ name: newCatName }]);
     if (error) alert("Error: Might be a duplicate.");
     else {
         input.value = '';
