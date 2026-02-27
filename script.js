@@ -1,6 +1,4 @@
-/* ==========================================
-   1. INITIALIZATION & LISTENERS
-   ========================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
@@ -223,3 +221,4 @@ window.checkAuthToSell = async function() {
     }
     window.location.href = 'submit.html';
 };
+
