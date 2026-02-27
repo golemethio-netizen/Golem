@@ -148,8 +148,10 @@ async function handleSignOut() {
 
 
 
+// ... (Top part of your script.js remains the same)
+
 async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-container'); // 🚩 Matches the new HTML class
+    const container = document.querySelector('.filter-container');
     if (!container) return;
 
     const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
@@ -159,7 +161,6 @@ async function loadDynamicFilters() {
         return;
     }
 
-    // Clear the "Loading categories..." text
     container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
     
     if (cats) {
@@ -167,8 +168,19 @@ async function loadDynamicFilters() {
             container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
         });
     }
-}
-}
+} // <--- Matches 'async function loadDynamicFilters() {'
+
+window.applyPriceFilter = function() {
+    const min = parseFloat(document.getElementById('minPrice').value) || 0;
+    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const priceText = card.querySelector('.price').innerText;
+        const price = parseFloat(priceText.replace(' ETB', ''));
+        card.style.display = (price >= min && price <= max) ? 'block' : 'none';
+    });
+}; // <--- Matches 'window.applyPriceFilter = fu
 
 
 
@@ -228,4 +240,5 @@ window.applyPriceFilter = function() {
         }
     });
 };
+
 
