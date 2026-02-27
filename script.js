@@ -174,3 +174,20 @@ function filterCategory(cat, btn) {
     // 3. This part will now run perfectly!
     fetchProducts(cat);
 }
+
+
+// 1. Make the function Global by attaching it to 'window'
+window.checkAuthToSell = async function() {
+    console.log("Checking authentication...");
+    
+    const { data: { user }, error } = await _supabase.auth.getUser();
+
+    if (error || !user) {
+        alert("Please Sign In to post an item.");
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // If user exists, go to the submit page
+    window.location.href = 'submit.html';
+};
