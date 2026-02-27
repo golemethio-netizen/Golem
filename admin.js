@@ -136,3 +136,57 @@ async function deleteCategory(id) {
         fetchCategories();
     }
 }
+
+// 1. Load Categories into the Admin List
+async function loadAdminCategories() {
+    const listContainer = document.getElementById('adminCategoryList');
+    if (!listContainer) return;
+
+    const { data: cats, error } = await _supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        listContainer.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+        return;
+    }
+
+    if (cats.length === 0) {
+        listContainer.innerHTML = `<p>No categories found.</p>`;
+        return;
+    }
+
+    listContainer.innerHTML = cats.map(c => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee;">
+            <span style="font-weight: bold;">${c.name}</span>
+            <button onclick="deleteCategory('${c.id}', '${c.name}')" 
+                    style="background: #ff4d4f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                Delete
+            </button>
+        </div>
+    `).join('');
+}
+
+// 2. Delete Category Function
+window.deleteCategory = async function(id, name) {
+    if (confirm(`Are you sure you want to delete the "${name}" category? This might affect items currently assigned to it.`)) {
+        const { error } = await _supabase
+            .from('categories')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("Category deleted!");
+            loadAdminCategories(); // Refresh list
+        }
+    }
+};
+
+// 3. Make sure it loads when the page opens
+document.addEventListener('DOMContentLoaded', () => {
+    // ... your existing admin check code ...
+    loadAdminCategories();
+});
