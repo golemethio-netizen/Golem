@@ -103,16 +103,20 @@ async function fetchCategories() {
 }
 
 async function addCategory() {
-    const input = document.getElementById('newCatName');
-    const name = input.value.trim();
+    const name = document.getElementById('newCatInput').value;
     if (!name) return;
 
-  
-const { error } = await _supabase.from('categories').insert([{ name: newCatName }]);
-    if (error) alert("Error: Might be a duplicate.");
-    else {
-        input.value = '';
-        fetchCategories();
+    const { error } = await _supabase
+        .from('categories')
+        .insert([{ name: name }]);
+
+    if (error) {
+        // This will tell you if it's a 403 (Permission) or 409 (Duplicate)
+        console.error("Supabase Admin Error:", error);
+        alert(`Error: ${error.message}`); 
+    } else {
+        alert("Category added successfully!");
+        location.reload();
     }
 }
 
