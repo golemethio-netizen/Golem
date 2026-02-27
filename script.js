@@ -211,4 +211,21 @@ window.checkAuthToSell = async function() {
 
 
 
+window.applyPriceFilter = function() {
+    const min = parseFloat(document.getElementById('minPrice').value) || 0;
+    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+    
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const priceText = card.querySelector('.price').innerText;
+        const price = parseFloat(priceText.replace(' ETB', ''));
+        
+        if (price >= min && price <= max) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+};
 
