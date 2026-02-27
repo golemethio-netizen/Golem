@@ -39,33 +39,38 @@ function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    grid.innerHTML = products.map(p => {
-        const isSold = p.status === 'sold';
-        const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
-        
-        return `
-            <div class="product-card ${isSold ? 'is-sold' : ''}">
-                <div class="img-wrapper">
-                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    <img src="${p.image}" alt="${p.name}" loading="lazy">
-                </div>
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <p class="price">${p.price} ETB</p>
-                    <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
-                        ${isSold ? 
-                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
-                            `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>`
-                        }
-                        <div style="display: flex; gap: 5px;">
-                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none;">✈️ Telegram</a>
-                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤 Share</button>
-                        </div>
+   grid.innerHTML = products.map(p => {
+    const isSold = p.status === 'sold';
+    const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
+    
+    return `
+        <div class="product-card ${isSold ? 'is-sold' : ''}">
+            <div class="img-wrapper" style="position: relative;">
+                ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                <span class="condition-tag">${p.condition || 'Used'}</span> 
+                <img src="${p.image}" alt="${p.name}" loading="lazy">
+            </div>
+            
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p class="description-preview">${p.description || 'No description provided.'}</p>
+                <p class="price">${p.price} ETB</p>
+                
+                <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
+                    ${isSold ? 
+                        `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
+                        `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>`
+                    }
+                    
+                    <div style="display: flex; gap: 5px;">
+                        <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none; text-align: center;">✈️ Telegram</a>
+                        <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤 Share</button>
                     </div>
                 </div>
             </div>
-        `;
-    }).join('');
+        </div>
+    `;
+}).join('');
 
     const loader = document.getElementById('pageLoader');
     if (loader) loader.style.display = 'none';
@@ -185,3 +190,4 @@ window.checkAuthToSell = async function() {
     }
     window.location.href = 'submit.html';
 };
+
