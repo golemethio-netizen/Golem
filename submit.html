@@ -34,8 +34,19 @@
     <label style="font-size: 0.85rem; font-weight: bold;">Product Image</label>
     <input type="file" id="pImageFile" accept="image/*" required style="margin-top: 5px;">
     <img id="imagePreview" style="display:none; width:100%; margin-top:10px; border-radius:8px;">
+<div class="form-group">
+    <label>Condition</label>
+    <select id="itemCondition" class="input-field" required>
+        <option value="used">Used</option>
+        <option value="new">New / Boxed</option>
+        <option value="refurbished">Refurbished</option>
+    </select>
 </div>
-            
+
+<div class="form-group">
+    <label>Description</label>
+    <textarea id="itemDescription" class="input-field" placeholder="Describe the item's features or flaws..." rows="4" required></textarea>
+</div>
             <select id="pCat">
                 <option value="Electronics">Electronics</option>
                 <option value="Computer & Phone">Computer & Phone</option>
