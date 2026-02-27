@@ -150,25 +150,30 @@ async function loadDynamicFilters() {
     const container = document.querySelector('.filter-container');
     if (!container) return;
 
+    console.log("Fetching categories from Supabase...");
     const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
     
     if (error) {
-        console.error("Category Load Error:", error);
+        console.error("Supabase Error:", error.message);
         return;
     }
 
-    // Start with the 'All' button
-    let html = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
-    
-    // Add each category from your database
-    if (cats) {
-        cats.forEach(c => {
-            html += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
-        });
+    console.log("Categories found:", cats); // 🚩 Look at your console for this!
+
+    if (!cats || cats.length === 0) {
+        console.warn("No categories returned from database. Check RLS policies!");
+        return;
     }
+
+    let html = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    cats.forEach(c => {
+        html += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+    });
     
     container.innerHTML = html;
 }
+
+
 
 function filterCategory(cat, btn) {
     // 1. Safety Check: If btn is undefined, find the button using the text content
@@ -203,5 +208,6 @@ window.checkAuthToSell = async function() {
     // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
+
 
 
