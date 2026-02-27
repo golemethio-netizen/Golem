@@ -31,18 +31,19 @@ async function fetchMyItems() {
 
     // 3. Calculate and Render Stats
     if (statsContainer) {
-        const totalViews = products.reduce((sum, p) => sum + (p.views || 0), 0);
+        // Calculate total views across all items
+        const totalViews = products.reduce((sum, item) => sum + (item.views || 0), 0);
+        
         statsContainer.innerHTML = `
-            <div>
+            <div style="text-align:center; flex:1;">
                 <p style="margin:0; font-size:0.8rem; color:#666;">Total Items</p>
                 <strong style="font-size:1.2rem;">${products.length}</strong>
             </div>
-            <div style="border-left: 1px solid #ddd; border-right: 1px solid #ddd; padding: 0 20px;">
-               
-<p style="font-size:0.8rem; color:#666; margin-bottom:10px;">👁️ ${p.views || 0} views</p>
+            <div style="border-left: 1px solid #ddd; border-right: 1px solid #ddd; padding: 0 20px; text-align:center; flex:1;">
+                <p style="margin:0; font-size:0.8rem; color:#666;">Total Views</p>
                 <strong style="font-size:1.2rem;">👁️ ${totalViews}</strong>
             </div>
-            <div>
+            <div style="text-align:center; flex:1;">
                 <p style="margin:0; font-size:0.8rem; color:#666;">Account</p>
                 <strong style="font-size:1.2rem; color:#2e7d32;">Active</strong>
             </div>
@@ -63,7 +64,7 @@ async function fetchMyItems() {
             return `
                 <div class="product-card ${isSold ? 'is-sold' : ''} ${isRejected ? 'rejected-border' : ''}">
                     <div class="status-badge ${p.status}">${p.status.toUpperCase()}</div>
-                    <img src="${p.image}" alt="${p.name}">
+                    <img src="${p.image}" alt="${p.name}" style="width:100%; height:180px; object-fit:cover;">
                     <div class="product-info">
                         <h3>${p.name}</h3>
                         
@@ -78,10 +79,12 @@ async function fetchMyItems() {
                         <p class="price">${p.price} ETB</p>
                         <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">👁️ ${p.views || 0} views</p>
                         
-                        <div class="manage-btns">
-                            ${(!isSold && !isRejected) ? `<button class="sold-btn" onclick="markAsSold('${p.id}')">✅ Mark Sold</button>` : ''}
-                            <button class="edit-btn" onclick="editItem('${p.id}')">✏️ Edit</button>
-                            <button class="delete-btn" onclick="deleteItem('${p.id}', '${p.image}')">🗑️ Delete</button>
+                        <div class="manage-btns" style="display:flex; flex-direction:column; gap:8px;">
+                            ${(!isSold && !isRejected) ? `<button class="sold-btn" onclick="markAsSold('${p.id}')" style="background:#28a745; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✅ Mark Sold</button>` : ''}
+                            <div style="display:flex; gap:5px;">
+                                <button onclick="editItem('${p.id}')" style="flex:1; padding:8px; border:1px solid #ddd; background:white; border-radius:5px; cursor:pointer;">✏️ Edit</button>
+                                <button onclick="deleteItem('${p.id}', '${p.image}')" style="flex:1; padding:8px; background:#ff4d4f; color:white; border:none; border-radius:5px; cursor:pointer;">🗑️ Delete</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -93,7 +96,7 @@ async function fetchMyItems() {
 // --- ACTION FUNCTIONS ---
 
 async function markAsSold(id) {
-    if (confirm("Mark as SOLD? It will be hidden from the shop.")) {
+    if (confirm("Mark as SOLD? It will show a SOLD badge on the shop.")) {
         const { error } = await _supabase.from('products').update({ status: 'sold' }).eq('id', id);
         if (error) alert(error.message);
         else fetchMyItems();
@@ -101,12 +104,16 @@ async function markAsSold(id) {
 }
 
 async function deleteItem(id, imageUrl) {
-    if (confirm("Permanently delete this item?")) {
+    if (confirm("Permanently delete this item? This cannot be undone.")) {
         const { error: dbError } = await _supabase.from('products').delete().eq('id', id);
         
-        if (imageUrl && imageUrl.includes('product-images')) {
-            const fileName = imageUrl.split('/').pop();
-            await _supabase.storage.from('product-images').remove([`uploads/${fileName}`]);
+        if (imageUrl && imageUrl.includes('supabase.co')) {
+            try {
+                const fileName = imageUrl.split('/').pop();
+                await _supabase.storage.from('product-images').remove([`uploads/${fileName}`]);
+            } catch (e) {
+                console.log("Image removal skipped or failed");
+            }
         }
 
         if (dbError) alert(dbError.message);
