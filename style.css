@@ -260,3 +260,25 @@ nav { display: flex; justify-content: space-between; padding: 15px; background: 
     font-weight: bold;
     margin-top: 5px;
 }
+
+/* The Spinner Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* A class to dim the button while loading */
+.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
