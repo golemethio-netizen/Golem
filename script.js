@@ -146,35 +146,36 @@ async function handleSignOut() {
     window.location.reload();
 }
 
+
+
 async function loadDynamicFilters() {
     const container = document.querySelector('.filter-container');
-    if (!container) return;
+    if (!container) {
+        console.error("Could not find .filter-container in HTML");
+        return;
+    }
 
-    console.log("Fetching categories from Supabase...");
     const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
     
     if (error) {
-        console.error("Supabase Error:", error.message);
+        console.error("Fetch error:", error.message);
         return;
     }
 
-    console.log("Categories found:", cats); // 🚩 Look at your console for this!
-
-    if (!cats || cats.length === 0) {
-        console.warn("No categories returned from database. Check RLS policies!");
-        return;
+    // This clears the 'Gathering categories...' text before adding buttons
+    container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    
+    if (cats) {
+        cats.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.innerText = c.name;
+            btn.onclick = (e) => filterCategory(c.name, e.target);
+            container.appendChild(btn);
+        });
     }
-
-   let html = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
-    
-    cats.forEach(c => {
-        if (c.name) { // 🚩 Only add if name is not null/empty
-            html += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
-        }
-    });
-    
-    container.innerHTML = html;
 }
+
 
 
 
@@ -211,6 +212,7 @@ window.checkAuthToSell = async function() {
     // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
+
 
 
 
