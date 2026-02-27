@@ -149,31 +149,25 @@ async function handleSignOut() {
 
 
 async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-container');
-    if (!container) {
-        console.error("Could not find .filter-container in HTML");
-        return;
-    }
+    const container = document.querySelector('.filter-container'); // 🚩 Matches the new HTML class
+    if (!container) return;
 
     const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
     
     if (error) {
-        console.error("Fetch error:", error.message);
+        console.error("Supabase Error:", error.message);
         return;
     }
 
-    // This clears the 'Gathering categories...' text before adding buttons
+    // Clear the "Loading categories..." text
     container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
     
     if (cats) {
         cats.forEach(c => {
-            const btn = document.createElement('button');
-            btn.className = 'filter-btn';
-            btn.innerText = c.name;
-            btn.onclick = (e) => filterCategory(c.name, e.target);
-            container.appendChild(btn);
+            container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
         });
     }
+}
 }
 
 
@@ -212,6 +206,7 @@ window.checkAuthToSell = async function() {
     // If user exists, go to the submit page
     window.location.href = 'submit.html';
 };
+
 
 
 
