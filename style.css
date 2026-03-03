@@ -16,7 +16,7 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
 
 /* Modal Styles */
 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:1000; }
-.modal-content { background:white; padding:30px; border-radius:15px; max-width:600px; width:90%; position:relative; }
+/* .modal-content { background:white; padding:30px; border-radius:15px; max-width:600px; width:90%; position:relative; } */
 .modal-body { display: flex; gap: 20px; }
 .modal-body img { width: 50%; border-radius: 10px; }
 .close-btn { position:absolute; top:10px; right:20px; font-size:30px; cursor:pointer; }
@@ -194,4 +194,78 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
 @media (max-width: 600px) {
     .nav-item-box p { display: none; } /* Show only icons on small screens */
     .search-wrapper { margin: 0 10px; }
+}
+
+
+
+
+
+
+/* Modal Overlay */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Box */
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+}
+
+.auth-submit {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
 }
