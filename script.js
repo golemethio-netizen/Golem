@@ -234,3 +234,7 @@ document.querySelector('.signin-btn').onclick = (e) => {
     toggleModal();
 };
 
+const langBtn = document.querySelector('.lang-toggle');
+        langBtn.addEventListener('click', () => {
+            alert('Switching to Amharic!');
+        });
