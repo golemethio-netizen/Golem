@@ -223,7 +223,7 @@ window.checkAuthToSell = async function() {
 };
 
 
-function toggleModal() {
+/* function toggleModal() {
     const modal = document.getElementById('authModal');
     modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
 }
@@ -233,8 +233,25 @@ document.querySelector('.signin-btn').onclick = (e) => {
     e.preventDefault();
     toggleModal();
 };
-
+*/
 const langBtn = document.querySelector('.lang-toggle');
         langBtn.addEventListener('click', () => {
             alert('Switching to Amharic!');
         });
+
+
+
+
+
+
+function toggleModal() {
+        const modal = document.getElementById('authModal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    // Link the Sign In button to the modal
+    document.querySelector('.signin-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleModal();
+    });
+
