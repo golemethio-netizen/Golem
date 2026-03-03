@@ -139,6 +139,40 @@
         </div>
     </main>
 
+
+
+
+<div id="authModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="toggleModal()">&times;</span>
+        <h2 id="modalTitle">Welcome Back</h2>
+        <p style="color: #666; margin-bottom: 20px;">Please enter your details</p>
+        
+        <form id="authForm">
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="auth-submit">Sign In</button>
+        </form>
+
+        <div class="modal-footer">
+            <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    
+    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
@@ -150,4 +184,5 @@
     </script>
 </body>
 </html>
+
 
