@@ -6,40 +6,86 @@
     <title>Golem Marketplace | Buy & Sell</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <style>
+        /* Horizontal Navigation Styles */
+        .nav-container-horizontal {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Pushes links to take available space */
+        }
+
+        .nav-item-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            min-width: 80px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-item-box i {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item-box p {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .nav-item-box:hover {
+            transform: translateY(-3px);
+            filter: brightness(0.95);
+        }
+
+        /* Colors as per your example */
+        .bg-home { background-color: #FFF4A3; }
+        .bg-sell { background-color: #FFC0C7; }
+        .bg-items { background-color: #D9EEE1; }
+
+        /* Ensuring the header layout stays clean */
+        .golem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5%;
+            background: white;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
 
     <header class="golem-header">
         <div class="logo">GOLEM</div>
-        
 
-   
-
-<div class="container">
-
-  <div style="background-color:#FFF4A3;">
-    <h2>London</h2>
-   <div class="nav-item" onclick="location.href='index.html'">🏠<p>Home</p>
-    <p>London has over 9 million inhabitants.</p>
-  </div>
-  
-  <div style="background-color:#FFC0C7;">
-    <h2>Oslo</h2>
-     <div class="nav-item" onclick="checkAuthToSell()">➕<p>Sell</p>
-    <p>Oslo has over 700,000 inhabitants.</p>
-  </div>
-  
-  <div style="background-color:#D9EEE1;">
-    <h2>Rome</h2> <p>Rome has over 4 million inhabitants.</p>
-        <div class="nav-item" onclick="location.href='my-items.html'">📦<p>My Items</p></div>
-  </div>
-
-</div>
-
-
-
+        <div class="nav-container-horizontal">
+            <div class="nav-item-box bg-home" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <p>Home</p>
+            </div>
             
+            <div class="nav-item-box bg-sell" onclick="checkAuthToSell()">
+                <i class="fas fa-plus-circle"></i>
+                <p>Sell</p>
+            </div>
+            
+            <div class="nav-item-box bg-items" onclick="location.href='my-items.html'">
+                <i class="fas fa-box-open"></i>
+                <p>My Items</p>
+            </div>
+        </div>
 
         <div class="auth-buttons">
             <button class="lang-toggle">አማ</button>
@@ -47,42 +93,36 @@
         </div>
     </header>
 
-<div class="sort-container" style="padding: 10px 15px; display: flex; justify-content: flex-end;">
-    <select id="sortSelect" onchange="fetchProducts()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd; outline: none; background: #fff;">
-        <option value="newest">🆕 Newest First</option>
-        <option value="price_low">💰 Price: Low to High</option>
-        <option value="price_high">💎 Price: High to Low</option>
-        <option value="popular">🔥 Most Viewed</option>
-    </select>
-</div>
+    <div class="filter-controls" style="padding: 20px 0; background: #fff;">
+        <div class="sort-container" style="display: flex; justify-content: flex-end; padding: 0 5%;">
+            <select id="sortSelect" onchange="fetchProducts()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                <option value="newest">🆕 Newest First</option>
+                <option value="price_low">💰 Price: Low to High</option>
+                <option value="price_high">💎 Price: High to Low</option>
+                <option value="popular">🔥 Most Viewed</option>
+            </select>
+        </div>
 
-<div style="display: flex; gap: 10px; justify-content: center; padding: 0 15px 15px;">
-    <input type="number" id="minPrice" placeholder="Min Price" style="width: 100px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
-    <input type="number" id="maxPrice" placeholder="Max Price" style="width: 100px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
-    
-    <button onclick="applyPriceFilter()" class="filter-btn" style="padding: 5px 15px;">Apply</button>
-</div>
+        <div style="display: flex; gap: 10px; justify-content: center; padding: 15px;">
+            <input type="number" id="minPrice" placeholder="Min Price" style="width: 100px; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+            <input type="number" id="maxPrice" placeholder="Max Price" style="width: 100px; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+            <button onclick="applyPriceFilter()" class="filter-btn" style="padding: 8px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Apply</button>
+        </div>
+    </div>
 
-        
-</div>
-
-    <div class="filter-bar">
-     <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
-<button class="filter-btn" onclick="filterCategory('Electronics')">Electronics</button>
+    <div class="filter-bar" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; white-space: nowrap;">
+        <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
+        <button class="filter-btn" onclick="filterCategory('Electronics')">Electronics</button>
         <button class="filter-btn" onclick="filterCategory('Computer & Phone')">Computer & Phone</button>
         <button class="filter-btn" onclick="filterCategory('Fashion')">Fashion</button>
-        <button class="filter-btn" onclick="filterCategory('home & Furniture')">home & Furniture</button>
-        <button class="filter-btn" onclick="filterCategory('Vehicls')">Vehicls</button>
-        <button class="filter-btn" onclick="filterCategory('Jobes')">Jobes</button>
+        <button class="filter-btn" onclick="filterCategory('home & Furniture')">Home & Furniture</button>
+        <button class="filter-btn" onclick="filterCategory('Vehicls')">Vehicles</button>
+        <button class="filter-btn" onclick="filterCategory('Jobes')">Jobs</button>
         <button class="filter-btn" onclick="filterCategory('Services')">Services</button>
-       
-          </div>
-    <div id="productGrid" class="product-grid"></div>
+    </div>
 
-    
-    <main class="container">
-        <div class="masonry-wrapper">
-            
+    <main class="container" style="max-width: 1200px; margin: auto; padding: 20px;">
+        <div id="productGrid" class="masonry-wrapper">
             <div class="product-card">
                 <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80" alt="Watch" loading="lazy">
                 <div class="product-info">
@@ -91,67 +131,17 @@
                     <span class="view-count"><i class="far fa-eye"></i> 154</span>
                 </div>
             </div>
-
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=120" alt="Headphones" loading="lazy">
-                <div class="product-info">
-                    <div class="product-title">Premium Wireless Headphones</div>
-                    <span class="product-price">$85</span>
-                    <span class="view-count"><i class="far fa-eye"></i> 89</span>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&h=600&q=80" alt="Shoes" loading="lazy">
-                <div class="product-info">
-                    <div class="product-title">Red Sport Sneakers</div>
-                    <span class="product-price">$65</span>
-                    <span class="view-count"><i class="far fa-eye"></i> 210</span>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1585333127302-c2c98184b83c?auto=format&fit=crop&w=400&q=80" alt="Camera" loading="lazy">
-                <div class="product-info">
-                    <div class="product-title">Vintage Camera</div>
-                    <span class="product-price">$450</span>
-                    <span class="view-count"><i class="far fa-eye"></i> 42</span>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=400&h=500&q=80" alt="Shoes" loading="lazy">
-                <div class="product-info">
-                    <div class="product-title">Classic Yellow Vans</div>
-                    <span class="product-price">$55</span>
-                    <span class="view-count"><i class="far fa-eye"></i> 302</span>
-                </div>
-            </div>
-
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
     <script>
-        // Placeholder for language toggle functionality
         const langBtn = document.querySelector('.lang-toggle');
         langBtn.addEventListener('click', () => {
-            alert('Switching to Amharic logic will go here!');
+            alert('Switching to Amharic!');
         });
     </script>
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="config.js"></script>
-
-<script src="script.js"></script>
-
-    
 </body>
 </html>
-
-
-
