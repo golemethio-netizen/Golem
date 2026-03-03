@@ -9,7 +9,7 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
 
 /* Product Grid */
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-.product-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; }
+
 .product-card:hover { transform: translateY(-5px); }
 .product-card img { width: 100%; height: 200px; object-fit: cover; }
 .product-info { padding: 15px; text-align: center; }
@@ -323,3 +323,40 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
 }
 
 
+
+
+
+
+
+
+
+
+/* Header Layout Fix */
+.golem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5%;
+    background: white;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Masonry Grid Fix */
+.masonry-wrapper {
+    column-count: 2; /* 2 columns for mobile */
+    column-gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .masonry-wrapper { column-count: 4; } /* 4 columns for desktop */
+}
+
+/* Prevent cards from breaking across columns */
+.product-card {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
