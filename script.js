@@ -1,16 +1,26 @@
-
+/* ==========================================
+   1. INITIALIZATION & LISTENERS
+   ========================================== */
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
     loadDynamicFilters();
 
-    // Search input listener
-    const searchInput = document.getElementById('searchInput');
+    // Synced with your index.html ID "headerSearch"
+    const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             filterSearch(term);
         });
+    }
+
+    // Modal close listener (clicks outside content close the modal)
+    window.onclick = function(event) {
+        const modal = document.getElementById('authModal');
+        if (event.target == modal) {
+            toggleModal();
+        }
     }
 });
 
@@ -21,16 +31,14 @@ async function fetchProducts(category = 'All') {
     const sortSelect = document.getElementById('sortSelect');
     const sortOrder = sortSelect ? sortSelect.value : 'newest';
 
-    // We use .select('*') to ensure new columns (description, condition) are fetched
     let query = _supabase.from('products').select('*').eq('status', 'approved');
 
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    // Sort: Sponsored items always stay at the top
+    // Sorting Logic
     query = query.order('is_sponsored', { ascending: false });
-
     if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
     else if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
     else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
@@ -49,7 +57,7 @@ function renderProducts(products) {
     if (!grid) return;
 
     if (products.length === 0) {
-        grid.innerHTML = '<p style="text-align:center; padding:20px;">No items found.</p>';
+        grid.innerHTML = '<p style="text-align:center; padding:20px; width: 100%;">No items found.</p>';
         return;
     }
 
@@ -61,23 +69,25 @@ function renderProducts(products) {
             <div class="product-card ${isSold ? 'is-sold' : ''}">
                 <div class="img-wrapper" style="position: relative;">
                     ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    <span class="condition-tag">${p.condition || 'Used'}</span>
-                    <img src="${p.image}" alt="${p.name}" loading="lazy">
+                    <span class="condition-tag" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:2px 8px; border-radius:5px; font-size:12px;">
+                        ${p.condition || 'Used'}
+                    </span>
+                    <img src="${p.image}" alt="${p.name}" loading="lazy" style="width:100%; display:block;">
                 </div>
                 <div class="product-info">
                     <h3>${p.name}</h3>
-                    <p class="description-preview">${p.description || 'No description provided.'}</p>
-                    <p class="price">${p.price} ETB</p>
+                    <p class="description-preview" style="font-size:14px; color:#666; margin: 5px 0;">${p.description || 'No description provided.'}</p>
+                    <p class="price" style="font-weight:bold; color:#28a745; margin-bottom:10px;">${p.price} ETB</p>
                     
                     <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
                         ${isSold ? 
-                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
-                            `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>`
+                            `<button class="main-btn" disabled style="background:#ccc; border:none; padding:8px; border-radius:5px;">Already Sold</button>` : 
+                            `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">🛒 Buy Now</button>`
                         }
                         
                         <div style="display: flex; gap: 5px;">
-                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none; text-align: center;">✈️ Telegram</a>
-                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤 Share</button>
+                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none; text-align: center; background:#0088cc; color:white; padding:5px; border-radius:5px; font-size:14px;">✈️ Telegram</a>
+                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1; cursor:pointer; background:#eee; border:1px solid #ddd; border-radius:5px;">📤 Share</button>
                         </div>
                     </div>
                 </div>
@@ -85,13 +95,12 @@ function renderProducts(products) {
         `;
     }).join('');
 
-    // Hide global loader if present
     const loader = document.getElementById('pageLoader');
     if (loader) loader.style.display = 'none';
 }
 
 /* ==========================================
-   3. FILTERS & SEARCH
+   3. FILTERS & SEARCH (GRID-FRIENDLY)
    ========================================== */
 function filterSearch(term) {
     const cards = document.querySelectorAll('.product-card');
@@ -102,7 +111,8 @@ function filterSearch(term) {
         const desc = card.querySelector('.description-preview').innerText.toLowerCase();
         
         if (title.includes(term) || desc.includes(term)) {
-            card.style.display = 'block';
+            // FIX: Using inline-block to preserve Masonry flow
+            card.style.display = 'inline-block'; 
             visibleCount++;
         } else {
             card.style.display = 'none';
@@ -116,7 +126,7 @@ function filterSearch(term) {
         const msg = document.createElement('p');
         msg.id = 'noMatchMsg';
         msg.innerText = "No items match your search.";
-        msg.style.cssText = "text-align:center; grid-column:1/-1; padding:20px; color:#666;";
+        msg.style.cssText = "text-align:center; width:100%; padding:20px; color:#666;";
         grid.appendChild(msg);
     } else if (visibleCount > 0 && existingMsg) {
         existingMsg.remove();
@@ -124,7 +134,7 @@ function filterSearch(term) {
 }
 
 async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-container');
+    const container = document.querySelector('.filter-bar'); // Matches your HTML class
     if (!container) return;
 
     const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
@@ -133,6 +143,7 @@ async function loadDynamicFilters() {
         return;
     }
 
+    // Keep the hardcoded "All" button and append dynamic ones
     container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
     if (cats) {
         cats.forEach(c => {
@@ -142,16 +153,15 @@ async function loadDynamicFilters() {
 }
 
 window.filterCategory = function(cat, btn) {
-    // UI Update
-    if (!btn) {
-        const allBtns = document.querySelectorAll('.filter-btn');
-        btn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
-    }
+    const allBtns = document.querySelectorAll('.filter-btn');
+    allBtns.forEach(b => b.classList.remove('active'));
+    
     if (btn) {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+    } else {
+        const targetBtn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
+        if (targetBtn) targetBtn.classList.add('active');
     }
-    // Fetch Data
     fetchProducts(cat);
 };
 
@@ -163,13 +173,55 @@ window.applyPriceFilter = function() {
     cards.forEach(card => {
         const priceText = card.querySelector('.price').innerText;
         const price = parseFloat(priceText.replace(' ETB', ''));
-        card.style.display = (price >= min && price <= max) ? 'block' : 'none';
+        // FIX: Using inline-block to preserve Masonry flow
+        card.style.display = (price >= min && price <= max) ? 'inline-block' : 'none';
     });
 };
 
 /* ==========================================
    4. USER ACTIONS & AUTH
    ========================================== */
+function toggleModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        const currentDisplay = window.getComputedStyle(modal).display;
+        modal.style.display = (currentDisplay === 'none') ? 'flex' : 'none';
+    }
+}
+
+async function updateUIForUser() {
+    const signinBtn = document.querySelector('.signin-btn');
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    if (user && signinBtn) {
+        signinBtn.innerHTML = "Sign Out";
+        signinBtn.onclick = handleSignOut;
+    } else if (signinBtn) {
+        signinBtn.innerHTML = "Sign In";
+        signinBtn.onclick = (e) => {
+            e.preventDefault();
+            toggleModal();
+        };
+    }
+}
+
+async function handleSignOut(e) {
+    if (e) e.preventDefault();
+    await _supabase.auth.signOut();
+    window.location.reload();
+}
+
+window.checkAuthToSell = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        alert("Please Sign In to post an item.");
+        toggleModal();
+        return;
+    }
+    window.location.href = 'submit.html';
+};
+
+// Increment view helper
 async function incrementView(productId) {
     try {
         await _supabase.rpc('increment_views', { row_id: productId });
@@ -196,62 +248,11 @@ async function shareItem(name, price, id) {
     }
 }
 
-async function updateUIForUser() {
-    const userMenu = document.getElementById('userMenu');
-    if (!userMenu) return;
-
-    const { data: { user } } = await _supabase.auth.getUser();
-    userMenu.innerHTML = user ? 
-        `<button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
-         <button onclick="handleSignOut()" class="login-btn">Sign Out</button>` : 
-        `<button onclick="location.href='login.html'" class="login-btn">Sign In</button>`;
-}
-
-async function handleSignOut() {
-    await _supabase.auth.signOut();
-    window.location.reload();
-}
-
-window.checkAuthToSell = async function() {
-    const { data: { user }, error } = await _supabase.auth.getUser();
-    if (error || !user) {
-        alert("Please Sign In to post an item.");
-        window.location.href = 'login.html';
-        return;
-    }
-    window.location.href = 'submit.html';
-};
-
-
-/* function toggleModal() {
-    const modal = document.getElementById('authModal');
-    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-}
-
-// Update your existing Sign In button to trigger this:
-document.querySelector('.signin-btn').onclick = (e) => {
-    e.preventDefault();
-    toggleModal();
-};
-*/
+// Amharic Toggle Placeholder
 const langBtn = document.querySelector('.lang-toggle');
-        langBtn.addEventListener('click', () => {
-            alert('Switching to Amharic!');
-        });
-
-
-
-
-
-
-function toggleModal() {
-        const modal = document.getElementById('authModal');
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
-
-    // Link the Sign In button to the modal
-    document.querySelector('.signin-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleModal();
+if (langBtn) {
+    langBtn.addEventListener('click', () => {
+        alert('Switching to Amharic!');
+        // logic for translation goes here
     });
-
+}
