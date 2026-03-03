@@ -151,3 +151,9 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
   font-weight: 600;
 }
 
+.container {
+  display: flex;
+}
+.container > div {
+  width:33%;
+}
