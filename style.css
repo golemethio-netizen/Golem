@@ -1,167 +1,34 @@
-body { font-family: 'Inter', sans-serif; margin: 0; background: #f4f7f6; }
-nav { background: #333; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
-.hero { text-align: center; padding: 50px 20px; background: white; }
-
-/* Filter Buttons */
-.filter-container { display: flex; justify-content: center; gap: 10px; margin: 20px; flex-wrap: wrap; }
-.filter-btn { padding: 8px 18px; border: 2px solid #007bff; border-radius: 20px; background: none; color: #007bff; cursor: pointer; font-weight: 600; }
-.filter-btn.active { background: #007bff; color: white; }
-
-/* Product Grid */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-
-.product-card:hover { transform: translateY(-5px); }
-.product-card img { width: 100%; height: 200px; object-fit: cover; }
-.product-info { padding: 15px; text-align: center; }
-
-/* Modal Styles */
-.modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:1000; }
-/* .modal-content { background:white; padding:30px; border-radius:15px; max-width:600px; width:90%; position:relative; } */
-.modal-body { display: flex; gap: 20px; }
-.modal-body img { width: 50%; border-radius: 10px; }
-.close-btn { position:absolute; top:10px; right:20px; font-size:30px; cursor:pointer; }
-
-@media (max-width: 600px) { .modal-body { flex-direction: column; } .modal-body img { width: 100%; } }
-/* CART SIDEBAR */
-.cart-sidebar {
-    position: fixed;
-    right: -350px; /* Hidden by default */
-    top: 0;
-    width: 320px;
-    height: 100%;
-    background: white;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-    transition: 0.3s ease;
-    z-index: 3000;
-    display: flex;
-    flex-direction: column;
+/* --- 1. Base & Reset --- */
+body { 
+    font-family: 'Inter', sans-serif; 
+    margin: 0; 
+    background: #f4f7f6; 
+    color: #333;
 }
 
-.cart-sidebar.active {
-    right: 0; /* Slide in */
-}
-
-.cart-header {
-    padding: 20px;
-    background: #333;
-    color: white;
+/* --- 2. Header & Navigation --- */
+.golem-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-#cartItems {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-/* Individual Item in Cart */
-.cart-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
+    padding: 10px 5%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     border-bottom: 1px solid #eee;
 }
 
-.cart-item img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 5px;
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
-
-.cart-item-info h4 { margin: 0; font-size: 0.9rem; }
-.cart-item-info p { margin: 0; color: #007bff; font-weight: bold; }
-
-.remove-btn {
-    background: none;
-    border: none;
-    color: red;
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-left: auto;
-}
-
-.cart-footer {
-    padding: 20px;
-    border-top: 2px solid #eee;
-    background: #f9f9f9;
-}
-
-/* Container for the badge positioning */
-.product-card {
-    position: relative;
-}
-
-/* The Sold Badge */
-.sold-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #ff4d4d;
-    color: white;
-    padding: 5px 12px;
-    font-weight: bold;
-    border-radius: 5px;
-    z-index: 10;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* Dim the card slightly if sold */
-.product-card.sold-out {
-    cursor: default;
-}
-
-
-.golem-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 5%;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px); /* Modern blur effect */
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  border-bottom: 1px solid #eee;
-}
-
-.nav-link {
-  margin: 0 15px;
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.nav-link:hover {
-  color: #007bff; /* Highlight color */
-}
-
-.nav-link-sell {
-  margin: 0 15px;
-  text-decoration: none;
-  background: #28a745; /* Stand-out Green for 'Sell' */
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.container {
-  display: flex;
-}
-.container > div {
-  width:11%;
-}
-
 
 .search-wrapper {
     position: relative;
-    flex-grow: 2; /* Takes up more space than the buttons */
+    flex-grow: 2;
     margin: 0 20px;
     max-width: 400px;
 }
@@ -179,88 +46,94 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
     padding: 10px 15px 10px 35px;
     border-radius: 20px;
     border: 1px solid #ddd;
-    background: #fdfdfd;
     outline: none;
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
 
-#headerSearch:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.15);
-    background: #fff;
+.nav-container-horizontal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
 }
 
-/* On mobile, we might want to hide some text to save space */
- /* Horizontal Navigation Styles */
-        .nav-container-horizontal {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1; /* Pushes links to take available space */
-        }
+.nav-item-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    min-width: 70px;
+    transition: transform 0.2s;
+}
 
-        .nav-item-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
-            min-width: 80px;
-            text-decoration: none;
-            color: #333;
-        }
+.nav-item-box i { font-size: 1.1rem; margin-bottom: 2px; }
+.nav-item-box p { font-size: 0.75rem; font-weight: 600; margin: 0; }
+.nav-item-box:hover { transform: translateY(-3px); }
 
-        .nav-item-box i {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
-        }
+.bg-home { background-color: #FFF4A3; }
+.bg-sell { background-color: #FFC0C7; }
+.bg-items { background-color: #D9EEE1; }
 
-        .nav-item-box p {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin: 0;
-        }
+/* --- 3. Masonry Layout --- */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
 
-        .nav-item-box:hover {
-            transform: translateY(-3px);
-            filter: brightness(0.95);
-        }
+.masonry-wrapper {
+    column-count: 2; /* Mobile Default */
+    column-gap: 1.2rem;
+}
 
-        /* Colors as per your example */
-        .bg-home { background-color: #FFF4A3; }
-        .bg-sell { background-color: #FFC0C7; }
-        .bg-items { background-color: #D9EEE1; }
+@media (min-width: 768px) { .masonry-wrapper { column-count: 3; } }
+@media (min-width: 1024px) { .masonry-wrapper { column-count: 4; } }
 
-        /* Ensuring the header layout stays clean */
-        .golem-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 5%;
-            background: white;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-
-
-
-
-
-/* Modal Overlay */
-.modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
+/* --- 4. Product Cards --- */
+.product-card {
+    display: inline-block; /* Crucial for Masonry flow */
     width: 100%;
-    height: 100%;
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.product-card img {
+    width: 100%;
+    display: block;
+    height: auto; /* Keeps the masonry look based on image height */
+}
+
+.product-info {
+    padding: 12px;
+    text-align: left;
+}
+
+.sold-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff4d4d;
+    color: white;
+    padding: 4px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 10;
+    font-size: 0.75rem;
+}
+
+/* --- 5. Modal & Auth --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(5px);
     z-index: 2000;
@@ -268,25 +141,14 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
     align-items: center;
 }
 
-/* Modal Box */
 .modal-content {
     background: white;
-    padding: 40px;
+    padding: 30px;
     border-radius: 20px;
     width: 90%;
     max-width: 400px;
     position: relative;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-.close-modal {
-    position: absolute;
-    right: 20px;
-    top: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #999;
 }
 
 .input-group {
@@ -304,7 +166,7 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
 
 .input-group input {
     width: 100%;
-    padding: 12px 12px 12px 45px;
+    padding: 12px 12px 12px 40px;
     border: 1px solid #ddd;
     border-radius: 10px;
     outline: none;
@@ -319,44 +181,4 @@ nav { background: #333; color: white; padding: 1rem; display: flex; justify-cont
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 10px;
-}
-
-
-
-
-
-
-
-
-
-
-/* Header Layout Fix */
-.golem-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 5%;
-    background: white;
-    border-bottom: 1px solid #eee;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-/* Masonry Grid Fix */
-.masonry-wrapper {
-    column-count: 2; /* 2 columns for mobile */
-    column-gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .masonry-wrapper { column-count: 4; } /* 4 columns for desktop */
-}
-
-/* Prevent cards from breaking across columns */
-.product-card {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 1.5rem;
 }
