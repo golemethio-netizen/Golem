@@ -222,3 +222,15 @@ window.checkAuthToSell = async function() {
     window.location.href = 'submit.html';
 };
 
+
+function toggleModal() {
+    const modal = document.getElementById('authModal');
+    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+}
+
+// Update your existing Sign In button to trigger this:
+document.querySelector('.signin-btn').onclick = (e) => {
+    e.preventDefault();
+    toggleModal();
+};
+
