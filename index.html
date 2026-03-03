@@ -67,31 +67,36 @@
 </head>
 <body>
 
-    <header class="golem-header">
-        <div class="logo">GOLEM</div>
+  <header class="golem-header">
+    <div class="logo">GOLEM</div>
 
-        <div class="nav-container-horizontal">
-            <div class="nav-item-box bg-home" onclick="location.href='index.html'">
-                <i class="fas fa-home"></i>
-                <p>Home</p>
-            </div>
-            
-            <div class="nav-item-box bg-sell" onclick="checkAuthToSell()">
-                <i class="fas fa-plus-circle"></i>
-                <p>Sell</p>
-            </div>
-            
-            <div class="nav-item-box bg-items" onclick="location.href='my-items.html'">
-                <i class="fas fa-box-open"></i>
-                <p>My Items</p>
-            </div>
-        </div>
+    <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="headerSearch" placeholder="Search for items..." onkeyup="handleSearch(event)">
+    </div>
 
-        <div class="auth-buttons">
-            <button class="lang-toggle">አማ</button>
-            <a href="#" class="signin-btn">Sign In</a>
+    <div class="nav-container-horizontal">
+        <div class="nav-item-box bg-home" onclick="location.href='index.html'">
+            <i class="fas fa-home"></i>
+            <p>Home</p>
         </div>
-    </header>
+        
+        <div class="nav-item-box bg-sell" onclick="checkAuthToSell()">
+            <i class="fas fa-plus-circle"></i>
+            <p>Sell</p>
+        </div>
+        
+        <div class="nav-item-box bg-items" onclick="location.href='my-items.html'">
+            <i class="fas fa-box-open"></i>
+            <p>My Items</p>
+        </div>
+    </div>
+
+    <div class="auth-buttons">
+        <button class="lang-toggle">አማ</button>
+        <a href="#" class="signin-btn">Sign In</a>
+    </div>
+</header>
 
     <div class="filter-controls" style="padding: 20px 0; background: #fff;">
         <div class="sort-container" style="display: flex; justify-content: flex-end; padding: 0 5%;">
@@ -145,3 +150,4 @@
     </script>
 </body>
 </html>
+
