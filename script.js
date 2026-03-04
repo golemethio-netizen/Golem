@@ -67,15 +67,24 @@ function renderProducts(products) {
     console.log("Rendering 33 products into the grid now...");
 
     grid.innerHTML = products.map(p => {
-        return `
-            <div class="product-card">
-                <img src="${p.image}" alt="${p.name}">
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <p>${p.price} ETB</p>
+       // Inside products.map(p => { ...
+return `
+    <div class="product-card">
+        <img src="${p.image}" alt="${p.name}">
+        <div class="product-info">
+            <h3>${p.name}</h3>
+            <p class="price">${p.price} ETB</p>
+            
+            <div class="action-buttons">
+                <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>
+                <div style="display: flex; gap: 5px;">
+                    <a href="https://t.me/${p.telegram_username}" target="_blank" class="tg-btn" style="flex:2;">✈️ Telegram</a>
+                    <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex:1;">📤 Share</button>
                 </div>
             </div>
-        `;
+        </div>
+    </div>
+`;
     }).join('');
 
    const loader = document.getElementById('pageLoader');
@@ -241,6 +250,7 @@ if (langBtn) {
         // logic for translation goes here
     });
 }
+
 
 
 
