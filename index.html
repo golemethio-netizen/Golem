@@ -57,7 +57,15 @@
             <button onclick="applyPriceFilter()" class="filter-btn" style="padding: 8px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Apply</button>
         </div>
     </div>
+<div class="filter-bar" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; white-space: nowrap;">
+    <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
+    
+    <button class="filter-btn fav-filter-btn" onclick="filterFavorites(this)" style="border-color: #ff4d4d; color: #ff4d4d;">
+        <i class="fas fa-heart"></i> My Favorites
+    </button>
 
+    <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
+    </div>
     <div class="filter-bar" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; white-space: nowrap;">
 <button class="filter-btn" onclick="filterCategory('All', this)">All</button>
         <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
@@ -101,5 +109,6 @@
    
 </body>
 </html>
+
 
 
