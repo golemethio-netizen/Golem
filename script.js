@@ -293,3 +293,15 @@ window.handleForgotPassword = async function(event) {
 };
 
 
+window.checkAuthToSell = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    if (user) {
+        // User is logged in, let them go to the sell page
+        window.location.href = 'sell.html';
+    } else {
+        // User is a guest, force the login modal open
+        alert("Please Sign In first to post an item.");
+        toggleModal();
+    }
+};
