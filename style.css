@@ -239,3 +239,9 @@ body {
     border-radius: 8px;
     cursor: pointer;
 }
+
+.fav-filter-btn.active {
+    background-color: #ff4d4d !important;
+    color: white !important;
+    border-color: #ff4d4d !important;
+}
