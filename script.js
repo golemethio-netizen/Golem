@@ -6,38 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser();
     loadDynamicFilters();
 
-    // Synced with your index.html ID "headerSearch"
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            filterSearch(term);
+            filterSearch(e.target.value.toLowerCase());
         });
-    }
-
-    // Modal close listener (clicks outside content close the modal)
-    window.onclick = function(event) {
-        const modal = document.getElementById('authModal');
-        if (event.target == modal) {
-            toggleModal();
-        }
     }
 });
 
 /* ==========================================
-   2. PRODUCT FETCHING & RENDERING
+   2. DATA FETCHING
    ========================================== */
 async function fetchProducts(category = 'All') {
-    console.log("Fetching products for category:", category); // Debugging line
+    console.log("Fetching:", category);
     
-    const sortSelect = document.getElementById('sortSelect');
-    const sortOrder = sortSelect ? sortSelect.value : 'newest';
-
-    // IMPORTANT: Ensure '_supabase' matches your config.js variable name
+    // Using the '_supabase' variable from your config.js
     let query = _supabase.from('products').select('*');
-
-    // Remove the 'approved' filter temporarily to see if products appear
-    // query = query.eq('status', 'approved'); 
 
     if (category !== 'All') {
         query = query.eq('category', category);
@@ -50,225 +34,90 @@ async function fetchProducts(category = 'All') {
         return;
     }
 
-    console.log("Products found:", products.length);
     renderProducts(products);
 }
 
-
+/* ==========================================
+   3. RENDERING ENGINE (The Core Fix)
+   ========================================== */
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
-    
-    // Debugging: This will tell us if the script can't find the 'productGrid' div
-    if (!grid) {
-        console.error("Error: Could not find the element with ID 'productGrid' on the page.");
+    if (!grid) return;
+
+    // Get current favorites to highlight hearts correctly
+    const favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
+
+    if (products.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; width:100%; padding:50px;">No items found.</p>';
         return;
     }
-
-    console.log("Rendering 33 products into the grid now...");
 
     grid.innerHTML = products.map(p => {
-       // Inside products.map(p => { ...
-return `
-    <div class="product-card">
-        <img src="${p.image}" alt="${p.name}">
-        <div class="product-info">
-            <h3>${p.name}</h3>
-            <p class="price">${p.price} ETB</p>
-            
-            <div class="action-buttons">
-                <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>
-                <div style="display: flex; gap: 5px;">
-                    <a href="https://t.me/${p.telegram_username}" target="_blank" class="tg-btn" style="flex:2;">✈️ Telegram</a>
-                    <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex:1;">📤 Share</button>
+        const isFav = favs.includes(p.id);
+        const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
+        
+        return `
+            <div class="product-card" data-id="${p.id}">
+                <div class="img-wrapper" style="position: relative;">
+                    <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${p.id}')">
+                        <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                    
+                    <span class="condition-tag">${p.condition || 'Used'}</span>
+                    <img src="${p.image}" alt="${p.name}" loading="lazy">
+                </div>
+
+                <div class="product-info">
+                    <h3>${p.name}</h3>
+                    <p class="description-preview">${p.description || ''}</p>
+                    <p class="price">${p.price} ETB</p>
+                    
+                    <div class="action-buttons">
+                        <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>
+                        
+                        <div style="display: flex; gap: 5px; width: 100%;">
+                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2;">✈️ Telegram</a>
+                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-`;
+        `;
     }).join('');
-
-   const loader = document.getElementById('pageLoader');
-    if (loader) loader.style.display = 'none';
-
-
 }
-
 
 /* ==========================================
-   3. FILTERS & SEARCH (GRID-FRIENDLY)
+   4. FAVORITES & FILTERS LOGIC
    ========================================== */
-function filterSearch(term) {
-    const cards = document.querySelectorAll('.product-card');
-    let visibleCount = 0;
+window.toggleFavorite = function(event, productId) {
+    event.stopPropagation();
+    let favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
+    const btn = event.currentTarget;
+    const icon = btn.querySelector('i');
 
-    cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        const desc = card.querySelector('.description-preview').innerText.toLowerCase();
-        
-        if (title.includes(term) || desc.includes(term)) {
-            // FIX: Using inline-block to preserve Masonry flow
-            card.style.display = 'inline-block'; 
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    const grid = document.getElementById('productGrid');
-    const existingMsg = document.getElementById('noMatchMsg');
-    
-    if (visibleCount === 0 && !existingMsg) {
-        const msg = document.createElement('p');
-        msg.id = 'noMatchMsg';
-        msg.innerText = "No items match your search.";
-        msg.style.cssText = "text-align:center; width:100%; padding:20px; color:#666;";
-        grid.appendChild(msg);
-    } else if (visibleCount > 0 && existingMsg) {
-        existingMsg.remove();
-    }
-}
-
-async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-bar'); // Matches your HTML
-    if (!container) return;
-
-    const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
-    if (error) {
-        console.error("Category Load Error:", error.message);
-        return;
-    }
-
-    // Keep your hardcoded buttons and append new ones from the database
-    if (cats) {
-        cats.forEach(c => {
-            // Check if button already exists to avoid duplicates
-            if (!container.innerHTML.includes(c.name)) {
-                container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
-            }
-        });
-    }
-}
-
-window.filterCategory = function(cat, btn) {
-    console.log("Category clicked:", cat); // This should pop up in your console!
-    fetchProducts(cat);
-    
-    // UI: highlight active button
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-};
-
-
-window.applyPriceFilter = function() {
-    const min = parseFloat(document.getElementById('minPrice').value) || 0;
-    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-    const cards = document.querySelectorAll('.product-card');
-    
-    cards.forEach(card => {
-        const priceText = card.querySelector('.price').innerText;
-        const price = parseFloat(priceText.replace(' ETB', ''));
-        // FIX: Using inline-block to preserve Masonry flow
-        card.style.display = (price >= min && price <= max) ? 'inline-block' : 'none';
-    });
-};
-
-/* ==========================================
-   4. USER ACTIONS & AUTH
-   ========================================== */
-function toggleModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        const currentDisplay = window.getComputedStyle(modal).display;
-        modal.style.display = (currentDisplay === 'none') ? 'flex' : 'none';
-    }
-}
-
-async function updateUIForUser() {
-    const signinBtn = document.querySelector('.signin-btn');
-    const { data: { user } } = await _supabase.auth.getUser();
-
-    if (user && signinBtn) {
-        signinBtn.innerHTML = "Sign Out";
-        signinBtn.onclick = handleSignOut;
-    } else if (signinBtn) {
-        signinBtn.innerHTML = "Sign In";
-        signinBtn.onclick = (e) => {
-            e.preventDefault();
-            toggleModal();
-        };
-    }
-}
-
-async function handleSignOut(e) {
-    if (e) e.preventDefault();
-    await _supabase.auth.signOut();
-    window.location.reload();
-}
-
-window.checkAuthToSell = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) {
-        alert("Please Sign In to post an item.");
-        toggleModal();
-        return;
-    }
-    window.location.href = 'submit.html';
-};
-
-// Increment view helper
-async function incrementView(productId) {
-    try {
-        await _supabase.rpc('increment_views', { row_id: productId });
-    } catch (e) {
-        console.log("View count error:", e);
-    }
-}
-
-function handleViewAndBuy(id) {
-    incrementView(id);
-    location.href = `checkout.html?id=${id}`;
-}
-
-async function shareItem(name, price, id) {
-    const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html','')}checkout.html?id=${id}`;
-    const shareText = `Check out this ${name} for ${price} ETB on Golem Marketplace!`;
-
-    if (navigator.share) {
-        try { await navigator.share({ title: 'Golem', text: shareText, url: shareUrl }); } 
-        catch (err) { console.log("Share cancelled"); }
+    if (favs.includes(productId)) {
+        favs = favs.filter(id => id !== productId);
+        btn.classList.remove('active');
+        icon.classList.replace('fas', 'far');
     } else {
-        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-        alert("Link copied to clipboard!");
+        favs.push(productId);
+        btn.classList.add('active');
+        icon.classList.replace('far', 'fas');
     }
-}
-
-// Amharic Toggle Placeholder
-const langBtn = document.querySelector('.lang-toggle');
-if (langBtn) {
-    langBtn.addEventListener('click', () => {
-        alert('Switching to Amharic!');
-        // logic for translation goes here
-    });
-}
-
+    localStorage.setItem('golem_favs', JSON.stringify(favs));
+};
 
 window.filterFavorites = function(btn) {
-    // 1. UI: Highlight this button and remove active from others
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    // 2. Get the list of favorited IDs from local storage
     const favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
     const cards = document.querySelectorAll('.product-card');
     let visibleCount = 0;
 
-    // 3. Loop through cards on the screen
     cards.forEach(card => {
-        // We need the ID of the product. 
-        // TIP: Ensure your renderProducts adds 'data-id' to the card div
-        const productId = card.getAttribute('data-id');
-        
-        if (favs.includes(productId)) {
+        const id = card.getAttribute('data-id');
+        if (favs.includes(id)) {
             card.style.display = 'inline-block';
             visibleCount++;
         } else {
@@ -276,21 +125,79 @@ window.filterFavorites = function(btn) {
         }
     });
 
-    // 4. Handle empty state
-    const grid = document.getElementById('productGrid');
-    const existingMsg = document.getElementById('noFavsMsg');
-    
-    if (visibleCount === 0 && !existingMsg) {
-        const msg = document.createElement('p');
-        msg.id = 'noFavsMsg';
-        msg.innerHTML = "You haven't added any favorites yet! <br> Click the ❤️ on an item to save it.";
-        msg.style.cssText = "text-align:center; width:100%; padding:40px; color:#666; font-style:italic;";
-        grid.appendChild(msg);
-    } else if (visibleCount > 0 && existingMsg) {
-        existingMsg.remove();
+    if (visibleCount === 0) {
+        alert("No favorites saved yet!");
+        filterCategory('All');
     }
 };
 
+window.filterCategory = function(cat, btn) {
+    const allBtns = document.querySelectorAll('.filter-btn');
+    allBtns.forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    
+    fetchProducts(cat);
+};
 
+/* ==========================================
+   5. SEARCH & PRICE FILTERS
+   ========================================== */
+function filterSearch(term) {
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        card.style.display = title.includes(term) ? 'inline-block' : 'none';
+    });
+}
 
+window.applyPriceFilter = function() {
+    const min = parseFloat(document.getElementById('minPrice').value) || 0;
+    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+    document.querySelectorAll('.product-card').forEach(card => {
+        const price = parseFloat(card.querySelector('.price').innerText.replace(' ETB', ''));
+        card.style.display = (price >= min && price <= max) ? 'inline-block' : 'none';
+    });
+};
 
+/* ==========================================
+   6. UTILITIES (Buy, Share, Auth)
+   ========================================== */
+function handleViewAndBuy(id) {
+    location.href = `checkout.html?id=${id}`;
+}
+
+async function shareItem(name, price, id) {
+    const url = `${window.location.origin}/checkout.html?id=${id}`;
+    if (navigator.share) {
+        navigator.share({ title: 'Golem', text: `${name} - ${price} ETB`, url });
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("Link copied!");
+    }
+}
+
+async function loadDynamicFilters() {
+    const container = document.querySelector('.filter-bar');
+    const { data: cats } = await _supabase.from('categories').select('name');
+    if (cats && container) {
+        cats.forEach(c => {
+            if (!container.innerHTML.includes(c.name)) {
+                container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+            }
+        });
+    }
+}
+
+function toggleModal() {
+    const m = document.getElementById('authModal');
+    m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+}
+
+async function updateUIForUser() {
+    const btn = document.querySelector('.signin-btn');
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user && btn) {
+        btn.innerText = "Sign Out";
+        btn.onclick = async () => { await _supabase.auth.signOut(); location.reload(); };
+    }
+}
