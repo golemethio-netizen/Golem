@@ -111,6 +111,26 @@
                 window.location.href = 'index.html';
             }
         });
+
+
+
+
+
+// Get the user again to ensure we have the email
+const { data: { user } } = await _supabase.auth.getUser();
+
+const productData = {
+    name: document.getElementById('prodName').value,
+    price: parseFloat(document.getElementById('prodPrice').value),
+    category: document.getElementById('prodCategory').value,
+    description: document.getElementById('prodDesc').value,
+    image: publicUrl,
+    seller_phone: document.getElementById('prodPhone').value,
+    seller_email: user.email, // <--- ADD THIS LINE
+    user_id: user.id,
+    status: 'pending'
+};
+        
     </script>
 
     <style>
