@@ -118,6 +118,7 @@ body {
 .product-info {
     padding: 12px;
     text-align: left;
+    overflow: visible !important;
 }
 
 .sold-badge {
@@ -197,3 +198,44 @@ body {
     opacity: 1 !important;
 }
 
+/* Ensure the button container is visible */
+.action-buttons {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+/* Force Buy Button Visibility */
+.main-btn {
+    display: block !important;
+    width: 100%;
+    background-color: #007bff !important; /* Blue */
+    color: white !important;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Force Share/Telegram Buttons Visibility */
+.tg-btn {
+    background-color: #0088cc !important; /* Telegram Blue */
+    color: white !important;
+    padding: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.share-btn {
+    background-color: #eeeeee !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
