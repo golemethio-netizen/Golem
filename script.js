@@ -81,10 +81,10 @@ window.toggleAuthMode = function() {
    2. DATA FETCHING
    ========================================== */
 async function fetchProducts(category = 'All') {
-    console.log("Fetching:", category);
-    
-    // Using the '_supabase' variable from your config.js
-    let query = _supabase.from('products').select('*');
+    let query = _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved'); // ONLY show approved items to the public
 
     if (category !== 'All') {
         query = query.eq('category', category);
@@ -305,3 +305,30 @@ window.checkAuthToSell = async function() {
         toggleModal();
     }
 };
+
+
+
+
+
+// Inside your sellForm.addEventListener('submit', ...)
+
+const productData = {
+    name: document.getElementById('prodName').value,
+    price: parseFloat(document.getElementById('prodPrice').value),
+    category: document.getElementById('prodCategory').value,
+    description: document.getElementById('prodDesc').value,
+    image: publicUrl, // The URL from Supabase Storage
+    seller_phone: document.getElementById('prodPhone').value, // Swapped from Telegram
+    user_id: user.id,
+    status: 'pending' // THIS ENSURES IT GOES TO ADMIN FOR APPROVAL
+};
+
+const { error: insertError } = await _supabase
+    .from('products')
+    .insert([productData]);
+
+if (!insertError) {
+    alert("Listing submitted! An admin will review and approve it shortly.");
+    window.location.href = 'index.html';
+}
+
