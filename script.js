@@ -332,3 +332,28 @@ if (!insertError) {
     window.location.href = 'index.html';
 }
 
+
+
+// Inside Supabase Edge Function: /supabase/functions/send-email/index.ts
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+
+serve(async (req) => {
+  const { record } = await req.json()
+
+  // This would use a service like Resend (free tier)
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer YOUR_RESEND_API_KEY`,
+    },
+    body: JSON.stringify({
+      from: 'Golem Marketplace <notifications@golem.et>',
+      to: record.seller_email, // We'll need to store this in the products table
+      subject: 'Your item is now LIVE! 🎉',
+      html: `<strong>Congratulations!</strong> Your item "${record.name}" has been approved and is now visible to all buyers on Golem.`,
+    }),
+  })
+
+  return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
+})
