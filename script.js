@@ -28,29 +28,32 @@ document.addEventListener('DOMContentLoaded', () => {
    2. PRODUCT FETCHING & RENDERING
    ========================================== */
 async function fetchProducts(category = 'All') {
+    console.log("Fetching products for category:", category); // Debugging line
+    
     const sortSelect = document.getElementById('sortSelect');
     const sortOrder = sortSelect ? sortSelect.value : 'newest';
 
-    let query = _supabase.from('products').select('*').eq('status', 'approved');
+    // IMPORTANT: Ensure '_supabase' matches your config.js variable name
+    let query = _supabase.from('products').select('*');
+
+    // Remove the 'approved' filter temporarily to see if products appear
+    // query = query.eq('status', 'approved'); 
 
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    // Sorting Logic
-    query = query.order('is_sponsored', { ascending: false });
-    if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
-    else if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
-    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
-    else if (sortOrder === 'popular') query = query.order('views', { ascending: false });
-
     const { data: products, error } = await query;
+
     if (error) {
-        console.error("Error fetching products:", error);
+        console.error("Supabase Error:", error.message);
         return;
     }
+
+    console.log("Products found:", products.length);
     renderProducts(products);
 }
+
 
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
@@ -256,3 +259,4 @@ if (langBtn) {
         // logic for translation goes here
     });
 }
+
