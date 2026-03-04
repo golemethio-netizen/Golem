@@ -3,42 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage My Items | Golem</title>
+    <title>My Items | Golem Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-    <nav>
-        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
-        <div id="userMenu">
-            <button onclick="location.href='index.html'" class="filter-btn">Back to Shop</button>
-        </div>
-    </nav>
+    <header class="golem-header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <h2 style="color: white; margin: 0;">My Dashboard</h2>
+        <a href="index.html" class="signin-btn" style="text-decoration: none;">Back Home</a>
+    </header>
 
-    <div class="container">
-        <div id="statsSummary">
-            </div>
-
-        <div class="header-row">
-            <h2>My Listings</h2>
-            <button onclick="location.href='submit.html'" class="main-btn" style="width: auto; padding: 10px 20px;">
-                ➕ Sell New Item
-            </button>
+    <main class="container" style="padding: 20px;">
+        <div class="dashboard-header" style="margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            <h3>Your Posted Items</h3>
+            <p style="color: #666;">Manage your listings and track their status.</p>
         </div>
 
-        <div id="myItemsGrid" class="product-grid">
-            <p class="loading">Loading your items...</p>
+        <div id="myItemsGrid" class="masonry-wrapper">
+            <div class="loading-spinner" style="text-align: center; padding: 50px;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i> Loading your items...
+             </div>
         </div>
-    </div>
+    </main>
 
-    <footer class="bottom-nav">
-        <div class="nav-item" onclick="location.href='index.html'">🏠 Home</div>
-        <div class="nav-item active" onclick="location.href='my-items.html'">📦 My Items</div>
-        <div class="nav-item" onclick="checkAuthToSell()">➕ Sell</div>
-    </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="my-items.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { user } } = await _supabase.auth.getUser();
+            
+            if (!user) {
+                alert("Please sign in to view your items.");
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            fetchUserItems(user.id);
+        });
+
+        async function fetchUserItems(userId) {
+            const { data: items, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('user_id', userId); // Filter by the logged-in user's ID
+
+            const grid = document.getElementById('myItemsGrid');
+            
+            if (error || !items || items.length === 0) {
+                grid.innerHTML = `<div style="text-align:center; padding:50px;">
+                    <i class="fas fa-box-open fa-3x" style="color: #ccc;"></i>
+                    <p>You haven't posted any items yet.</p>
+                    <button onclick="location.href='sell.html'" class="main-btn">Post an Item Now</button>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+                <div class="product-card" id="item-${item.id}">
+                    <div class="img-wrapper">
+                        <span class="status-tag ${item.status}">${item.status}</span>
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="product-info">
+                        <h3>${item.name}</h3>
+                        <p class="price">${item.price} ETB</p>
+                        <div class="action-buttons" style="flex-direction: row; gap: 5px;">
+                            <button class="share-btn" style="flex: 1; background: #ff4d4d; color: white; border: none;" 
+                                    onclick="deleteItem('${item.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteItem(id) {
+            if (confirm("Are you sure you want to delete this listing? This cannot be undone.")) {
+                const { error } = await _supabase.from('products').delete().eq('id', id);
+                if (error) {
+                    alert("Error deleting item: " + error.message);
+                } else {
+                    document.getElementById(`item-${id}`).remove();
+                }
+            }
+        }
+    </script>
 </body>
 </html>
