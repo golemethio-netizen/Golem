@@ -93,15 +93,12 @@ body {
 
 /* --- 4. Product Cards --- */
 .product-card {
-    display: inline-block; /* Crucial for Masonry flow */
-    width: 100%;
     background: white;
-    border-radius: 15px;
-    margin-bottom: 1.2rem;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    transition: 0.3s;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+    break-inside: avoid; /* Essential for Masonry */
+    display: inline-block;
+    width: 100%;
 }
 
 .product-card img {
@@ -181,4 +178,13 @@ body {
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
+}
+
+#productGrid {
+    display: block !important; /* Overrides any accidental grid/flex conflicts */
+    min-height: 500px; 
+    width: 100%;
+    clear: both;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
