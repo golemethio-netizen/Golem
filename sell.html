@@ -21,8 +21,11 @@
 
             <form id="sellForm">
                 <div class="input-group-sell">
-                    <label><i class="fas fa-image"></i> Product Image URL</label>
-                    <input type="url" id="prodImage" placeholder="https://example.com/image.jpg" required>
+    <label><i class="fas fa-camera"></i> Upload Product Photo</label>
+    <input type="file" id="prodFile" accept="image/*" required 
+           style="border: 2px dashed #ddd; padding: 20px; text-align: center;">
+    <p id="uploadStatus" style="font-size: 12px; color: #666; margin-top: 5px;"></p>
+</div>
                 </div>
 
                 <div class="input-group-sell">
