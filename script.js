@@ -57,50 +57,28 @@ async function fetchProducts(category = 'All') {
 
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
-    if (!grid) return;
-
-    if (products.length === 0) {
-        grid.innerHTML = '<p style="text-align:center; padding:20px; width: 100%;">No items found.</p>';
+    
+    // Debugging: This will tell us if the script can't find the 'productGrid' div
+    if (!grid) {
+        console.error("Error: Could not find the element with ID 'productGrid' on the page.");
         return;
     }
 
+    console.log("Rendering 33 products into the grid now...");
+
     grid.innerHTML = products.map(p => {
-        const isSold = p.status === 'sold';
-        const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
-        
         return `
-            <div class="product-card ${isSold ? 'is-sold' : ''}">
-                <div class="img-wrapper" style="position: relative;">
-                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    <span class="condition-tag" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:2px 8px; border-radius:5px; font-size:12px;">
-                        ${p.condition || 'Used'}
-                    </span>
-                    <img src="${p.image}" alt="${p.name}" loading="lazy" style="width:100%; display:block;">
-                </div>
+            <div class="product-card">
+                <img src="${p.image}" alt="${p.name}">
                 <div class="product-info">
                     <h3>${p.name}</h3>
-                    <p class="description-preview" style="font-size:14px; color:#666; margin: 5px 0;">${p.description || 'No description provided.'}</p>
-                    <p class="price" style="font-weight:bold; color:#28a745; margin-bottom:10px;">${p.price} ETB</p>
-                    
-                    <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
-                        ${isSold ? 
-                            `<button class="main-btn" disabled style="background:#ccc; border:none; padding:8px; border-radius:5px;">Already Sold</button>` : 
-                            `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">🛒 Buy Now</button>`
-                        }
-                        
-                        <div style="display: flex; gap: 5px;">
-                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none; text-align: center; background:#0088cc; color:white; padding:5px; border-radius:5px; font-size:14px;">✈️ Telegram</a>
-                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1; cursor:pointer; background:#eee; border:1px solid #ddd; border-radius:5px;">📤 Share</button>
-                        </div>
-                    </div>
+                    <p>${p.price} ETB</p>
                 </div>
             </div>
         `;
     }).join('');
-
-    const loader = document.getElementById('pageLoader');
-    if (loader) loader.style.display = 'none';
 }
+
 
 /* ==========================================
    3. FILTERS & SEARCH (GRID-FRIENDLY)
@@ -259,4 +237,5 @@ if (langBtn) {
         // logic for translation goes here
     });
 }
+
 
