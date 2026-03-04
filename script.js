@@ -266,3 +266,30 @@ async function updateUIForUser() {
 }
 
 
+window.handleForgotPassword = async function(event) {
+    event.preventDefault();
+    
+    // 1. Get the email the user already typed in
+    const emailInput = document.querySelector('#authForm input[type="email"]');
+    const email = emailInput.value;
+
+    if (!email) {
+        alert("Please enter your email address first so we know where to send the reset link.");
+        emailInput.focus();
+        return;
+    }
+
+    // 2. Request the reset from Supabase
+    // Note: You must configure your 'Site URL' in the Supabase Auth dashboard for this to redirect correctly.
+    const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password.html',
+    });
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("Password reset link sent! Please check your inbox.");
+    }
+};
+
+
