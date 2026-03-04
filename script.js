@@ -8,41 +8,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// 1. Find the form
+let isSignUp = false; // Tracks the current mode
+
+// Add this inside your DOMContentLoaded listener
 const authForm = document.getElementById('authForm');
+const modalTitle = document.getElementById('modalTitle');
+const submitBtn = document.querySelector('.auth-submit');
 
 if (authForm) {
     authForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent page from refreshing
+        e.preventDefault();
         
-        // 2. Get the values from your HTML inputs
-        // Note: Check your HTML to ensure these inputs have 'type="email"' and 'type="password"'
         const email = authForm.querySelector('input[type="email"]').value;
         const password = authForm.querySelector('input[type="password"]').value;
-        const submitBtn = authForm.querySelector('.auth-submit');
 
-        // UI: Show the user something is happening
         submitBtn.innerText = "Processing...";
         submitBtn.disabled = true;
 
-        // 3. Send to Supabase
-        const { data, error } = await _supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
-        });
-
-        if (error) {
-            alert("Login Failed: " + error.message);
-            submitBtn.innerText = "Sign In";
-            submitBtn.disabled = false;
+        if (isSignUp) {
+            // SIGN UP LOGIC
+            const { data, error } = await _supabase.auth.signUp({ email, password });
+            if (error) {
+                alert("Sign Up Error: " + error.message);
+            } else {
+                alert("Success! Please check your email for a confirmation link.");
+                toggleModal();
+            }
         } else {
-            // Success!
-            console.log("Logged in as:", data.user.email);
-            toggleModal(); // Close the modal
-            window.location.reload(); // Refresh to update the Nav bar
+            // LOGIN LOGIC
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert("Login Error: " + error.message);
+            } else {
+                window.location.reload(); 
+            }
         }
+        
+        submitBtn.innerText = isSignUp ? "Create Account" : "Sign In";
+        submitBtn.disabled = false;
     });
 }
+
+// Function to switch between Login and Sign Up
+window.toggleAuthMode = function() {
+    isSignUp = !isSignUp;
+    const footerText = document.querySelector('.modal-footer p');
+    
+    if (isSignUp) {
+        modalTitle.innerText = "Create Account";
+        submitBtn.innerText = "Create Account";
+        footerText.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>`;
+    } else {
+        modalTitle.innerText = "Welcome Back";
+        submitBtn.innerText = "Sign In";
+        footerText.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>`;
+    }
+};
 
 
 
@@ -243,4 +264,5 @@ async function updateUIForUser() {
         btn.onclick = async () => { await _supabase.auth.signOut(); location.reload(); };
     }
 }
+
 
