@@ -120,7 +120,7 @@ function filterSearch(term) {
 }
 
 async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-bar'); // Matches your HTML class
+    const container = document.querySelector('.filter-bar'); // Matches your HTML
     if (!container) return;
 
     const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
@@ -129,11 +129,13 @@ async function loadDynamicFilters() {
         return;
     }
 
-    // Keep the hardcoded "All" button and append dynamic ones
-    container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    // Keep your hardcoded buttons and append new ones from the database
     if (cats) {
         cats.forEach(c => {
-            container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+            // Check if button already exists to avoid duplicates
+            if (!container.innerHTML.includes(c.name)) {
+                container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+            }
         });
     }
 }
@@ -239,6 +241,7 @@ if (langBtn) {
         // logic for translation goes here
     });
 }
+
 
 
 
