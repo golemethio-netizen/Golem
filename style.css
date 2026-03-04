@@ -283,3 +283,117 @@ body {
     flex-wrap: wrap;
 }
 
+
+/* --- Product Card Container --- */
+.product-card {
+    position: relative; /* Essential for the heart positioning */
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* --- Image & Heart Wrapper --- */
+.img-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.img-wrapper img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* The Heart Button */
+.fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.fav-btn i {
+    font-size: 18px;
+    color: #ccc; /* Default grey */
+}
+
+.fav-btn.active i {
+    color: #ff4d4d; /* Red when hearted */
+}
+
+.fav-btn:hover {
+    transform: scale(1.15);
+    background: white;
+}
+
+/* --- Action Buttons (Call & Share) --- */
+.action-buttons {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.main-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.tg-btn {
+    background: #28a745; /* Green for Call/Phone */
+    color: white !important;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.share-btn {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #555;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* --- Category Filter Bar Customizations --- */
+.fav-filter-btn {
+    border: 1px solid #ff4d4d !important;
+    color: #ff4d4d !important;
+}
+
+.fav-filter-btn.active {
+    background: #ff4d4d !important;
+    color: white !important;
+}
