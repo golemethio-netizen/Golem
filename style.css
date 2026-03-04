@@ -92,13 +92,21 @@ body {
 @media (min-width: 1024px) { .masonry-wrapper { column-count: 4; } }
 
 /* --- 4. Product Cards --- */
-.product-card {
-    background: white;
-    border: 1px solid #eee;
-    margin-bottom: 20px;
-    break-inside: avoid; /* Essential for Masonry */
-    display: inline-block;
+.masonry-wrapper {
+    display: block !important;
     width: 100%;
+    min-height: 400px;
+    padding: 20px;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    /* Ensure they don't have 0 height */
+    min-height: 100px; 
 }
 
 .product-card img {
@@ -188,3 +196,4 @@ body {
     visibility: visible !important;
     opacity: 1 !important;
 }
+
