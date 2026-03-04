@@ -4,46 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golem Marketplace | Buy & Sell</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header class="golem-header">
-    <div class="logo">GOLEM</div>
+    <header class="golem-header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
 
-    <div class="search-wrapper">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="headerSearch" placeholder="Search for items..." onkeyup="handleSearch(event)">
-    </div>
-
-    <div class="nav-container-horizontal">
-        <div class="nav-item-box bg-home" onclick="location.href='index.html'">
-            <i class="fas fa-home"></i>
-            <p>Home</p>
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="headerSearch" placeholder="Search for electronics, fashion...">
         </div>
-        
-        <div class="nav-item-box bg-sell" onclick="checkAuthToSell()">
-            <i class="fas fa-plus-circle"></i>
-            <p>Sell</p>
-        </div>
-        
-        <div class="nav-item-box bg-items" onclick="location.href='my-items.html'">
-            <i class="fas fa-box-open"></i>
-            <p>My Items</p>
-        </div>
-    </div>
 
-    <div class="auth-buttons">
-        <button class="lang-toggle">አማ</button>
-        <button type="submit" class="auth-submit">Sign In</button>
-    </div>
-</header>
+        <nav class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box bg-home">
+                <i class="fas fa-home"></i>
+                <p>Home</p>
+            </a>
+            
+            <div class="nav-item-box bg-sell" onclick="checkAuthToSell()" style="cursor:pointer;">
+                <i class="fas fa-plus-circle"></i>
+                <p>Sell</p>
+            </div>
+            
+            <a href="my-items.html" class="nav-item-box bg-items">
+                <i class="fas fa-box-open"></i>
+                <p>My Items</p>
+            </a>
+        </nav>
 
-    <div class="filter-controls" style="padding: 20px 0; background: #fff;">
-        <div class="sort-container" style="display: flex; justify-content: flex-end; padding: 0 5%;">
-            <select id="sortSelect" onchange="fetchProducts()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+        <div class="auth-buttons">
+            <button class="lang-toggle">አማ</button>
+            <button class="signin-btn" onclick="toggleModal()">Sign In</button>
+        </div>
+    </header>
+
+    <section class="filter-controls">
+        <div class="sort-container">
+            <select id="sortSelect" onchange="fetchProducts()">
                 <option value="newest">🆕 Newest First</option>
                 <option value="price_low">💰 Price: Low to High</option>
                 <option value="price_high">💎 Price: High to Low</option>
@@ -51,62 +50,66 @@
             </select>
         </div>
 
-        <div style="display: flex; gap: 10px; justify-content: center; padding: 15px;">
-            <input type="number" id="minPrice" placeholder="Min Price" style="width: 100px; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
-            <input type="number" id="maxPrice" placeholder="Max Price" style="width: 100px; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
-            <button onclick="applyPriceFilter()" class="filter-btn" style="padding: 8px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Apply</button>
+        <div class="price-filter-wrapper">
+            <input type="number" id="minPrice" placeholder="Min ETB">
+            <input type="number" id="maxPrice" placeholder="Max ETB">
+            <button onclick="applyPriceFilter()" class="apply-btn">Apply</button>
         </div>
-    </div>
-<div class="filter-bar" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; white-space: nowrap;">
-   <button class="filter-btn" onclick="filterCategory('All', this)">All</button>
-    
-  
+    </section>
 
-    <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
-      <button class="filter-btn fav-filter-btn" onclick="filterFavorites(this)" style="border-color: #ff4d4d; color: #ff4d4d;">
-        <i class="fas fa-heart"></i> My Favorites
-    </button>
-    </div>
-    <div class="filter-bar" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 5%; white-space: nowrap;">
-
-       
-    </div>
-<div id="productGrid" class="masonry-wrapper"></div>
-
-
-<div id="authModal" class="modal-overlay">
-    <div class="modal-content">
-        <span class="close-modal" onclick="toggleModal()">&times;</span>
-        <h2 id="modalTitle">Welcome Back</h2>
-        <p style="color: #666; margin-bottom: 20px;">Please enter your details</p>
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
         
-        <form id="authForm">
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" placeholder="Email Address" required>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" placeholder="Password" required>
-            </div>
-            <button type="submit" class="auth-submit">Sign In</button>
-        </form>
+        <button class="filter-btn fav-filter-btn" onclick="filterFavorites(this)">
+            <i class="fas fa-heart"></i> My Favorites
+        </button>
 
-        <div class="modal-footer">
-            <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+        <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
+        <button class="filter-btn" onclick="filterCategory('Computer & Phone', this)">Computer & Phone</button>
+        <button class="filter-btn" onclick="filterCategory('Fashion', this)">Fashion</button>
+        <button class="filter-btn" onclick="filterCategory('Home & Furniture', this)">Home & Furniture</button>
+        <button class="filter-btn" onclick="filterCategory('Vehicles', this)">Vehicles</button>
+        <button class="filter-btn" onclick="filterCategory('Jobs', this)">Jobs</button>
+        <button class="filter-btn" onclick="filterCategory('Services', this)">Services</button>
+    </div>
+
+    <main class="container">
+        <div id="productGrid" class="masonry-wrapper">
+            </div>
+    </main>
+
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleModal()">&times;</span>
+            <h2 id="modalTitle">Welcome Back</h2>
+            <p id="modalSubtitle">Please enter your details to continue</p>
+            
+            <form id="authForm">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Password" required>
+                </div>
+
+                <div class="forgot-link">
+                    <a href="#" onclick="handleForgotPassword(event)">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="auth-submit">Sign In</button>
+            </form>
+
+            <div class="modal-footer">
+                <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+            </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
-   
+
 </body>
 </html>
-
-
-
-
-
-
