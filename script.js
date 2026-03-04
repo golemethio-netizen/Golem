@@ -252,6 +252,44 @@ if (langBtn) {
 }
 
 
+window.filterFavorites = function(btn) {
+    // 1. UI: Highlight this button and remove active from others
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // 2. Get the list of favorited IDs from local storage
+    const favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
+    const cards = document.querySelectorAll('.product-card');
+    let visibleCount = 0;
+
+    // 3. Loop through cards on the screen
+    cards.forEach(card => {
+        // We need the ID of the product. 
+        // TIP: Ensure your renderProducts adds 'data-id' to the card div
+        const productId = card.getAttribute('data-id');
+        
+        if (favs.includes(productId)) {
+            card.style.display = 'inline-block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // 4. Handle empty state
+    const grid = document.getElementById('productGrid');
+    const existingMsg = document.getElementById('noFavsMsg');
+    
+    if (visibleCount === 0 && !existingMsg) {
+        const msg = document.createElement('p');
+        msg.id = 'noFavsMsg';
+        msg.innerHTML = "You haven't added any favorites yet! <br> Click the ❤️ on an item to save it.";
+        msg.style.cssText = "text-align:center; width:100%; padding:40px; color:#666; font-style:italic;";
+        grid.appendChild(msg);
+    } else if (visibleCount > 0 && existingMsg) {
+        existingMsg.remove();
+    }
+};
 
 
 
