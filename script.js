@@ -77,6 +77,11 @@ function renderProducts(products) {
             </div>
         `;
     }).join('');
+
+   const loader = document.getElementById('pageLoader');
+    if (loader) loader.style.display = 'none';
+
+
 }
 
 
@@ -237,5 +242,6 @@ if (langBtn) {
         // logic for translation goes here
     });
 }
+
 
 
