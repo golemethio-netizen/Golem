@@ -139,17 +139,14 @@ async function loadDynamicFilters() {
 }
 
 window.filterCategory = function(cat, btn) {
-    const allBtns = document.querySelectorAll('.filter-btn');
-    allBtns.forEach(b => b.classList.remove('active'));
-    
-    if (btn) {
-        btn.classList.add('active');
-    } else {
-        const targetBtn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
-        if (targetBtn) targetBtn.classList.add('active');
-    }
+    console.log("Category clicked:", cat); // This should pop up in your console!
     fetchProducts(cat);
+    
+    // UI: highlight active button
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
 };
+
 
 window.applyPriceFilter = function() {
     const min = parseFloat(document.getElementById('minPrice').value) || 0;
@@ -242,6 +239,7 @@ if (langBtn) {
         // logic for translation goes here
     });
 }
+
 
 
 
