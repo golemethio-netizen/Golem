@@ -6,6 +6,48 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser();
     loadDynamicFilters();
 
+
+
+// 1. Find the form
+const authForm = document.getElementById('authForm');
+
+if (authForm) {
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent page from refreshing
+        
+        // 2. Get the values from your HTML inputs
+        // Note: Check your HTML to ensure these inputs have 'type="email"' and 'type="password"'
+        const email = authForm.querySelector('input[type="email"]').value;
+        const password = authForm.querySelector('input[type="password"]').value;
+        const submitBtn = authForm.querySelector('.auth-submit');
+
+        // UI: Show the user something is happening
+        submitBtn.innerText = "Processing...";
+        submitBtn.disabled = true;
+
+        // 3. Send to Supabase
+        const { data, error } = await _supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+        });
+
+        if (error) {
+            alert("Login Failed: " + error.message);
+            submitBtn.innerText = "Sign In";
+            submitBtn.disabled = false;
+        } else {
+            // Success!
+            console.log("Logged in as:", data.user.email);
+            toggleModal(); // Close the modal
+            window.location.reload(); // Refresh to update the Nav bar
+        }
+    });
+}
+
+
+
+   
+
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -201,3 +243,4 @@ async function updateUIForUser() {
         btn.onclick = async () => { await _supabase.auth.signOut(); location.reload(); };
     }
 }
+
