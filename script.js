@@ -1,146 +1,90 @@
 /* ==========================================
-   1. INITIALIZATION & LISTENERS
+   1. INITIALIZATION & CORE LISTENERS
    ========================================== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Initial data fetch
     fetchProducts();
     updateUIForUser();
-    loadDynamicFilters();
 
-
-
-let isSignUp = false; // Tracks the current mode
-
-// Add this inside your DOMContentLoaded listener
-const authForm = document.getElementById('authForm');
-const modalTitle = document.getElementById('modalTitle');
-const submitBtn = document.querySelector('.auth-submit');
-
-if (authForm) {
-    authForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const email = authForm.querySelector('input[type="email"]').value;
-        const password = authForm.querySelector('input[type="password"]').value;
-
-        submitBtn.innerText = "Processing...";
-        submitBtn.disabled = true;
-
-        if (isSignUp) {
-            // SIGN UP LOGIC
-            const { data, error } = await _supabase.auth.signUp({ email, password });
-            if (error) {
-                alert("Sign Up Error: " + error.message);
-            } else {
-                alert("Success! Please check your email for a confirmation link.");
-                toggleModal();
-            }
-        } else {
-            // LOGIN LOGIC
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert("Login Error: " + error.message);
-            } else {
-                window.location.reload(); 
-            }
-        }
-        
-        submitBtn.innerText = isSignUp ? "Create Account" : "Sign In";
-        submitBtn.disabled = false;
-    });
-}
-
-// Function to switch between Login and Sign Up
-window.toggleAuthMode = function() {
-    isSignUp = !isSignUp;
-    const footerText = document.querySelector('.modal-footer p');
-    
-    if (isSignUp) {
-        modalTitle.innerText = "Create Account";
-        submitBtn.innerText = "Create Account";
-        footerText.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>`;
-    } else {
-        modalTitle.innerText = "Welcome Back";
-        submitBtn.innerText = "Sign In";
-        footerText.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>`;
-    }
-};
-
-
-
-   
-
+    // Search Listener
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             filterSearch(e.target.value.toLowerCase());
         });
     }
+
+    // Auth Form Listener (Login & Sign Up)
+    const authForm = document.getElementById('authForm');
+    if (authForm) {
+        authForm.addEventListener('submit', handleAuthSubmit);
+    }
 });
 
 /* ==========================================
-   2. DATA FETCHING
+   2. PRODUCT FETCHING & FILTERING
    ========================================== */
 async function fetchProducts(category = 'All') {
+    // Show only 'approved' items to the public
     let query = _supabase
         .from('products')
         .select('*')
-        .eq('status', 'approved'); // ONLY show approved items to the public
+        .eq('status', 'approved');
 
+    // Filter by Category
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
+    // Sort Logic
+    const sortVal = document.getElementById('sortSelect')?.value;
+    if (sortVal === 'price_low') query = query.order('price', { ascending: true });
+    else if (sortVal === 'price_high') query = query.order('price', { ascending: false });
+    else query = query.order('created_at', { ascending: false });
+
     const { data: products, error } = await query;
 
     if (error) {
-        console.error("Supabase Error:", error.message);
+        console.error("Fetch Error:", error.message);
         return;
     }
 
     renderProducts(products);
 }
 
-/* ==========================================
-   3. RENDERING ENGINE (The Core Fix)
-   ========================================== */
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // Get current favorites to highlight hearts correctly
     const favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
 
     if (products.length === 0) {
-        grid.innerHTML = '<p style="text-align:center; width:100%; padding:50px;">No items found.</p>';
+        grid.innerHTML = '<p style="text-align:center; width:100%; padding:50px;">No items available yet.</p>';
         return;
     }
 
     grid.innerHTML = products.map(p => {
         const isFav = favs.includes(p.id);
-        const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
-        
         return `
             <div class="product-card" data-id="${p.id}">
                 <div class="img-wrapper" style="position: relative;">
                     <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${p.id}')">
                         <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
                     </button>
-                    
-                    <span class="condition-tag">${p.condition || 'Used'}</span>
                     <img src="${p.image}" alt="${p.name}" loading="lazy">
                 </div>
-
                 <div class="product-info">
                     <h3>${p.name}</h3>
-                    <p class="description-preview">${p.description || ''}</p>
                     <p class="price">${p.price} ETB</p>
-                    
                     <div class="action-buttons">
                         <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>
-                        
                         <div style="display: flex; gap: 5px; width: 100%;">
-                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2;">✈️ Telegram</a>
-                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤</button>
+                            <a href="tel:${p.seller_phone}" class="tg-btn" style="flex: 2; text-decoration:none; text-align:center;">
+                                <i class="fas fa-phone"></i> Call Seller
+                            </a>
+                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -150,20 +94,81 @@ function renderProducts(products) {
 }
 
 /* ==========================================
-   4. FAVORITES & FILTERS LOGIC
+   3. AUTHENTICATION LOGIC (Login/Sign-up)
+   ========================================= */
+let isSignUp = false;
+
+window.toggleModal = function() {
+    const m = document.getElementById('authModal');
+    m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+};
+
+window.toggleAuthMode = function() {
+    isSignUp = !isSignUp;
+    const title = document.getElementById('modalTitle');
+    const submitBtn = document.querySelector('.auth-submit');
+    const footer = document.querySelector('.modal-footer p');
+
+    if (isSignUp) {
+        title.innerText = "Create Account";
+        submitBtn.innerText = "Create Account";
+        footer.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>`;
+    } else {
+        title.innerText = "Welcome Back";
+        submitBtn.innerText = "Sign In";
+        footer.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>`;
+    }
+};
+
+async function handleAuthSubmit(e) {
+    e.preventDefault();
+    const email = e.target.querySelector('input[type="email"]').value;
+    const password = e.target.querySelector('input[type="password"]').value;
+    const btn = e.target.querySelector('.auth-submit');
+
+    btn.innerText = "Processing...";
+    btn.disabled = true;
+
+    const { data, error } = isSignUp 
+        ? await _supabase.auth.signUp({ email, password })
+        : await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        alert(error.message);
+        btn.innerText = isSignUp ? "Create Account" : "Sign In";
+        btn.disabled = false;
+    } else {
+        if (isSignUp) alert("Check your email for confirmation!");
+        window.location.reload();
+    }
+}
+
+window.handleForgotPassword = async function(e) {
+    e.preventDefault();
+    const email = document.querySelector('#authForm input[type="email"]').value;
+    if (!email) return alert("Enter your email first.");
+
+    const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password.html'
+    });
+    alert(error ? error.message : "Reset link sent to your email!");
+};
+
+/* ==========================================
+   4. FAVORITES & UI HELPERS
    ========================================== */
-window.toggleFavorite = function(event, productId) {
-    event.stopPropagation();
+window.toggleFavorite = function(e, id) {
+    e.stopPropagation();
     let favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
-    const btn = event.currentTarget;
+    const btn = e.currentTarget;
     const icon = btn.querySelector('i');
 
-    if (favs.includes(productId)) {
-        favs = favs.filter(id => id !== productId);
+    if (favs.includes(id)) {
+        favs = favs.filter(item => item !== id);
         btn.classList.remove('active');
         icon.classList.replace('fas', 'far');
     } else {
-        favs.push(productId);
+        favs.push(id);
         btn.classList.add('active');
         icon.classList.replace('far', 'fas');
     }
@@ -175,185 +180,56 @@ window.filterFavorites = function(btn) {
     btn.classList.add('active');
 
     const favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
-    const cards = document.querySelectorAll('.product-card');
-    let visibleCount = 0;
-
-    cards.forEach(card => {
+    document.querySelectorAll('.product-card').forEach(card => {
         const id = card.getAttribute('data-id');
-        if (favs.includes(id)) {
-            card.style.display = 'inline-block';
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = favs.includes(id) ? 'inline-block' : 'none';
     });
-
-    if (visibleCount === 0) {
-        alert("No favorites saved yet!");
-        filterCategory('All');
-    }
 };
 
 window.filterCategory = function(cat, btn) {
-    const allBtns = document.querySelectorAll('.filter-btn');
-    allBtns.forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    
     fetchProducts(cat);
 };
 
-/* ==========================================
-   5. SEARCH & PRICE FILTERS
-   ========================================== */
+window.checkAuthToSell = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) window.location.href = 'sell.html';
+    else {
+        alert("Please Sign In to sell an item.");
+        toggleModal();
+    }
+};
+
+async function updateUIForUser() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const authBtn = document.querySelector('.signin-btn');
+    if (user && authBtn) {
+        authBtn.innerText = "Sign Out";
+        authBtn.onclick = async () => {
+            await _supabase.auth.signOut();
+            window.location.reload();
+        };
+    }
+}
+
 function filterSearch(term) {
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach(card => {
+    document.querySelectorAll('.product-card').forEach(card => {
         const title = card.querySelector('h3').innerText.toLowerCase();
         card.style.display = title.includes(term) ? 'inline-block' : 'none';
     });
 }
 
-window.applyPriceFilter = function() {
-    const min = parseFloat(document.getElementById('minPrice').value) || 0;
-    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-    document.querySelectorAll('.product-card').forEach(card => {
-        const price = parseFloat(card.querySelector('.price').innerText.replace(' ETB', ''));
-        card.style.display = (price >= min && price <= max) ? 'inline-block' : 'none';
-    });
-};
-
-/* ==========================================
-   6. UTILITIES (Buy, Share, Auth)
-   ========================================== */
 function handleViewAndBuy(id) {
-    location.href = `checkout.html?id=${id}`;
+    window.location.href = `checkout.html?id=${id}`;
 }
 
-async function shareItem(name, price, id) {
+function shareItem(name, price, id) {
     const url = `${window.location.origin}/checkout.html?id=${id}`;
     if (navigator.share) {
-        navigator.share({ title: 'Golem', text: `${name} - ${price} ETB`, url });
+        navigator.share({ title: name, text: `Check this out for ${price} ETB`, url });
     } else {
         navigator.clipboard.writeText(url);
-        alert("Link copied!");
+        alert("Link copied to clipboard!");
     }
 }
-
-async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-bar');
-    const { data: cats } = await _supabase.from('categories').select('name');
-    if (cats && container) {
-        cats.forEach(c => {
-            if (!container.innerHTML.includes(c.name)) {
-                container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
-            }
-        });
-    }
-}
-
-function toggleModal() {
-    const m = document.getElementById('authModal');
-    m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-}
-
-async function updateUIForUser() {
-    const btn = document.querySelector('.signin-btn');
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (user && btn) {
-        btn.innerText = "Sign Out";
-        btn.onclick = async () => { await _supabase.auth.signOut(); location.reload(); };
-    }
-}
-
-
-window.handleForgotPassword = async function(event) {
-    event.preventDefault();
-    
-    // 1. Get the email the user already typed in
-    const emailInput = document.querySelector('#authForm input[type="email"]');
-    const email = emailInput.value;
-
-    if (!email) {
-        alert("Please enter your email address first so we know where to send the reset link.");
-        emailInput.focus();
-        return;
-    }
-
-    // 2. Request the reset from Supabase
-    // Note: You must configure your 'Site URL' in the Supabase Auth dashboard for this to redirect correctly.
-    const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/reset-password.html',
-    });
-
-    if (error) {
-        alert("Error: " + error.message);
-    } else {
-        alert("Password reset link sent! Please check your inbox.");
-    }
-};
-
-
-window.checkAuthToSell = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    if (user) {
-        // User is logged in, let them go to the sell page
-        window.location.href = 'sell.html';
-    } else {
-        // User is a guest, force the login modal open
-        alert("Please Sign In first to post an item.");
-        toggleModal();
-    }
-};
-
-
-
-
-
-// Inside your sellForm.addEventListener('submit', ...)
-
-const productData = {
-    name: document.getElementById('prodName').value,
-    price: parseFloat(document.getElementById('prodPrice').value),
-    category: document.getElementById('prodCategory').value,
-    description: document.getElementById('prodDesc').value,
-    image: publicUrl, // The URL from Supabase Storage
-    seller_phone: document.getElementById('prodPhone').value, // Swapped from Telegram
-    user_id: user.id,
-    status: 'pending' // THIS ENSURES IT GOES TO ADMIN FOR APPROVAL
-};
-
-const { error: insertError } = await _supabase
-    .from('products')
-    .insert([productData]);
-
-if (!insertError) {
-    alert("Listing submitted! An admin will review and approve it shortly.");
-    window.location.href = 'index.html';
-}
-
-
-
-// Inside Supabase Edge Function: /supabase/functions/send-email/index.ts
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
-serve(async (req) => {
-  const { record } = await req.json()
-
-  // This would use a service like Resend (free tier)
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer YOUR_RESEND_API_KEY`,
-    },
-    body: JSON.stringify({
-      from: 'Golem Marketplace <notifications@golem.et>',
-      to: record.seller_email, // We'll need to store this in the products table
-      subject: 'Your item is now LIVE! 🎉',
-      html: `<strong>Congratulations!</strong> Your item "${record.name}" has been approved and is now visible to all buyers on Golem.`,
-    }),
-  })
-
-  return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } })
-})
