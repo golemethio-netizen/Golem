@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell an Item | Golem</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background: #f8f9fa;">
+
+    <header class="golem-header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <a href="index.html" class="signin-btn" style="text-decoration: none;">Cancel</a>
+    </header>
+
+    <main class="container" style="max-width: 600px; padding: 20px;">
+        <div class="form-card" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+            <h2 style="margin-bottom: 10px;">Post New Listing</h2>
+            <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
+
+            <form id="sellForm">
+                <div class="input-group-sell">
+                    <label><i class="fas fa-image"></i> Product Image URL</label>
+                    <input type="url" id="prodImage" placeholder="https://example.com/image.jpg" required>
+                </div>
+
+                <div class="input-group-sell">
+                    <label><i class="fas fa-tag"></i> Item Name</label>
+                    <input type="text" id="prodName" placeholder="e.g., iPhone 15 Pro Max" required>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="input-group-sell" style="flex: 1;">
+                        <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
+                        <input type="number" id="prodPrice" placeholder="0.00" required>
+                    </div>
+                    <div class="input-group-sell" style="flex: 1;">
+                        <label><i class="fas fa-list"></i> Category</label>
+                        <select id="prodCategory" required>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Home & Furniture">Home & Furniture</option>
+                            <option value="Vehicles">Vehicles</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group-sell">
+                    <label><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item condition, features, etc." required></textarea>
+                </div>
+
+                <div class="input-group-sell">
+                    <label><i class="fab fa-telegram"></i> Telegram Username (without @)</label>
+                    <input type="text" id="prodTg" placeholder="YourUsername" required>
+                </div>
+
+                <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
+                    Publish Listing
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        const sellForm = document.getElementById('sellForm');
+
+        sellForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            
+            // 1. Get Logged-in User
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) {
+                alert("You must be signed in to sell!");
+                return;
+            }
+
+            btn.innerText = "Publishing...";
+            btn.disabled = true;
+
+            // 2. Prepare Data
+            const productData = {
+                name: document.getElementById('prodName').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                category: document.getElementById('prodCategory').value,
+                description: document.getElementById('prodDesc').value,
+                image: document.getElementById('prodImage').value,
+                telegram_username: document.getElementById('prodTg').value,
+                user_id: user.id, // Links the product to the person who posted it
+                status: 'pending' // Default status for admin review
+            };
+
+            // 3. Insert into Supabase
+            const { error } = await _supabase
+                .from('products')
+                .insert([productData]);
+
+            if (error) {
+                alert("Error: " + error.message);
+                btn.innerText = "Publish Listing";
+                btn.disabled = false;
+            } else {
+                alert("Listing created successfully! It will appear once approved.");
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+
+    <style>
+        .input-group-sell { margin-bottom: 15px; }
+        .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
+        .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;
+        }
+    </style>
+</body>
+</html>
