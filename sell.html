@@ -144,7 +144,27 @@
         });
 
 
+const tosCheck = document.getElementById('tosCheck');
+const acceptBtn = document.getElementById('acceptTosBtn');
+const tosModal = document.getElementById('tosModal');
 
+// Enable button only when checked
+tosCheck.addEventListener('change', () => {
+    if (tosCheck.checked) {
+        acceptBtn.disabled = false;
+        acceptBtn.style.opacity = "1";
+        acceptBtn.style.cursor = "pointer";
+    } else {
+        acceptBtn.disabled = true;
+        acceptBtn.style.opacity = "0.5";
+        acceptBtn.style.cursor = "not-allowed";
+    }
+});
+
+// Close modal when clicked
+acceptBtn.addEventListener('click', () => {
+    tosModal.style.display = 'none';
+});
 
 
 // Get the user again to ensure we have the email
