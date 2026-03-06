@@ -91,6 +91,27 @@
                 }
             }
         }
+
+
+async function shareMyShop() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    // This assumes you have a filtered view for specific users
+    const shareUrl = `${window.location.origin}/index.html?seller=${user.id}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Golem Shop',
+            text: 'Check out the items I have for sale on Golem!',
+            url: shareUrl
+        });
+    } else {
+        navigator.clipboard.writeText(shareUrl);
+        alert("Shop link copied to clipboard!");
+    }
+}
+        
     </script>
 </body>
 </html>
