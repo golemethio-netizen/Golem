@@ -255,3 +255,14 @@ document.getElementById('supportForm')?.addEventListener('submit', async (e) => 
 });
 
 
+window.shareToTelegram = function() {
+    const siteUrl = window.location.origin;
+    const text = encodeURIComponent("Check out Golem Marketplace! It's the best place to buy and sell items in Ethiopia. Post your first item for free here: ");
+    window.open(`https://t.me/share/url?url=${siteUrl}&text=${text}`, '_blank');
+};
+
+window.shareToWhatsApp = function() {
+    const siteUrl = window.location.origin;
+    const text = encodeURIComponent("Hey! I'm using Golem to buy and sell items in Addis. You should check it out: " + siteUrl);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+};
