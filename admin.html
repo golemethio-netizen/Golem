@@ -107,7 +107,19 @@ async function editItem(id) {
     }
 }
 
+async function toggleFeatured(id, currentStatus) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ is_featured: !currentStatus }) // Flips true to false, or false to true
+        .eq('id', id);
 
+    if (!error) {
+        alert("Featured status updated!");
+        loadPending(); // Refresh the admin list
+    } else {
+        alert("Error: " + error.message);
+    }
+}
 
 
 
