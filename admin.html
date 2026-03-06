@@ -153,7 +153,36 @@ async function toggleFeatured(id, currentStatus) {
     }
 }
 
+async function loadStats() {
+    // 1. Get Total Count of all products
+    const { count: itemsCount } = await _supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true });
 
+    // 2. Get Unique Sellers (using a trick to count unique user_ids)
+    const { data: userData } = await _supabase
+        .from('products')
+        .select('user_id');
+    const uniqueSellers = new Set(userData.map(item => item.user_id)).size;
+
+    // 3. Get Total Market Value (Sum of all prices)
+    const { data: priceData } = await _supabase
+        .from('products')
+        .select('price');
+    const totalValue = priceData.reduce((sum, item) => sum + (item.price || 0), 0);
+
+    // Update the UI
+    document.getElementById('totalItems').innerText = itemsCount || 0;
+    document.getElementById('totalUsers').innerText = uniqueSellers || 0;
+    document.getElementById('totalValue').innerText = totalValue.toLocaleString() + " ETB";
+}
+
+// Update your existing load function to include stats
+window.onload = () => {
+    checkAdmin();
+    loadStats();
+    loadPending();
+};
 
         
         // Run on load
