@@ -1,124 +1,518 @@
-/* --- Global Reset & Base --- */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-body { background-color: #f4f7f6; color: #333; line-height: 1.6; }
+/* --- 1. Base & Reset --- */
+body { 
+    font-family: 'Inter', sans-serif; 
+    margin: 0; 
+    background: #f4f7f6; 
+    color: #333;
+}
 
-/* --- Responsive Header --- */
+/* --- 2. Header & Navigation --- */
 .golem-header {
-    background: #ffffff;
-    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #eee;
 }
 
-.header-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 
-.logo { font-size: 24px; font-weight: 800; color: #007bff; cursor: pointer; letter-spacing: -1px; }
-
-.search-bar-container {
-    flex: 1;
+.search-wrapper {
     position: relative;
-    max-width: 500px;
+    flex-grow: 2;
+    margin: 0 20px;
+    max-width: 400px;
 }
 
-.search-bar-container i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888; }
-.search-bar-container input {
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+#headerSearch {
     width: 100%;
-    padding: 10px 10px 10px 35px;
+    padding: 10px 15px 10px 35px;
     border-radius: 20px;
     border: 1px solid #ddd;
-    background: #f8f9fa;
     outline: none;
+    transition: 0.3s;
 }
 
-.nav-actions { display: flex; gap: 10px; }
-
-/* Hide text on mobile 'Sell' button to save space */
-@media (max-width: 480px) {
-    .nav-actions span { display: none; }
-    .sell-btn { padding: 10px 15px; border-radius: 50%; }
-}
-
-/* --- Invite & Support Styling --- */
-.invite-container {
-    background: #ffffff;
-    border: 1px solid #e0e6ed;
-    padding: 40px 20px;
-    text-align: center;
-    border-radius: 20px;
-    margin: 40px auto;
-    max-width: 800px;
-}
-
-.invite-btns {
+.nav-container-horizontal {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-}
-
-.share-pill {
-    padding: 12px 25px;
-    border-radius: 30px;
-    border: none;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
+    gap: 12px;
     align-items: center;
-    gap: 10px;
+}
+
+.nav-item-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    min-width: 70px;
     transition: transform 0.2s;
 }
 
-.share-pill:active { transform: scale(0.95); }
-.share-pill.tg { background: #0088cc; }
-.share-pill.wa { background: #25d366; }
+.nav-item-box i { font-size: 1.1rem; margin-bottom: 2px; }
+.nav-item-box p { font-size: 0.75rem; font-weight: 600; margin: 0; }
+.nav-item-box:hover { transform: translateY(-3px); }
 
-/* --- Support Modal Specifics --- */
-#supportMsg {
+.bg-home { background-color: #FFF4A3; }
+.bg-sell { background-color: #FFC0C7; }
+.bg-items { background-color: #D9EEE1; }
+
+/* --- 3. Masonry Layout --- */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+.masonry-wrapper {
+    column-count: 2; /* Mobile Default */
+    column-gap: 1.2rem;
+}
+
+@media (min-width: 768px) { .masonry-wrapper { column-count: 3; } }
+@media (min-width: 1024px) { .masonry-wrapper { column-count: 4; } }
+
+/* --- 4. Product Cards --- */
+.masonry-wrapper {
+    display: block !important;
     width: 100%;
-    height: 120px;
-    margin-top: 15px;
+    min-height: 400px;
+    padding: 20px;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    /* Ensure they don't have 0 height */
+    min-height: 100px; 
+}
+
+.product-card img {
+    width: 100%;
+    display: block;
+    height: auto; /* Keeps the masonry look based on image height */
+}
+
+.product-info {
     padding: 12px;
-    border-radius: 10px;
+    text-align: left;
+    overflow: visible !important;
+}
+
+.sold-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff4d4d;
+    color: white;
+    padding: 4px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 10;
+    font-size: 0.75rem;
+}
+
+/* --- 5. Modal & Auth --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    text-align: center;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
     border: 1px solid #ddd;
-    resize: none;
-    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+    border-radius: 10px;
+    outline: none;
 }
 
-/* --- Grid System --- */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-    padding: 20px 0;
+.auth-submit {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-@media (max-width: 600px) {
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 items per row on mobile */
-        gap: 10px;
-    }
+#productGrid {
+    display: block !important; /* Overrides any accidental grid/flex conflicts */
+    min-height: 500px; 
+    width: 100%;
+    clear: both;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
-/* --- Footer --- */
-.golem-footer { background: #1a1a1a; color: #999; padding: 50px 20px; }
+/* Ensure the button container is visible */
+.action-buttons {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+/* Force Buy Button Visibility */
+.main-btn {
+    display: block !important;
+    width: 100%;
+    background-color: #007bff !important; /* Blue */
+    color: white !important;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Force Share/Telegram Buttons Visibility */
+.tg-btn {
+    background-color: #0088cc !important; /* Telegram Blue */
+    color: white !important;
+    padding: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.share-btn {
+    background-color: #eeeeee !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.fav-filter-btn.active {
+    background-color: #ff4d4d !important;
+    color: white !important;
+    border-color: #ff4d4d !important;
+}
+
+.modal-footer a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.modal-footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* Status Tags */
+.status-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    z-index: 10;
+    color: white;
+}
+
+.status-tag.pending { background: #ff9800; }   /* Orange */
+.status-tag.approved { background: #4caf50; }  /* Green */
+.status-tag.rejected { background: #f44336; }  /* Red */
+
+/* Responsive Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+/* --- Product Card Container --- */
+.product-card {
+    position: relative; /* Essential for the heart positioning */
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* --- Image & Heart Wrapper --- */
+.img-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.img-wrapper img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* The Heart Button */
+.fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.fav-btn i {
+    font-size: 18px;
+    color: #ccc; /* Default grey */
+}
+
+.fav-btn.active i {
+    color: #ff4d4d; /* Red when hearted */
+}
+
+.fav-btn:hover {
+    transform: scale(1.15);
+    background: white;
+}
+
+/* --- Action Buttons (Call & Share) --- */
+.action-buttons {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.main-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.tg-btn {
+    background: #28a745; /* Green for Call/Phone */
+    color: white !important;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.share-btn {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #555;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* --- Category Filter Bar Customizations --- */
+.fav-filter-btn {
+    border: 1px solid #ff4d4d !important;
+    color: #ff4d4d !important;
+}
+
+.fav-filter-btn.active {
+    background: #ff4d4d !important;
+    color: white !important;
+}
+
+
+/* Styling for featured cards */
+.product-card.featured {
+    border: 2px solid #ffd700; /* Gold Border */
+    background: #fffdf0; /* Very light yellow tint */
+}
+
+/* Add a badge */
+.vip-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ffd700;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.stat-card i {
+    font-size: 24px;
+    color: #007bff;
+    background: #e7f1ff;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.stat-card h4 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #777;
+}
+
+.golem-footer {
+    background: #333;
+    color: white;
+    padding: 40px 20px;
+    margin-top: 50px;
+}
+
 .footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
     max-width: 1200px;
     margin: 0 auto;
 }
-.footer-section h4 { color: white; margin-bottom: 20px; }
-.footer-section a { display: block; color: #999; text-decoration: none; margin-bottom: 10px; font-size: 14px; }
-.footer-section a:hover { color: #007bff; }
+
+.footer-section h4 { margin-bottom: 15px; color: #ffd700; }
+.footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; }
+.footer-section a:hover { color: white; }
+
+.social-links i { margin-right: 8px; }
+.copyright { text-align: center; margin-top: 30px; font-size: 12px; color: #888; border-top: 1px solid #444; padding-top: 20px; }
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+
+
+.tab-btn {
+    background: #f0f2f5;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+.btn-approve { background: #28a745; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
+.btn-reject { background: #dc3545; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
+.btn-feature { background: #ffd700; color: #333; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
