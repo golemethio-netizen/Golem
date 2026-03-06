@@ -25,30 +25,20 @@ document.addEventListener('DOMContentLoaded', async () => {
    2. PRODUCT FETCHING & FILTERING
    ========================================== */
 async function fetchProducts(category = 'All') {
-    // Show only 'approved' items to the public
     let query = _supabase
         .from('products')
         .select('*')
-        .eq('status', 'approved');
+        .eq('status', 'approved')
+        // 1. Sort by Featured first (true comes before false)
+        .order('is_featured', { ascending: false }) 
+        // 2. Then sort by Newest
+        .order('created_at', { ascending: false });
 
-    // Filter by Category
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    // Sort Logic
-    const sortVal = document.getElementById('sortSelect')?.value;
-    if (sortVal === 'price_low') query = query.order('price', { ascending: true });
-    else if (sortVal === 'price_high') query = query.order('price', { ascending: false });
-    else query = query.order('created_at', { ascending: false });
-
     const { data: products, error } = await query;
-
-    if (error) {
-        console.error("Fetch Error:", error.message);
-        return;
-    }
-
     renderProducts(products);
 }
 
@@ -233,3 +223,4 @@ function shareItem(name, price, id) {
         alert("Link copied to clipboard!");
     }
 }
+
