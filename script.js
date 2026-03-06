@@ -225,3 +225,32 @@ function shareItem(name, price, id) {
 }
 
 
+window.openSupportModal = function() {
+    document.getElementById('supportModal').style.display = 'flex';
+};
+
+window.closeSupportModal = function() {
+    document.getElementById('supportModal').style.display = 'none';
+};
+
+document.getElementById('supportForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('supportMsg').value;
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    // Option: Save to a 'support_tickets' table in Supabase
+    const { error } = await _supabase.from('support_tickets').insert([
+        { 
+            user_id: user ? user.id : null, 
+            email: user ? user.email : 'Guest', 
+            message: msg 
+        }
+    ]);
+
+    if (!error) {
+        alert("Message sent! Admin will contact you soon.");
+        closeSupportModal();
+        document.getElementById('supportForm').reset();
+    }
+});
+
