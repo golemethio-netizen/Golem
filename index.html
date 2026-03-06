@@ -110,6 +110,35 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
+<footer class="golem-footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Support</h4>
+            <a href="#" onclick="openSupportModal()">Report an Issue</a>
+            <a href="#" onclick="openSupportModal()">Request VIP Posting</a>
+        </div>
+        <div class="footer-section">
+            <h4>Connect</h4>
+            <div class="social-links">
+                <a href="https://t.me/YourTelegramUsername" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="https://wa.me/251911223344" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+    </div>
+    <p class="copyright">&copy; 2026 Golem Marketplace. All rights reserved.</p>
+</footer>
 
+<div id="supportModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeSupportModal()">&times;</span>
+        <h3>Contact Admin</h3>
+        <p>Have a problem or want to promote your item?</p>
+        <form id="supportForm">
+            <textarea id="supportMsg" placeholder="Describe your issue or request..." required style="width: 100%; height: 100px; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+            <button type="submit" class="auth-submit" style="width: 100%; margin-top: 15px;">Send Message</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
+
