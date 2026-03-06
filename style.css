@@ -494,3 +494,28 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
+
+
+
+
+
+.tab-btn {
+    background: #f0f2f5;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+.btn-approve { background: #28a745; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
+.btn-reject { background: #dc3545; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
+.btn-feature { background: #ffd700; color: #333; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
