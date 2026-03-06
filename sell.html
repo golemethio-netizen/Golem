@@ -64,6 +64,37 @@
                 </button>
             </form>
         </div>
+
+
+
+<div id="tosModal" class="modal-overlay" style="display: flex;">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
+        <h2 style="color: #333;"><i class="fas fa-gavel"></i> Golem Seller Rules</h2>
+        <div style="height: 250px; overflow-y: scroll; margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #555;">
+            <p><strong>1. Accuracy:</strong> You must provide a real photo and the correct price of the item.</p>
+            <p><strong>2. Prohibited Items:</strong> No illegal goods, weapons, or stolen items are allowed.</p>
+            <p><strong>3. Communication:</strong> You agree to be contacted via the phone number provided.</p>
+            <p><strong>4. Approval:</strong> All items are subject to Admin review and may be rejected if they violate our quality standards.</p>
+            <p><strong>5. Fees:</strong> Standard posting is free, but VIP featured slots may require a fee.</p>
+        </div>
+        
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 20px;">
+            <input type="checkbox" id="tosCheck" style="width: 20px; height: 20px;">
+            <span>I agree to the Golem Marketplace terms.</span>
+        </label>
+
+        <button id="acceptTosBtn" class="auth-submit" disabled style="width: 100%; opacity: 0.5; cursor: not-allowed;">
+            Continue to Post
+        </button>
+    </div>
+</div>
+
+
+
+
+
+
+        
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
