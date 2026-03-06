@@ -101,6 +101,22 @@
                 <button type="submit" class="auth-submit">Sign In</button>
             </form>
 
+<div class="invite-container" style="background: #e7f1ff; padding: 30px; border-radius: 15px; text-align: center; margin: 40px 20px;">
+    <i class="fas fa-users" style="font-size: 2rem; color: #007bff; margin-bottom: 15px;"></i>
+    <h3>Help Golem Grow!</h3>
+    <p style="color: #555; margin-bottom: 20px;">Know someone selling something? Invite them to Golem and help us build Ethiopia's biggest marketplace.</p>
+    
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="shareToTelegram()" class="tg-btn" style="background: #0088cc; padding: 12px 25px;">
+            <i class="fab fa-telegram-plane"></i> Invite via Telegram
+        </button>
+        <button onclick="shareToWhatsApp()" class="tg-btn" style="background: #25d366; padding: 12px 25px;">
+            <i class="fab fa-whatsapp"></i> Invite via WhatsApp
+        </button>
+    </div>
+</div>
+            
+
             <div class="modal-footer">
                 <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
             </div>
@@ -142,5 +158,6 @@
 </div>
 </body>
 </html>
+
 
 
