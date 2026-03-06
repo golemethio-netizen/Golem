@@ -419,3 +419,32 @@ body {
     z-index: 5;
 }
 
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.stat-card i {
+    font-size: 24px;
+    color: #007bff;
+    background: #e7f1ff;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.stat-card h4 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #777;
+}
