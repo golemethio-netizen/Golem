@@ -176,7 +176,13 @@ async function loadStats() {
         .from('products')
         .select('price');
     const totalValue = priceData.reduce((sum, item) => sum + (item.price || 0), 0);
+// Add this inside your existing loadStats() function
+const { count: ticketCount } = await _supabase
+    .from('support_tickets')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_resolved', false);
 
+document.getElementById('pendingTickets').innerText = ticketCount || 0;
     // Update the UI
     document.getElementById('totalItems').innerText = itemsCount || 0;
     document.getElementById('totalUsers').innerText = uniqueSellers || 0;
