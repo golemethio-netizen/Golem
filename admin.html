@@ -3,119 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Marketplace | Buy & Sell in Ethiopia</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Admin Approval | Golem</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body style="background: #f0f2f5;">
 
     <header class="golem-header">
-        <div class="header-container">
-            <div class="logo" onclick="location.href='index.html'">GOLEM</div>
-            
-            <div class="search-bar-container">
-                <i class="fas fa-search"></i>
-                <input type="text" id="headerSearch" placeholder="Search items in Addis Ababa...">
-            </div>
-
-            <div class="nav-actions">
-                <button class="sell-btn" onclick="checkAuthToSell()">
-                    <i class="fas fa-plus"></i> <span>Sell</span>
-                </button>
-                <button class="signin-btn" onclick="toggleModal()">Sign In</button>
-            </div>
-        </div>
+        <div class="logo">GOLEM ADMIN</div>
+        <button class="signin-btn" onclick="location.href='index.html'">View Site</button>
     </header>
 
-    <div class="filter-strip">
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
-            <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
-            <button class="filter-btn" onclick="filterCategory('Fashion', this)">Fashion</button>
-            <button class="filter-btn" onclick="filterCategory('Home', this)">Home</button>
-            <button class="filter-btn" onclick="filterCategory('Vehicles', this)">Vehicles</button>
-            <button class="filter-btn fav-filter-btn" onclick="filterFavorites(this)">
-                <i class="fas fa-heart"></i> Favorites
-            </button>
+
+
+<div class="admin-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #ddd; padding-bottom: 10px;">
+    <button onclick="switchTab('pending', this)" class="tab-btn active">Pending</button>
+    <button onclick="switchTab('approved', this)" class="tab-btn">Approved (Live)</button>
+    <button onclick="switchTab('rejected', this)" class="tab-btn">Rejected/Deleted</button>
+</div>
+
+
+
+<div class="admin-search-bar" style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <div style="position: relative; flex: 1;">
+        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+        <input type="text" id="adminSearchInput" placeholder="Search by name or phone number..." 
+               style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 8px; border: 1px solid #ddd; outline: none;">
+    </div>
+    <select id="categoryFilter" onchange="loadItems(currentView)" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+        <option value="All">All Categories</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Fashion">Fashion</option>
+        <option value="Home">Home</option>
+        <option value="Vehicles">Vehicles</option>
+    </select>
+</div>
+
+
+
+    
+<div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    <div class="stat-card">
+        <i class="fas fa-box"></i>
+        <div>
+            <h4 id="totalItems">0</h4>
+            <p>Total Items</p>
         </div>
     </div>
-
-    <main class="container">
-        <div id="productGrid" class="product-grid">
-            <div class="loader">Loading Marketplace...</div>
+    <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <div>
+            <h4 id="totalUsers">0</h4>
+            <p>Active Sellers</p>
         </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-hand-holding-usd"></i>
+        <div>
+            <h4 id="totalValue">0 ETB</h4>
+            <p>Market Value</p>
+        </div>
+    </div>
+</div>
+
+
+    
+    <main class="container" style="padding: 20px;">
+        <h2 style="margin-bottom: 20px;">Pending Approval</h2>
+        <div id="adminGrid" class="masonry-wrapper">
+            </div>
     </main>
 
-    <section class="invite-container">
-        <i class="fas fa-users"></i>
-        <h3>Help Golem Grow!</h3>
-        <p>Know someone selling something? Invite them to Golem and help us build Ethiopia's biggest marketplace.</p>
-        <div class="invite-btns">
-            <button onclick="shareToTelegram()" class="share-pill tg">
-                <i class="fab fa-telegram-plane"></i> Telegram
-            </button>
-            <button onclick="shareToWhatsApp()" class="share-pill wa">
-                <i class="fab fa-whatsapp"></i> WhatsApp
-            </button>
-        </div>
-    </section>
 
-    <footer class="golem-footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>Golem</h4>
-                <a href="about.html">About Us</a>
-                <a href="#" onclick="openSupportModal()">Report an Issue</a>
-                <a href="#" onclick="openSupportModal()">Request VIP Posting</a>
-            </div>
-            <div class="footer-section">
-                <h4>Contact Admin</h4>
-                <div class="social-links">
-                    <a href="https://t.me/YourTelegram" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
-                    <a href="https://wa.me/251911223344" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                </div>
-            </div>
-        </div>
-        <p class="copyright">&copy; 2026 Golem Marketplace. Proudly developed in Addis Ababa.</p>
-    </footer>
-
-    <div id="authModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-modal" onclick="toggleModal()">&times;</span>
-            <h2 id="modalTitle">Welcome Back</h2>
-            <form id="authForm">
-                <div class="input-group">
-                    <label>Email Address</label>
-                    <input type="email" placeholder="example@mail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="auth-submit">Sign In</button>
-                <p class="forgot-link"><a href="#" onclick="handleForgotPassword(event)">Forgot Password?</a></p>
-            </form>
-            <div class="modal-footer">
-                <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
-            </div>
-        </div>
+<div class="stat-card" onclick="location.href='#ticketsSection'" style="cursor:pointer; border: 1px solid #ff4d4d;">
+    <i class="fas fa-headset" style="color: #ff4d4d; background: #fff5f5;"></i>
+    <div>
+        <h4 id="pendingTickets">0</h4>
+        <p>Support Tickets</p>
     </div>
+</div>
 
-    <div id="supportModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeSupportModal()">&times;</span>
-            <h3><i class="fas fa-headset"></i> Contact Support</h3>
-            <p>Tell us how we can help you.</p>
-            <form id="supportForm">
-                <textarea id="supportMsg" placeholder="Describe your issue or VIP request..." required></textarea>
-                <button type="submit" class="auth-submit">Send Message</button>
-            </form>
-        </div>
-    </div>
+
+    
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js"></script>
+    <script>
+
+let currentView = 'pending';
+
+async function switchTab(status, btn) {
+    currentView = status;
+    // UI: Update active button look
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Load data
+    loadItems(status);
+}
+
+async function loadItems(status = 'pending') {
+    const grid = document.getElementById('adminGrid');
+    grid.innerHTML = "<p>Loading...</p>";
+
+    const { data: items, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('status', status)
+        .order('created_at', { ascending: false });
+
+    if (error || !items || items.length === 0) {
+        grid.innerHTML = `<p style="padding:20px;">No items found in ${status}.</p>`;
+        return;
+    }
+
+    grid.innerHTML = items.map(item => `
+        <div class="product-card ${item.is_featured ? 'featured' : ''}" id="card-${item.id}">
+            ${item.is_featured ? '<span class="vip-badge">⭐ FEATURED</span>' : ''}
+            <img src="${item.image}" style="width:100%; height:180px; object-fit:cover;">
+            <div class="product-info">
+                <h3>${item.name}</h3>
+                <p><strong>Price:</strong> ${item.price} ETB</p>
+                <p><strong>Seller:</strong> ${item.seller_phone}</p>
+                
+                <div class="admin-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px;">
+                    ${status === 'pending' ? `
+                        <button onclick="updateStatus('${item.id}', 'approved')" class="btn-approve">Approve</button>
+                        <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Reject</button>
+                    ` : ''}
+
+                    ${status === 'approved' ? `
+                        <button onclick="toggleFeatured('${item.id}', ${item.is_featured})" class="btn-feature">
+                            ${item.is_featured ? '❌ Unfeature' : '⭐ Feature'}
+                        </button>
+                        <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Remove</button>
+                    ` : ''}
+
+                    ${status === 'rejected' ? `
+                        <button onclick="updateStatus('${item.id}', 'pending')" class="btn-approve">Restore to Pending</button>
+                        <button onclick="permanentlyDelete('${item.id}')" style="background:black; color:white; border:none; padding:8px; border-radius:5px;">Delete Perm.</button>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Unified Status Updater
+async function updateStatus(id, newStatus) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+    if (!error) {
+        alert(`Item moved to ${newStatus}`);
+        loadItems(currentView); // Refresh current tab
+        loadStats(); // Update counters
+    }
+}
+
+async function checkAdmin() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    // Replace with your actual email address
+    if (!user || user.email !== 'yohannes.surafel@gmail.com') {
+        alert("Access Denied.");
+        window.location.href = 'index.html';
+    }
+}
+checkAdmin();
+
+        
+        async function loadPending() {
+            const grid = document.getElementById('adminGrid');
+            
+            // 1. Fetch only pending items
+            const { data: items, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('status', 'pending');
+
+            if (error || items.length === 0) {
+                grid.innerHTML = "<p>No items waiting for approval.</p>";
+                return;
+            }
+
+           grid.innerHTML = items.map(item => `
+    <div class="product-card" id="card-${item.id}">
+        <div class="admin-badge">${item.category}</div>
+        <img src="${item.image}" style="width:100%; height:200px; object-fit:cover;">
+        <div class="product-info">
+            <h3>${item.name}</h3>
+            <p><strong>Price:</strong> ${item.price} ETB <i class="fas fa-edit" onclick="editItem('${item.id}')" style="cursor:pointer; color:#007bff;"></i></p>
+            <p><strong>Seller:</strong> ${item.seller_phone}</p>
+            
+            <div class="admin-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
+                <button onclick="approveItem('${item.id}')" class="btn-approve">Approve</button>
+                <button onclick="rejectItem('${item.id}')" class="btn-reject">Delete</button>
+                <button onclick="toggleFeatured('${item.id}')" class="btn-feature">⭐ Feature</button>
+                <a href="tel:${item.seller_phone}" class="btn-call">📞 Contact</a>
+            </div>
+        </div>
+    </div>
+`).join('');
+            
+        }
+
+        async function approveItem(id) {
+            const { error } = await _supabase
+                .from('products')
+                .update({ status: 'approved' })
+                .eq('id', id);
+
+            if (!error) {
+                document.getElementById(`card-${id}`).remove();
+                alert("Item Approved!");
+            }
+        }
+
+        async function rejectItem(id) {
+            if (confirm("Delete this listing permanently?")) {
+                const { error } = await _supabase
+                    .from('products')
+                    .delete()
+                    .eq('id', id);
+
+                if (!error) document.getElementById(`card-${id}`).remove();
+            }
+        }
+
+async function editItem(id) {
+    const newPrice = prompt("Enter corrected price (ETB):");
+    if (newPrice) {
+        const { error } = await _supabase
+            .from('products')
+            .update({ price: parseFloat(newPrice) })
+            .eq('id', id);
+        if (!error) location.reload();
+    }
+}
+
+async function toggleFeatured(id, currentStatus) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ is_featured: !currentStatus })
+        .eq('id', id);
+
+    if (!error) {
+        // Find the specific card and update its UI without a full reload
+        const card = document.getElementById(`card-${id}`);
+        if (card) {
+            card.classList.toggle('featured');
+            const btn = card.querySelector('.btn-feature');
+            btn.innerText = !currentStatus ? '❌ Unfeature' : '⭐ Feature';
+            
+            // Add/Remove VIP badge dynamically
+            if (!currentStatus) {
+                card.insertAdjacentHTML('afterbegin', '<span class="vip-badge">⭐ FEATURED</span>');
+            } else {
+                card.querySelector('.vip-badge')?.remove();
+            }
+        }
+    }
+}
+
+async function loadStats() {
+    // 1. Get Total Count of all products
+    const { count: itemsCount } = await _supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true });
+
+    // 2. Get Unique Sellers (using a trick to count unique user_ids)
+    const { data: userData } = await _supabase
+        .from('products')
+        .select('user_id');
+    const uniqueSellers = new Set(userData.map(item => item.user_id)).size;
+
+    // 3. Get Total Market Value (Sum of all prices)
+    const { data: priceData } = await _supabase
+        .from('products')
+        .select('price');
+    const totalValue = priceData.reduce((sum, item) => sum + (item.price || 0), 0);
+// Add this inside your existing loadStats() function
+const { count: ticketCount } = await _supabase
+    .from('support_tickets')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_resolved', false);
+
+document.getElementById('pendingTickets').innerText = ticketCount || 0;
+    // Update the UI
+    document.getElementById('totalItems').innerText = itemsCount || 0;
+    document.getElementById('totalUsers').innerText = uniqueSellers || 0;
+    document.getElementById('totalValue').innerText = totalValue.toLocaleString() + " ETB";
+}
+
+// Update your existing load function to include stats
+window.onload = () => {
+    checkAdmin();
+    loadStats();
+    loadPending();
+};
+
+        
+        // Run on load
+        loadPending();
+    </script>
 </body>
 </html>
