@@ -47,7 +47,7 @@ async function fetchProducts() {
     products.forEach(product => {
     const productCard = document.createElement('div');
     productCard.className = 'product-card';
-    
+    const condition = product.status || product.status_condition || "New";
     const shortDesc = product.description 
         ? product.description.substring(0, 60) + '...' 
         : 'No description available.';
@@ -58,12 +58,14 @@ async function fetchProducts() {
     const tgLink = `https://t.me/share/url?url=${shareUrl}&text=${shareMessage}`;
 
     productCard.innerHTML = `
-        <div class="image-container">
-            <img src="${product.image}" alt="${product.name}">
-            <span class="status-badge ${product.status ? product.status.toLowerCase() : 'new'}">
-                ${product.status || 'New'}
-            </span>
-        </div>
+        <div class="image-container" style="position: relative; min-height: 150px;">
+        <img src="${product.image}" alt="${product.name}">
+        
+        <span class="status-badge ${condition.toLowerCase()}" 
+              style="display: block !important; visibility: visible !important;">
+            ${condition}
+        </span>
+    </div>
         <div class="product-info">
             <h3 class="product-title">${product.name}</h3>
             <p class="product-price">${product.price.toLocaleString()} ETB</p>
@@ -327,11 +329,25 @@ function openProductDetails(product) {
     document.getElementById('modalProductTitle').innerText = product.title;
     document.getElementById('modalProductPrice').innerText = `${product.price} ETB`;
     document.getElementById('modalProductDesc').innerText = product.description;
-    
+    document.getElementById('status_condition').innerText = product.prodStatus;
     // Handle the Status Badge
     const statusEl = document.getElementById('modalProductStatus');
     statusEl.innerText = product.status;
     statusEl.className = `status-badge ${product.status.toLowerCase()}`;
+   
+   const callBtn = document.getElementById('callContact');
+    // Check both possible column names: 'seller_phone' or 'phone'
+    const phoneNumber = product.seller_phone || product.phone; 
+
+    if (phoneNumber) {
+        callBtn.href = `tel:${phoneNumber}`;
+        callBtn.style.display = 'flex'; // Force visibility
+    } else {
+        console.warn("No phone number found for this product");
+        callBtn.style.display = 'none'; 
+    }
+
+    document.getElementById('productModal').style.display = 'flex';
    
 const callBtn = document.getElementById('callContact');
     if (product.seller_phone) {
@@ -352,6 +368,7 @@ const callBtn = document.getElementById('callContact');
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
 }
+
 
 
 
