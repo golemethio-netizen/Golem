@@ -232,15 +232,24 @@ checkAdmin();
         }
 
         async function rejectItem(id) {
-            if (confirm("Delete this listing permanently?")) {
-                const { error } = await _supabase
-                    .from('products')
-                    .delete()
-                    .eq('id', id);
+    const reasonInput = document.getElementById(`reason-${id}`);
+    const reasonText = reasonInput ? reasonInput.value : "Violation of community standards";
 
-                if (!error) document.getElementById(`card-${id}`).remove();
-            }
-        }
+    const { error } = await _supabase
+        .from('products')
+        .update({ 
+            status: 'rejected', 
+            rejection_reason: reasonText 
+        })
+        .eq('id', id);
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("Item rejected and reason saved.");
+        location.reload(); // Refresh to update the admin list
+    }
+}
 
 async function editItem(id) {
     const newPrice = prompt("Enter corrected price (ETB):");
