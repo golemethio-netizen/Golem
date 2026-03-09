@@ -93,55 +93,69 @@ function renderProductGrid(products) {
    3. MODAL & INTERACTION LOGIC
    ========================================== */
 function openProductDetails(product) {
-    cconst modal = document.getElementById('productModal');
-    const callBtn = document.getElementById('callContact');
-   const phoneNumber = product.seller_contact || 
-                        product.seller_phone || 
-                        product.phone || 
-                        product.contact;
-
-    console.log("Found Phone Number:", phoneNumber); // Check your F12 Console for this!
-
-    if (phoneNumber && callBtn) {
-        callBtn.href = `tel:${phoneNumber}`;
-        callBtn.style.setProperty('display', 'flex', 'important');
-        
-        // Update the text inside just to be sure
-        callBtn.innerHTML = `<i class="fas fa-phone-alt"></i> Call Seller (${phoneNumber})`;
-    } else if (callBtn) {
-        console.error("No phone number found in product data:", product);
-        callBtn.style.display = 'none';
-    }
-
-
-    if(!modal) return;
-
-    // Set Text Content
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
-    document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
-    document.getElementById('modalProductImg').src = product.image;
-
-    // Call Button Logic
-    const callBtn = document.getElementById('callContact');
-    const phone = product.seller_contact || product.phone;
+    // 1. Get all Modal Elements
+    const modal = document.getElementById('productModal');
+    const titleEl = document.getElementById('modalProductTitle');
+    const descEl = document.getElementById('modalProductDesc');
+    const priceEl = document.getElementById('modalProductPrice');
+    const imgEl = document.getElementById('modalProductImg');
     
+    // Action Buttons
+    const callBtn = document.getElementById('callContact');
+    const waBtn = document.getElementById('whatsappContact');
+    const tgBtn = document.getElementById('telegramContact');
+
+    // 2. Data Validation & Mapping
+    // We use your specific Supabase column name: phone_number
+    const phone = product.phone_number;
+    const telegramUsername = product.seller_telegram || ""; // Optional field
+
+    // 3. Populate Text & Media
+    if (titleEl) titleEl.innerText = product.name || "Untitled Product";
+    if (descEl) descEl.innerText = product.description || "No description available.";
+    if (priceEl) priceEl.innerText = `${product.price?.toLocaleString()} ETB`;
+    if (imgEl) imgEl.src = product.image || 'assets/placeholder.png';
+
+    // 4. "Call Seller" Logic (The Fix)
     if (phone && callBtn) {
         callBtn.href = `tel:${phone}`;
-        callBtn.style.display = 'flex';
+        callBtn.style.display = 'flex'; // Force show
+        // Optional: Update button text to show the number
+        callBtn.innerHTML = `<i class="fas fa-phone-alt"></i> Call Seller`;
     } else if (callBtn) {
-        callBtn.style.display = 'none';
+        callBtn.style.display = 'none'; // Hide if no number exists
     }
 
-    // Social Links
-    const waLink = document.getElementById('whatsappContact');
-    const tgLink = document.getElementById('telegramContact');
-    
-    if(waLink) waLink.href = `https://wa.me/${phone}`;
-    if(tgLink) tgLink.href = `https://t.me/${product.seller_telegram || ''}`;
+    // 5. WhatsApp Logic
+    if (phone && waBtn) {
+        // Clean the phone number (remove spaces/dashes) for the link
+        const cleanPhone = phone.replace(/\D/g, ''); 
+        waBtn.href = `https://wa.me/${cleanPhone}`;
+        waBtn.style.display = 'flex';
+    } else if (waBtn) {
+        waBtn.style.display = 'none';
+    }
 
-    modal.style.display = 'flex';
+    // 6. Telegram Logic
+    if (telegramUsername && tgBtn) {
+        const cleanTG = telegramUsername.replace('@', '');
+        tgBtn.href = `https://t.me/${cleanTG}`;
+        tgBtn.style.display = 'flex';
+    } else if (tgBtn) {
+        tgBtn.style.display = 'none';
+    }
+
+    // 7. Show the Modal
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error("Critical Error: 'productModal' element not found in HTML.");
+    }
 }
+
+
+
+
 
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
@@ -188,4 +202,5 @@ window.onclick = function(event) {
     if (event.target == authModal) authModal.style.display = "none";
     if (event.target == productModal) productModal.style.display = "none";
 };
+
 
