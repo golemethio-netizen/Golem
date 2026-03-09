@@ -1398,3 +1398,24 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 
 }
+/* Force the Call Button to be visible when the ID is present */
+#callContact {
+    display: flex !important; /* Overrides any other 'none' settings */
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-color: #28a745 !important; /* Success Green */
+    color: white !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#callContact i {
+    display: inline-block !important;
+}
+
