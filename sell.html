@@ -19,14 +19,11 @@
             <h2 style="margin-bottom: 10px;">Post New Listing</h2>
             <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
 
-            
+            <form id="sellForm">
                 <div class="input-group-sell">
-    <label><i class="fas fa-camera"></i> Upload Product Photo</label>
-    <input type="file" id="prodFile" accept="image/*" required 
-           style="border: 2px dashed #ddd; padding: 20px; text-align: center;">
-    <p id="uploadStatus" style="font-size: 12px; color: #666; margin-top: 5px;"></p>
-</div>
-               
+                    <label><i class="fas fa-camera"></i> Image URL</label>
+                    <input type="text" id="prodImage" placeholder="Paste image link here" required>
+                </div>
 
                 <div class="input-group-sell">
                     <label><i class="fas fa-tag"></i> Item Name</label>
@@ -51,12 +48,12 @@
 
                 <div class="input-group-sell">
                     <label><i class="fas fa-align-left"></i> Description</label>
-                    <textarea id="prodDesc" rows="4" placeholder="Describe the item condition, features, etc." required></textarea>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item condition..." required></textarea>
                 </div>
 
                 <div class="input-group-sell">
-                    <label><i class="fab fa-telegram"></i> Telegram Username (without @)</label>
-                    <input type="text" id="prodTg" placeholder="YourUsername" required>
+                    <label><i class="fas fa-phone"></i> Phone Number</label>
+                    <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
 
                 <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
@@ -64,37 +61,6 @@
                 </button>
             </form>
         </div>
-
-
-
-<div id="tosModal" class="modal-overlay" style="display: flex;">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
-        <h2 style="color: #333;"><i class="fas fa-gavel"></i> Golem Seller Rules</h2>
-        <div style="height: 250px; overflow-y: scroll; margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #555;">
-            <p><strong>1. Accuracy:</strong> You must provide a real photo and the correct price of the item.</p>
-            <p><strong>2. Prohibited Items:</strong> No illegal goods, weapons, or stolen items are allowed.</p>
-            <p><strong>3. Communication:</strong> You agree to be contacted via the phone number provided.</p>
-            <p><strong>4. Approval:</strong> All items are subject to Admin review and may be rejected if they violate our quality standards.</p>
-            <p><strong>5. Fees:</strong> Standard posting is free, but VIP featured slots may require a fee.</p>
-        </div>
-        
-        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 20px;">
-            <input type="checkbox" id="tosCheck" style="width: 20px; height: 20px;">
-            <span>I agree to the Golem Marketplace terms.</span>
-        </label>
-
-        <button id="acceptTosBtn" class="auth-submit" disabled style="width: 100%; opacity: 0.5; cursor: not-allowed;">
-            Continue to Post
-        </button>
-    </div>
-</div>
-
-
-
-
-
-
-        
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -106,7 +72,6 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             
-            // 1. Get Logged-in User
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) {
                 alert("You must be signed in to sell!");
@@ -116,19 +81,18 @@
             btn.innerText = "Publishing...";
             btn.disabled = true;
 
-            // 2. Prepare Data
             const productData = {
                 name: document.getElementById('prodName').value,
                 price: parseFloat(document.getElementById('prodPrice').value),
                 category: document.getElementById('prodCategory').value,
                 description: document.getElementById('prodDesc').value,
                 image: document.getElementById('prodImage').value,
-                telegram_username: document.getElementById('prodTg').value,
-                user_id: user.id, // Links the product to the person who posted it
-                status: 'pending' // Default status for admin review
+                seller_phone: document.getElementById('prodPhone').value,
+                seller_email: user.email,
+                user_id: user.id,
+                status: 'pending'
             };
 
-            // 3. Insert into Supabase
             const { error } = await _supabase
                 .from('products')
                 .insert([productData]);
@@ -138,50 +102,10 @@
                 btn.innerText = "Publish Listing";
                 btn.disabled = false;
             } else {
-                alert("Listing created successfully! It will appear once approved.");
+                alert("Success! Your item is waiting for admin approval.");
                 window.location.href = 'index.html';
             }
         });
-
-
-const tosCheck = document.getElementById('tosCheck');
-const acceptBtn = document.getElementById('acceptTosBtn');
-const tosModal = document.getElementById('tosModal');
-
-// Enable button only when checked
-tosCheck.addEventListener('change', () => {
-    if (tosCheck.checked) {
-        acceptBtn.disabled = false;
-        acceptBtn.style.opacity = "1";
-        acceptBtn.style.cursor = "pointer";
-    } else {
-        acceptBtn.disabled = true;
-        acceptBtn.style.opacity = "0.5";
-        acceptBtn.style.cursor = "not-allowed";
-    }
-});
-
-// Close modal when clicked
-acceptBtn.addEventListener('click', () => {
-    tosModal.style.display = 'none';
-});
-
-
-// Get the user again to ensure we have the email
-const { data: { user } } = await _supabase.auth.getUser();
-
-const productData = {
-    name: document.getElementById('prodName').value,
-    price: parseFloat(document.getElementById('prodPrice').value),
-    category: document.getElementById('prodCategory').value,
-    description: document.getElementById('prodDesc').value,
-    image: publicUrl,
-    seller_phone: document.getElementById('prodPhone').value,
-    seller_email: user.email, // <--- ADD THIS LINE
-    user_id: user.id,
-    status: 'pending'
-};
-        
     </script>
 
     <style>
@@ -190,6 +114,8 @@ const productData = {
         .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;
         }
+        .auth-submit { background: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .auth-submit:disabled { background: #ccc; }
     </style>
 </body>
 </html>
