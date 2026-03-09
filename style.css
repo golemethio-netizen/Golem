@@ -670,4 +670,20 @@ body {
     opacity: 0.8;
 }
 
+.call-btn {
+    background: #28a745; /* Success Green */
+    color: white;
+    font-size: 1.1rem;
+    padding: 15px;
+    margin-bottom: 15px; /* Give it more space */
+}
+
+.call-btn:hover {
+    background: #218838;
+}
+
+/* Ensure the icons have space */
+.contact-btn i {
+    font-size: 1.2rem;
+}
 
