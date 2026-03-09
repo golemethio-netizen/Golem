@@ -27,7 +27,17 @@
              </div>
         </div>
     </main>
-
+<div id="editModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h3>Edit Listing</h3>
+        <input type="hidden" id="editId">
+        <input type="text" id="editName" placeholder="Item Name">
+        <input type="number" id="editPrice" placeholder="Price">
+        <textarea id="editDesc" placeholder="Description"></textarea>
+        <button onclick="saveChanges()" class="auth-submit">Update & Resubmit</button>
+        <button onclick="closeEditModal()" style="background:none; border:none; color:red;">Cancel</button>
+    </div>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     
@@ -111,7 +121,40 @@ async function shareMyShop() {
         alert("Shop link copied to clipboard!");
     }
 }
-        
+
+
+
+
+        async function loadMyItems() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    // Fetch everything: pending, approved, AND rejected
+    const { data: items } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+    const container = document.getElementById('myItemsGrid');
+    container.innerHTML = items.map(item => `
+        <div class="item-card ${item.status}">
+            <img src="${item.image}" alt="${item.name}">
+            <div class="info">
+                <h3>${item.name}</h3>
+                <span class="status-badge ${item.status}">${item.status.toUpperCase()}</span>
+                
+                <div class="actions">
+                    <button onclick="openEditModal('${item.id}')" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button onclick="deleteItem('${item.id}')" class="delete-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
     </script>
 </body>
 </html>
