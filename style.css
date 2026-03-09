@@ -630,3 +630,44 @@ body {
     overflow: hidden;
 }
 
+.product-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+.buy-btn {
+    flex: 1; /* Makes the Buy button take up most of the space */
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.buy-btn:hover {
+    background: #0056b3;
+}
+
+.share-btn {
+    background: #24A1DE; /* Telegram Blue */
+    color: white;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.share-btn:hover {
+    opacity: 0.8;
+}
+
+
