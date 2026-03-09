@@ -195,6 +195,15 @@ window.deleteItem = async function(id) {
         }
     }
 };
+
+
+
+window.contactAdmin = function(itemName) {
+    const adminTelegram = "@allInOneEthiopia1"; // Replace with your actual username
+    const message = encodeURIComponent(`Hello Admin, I have a question about my rejected item: "${itemName}" on Golem.`);
+    window.open(`https://t.me/${adminTelegram}?text=${message}`, '_blank');
+};
+        
     </script>
 
 
