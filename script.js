@@ -45,32 +45,43 @@ async function fetchProducts() {
 
     // 2. Loop through products and build the HTML
     products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        
-        // Truncate description so it stays neat (e.g., first 60 characters)
-        const shortDesc = product.description 
-            ? product.description.substring(0, 60) + (product.description.length > 60 ? '...' : '')
-            : 'No description available.';
+    const productCard = document.createElement('div');
+    productCard.className = 'product-card';
+    
+    const shortDesc = product.description 
+        ? product.description.substring(0, 60) + '...' 
+        : 'No description available.';
 
-        productCard.innerHTML = `
-            <div class="image-container" style="position: relative;">
-                <img src="${product.image}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
-                <span class="status-badge ${product.status ? product.status.toLowerCase() : 'new'}">
-                    ${product.status || 'New'}
-                </span>
-            </div>
-            <div class="product-info">
-                <h3 class="product-title">${product.name}</h3>
-                <p class="product-price">${product.price.toLocaleString()} ETB</p>
-                <p class="product-description">${shortDesc}</p>
-                <button class="view-btn" onclick='openProductDetails(${JSON.stringify(product)})'>
-                    View Details
+    // Create the Telegram Share Link
+    const shareMessage = encodeURIComponent(`Check out this ${product.name} for ${product.price} ETB on Golem!`);
+    const shareUrl = encodeURIComponent(window.location.href);
+    const tgLink = `https://t.me/share/url?url=${shareUrl}&text=${shareMessage}`;
+
+    productCard.innerHTML = `
+        <div class="image-container">
+            <img src="${product.image}" alt="${product.name}">
+            <span class="status-badge ${product.status ? product.status.toLowerCase() : 'new'}">
+                ${product.status || 'New'}
+            </span>
+        </div>
+        <div class="product-info">
+            <h3 class="product-title">${product.name}</h3>
+            <p class="product-price">${product.price.toLocaleString()} ETB</p>
+            <p class="product-description">${shortDesc}</p>
+            
+            <div class="product-actions">
+                <button class="buy-btn" onclick='openProductDetails(${JSON.stringify(product)})'>
+                    Buy Now
                 </button>
+                
+                <a href="${tgLink}" target="_blank" class="share-btn">
+                    <i class="fab fa-telegram"></i>
+                </a>
             </div>
-        `;
-        grid.appendChild(productCard);
-    });
+        </div>
+    `;
+    grid.appendChild(productCard);
+});
 }
 
 function renderProducts(products) {
@@ -333,5 +344,6 @@ function openProductDetails(product) {
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
 }
+
 
 
