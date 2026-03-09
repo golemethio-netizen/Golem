@@ -143,7 +143,66 @@ async function shareMyShop() {
 }
 
 
+// 1. Function to open the modal and fill it with existing data
+async function openEditModal(id) {
+    console.log("Opening edit for ID:", id); // For debugging
+    
+    // Fetch the specific item from Supabase
+    const { data: item, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
 
+    if (error) {
+        alert("Error fetching item data");
+        return;
+    }
+
+    // Fill the modal inputs
+    document.getElementById('editId').value = item.id;
+    document.getElementById('editName').value = item.name;
+    document.getElementById('editPrice').value = item.price;
+    document.getElementById('editDesc').value = item.description;
+
+    // Show the modal
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+// 2. Function to close the modal
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+// 3. Function to save the changes back to Supabase
+async function saveChanges() {
+    const id = document.getElementById('editId').value;
+    const btn = document.querySelector('#editModal .auth-submit');
+    
+    btn.innerText = "Updating...";
+    btn.disabled = true;
+
+    const updatedData = {
+        name: document.getElementById('editName').value,
+        price: parseFloat(document.getElementById('editPrice').value),
+        description: document.getElementById('editDesc').value,
+        status: 'pending' // Reset to pending so you can review the changes
+    };
+
+    const { error } = await _supabase
+        .from('products')
+        .update(updatedData)
+        .eq('id', id);
+
+    if (error) {
+        alert("Update failed: " + error.message);
+        btn.innerText = "Update Listing";
+        btn.disabled = false;
+    } else {
+        alert("Post updated! It is now pending review.");
+        location.reload(); // Refresh to show changes
+    }
+}
 
         async function loadMyItems() {
     const { data: { user } } = await _supabase.auth.getUser();
@@ -179,36 +238,7 @@ async function shareMyShop() {
 
 
 
-        async function openEditModal(id) {
-    const { data: item } = await _supabase.from('products').select('*').eq('id', id).single();
-    
-    document.getElementById('editId').value = item.id;
-    document.getElementById('editName').value = item.name;
-    document.getElementById('editPrice').value = item.price;
-    document.getElementById('editDesc').value = item.description;
-    
-    document.getElementById('editModal').style.display = 'flex';
-}
-
-async function saveChanges() {
-    const id = document.getElementById('editId').value;
-    const updatedData = {
-        name: document.getElementById('editName').value,
-        price: parseFloat(document.getElementById('editPrice').value),
-        description: document.getElementById('editDesc').value,
-        status: 'pending' // Reset to pending for Admin review
-    };
-
-    const { error } = await _supabase
-        .from('products')
-        .update(updatedData)
-        .eq('id', id);
-
-    if (!error) {
-        alert("Update successful! Your item is back in review.");
-        location.reload();
-    }
-}
+      
     </script>
 </body>
 </html>
