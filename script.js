@@ -24,22 +24,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function fetchProducts(category = 'All') {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
-    
-    grid.innerHTML = '<p style="text-align:center; width:100%;">Loading latest items...</p>';
 
-    let query = _supabase.from('products').select('*');
-    
+    // 1. START THE QUERY
+    let query = _supabase
+        .from('products')
+        // THIS IS THE LINE YOU MUST CHANGE:
+        // Add 'phone_number' inside the quotes below
+        .select('id, name, price, description, image, status, category, phone_number');
+
+    // 2. APPLY FILTERS (if any)
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
+    // 3. EXECUTE THE QUERY
     const { data: products, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
-        grid.innerHTML = '<p>Error loading products.</p>';
+        console.error("Supabase Error:", error);
         return;
     }
 
+    // 4. SEND DATA TO BE DRAWN ON SCREEN
     renderProductGrid(products);
 }
 
@@ -202,5 +208,6 @@ window.onclick = function(event) {
     if (event.target == authModal) authModal.style.display = "none";
     if (event.target == productModal) productModal.style.display = "none";
 };
+
 
 
