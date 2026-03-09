@@ -523,4 +523,14 @@ body {
 
 .item-card.rejected { border: 2px solid #f5c6cb; opacity: 0.8; }
 
+/* Add this to your style.css */
+.filter-bar {
+    position: sticky;
+    top: 70px; /* Adjust based on your header height */
+    background: white;
+    z-index: 100;
+    padding: 10px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
 
