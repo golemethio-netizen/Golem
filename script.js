@@ -24,22 +24,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ==========================================
    2. PRODUCT FETCHING & FILTERING
    ========================================== */
-async function fetchProducts(category = 'All') {
-    let query = _supabase
+async function fetchProducts() {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '<p>Loading latest items...</p>';
+
+    // 1. Fetch data from Supabase
+    // Ensure these column names match your Supabase Table exactly!
+    const { data: products, error } = await _supabase
         .from('products')
-        .select('*')
-        .eq('status', 'approved')
-        // 1. Sort by Featured first (true comes before false)
-        .order('is_featured', { ascending: false }) 
-        // 2. Then sort by Newest
+        .select('id, name, price, description, status, image, category')
         .order('created_at', { ascending: false });
 
-    if (category !== 'All') {
-        query = query.eq('category', category);
+    if (error) {
+        console.error("Error fetching products:", error);
+        grid.innerHTML = '<p>Could not load products. Please try again later.</p>';
+        return;
     }
 
-    const { data: products, error } = await query;
-    renderProducts(products);
+    grid.innerHTML = ''; // Clear loading message
+
+    // 2. Loop through products and build the HTML
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        
+        // Truncate description so it stays neat (e.g., first 60 characters)
+        const shortDesc = product.description 
+            ? product.description.substring(0, 60) + (product.description.length > 60 ? '...' : '')
+            : 'No description available.';
+
+        productCard.innerHTML = `
+            <div class="image-container" style="position: relative;">
+                <img src="${product.image}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
+                <span class="status-badge ${product.status ? product.status.toLowerCase() : 'new'}">
+                    ${product.status || 'New'}
+                </span>
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-price">${product.price.toLocaleString()} ETB</p>
+                <p class="product-description">${shortDesc}</p>
+                <button class="view-btn" onclick='openProductDetails(${JSON.stringify(product)})'>
+                    View Details
+                </button>
+            </div>
+        `;
+        grid.appendChild(productCard);
+    });
 }
 
 function renderProducts(products) {
@@ -302,4 +333,5 @@ function openProductDetails(product) {
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
 }
+
 
