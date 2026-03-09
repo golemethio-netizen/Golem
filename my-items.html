@@ -60,91 +60,74 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { user } } = await _supabase.auth.getUser();
-            
-            if (!user) {
-                alert("Please sign in to view your items.");
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            fetchUserItems(user.id);
-        });
-
-        async function fetchUserItems(userId) {
-            const { data: items, error } = await _supabase
-                .from('products')
-                .select('*')
-                .eq('user_id', userId); // Filter by the logged-in user's ID
-
-            const grid = document.getElementById('myItemsGrid');
-            
-            if (error || !items || items.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; padding:50px;">
-                    <i class="fas fa-box-open fa-3x" style="color: #ccc;"></i>
-                    <p>You haven't posted any items yet.</p>
-                    <button onclick="location.href='sell.html'" class="main-btn">Post an Item Now</button>
-                </div>`;
-                return;
-            }
-
-            grid.innerHTML = items.map(item => `
-                <div class="product-card" id="item-${item.id}">
-                    <div class="img-wrapper">
-                        <span class="status-tag ${item.status}">${item.status}</span>
-                        <img src="${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="product-info">
-                        <h3>${item.name}</h3>
-                        <p class="price">${item.price} ETB</p>
-                        <div class="action-buttons" style="flex-direction: row; gap: 5px;">
-                            <button class="share-btn" style="flex: 1; background: #ff4d4d; color: white; border: none;" 
-                                    onclick="deleteItem('${item.id}')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function deleteItem(id) {
-            if (confirm("Are you sure you want to delete this listing? This cannot be undone.")) {
-                const { error } = await _supabase.from('products').delete().eq('id', id);
-                if (error) {
-                    alert("Error deleting item: " + error.message);
-                } else {
-                    document.getElementById(`item-${id}`).remove();
-                }
-            }
-        }
-
-
-async function shareMyShop() {
+   document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return;
-
-    // This assumes you have a filtered view for specific users
-    const shareUrl = `${window.location.origin}/index.html?seller=${user.id}`;
     
-    if (navigator.share) {
-        navigator.share({
-            title: 'My Golem Shop',
-            text: 'Check out the items I have for sale on Golem!',
-            url: shareUrl
-        });
-    } else {
-        navigator.clipboard.writeText(shareUrl);
-        alert("Shop link copied to clipboard!");
+    if (!user) {
+        alert("Please sign in to view your items.");
+        window.location.href = 'index.html';
+        return;
     }
+    
+    // Call the correct function
+    loadMyItems(user.id);
+});
+
+async function loadMyItems(userId) {
+    const grid = document.getElementById('myItemsGrid');
+    
+    // Fetch everything: pending, approved, AND rejected
+    const { data: items, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error || !items || items.length === 0) {
+        grid.innerHTML = `
+            <div style="text-align:center; padding:50px; grid-column: 1 / -1;">
+                <i class="fas fa-box-open fa-3x" style="color: #ccc;"></i>
+                <p>You haven't posted any items yet.</p>
+                <button onclick="location.href='sell.html'" class="signin-btn" style="margin-top:10px; display:inline-block; border:1px solid #007bff; color:#007bff;">Post an Item Now</button>
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = items.map(item => `
+        <div class="product-card" id="item-${item.id}">
+            <div class="img-wrapper" style="position:relative;">
+                <span class="status-tag ${item.status}" style="position:absolute; top:10px; left:10px; padding:5px 10px; border-radius:5px; font-size:12px; font-weight:bold; text-transform:uppercase; color:white; background:${getStatusColor(item.status)};">
+                    ${item.status}
+                </span>
+                <img src="${item.image}" alt="${item.name}" style="width:100%; height:200px; object-fit:cover; border-radius:10px 10px 0 0;">
+            </div>
+            <div class="product-info" style="padding:15px;">
+                <h3 style="margin-bottom:5px;">${item.name}</h3>
+                <p class="price" style="color:#007bff; font-weight:bold; margin-bottom:15px;">${item.price} ETB</p>
+                
+                <div class="action-buttons" style="display: flex; gap: 10px;">
+                    <button onclick="openEditModal('${item.id}')" class="edit-btn" style="flex:1; padding:8px; border-radius:5px; border:1px solid #ddd; background:#f8f9fa; cursor:pointer;">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button onclick="deleteItem('${item.id}')" class="delete-btn" style="flex:1; padding:8px; border-radius:5px; border:none; background:#ff4d4d; color:white; cursor:pointer;">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
 }
 
+// Helper to color the status tags
+function getStatusColor(status) {
+    if (status === 'approved') return '#28a745'; // Green
+    if (status === 'rejected') return '#dc3545'; // Red
+    return '#ffc107'; // Yellow for pending
+}
 
-// 1. Function to open the modal and fill it with existing data
-// Function to Open Modal and Fetch Data
+// --- MODAL FUNCTIONS ---
+
 window.openEditModal = async function(id) {
     const { data: item, error } = await _supabase
         .from('products')
@@ -154,22 +137,18 @@ window.openEditModal = async function(id) {
 
     if (error) return alert("Error loading item details.");
 
-    // Fill Modal Fields
     document.getElementById('editId').value = item.id;
     document.getElementById('editName').value = item.name;
     document.getElementById('editPrice').value = item.price;
     document.getElementById('editDesc').value = item.description;
 
-    // Show Modal
     document.getElementById('editModal').style.display = 'flex';
 };
 
-// Function to Close Modal
 window.closeEditModal = function() {
     document.getElementById('editModal').style.display = 'none';
 };
 
-// Function to Save Changes
 window.saveChanges = async function() {
     const id = document.getElementById('editId').value;
     const btn = document.querySelector('#editModal .auth-submit');
@@ -181,7 +160,7 @@ window.saveChanges = async function() {
         name: document.getElementById('editName').value,
         price: parseFloat(document.getElementById('editPrice').value),
         description: document.getElementById('editDesc').value,
-        status: 'pending' // Reset status so you can re-approve the changes
+        status: 'pending' 
     };
 
     const { error } = await _supabase
@@ -191,57 +170,23 @@ window.saveChanges = async function() {
 
     if (error) {
         alert("Error updating: " + error.message);
-        btn.innerText = "Update & Resubmit";
+        btn.innerText = "Update Listing";
         btn.disabled = false;
     } else {
-        alert("Success! Your item has been updated and is back in the review queue.");
+        alert("Success! Your item is back in review.");
         location.reload();
     }
 };
 
-// Placeholder for Delete Function
 window.deleteItem = async function(id) {
     if(confirm("Are you sure you want to delete this listing permanently?")) {
         const { error } = await _supabase.from('products').delete().eq('id', id);
-        if(!error) location.reload();
+        if(!error) {
+            const el = document.getElementById(`item-${id}`);
+            if(el) el.remove();
+        }
     }
 };
-
-        async function loadMyItems() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    // Fetch everything: pending, approved, AND rejected
-    const { data: items } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-    const container = document.getElementById('myItemsGrid');
-    container.innerHTML = items.map(item => `
-        <div class="item-card ${item.status}">
-            <img src="${item.image}" alt="${item.name}">
-            <div class="info">
-                <h3>${item.name}</h3>
-                <span class="status-badge ${item.status}">${item.status.toUpperCase()}</span>
-                
-                <div class="actions">
-                    <button onclick="openEditModal('${item.id}')" class="edit-btn">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button onclick="deleteItem('${item.id}')" class="delete-btn">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-
-
-
-      
     </script>
 
 
