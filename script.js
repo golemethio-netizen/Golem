@@ -266,3 +266,16 @@ window.shareToWhatsApp = function() {
     const text = encodeURIComponent("Hey! I'm using Golem to buy and sell items in Addis. You should check it out: " + siteUrl);
     window.open(`https://wa.me/?text=${text}`, '_blank');
 };
+
+
+function shareToTelegram() {
+    const text = "Check out Golem Marketplace - Buy and sell items in Ethiopia!";
+    const url = window.location.href;
+    window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+}
+
+function shareToWhatsApp() {
+    const text = "Check out Golem Marketplace: " + window.location.href;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
