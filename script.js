@@ -279,3 +279,27 @@ function shareToWhatsApp() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
+function openProductDetails(product) {
+    // Fill in the text/images
+    document.getElementById('modalProductImg').src = product.image_url;
+    document.getElementById('modalProductTitle').innerText = product.title;
+    document.getElementById('modalProductPrice').innerText = `${product.price} ETB`;
+    document.getElementById('modalProductDesc').innerText = product.description;
+    
+    // Handle the Status Badge
+    const statusEl = document.getElementById('modalProductStatus');
+    statusEl.innerText = product.status;
+    statusEl.className = `status-badge ${product.status.toLowerCase()}`;
+
+    // Update Contact Links (assuming your DB has seller phone/username)
+    document.getElementById('whatsappContact').href = `https://wa.me/${product.seller_phone}`;
+    document.getElementById('telegramContact').href = `https://t.me/${product.seller_telegram}`;
+
+    // Show the modal
+    document.getElementById('productModal').style.display = 'flex';
+}
+
+function closeProductModal() {
+    document.getElementById('productModal').style.display = 'none';
+}
+
