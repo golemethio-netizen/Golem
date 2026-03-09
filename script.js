@@ -113,7 +113,7 @@ function renderProducts(products) {
                     <div class="action-buttons">
                         <button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>
                         <div style="display: flex; gap: 5px; width: 100%;">
-                            <a href="tel:${p.seller_phone}" class="tg-btn" style="flex: 2; text-decoration:none; text-align:center;">
+                            <a href="tel:${p.seller_contact}" class="tg-btn" style="flex: 2; text-decoration:none; text-align:center;">
                                 <i class="fas fa-phone"></i> Call Seller
                             </a>
                             <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">
@@ -324,41 +324,38 @@ function shareToWhatsApp() {
 }
 
 function openProductDetails(product) {
-    // Fill in the text/images
-    document.getElementById('modalProductImg').src = product.image_url;
-    document.getElementById('modalProductTitle').innerText = product.title;
-    document.getElementById('modalProductPrice').innerText = `${product.price} ETB`;
-    document.getElementById('modalProductDesc').innerText = product.description;
-    document.getElementById('status_condition').innerText = product.prodStatus;
-    // Handle the Status Badge
-    const statusEl = document.getElementById('modalProductStatus');
-    statusEl.innerText = product.status;
-    statusEl.className = `status-badge ${product.status.toLowerCase()}`;
-   
-   const callBtn = document.getElementById('callContact');
-    // Check both possible column names: 'seller_phone' or 'phone'
-    const phoneNumber = product.seller_phone || product.phone; 
+    // 1. Get the modal elements
+    const modal = document.getElementById('productModal');
+    const titleEl = document.getElementById('modalProductTitle');
+    const descEl = document.getElementById('modalProductDesc');
+    const priceEl = document.getElementById('modalProductPrice');
+    const imgEl = document.getElementById('modalProductImg');
+    
+    // Use a different name like 'callElement' to avoid the "already declared" error
+    const callElement = document.getElementById('callContact'); 
 
-    if (phoneNumber) {
-        callBtn.href = `tel:${phoneNumber}`;
-        callBtn.style.display = 'flex'; // Force visibility
-    } else {
-        console.warn("No phone number found for this product");
-        callBtn.style.display = 'none'; 
+    // 2. Populate data
+    titleEl.innerText = product.name || "No Title";
+    descEl.innerText = product.description || "No description available.";
+    priceEl.innerText = `${product.price?.toLocaleString()} ETB`;
+    imgEl.src = product.image;
+
+    // 3. Handle the Call Button logic
+    const phoneNumber = product.seller_contact || product.phone;
+    if (phoneNumber && callElement) {
+        callElement.href = `tel:${phoneNumber}`;
+        callElement.style.setProperty('display', 'flex', 'important'); // Force display
+    } else if (callElement) {
+        callElement.style.display = 'none';
     }
 
-    document.getElementById('productModal').style.display = 'flex';
-   
-const callBtn = document.getElementById('callContact');
-    if (product.seller_phone) {
-        callBtn.href = `tel:${product.seller_phone}`;
-        callBtn.style.display = 'flex'; // Show if phone exists
-    } else {
-        callBtn.style.display = 'none'; // Hide if no phone
-    }
+    // 4. Show the modal
+    modal.style.display = 'flex';
+}
+
    
     // Update Contact Links (assuming your DB has seller phone/username)
-   document.getElementById('whatsappContact').href = `https://wa.me/${product.seller_phone}`;
+   document.getElementById('whatsappContact').href = `https://wa.me/${product.seller_contact}`;
     document.getElementById('telegramContact').href = `https://t.me/${product.seller_telegram || ''}`;
 
     // Show the modal
@@ -368,6 +365,7 @@ const callBtn = document.getElementById('callContact');
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
 }
+
 
 
 
