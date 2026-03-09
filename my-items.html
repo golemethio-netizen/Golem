@@ -94,29 +94,37 @@ async function loadMyItems(userId) {
         return;
     }
 
-    grid.innerHTML = items.map(item => `
+grid.innerHTML = items.map(item => {
+    // Check if there is a reason provided by the admin
+    const reasonNote = item.rejection_reason ? 
+        `<p style="color: #dc3545; font-size: 12px; margin-top: 5px;"><b>Reason:</b> ${item.rejection_reason}</p>` : '';
+
+    return `
         <div class="product-card" id="item-${item.id}">
             <div class="img-wrapper" style="position:relative;">
-                <span class="status-tag ${item.status}" style="position:absolute; top:10px; left:10px; padding:5px 10px; border-radius:5px; font-size:12px; font-weight:bold; text-transform:uppercase; color:white; background:${getStatusColor(item.status)};">
+                <span class="status-tag ${item.status}" style="background:${getStatusColor(item.status)};">
                     ${item.status}
                 </span>
-                <img src="${item.image}" alt="${item.name}" style="width:100%; height:200px; object-fit:cover; border-radius:10px 10px 0 0;">
+                <img src="${item.image}" alt="${item.name}">
             </div>
-            <div class="product-info" style="padding:15px;">
-                <h3 style="margin-bottom:5px;">${item.name}</h3>
-                <p class="price" style="color:#007bff; font-weight:bold; margin-bottom:15px;">${item.price} ETB</p>
-                
-                <div class="action-buttons" style="display: flex; gap: 10px;">
-                    <button onclick="openEditModal('${item.id}')" class="edit-btn" style="flex:1; padding:8px; border-radius:5px; border:1px solid #ddd; background:#f8f9fa; cursor:pointer;">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button onclick="deleteItem('${item.id}')" class="delete-btn" style="flex:1; padding:8px; border-radius:5px; border:none; background:#ff4d4d; color:white; cursor:pointer;">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
+            <div class="product-info">
+                <h3>${item.name}</h3>
+                <p class="price">${item.price} ETB</p>
+                ${reasonNote} <div class="action-buttons">
+                    <button onclick="openEditModal('${item.id}')" class="edit-btn">Edit</button>
+                    
+                    ${item.status === 'rejected' ? `
+                        <button onclick="contactAdmin('${item.name}')" style="background:#6c757d; color:white; border:none; padding:8px; border-radius:5px; flex:1;">
+                            <i class="fas fa-question-circle"></i> Why?
+                        </button>
+                    ` : ''}
+                    
+                    <button onclick="deleteItem('${item.id}')" class="delete-btn">Delete</button>
                 </div>
             </div>
         </div>
-    `).join('');
+    `;
+}).join('');
 }
 
 // Helper to color the status tags
