@@ -146,12 +146,54 @@ async function loadItems(status = 'pending') {
                         <button onclick="updateStatus('${item.id}', 'pending')" class="btn-approve">Restore to Pending</button>
                         <button onclick="permanentlyDelete('${item.id}')" style="background:black; color:white; border:none; padding:8px; border-radius:5px;">Delete Perm.</button>
                     ` : ''}
+
+// Inside your grid.innerHTML map loop:
+<div class="action-buttons">
+    <button onclick="openEditModal('${item.id}')" class="edit-btn">Edit</button>
+    
+    ${item.status === 'approved' ? `
+        <button onclick="markAsSold('${item.id}')" style="background:#28a745; color:white; border:none; padding:8px; border-radius:5px; flex:1;">
+            <i class="fas fa-check-circle"></i> Mark Sold
+        </button>
+    ` : ''}
+    
+    <button onclick="deleteItem('${item.id}')" class="delete-btn">Delete</button>
+</div>
+
+
+
+                    
                 </div>
             </div>
         </div>
     `).join('');
 }
 
+
+
+
+
+
+
+
+
+        window.markAsSold = async function(id) {
+    if (confirm("Congratulations! Is this item sold? This will hide it from the public marketplace.")) {
+        const { error } = await _supabase
+            .from('products')
+            .update({ status: 'sold' })
+            .eq('id', id);
+
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("Item marked as sold!");
+            location.reload();
+        }
+    }
+};
+
+        
 // Unified Status Updater
 async function updateStatus(id, newStatus) {
     const { error } = await _supabase
