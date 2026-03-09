@@ -21,7 +21,13 @@
     <button onclick="switchTab('rejected', this)" class="tab-btn">Rejected/Deleted</button>
 </div>
 
-
+<div class="admin-actions">
+    <textarea id="reason-${item.id}" placeholder="Optional: Why reject?" style="width: 100%; margin-bottom: 5px; font-size: 12px;"></textarea>
+    <div style="display: flex; gap: 5px;">
+        <button onclick="approveItem('${item.id}')" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px;">Approve</button>
+        <button onclick="rejectItem('${item.id}')" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;">Reject</button>
+    </div>
+</div>
 
 <div class="admin-search-bar" style="margin-bottom: 20px; display: flex; gap: 10px;">
     <div style="position: relative; flex: 1;">
@@ -82,13 +88,7 @@
     </div>
 </div>
 
-<div class="admin-actions">
-    <textarea id="reason-${item.id}" placeholder="Optional: Why reject?" style="width: 100%; margin-bottom: 5px; font-size: 12px;"></textarea>
-    <div style="display: flex; gap: 5px;">
-        <button onclick="approveItem('${item.id}')" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px;">Approve</button>
-        <button onclick="rejectItem('${item.id}')" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;">Reject</button>
-    </div>
-</div>
+
 
 
     
