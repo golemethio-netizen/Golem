@@ -687,3 +687,21 @@ body {
     font-size: 1.2rem;
 }
 
+/* Force badges to the top layer */
+.status-badge {
+    position: absolute !important;
+    top: 12px !important;
+    left: 12px !important;
+    z-index: 999 !important; /* Higher than the image */
+    background-color: #333; /* Fallback color */
+    color: white !important;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.status-badge.new { background-color: #28a745 !important; }
+.status-badge.used { background-color: #ffc107 !important; color: black !important; }
+
+
