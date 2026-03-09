@@ -705,3 +705,25 @@ body {
 .status-badge.used { background-color: #ffc107 !important; color: black !important; }
 
 
+
+/* Ensure the image container is the "anchor" */
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+}
+
+/* Force the badge to the very front layer */
+.status-badge {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 10 !important; /* This puts it on top of the image */
+    background-color: #28a745; /* Default Green */
+    color: white !important;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
