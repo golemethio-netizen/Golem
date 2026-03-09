@@ -155,6 +155,40 @@ async function shareMyShop() {
         </div>
     `).join('');
 }
+
+
+
+
+        async function openEditModal(id) {
+    const { data: item } = await _supabase.from('products').select('*').eq('id', id).single();
+    
+    document.getElementById('editId').value = item.id;
+    document.getElementById('editName').value = item.name;
+    document.getElementById('editPrice').value = item.price;
+    document.getElementById('editDesc').value = item.description;
+    
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+async function saveChanges() {
+    const id = document.getElementById('editId').value;
+    const updatedData = {
+        name: document.getElementById('editName').value,
+        price: parseFloat(document.getElementById('editPrice').value),
+        description: document.getElementById('editDesc').value,
+        status: 'pending' // Reset to pending for Admin review
+    };
+
+    const { error } = await _supabase
+        .from('products')
+        .update(updatedData)
+        .eq('id', id);
+
+    if (!error) {
+        alert("Update successful! Your item is back in review.");
+        location.reload();
+    }
+}
     </script>
 </body>
 </html>
