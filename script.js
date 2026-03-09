@@ -93,7 +93,27 @@ function renderProductGrid(products) {
    3. MODAL & INTERACTION LOGIC
    ========================================== */
 function openProductDetails(product) {
-    const modal = document.getElementById('productModal');
+    cconst modal = document.getElementById('productModal');
+    const callBtn = document.getElementById('callContact');
+   const phoneNumber = product.seller_contact || 
+                        product.seller_phone || 
+                        product.phone || 
+                        product.contact;
+
+    console.log("Found Phone Number:", phoneNumber); // Check your F12 Console for this!
+
+    if (phoneNumber && callBtn) {
+        callBtn.href = `tel:${phoneNumber}`;
+        callBtn.style.setProperty('display', 'flex', 'important');
+        
+        // Update the text inside just to be sure
+        callBtn.innerHTML = `<i class="fas fa-phone-alt"></i> Call Seller (${phoneNumber})`;
+    } else if (callBtn) {
+        console.error("No phone number found in product data:", product);
+        callBtn.style.display = 'none';
+    }
+
+
     if(!modal) return;
 
     // Set Text Content
@@ -168,3 +188,4 @@ window.onclick = function(event) {
     if (event.target == authModal) authModal.style.display = "none";
     if (event.target == productModal) productModal.style.display = "none";
 };
+
