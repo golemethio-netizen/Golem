@@ -1419,3 +1419,28 @@ body {
     display: inline-block !important;
 }
 
+.seller-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.contact-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.call-btn { background-color: #28a745; color: white; }
+.wa-btn { background-color: #25D366; color: white; }
+.tg-btn { background-color: #0088cc; color: white; }
+
+.contact-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
