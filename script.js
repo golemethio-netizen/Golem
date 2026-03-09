@@ -332,10 +332,18 @@ function openProductDetails(product) {
     const statusEl = document.getElementById('modalProductStatus');
     statusEl.innerText = product.status;
     statusEl.className = `status-badge ${product.status.toLowerCase()}`;
-
+   
+const callBtn = document.getElementById('callContact');
+    if (product.seller_phone) {
+        callBtn.href = `tel:${product.seller_phone}`;
+        callBtn.style.display = 'flex'; // Show if phone exists
+    } else {
+        callBtn.style.display = 'none'; // Hide if no phone
+    }
+   
     // Update Contact Links (assuming your DB has seller phone/username)
-    document.getElementById('whatsappContact').href = `https://wa.me/${product.seller_phone}`;
-    document.getElementById('telegramContact').href = `https://t.me/${product.seller_telegram}`;
+   document.getElementById('whatsappContact').href = `https://wa.me/${product.seller_phone}`;
+    document.getElementById('telegramContact').href = `https://t.me/${product.seller_telegram || ''}`;
 
     // Show the modal
     document.getElementById('productModal').style.display = 'flex';
@@ -344,6 +352,7 @@ function openProductDetails(product) {
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
 }
+
 
 
 
