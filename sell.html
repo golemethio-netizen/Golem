@@ -34,7 +34,7 @@
                 </div>
 <div class="input-group-sell">
     <label><i class="fas fa-star"></i> Condition</label>
-    <select id="prodStatus" required>
+    <select id="status_condition" required>
         <option value="New">New</option>
         <option value="Used">Used</option>
         <option value="Refurbished">Refurbished</option>
@@ -115,7 +115,7 @@
     btn.innerText = "Publishing Listing...";
     const productData = {
         name: document.getElementById('prodName').value,
-        status_condition: document.getElementById('prodStatus').value, // Add this line
+        status_condition: document.getElementById('status_condition').value, // Add this line
         price: parseFloat(document.getElementById('prodPrice').value),
         category: document.getElementById('prodCategory').value,
         description: document.getElementById('prodDesc').value,
