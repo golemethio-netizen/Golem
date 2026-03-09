@@ -22,6 +22,7 @@
             <form id="sellForm">
               <div class="input-group-sell">
     <label><i class="fas fa-camera"></i> Upload Product Photo</label>
+                  <img id="imagePreview" src="#" alt="Preview" style="display:none; width:100%; border-radius:10px; margin-top:10px;">
     <input type="file" id="prodFile" accept="image/*" required 
            style="border: 2px dashed #ddd; padding: 20px; text-align: center;">
     <p id="uploadStatus" style="font-size: 12px; color: #666; margin-top: 5px;"></p>
@@ -31,7 +32,14 @@
                     <label><i class="fas fa-tag"></i> Item Name</label>
                     <input type="text" id="prodName" placeholder="e.g., iPhone 15 Pro Max" required>
                 </div>
-
+<div class="input-group-sell">
+    <label><i class="fas fa-star"></i> Condition</label>
+    <select id="prodStatus" required>
+        <option value="New">New</option>
+        <option value="Used">Used</option>
+        <option value="Refurbished">Refurbished</option>
+    </select>
+</div>
                 <div style="display: flex; gap: 15px;">
                     <div class="input-group-sell" style="flex: 1;">
                         <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
@@ -107,6 +115,7 @@
     btn.innerText = "Publishing Listing...";
     const productData = {
         name: document.getElementById('prodName').value,
+        status_condition: document.getElementById('prodStatus').value, // Add this line
         price: parseFloat(document.getElementById('prodPrice').value),
         category: document.getElementById('prodCategory').value,
         description: document.getElementById('prodDesc').value,
@@ -117,6 +126,16 @@
         status: 'pending'
     };
 
+
+
+           document.getElementById('prodFile').onchange = evt => {
+    const [file] = document.getElementById('prodFile').files;
+    if (file) {
+        const preview = document.getElementById('imagePreview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+}
     const { error: dbError } = await _supabase
         .from('products')
         .insert([productData]);
