@@ -2,9 +2,11 @@
    1. INITIALIZATION & CORE LISTENERS
    ========================================== */
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initial data fetch
     fetchProducts();
     updateUIForUser();
 
+    // Search Listener
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -12,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Auth Form Listener
     const authForm = document.getElementById('authForm');
     if (authForm) {
         authForm.addEventListener('submit', handleAuthSubmit);
@@ -19,33 +22,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /* ==========================================
-   2. PRODUCT FETCHING & RENDERING
+   2. PRODUCT FETCHING (The Supabase Handshake)
    ========================================== */
 async function fetchProducts(category = 'All') {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
+    
+    grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>';
 
-    // 1. START THE QUERY
+    // IMPORTANT: We explicitly ask for 'phone_number' here
     let query = _supabase
         .from('products')
-        // THIS IS THE LINE YOU MUST CHANGE:
-        // Add 'phone_number' inside the quotes below
-        .select('id, name, price, description, image, status, category, phone_number');
+        .select('id, name, price, description, status, image, category, phone_number, seller_telegram');
 
-    // 2. APPLY FILTERS (if any)
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    // 3. EXECUTE THE QUERY
     const { data: products, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
         console.error("Supabase Error:", error);
+        grid.innerHTML = '<p>Error loading products. Please refresh.</p>';
         return;
     }
 
-    // 4. SEND DATA TO BE DRAWN ON SCREEN
     renderProductGrid(products);
 }
 
@@ -61,15 +62,11 @@ function renderProductGrid(products) {
     grid.innerHTML = products.map(p => {
         const isFav = favs.includes(p.id);
         const condition = p.status || "New";
-        const shortDesc = p.description ? p.description.substring(0, 60) + '...' : 'No description.';
+        const shortDesc = p.description ? p.description.substring(0, 50) + '...' : 'No description.';
         
-        // Share Logic
-        const shareMsg = encodeURIComponent(`Check out this ${p.name} for ${p.price} ETB!`);
-        const tgLink = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${shareMsg}`;
-
         return `
             <div class="product-card" data-id="${p.id}">
-                <div class="image-container" style="position: relative;">
+                <div class="image-container">
                     <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${p.id}')">
                         <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
                     </button>
@@ -78,16 +75,13 @@ function renderProductGrid(products) {
                 </div>
                 <div class="product-info">
                     <h3>${p.name}</h3>
-                    <p class="product-price">${p.price.toLocaleString()} ETB</p>
+                    <p class="product-price">${p.price?.toLocaleString()} ETB</p>
                     <p class="product-description">${shortDesc}</p>
                     
                     <div class="product-actions">
                         <button class="buy-btn" onclick='openProductDetails(${JSON.stringify(p)})'>
                            Buy Now
                         </button>
-                        <a href="${tgLink}" target="_blank" class="share-btn">
-                            <i class="fab fa-telegram"></i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -96,94 +90,96 @@ function renderProductGrid(products) {
 }
 
 /* ==========================================
-   3. MODAL & INTERACTION LOGIC
+   3. PRODUCT MODAL (The Display Logic)
    ========================================== */
 function openProductDetails(product) {
-    // 1. Get all Modal Elements
     const modal = document.getElementById('productModal');
-    const titleEl = document.getElementById('modalProductTitle');
-    const descEl = document.getElementById('modalProductDesc');
-    const priceEl = document.getElementById('modalProductPrice');
-    const imgEl = document.getElementById('modalProductImg');
     
-    // Action Buttons
+    // Fill Text & Image
+    document.getElementById('modalProductTitle').innerText = product.name;
+    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
+    document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
+    document.getElementById('modalProductImg').src = product.image;
+
+    // Call Button Logic
     const callBtn = document.getElementById('callContact');
-    const waBtn = document.getElementById('whatsappContact');
-    const tgBtn = document.getElementById('telegramContact');
+    const phone = product.phone_number; // Mapping to your Supabase column
 
-    // 2. Data Validation & Mapping
-    // We use your specific Supabase column name: phone_number
-    const phone = product.phone_number;
-    const telegramUsername = product.seller_telegram || ""; // Optional field
-
-    // 3. Populate Text & Media
-    if (titleEl) titleEl.innerText = product.name || "Untitled Product";
-    if (descEl) descEl.innerText = product.description || "No description available.";
-    if (priceEl) priceEl.innerText = `${product.price?.toLocaleString()} ETB`;
-    if (imgEl) imgEl.src = product.image || 'assets/placeholder.png';
-
-    // 4. "Call Seller" Logic (The Fix)
     if (phone && callBtn) {
         callBtn.href = `tel:${phone}`;
-        callBtn.style.display = 'flex'; // Force show
-        // Optional: Update button text to show the number
-        callBtn.innerHTML = `<i class="fas fa-phone-alt"></i> Call Seller`;
+        callBtn.style.display = 'flex'; // This makes it visible
     } else if (callBtn) {
-        callBtn.style.display = 'none'; // Hide if no number exists
+        console.warn("Phone number missing for:", product.name);
+        callBtn.style.display = 'none'; // Hides it if the data is empty
     }
 
-    // 5. WhatsApp Logic
+    // WhatsApp Logic
+    const waBtn = document.getElementById('whatsappContact');
     if (phone && waBtn) {
-        // Clean the phone number (remove spaces/dashes) for the link
         const cleanPhone = phone.replace(/\D/g, ''); 
         waBtn.href = `https://wa.me/${cleanPhone}`;
         waBtn.style.display = 'flex';
-    } else if (waBtn) {
-        waBtn.style.display = 'none';
     }
 
-    // 6. Telegram Logic
-    if (telegramUsername && tgBtn) {
-        const cleanTG = telegramUsername.replace('@', '');
-        tgBtn.href = `https://t.me/${cleanTG}`;
+    // Telegram Logic
+    const tgBtn = document.getElementById('telegramContact');
+    const tgUser = product.seller_telegram;
+    if (tgUser && tgBtn) {
+        tgBtn.href = `https://t.me/${tgUser.replace('@', '')}`;
         tgBtn.style.display = 'flex';
     } else if (tgBtn) {
         tgBtn.style.display = 'none';
     }
 
-    // 7. Show the Modal
-    if (modal) {
-        modal.style.display = 'flex';
-    } else {
-        console.error("Critical Error: 'productModal' element not found in HTML.");
-    }
+    modal.style.display = 'flex';
 }
-
-
-
-
 
 function closeProductModal() {
     document.getElementById('productModal').style.display = 'none';
 }
 
 /* ==========================================
-   4. FAVORITES & FILTERS
+   4. AUTH & UI HELPERS
    ========================================== */
+async function handleAuthSubmit(e) {
+    e.preventDefault();
+    const email = e.target.querySelector('input[type="email"]').value;
+    const password = e.target.querySelector('input[type="password"]').value;
+    const btn = e.target.querySelector('.auth-submit');
+
+    btn.innerText = "Processing...";
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        alert(error.message);
+        btn.innerText = "Sign In";
+    } else {
+        window.location.reload();
+    }
+}
+
+async function updateUIForUser() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const authBtn = document.querySelector('.signin-btn');
+    if (user && authBtn) {
+        authBtn.innerText = "Sign Out";
+        authBtn.onclick = async () => {
+            await _supabase.auth.signOut();
+            window.location.reload();
+        };
+    }
+}
+
 window.toggleFavorite = function(e, id) {
     e.stopPropagation();
     let favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
     const btn = e.currentTarget;
-    const icon = btn.querySelector('i');
-
     if (favs.includes(id)) {
         favs = favs.filter(item => item !== id);
         btn.classList.remove('active');
-        icon.classList.replace('fas', 'far');
     } else {
         favs.push(id);
         btn.classList.add('active');
-        icon.classList.replace('far', 'fas');
     }
     localStorage.setItem('golem_favs', JSON.stringify(favs));
 };
@@ -201,13 +197,7 @@ function filterSearch(term) {
     });
 }
 
-// Ensure modal closes when clicking outside the content
-window.onclick = function(event) {
-    const authModal = document.getElementById('authModal');
-    const productModal = document.getElementById('productModal');
-    if (event.target == authModal) authModal.style.display = "none";
-    if (event.target == productModal) productModal.style.display = "none";
-};
-
-
-
+function toggleModal() {
+    const m = document.getElementById('authModal');
+    m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+}
