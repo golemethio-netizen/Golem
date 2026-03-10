@@ -1,29 +1,18 @@
-/* ==========================================
-   1. INITIALIZATION & CORE LISTENERS
-   ========================================== */
-document.addEventListener('DOMContentLoaded', async () => {
-    // Initial data fetch
+document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     updateUIForUser();
+    loadDynamicFilters();
 
-    // Search Listener
-    const searchInput = document.getElementById('headerSearch');
+    const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            filterSearch(e.target.value.toLowerCase());
+            const term = e.target.value.toLowerCase();
+            filterSearch(term);
         });
-    }
-
-    // Auth Form Listener
-    const authForm = document.getElementById('authForm');
-    if (authForm) {
-        authForm.addEventListener('submit', handleAuthSubmit);
     }
 });
 
-/* ==========================================
-   2. PRODUCT FETCHING (The Supabase Handshake)
-   ========================================== */
+// 1. Fetch Approved Products
 async function fetchProducts(category = 'All') {
     const sortSelect = document.getElementById('sortSelect');
     const sortOrder = sortSelect ? sortSelect.value : 'newest';
@@ -45,158 +34,154 @@ async function fetchProducts(category = 'All') {
     if (!error) renderProducts(products);
 }
 
-
-
-function renderProductGrid(products) {
+// 2. Render Products
+function renderProducts(products) {
     const grid = document.getElementById('productGrid');
-    const favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
-
-    if (products.length === 0) {
-        grid.innerHTML = '<p style="text-align:center; width:100%; padding:50px;">No items found.</p>';
-        return;
-    }
+    if (!grid) return;
 
     grid.innerHTML = products.map(p => {
-        const isFav = favs.includes(p.id);
-        const condition = p.status || "New";
-        const shortDesc = p.description ? p.description.substring(0, 50) + '...' : 'No description.';
+        const isSold = p.status === 'sold';
+        const telegramLink = `https://t.me/${p.telegram_username || 'GolemSupport'}`;
         
         return `
-            <div class="product-card" data-id="${p.id}">
-                <div class="image-container">
-                    <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${p.id}')">
-                        <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
-                    </button>
+            <div class="product-card ${isSold ? 'is-sold' : ''}">
+                <div class="img-wrapper">
+                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                     <img src="${p.image}" alt="${p.name}" loading="lazy">
-                    <span class="status-badge ${condition.toLowerCase()}">${condition}</span>
                 </div>
                 <div class="product-info">
                     <h3>${p.name}</h3>
-                    <p class="product-price">${p.price?.toLocaleString()} ETB</p>
-                    <p class="product-description">${shortDesc}</p>
-                    
-                    <div class="product-actions">
-                        <button class="buy-btn" onclick='openProductDetails(${JSON.stringify(p)})'>
-                           Buy Now
-                        </button>
+                    <p class="price">${p.price} ETB</p>
+                    <div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px;">
+                        ${isSold ? 
+                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
+                            `<button class="main-btn" onclick="handleViewAndBuy('${p.id}')">🛒 Buy Now</button>`
+                        }
+                        <div style="display: flex; gap: 5px;">
+                            <a href="${telegramLink}" target="_blank" class="tg-btn" style="flex: 2; text-decoration: none;">✈️ Telegram</a>
+                            <button class="share-btn" onclick="shareItem('${p.name}', '${p.price}', '${p.id}')" style="flex: 1;">📤 Share</button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
     }).join('');
+
+    const loader = document.getElementById('pageLoader');
+    if (loader) loader.style.display = 'none';
 }
 
-/* ==========================================
-   3. PRODUCT MODAL (The Display Logic)
-   ========================================== */
-function openProductDetails(product) {
-    const modal = document.getElementById('productModal');
+// 3. Filters & Search
+function filterSearch(term) {
+    const cards = document.querySelectorAll('.product-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        if (title.includes(term)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const grid = document.getElementById('productGrid');
+    const existingMsg = document.getElementById('noMatchMsg');
     
-    // Fill Text & Image
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
-    document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
-    document.getElementById('modalProductImg').src = product.image;
-
-    // Call Button Logic
-    const callBtn = document.getElementById('callContact');
-    const phone = product.phone_number; // Mapping to your Supabase column
-
-    if (phone && callBtn) {
-        callBtn.href = `tel:${phone}`;
-        callBtn.style.display = 'flex'; // This makes it visible
-    } else if (callBtn) {
-        console.warn("Phone number missing for:", product.name);
-        callBtn.style.display = 'none'; // Hides it if the data is empty
+    if (visibleCount === 0 && !existingMsg) {
+        const msg = document.createElement('p');
+        msg.id = 'noMatchMsg';
+        msg.innerText = "No items match your search.";
+        msg.style.cssText = "text-align:center; grid-column:1/-1; padding:20px;";
+        grid.appendChild(msg);
+    } else if (visibleCount > 0 && existingMsg) {
+        existingMsg.remove();
     }
-
-    // WhatsApp Logic
-    const waBtn = document.getElementById('whatsappContact');
-    if (phone && waBtn) {
-        const cleanPhone = phone.replace(/\D/g, ''); 
-        waBtn.href = `https://wa.me/${cleanPhone}`;
-        waBtn.style.display = 'flex';
-    }
-
-    // Telegram Logic
-    const tgBtn = document.getElementById('telegramContact');
-    const tgUser = product.seller_telegram;
-    if (tgUser && tgBtn) {
-        tgBtn.href = `https://t.me/${tgUser.replace('@', '')}`;
-        tgBtn.style.display = 'flex';
-    } else if (tgBtn) {
-        tgBtn.style.display = 'none';
-    }
-
-    modal.style.display = 'flex';
 }
 
-function closeProductModal() {
-    document.getElementById('productModal').style.display = 'none';
+async function loadDynamicFilters() {
+    const container = document.querySelector('.filter-container');
+    if (!container) return;
+
+    const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
+    if (error) return;
+
+    container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
+    if (cats) {
+        cats.forEach(c => {
+            container.innerHTML += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
+        });
+    }
 }
 
-/* ==========================================
-   4. AUTH & UI HELPERS
-   ========================================== */
-async function handleAuthSubmit(e) {
-    e.preventDefault();
-    const email = e.target.querySelector('input[type="email"]').value;
-    const password = e.target.querySelector('input[type="password"]').value;
-    const btn = e.target.querySelector('.auth-submit');
+window.filterCategory = function(cat, btn) {
+    if (!btn) {
+        const allBtns = document.querySelectorAll('.filter-btn');
+        btn = Array.from(allBtns).find(b => b.innerText.trim() === cat);
+    }
+    if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    fetchProducts(cat);
+};
 
-    btn.innerText = "Processing...";
-    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+window.applyPriceFilter = function() {
+    const min = parseFloat(document.getElementById('minPrice').value) || 0;
+    const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const priceText = card.querySelector('.price').innerText;
+        const price = parseFloat(priceText.replace(' ETB', ''));
+        card.style.display = (price >= min && price <= max) ? 'block' : 'none';
+    });
+};
 
-    if (error) {
-        alert(error.message);
-        btn.innerText = "Sign In";
+// 4. Navigation & Auth
+async function incrementView(productId) {
+    await _supabase.rpc('increment_views', { row_id: productId });
+}
+
+function handleViewAndBuy(id) {
+    incrementView(id);
+    location.href = `checkout.html?id=${id}`;
+}
+
+async function shareItem(name, price, id) {
+    const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html','')}checkout.html?id=${id}`;
+    const shareText = `Check out this ${name} for ${price} ETB on Golem Marketplace!`;
+    if (navigator.share) {
+        try { await navigator.share({ title: 'Golem', text: shareText, url: shareUrl }); } 
+        catch (err) { console.log("Share cancelled"); }
     } else {
-        window.location.reload();
+        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        alert("Link copied to clipboard!");
     }
 }
 
 async function updateUIForUser() {
+    const userMenu = document.getElementById('userMenu');
+    if (!userMenu) return;
     const { data: { user } } = await _supabase.auth.getUser();
-    const authBtn = document.querySelector('.signin-btn');
-    if (user && authBtn) {
-        authBtn.innerText = "Sign Out";
-        authBtn.onclick = async () => {
-            await _supabase.auth.signOut();
-            window.location.reload();
-        };
+    userMenu.innerHTML = user ? 
+        `<button onclick="location.href='my-items.html'" class="filter-btn">My Items</button>
+         <button onclick="handleSignOut()" class="login-btn">Sign Out</button>` : 
+        `<button onclick="location.href='login.html'" class="login-btn">Sign In</button>`;
+}
+
+async function handleSignOut() {
+    await _supabase.auth.signOut();
+    window.location.reload();
+}
+
+window.checkAuthToSell = async function() {
+    const { data: { user }, error } = await _supabase.auth.getUser();
+    if (error || !user) {
+        alert("Please Sign In to post an item.");
+        window.location.href = 'login.html';
+        return;
     }
-}
-
-window.toggleFavorite = function(e, id) {
-    e.stopPropagation();
-    let favs = JSON.parse(localStorage.getItem('golem_favs') || '[]');
-    const btn = e.currentTarget;
-    if (favs.includes(id)) {
-        favs = favs.filter(item => item !== id);
-        btn.classList.remove('active');
-    } else {
-        favs.push(id);
-        btn.classList.add('active');
-    }
-    localStorage.setItem('golem_favs', JSON.stringify(favs));
+    window.location.href = 'submit.html';
 };
-
-window.filterCategory = function(cat, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    fetchProducts(cat);
-};
-
-function filterSearch(term) {
-    document.querySelectorAll('.product-card').forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        card.style.display = title.includes(term) ? 'block' : 'none';
-    });
-}
-
-function toggleModal() {
-    const m = document.getElementById('authModal');
-    m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-}
-
-
