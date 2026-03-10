@@ -70,46 +70,56 @@ function renderProducts(products) {
 }
 
 // 3. Modal & Call Seller Logic
+// 3. Modal & Call Seller Logic
 window.openProductDetails = function(product) {
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
+    // Set Text Content
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
     document.getElementById('modalProductImg').src = product.image;
 
-    // 📞 Call Seller Fix
+    // Setup Dynamic IDs for the new buttons
     const callBtn = document.getElementById('callContact');
-    if (callBtn && product.phone_number) {
-        callBtn.href = `tel:${product.phone_number}`;
+    const waBtn = document.getElementById('whatsappContact');
+    const tgBtn = document.getElementById('telegramContact');
+    const shareTgBtn = document.getElementById('shareTgBtn');
+    
+    const phone = product.phone_number;
+    const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
+
+    // 📞 Call Seller
+    if (callBtn && phone) {
+        callBtn.href = `tel:${phone}`;
         callBtn.style.display = "flex";
-    } else if (callBtn) {
-        callBtn.style.display = "none";
     }
 
-    // 🟢 WhatsApp
-    const waBtn = document.getElementById('whatsappContact');
-    if (waBtn && product.phone_number) {
-        const cleanPhone = product.phone_number.replace(/\D/g, '');
-        waBtn.href = `https://wa.me/${cleanPhone}`;
+    // 🟢 WhatsApp (Buy Now / Add to Cart logic)
+    if (waBtn && phone) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        waBtn.href = `https://wa.me/${cleanPhone}?text=I am interested in ${product.name}`;
         waBtn.style.display = "flex";
     }
 
-    // ✈️ Telegram
-    const tgBtn = document.getElementById('telegramContact');
-    const tgUser = product.telegram_username || product.seller_telegram;
+    // ✈️ Telegram (Contact Seller)
     if (tgBtn && tgUser) {
-        tgBtn.href = `https://t.me/${tgUser.replace('@', '')}`;
+        tgBtn.href = `https://t.me/${tgUser}`;
         tgBtn.style.display = "flex";
-    } else if (tgBtn) {
-        tgBtn.style.display = "none";
+    }
+
+    // 📤 Share to Telegram (New Feature)
+    if (shareTgBtn) {
+        const shareUrl = window.location.href; // Or a specific product link
+        const shareText = encodeURIComponent(`Check out this ${product.name} for ${product.price} ETB on Golem!\n\n${shareUrl}`);
+        shareTgBtn.href = `https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
+        shareTgBtn.style.display = "flex";
     }
 
     modal.style.display = 'flex';
     if(product.id) _supabase.rpc('increment_views', { row_id: product.id });
 };
-
 window.closeProductModal = function() {
     document.getElementById('productModal').style.display = 'none';
 };
@@ -175,3 +185,4 @@ async function updateUIForUser() {
         };
     }
 }
+
