@@ -25,40 +25,27 @@ document.addEventListener('DOMContentLoaded', async () => {
    2. PRODUCT FETCHING (The Supabase Handshake)
    ========================================== */
 async function fetchProducts(category = 'All') {
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>';
+    const sortSelect = document.getElementById('sortSelect');
+    const sortOrder = sortSelect ? sortSelect.value : 'newest';
 
-    // TRY THIS: Remove 'seller_telegram' first to see if that's the error.
-    // Also double-check if 'phone_number' is exactly as written in your Supabase dashboard.
-    let query = _supabase
-        .from('products')
-        .select(`
-            id, 
-            name, 
-            price, 
-            description, 
-            status, 
-            image, 
-            category, 
-            phone_number
-        `); 
+    let query = _supabase.from('products').select('*').eq('status', 'approved');
 
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    const { data: products, error } = await query.order('created_at', { ascending: false });
+    query = query.order('is_sponsored', { ascending: false });
 
-    if (error) {
-        console.error("Supabase Error Details:", error.message); // This will tell us the EXACT missing column
-        grid.innerHTML = `<p>Error: ${error.message}</p>`;
-        return;
-    }
+    if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
+    else if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
+    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+    else if (sortOrder === 'popular') query = query.order('views', { ascending: false });
 
-    renderProductGrid(products);
+    const { data: products, error } = await query;
+    if (!error) renderProducts(products);
 }
+
+
 
 function renderProductGrid(products) {
     const grid = document.getElementById('productGrid');
@@ -211,4 +198,5 @@ function toggleModal() {
     const m = document.getElementById('authModal');
     m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
 }
+
 
