@@ -1470,3 +1470,23 @@ body {
 
 .call-btn { background-color: #28a745; } /* Green for calling */
 
+
+.share-tg-btn {
+    background-color: #34a853; /* Success Green or a different blue */
+    color: white;
+}
+
+.wa-btn {
+    background-color: #25D366; /* WhatsApp Green */
+}
+
+/* Make buttons look clickable and uniform */
+.contact-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
