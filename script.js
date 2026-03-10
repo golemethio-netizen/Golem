@@ -30,10 +30,20 @@ async function fetchProducts(category = 'All') {
     
     grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>';
 
-    // IMPORTANT: We explicitly ask for 'phone_number' here
+    // TRY THIS: Remove 'seller_telegram' first to see if that's the error.
+    // Also double-check if 'phone_number' is exactly as written in your Supabase dashboard.
     let query = _supabase
         .from('products')
-        .select('id, name, price, description, status, image, category, phone_number, seller_telegram');
+        .select(`
+            id, 
+            name, 
+            price, 
+            description, 
+            status, 
+            image, 
+            category, 
+            phone_number
+        `); 
 
     if (category !== 'All') {
         query = query.eq('category', category);
@@ -42,8 +52,8 @@ async function fetchProducts(category = 'All') {
     const { data: products, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
-        console.error("Supabase Error:", error);
-        grid.innerHTML = '<p>Error loading products. Please refresh.</p>';
+        console.error("Supabase Error Details:", error.message); // This will tell us the EXACT missing column
+        grid.innerHTML = `<p>Error: ${error.message}</p>`;
         return;
     }
 
@@ -201,3 +211,4 @@ function toggleModal() {
     const m = document.getElementById('authModal');
     m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
 }
+
