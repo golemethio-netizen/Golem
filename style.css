@@ -1444,3 +1444,29 @@ body {
 
 .contact-btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-btn {
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.call-btn { background-color: #28a745; } /* Green for calling */
+
