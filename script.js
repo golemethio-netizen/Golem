@@ -70,7 +70,6 @@ function renderProducts(products) {
 }
 
 // 3. Modal & Call Seller Logic
-// 3. Modal & Call Seller Logic
 // 3. Modal & Contact Logic
 window.openProductDetails = function(product) {
     const modal = document.getElementById('productModal');
@@ -81,7 +80,7 @@ window.openProductDetails = function(product) {
     document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
     
-    // Fix for Lazy Loading: Force the image to load immediately in the modal
+    // Fix for Lazy Loading Intervention: Force eager loading in modal
     const modalImg = document.getElementById('modalProductImg');
     modalImg.src = product.image;
     modalImg.loading = "eager"; 
@@ -99,15 +98,12 @@ window.openProductDetails = function(product) {
     if (callBtn && phone) {
         callBtn.href = `tel:${phone}`;
         callBtn.style.display = "flex";
-    } else if (callBtn) {
-        callBtn.style.display = "none";
     }
 
-    // 🛒 Buy Now / WhatsApp Logic
+    // 🛒 Buy Now (WhatsApp with pre-filled text)
     if (waBtn && phone) {
         const cleanPhone = phone.replace(/\D/g, '');
-        // Pre-fills a message for the seller
-        const waMsg = encodeURIComponent(`Hello, I'm interested in buying your "${product.name}" listed on Golem.`);
+        const waMsg = encodeURIComponent(`Hello! I want to buy your "${product.name}" for ${product.price} ETB on Golem. Is it still available?`);
         waBtn.href = `https://wa.me/${cleanPhone}?text=${waMsg}`;
         waBtn.style.display = "flex";
     }
@@ -121,16 +117,43 @@ window.openProductDetails = function(product) {
     // 📤 Share to Telegram Logic
     if (shareTgBtn) {
         const shareUrl = window.location.href; 
-        const shareText = encodeURIComponent(`🔥 Check out this ${product.name}!\n💰 Price: ${product.price} ETB\n\nSee details here:`);
+        const shareText = encodeURIComponent(`🔥 Check out this ${product.name}!\n💰 Price: ${product.price} ETB\n\nContact seller on Golem:`);
         shareTgBtn.href = `https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
         shareTgBtn.style.display = "flex";
     }
 
+    // 🛍️ Add to Cart Logic (Local Storage)
+    const cartBtn = document.querySelector('.add-to-cart-btn');
+    if (cartBtn) {
+        cartBtn.onclick = () => addToCart(product);
+    }
+
     modal.style.display = 'flex';
-    
-    // Analytics: Increment views in Supabase
     if(product.id) _supabase.rpc('increment_views', { row_id: product.id });
 };
+
+
+
+
+// 4. Simple Cart System
+function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    
+    // Check if already in cart
+    if (!cart.find(item => item.id === product.id)) {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image
+        });
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        alert("Item added to your interests!");
+    } else {
+        alert("This item is already in your list.");
+    }
+}
+
 
 // 4. Dynamic Categories Fix
 async function loadDynamicFilters() {
@@ -193,5 +216,6 @@ async function updateUIForUser() {
         };
     }
 }
+
 
 
