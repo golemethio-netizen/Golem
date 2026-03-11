@@ -71,17 +71,22 @@ function renderProducts(products) {
 
 // 3. Modal & Call Seller Logic
 // 3. Modal & Call Seller Logic
+// 3. Modal & Contact Logic
 window.openProductDetails = function(product) {
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
-    // Set Text Content
+    // Fill Basic Info
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
-    document.getElementById('modalProductImg').src = product.image;
+    
+    // Fix for Lazy Loading: Force the image to load immediately in the modal
+    const modalImg = document.getElementById('modalProductImg');
+    modalImg.src = product.image;
+    modalImg.loading = "eager"; 
 
-    // Setup Dynamic IDs for the new buttons
+    // Button Selectors
     const callBtn = document.getElementById('callContact');
     const waBtn = document.getElementById('whatsappContact');
     const tgBtn = document.getElementById('telegramContact');
@@ -90,37 +95,42 @@ window.openProductDetails = function(product) {
     const phone = product.phone_number;
     const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
 
-    // 📞 Call Seller
+    // 📞 Call Seller Logic
     if (callBtn && phone) {
         callBtn.href = `tel:${phone}`;
         callBtn.style.display = "flex";
+    } else if (callBtn) {
+        callBtn.style.display = "none";
     }
 
-    // 🟢 WhatsApp (Buy Now / Add to Cart logic)
+    // 🛒 Buy Now / WhatsApp Logic
     if (waBtn && phone) {
         const cleanPhone = phone.replace(/\D/g, '');
-        waBtn.href = `https://wa.me/${cleanPhone}?text=I am interested in ${product.name}`;
+        // Pre-fills a message for the seller
+        const waMsg = encodeURIComponent(`Hello, I'm interested in buying your "${product.name}" listed on Golem.`);
+        waBtn.href = `https://wa.me/${cleanPhone}?text=${waMsg}`;
         waBtn.style.display = "flex";
     }
 
-    // ✈️ Telegram (Contact Seller)
+    // ✈️ Telegram Contact
     if (tgBtn && tgUser) {
         tgBtn.href = `https://t.me/${tgUser}`;
         tgBtn.style.display = "flex";
     }
 
-    // 📤 Share to Telegram (New Feature)
+    // 📤 Share to Telegram Logic
     if (shareTgBtn) {
-        const shareUrl = window.location.href; // Or a specific product link
-        const shareText = encodeURIComponent(`Check out this ${product.name} for ${product.price} ETB on Golem!\n\n${shareUrl}`);
+        const shareUrl = window.location.href; 
+        const shareText = encodeURIComponent(`🔥 Check out this ${product.name}!\n💰 Price: ${product.price} ETB\n\nSee details here:`);
         shareTgBtn.href = `https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
         shareTgBtn.style.display = "flex";
     }
 
     modal.style.display = 'flex';
+    
+    // Analytics: Increment views in Supabase
     if(product.id) _supabase.rpc('increment_views', { row_id: product.id });
 };
-
 
 // 4. Dynamic Categories Fix
 async function loadDynamicFilters() {
@@ -183,4 +193,5 @@ async function updateUIForUser() {
         };
     }
 }
+
 
