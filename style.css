@@ -1490,3 +1490,33 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+.seller-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two buttons per row */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.contact-btn {
+    padding: 12px 5px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.call-btn { background-color: #28a745; }
+.wa-btn { background-color: #25D366; }
+.tg-btn { background-color: #0088cc; }
+.share-tg-btn { background-color: #6c757d; } /* Grey for sharing */
+
+@media (max-width: 480px) {
+    .seller-actions {
+        grid-template-columns: 1fr; /* Stack buttons on small phones */
+    }
+}
