@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Saved Items | Golem</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="golem-header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <nav class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 style="margin: 20px 0;">My Saved Items <span id="cartCountBadge">0</span></h2>
+        <div id="cartGrid" class="masonry-wrapper">
+            </div>
+        <div id="emptyCartMsg" style="display:none; text-align:center; padding:50px;">
+            <i class="fas fa-shopping-basket" style="font-size:3rem; color:#ccc;"></i>
+            <p>Your list is empty.</p>
+            <a href="index.html" class="main-btn" style="display:inline-block; margin-top:20px;">Browse Items</a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+        });
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+            const grid = document.getElementById('cartGrid');
+            const emptyMsg = document.getElementById('emptyCartMsg');
+            const badge = document.getElementById('cartCountBadge');
+
+            badge.innerText = cart.length;
+
+            if (cart.length === 0) {
+                grid.innerHTML = '';
+                emptyMsg.style.display = 'block';
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+            grid.innerHTML = cart.map(item => `
+                <div class="product-card">
+                    <div class="img-wrapper">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="product-info">
+                        <h3>${item.name}</h3>
+                        <p class="price">${item.price?.toLocaleString()} ETB</p>
+                        <div class="action-buttons" style="display: flex; gap: 8px; margin-top:10px;">
+                            <button class="main-btn" onclick="removeItem('${item.id}')" style="background:#ff4757; flex:1;">Remove</button>
+                            <button class="main-btn" onclick="viewItem('${item.id}')" style="flex:2;">View Detail</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeItem(id) {
+            let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+            cart = cart.filter(item => item.id !== id);
+            localStorage.setItem('golem_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function viewItem(id) {
+            // Redirect back to home and open that specific item
+            // Or simply link to your checkout/detail page
+            window.location.href = `index.html?open=${id}`;
+        }
+    </script>
+</body>
+</html>
