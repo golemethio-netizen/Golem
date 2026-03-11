@@ -253,4 +253,25 @@ async function updateUIForUser() {
 
 
 
+async function notifyAdmin(message) {
+    const botToken = "YOUR_BOT_TOKEN"; // Keep this private if possible
+    const chatId = "YOUR_CHAT_ID";
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: `🔔 Golem Alert: ${message}`
+            })
+        });
+    } catch (e) {
+        console.error("Bot notification failed", e);
+    }
+}
+
+// Example usage inside openProductDetails
+// notifyAdmin(`Someone is viewing ${product.name}`);
 
