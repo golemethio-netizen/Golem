@@ -75,6 +75,33 @@
             // Or simply link to your checkout/detail page
             window.location.href = `index.html?open=${id}`;
         }
+
+
+
+function whatsappAllItems() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    if (cart.length === 0) return alert("Your list is empty!");
+
+    // Build the summary message
+    let message = "🚀 *New Order Inquiry from Golem Marketplace*\n\n";
+    message += "I am interested in the following items:\n";
+    message += "--------------------------------\n";
+    
+    let totalPrice = 0;
+    cart.forEach((item, index) => {
+        message += `🔹 *${item.name}*\n   Price: ${item.price.toLocaleString()} ETB\n`;
+        totalPrice += parseFloat(item.price);
+    });
+    
+    message += "--------------------------------\n";
+    message += `💰 *Total Value:* ${totalPrice.toLocaleString()} ETB\n\n`;
+    message += "Are these items currently in stock? Please let me know the next steps.";
+
+    const adminPhone = "251911223344"; // Your admin/business number
+    const encodedMsg = encodeURIComponent(message);
+    window.open(`https://wa.me/${adminPhone}?text=${encodedMsg}`, '_blank');
+}
+        
     </script>
 </body>
 </html>
