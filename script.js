@@ -3,6 +3,40 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser();
     loadDynamicFilters();
 
+
+
+
+
+// Add this inside your DOMContentLoaded listener
+function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    const badge = document.getElementById('cartBadge'); // Add an element in HTML for this
+    if (badge) {
+        badge.innerText = cart.length;
+        badge.style.display = cart.length > 0 ? 'flex' : 'none';
+    }
+}
+
+// Update your addToCart function to refresh the badge
+function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    if (!cart.find(item => item.id === product.id)) {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image
+        });
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        updateCartBadge(); // Refresh UI
+        alert("Saved to your list!");
+    }
+}
+
+
+
+
+    
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -216,6 +250,7 @@ async function updateUIForUser() {
         };
     }
 }
+
 
 
 
