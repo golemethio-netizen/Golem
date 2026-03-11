@@ -1520,3 +1520,37 @@ body {
         grid-template-columns: 1fr; /* Stack buttons on small phones */
     }
 }
+
+
+.seller-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two buttons per row */
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.contact-btn {
+    padding: 14px 8px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.call-btn { background: #28a745; color: white; }
+.wa-btn { background: #25D366; color: white; }
+.share-tg-btn { background: #0088cc; color: white; }
+.cart-btn { background: #f8f9fa; color: #333; border: 1px solid #ddd; }
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+@media (max-width: 400px) {
+    .seller-actions {
+        grid-template-columns: 1fr; /* Stack on very small screens */
+    }
+}
