@@ -175,11 +175,13 @@ window.whatsappAllItems = function() {
 window.toggleModal = function() {
     const modal = document.getElementById('authModal');
     if (modal) {
-        const isFlex = modal.style.display === "flex";
-        modal.style.display = isFlex ? "none" : "flex";
+        if (modal.style.display === "flex") {
+            modal.style.display = "none";
+        } else {
+            modal.style.display = "flex";
+        }
     }
 };
-
 window.closeProductModal = function() {
     const pModal = document.getElementById('productModal');
     if (pModal) pModal.style.display = 'none';
@@ -251,7 +253,6 @@ function filterSearch(term) {
     });
 }
 
-// --- 1. AUTH UI UPDATER ---
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signinBtn = document.querySelector('.signin-btn');
@@ -259,30 +260,18 @@ async function updateUIForUser() {
     if (!signinBtn) return;
 
     if (user) {
-        // If logged in, change button to Sign Out
         signinBtn.innerText = "Sign Out";
         signinBtn.onclick = async () => {
             await _supabase.auth.signOut();
-            alert("Signed out!");
+            alert("Signed out successfully");
             window.location.reload();
-        };
+        }; // End of onclick
     } else {
-        // If logged out, ensure it's a Sign In button
         signinBtn.innerText = "Sign In";
         signinBtn.onclick = () => window.toggleModal();
-    }
-    
-        
-        // 2. Optional: Show a "Welcome" message or User Email
-        console.log("Logged in as:", user.email);
-    } else {
-        // 1. Ensure button says Sign In
-        if (signinBtn) {
-            signinBtn.innerText = "Sign In";
-            signinBtn.onclick = () => window.toggleModal();
-        }
-    }
+    } // End of if-else
 }
+
 
 
 // Global click handler to close modals
@@ -350,5 +339,6 @@ window.checkAuthToSell = async function() {
         window.toggleModal();
     }
 };
+
 
 
