@@ -245,8 +245,11 @@ async function updateUIForUser() {
 }
 
 
+// --- 2. SIGN IN LOGIC ---
 window.handleAuth = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Stop page from refreshing
+    
+    // Get values from your HTML form
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
 
@@ -256,10 +259,10 @@ window.handleAuth = async (event) => {
     });
 
     if (error) {
-        alert("Login failed: " + error.message);
+        alert("Error: " + error.message);
     } else {
-        alert("Welcome back!");
-        window.location.reload(); // Refresh to update UI
+        alert("Success! Welcome back.");
+        window.location.reload(); 
     }
 };
 
@@ -346,6 +349,7 @@ window.toggleModal = function() {
 };
 
 // Also add this to handle clicking outside the modal to close it
+// Close modal if user clicks outside of the box
 window.onclick = function(event) {
     const modal = document.getElementById('authModal');
     if (event.target === modal) {
