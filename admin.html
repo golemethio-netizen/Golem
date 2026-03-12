@@ -105,7 +105,7 @@ async function switchTab(status, btn) {
     loadItems(status);
 }
 
-/*  async function loadItems(status = 'pending') {
+        async function loadItems(status = 'pending') {
     const grid = document.getElementById('adminGrid');
     grid.innerHTML = "<p>Loading...</p>";
 
@@ -170,7 +170,7 @@ async function switchTab(status, btn) {
 }
 
 
-*/
+
 
         window.markAsSold = async function(id) {
     if (confirm("Congratulations! Is this item sold? This will hide it from the public marketplace.")) {
@@ -240,7 +240,7 @@ async function checkAdmin() {
 }
 checkAdmin();
 
-        
+     /*   
         async function loadPending() {
             const grid = document.getElementById('adminGrid');
             
@@ -290,6 +290,10 @@ checkAdmin();
             
         }
 
+
+*/
+
+        
         async function approveItem(id) {
             const { error } = await _supabase
                 .from('products')
