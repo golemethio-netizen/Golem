@@ -3,10 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser();
     loadDynamicFilters();
 
-
-
-
-
 // Add this inside your DOMContentLoaded listener
 function updateCartBadge() {
     const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
@@ -33,10 +29,7 @@ function addToCart(product) {
     }
 }
 
-
-
-
-    
+ 
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -273,13 +266,6 @@ window.handleAuth = async (event) => {
 // Attach this to your form in index.html: <form id="authForm" onsubmit="handleAuth(event)">
 
 
-
-
-
-
-
-
-
 async function notifyAdmin(message) {
     const botToken = "YOUR_BOT_TOKEN"; // Keep this private if possible
     const chatId = "YOUR_CHAT_ID";
@@ -384,3 +370,4 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 };
+
