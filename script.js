@@ -254,12 +254,23 @@ function filterSearch(term) {
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signinBtn = document.querySelector('.signin-btn');
-    if (user && signinBtn) {
+    
+    if (!signinBtn) return;
+
+    if (user) {
+        // User is logged in
         signinBtn.innerText = "Sign Out";
         signinBtn.onclick = async () => {
-            await _supabase.auth.signOut();
-            window.location.reload();
+            const { error } = await _supabase.auth.signOut();
+            if (!error) {
+                alert("Signed out successfully");
+                window.location.reload();
+            }
         };
+    } else {
+        // User is logged out
+        signinBtn.innerText = "Sign In";
+        signinBtn.onclick = () => toggleModal();
     }
 }
 
@@ -273,3 +284,44 @@ window.onclick = function(event) {
 
 
 
+window.toggleAuthMode = function() {
+    const title = document.getElementById('modalTitle');
+    const subtitle = document.getElementById('modalSubtitle');
+    const submitBtn = document.querySelector('.auth-submit');
+    const footerLink = document.querySelector('.modal-footer p');
+
+    if (title.innerText === "Welcome Back") {
+        title.innerText = "Create Account";
+        subtitle.innerText = "Join the Golem marketplace today";
+        submitBtn.innerText = "Sign Up";
+        footerLink.innerHTML = 'Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>';
+        // Change form behavior to sign up
+        document.getElementById('authForm').onsubmit = (e) => handleSignUp(e);
+    } else {
+        title.innerText = "Welcome Back";
+        subtitle.innerText = "Please enter your details to continue";
+        submitBtn.innerText = "Sign In";
+        footerLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>';
+        // Change form behavior back to sign in
+        document.getElementById('authForm').onsubmit = (e) => handleAuth(e);
+    }
+};
+
+
+window.handleSignUp = async (event) => {
+    event.preventDefault();
+    const email = event.target.querySelector('input[type="email"]').value;
+    const password = event.target.querySelector('input[type="password"]').value;
+
+    const { data, error } = await _supabase.auth.signUp({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        alert("Registration Error: " + error.message);
+    } else {
+        alert("Check your email for the confirmation link!");
+        toggleModal();
+    }
+};
