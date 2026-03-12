@@ -147,7 +147,7 @@ async function loadItems(status = 'pending') {
                         <button onclick="permanentlyDelete('${item.id}')" style="background:black; color:white; border:none; padding:8px; border-radius:5px;">Delete Perm.</button>
                     ` : ''}
 
-// Inside your grid.innerHTML map loop:
+
 <div class="action-buttons">
     <button onclick="openEditModal('${item.id}')" class="edit-btn">Edit</button>
     
@@ -168,11 +168,6 @@ async function loadItems(status = 'pending') {
         </div>
     `).join('');
 }
-
-
-
-
-
 
 
 
