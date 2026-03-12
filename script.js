@@ -298,3 +298,40 @@ Deno.serve(async (req) => {
     headers: { "Content-Type": "application/json" },
   })
 })
+
+// --- CART & WHATSAPP ALL LOGIC ---
+
+window.addToCart = function(product) {
+    let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    if (!cart.find(item => item.id === product.id)) {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image
+        });
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        alert("Saved to your list!");
+        if (typeof updateCartBadge === "function") updateCartBadge();
+    } else {
+        alert("Already in your list.");
+    }
+};
+
+window.whatsappAllItems = function() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    if (cart.length === 0) return alert("Your list is empty!");
+
+    let message = "🚀 *Golem Marketplace Inquiry*\n\nI am interested in:\n";
+    let total = 0;
+    
+    cart.forEach((item, i) => {
+        message += `${i + 1}. ${item.name} - ${item.price} ETB\n`;
+        total += parseFloat(item.price) || 0;
+    });
+
+    message += `\n*Total Value:* ${total.toLocaleString()} ETB\n\nAre these available?`;
+    
+    const adminPhone = "251911223344"; // Replace with your number
+    window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
+};
