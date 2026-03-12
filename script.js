@@ -294,7 +294,6 @@ async function notifyAdmin(message) {
 //The code for your Supabase Edge Function (telegram-handler):
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-)
 
 // --- CART & WHATSAPP ALL LOGIC ---
 
@@ -356,5 +355,6 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 };
+
 
 
