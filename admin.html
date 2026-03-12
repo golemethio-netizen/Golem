@@ -105,7 +105,7 @@ async function switchTab(status, btn) {
     loadItems(status);
 }
 
-async function loadItems(status = 'pending') {
+/*  async function loadItems(status = 'pending') {
     const grid = document.getElementById('adminGrid');
     grid.innerHTML = "<p>Loading...</p>";
 
@@ -170,7 +170,7 @@ async function loadItems(status = 'pending') {
 }
 
 
-
+*/
 
         window.markAsSold = async function(id) {
     if (confirm("Congratulations! Is this item sold? This will hide it from the public marketplace.")) {
@@ -200,9 +200,36 @@ async function updateStatus(id, newStatus) {
         alert(`Item moved to ${newStatus}`);
         loadItems(currentView); // Refresh current tab
         loadStats(); // Update counters
+  
     }
+
 }
 
+window.permanentlyDelete = async function(id) {
+    const confirmation = confirm("⚠️ PERMANENT ACTION: Are you sure you want to delete this item forever? This cannot be undone.");
+    
+    if (confirmation) {
+        const { error } = await _supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert("Delete failed: " + error.message);
+        } else {
+            alert("Item erased from database.");
+            // Remove the card from UI immediately
+            document.getElementById(`card-${id}`)?.remove();
+            loadStats(); // Update the dashboard counters
+        }
+    }
+};
+
+
+
+
+
+        
 async function checkAdmin() {
     const { data: { user } } = await _supabase.auth.getUser();
     // Replace with your actual admin email
@@ -361,10 +388,10 @@ document.getElementById('pendingTickets').innerText = ticketCount || 0;
 }
 
 // Update your existing load function to include stats
-window.onload = () => {
-    checkAdmin();
-    loadStats();
-    loadPending();
+window.onload = async () => {
+    await checkAdmin(); // Ensure you are admin first
+    loadStats();        // Load the top stats cards
+    loadItems('pending'); // Start by showing pending items
 };
 
         
