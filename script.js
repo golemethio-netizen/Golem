@@ -275,3 +275,26 @@ async function notifyAdmin(message) {
 // Example usage inside openProductDetails
 // notifyAdmin(`Someone is viewing ${product.name}`);
 
+//The code for your Supabase Edge Function (telegram-handler):
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+Deno.serve(async (req) => {
+  const { callback_query } = await req.json()
+  const [action, productId] = callback_query.data.split(':')
+  
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL'),
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  )
+
+  if (action === 'approve') {
+    await supabase.from('products').update({ status: 'approved' }).eq('id', productId)
+  } else if (action === 'delete') {
+    await supabase.from('products').delete().eq('id', productId)
+  }
+
+  // Tell Telegram the action is done
+  return new Response(JSON.stringify({ method: "answerCallbackQuery", callback_query_id: callback_query.id, text: "Action Completed!" }), {
+    headers: { "Content-Type": "application/json" },
+  })
+})
