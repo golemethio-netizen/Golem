@@ -291,26 +291,7 @@ async function notifyAdmin(message) {
 //The code for your Supabase Edge Function (telegram-handler):
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-Deno.serve(async (req) => {
-  const { callback_query } = await req.json()
-  const [action, productId] = callback_query.data.split(':')
-  
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL'),
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  )
-
-  if (action === 'approve') {
-    await supabase.from('products').update({ status: 'approved' }).eq('id', productId)
-  } else if (action === 'delete') {
-    await supabase.from('products').delete().eq('id', productId)
-  }
-
-  // Tell Telegram the action is done
-  return new Response(JSON.stringify({ method: "answerCallbackQuery", callback_query_id: callback_query.id, text: "Action Completed!" }), {
-    headers: { "Content-Type": "application/json" },
-  })
-})
+)
 
 // --- CART & WHATSAPP ALL LOGIC ---
 
@@ -355,11 +336,12 @@ window.whatsappAllItems = function() {
 window.toggleModal = function() {
     const modal = document.getElementById('authModal');
     if (modal) {
-        // Toggle between flex and none
-        const isFlex = modal.style.display === 'flex';
-        modal.style.display = isFlex ? 'none' : 'flex';
-    } else {
-        console.error("Could not find authModal element in HTML");
+        // Simple toggle logic
+        if (modal.style.display === "flex") {
+            modal.style.display = "none";
+        } else {
+            modal.style.display = "flex";
+        }
     }
 };
 
@@ -370,4 +352,5 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 };
+
 
