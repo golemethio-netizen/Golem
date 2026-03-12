@@ -30,24 +30,41 @@ async function fetchProducts(category = 'All') {
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
-    
+
     grid.innerHTML = products.map(p => {
-        const productData = JSON.stringify(p).replace(/'/g, "&apos;");
+        // We use encodeURIComponent to safely hide special characters 
+        // that usually break the HTML 'onclick' attribute.
+        const safeData = encodeURIComponent(JSON.stringify(p));
+        const isSold = p.status === 'sold';
+        
         return `
-            <div class="product-card">
-                <div class="img-wrapper"><img src="${p.image}" loading="lazy"></div>
+            <div class="product-card ${isSold ? 'is-sold' : ''}">
+                <div class="img-wrapper">
+                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                    <img src="${p.image}" alt="${p.name}" loading="lazy">
+                </div>
                 <div class="product-info">
                     <h3>${p.name}</h3>
                     <p class="price">${p.price?.toLocaleString()} ETB</p>
-                    <button class="main-btn" onclick='openProductDetails(${productData})'>View Details</button>
+                    <div class="action-buttons">
+                        ${isSold ? 
+                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
+                            `<button class="main-btn" onclick="openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
+                        }
+                    </div>
                 </div>
             </div>
         `;
     }).join('');
-    
+
     const loader = document.querySelector('.loading-spinner');
     if (loader) loader.style.display = 'none';
 }
+// Add this helper function to handle the safe data
+window.openProductDetailsSafe = function(encodedData) {
+    const product = JSON.parse(decodeURIComponent(encodedData));
+    window.openProductDetails(product);
+};
 
 // Ensure filters are global
 window.filterCategory = (cat, btn) => {
@@ -253,4 +270,5 @@ window.onclick = function(event) {
     if (event.target === authModal) authModal.style.display = "none";
     if (event.target === prodModal) prodModal.style.display = "none";
 };
+
 
