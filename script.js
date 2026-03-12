@@ -246,10 +246,9 @@ async function updateUIForUser() {
 
 
 // --- 2. SIGN IN LOGIC ---
+// --- 2. AUTHENTICATION ---
 window.handleAuth = async (event) => {
-    event.preventDefault(); // Stop page from refreshing
-    
-    // Get values from your HTML form
+    event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
 
@@ -259,10 +258,10 @@ window.handleAuth = async (event) => {
     });
 
     if (error) {
-        alert("Error: " + error.message);
+        alert("Login Error: " + error.message);
     } else {
-        alert("Success! Welcome back.");
-        window.location.reload(); 
+        alert("Welcome back!");
+        window.location.reload();
     }
 };
 
@@ -318,42 +317,41 @@ window.whatsappAllItems = function() {
     const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
     if (cart.length === 0) return alert("Your list is empty!");
 
-    let message = "🚀 *Golem Marketplace Inquiry*\n\nI am interested in:\n";
-    let total = 0;
-    
+    let message = "🚀 *Inquiry from Golem Marketplace*\n\nI'm interested in:\n";
     cart.forEach((item, i) => {
         message += `${i + 1}. ${item.name} - ${item.price} ETB\n`;
-        total += parseFloat(item.price) || 0;
     });
-
-    message += `\n*Total Value:* ${total.toLocaleString()} ETB\n\nAre these available?`;
     
-    const adminPhone = "251911223344"; // Replace with your number
+    const adminPhone = "251911223344"; 
     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
 };
-
 
 // --- AUTH MODAL LOGIC ---
 
 window.toggleModal = function() {
     const modal = document.getElementById('authModal');
     if (modal) {
-        // Simple toggle logic
-        if (modal.style.display === "flex") {
-            modal.style.display = "none";
-        } else {
-            modal.style.display = "flex";
-        }
+        const isFlex = modal.style.display === "flex";
+        modal.style.display = isFlex ? "none" : "flex";
     }
 };
 
-// Also add this to handle clicking outside the modal to close it
-// Close modal if user clicks outside of the box
+window.closeProductModal = function() {
+    const pModal = document.getElementById('productModal');
+    if (pModal) pModal.style.display = 'none';
+};
+
+
+
+
+
+
+// --- 4. GLOBAL CLICKS ---
 window.onclick = function(event) {
-    const modal = document.getElementById('authModal');
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
+    const authModal = document.getElementById('authModal');
+    const prodModal = document.getElementById('productModal');
+    if (event.target === authModal) authModal.style.display = "none";
+    if (event.target === prodModal) prodModal.style.display = "none";
 };
 
 
