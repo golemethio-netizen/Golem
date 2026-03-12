@@ -277,7 +277,7 @@ async function updateUIForUser() {
         }
     }
 }
-}
+
 
 // Global click handler to close modals
 window.onclick = function(event) {
@@ -345,3 +345,4 @@ window.checkAuthToSell = async function() {
         window.toggleModal();
     }
 };
+
