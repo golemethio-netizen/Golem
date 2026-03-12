@@ -253,25 +253,30 @@ function filterSearch(term) {
 
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
+    const authContainer = document.querySelector('.auth-buttons');
     const signinBtn = document.querySelector('.signin-btn');
     
-    if (!signinBtn) return;
-
     if (user) {
-        // User is logged in
-        signinBtn.innerText = "Sign Out";
-        signinBtn.onclick = async () => {
-            const { error } = await _supabase.auth.signOut();
-            if (!error) {
-                alert("Signed out successfully");
+        // 1. Change Sign In button to Sign Out
+        if (signinBtn) {
+            signinBtn.innerText = "Sign Out";
+            signinBtn.onclick = async () => {
+                await _supabase.auth.signOut();
+                alert("You have been signed out.");
                 window.location.reload();
-            }
-        };
+            };
+        }
+        
+        // 2. Optional: Show a "Welcome" message or User Email
+        console.log("Logged in as:", user.email);
     } else {
-        // User is logged out
-        signinBtn.innerText = "Sign In";
-        signinBtn.onclick = () => toggleModal();
+        // 1. Ensure button says Sign In
+        if (signinBtn) {
+            signinBtn.innerText = "Sign In";
+            signinBtn.onclick = () => window.toggleModal();
+        }
     }
+}
 }
 
 // Global click handler to close modals
@@ -323,5 +328,20 @@ window.handleSignUp = async (event) => {
     } else {
         alert("Check your email for the confirmation link!");
         toggleModal();
+    }
+};
+
+// --- SELL BUTTON GATEKEEPER ---
+window.checkAuthToSell = async function() {
+    // Check if a user is currently logged in
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    if (user) {
+        // If logged in, send them to the sell page
+        window.location.href = 'sell.html'; 
+    } else {
+        // If not logged in, show a friendly alert and open the login modal
+        alert("Please Sign In first to post an item for sale.");
+        window.toggleModal();
     }
 };
