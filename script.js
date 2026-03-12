@@ -341,4 +341,35 @@ window.checkAuthToSell = async function() {
 };
 
 
+window.permanentlyDelete = async function(productId) {
+    // 1. Double check with the admin
+    const confirmDelete = confirm("⚠️ Are you sure? This will permanently remove the item from the database. This cannot be undone.");
+    
+    if (!confirmDelete) return;
 
+    try {
+        // 2. Execute the delete query
+        const { error } = await _supabase
+            .from('products')
+            .delete()
+            .eq('id', productId);
+
+        if (error) {
+            throw error;
+        }
+
+        // 3. Success! Update the UI
+        alert("Product deleted permanently.");
+        
+        // If you have a function to refresh the list, call it here
+        if (typeof fetchPendingProducts === "function") {
+            fetchPendingProducts(); 
+        } else {
+            window.location.reload(); // Fallback: refresh the whole page
+        }
+
+    } catch (err) {
+        console.error("Delete Error:", err.message);
+        alert("Failed to delete item: " + err.message);
+    }
+};
