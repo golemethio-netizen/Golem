@@ -142,10 +142,12 @@ async function switchTab(status, btn) {
                         <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Remove</button>
                     ` : ''}
 
-                    ${status === 'rejected' ? `
-                        <button onclick="updateStatus('${item.id}', 'pending')" class="btn-approve">Restore to Pending</button>
-                        <button onclick="permanentlyDelete('${item.id}')" style="background:black; color:white; border:none; padding:8px; border-radius:5px;">Delete Perm.</button>
-                    ` : ''}
+                   ${status === 'rejected' ? `
+    <button onclick="updateStatus('${item.id}', 'pending')" class="btn-approve">Restore</button>
+    <button onclick="window.permanentlyDelete('${item.id}')" style="background:black; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">
+        <i class="fas fa-trash-alt"></i> Delete Perm.
+    </button>
+` : ''}
 
 
 <div class="action-buttons">
