@@ -171,12 +171,12 @@ window.whatsappAllItems = function() {
     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
 };
 
-// --- 2. AUTH & MODAL LOGIC (Global Access) ---
-// --- 2. AUTH & MODAL LOGIC (Global Access) ---
+// --- 3. MODAL TOGGLE ---
 window.toggleModal = function() {
     const modal = document.getElementById('authModal');
     if (modal) {
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        const isFlex = modal.style.display === "flex";
+        modal.style.display = isFlex ? "none" : "flex";
     }
 };
 
@@ -251,21 +251,27 @@ function filterSearch(term) {
     });
 }
 
+// --- 1. AUTH UI UPDATER ---
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
-    const authContainer = document.querySelector('.auth-buttons');
     const signinBtn = document.querySelector('.signin-btn');
     
+    if (!signinBtn) return;
+
     if (user) {
-        // 1. Change Sign In button to Sign Out
-        if (signinBtn) {
-            signinBtn.innerText = "Sign Out";
-            signinBtn.onclick = async () => {
-                await _supabase.auth.signOut();
-                alert("You have been signed out.");
-                window.location.reload();
-            };
-        }
+        // If logged in, change button to Sign Out
+        signinBtn.innerText = "Sign Out";
+        signinBtn.onclick = async () => {
+            await _supabase.auth.signOut();
+            alert("Signed out!");
+            window.location.reload();
+        };
+    } else {
+        // If logged out, ensure it's a Sign In button
+        signinBtn.innerText = "Sign In";
+        signinBtn.onclick = () => window.toggleModal();
+    }
+    
         
         // 2. Optional: Show a "Welcome" message or User Email
         console.log("Logged in as:", user.email);
@@ -331,18 +337,18 @@ window.handleSignUp = async (event) => {
     }
 };
 
-// --- SELL BUTTON GATEKEEPER ---
+// --- 2. THE SELL BUTTON GATEKEEPER ---
 window.checkAuthToSell = async function() {
-    // Check if a user is currently logged in
     const { data: { user } } = await _supabase.auth.getUser();
 
     if (user) {
-        // If logged in, send them to the sell page
+        // If logged in, go to sell page
         window.location.href = 'sell.html'; 
     } else {
-        // If not logged in, show a friendly alert and open the login modal
-        alert("Please Sign In first to post an item for sale.");
+        // If not logged in, pop the modal
+        alert("Please Sign In first to post an item.");
         window.toggleModal();
     }
 };
+
 
