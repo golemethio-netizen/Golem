@@ -252,6 +252,33 @@ async function updateUIForUser() {
 }
 
 
+window.handleAuth = async (event) => {
+    event.preventDefault();
+    const email = event.target.querySelector('input[type="email"]').value;
+    const password = event.target.querySelector('input[type="password"]').value;
+
+    const { data, error } = await _supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        alert("Login failed: " + error.message);
+    } else {
+        alert("Welcome back!");
+        window.location.reload(); // Refresh to update UI
+    }
+};
+
+// Attach this to your form in index.html: <form id="authForm" onsubmit="handleAuth(event)">
+
+
+
+
+
+
+
+
 
 async function notifyAdmin(message) {
     const botToken = "YOUR_BOT_TOKEN"; // Keep this private if possible
@@ -334,4 +361,26 @@ window.whatsappAllItems = function() {
     
     const adminPhone = "251911223344"; // Replace with your number
     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
+};
+
+
+// --- AUTH MODAL LOGIC ---
+
+window.toggleModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        // Toggle between flex and none
+        const isFlex = modal.style.display === 'flex';
+        modal.style.display = isFlex ? 'none' : 'flex';
+    } else {
+        console.error("Could not find authModal element in HTML");
+    }
+};
+
+// Also add this to handle clicking outside the modal to close it
+window.onclick = function(event) {
+    const modal = document.getElementById('authModal');
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
 };
