@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/ --- 5. PRODUCT & FILTER LOGIC ---
+// --- 5. PRODUCT & FILTER LOGIC ---
 async function fetchProducts(category = 'All') {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     let query = _supabase.from('products').select('*').eq('status', 'approved');
@@ -270,5 +270,6 @@ window.onclick = function(event) {
     if (event.target === authModal) authModal.style.display = "none";
     if (event.target === prodModal) prodModal.style.display = "none";
 };
+
 
 
