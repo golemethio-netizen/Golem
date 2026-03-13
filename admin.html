@@ -14,14 +14,11 @@
         <button class="signin-btn" onclick="location.href='index.html'">View Site</button>
     </header>
 
-
 <div class="admin-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #ddd; padding-bottom: 10px;">
     <button onclick="switchTab('pending', this)" class="tab-btn active">Pending</button>
     <button onclick="switchTab('approved', this)" class="tab-btn">Approved (Live)</button>
     <button onclick="switchTab('rejected', this)" class="tab-btn">Rejected/Deleted</button>
 </div>
-
-
 
 <div class="admin-search-bar" style="margin-bottom: 20px; display: flex; gap: 10px;">
     <div style="position: relative; flex: 1;">
@@ -37,10 +34,7 @@
         <option value="Vehicles">Vehicles</option>
     </select>
 </div>
-
-
-
-    
+ 
 <div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
     <div class="stat-card">
         <i class="fas fa-box"></i>
@@ -81,13 +75,6 @@
         <p>Support Tickets</p>
     </div>
 </div>
-
-
-
-
-    
-
-    
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -161,18 +148,12 @@ async function switchTab(status, btn) {
     
     <button onclick="deleteItem('${item.id}')" class="delete-btn">Delete</button>
 </div>
-
-
-
-                    
+           
                 </div>
             </div>
         </div>
     `).join('');
 }
-
-
-
 
         window.markAsSold = async function(id) {
     if (confirm("Congratulations! Is this item sold? This will hide it from the public marketplace.")) {
@@ -226,10 +207,6 @@ window.permanentlyDelete = async function(id) {
         }
     }
 };
-
-
-
-
 
         
 async function checkAdmin() {
@@ -412,9 +389,7 @@ document.getElementById('adminSearchInput').addEventListener('input', (e) => {
         // Run on load
         loadPending();
 
-
-
-        
+ 
     </script>
 </body>
 </html>
