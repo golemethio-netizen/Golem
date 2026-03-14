@@ -27,35 +27,39 @@ async function fetchProducts(category = 'All') {
 }
 
 
-function renderProducts(products) {
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
+function renderProductCard(product) {
+    // Format price with a comma for a more professional look
+    const formattedPrice = new Intl.NumberFormat().format(product.price);
 
-    grid.innerHTML = products.map(p => {
-        // We use encodeURIComponent to safely hide special characters 
-        // that usually break the HTML 'onclick' attribute.
-        const safeData = encodeURIComponent(JSON.stringify(p));
-        const isSold = p.status === 'sold';
-        
-        return `
-            <div class="product-card ${isSold ? 'is-sold' : ''}">
-                <div class="img-wrapper">
-                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    <img src="${p.image}" alt="${p.name}" loading="lazy">
-                </div>
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <p class="price">${p.price?.toLocaleString()} ETB</p>
-                    <div class="action-buttons">
-                        ${isSold ? 
-                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
-                            `<button class="main-btn" onclick="openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
-                        }
-                    </div>
+    return `
+        <div class="product-card" id="card-${product.id}">
+            <div class="card-img-container">
+                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                <div class="image-overlay">
+                    <button class="view-btn" onclick="openDetails('${product.id}')">
+                        <i class="fas fa-expand"></i> Quick View
+                    </button>
                 </div>
             </div>
-        `;
-    }).join('');
+            
+            <div class="card-content" style="padding: 20px;">
+                <span class="category-badge">${product.category || 'General'}</span>
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-description" style="color: #777; font-size: 0.85rem; height: 40px; overflow: hidden;">
+                    ${product.description || 'Premium quality item from Golem Marketplace.'}
+                </p>
+                
+                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <span class="product-price">${formattedPrice} <small style="font-size: 0.7rem;">ETB</small></span>
+                    <button class="contact-btn" onclick="contactSeller('${product.id}')" 
+                            style="background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        Interested
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}).join('');
 
     const loader = document.querySelector('.loading-spinner');
     if (loader) loader.style.display = 'none';
