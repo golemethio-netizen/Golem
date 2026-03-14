@@ -63,7 +63,7 @@ function renderProductCard(product) {
 
     const loader = document.querySelector('.loading-spinner');
     if (loader) loader.style.display = 'none';
-}
+
 // Add this helper function to handle the safe data
 window.openProductDetailsSafe = function(encodedData) {
     const product = JSON.parse(decodeURIComponent(encodedData));
