@@ -59,7 +59,7 @@ function renderProductCard(product) {
             </div>
         </div>
     `;
-}.join('');
+}
 
     const loader = document.querySelector('.loading-spinner');
     if (loader) loader.style.display = 'none';
