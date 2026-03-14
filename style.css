@@ -1,16 +1,6 @@
 /* --- 1. Base & Reset --- */
 
-body { 
 
-    font-family: 'Inter', sans-serif; 
-
-    margin: 0; 
-
-    background: #f4f7f6; 
-
-    color: #333;
-
-}
 
 
 
@@ -200,23 +190,6 @@ body {
 
 
 
-.product-card {
-
-    background: #fff;
-
-    border-radius: 8px;
-
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
-    margin-bottom: 20px;
-
-    overflow: hidden;
-
-    /* Ensure they don't have 0 height */
-
-    min-height: 100px; 
-
-}
 
 
 
@@ -562,11 +535,7 @@ body {
 
 
 
-.product-card:hover {
 
-    transform: translateY(-5px);
-
-}
 
 
 
@@ -1570,4 +1539,88 @@ body {
     align-items: center;
     justify-content: center;
     border: 2px solid white;
+}
+
+
+:root {
+    --primary-color: #007bff;
+    --dark-text: #2d3436;
+    --light-gray: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.product-card {
+    background: var(--glass-bg);
+    border: none; /* Remove harsh borders */
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(10px);
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
+    color: var(--dark-text);
+}
+
+.product-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+}
+
+.product-price {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+
+.card-img-container {
+    overflow: hidden;
+    position: relative;
+    height: 250px;
+}
+
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.1); /* Subtle zoom */
+}
+
+/* Add a sleek gradient overlay on the image */
+.card-img-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.05));
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #e7f1ff;
+    color: #007bff;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
 }
