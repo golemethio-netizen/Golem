@@ -28,7 +28,6 @@ async function fetchProducts(category = 'All') {
 
 
 function renderProductCard(product) {
-    // Format price with a comma for a more professional look
     const formattedPrice = new Intl.NumberFormat().format(product.price);
 
     return `
@@ -36,7 +35,7 @@ function renderProductCard(product) {
             <div class="card-img-container">
                 <img src="${product.image}" alt="${product.name}" loading="lazy">
                 <div class="image-overlay">
-                    <button class="view-btn" onclick="openDetails('${product.id}')">
+                    <button class="view-btn" onclick="openProductDetailsSafe('${encodeURIComponent(JSON.stringify(product))}')">
                         <i class="fas fa-expand"></i> Quick View
                     </button>
                 </div>
@@ -51,7 +50,7 @@ function renderProductCard(product) {
                 
                 <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                     <span class="product-price">${formattedPrice} <small style="font-size: 0.7rem;">ETB</small></span>
-                    <button class="contact-btn" onclick="contactSeller('${product.id}')" 
+                    <button class="contact-btn" onclick="openProductDetailsSafe('${encodeURIComponent(JSON.stringify(product))}')" 
                             style="background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 500;">
                         Interested
                     </button>
