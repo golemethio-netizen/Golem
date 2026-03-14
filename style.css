@@ -1625,3 +1625,53 @@ body {
     text-transform: uppercase;
     margin-bottom: 10px;
 }
+
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card-img-container:hover .image-overlay {
+    opacity: 1;
+}
+
+.view-btn {
+    background: white;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.card-img-container:hover .view-btn {
+    transform: translateY(0);
+}
+
+@keyframes shimmer {
+    0% { background-position: -468px 0; }
+    100% { background-position: 468px 0; }
+}
+
+.skeleton {
+    background: #f6f7f8;
+    background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+    animation: shimmer 1.5s infinite linear;
+}
