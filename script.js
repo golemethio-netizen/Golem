@@ -1,6 +1,8 @@
 // --- 1. INITIALIZATION & HEARTBEAT ---
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Connection Check
+    console.log("🚀 Golem System Initializing...");
+    
+    // Check Database Connection
     try {
         const { count, error } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved');
         if (error) throw error;
@@ -9,27 +11,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("❌ Connection Error:", err.message);
     }
 
-    // 2. Load UI
+    // Load Core UI
     fetchProducts();
     updateUIForUser();
     loadDynamicFilters();
     updateCartBadge();
 
-    // 3. Search Logic
+    // Search Input Listener
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => filterSearch(e.target.value.toLowerCase()));
     }
 });
 
-// --- 2. PRODUCT & FILTER LOGIC ---
+// --- 2. PRODUCT DATA & RENDERING ---
 async function fetchProducts(category = 'All') {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     let query = _supabase.from('products').select('*').eq('status', 'approved');
 
     if (category !== 'All') query = query.eq('category', category);
 
-    // Sorting
+    // Apply Sorting
     if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
     else if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
     else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
@@ -40,14 +42,15 @@ async function fetchProducts(category = 'All') {
 }
 
 function renderProducts(products) {
-   const grid = document.getElementById('productGrid') || document.getElementById('productsContainer');
+    // Looks for both common IDs to prevent "Loading..." hang
+    const grid = document.getElementById('productGrid') || document.getElementById('productsContainer');
     if (!grid) return;
-if (!grid) {
-        console.error("Could not find a container with ID 'productGrid' or 'productsContainer'");
-        return;
-    }
+
     if (products.length === 0) {
-        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:50px; color:#888;">No items found.</div>`;
+        grid.innerHTML = `
+            <div style="text-align:center; grid-column: 1/-1; padding: 60px 20px;">
+                <p style="color: #777;">No products found in this category.</p>
+            </div>`;
     } else {
         grid.innerHTML = products.map(p => {
             const safeData = encodeURIComponent(JSON.stringify(p));
@@ -57,7 +60,7 @@ if (!grid) {
                 <div class="product-card ${isSold ? 'is-sold' : ''}">
                     <div class="img-wrapper">
                         ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
                     </div>
                     <div class="product-info">
                         <span class="category-tag">${p.category || 'General'}</span>
@@ -65,8 +68,8 @@ if (!grid) {
                         <p class="price">${p.price?.toLocaleString()} <small>ETB</small></p>
                         <div class="action-buttons">
                             ${isSold ? 
-                                `<button class="main-btn" disabled style="background:#ccc; cursor:not-allowed;">Already Sold</button>` : 
-                                `<button class="main-btn" onclick="openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
+                                `<button class="main-btn" disabled style="background:#ccc; cursor:not-allowed;">Sold Out</button>` : 
+                                `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
                             }
                         </div>
                     </div>
@@ -75,32 +78,22 @@ if (!grid) {
         }).join('');
     }
 
+    // Hide Loading Message
     const loader = document.querySelector('.loading-spinner') || document.getElementById('loadingMessage');
     if (loader) loader.style.display = 'none';
 }
 
-// Helper to handle safe modal opening
+// --- 3. GLOBAL EXPOSED FUNCTIONS (For HTML onclick) ---
+
 window.openProductDetailsSafe = function(encodedData) {
-    const product = JSON.parse(decodeURIComponent(encodedData));
-    window.openProductDetails(product);
-};
-
-// Ensure filters are global
-window.filterCategory = (cat, btn) => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    fetchProducts(cat);
-};
-
-// Global click to close modals
-window.onclick = (e) => {
-    if (e.target.classList.contains('modal-overlay')) {
-        e.target.style.display = 'none';
+    try {
+        const product = JSON.parse(decodeURIComponent(encodedData));
+        window.openProductDetails(product);
+    } catch (e) {
+        console.error("Error parsing product data", e);
     }
 };
 
-
-// --- 3. MODAL & PRODUCT DETAILS ---
 window.openProductDetails = function(product) {
     const modal = document.getElementById('productModal');
     if (!modal) return;
@@ -108,11 +101,8 @@ window.openProductDetails = function(product) {
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
-    
-    const modalImg = document.getElementById('modalProductImg');
-    modalImg.src = product.image;
+    document.getElementById('modalProductImg').src = product.image;
 
-    // Contact buttons
     const phone = product.phone_number;
     const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
 
@@ -127,126 +117,21 @@ window.openProductDetails = function(product) {
 
     if (waBtn && phone) {
         const cleanPhone = phone.replace(/\D/g, '');
-        const waMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" for ${product.price} ETB.`);
+        const waMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" on Golem.`);
         waBtn.href = `https://wa.me/${cleanPhone}?text=${waMsg}`;
         waBtn.style.display = "flex";
     }
 
-    if (tgBtn && tgUser) {
+    if (tgBtn) {
         tgBtn.href = `https://t.me/${tgUser}`;
-        tgBtn.style.display = "flex";
+        tgBtn.style.display = tgUser ? "flex" : "none";
     }
 
     const cartBtn = document.querySelector('.add-to-cart-btn');
     if (cartBtn) cartBtn.onclick = () => addToCart(product);
 
     modal.style.display = 'flex';
-    if(product.id) _supabase.rpc('increment_views', { row_id: product.id });
 };
-
-window.closeProductModal = function() {
-    const pModal = document.getElementById('productModal');
-    if (pModal) pModal.style.display = 'none';
-};
-
-// --- 4. CART SYSTEM ---
-window.updateCartBadge = function() {
-    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-    const badge = document.getElementById('cartBadge');
-    if (badge) {
-        badge.innerText = cart.length;
-        badge.style.display = cart.length > 0 ? 'flex' : 'none';
-    }
-};
-
-window.addToCart = function(product) {
-    let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-    if (!cart.find(item => item.id === product.id)) {
-        cart.push(product);
-        localStorage.setItem('golem_cart', JSON.stringify(cart));
-        updateCartBadge();
-        alert("Saved to list!");
-    }
-};
-
-window.onclick = (e) => {
-    if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
-};
-
-
-window.whatsappAllItems = function() {
-    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-    if (cart.length === 0) return alert("Your list is empty!");
-
-    let message = "🚀 *Inquiry from Golem Marketplace*\n\nI'm interested in:\n";
-    cart.forEach((item, i) => {
-        message += `${i + 1}. ${item.name} - ${item.price} ETB\n`;
-    });
-    
-    const adminPhone = "251911223344"; 
-    window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
-};
-
-// --- 3. MODAL TOGGLE ---
-window.toggleModal = function() {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        if (modal.style.display === "flex") {
-            modal.style.display = "none";
-        } else {
-            modal.style.display = "flex";
-        }
-    }
-};
-window.closeProductModal = function() {
-    const pModal = document.getElementById('productModal');
-    if (pModal) pModal.style.display = 'none';
-};
-
-
-window.handleAuth = async (event) => {
-    event.preventDefault();
-    const email = event.target.querySelector('input[type="email"]').value;
-    const password = event.target.querySelector('input[type="password"]').value;
-    const { error } = await _supabase.auth.signInWithPassword({ email, password });
-    if (error) alert(error.message);
-    else window.location.reload();
-};
-
-
-
-// --- 3. INVITE & SHARE LOGIC ---
-window.shareToTelegram = function() {
-    const text = encodeURIComponent("Check out Golem Marketplace - Ethiopia's best place to buy and sell!");
-    const url = window.location.origin;
-    window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
-};
-
-window.shareToWhatsApp = function() {
-    const text = encodeURIComponent("Check out Golem Marketplace: " + window.location.origin);
-    window.open(`https://wa.me/?text=${text}`, '_blank');
-};
-
-
-
-
-
-
-
-// --- 6. HELPERS ---
-// --- 5. HELPERS & UTILITIES ---
-async function loadDynamicFilters() {
-    const container = document.querySelector('.filter-bar');
-    if (!container) return;
-    const { data: cats } = await _supabase.from('categories').select('name').order('name');
-    let buttonsHtml = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
-    if (cats) {
-        cats.forEach(c => {
-            buttonsHtml += `<button class="filter-btn" onclick="filterCategory('${c.name}', this)">${c.name}</button>`;
-        });
-    }
-    container.innerHTML = buttonsHtml;
-}
 
 window.filterCategory = function(cat, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -254,14 +139,13 @@ window.filterCategory = function(cat, btn) {
     fetchProducts(cat);
 };
 
-function filterSearch(term) {
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        card.style.display = title.includes(term) ? 'block' : 'none';
-    });
+window.closeProductModal = function() {
+    const pModal = document.getElementById('productModal');
+    if (pModal) pModal.style.display = 'none';
+};
 
-// --- 4. AUTH & USER UI ---
+// --- 4. AUTHENTICATION & USER UI ---
+
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signinBtn = document.querySelector('.signin-btn');
@@ -279,49 +163,23 @@ async function updateUIForUser() {
     }
 }
 
-
-// Global click handler to close modals
-window.onclick = function(event) {
-    const authModal = document.getElementById('authModal');
-    const prodModal = document.getElementById('productModal');
-    if (event.target === authModal) authModal.style.display = "none";
-    if (event.target === prodModal) prodModal.style.display = "none";
+window.handleAuth = async (event) => {
+    event.preventDefault();
+    const email = event.target.querySelector('input[type="email"]').value;
+    const password = event.target.querySelector('input[type="password"]').value;
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) alert(error.message);
+    else window.location.reload();
 };
 
-
-
-window.toggleAuthMode = function() {
-    const title = document.getElementById('modalTitle');
-    const subtitle = document.getElementById('modalSubtitle');
-    const submitBtn = document.querySelector('.auth-submit');
-    const footerLink = document.querySelector('.modal-footer p');
-
-    if (title.innerText === "Welcome Back") {
-        title.innerText = "Create Account";
-        subtitle.innerText = "Join the Golem marketplace today";
-        submitBtn.innerText = "Sign Up";
-        footerLink.innerHTML = 'Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>';
-        // Change form behavior to sign up
-        document.getElementById('authForm').onsubmit = (e) => handleSignUp(e);
-    } else {
-        title.innerText = "Welcome Back";
-        subtitle.innerText = "Please enter your details to continue";
-        submitBtn.innerText = "Sign In";
-        footerLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>';
-        // Change form behavior back to sign in
-        document.getElementById('authForm').onsubmit = (e) => handleAuth(e);
-    }
-};
-
-
-wwindow.handleSignUp = async (event) => {
+window.handleSignUp = async (event) => {
     event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
     const { error } = await _supabase.auth.signUp({ email, password });
     if (error) alert(error.message);
     else {
-        alert("Success! Check your email to confirm.");
+        alert("Check your email for the confirmation link!");
         window.toggleModal();
     }
 };
@@ -338,50 +196,61 @@ window.toggleAuthMode = function() {
     document.getElementById('authForm').onsubmit = isSignIn ? handleSignUp : handleAuth;
 };
 
-// --- 2. THE SELL BUTTON GATEKEEPER ---
-window.checkAuthToSell = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
+// --- 5. UTILITIES ---
 
-    if (user) {
-        // If logged in, go to sell page
-        window.location.href = 'sell.html'; 
-    } else {
-        // If not logged in, pop the modal
-        alert("Please Sign In first to post an item.");
-        window.toggleModal();
+async function loadDynamicFilters() {
+    const container = document.querySelector('.filter-bar');
+    if (!container) return;
+    const { data: cats } = await _supabase.from('categories').select('name').order('name');
+    let buttonsHtml = `<button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>`;
+    if (cats) {
+        cats.forEach(c => {
+            buttonsHtml += `<button class="filter-btn" onclick="window.filterCategory('${c.name}', this)">${c.name}</button>`;
+        });
+    }
+    container.innerHTML = buttonsHtml;
+}
+
+function filterSearch(term) {
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        card.style.display = title.includes(term) ? 'block' : 'none';
+    });
+}
+
+window.updateCartBadge = function() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.innerText = cart.length;
+        badge.style.display = cart.length > 0 ? 'flex' : 'none';
     }
 };
 
+window.addToCart = function(product) {
+    let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    if (!cart.find(item => item.id === product.id)) {
+        cart.push(product);
+        localStorage.setItem('golem_cart', JSON.stringify(cart));
+        window.updateCartBadge();
+        alert("Saved to your list!");
+    } else {
+        alert("Already in your list.");
+    }
+};
 
-window.permanentlyDelete = async function(productId) {
-    // 1. Double check with the admin
-    const confirmDelete = confirm("⚠️ Are you sure? This will permanently remove the item from the database. This cannot be undone.");
-    
-    if (!confirmDelete) return;
+window.onclick = (e) => {
+    if (e.target.classList.contains('modal-overlay') || e.target.id === 'productModal' || e.target.id === 'authModal') {
+        e.target.style.display = 'none';
+    }
+};
 
-    try {
-        // 2. Execute the delete query
-        const { error } = await _supabase
-            .from('products')
-            .delete()
-            .eq('id', productId);
-
-        if (error) {
-            throw error;
-        }
-
-        // 3. Success! Update the UI
-        alert("Product deleted permanently.");
-        
-        // If you have a function to refresh the list, call it here
-        if (typeof fetchPendingProducts === "function") {
-            fetchPendingProducts(); 
-        } else {
-            window.location.reload(); // Fallback: refresh the whole page
-        }
-
-    } catch (err) {
-        console.error("Delete Error:", err.message);
-        alert("Failed to delete item: " + err.message);
+window.checkAuthToSell = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) window.location.href = 'sell.html';
+    else {
+        alert("Please Sign In first to post an item.");
+        window.toggleModal();
     }
 };
