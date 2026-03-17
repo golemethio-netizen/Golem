@@ -1,5 +1,19 @@
-// --- 1. INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
+// --- 1. INITIALIZATION & HEARTBEAT ---
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check Supabase Connection
+    try {
+        const { count, error } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+        if (error) throw error;
+        console.log("✅ Supabase Connected: Found", count, "approved items.");
+    } catch (err) {
+        console.error("❌ Supabase Connection Blocked:", err.message);
+        const container = document.getElementById('productsContainer');
+        if (container) {
+            container.innerHTML = `<p style="color:red; text-align:center; padding:20px;">Connection failed. Please disable "Strict" tracking protection.</p>`;
+        }
+    }
+
+    // Run UI Initializations
     fetchProducts();
     updateUIForUser();
     loadDynamicFilters();
@@ -47,13 +61,18 @@ function renderProducts(products) {
 
 function renderProductCard(product) {
     const formattedPrice = new Intl.NumberFormat().format(product.price);
-    // Encode product data to safely pass through HTML attributes
     const productData = encodeURIComponent(JSON.stringify(product));
+    
+    // Path to a placeholder image if the product image fails
+    const placeholder = 'https://via.placeholder.com/300x250?text=Image+Coming+Soon';
 
     return `
         <div class="product-card" id="card-${product.id}">
             <div class="card-img-container">
-                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                <img src="${product.image}" 
+                     alt="${product.name}" 
+                     loading="lazy" 
+                     onerror="this.onerror=null;this.src='${placeholder}';">
                 <div class="image-overlay">
                     <button class="view-btn" onclick="openProductDetailsSafe('${productData}')">
                         <i class="fas fa-expand"></i> Quick View
@@ -68,7 +87,7 @@ function renderProductCard(product) {
                     ${product.description || 'Premium quality item from Golem Marketplace.'}
                 </p>
                 
-                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; pt: 15px;">
+                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 15px;">
                     <span class="product-price" style="font-weight: bold; color: #007bff; font-size: 1.2rem;">
                         ${formattedPrice} <small style="font-size: 0.7rem; color: #333;">ETB</small>
                     </span>
@@ -98,6 +117,7 @@ window.openProductDetails = function(product) {
     
     const modalImg = document.getElementById('modalProductImg');
     modalImg.src = product.image;
+    modalImg.onerror = function() { this.src = 'https://via.placeholder.com/500x400?text=No+Image+Available'; };
 
     // Contact Buttons Logic
     const phone = product.phone_number;
@@ -146,7 +166,6 @@ async function updateUIForUser() {
         signinBtn.innerText = "Sign Out";
         signinBtn.onclick = async () => {
             await _supabase.auth.signOut();
-            alert("Signed out successfully");
             window.location.reload();
         };
     } else {
@@ -159,9 +178,8 @@ window.handleAuth = async (event) => {
     event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
-
-    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-    if (error) alert("Login Error: " + error.message);
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) alert(error.message);
     else window.location.reload();
 };
 
@@ -169,11 +187,10 @@ window.handleSignUp = async (event) => {
     event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
-
     const { error } = await _supabase.auth.signUp({ email, password });
-    if (error) alert("Registration Error: " + error.message);
+    if (error) alert(error.message);
     else {
-        alert("Success! Check your email for the confirmation link.");
+        alert("Check your email for the confirmation link!");
         window.toggleModal();
     }
 };
@@ -187,7 +204,6 @@ window.toggleAuthMode = function() {
     const title = document.getElementById('modalTitle');
     const submitBtn = document.querySelector('.auth-submit');
     const isSignIn = title.innerText === "Welcome Back";
-
     title.innerText = isSignIn ? "Create Account" : "Welcome Back";
     submitBtn.innerText = isSignIn ? "Sign Up" : "Sign In";
     document.getElementById('authForm').onsubmit = isSignIn ? handleSignUp : handleAuth;
@@ -197,7 +213,6 @@ window.toggleAuthMode = function() {
 async function loadDynamicFilters() {
     const container = document.querySelector('.filter-bar');
     if (!container) return;
-
     const { data: cats } = await _supabase.from('categories').select('name').order('name');
     let buttonsHtml = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
     if (cats) {
@@ -260,26 +275,3 @@ window.checkAuthToSell = async function() {
         window.toggleModal();
     }
 };
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // --- Connection Heartbeat ---
-    try {
-        const { data, error } = await _supabase.from('products').select('count', { count: 'exact', head: true });
-        if (error) throw error;
-        console.log("✅ Supabase Connected: Found", data, "approved items.");
-    } catch (err) {
-        console.error("❌ Supabase Connection Blocked:", err.message);
-        // Show a small warning to the user if the database is unreachable
-        const container = document.getElementById('productsContainer');
-        if (container) {
-            container.innerHTML = `<p style="color:red; text-align:center; padding:20px;">
-                Unable to connect to the database. Please check your internet or disable "Strict" tracking protection.
-            </p>`;
-        }
-    }
-
-    // Existing initializations...
-    fetchProducts();
-    updateUIForUser();
-    // ... rest of your code
-});
