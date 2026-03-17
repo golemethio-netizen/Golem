@@ -40,9 +40,12 @@ async function fetchProducts(category = 'All') {
 }
 
 function renderProducts(products) {
-    const grid = document.getElementById('productGrid');
+   const grid = document.getElementById('productGrid') || document.getElementById('productsContainer');
     if (!grid) return;
-
+if (!grid) {
+        console.error("Could not find a container with ID 'productGrid' or 'productsContainer'");
+        return;
+    }
     if (products.length === 0) {
         grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:50px; color:#888;">No items found.</div>`;
     } else {
@@ -72,7 +75,7 @@ function renderProducts(products) {
         }).join('');
     }
 
-    const loader = document.querySelector('.loading-spinner');
+    const loader = document.querySelector('.loading-spinner') || document.getElementById('loadingMessage');
     if (loader) loader.style.display = 'none';
 }
 
