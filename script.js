@@ -1,66 +1,82 @@
-// --- 1. INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
+// --- 1. INITIALIZATION & HEARTBEAT ---
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Connection Check
+    try {
+        const { count, error } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+        if (error) throw error;
+        console.log("✅ Supabase Connected: Found", count, "approved items.");
+    } catch (err) {
+        console.error("❌ Connection Error:", err.message);
+    }
+
+    // 2. Load UI
     fetchProducts();
     updateUIForUser();
     loadDynamicFilters();
     updateCartBadge();
 
+    // 3. Search Logic
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => filterSearch(e.target.value.toLowerCase()));
     }
 });
 
-// --- 5. PRODUCT & FILTER LOGIC ---
+// --- 2. PRODUCT & FILTER LOGIC ---
 async function fetchProducts(category = 'All') {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     let query = _supabase.from('products').select('*').eq('status', 'approved');
 
     if (category !== 'All') query = query.eq('category', category);
 
+    // Sorting
     if (sortOrder === 'newest') query = query.order('created_at', { ascending: false });
     else if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
     else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
 
     const { data, error } = await query;
     if (!error) renderProducts(data);
+    else console.error("Fetch error:", error.message);
 }
-
 
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    grid.innerHTML = products.map(p => {
-        // We use encodeURIComponent to safely hide special characters 
-        // that usually break the HTML 'onclick' attribute.
-        const safeData = encodeURIComponent(JSON.stringify(p));
-        const isSold = p.status === 'sold';
-        
-        return `
-            <div class="product-card ${isSold ? 'is-sold' : ''}">
-                <div class="img-wrapper">
-                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    <img src="${p.image}" alt="${p.name}" loading="lazy">
-                </div>
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <p class="price">${p.price?.toLocaleString()} ETB</p>
-                    <div class="action-buttons">
-                        ${isSold ? 
-                            `<button class="main-btn" disabled style="background:#ccc;">Already Sold</button>` : 
-                            `<button class="main-btn" onclick="openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
-                        }
+    if (products.length === 0) {
+        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:50px; color:#888;">No items found.</div>`;
+    } else {
+        grid.innerHTML = products.map(p => {
+            const safeData = encodeURIComponent(JSON.stringify(p));
+            const isSold = p.status === 'sold';
+            
+            return `
+                <div class="product-card ${isSold ? 'is-sold' : ''}">
+                    <div class="img-wrapper">
+                        ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    </div>
+                    <div class="product-info">
+                        <span class="category-tag">${p.category || 'General'}</span>
+                        <h3>${p.name}</h3>
+                        <p class="price">${p.price?.toLocaleString()} <small>ETB</small></p>
+                        <div class="action-buttons">
+                            ${isSold ? 
+                                `<button class="main-btn" disabled style="background:#ccc; cursor:not-allowed;">Already Sold</button>` : 
+                                `<button class="main-btn" onclick="openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    }
 
     const loader = document.querySelector('.loading-spinner');
     if (loader) loader.style.display = 'none';
 }
-// Add this helper function to handle the safe data
+
+// Helper to handle safe modal opening
 window.openProductDetailsSafe = function(encodedData) {
     const product = JSON.parse(decodeURIComponent(encodedData));
     window.openProductDetails(product);
@@ -92,47 +108,42 @@ window.openProductDetails = function(product) {
     
     const modalImg = document.getElementById('modalProductImg');
     modalImg.src = product.image;
-    modalImg.loading = "eager"; 
+
+    // Contact buttons
+    const phone = product.phone_number;
+    const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
 
     const callBtn = document.getElementById('callContact');
     const waBtn = document.getElementById('whatsappContact');
     const tgBtn = document.getElementById('telegramContact');
-    const shareTgBtn = document.getElementById('shareTgBtn');
-    
-    const phone = product.phone_number;
-    const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
 
-    if (callBtn && phone) {
+    if (callBtn) {
         callBtn.href = `tel:${phone}`;
-        callBtn.style.display = "flex";
+        callBtn.style.display = phone ? "flex" : "none";
     }
 
     if (waBtn && phone) {
         const cleanPhone = phone.replace(/\D/g, '');
-        const waMsg = encodeURIComponent(`Hello! I want to buy your "${product.name}" for ${product.price} ETB on Golem. Is it still available?`);
+        const waMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" for ${product.price} ETB.`);
         waBtn.href = `https://wa.me/${cleanPhone}?text=${waMsg}`;
         waBtn.style.display = "flex";
     }
 
     if (tgBtn && tgUser) {
-        tgBtn.href = `https://t.me/${tgUser.replace('@', '')}`;
+        tgBtn.href = `https://t.me/${tgUser}`;
         tgBtn.style.display = "flex";
     }
 
-    if (shareTgBtn) {
-        const shareUrl = window.location.href; 
-        const shareText = encodeURIComponent(`🔥 Check out this ${product.name}!\n💰 Price: ${product.price} ETB\n\nContact seller on Golem:`);
-        shareTgBtn.href = `https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
-        shareTgBtn.style.display = "flex";
-    }
-
     const cartBtn = document.querySelector('.add-to-cart-btn');
-    if (cartBtn) {
-        cartBtn.onclick = () => addToCart(product);
-    }
+    if (cartBtn) cartBtn.onclick = () => addToCart(product);
 
     modal.style.display = 'flex';
     if(product.id) _supabase.rpc('increment_views', { row_id: product.id });
+};
+
+window.closeProductModal = function() {
+    const pModal = document.getElementById('productModal');
+    if (pModal) pModal.style.display = 'none';
 };
 
 // --- 4. CART SYSTEM ---
@@ -148,13 +159,15 @@ window.updateCartBadge = function() {
 window.addToCart = function(product) {
     let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
     if (!cart.find(item => item.id === product.id)) {
-        cart.push({ id: product.id, name: product.name, price: product.price, image: product.image });
+        cart.push(product);
         localStorage.setItem('golem_cart', JSON.stringify(cart));
         updateCartBadge();
-        alert("Saved to your list!");
-    } else {
-        alert("Already in your list.");
+        alert("Saved to list!");
     }
+};
+
+window.onclick = (e) => {
+    if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
 };
 
 
@@ -192,14 +205,9 @@ window.handleAuth = async (event) => {
     event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
-
-    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-
-    if (error) alert("Login Error: " + error.message);
-    else {
-        alert("Welcome back!");
-        window.location.reload();
-    }
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) alert(error.message);
+    else window.location.reload();
 };
 
 
@@ -223,13 +231,11 @@ window.shareToWhatsApp = function() {
 
 
 // --- 6. HELPERS ---
+// --- 5. HELPERS & UTILITIES ---
 async function loadDynamicFilters() {
     const container = document.querySelector('.filter-bar');
     if (!container) return;
-
-    const { data: cats, error } = await _supabase.from('categories').select('name').order('name');
-    if (error) return;
-
+    const { data: cats } = await _supabase.from('categories').select('name').order('name');
     let buttonsHtml = `<button class="filter-btn active" onclick="filterCategory('All', this)">All</button>`;
     if (cats) {
         cats.forEach(c => {
@@ -251,27 +257,24 @@ function filterSearch(term) {
         const title = card.querySelector('h3').innerText.toLowerCase();
         card.style.display = title.includes(term) ? 'block' : 'none';
     });
-}
 
+// --- 4. AUTH & USER UI ---
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signinBtn = document.querySelector('.signin-btn');
-    
     if (!signinBtn) return;
 
     if (user) {
         signinBtn.innerText = "Sign Out";
         signinBtn.onclick = async () => {
             await _supabase.auth.signOut();
-            alert("Signed out successfully");
             window.location.reload();
-        }; // End of onclick
+        };
     } else {
         signinBtn.innerText = "Sign In";
         signinBtn.onclick = () => window.toggleModal();
-    } // End of if-else
+    }
 }
-
 
 
 // Global click handler to close modals
@@ -308,22 +311,28 @@ window.toggleAuthMode = function() {
 };
 
 
-window.handleSignUp = async (event) => {
+wwindow.handleSignUp = async (event) => {
     event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
-
-    const { data, error } = await _supabase.auth.signUp({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        alert("Registration Error: " + error.message);
-    } else {
-        alert("Check your email for the confirmation link!");
-        toggleModal();
+    const { error } = await _supabase.auth.signUp({ email, password });
+    if (error) alert(error.message);
+    else {
+        alert("Success! Check your email to confirm.");
+        window.toggleModal();
     }
+};
+
+window.toggleModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+};
+
+window.toggleAuthMode = function() {
+    const title = document.getElementById('modalTitle');
+    const isSignIn = title.innerText === "Welcome Back";
+    title.innerText = isSignIn ? "Create Account" : "Welcome Back";
+    document.getElementById('authForm').onsubmit = isSignIn ? handleSignUp : handleAuth;
 };
 
 // --- 2. THE SELL BUTTON GATEKEEPER ---
