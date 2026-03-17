@@ -260,3 +260,26 @@ window.checkAuthToSell = async function() {
         window.toggleModal();
     }
 };
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- Connection Heartbeat ---
+    try {
+        const { data, error } = await _supabase.from('products').select('count', { count: 'exact', head: true });
+        if (error) throw error;
+        console.log("✅ Supabase Connected: Found", data, "approved items.");
+    } catch (err) {
+        console.error("❌ Supabase Connection Blocked:", err.message);
+        // Show a small warning to the user if the database is unreachable
+        const container = document.getElementById('productsContainer');
+        if (container) {
+            container.innerHTML = `<p style="color:red; text-align:center; padding:20px;">
+                Unable to connect to the database. Please check your internet or disable "Strict" tracking protection.
+            </p>`;
+        }
+    }
+
+    // Existing initializations...
+    fetchProducts();
+    updateUIForUser();
+    // ... rest of your code
+});
