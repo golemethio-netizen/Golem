@@ -1,136 +1,410 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <link rel="icon" href="data:,">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Marketplace | Buy & Sell</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+<link rel="icon" href="data:,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Golem Marketplace | Buy & Sell</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
-    <header class="golem-header">
-        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search for electronics, furniture...">
-        </div>
-        <nav class="nav-container-horizontal">
-            <a href="index.html" class="nav-item-box bg-home">
-                <i class="fas fa-home"></i>
-                <p>Home</p>
-            </a>
-            <div class="nav-item-box bg-sell" onclick="checkAuthToSell()" style="cursor:pointer;">
-                <i class="fas fa-plus-circle"></i>
-                <p>Sell</p>
-            </div>
-            <a href="my-items.html" class="nav-item-box bg-items">
-                <i class="fas fa-box-open"></i>
-                <p>My Items</p>
-            </a>
-        </nav>
-        <div class="auth-buttons">
-            <a href="cart.html" class="nav-item-box bg-items" style="position:relative;">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Saved</p>
-                <span id="cartBadge">0</span>
-            </a>
-            <button class="signin-btn" onclick="toggleModal()">Sign In</button>
-        </div>
-    </header>
 
-    <section class="filter-controls">
-        <div class="sort-container">
-            <select id="sortSelect" onchange="fetchProducts()">
-                <option value="newest">🆕 Newest First</option>
-                <option value="price_low">💰 Price: Low to High</option>
-                <option value="price_high">💎 Price: High to Low</option>
-            </select>
-        </div>
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
-            <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
-            <button class="filter-btn" onclick="filterCategory('Home & Furniture', this)">Furniture</button>
-            <button class="filter-btn" onclick="filterCategory('Fashion', this)">Fashion</button>
-        </div>
-    </section>
+    <header class="golem-header">
 
-    <main class="container">
-        <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
-        </div>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
 
-        <div class="invite-container">
-            <i class="fas fa-users"></i>
-            <h3>Help Golem Grow!</h3>
-            <p>Know someone selling something? Invite them to Golem.</p>
-            <div class="invite-btns">
-                <button onclick="shareToTelegram()" class="tg-btn" style="background:#0088cc;"><i class="fab fa-telegram-plane"></i> Telegram</button>
-                <button onclick="shareToWhatsApp()" class="tg-btn" style="background:#25d366;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-            </div>
-        </div>
-    </main>
+        <div class="search-wrapper">
 
-    <div id="authModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content">
-            <span class="close-modal" onclick="toggleModal()">&times;</span>
-            <h2 id="modalTitle">Welcome Back</h2>
-            <form id="authForm" onsubmit="handleAuth(event)">
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" placeholder="Email" required>
-                </div>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" placeholder="Password" required>
-                </div>
-                <button type="submit" class="auth-submit">Sign In</button>
-            </form>
-            <div class="modal-footer">
-                <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
-            </div>
-        </div>
-    </div>
+            <i class="fas fa-search search-icon"></i>
 
-    <div id="productModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content product-detail-content">
-            <span class="close-modal" onclick="closeProductModal()">&times;</span>
-            <div class="modal-body">
-                <div class="modal-image-side">
-                    <img id="modalProductImg" src="" alt="Product">
-                    <span id="modalCondition" class="condition-badge">Condition</span>
-                </div>
-                <div class="modal-info-side">
-                    <h2 id="modalProductTitle">Product Name</h2>
-                    <p class="modal-price" id="modalProductPrice">0 ETB</p>
-                    <p class="modal-seller"><i class="fas fa-user-circle"></i> Sold by: <strong id="modalSellerName">Seller</strong></p>
-                    <hr>
-                    <h4>Description</h4>
-                    <p id="modalProductDesc" class="modal-description"></p>
-                    
-                    <div class="modal-actions">
-                        <a id="whatsappOrder" href="#" target="_blank" class="btn-order btn-whatsapp">
-                            <i class="fab fa-whatsapp"></i> Order on WhatsApp
-                        </a>
-                        <a id="telegramOrder" href="#" target="_blank" class="btn-order btn-telegram">
-                            <i class="fab fa-telegram"></i> Order on Telegram
-                        </a>
-                        <a id="callContact" href="#" class="btn-order btn-call">
-                            <i class="fas fa-phone"></i> Call Seller
-                        </a>
-                        <button class="add-to-cart-btn" onclick="addToCartFromModal()">
-                            <i class="fas fa-bookmark"></i> Save to My List
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+            <input type="text" id="headerSearch" placeholder="Search for electronics, fashion...">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script type="module" src="script.js"></script>
+        </div>
+
+        <nav class="nav-container-horizontal">
+
+            <a href="index.html" class="nav-item-box bg-home">
+
+                <i class="fas fa-home"></i>
+
+                <p>Home</p>
+
+            </a>
+
+         <div class="nav-item-box bg-sell" onclick="checkAuthToSell()" style="cursor:pointer;">
+    <i class="fas fa-plus-circle"></i>
+    <p>Sell</p>
+</div>
+
+            <a href="my-items.html" class="nav-item-box bg-items">
+
+                <i class="fas fa-box-open"></i>
+
+                <p>My Items</p>
+
+            </a>
+
+        </nav>
+
+        <div class="auth-buttons">
+
+           <a href="cart.html" class="nav-item-box bg-items" style="position:relative;">
+    <i class="fas fa-shopping-cart"></i>
+    <p>Saved</p>
+    <span id="cartBadge" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; width:18px; height:18px; font-size:10px; display:none; align-items:center; justify-content:center;">0</span>
+</a>
+<button class="signin-btn" onclick="toggleModal()">Sign In</button>
+
+        </div>
+
+    </header>
+
+
+
+    <section class="filter-controls">
+
+        <div class="sort-container">
+
+            <select id="sortSelect" onchange="fetchProducts()">
+
+                <option value="newest">🆕 Newest First</option>
+
+                <option value="price_low">💰 Price: Low to High</option>
+
+                <option value="price_high">💎 Price: High to Low</option>
+
+                <option value="popular">🔥 Most Viewed</option>
+
+            </select>
+
+        </div>
+
+        <div class="price-filter-wrapper">
+
+            <input type="number" id="minPrice" placeholder="Min ETB">
+
+            <input type="number" id="maxPrice" placeholder="Max ETB">
+
+            <button onclick="applyPriceFilter()" class="apply-btn">Apply</button>
+
+        </div>
+
+    </section>
+
+    <div class="filter-bar">
+
+        <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
+
+        
+
+        <button class="filter-btn fav-filter-btn" onclick="filterFavorites(this)">
+
+            <i class="fas fa-heart"></i> My Favorites
+
+        </button>
+
+        <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
+
+        <button class="filter-btn" onclick="filterCategory('Computer & Phone', this)">Computer & Phone</button>
+
+        <button class="filter-btn" onclick="filterCategory('Fashion', this)">Fashion</button>
+
+        <button class="filter-btn" onclick="filterCategory('Home & Furniture', this)">Home & Furniture</button>
+
+        <button class="filter-btn" onclick="filterCategory('Vehicles', this)">Vehicles</button>
+
+        <button class="filter-btn" onclick="filterCategory('Jobs', this)">Jobs</button>
+
+        <button class="filter-btn" onclick="filterCategory('Services', this)">Services</button>
+
+    </div>
+
+    <main class="container">
+
+        <div id="productGrid" class="masonry-wrapper">
+
+    <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
+
+</div>
+
+            </div>
+
+<div class="invite-container" style="background: #e7f1ff; padding: 30px; border-radius: 15px; text-align: center; margin: 40px 20px;">
+
+    <i class="fas fa-users" style="font-size: 2rem; color: #007bff; margin-bottom: 15px;"></i>
+
+    <h3>Help Golem Grow!</h3>
+
+    <p style="color: #555; margin-bottom: 20px;">Know someone selling something? Invite them to Golem and help us build Ethiopia's biggest marketplace.</p>
+
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+
+        <button onclick="shareToTelegram()" class="tg-btn" style="background: #0088cc; padding: 12px 25px;">
+
+            <i class="fab fa-telegram-plane"></i> Invite via Telegram
+
+        </button>
+
+        <button onclick="shareToWhatsApp()" class="tg-btn" style="background: #25d366; padding: 12px 25px;">
+
+            <i class="fab fa-whatsapp"></i> Invite via WhatsApp
+
+        </button>
+
+    </div>
+
+</div>
+
+    </main>
+
+    <div id="authModal" class="modal-overlay">
+
+        <div class="modal-content">
+
+            <span class="close-modal" onclick="toggleModal()">&times;</span>
+
+            <h2 id="modalTitle">Welcome Back</h2>
+
+            <p id="modalSubtitle">Please enter your details to continue</p>
+
+            
+
+            <form id="authForm" onsubmit="handleAuth(event)">
+
+                <div class="input-group">
+
+                    <i class="fas fa-envelope"></i>
+
+                    <input type="email" placeholder="Email Address" required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <i class="fas fa-lock"></i>
+
+                    <input type="password" placeholder="Password" required>
+
+                </div>
+
+
+
+            <div class="forgot-link">
+    <a href="reset-password.html">Forgot Password?</a>
+</div>
+                
+<button type="submit" class="auth-submit">Sign In</button>
+
+            </form>
+
+
+
+<div class="invite-container" style="background: #e7f1ff; padding: 30px; border-radius: 15px; text-align: center; margin: 40px 20px;">
+
+    <i class="fas fa-users" style="font-size: 2rem; color: #007bff; margin-bottom: 15px;"></i>
+
+    <h3>Help Golem Grow!</h3>
+
+    <p style="color: #555; margin-bottom: 20px;">Know someone selling something? Invite them to Golem and help us build Ethiopia's biggest marketplace.</p>
+
+    
+
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+
+        <button onclick="shareToTelegram()" class="tg-btn" style="background: #0088cc; padding: 12px 25px;">
+
+            <i class="fab fa-telegram-plane"></i> Invite via Telegram
+
+        </button>
+
+        <button onclick="shareToWhatsApp()" class="tg-btn" style="background: #25d366; padding: 12px 25px;">
+
+            <i class="fab fa-whatsapp"></i> Invite via WhatsApp
+
+        </button>
+
+    </div>
+
+</div>
+  <div class="modal-footer">
+    <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+</div>
+
+        </div>
+
+    </div>
+
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="config.js"></script>
+
+    <script type="module" src="script.js"></script>
+
+<footer class="golem-footer">
+    <div class="admin-access" style="opacity: 0.3; font-size: 10px; margin-top: 20px;">
+        <a href="cart.html" style="color: inherit;">Manage Saved List</a>
+    </div>
+
+    <div class="footer-content">
+
+        <div class="footer-section">
+
+            <h4>Support</h4>
+
+            <a href="#" onclick="openSupportModal()">Report an Issue</a>
+
+            <a href="#" onclick="openSupportModal()">Request VIP Posting</a>
+
+        </div>
+
+        <div class="footer-section">
+
+            <h4>Connect</h4>
+
+            <div class="social-links">
+
+                <a href="https://t.me/YourTelegramUsername" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
+
+                <a href="https://wa.me/251911223344" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+
+                <a href="about.html">About Golem</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <p class="copyright">&copy; 2026 Golem Marketplace. All rights reserved.</p>
+
+</footer>
+
+<div id="supportModal" class="modal-overlay">
+
+    <div class="modal-content">
+
+        <span class="close-modal" onclick="closeSupportModal()">&times;</span>
+
+        <h3>Contact Admin</h3>
+
+        <p>Have a problem or want to promote your item?</p>
+
+        <form id="supportForm">
+
+            <textarea id="supportMsg" placeholder="Describe your issue or request..." required style="width: 100%; height: 100px; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+
+            <button type="submit" class="auth-submit" style="width: 100%; margin-top: 15px;">Send Message</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+    <div id="productModal" class="modal-overlay">
+
+    <div class="modal-content product-detail-content">
+
+        <span class="close-modal" onclick="closeProductModal()">&times;</span>
+
+    
+        <div class="product-detail-layout">
+
+            <div class="detail-image-side">
+
+                <img id="modalProductImg" src="" alt="Product Image">
+
+                <span id="modalProductStatus" class="status-badge"></span>
+
+            </div>
+
+            
+            <div class="detail-info-side">
+
+                <h2 id="modalProductTitle">Product Title</h2>
+
+                <p class="detail-price" id="modalProductPrice"></p>
+
+                <hr>
+
+                <h4>Description</h4>
+
+                <p id="modalProductDesc" class="full-description"></p>                
+<div id="productModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeProductModal()">&times;</button>
+        
+        <div class="modal-body">
+            <div class="modal-image-container">
+                <img id="modalProductImg" src="" alt="Product Image">
+            </div>
+
+            <div class="modal-info">
+                <div class="modal-header-info">
+                    <span id="modalCondition" class="condition-badge">Condition</span>
+                    <h2 id="modalProductTitle">Product Name</h2>
+                    <p class="modal-price"><span id="modalProductPrice">0</span></p>
+                    <p class="modal-seller">
+                        <i class="fas fa-user-circle"></i> Sold by: <strong id="modalSellerName">Seller Name</strong>
+                    </p>
+                </div>
+
+                <hr>
+                
+                <p id="modalProductDesc" class="modal-description">Product description goes here...</p>
+
+                <div class="modal-actions">
+                    <a id="whatsappOrder" href="#" target="_blank" class="btn-order btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> Order on WhatsApp
+                    </a>
+                    <a id="telegramOrder" href="#" target="_blank" class="btn-order btn-telegram">
+                        <i class="fab fa-telegram"></i> Order on Telegram
+                    </a>
+                    <a id="callContact" href="#" class="btn-order btn-call">
+                        <i class="fas fa-phone"></i> Call Seller
+                    </a>
+                    <button class="add-to-cart-btn">
+                        <i class="fas fa-bookmark"></i> Save to My List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  <div class="seller-actions">
+    <a id="callContact" href="#" class="contact-btn call-btn">
+        <i class="fas fa-phone-alt"></i> Call Seller
+    </a>
+
+    <a id="whatsappContact" href="#" target="_blank" class="contact-btn wa-btn">
+        <i class="fab fa-whatsapp"></i> Buy Now
+    </a>
+
+    <a id="shareTgBtn" href="#" target="_blank" class="contact-btn share-tg-btn">
+        <i class="fab fa-telegram-plane"></i> Share
+    </a>
+
+    <button class="contact-btn cart-btn add-to-cart-btn">
+        <i class="fas fa-shopping-basket"></i> Add to List
+    </button>
+</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 </body>
+
 </html>
