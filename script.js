@@ -281,3 +281,28 @@ window.shareToWhatsApp = () => {
     const text = encodeURIComponent("Check out Golem Marketplace! " + window.location.href);
     window.open(`https://wa.me/?text=${text}`, '_blank');
 };
+window.addToCartFromModal = () => {
+    const productId = currentProduct.id; // Assuming you store the open product in a variable
+    let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
+
+    if (!saved.includes(productId)) {
+        saved.push(productId);
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        alert("Item saved to your wishlist!");
+        updateCartBadge(); // Update the number on the heart icon
+    } else {
+        alert("This item is already in your wishlist.");
+    }
+};
+
+function updateCartBadge() {
+    const saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.innerText = saved.length;
+        badge.style.display = saved.length > 0 ? 'block' : 'none';
+    }
+}
+
+// Call updateCartBadge on page load
+document.addEventListener('DOMContentLoaded', updateCartBadge);
