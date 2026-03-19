@@ -74,11 +74,13 @@ function renderProducts(products) {
             const tg = p.telegram_username || p.seller_telegram || '';
 
             return `
-                <div class="product-card ${isSold ? 'is-sold' : ''}">
-                    <div class="img-wrapper">
-                        ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
-                    </div>
+               <div class="product-card">
+        <div class="badge-row">
+            <span class="category-tag">${p.category}</span>
+            <span class="condition-tag ${condClass}">${condition}</span>
+        </div>
+        </div>
+`;
                     
                     <div class="product-info">
                         <div class="badge-row" style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
