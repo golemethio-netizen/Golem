@@ -1785,3 +1785,32 @@ body {
     background-color: #e9ecef;
     color: #495057;
 }
+
+
+/* Toast Notification Styling */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s, bottom 0.3s;
+}
+
+.toast-container.show {
+    opacity: 1;
+    bottom: 40px;
+}
+
+.toast-icon {
+    color: #25D366; /* Green for success */
+}
