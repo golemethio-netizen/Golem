@@ -31,38 +31,38 @@
             renderCart();
         });
 
-        function renderCart() {
-            const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-            const grid = document.getElementById('cartGrid');
-            const emptyMsg = document.getElementById('emptyCartMsg');
-            const badge = document.getElementById('cartCountBadge');
+       function renderCart() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    const grid = document.getElementById('cartGrid');
+    const emptyMsg = document.getElementById('emptyCartMsg');
+    const footer = document.getElementById('cartFooter'); // Get footer
+    const badge = document.getElementById('cartCountBadge');
 
-            badge.innerText = cart.length;
+    badge.innerText = cart.length;
 
-            if (cart.length === 0) {
-                grid.innerHTML = '';
-                emptyMsg.style.display = 'block';
-                return;
-            }
+    if (cart.length === 0) {
+        grid.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        footer.style.display = 'none'; // Hide footer
+        return;
+    }
 
-            emptyMsg.style.display = 'none';
-            grid.innerHTML = cart.map(item => `
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <img src="${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="product-info">
-                        <h3>${item.name}</h3>
-                        <p class="price">${item.price?.toLocaleString()} ETB</p>
-                        <div class="action-buttons" style="display: flex; gap: 8px; margin-top:10px;">
-                            <button class="main-btn" onclick="removeItem('${item.id}')" style="background:#ff4757; flex:1;">Remove</button>
-                            <button class="main-btn" onclick="viewItem('${item.id}')" style="flex:2;">View Detail</button>
-                        </div>
-                    </div>
+    emptyMsg.style.display = 'none';
+    footer.style.display = 'block'; // Show footer
+    grid.innerHTML = cart.map(item => `
+        <div class="product-card" style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px;">
+            <img src="${item.image}" style="width:100%; height:150px; object-fit:cover;">
+            <div style="padding:15px;">
+                <h3 style="margin:0 0 5px 0;">${item.name}</h3>
+                <p style="color:#007bff; font-weight:bold;">${item.price?.toLocaleString()} ETB</p>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button onclick="removeItem('${item.id}')" style="flex:1; background:#fff1f0; color:#ff4d4f; border:none; padding:8px; border-radius:5px; cursor:pointer;">Remove</button>
+                    <button onclick="viewItem('${item.id}')" style="flex:2; background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">View</button>
                 </div>
-            `).join('');
-        }
-
+            </div>
+        </div>
+    `).join('');
+}
         function removeItem(id) {
             let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
             cart = cart.filter(item => item.id !== id);
