@@ -211,3 +211,11 @@ window.checkAuthToSell = async () => {
         window.toggleModal(); 
     }
 };
+
+window.addToCartFromModal = function() {
+    const name = document.getElementById('modalProductTitle').innerText;
+    const price = document.getElementById('modalProductPrice').innerText;
+    const image = document.getElementById('modalProductImg').src;
+    // We use the title as a temporary ID if ID isn't globally stored
+    window.addToCart(name, name, price, image); 
+};
