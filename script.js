@@ -228,3 +228,82 @@ window.addToCartFromModal = function() {
     // We use the title as a temporary ID if ID isn't globally stored
     window.addToCart(name, name, price, image); 
 };
+
+
+
+// --- 5. AUTH & UI HELPERS (EXPOSED FOR MODULE USE) ---
+
+let isSignUpMode = false;
+
+window.toggleAuthMode = function() {
+    isSignUpMode = !isSignUpMode;
+    const title = document.getElementById('modalTitle');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const regFields = document.getElementById('registerFields');
+    const toggleLink = document.getElementById('toggleText');
+
+    if (isSignUpMode) {
+        title.innerText = "Create Account";
+        submitBtn.innerText = "Sign Up";
+        regFields.style.display = "block";
+        toggleLink.innerHTML = 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>';
+    } else {
+        title.innerText = "Welcome Back";
+        submitBtn.innerText = "Sign In";
+        regFields.style.display = "none";
+        toggleLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
+    }
+};
+
+window.handleAuth = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmitBtn');
+
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    if (isSignUpMode) {
+        const fullName = document.getElementById('regName').value;
+        const phone = document.getElementById('regPhone').value;
+
+        const { data, error } = await _supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName, phone_number: phone } }
+        });
+
+        if (error) alert("Error: " + error.message);
+        else {
+            alert("Registration successful! Check your email.");
+            window.toggleModal();
+        }
+    } else {
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) alert("Login failed: " + error.message);
+        else window.location.reload(); 
+    }
+    btn.disabled = false;
+    btn.innerText = isSignUpMode ? "Sign Up" : "Sign In";
+};
+
+window.toggleModal = () => {
+    const m = document.getElementById('authModal');
+    if (!m) return;
+    m.style.display = (m.style.display === "flex") ? "none" : "flex";
+    document.body.style.overflow = (m.style.display === "flex") ? "hidden" : "auto";
+};
+
+// This ensures the UI updates (Sign In -> Sign Out) as soon as the page loads
+async function updateUIForUser() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const signinBtn = document.querySelector('.signin-btn');
+    if (signinBtn && user) {
+        signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
+        signinBtn.onclick = async () => { 
+            await _supabase.auth.signOut(); 
+            window.location.reload(); 
+        };
+    }
+}
