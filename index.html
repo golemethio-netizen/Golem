@@ -73,25 +73,43 @@
         </div>
     </main>
 
-    <div id="authModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content">
-            <span class="close-modal" onclick="toggleModal()">&times;</span>
-            <h2 id="modalTitle">Welcome Back</h2>
-            <form id="authForm" onsubmit="handleAuth(event)">
+   <div id="authModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="toggleModal()">&times;</span>
+        <h2 id="modalTitle">Welcome Back</h2>
+        <p id="modalSubtitle">Sign in to manage your listings</p>
+        
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <div id="registerFields" style="display: none;">
                 <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" placeholder="Email" required>
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="regName" placeholder="Full Name">
                 </div>
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" placeholder="Password" required>
+                    <i class="fas fa-phone"></i>
+                    <input type="text" id="regPhone" placeholder="Phone (09...)">
                 </div>
-                <button type="submit" class="auth-submit">Sign In</button>
-            </form>
-            <div class="modal-footer">
-                <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
             </div>
+
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="authEmail" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="authPassword" placeholder="Password" required>
+            </div>
+
+            <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
+        </form>
+
+        <div class="modal-footer">
+            <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
         </div>
+    </div>
+</div>
+
+    
     </div>
 
     <div id="productModal" class="modal-overlay" style="display:none;">
