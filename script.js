@@ -103,7 +103,8 @@ window.openProductModal = function(product) {
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
-
+// Inside your openProductModal function:
+document.getElementById('viewFullDetails').href = `checkout.html?id=${product.id}`;
     // --- Format Phone for Ethiopia (+251) ---
     const rawPhone = product.seller_phone || product.phone_number || '';
     const cleanPhone = rawPhone.replace(/\s+/g, '').replace(/-/g, '');
