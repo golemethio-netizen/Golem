@@ -31,17 +31,14 @@
                 <p>My Items</p>
             </a>
         </nav>
-        <div class="auth-buttons">
-            <a href="cart.html" class="nav-item-box bg-items" style="position:relative;">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Saved</p>
-                <span id="cartBadge">0</span>
-            </a>
-            // Example of how the button should look inside your map/template literal
-<button onclick="window.addToCart('${item.id}', '${item.name}', ${item.price}, '${item.image}')" class="cart-btn">
-    <i class="fas fa-heart"></i> Save Item
+       <button class="nav-item-box" onclick="location.href='cart.html'">
+    <div style="position: relative; display: inline-block;">
+        <i class="fas fa-heart"></i>
+        <span id="navCartCount" style="display:none; position: absolute; top: -8px; right: -10px; background: #ff4757; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; border: 2px solid white;">0</span>
+    </div>
+    <p>Saved</p>
 </button>
-        </div>
+        
     </header>
 
     <section class="filter-controls">
