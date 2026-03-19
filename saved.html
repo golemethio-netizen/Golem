@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Saved Items | Golem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #f9f9f9;">
+
+    <header class="golem-header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <div style="flex-grow: 1;"></div>
+        <a href="index.html" class="nav-item-box bg-home">
+            <i class="fas fa-arrow-left"></i>
+            <p>Back</p>
+        </a>
+    </header>
+
+    <main class="container">
+        <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-weight: 600;">❤️ My Saved Items</h2>
+            <button onclick="clearAllSaved()" style="background:none; border:none; color:#ff4b2b; cursor:pointer; font-size:0.9rem;">
+                <i class="fas fa-trash-alt"></i> Clear All
+            </button>
+        </div>
+
+        <div id="savedGrid" class="masonry-wrapper">
+            <div id="emptyState" style="text-align:center; padding: 100px 20px; color: #888;">
+                <i class="fas fa-heart-broken fa-3x" style="margin-bottom: 15px; color: #ddd;"></i>
+                <p>You haven't saved any items yet.</p>
+                <a href="index.html" class="filter-btn" style="display:inline-block; margin-top:15px; text-decoration:none;">Start Shopping</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        // Load saved items from LocalStorage
+        function loadSavedItems() {
+            const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+            const grid = document.getElementById('savedGrid');
+            const empty = document.getElementById('emptyState');
+
+            if (savedIds.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            fetchItems(savedIds);
+        }
+
+        async function fetchItems(ids) {
+            const { data, error } = await _supabase
+                .from('products')
+                .select('*')
+                .in('id', ids);
+
+            if (data) {
+                renderSaved(data);
+            }
+        }
+
+        function renderSaved(items) {
+            const grid = document.getElementById('savedGrid');
+            grid.innerHTML = items.map(p => `
+                <div class="product-card">
+                    <div onclick="location.href='checkout.html?id=${p.id}'" style="cursor:pointer;">
+                        <img src="${p.image}" alt="${p.name}">
+                        <div class="product-info">
+                            <h3>${p.name}</h3>
+                            <p class="price">${p.price.toLocaleString()} ETB</p>
+                        </div>
+                    </div>
+                    <button onclick="removeItem('${p.id}')" class="contact-btn" style="background:#fdeaea; color:#d9534f; border:none; width:100%; padding:8px; border-radius:0 0 10px 10px;">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeItem(id) {
+            let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
+            saved = saved.filter(savedId => savedId !== id);
+            localStorage.setItem('golem_saved', JSON.stringify(saved));
+            loadSavedItems();
+        }
+
+        function clearAllSaved() {
+            if(confirm("Clear all saved items?")) {
+                localStorage.removeItem('golem_saved');
+                loadSavedItems();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSavedItems);
+    </script>
+</body>
+</html>
