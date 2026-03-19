@@ -292,11 +292,24 @@ window.toggleModal = () => {
 async function updateUIForUser() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signinBtn = document.querySelector('.signin-btn');
-    if (signinBtn && user) {
-        signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
-        signinBtn.onclick = async () => { 
-            await _supabase.auth.signOut(); 
-            window.location.reload(); 
-        };
+    const adminLink = document.getElementById('adminNavLink');
+
+    if (user) {
+        // 1. Update Sign In button to Sign Out
+        if (signinBtn) {
+            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
+            signinBtn.onclick = async () => { 
+                await _supabase.auth.signOut(); 
+                window.location.reload(); 
+            };
+        }
+
+        // 2. Show Admin link ONLY if the email matches yours
+        if (adminLink && user.email === 'yohannes.surafel@gmail.com') {
+            adminLink.style.display = 'flex';
+        }
+    } else {
+        // If logged out, ensure Admin link is hidden
+        if (adminLink) adminLink.style.display = 'none';
     }
 }
