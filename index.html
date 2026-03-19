@@ -17,7 +17,7 @@
 
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search furniture...">
+            <input type="text" id="headerSearch" placeholder="Search items...">
         </div>
 
         <div class="nav-container-horizontal">
@@ -26,7 +26,7 @@
                 <p>Home</p>
             </a>
 
-            <a href="#" onclick="checkAuthToSell()" class="nav-item-box bg-sell">
+            <a href="#" onclick="window.checkAuthToSell()" class="nav-item-box bg-sell">
                 <i class="fas fa-plus-circle"></i>
                 <p>Sell</p>
             </a>
@@ -47,30 +47,30 @@
                 <p>Admin</p>
             </a>
 
-            <button class="nav-item-box signin-btn" onclick="toggleModal()" style="border: none; cursor: pointer; background-color: #eee;">
+            <button class="nav-item-box signin-btn" onclick="window.toggleModal()" style="border: none; cursor: pointer; background-color: #eee;">
                 <i class="fas fa-user"></i>
                 <p>Sign In</p>
             </button>
         </div>
 
-        <a href="#" onclick="toggleSupportModal()" style="color: #666; font-size: 0.9rem; margin-top: 10px; display: inline-block;">
-   <i class="fas fa-question-circle"></i> Need Help? Contact Us
-</a>
+        <a href="#" onclick="window.toggleSupportModal()" style="color: #666; font-size: 0.9rem; margin-top: 10px; display: inline-block;">
+            <i class="fas fa-question-circle"></i> Need Help? Contact Us
+        </a>
     </header>
 
     <section class="filter-controls">
         <div class="sort-container">
-            <select id="sortSelect" onchange="fetchProducts()">
+            <select id="sortSelect" onchange="window.fetchProducts()">
                 <option value="newest">🆕 Newest First</option>
                 <option value="price_low">💰 Price: Low to High</option>
                 <option value="price_high">💎 Price: High to Low</option>
             </select>
         </div>
         <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterCategory('All', this)">All</button>
-            <button class="filter-btn" onclick="filterCategory('Electronics', this)">Electronics</button>
-            <button class="filter-btn" onclick="filterCategory('Home & Furniture', this)">Furniture</button>
-            <button class="filter-btn" onclick="filterCategory('Fashion', this)">Fashion</button>
+            <button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>
+            <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
+            <button class="filter-btn" onclick="window.filterCategory('Home & Furniture', this)">Furniture</button>
+            <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
         </div>
     </section>
 
@@ -86,107 +86,79 @@
             <h3>Help Golem Grow!</h3>
             <p>Know someone selling something? Invite them to Golem.</p>
             <div class="invite-btns">
-                <button onclick="shareToTelegram()" class="tg-btn" style="background:#0088cc;">
+                <button onclick="window.shareToTelegram()" class="tg-btn" style="background:#0088cc;">
                     <i class="fab fa-telegram-plane"></i> Telegram
                 </button>
-                <button onclick="shareToWhatsApp()" class="tg-btn" style="background:#25d366;">
+                <button onclick="window.shareToWhatsApp()" class="tg-btn" style="background:#25d366;">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </button>
             </div>
         </div>
     </main>
 
-
-<div id="supportModal" class="modal-overlay" onclick="if(event.target == this) toggleSupportModal()">
-    <div class="modal-content" style="max-width: 400px;">
-        <button onclick="toggleSupportModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
-        <h2>Contact Golem Support</h2>
-        <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Have a problem? Send us a message.</p>
-        
-        <form onsubmit="handleSupportSubmit(event)">
-            <input type="email" id="supportEmail" placeholder="Your Email" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <input type="text" id="supportSubject" placeholder="Subject (e.g. Help with Item)" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <textarea id="supportMessage" placeholder="How can we help you?" required style="width: 100%; padding: 10px; height: 100px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
-            <button type="submit" class="auth-submit" style="width: 100%;">Send Message</button>
-        </form>
+    <div id="supportModal" class="modal-overlay" onclick="if(event.target == this) window.toggleSupportModal()">
+        <div class="modal-content" style="max-width: 400px;">
+            <button onclick="window.toggleSupportModal()" class="close-modal-btn">&times;</button>
+            <h2>Contact Golem Support</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Have a problem? Send us a message.</p>
+            
+            <form onsubmit="window.handleSupportSubmit(event)">
+                <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
+                <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
+                <textarea id="supportMessage" placeholder="How can we help?" required class="modal-input" style="height:100px;"></textarea>
+                <button type="submit" class="auth-submit" style="width: 100%;">Send Message</button>
+            </form>
+        </div>
     </div>
-</div>
 
-
-
-    <div id="authModal" class="modal-overlay" onclick="if(event.target == this) toggleModal()">
+    <div id="authModal" class="modal-overlay" onclick="if(event.target == this) window.toggleModal()">
         <div class="modal-content">
-            <button type="button" onclick="toggleModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #888;">&times;</button>
-            
-            <h2 id="modalTitle" style="margin-bottom: 20px;">Welcome Back</h2>
-            
-            <form onsubmit="handleAuth(event)">
+            <button type="button" onclick="window.toggleModal()" class="close-modal-btn">&times;</button>
+            <h2 id="modalTitle">Welcome Back</h2>
+            <form onsubmit="window.handleAuth(event)">
                 <div class="input-group">
                     <i class="fas fa-envelope"></i>
                     <input type="email" id="authEmail" placeholder="Email Address" required>
                 </div>
-                
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="authPassword" placeholder="Password" required>
                 </div>
-
                 <div id="registerFields" style="display: none;">
-                    <div class="input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="regName" placeholder="Full Name">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-phone"></i>
-                        <input type="text" id="regPhone" placeholder="Phone Number">
-                    </div>
+                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="regName" placeholder="Full Name"></div>
+                    <div class="input-group"><i class="fas fa-phone"></i><input type="text" id="regPhone" placeholder="Phone Number"></div>
                 </div>
-
                 <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
             </form>
-
-            <div class="modal-footer" style="margin-top: 20px; font-size: 0.9rem;">
-                <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
-                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
-                <a href="#" onclick="toggleModal()" style="color: #666; font-weight: 400;">Cancel and return to Home</a>
+            <div class="modal-footer">
+                <p id="toggleText">Don't have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a></p>
             </div>
         </div>
     </div>
 
-    <div id="productModal" class="modal-overlay" onclick="if(event.target == this) closeProductModal()">
+    <div id="productModal" class="modal-overlay" onclick="if(event.target == this) window.closeProductModal()">
         <div class="modal-content">
-            <button onclick="closeProductModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; z-index: 10;">&times;</button>
+            <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
             
+            <div class="modal-img-wrapper">
+                <img id="modalProductImg" src="" alt="Product">
+            </div>
+
             <div class="modal-body">
-                <div class="details-img-container">
-                    <img id="modalProductImg" src="" alt="Product Image">
-                </div>
+                <span id="modalCondition" class="condition-badge"></span>
+                <h2 id="modalProductTitle"></h2>
+                <div id="modalProductPrice" class="modal-price"></div>
+                
+                <p style="font-weight: 600; margin-bottom: 5px;">Description</p>
+                <p id="modalProductDesc" class="modal-description"></p>
 
-                <div class="details-scrollable-content">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                        <span id="modalCondition" class="condition-badge"></span>
-                    </div>
-                    
-                    <h2 id="modalProductTitle" style="margin-bottom: 10px; font-size: 1.5rem;"></h2>
-                    <h3 id="modalProductPrice" style="color: var(--primary-color); margin-bottom: 20px;"></h3>
-                    
-                    <p style="font-weight: 600; margin-bottom: 5px;">Description</p>
-                    <p id="modalProductDesc" style="color: #666; font-size: 0.95rem; margin-bottom: 30px; white-space: pre-wrap;"></p>
-
-                    <div class="fixed-bottom-actions">
-                        <a id="callContact" href="#" class="contact-btn call-btn">
-                            <i class="fas fa-phone"></i> Call
-                        </a>
-                        <a id="whatsappOrder" href="#" target="_blank" class="contact-btn wa-btn">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
-                        </a>
-                        <a id="telegramOrder" href="#" target="_blank" class="contact-btn tg-btn">
-                            <i class="fab fa-telegram-plane"></i> Telegram
-                        </a>
-                        <button class="contact-btn main-btn" onclick="addToCartFromModal()">
-                            <i class="fas fa-heart"></i> Save to List
-                        </button>
-                    </div>
+                <div class="modal-footer-actions">
+                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal()">
+                        <i class="fas fa-heart"></i> Save
+                    </button>
                 </div>
             </div>
         </div>
@@ -196,5 +168,4 @@
     <script src="config.js"></script>
     <script type="module" src="script.js"></script>
 </body>
-    
 </html>
