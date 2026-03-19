@@ -380,3 +380,32 @@ list.innerHTML = tickets.map(t => `
     </div>
 `).join('');
 }
+
+window.openProductModal = function(product) {
+    const modal = document.getElementById('productModal');
+    
+    // Fill text data
+    document.getElementById('modalProductImg').src = product.image;
+    document.getElementById('modalProductTitle').innerText = product.name;
+    document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
+    document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
+
+    // --- FIX CALL BUTTON ---
+    // Remove spaces/dashes so the dialer can read it
+    const cleanPhone = product.seller_phone.replace(/\s+/g, ''); 
+    document.getElementById('callContact').href = `tel:${cleanPhone}`;
+
+    // --- FIX TELEGRAM BUTTON ---
+    // If seller_phone is '0912345678', we use international format for Telegram
+    // Or if you have a telegram_username column, use that.
+    let tgPhone = cleanPhone;
+    if (tgPhone.startsWith('0')) {
+        tgPhone = '+251' + tgPhone.substring(1);
+    }
+    document.getElementById('telegramOrder').href = `https://t.me/${tgPhone}`;
+
+    // --- FIX WHATSAPP BUTTON ---
+    document.getElementById('whatsappOrder').href = `https://wa.me/${tgPhone}?text=I am interested in ${product.name}`;
+
+    modal.style.display = 'flex';
+};
