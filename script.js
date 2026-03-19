@@ -362,30 +362,21 @@ async function loadTickets() {
         return;
     }
 
-    list.innerHTML = tickets.map(t => {
-        // Debugging: If message is missing, show what columns ARE there
-        const messageContent = t.message || t.msg || "<em>(No message content found in database)</em>";
-        
-        return `
-        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: #fff; margin-bottom: 15px; border-left: 5px solid #ff4d4d;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="margin: 0; color: #333;">${t.subject || 'No Subject'}</h3>
-                <span style="font-size: 0.8rem; color: #999;">${new Date(t.created_at).toLocaleString()}</span>
-            </div>
-            
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 15px; color: #555; line-height: 1.5; white-space: pre-wrap;">
-                ${messageContent}
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.9rem; font-weight: 600; color: #007bff;">
-                    <i class="fas fa-user-circle"></i> ${t.user_email}
-                </span>
-                <button onclick="resolveTicket('${t.id}')" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600;">
-                    <i class="fas fa-check"></i> Mark Resolved
-                </button>
-            </div>
+    // Inside loadTickets()
+list.innerHTML = tickets.map(t => `
+    <div class="stat-card" style="display: block; border-left: 5px solid #ff4d4d; cursor: default;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <strong style="color: #333;">${t.subject}</strong>
+            <small style="color: #999;">${new Date(t.created_at).toLocaleDateString()}</small>
         </div>
-        `;
-    }).join('');
+        <p style="color: #555; background: #f9f9f9; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            ${t.message} </p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: #007bff;">From: ${t.user_email}</span>
+            <button onclick="resolveTicket('${t.id}')" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                Mark Resolved
+            </button>
+        </div>
+    </div>
+`).join('');
 }
