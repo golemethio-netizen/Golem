@@ -3,25 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | Golem</title>
+    <title>Item Details | Golem</title>
     
     <meta property="og:title" content="Golem Marketplace">
     <meta property="og:description" content="Check out this item on Golem!">
     <meta property="og:image" content="https://grand-sawine-a63bc3.netlify.app/logo.png">
+    
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:,">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
-    <nav>
+<body style="background-color: #f4f7f6;">
+    
+    <nav class="golem-header" style="padding: 10px 20px;">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <a href="index.html" style="text-decoration: none; color: #666; font-size: 0.9rem;">
+            <i class="fas fa-arrow-left"></i> Back to Shop
+        </a>
     </nav>
     
-    <div class="container" style="padding: 20px; text-align: center;">
-        <div id="checkoutDetails" class="product-card" style="max-width: 500px; margin: auto; background: white; padding: 0; overflow: hidden;">
-            <div style="padding: 50px;">
-                <p>Gathering item details...</p>
+    <div class="container" style="padding: 20px; display: flex; justify-content: center;">
+        <div id="checkoutDetails" class="product-card" style="max-width: 500px; width: 100%; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+            <div style="padding: 100px 20px; text-align: center; color: #888;">
+                <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+                <p style="margin-top: 10px;">Loading item details...</p>
             </div>
         </div>
     </div>
@@ -31,21 +36,23 @@
     <script>
         // 1. Share Functions
         function shareToTelegram(url, name) {
-            const text = encodeURIComponent(`Check out this ${name} on Golem!`);
+            const text = encodeURIComponent(`Check out this ${name} on Golem Marketplace!`);
             window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${text}`, '_blank');
         }
 
-        function shareToWhatsApp(url) {
-            const text = encodeURIComponent(`Check this out on Golem: ${url}`);
+        function shareToWhatsApp(url, name) {
+            const text = encodeURIComponent(`Check out this ${name} on Golem: ${url}`);
             window.open(`https://wa.me/?text=${text}`, '_blank');
         }
 
-        // 2. View Increment Logic
+        // 2. View Increment Logic (Silent)
         async function incrementViews(productId, currentViews) {
-            await _supabase
-                .from('products')
-                .update({ views: (currentViews || 0) + 1 })
-                .eq('id', productId);
+            try {
+                await _supabase
+                    .from('products')
+                    .update({ views: (currentViews || 0) + 1 })
+                    .eq('id', productId);
+            } catch (e) { console.error("View update failed", e); }
         }
 
         // 3. Main Loader
@@ -55,7 +62,7 @@
             const productId = params.get('id');
 
             if (!productId) {
-                display.innerHTML = "<div style='padding:40px;'><h3>Product not found.</h3><a href='index.html'>Back to Shop</a></div>";
+                display.innerHTML = "<div style='padding:60px; text-align:center;'><h3>Product not found.</h3><br><a href='index.html' class='buy-btn'>Return Home</a></div>";
                 return;
             }
 
@@ -66,40 +73,59 @@
                 .single();
 
             if (error || !p) {
-                display.innerHTML = "<div style='padding:40px;'><h3>Error loading product.</h3></div>";
+                display.innerHTML = "<div style='padding:60px; text-align:center;'><h3>Item might be removed.</h3><br><a href='index.html' class='buy-btn'>Return Home</a></div>";
                 return;
             }
 
-            // Trigger view increment
+            // Update page title dynamically
+            document.title = `${p.name} | Golem`;
+
+            // Track View
             incrementViews(p.id, p.views);
 
             const currentUrl = window.location.href;
 
+            // Format Phone for Ethiopia (+251)
+            const rawPhone = p.seller_phone || p.phone_number || '';
+            const cleanPhone = rawPhone.replace(/\D/g, ''); 
+            let tgLink = cleanPhone;
+            if (tgLink.startsWith('0')) tgLink = '251' + tgLink.substring(1);
+
             // 4. Render UI
             display.innerHTML = `
-                <img src="${p.image}" style="width:100%; height:300px; object-fit:cover;">
-                <div class="product-info" style="padding:20px; text-align:left;">
-                    <h2 style="margin-bottom:5px;">${p.name}</h2>
-                    <p style="font-size: 1.5rem; color: #ff4b2b; font-weight:bold; margin-bottom:15px;">${p.price} ETB</p>
+                <div style="position: relative;">
+                    <img src="${p.image}" style="width:100%; height:350px; object-fit:cover;">
+                    <span class="status-badge cond-new" style="position: absolute; top: 15px; left: 15px;">${p.status_condition || 'New'}</span>
+                </div>
+                
+                <div class="product-info" style="padding:25px;">
+                    <h2 style="margin-bottom:8px; font-size: 1.8rem;">${p.name}</h2>
+                    <p style="font-size: 1.6rem; color: #28a745; font-weight:700; margin-bottom:15px;">${p.price?.toLocaleString()} ETB</p>
                     
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">${p.description || 'No description provided.'}</p>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 25px;">
+                        <p style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; color: #333;">Description</p>
+                        <p style="color:#555; font-size:0.95rem; line-height: 1.6; white-space: pre-wrap;">${p.description || 'No description provided.'}</p>
+                    </div>
 
-                    <div style="display:grid; gap:12px; margin-top:20px;">
-                        <a href="tel:${p.phone_number}" class="main-btn" style="background:#007bff; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; color:white; padding:12px; border-radius:8px;">
-                           📞 Call Seller
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                        <a href="tel:${cleanPhone}" class="contact-btn" style="background:#007bff; color:white; text-decoration:none; padding:15px; border-radius:12px; text-align:center; font-weight:600;">
+                           <i class="fas fa-phone"></i> Call Seller
                         </a>
                         
-                        <a href="https://wa.me/251${p.phone_number.startsWith('0') ? p.phone_number.substring(1) : p.phone_number}" 
-                           target="_blank" class="main-btn" style="background:#25D366; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; color:white; padding:12px; border-radius:8px;">
-                           💬 WhatsApp
+                        <a href="https://t.me/+${tgLink}" target="_blank" class="contact-btn" style="background:#229ED9; color:white; text-decoration:none; padding:15px; border-radius:12px; text-align:center; font-weight:600;">
+                           <i class="fab fa-telegram-plane"></i> Telegram
+                        </a>
+
+                        <a href="https://wa.me/${tgLink}?text=Interested in ${p.name}" target="_blank" class="contact-btn" style="background:#25D366; color:white; text-decoration:none; padding:15px; border-radius:12px; text-align:center; font-weight:600; grid-column: span 2;">
+                           <i class="fab fa-whatsapp"></i> Chat on WhatsApp
                         </a>
                     </div>
 
-                    <div class="share-section" style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; text-align:center;">
-                        <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Share this item:</p>
-                        <div style="display: flex; justify-content: center; gap: 10px;">
-                            <button onclick="shareToTelegram('${currentUrl}', '${p.name}')" style="background: #0088cc; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor:pointer; flex:1;">✈️ Telegram</button>
-                            <button onclick="shareToWhatsApp('${currentUrl}')" style="background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor:pointer; flex:1;">💬 WhatsApp</button>
+                    <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid #eee; text-align:center;">
+                        <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px;">Help the seller by sharing this:</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="shareToTelegram('${currentUrl}', '${p.name}')" style="flex:1; background: #eee; border:none; padding:10px; border-radius:8px; cursor:pointer;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Share</button>
+                            <button onclick="shareToWhatsApp('${currentUrl}', '${p.name}')" style="flex:1; background: #eee; border:none; padding:10px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> Share</button>
                         </div>
                     </div>
                 </div>
