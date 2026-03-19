@@ -1675,3 +1675,72 @@ body {
     background-size: 800px 104px;
     animation: shimmer 1.5s infinite linear;
 }
+.btn-wa {
+    background-color: #25D366;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.btn-tg {
+    background-color: #0088cc;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.btn-wa:hover, .btn-tg:hover {
+    opacity: 0.9;
+    color: white;
+}
+/* Modal Layout */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    width: 90%; max-width: 900px;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 30px; }
+
+/* Buttons Styling */
+.modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+.btn-order {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 12px; border-radius: 8px; text-decoration: none;
+    font-weight: bold; color: white; transition: 0.3s;
+}
+
+.btn-whatsapp { background-color: #25D366; }
+.btn-telegram { background-color: #0088cc; }
+.btn-call { background-color: #333; }
+
+.btn-order:hover { opacity: 0.8; transform: translateY(-2px); }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .modal-body { grid-template-columns: 1fr; }
+}
