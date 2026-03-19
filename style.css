@@ -328,3 +328,24 @@ body {
         grid-template-columns: 1fr; /* Stack buttons on very small phones */
     }
 }
+
+.signin-btn {
+    transition: background 0.3s ease;
+}
+
+.signin-btn:hover {
+    background-color: #ddd !important;
+}
+
+/* Ensure the badge is visible on the Saved icon */
+#cartBadge {
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
