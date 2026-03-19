@@ -164,24 +164,7 @@ window.toggleModal = () => {
     }
 };
 
-async function updateUIForUser() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    const signinBtn = document.querySelector('.signin-btn');
-    const adminLink = document.getElementById('adminNavLink');
 
-    if (user) {
-        // Change Sign In to Sign Out
-        if (signinBtn) {
-            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
-            signinBtn.onclick = async () => { await _supabase.auth.signOut(); window.location.reload(); };
-        }
-
-        // Show Admin link only for your email
-        if (adminLink && user.email === 'yohannes.surafel@gmail.com') {
-            adminLink.style.display = 'flex';
-        }
-    }
-}
 
 window.updateCartBadge = function() {
     const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
