@@ -310,3 +310,20 @@ window.addToCart = function(id, name, price, image) {
     // Update the cart counter if you have one
     if (typeof updateCartBadge === "function") updateCartBadge();
 };
+
+
+window.updateCartBadge = function() {
+    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    const badge = document.getElementById('navCartCount');
+    if (badge) {
+        if (cart.length > 0) {
+            badge.innerText = cart.length;
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+};
+
+// Run on load
+document.addEventListener('DOMContentLoaded', window.updateCartBadge);
