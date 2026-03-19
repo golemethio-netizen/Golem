@@ -52,7 +52,10 @@ function renderProducts(products) {
             const safeData = encodeURIComponent(JSON.stringify(p));
             const isSold = p.status === 'sold';
             const condition = p.status_condition || 'New';
-            
+            const verifiedSellers = ['Crown Time', 'Crown Time Furniture', 'Golem Admin'];
+            const isVerified = ['Crown Time', 'Crown Time Furniture'].includes(product.seller_name);
+            const verifiedBadge = isVerified ? 
+    `<i class="fas fa-check-circle" style="color: #007bff; margin-left: 4px;" title="Verified Business"></i>` : '';
             // 1. Dynamic Condition Colors
             const conditionColors = {
                 'New': { bg: '#d4edda', text: '#155724' },      // Green
@@ -65,7 +68,12 @@ function renderProducts(products) {
             // 2. Contact Shortcuts
             const phone = p.phone_number ? p.phone_number.replace(/\D/g, '') : '';
             const tg = p.telegram_username || p.seller_telegram || '';
-
+if (sellerEl) {
+        sellerEl.innerHTML = `
+            ${product.seller_name || "Anonymous Seller"} 
+            ${isVerified ? '<i class="fas fa-check-circle" style="color: #007bff;"></i>' : ''}
+        `;
+    }
             return `
                 <div class="product-card ${isSold ? 'is-sold' : ''}">
                     <div class="img-wrapper">
@@ -83,10 +91,15 @@ function renderProducts(products) {
                         
                         <h3>${p.name}</h3>
                         
-                        <div class="seller-line" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#666; font-size:0.85rem;">
-                            <span><i class="fas fa-user-circle"></i> ${p.seller_name || 'Verified'}</span>
-                            <span style="font-weight:bold; color:#28a745;">${p.price?.toLocaleString()} ETB</span>
-                        </div>
+                        // Replace the previous seller-line with this:
+<div class="seller-line" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#666; font-size:0.85rem;">
+    <span>
+        <i class="fas fa-user-circle"></i> 
+        ${p.seller_name || 'Verified'} ${verifiedBadge}
+    </span>
+    <span style="font-weight:bold; color:#28a745;">${p.price?.toLocaleString()} ETB</span>
+</div>
+
 
                         <div class="quick-contact-bar" style="display:flex; gap:5px; margin-bottom:15px; border-top:1px solid #f0f0f0; padding-top:10px;">
                             ${phone ? `<a href="tel:${phone}" class="mini-contact" title="Call Seller" style="flex:1; text-align:center; padding:5px; background:#f8f9fa; border-radius:5px; color:#007bff;"><i class="fas fa-phone"></i></a>` : ''}
