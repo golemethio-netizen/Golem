@@ -112,40 +112,44 @@
     
     </div>
 
-    <div id="productModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content product-detail-content">
-            <span class="close-modal" onclick="closeProductModal()">&times;</span>
-            <div class="modal-body">
-                <div class="modal-image-side">
-                    <img id="modalProductImg" src="" alt="Product">
-                    <span id="modalCondition" class="condition-badge">Condition</span>
+    <div id="productModal" class="modal-overlay" onclick="if(event.target == this) closeProductModal()">
+    <div class="modal-content">
+        <button onclick="closeProductModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; z-index: 10;">&times;</button>
+        
+        <div class="modal-body">
+            <div class="details-img-container">
+                <img id="modalProductImg" src="" alt="Product Image">
+            </div>
+
+            <div class="details-scrollable-content">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <span id="modalCondition" class="condition-badge"></span>
                 </div>
-                <div class="modal-info-side">
-                    <h2 id="modalProductTitle">Product Name</h2>
-                    <p class="modal-price" id="modalProductPrice">0 ETB</p>
-                    <p class="modal-seller"><i class="fas fa-user-circle"></i> Sold by: <strong id="modalSellerName">Seller</strong></p>
-                    <hr>
-                    <h4>Description</h4>
-                    <p id="modalProductDesc" class="modal-description"></p>
-                    
-                    <div class="modal-actions">
-                        <a id="whatsappOrder" href="#" target="_blank" class="btn-order btn-whatsapp">
-                            <i class="fab fa-whatsapp"></i> Order on WhatsApp
-                        </a>
-                        <a id="telegramOrder" href="#" target="_blank" class="btn-order btn-telegram">
-                            <i class="fab fa-telegram"></i> Order on Telegram
-                        </a>
-                        <a id="callContact" href="#" class="btn-order btn-call">
-                            <i class="fas fa-phone"></i> Call Seller
-                        </a>
-                        <button class="add-to-cart-btn" onclick="addToCartFromModal()">
-                            <i class="fas fa-bookmark"></i> Save to My List
-                        </button>
-                    </div>
+                
+                <h2 id="modalProductTitle" style="margin-bottom: 10px; font-size: 1.5rem;"></h2>
+                <h3 id="modalProductPrice" style="color: var(--primary-color); margin-bottom: 20px;"></h3>
+                
+                <p style="font-weight: 600; margin-bottom: 5px;">Description</p>
+                <p id="modalProductDesc" style="color: #666; font-size: 0.95rem; margin-bottom: 30px; white-space: pre-wrap;"></p>
+
+                <div class="fixed-bottom-actions">
+                    <a id="callContact" href="#" class="contact-btn call-btn">
+                        <i class="fas fa-phone"></i> Call
+                    </a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn wa-btn">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn tg-btn">
+                        <i class="fab fa-telegram-plane"></i> Telegram
+                    </a>
+                    <button class="contact-btn main-btn" onclick="addToCartFromModal()">
+                        <i class="fas fa-heart"></i> Save to List
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
