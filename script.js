@@ -152,7 +152,16 @@ window.closeProductModal = () => document.getElementById('productModal').style.d
 
 window.toggleModal = () => {
     const m = document.getElementById('authModal');
-    if (m) m.style.display = (m.style.display === "flex") ? "none" : "flex";
+    if (!m) return;
+    
+    if (m.style.display === "flex") {
+        m.style.display = "none";
+        // Ensure the body doesn't stay locked/scrolled
+        document.body.style.overflow = "auto";
+    } else {
+        m.style.display = "flex";
+        document.body.style.overflow = "hidden"; // Prevent background scrolling
+    }
 };
 
 async function updateUIForUser() {
