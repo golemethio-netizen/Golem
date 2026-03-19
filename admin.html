@@ -311,6 +311,28 @@ window.onload = async () => {
     await loadStats();    // Load the dashboard numbers
     await loadItems('pending'); // Show pending items by default
 };
+
+
+
+const { count: ticketCount, error: ticketError } = await _supabase
+        .from('support_tickets')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_resolved', false);
+
+    if (ticketError) {
+        console.error("Ticket Stats Error:", ticketError.message);
+    }
+
+    // Update the UI - Make sure the ID matches 'pendingTickets'
+    const ticketElement = document.getElementById('pendingTickets');
+    if (ticketElement) {
+        ticketElement.innerText = ticketCount || 0;
+    }
+
+
+
+
+
         
 // 2. Fixed the search filter to be more specific
 document.getElementById('adminSearchInput').addEventListener('input', (e) => {
