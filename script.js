@@ -267,3 +267,16 @@ window.updateCartBadge = function() {
         badge.style.display = cart.length > 0 ? 'flex' : 'none';
     }
 };
+
+
+
+window.shareToTelegram = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("Check out Golem Marketplace! Buy and sell furniture easily.");
+    window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+};
+
+window.shareToWhatsApp = () => {
+    const text = encodeURIComponent("Check out Golem Marketplace! " + window.location.href);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+};
