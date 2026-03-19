@@ -90,13 +90,23 @@
         </div>
     </main>
 
-   <div id="authModal" class="modal-overlay" style="display:none;">
+  <div id="authModal" class="modal-overlay" onclick="if(event.target == this) toggleModal()">
     <div class="modal-content">
-        <span class="close-modal" onclick="toggleModal()">&times;</span>
-        <h2 id="modalTitle">Welcome Back</h2>
-        <p id="modalSubtitle">Sign in to manage your listings</p>
+        <button type="button" onclick="toggleModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #888;">&times;</button>
         
-        <form id="authForm" onsubmit="handleAuth(event)">
+        <h2 id="modalTitle" style="margin-bottom: 20px;">Welcome Back</h2>
+        
+        <form onsubmit="handleAuth(event)">
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="authEmail" placeholder="Email Address" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="authPassword" placeholder="Password" required>
+            </div>
+
             <div id="registerFields" style="display: none;">
                 <div class="input-group">
                     <i class="fas fa-user"></i>
@@ -104,24 +114,17 @@
                 </div>
                 <div class="input-group">
                     <i class="fas fa-phone"></i>
-                    <input type="text" id="regPhone" placeholder="Phone (09...)">
+                    <input type="text" id="regPhone" placeholder="Phone Number">
                 </div>
-            </div>
-
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="authEmail" placeholder="Email Address" required>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="authPassword" placeholder="Password" required>
             </div>
 
             <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
         </form>
 
-        <div class="modal-footer">
+        <div class="modal-footer" style="margin-top: 20px; font-size: 0.9rem;">
             <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            <a href="#" onclick="toggleModal()" style="color: #666; font-weight: 400;">Cancel and return to Home</a>
         </div>
     </div>
 </div>
