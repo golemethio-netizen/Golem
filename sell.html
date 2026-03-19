@@ -132,18 +132,19 @@
                     .getPublicUrl(filePath);
 
                 // C. Prepare Data
-                const productData = {
-                    name: document.getElementById('prodName').value,
-                    status_condition: document.getElementById('status_condition').value,
-                    price: parseFloat(document.getElementById('prodPrice').value),
-                    category: document.getElementById('prodCategory').value,
-                    description: document.getElementById('prodDesc').value,
-                    image: publicUrl,
-                    phone_number: document.getElementById('prodPhone').value,
-                    seller_name: user.user_metadata?.full_name || "Verified Seller",
-                    user_id: user.id,
-                    status: 'approved' 
-                };
+               // --- Inside sell.html submit listener ---
+const productData = {
+    name: document.getElementById('prodName').value,
+    status_condition: document.getElementById('status_condition').value,
+    price: parseFloat(document.getElementById('prodPrice').value),
+    category: document.getElementById('prodCategory').value,
+    description: document.getElementById('prodDesc').value,
+    image: publicUrl,
+    phone_number: document.getElementById('prodPhone').value,
+    seller_name: user.user_metadata?.full_name || "Verified Seller",
+    user_id: user.id,
+    status: 'pending' // 👈 CHANGE THIS FROM 'approved' TO 'pending'
+};
 
                 // D. Insert into Database
                 const { error: dbError } = await _supabase
