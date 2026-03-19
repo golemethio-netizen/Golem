@@ -75,81 +75,80 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script>
-        const sellForm = document.getElementById('sellForm');
+    const sellForm = document.getElementById('sellForm');
 
-       sellForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    const fileInput = document.getElementById('prodFile');
-    const status = document.getElementById('uploadStatus');
-    
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return alert("Please sign in.");
-
-    btn.innerText = "Uploading Image...";
-    btn.disabled = true;
-
-    // 1. Handle File Upload
-    const file = fileInput.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
-
-    let { error: uploadError } = await _supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-    if (uploadError) {
-        alert("Upload failed: " + uploadError.message);
-        btn.disabled = false;
-        return;
-    }
-
-    // 2. Get Public URL
-    const { data: { publicUrl } } = _supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-    // 3. Save Product Data to Database
-    btn.innerText = "Publishing Listing...";
-    const productData = {
-        name: document.getElementById('prodName').value,
-        status_condition: document.getElementById('status_condition').value, // Add this line
-        price: parseFloat(document.getElementById('prodPrice').value),
-        category: document.getElementById('prodCategory').value,
-        description: document.getElementById('prodDesc').value,
-        image: publicUrl, // Using the new URL from storage
-        seller_contact: document.getElementById('prodPhone').value,
-        seller_email: user.email,
-        user_id: user.id,
-        status: 'pending'
-    };
-
-
-
-           document.getElementById('prodFile').onchange = evt => {
-    const [file] = document.getElementById('prodFile').files;
+// 1. IMAGE PREVIEW LOGIC (Must be outside the submit listener)
+document.getElementById('prodFile').onchange = evt => {
+    const [file] = evt.target.files;
     if (file) {
         const preview = document.getElementById('imagePreview');
         preview.src = URL.createObjectURL(file);
         preview.style.display = 'block';
     }
-}
-    const { error: dbError } = await _supabase
-        .from('products')
-        .insert([productData]);
+};
 
-    if (dbError) {
-        alert("Database error: " + dbError.message);
-        btn.disabled = false;
-    } else {
-        alert("Item posted successfully! Please wait for admin approval.");
+// 2. SUBMIT FORM LOGIC
+sellForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const fileInput = document.getElementById('prodFile');
+    
+    // Check Auth
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return alert("Please sign in first.");
+
+    btn.innerText = "Processing...";
+    btn.disabled = true;
+
+    try {
+        // A. Handle File Upload to Storage
+        const file = fileInput.files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`; // Use Date.now for better uniqueness
+        const filePath = `${user.id}/${fileName}`;
+
+        let { error: uploadError } = await _supabase.storage
+            .from('product-images')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // B. Get Public URL
+        const { data: { publicUrl } } = _supabase.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+        // C. Prepare Data (Matching your Supabase columns)
+        const productData = {
+            name: document.getElementById('prodName').value,
+            status_condition: document.getElementById('status_condition').value,
+            price: parseFloat(document.getElementById('prodPrice').value),
+            category: document.getElementById('prodCategory').value,
+            description: document.getElementById('prodDesc').value,
+            image: publicUrl,
+            phone_number: document.getElementById('prodPhone').value, // Matches script.js
+            seller_name: user.user_metadata?.full_name || "Verified Seller",
+            user_id: user.id,
+            status: 'approved' // Set to 'approved' for testing, 'pending' for production
+        };
+
+        // D. Insert into Database
+        const { error: dbError } = await _supabase
+            .from('products')
+            .insert([productData]);
+
+        if (dbError) throw dbError;
+
+        alert("Item posted successfully!");
         window.location.href = 'index.html';
+
+    } catch (err) {
+        alert("Error: " + err.message);
+        console.error(err);
+        btn.innerText = "Publish Listing";
+        btn.disabled = false;
     }
 });
-    </script>
-
     <style>
         .input-group-sell { margin-bottom: 15px; }
         .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
