@@ -249,3 +249,18 @@ window.handleAuth = async function(e) {
     btn.disabled = false;
     btn.innerText = isSignUpMode ? "Sign Up" : "Sign In";
 };
+
+
+
+window.checkAuthToSell = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    if (user) {
+        // User is logged in, send them to the sell page
+        window.location.href = 'sell.html';
+    } else {
+        // User is not logged in, show the login modal
+        alert("Please sign in to post an item.");
+        window.toggleModal(); 
+    }
+};
