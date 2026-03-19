@@ -340,3 +340,52 @@ window.handleSupportSubmit = async function(e) {
         toggleSupportModal();
     }
 };
+
+
+async function loadTickets() {
+    const list = document.getElementById('ticketList');
+    list.innerHTML = "<p>Loading tickets...</p>";
+
+    const { data: tickets, error } = await _supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('is_resolved', false)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        list.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+        return;
+    }
+
+    if (!tickets || tickets.length === 0) {
+        list.innerHTML = "<p style='color: #888; padding: 20px; text-align: center;'>✅ All caught up! No pending tickets.</p>";
+        return;
+    }
+
+    list.innerHTML = tickets.map(t => {
+        // Debugging: If message is missing, show what columns ARE there
+        const messageContent = t.message || t.msg || "<em>(No message content found in database)</em>";
+        
+        return `
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: #fff; margin-bottom: 15px; border-left: 5px solid #ff4d4d;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #333;">${t.subject || 'No Subject'}</h3>
+                <span style="font-size: 0.8rem; color: #999;">${new Date(t.created_at).toLocaleString()}</span>
+            </div>
+            
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 15px; color: #555; line-height: 1.5; white-space: pre-wrap;">
+                ${messageContent}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.9rem; font-weight: 600; color: #007bff;">
+                    <i class="fas fa-user-circle"></i> ${t.user_email}
+                </span>
+                <button onclick="resolveTicket('${t.id}')" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                    <i class="fas fa-check"></i> Mark Resolved
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
