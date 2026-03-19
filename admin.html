@@ -172,21 +172,7 @@ async function switchTab(status, btn) {
 };
 
         
-// Unified Status Updater
-async function updateStatus(id, newStatus) {
-    const { error } = await _supabase
-        .from('products')
-        .update({ status: newStatus })
-        .eq('id', id);
 
-    if (!error) {
-        alert(`Item moved to ${newStatus}`);
-        loadItems(currentView); // Refresh current tab
-        loadStats(); // Update counters
-  
-    }
-
-}
 
 window.permanentlyDelete = async function(id) {
     const confirmation = confirm("⚠️ PERMANENT ACTION: Are you sure you want to delete this item forever? This cannot be undone.");
@@ -319,22 +305,41 @@ document.getElementById('pendingTickets').innerText = ticketCount || 0;
     document.getElementById('totalValue').innerText = totalValue.toLocaleString() + " ETB";
 }
 
-// Update your existing load function to include stats
 window.onload = async () => {
-    await checkAdmin(); // Ensure you are admin first
-    loadStats();        // Load the top stats cards
-    loadItems('pending'); // Start by showing pending items
+    await checkAdmin();   // Security check
+    await loadStats();    // Load the dashboard numbers
+    await loadItems('pending'); // Show pending items by default
 };
+        
+// 2. Fixed the search filter to be more specific
 document.getElementById('adminSearchInput').addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
     const cards = document.querySelectorAll('.product-card');
     
     cards.forEach(card => {
-        const text = card.innerText.toLowerCase();
-        card.style.display = text.includes(term) ? 'block' : 'none';
+        // Looks at the title and the seller phone inside the card
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        const info = card.querySelector('.product-info').innerText.toLowerCase();
+        card.style.display = (title.includes(term) || info.includes(term)) ? 'block' : 'none';
     });
 });
         
+ // 3. Cleaned up the updateStatus function
+async function updateStatus(id, newStatus) {
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+    if (error) {
+        alert("Error updating status: " + error.message);
+    } else {
+        alert(`Item successfully moved to ${newStatus}`);
+        // Remove the card from the UI immediately for a faster feel
+        document.getElementById(`card-${id}`)?.remove();
+        loadStats(); // Update the counters at the top
+    }
+}       
         // Run on load
         loadPending();
 
