@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     fetchProducts();
     updateUIForUser();
-    loadDynamicFilters();
     updateCartBadge();
 
     const searchInput = document.getElementById('headerSearch');
@@ -55,40 +54,35 @@ function renderProducts(products) {
             const verifiedBadge = isVerified ? `<i class="fas fa-check-circle" style="color: #007bff; margin-left: 4px;"></i>` : '';
 
             const phone = p.phone_number ? p.phone_number.replace(/\D/g, '') : '';
-            const tg = p.telegram_username || p.seller_telegram || '';
+            const tg = (p.telegram_username || p.seller_telegram || '').replace('@', '');
 
-            // FIXED: Combined the template into ONE string properly
             return `
                 <div class="product-card ${isSold ? 'is-sold' : ''}">
-                    <div class="img-wrapper">
+                    <div class="card-img-container">
                         ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                         <img src="${p.image}" alt="${p.name}" loading="lazy">
+                        <div class="image-overlay">
+                            <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
+                        </div>
+                        <span class="status-badge ${condClass}">${condition}</span>
                     </div>
                     <div class="product-info">
-                        <div class="badge-row" style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
-                            <span class="category-tag">${p.category || 'General'}</span>
-                            <span class="condition-tag ${condClass}">${condition}</span>
+                        <span class="category-badge">${p.category || 'General'}</span>
+                        <h3 class="product-title">${p.name}</h3>
+                        <div class="seller-line" style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">
+                            <i class="fas fa-user-circle"></i> ${p.seller_name || 'Seller'} ${verifiedBadge}
                         </div>
-                        <h3>${p.name}</h3>
-                        <div class="seller-line">
-                            <span><i class="fas fa-user-circle"></i> ${p.seller_name || 'Seller'} ${verifiedBadge}</span>
-                            <span style="font-weight:bold; color:#28a745;">${p.price?.toLocaleString()} ETB</span>
-                        </div>
-                        <div class="quick-contact-bar">
-                            ${phone ? `<a href="tel:${phone}" class="mini-contact"><i class="fas fa-phone"></i></a>` : ''}
-                            ${phone ? `<a href="https://wa.me/${phone}" target="_blank" class="mini-contact"><i class="fab fa-whatsapp"></i></a>` : ''}
-                            ${tg ? `<a href="https://t.me/${tg.replace('@','')}" target="_blank" class="mini-contact"><i class="fab fa-telegram"></i></a>` : ''}
-                        </div>
-                        <div class="action-buttons">
-                            <button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')">🛒 View Details</button>
+                        <div class="product-price">${p.price?.toLocaleString()} ETB</div>
+                        
+                        <div class="product-actions">
+                            <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')">View Details</button>
+                            ${tg ? `<a href="https://t.me/${tg}" target="_blank" class="share-btn"><i class="fab fa-telegram-plane"></i></a>` : ''}
                         </div>
                     </div>
                 </div>
             `;
         }).join('');
     }
-    const loader = document.querySelector('.loading-spinner');
-    if (loader) loader.style.display = 'none';
 }
 
 // --- 3. MODAL & ORDERING LOGIC ---
@@ -103,6 +97,7 @@ window.openProductDetails = function(product) {
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
+    // Fill Modal Data
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = `${product.price?.toLocaleString()} ETB`;
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
@@ -115,15 +110,20 @@ window.openProductDetails = function(product) {
         conditionDisplay.className = 'condition-badge ' + getConditionClass(cond);
     }
 
+    // Setup Order Buttons
     const phone = product.phone_number;
+    const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
     const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
     const orderMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" for ${product.price?.toLocaleString()} ETB.`);
 
     const waBtn = document.getElementById('whatsappOrder');
-    if (waBtn) waBtn.href = phone ? `https://wa.me/${phone.replace(/\D/g, '')}?text=${orderMsg}` : '#';
+    if (waBtn) waBtn.href = cleanPhone ? `https://wa.me/${cleanPhone}?text=${orderMsg}` : '#';
 
     const tgBtn = document.getElementById('telegramOrder');
     if (tgBtn) tgBtn.href = tgUser ? `https://t.me/${tgUser}` : '#';
+    
+    const callBtn = document.getElementById('callContact');
+    if (callBtn) callBtn.href = cleanPhone ? `tel:${cleanPhone}` : '#';
 
     modal.style.display = 'flex';
 };
@@ -142,22 +142,17 @@ function getConditionClass(condition) {
 function filterSearch(term) {
     const cards = document.querySelectorAll('.product-card');
     cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
+        const title = card.querySelector('.product-title').innerText.toLowerCase();
         card.style.display = title.includes(term) ? 'block' : 'none';
     });
 }
 
-// --- 5. EXPOSE TO WINDOW (Essential for type="module") ---
-window.filterCategory = function(cat, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    fetchProducts(cat);
-};
-
+// --- 5. AUTH & UI HELPERS ---
 window.closeProductModal = () => document.getElementById('productModal').style.display = 'none';
+
 window.toggleModal = () => {
     const m = document.getElementById('authModal');
-    m.style.display = (m.style.display === "flex") ? "none" : "flex";
+    if (m) m.style.display = (m.style.display === "flex") ? "none" : "flex";
 };
 
 async function updateUIForUser() {
@@ -171,159 +166,48 @@ async function updateUIForUser() {
 
 window.updateCartBadge = function() {
     const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-    const badge = document.getElementById('cartBadge');
+    const badge = document.getElementById('navCartCount') || document.getElementById('cartBadge');
     if (badge) {
         badge.innerText = cart.length;
         badge.style.display = cart.length > 0 ? 'flex' : 'none';
     }
 };
 
-window.fetchProducts = fetchProducts;
-
-let isSignUpMode = false;
-
-window.toggleAuthMode = function() {
-    isSignUpMode = !isSignUpMode;
-    const title = document.getElementById('modalTitle');
-    const submitBtn = document.getElementById('authSubmitBtn');
-    const regFields = document.getElementById('registerFields');
-    const toggleLink = document.getElementById('toggleText');
-
-    if (isSignUpMode) {
-        title.innerText = "Create Account";
-        submitBtn.innerText = "Sign Up";
-        regFields.style.display = "block";
-        toggleLink.innerHTML = 'Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>';
-    } else {
-        title.innerText = "Welcome Back";
-        submitBtn.innerText = "Sign In";
-        regFields.style.display = "none";
-        toggleLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>';
-    }
-};
-
-window.handleAuth = async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('authEmail').value;
-    const password = document.getElementById('authPassword').value;
-    const btn = document.getElementById('authSubmitBtn');
-
-    btn.disabled = true;
-    btn.innerText = "Processing...";
-
-    if (isSignUpMode) {
-        // SIGN UP LOGIC
-        const fullName = document.getElementById('regName').value;
-        const phone = document.getElementById('regPhone').value;
-
-        const { data, error } = await _supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: {
-                    full_name: fullName,
-                    phone_number: phone
-                }
-            }
-        });
-
-        if (error) {
-            alert("Error: " + error.message);
-        } else {
-            alert("Registration successful! Please check your email for a confirmation link.");
-            toggleModal();
-        }
-    } else {
-        // SIGN IN LOGIC
-        const { data, error } = await _supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
-
-        if (error) {
-            alert("Login failed: " + error.message);
-        } else {
-            window.location.reload(); // Refresh to update UI
-        }
-    }
-    btn.disabled = false;
-    btn.innerText = isSignUpMode ? "Sign Up" : "Sign In";
-};
-
-
-
-window.checkAuthToSell = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    if (user) {
-        // User is logged in, send them to the sell page
-        window.location.href = 'sell.html';
-    } else {
-        // User is not logged in, show the login modal
-        alert("Please sign in to post an item.");
-        window.toggleModal(); 
-    }
-};
-
-
-// This makes the function accessible to the HTML button
-window.checkAuthToSell = checkAuthToSell;
-
-
-
-
-
-
 window.showToast = function(message) {
-    // Create container if it doesn't exist
     let toast = document.querySelector('.toast-container');
     if (!toast) {
         toast = document.createElement('div');
         toast.className = 'toast-container';
         document.body.appendChild(toast);
     }
-
     toast.innerHTML = `<i class="fas fa-check-circle toast-icon"></i> ${message}`;
     toast.classList.add('show');
-
-    // Hide after 3 seconds
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+    setTimeout(() => toast.classList.remove('show'), 3000);
 };
 
 window.addToCart = function(id, name, price, image) {
     let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-    const exists = cart.find(item => item.id === id);
-
-    if (exists) {
+    if (cart.find(item => item.id === id)) {
         window.showToast("Already in your list!");
         return;
     }
-
     cart.push({ id, name, price, image });
     localStorage.setItem('golem_cart', JSON.stringify(cart));
-    
-    // Call the toast instead of alert
     window.showToast("Item saved to your list!");
-    
-    // Update the cart counter if you have one
-    if (typeof updateCartBadge === "function") updateCartBadge();
+    window.updateCartBadge();
 };
 
+window.filterCategory = (cat, btn) => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    fetchProducts(cat);
+};
 
-window.updateCartBadge = function() {
-    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
-    const badge = document.getElementById('navCartCount');
-    if (badge) {
-        if (cart.length > 0) {
-            badge.innerText = cart.length;
-            badge.style.display = 'block';
-        } else {
-            badge.style.display = 'none';
-        }
+window.checkAuthToSell = async () => {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) window.location.href = 'sell.html';
+    else {
+        alert("Please sign in to post an item.");
+        window.toggleModal(); 
     }
 };
-
-// Run on load
-document.addEventListener('DOMContentLoaded', window.updateCartBadge);
