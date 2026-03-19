@@ -36,11 +36,11 @@
                 <p>My Items</p>
             </a>
 
-            <a href="checkout.html" class="nav-item-box bg-items">
-                <i class="fas fa-heart"></i>
-                <p>Saved</p>
-                <span id="cartBadge" style="display: none;">0</span>
-            </a>
+        <a href="saved.html" class="nav-item-box bg-items">
+    <i class="fas fa-heart"></i>
+    <p>Saved</p>
+    <span id="cartBadge" style="display: none;">0</span>
+</a>
 
             <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none; background: #333; color: white;">
                 <i class="fas fa-user-shield"></i>
@@ -152,14 +152,19 @@
                 <p style="font-weight: 600; margin-bottom: 5px;">Description</p>
                 <p id="modalProductDesc" class="modal-description"></p>
 
-                <div class="modal-footer-actions">
-                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal()">
-                        <i class="fas fa-heart"></i> Save
-                    </button>
-                </div>
+               <div class="modal-footer-actions">
+    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
+    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
+    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    
+    <a id="viewFullDetails" href="#" class="contact-btn" style="background: #eee; color: #333; grid-column: span 2;">
+        <i class="fas fa-expand"></i> View Full Page & Share
+    </a>
+
+    <button class="contact-btn save-btn" onclick="window.addToCartFromModal()" style="grid-column: span 2;">
+        <i class="fas fa-heart"></i> Save to Wishlist
+    </button>
+</div>
             </div>
         </div>
     </div>
