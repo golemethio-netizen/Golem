@@ -37,7 +37,7 @@ async function fetchProducts(category = 'All') {
     else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
 
     const { data, error } = await query;
-    if (!error) renderProducts(data);
+    if (!error) (data);
     else console.error("Fetch error:", error.message);
 }
 
@@ -56,25 +56,33 @@ function renderProducts(products) {
             const safeData = encodeURIComponent(JSON.stringify(p));
             const isSold = p.status === 'sold';
             
-            return `
-                <div class="product-card ${isSold ? 'is-sold' : ''}">
-                    <div class="img-wrapper">
-                        ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
-                    </div>
-                    <div class="product-info">
-                        <span class="category-tag">${p.category || 'General'}</span>
-                        <h3>${p.name}</h3>
-                        <p class="price">${p.price?.toLocaleString()} <small>ETB</small></p>
-                        <div class="action-buttons">
-                            ${isSold ? 
-                                `<button class="main-btn" disabled style="background:#ccc; cursor:not-allowed;">Sold Out</button>` : 
-                                `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
-                            }
-                        </div>
-                    </div>
-                </div>
-            `;
+            // Inside renderProducts -> products.map(p => { ... })
+return `
+    <div class="product-card ${isSold ? 'is-sold' : ''}">
+        <div class="img-wrapper">
+            ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+            <img src="${p.image}" alt="${p.name}" loading="lazy">
+        </div>
+        <div class="product-info">
+            <div class="badge-row" style="display:flex; gap:5px; margin-bottom:8px;">
+                <span class="category-tag">${p.category || 'General'}</span>
+                <span class="condition-tag" style="background:#e9ecef; color:#495057; padding:2px 8px; border-radius:4px; font-size:0.75rem;">
+                    ${p.status_condition || 'New'}
+                </span>
+            </div>
+            <h3>${p.name}</h3>
+            <p class="seller-preview" style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">
+                <i class="fas fa-user"></i> ${p.seller_name || 'Verified Seller'}
+            </p>
+            <p class="price">${p.price?.toLocaleString()} <small>ETB</small></p>
+            <div class="action-buttons">
+                ${isSold ? 
+                    `<button class="main-btn" disabled style="background:#ccc;">Sold</button>` : 
+                    `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
+                }
+            </div>
+        </div>
+    </div>`;
         }).join('');
     }
 
@@ -95,7 +103,7 @@ window.openProductDetailsSafe = function(encodedData) {
 };
 
 window.openProductDetails = function(product) {
-    const modal = document.getElementById('productModal');
+   const modal = document.getElementById('productModal');
     if (!modal) return;
 
     document.getElementById('modalProductTitle').innerText = product.name;
@@ -106,10 +114,14 @@ window.openProductDetails = function(product) {
     const phone = product.phone_number;
     const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
 
+    const sellerEl = document.getElementById('modalSellerName');
+    const conditionEl = document.getElementById('modalCondition')
     const callBtn = document.getElementById('callContact');
     const waBtn = document.getElementById('whatsappContact');
     const tgBtn = document.getElementById('telegramContact');
-
+    
+if (sellerEl) sellerEl.innerText = product.seller_name || "Anonymous Seller";
+    if (conditionEl) conditionEl.innerText = product.status_condition || "Not Specified";
     if (callBtn) {
         callBtn.href = `tel:${phone}`;
         callBtn.style.display = phone ? "flex" : "none";
