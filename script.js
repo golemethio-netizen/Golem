@@ -271,6 +271,27 @@ window.checkAuthToSell = checkAuthToSell;
 
 
 
+
+
+
+window.showToast = function(message) {
+    // Create container if it doesn't exist
+    let toast = document.querySelector('.toast-container');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-container';
+        document.body.appendChild(toast);
+    }
+
+    toast.innerHTML = `<i class="fas fa-check-circle toast-icon"></i> ${message}`;
+    toast.classList.add('show');
+
+    // Hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+};
+
 window.addToCart = function(id, name, price, image) {
     let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
     const exists = cart.find(item => item.id === id);
