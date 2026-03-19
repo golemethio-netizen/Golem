@@ -179,3 +179,73 @@ window.updateCartBadge = function() {
 };
 
 window.fetchProducts = fetchProducts;
+
+let isSignUpMode = false;
+
+window.toggleAuthMode = function() {
+    isSignUpMode = !isSignUpMode;
+    const title = document.getElementById('modalTitle');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const regFields = document.getElementById('registerFields');
+    const toggleLink = document.getElementById('toggleText');
+
+    if (isSignUpMode) {
+        title.innerText = "Create Account";
+        submitBtn.innerText = "Sign Up";
+        regFields.style.display = "block";
+        toggleLink.innerHTML = 'Already have an account? <a href="#" onclick="toggleAuthMode()">Sign In</a>';
+    } else {
+        title.innerText = "Welcome Back";
+        submitBtn.innerText = "Sign In";
+        regFields.style.display = "none";
+        toggleLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>';
+    }
+};
+
+window.handleAuth = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmitBtn');
+
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    if (isSignUpMode) {
+        // SIGN UP LOGIC
+        const fullName = document.getElementById('regName').value;
+        const phone = document.getElementById('regPhone').value;
+
+        const { data, error } = await _supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    phone_number: phone
+                }
+            }
+        });
+
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("Registration successful! Please check your email for a confirmation link.");
+            toggleModal();
+        }
+    } else {
+        // SIGN IN LOGIC
+        const { data, error } = await _supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            alert("Login failed: " + error.message);
+        } else {
+            window.location.reload(); // Refresh to update UI
+        }
+    }
+    btn.disabled = false;
+    btn.innerText = isSignUpMode ? "Sign Up" : "Sign In";
+};
