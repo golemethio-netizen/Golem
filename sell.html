@@ -20,26 +20,26 @@
             <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
 
             <form id="sellForm">
-              <div class="input-group-sell">
-    <label><i class="fas fa-camera"></i> Upload Product Photo</label>
-                  <img id="imagePreview" src="#" alt="Preview" style="display:none; width:100%; border-radius:10px; margin-top:10px;">
-    <input type="file" id="prodFile" accept="image/*" required 
-           style="border: 2px dashed #ddd; padding: 20px; text-align: center;">
-    <p id="uploadStatus" style="font-size: 12px; color: #666; margin-top: 5px;"></p>
-</div>
+                <div class="input-group-sell">
+                    <label><i class="fas fa-camera"></i> Upload Product Photo</label>
+                    <img id="imagePreview" src="#" alt="Preview" style="display:none; width:100%; border-radius:10px; margin-top:10px; margin-bottom:10px;">
+                    <input type="file" id="prodFile" accept="image/*" required style="border: 2px dashed #ddd; padding: 20px; text-align: center; width: 100%;">
+                </div>
 
                 <div class="input-group-sell">
                     <label><i class="fas fa-tag"></i> Item Name</label>
                     <input type="text" id="prodName" placeholder="e.g., iPhone 15 Pro Max" required>
                 </div>
-<div class="input-group-sell">
-    <label><i class="fas fa-star"></i> Condition</label>
-    <select id="status_condition" required>
-        <option value="New">New</option>
-        <option value="Used">Used</option>
-        <option value="Refurbished">Refurbished</option>
-    </select>
-</div>
+
+                <div class="input-group-sell">
+                    <label><i class="fas fa-star"></i> Condition</label>
+                    <select id="status_condition" required>
+                        <option value="New">New</option>
+                        <option value="Used">Used</option>
+                        <option value="Refurbished">Refurbished</option>
+                    </select>
+                </div>
+
                 <div style="display: flex; gap: 15px;">
                     <div class="input-group-sell" style="flex: 1;">
                         <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
@@ -75,80 +75,94 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    const sellForm = document.getElementById('sellForm');
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- AUTO-FILL USER DATA ---
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (user) {
+                // Pre-fill phone number if it exists in metadata
+                if (user.user_metadata.phone_number) {
+                    document.getElementById('prodPhone').value = user.user_metadata.phone_number;
+                }
+            } else {
+                alert("Please log in to sell items.");
+                window.location.href = 'index.html';
+            }
+        });
 
-// 1. IMAGE PREVIEW LOGIC (Must be outside the submit listener)
-document.getElementById('prodFile').onchange = evt => {
-    const [file] = evt.target.files;
-    if (file) {
-        const preview = document.getElementById('imagePreview');
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-    }
-};
-
-// 2. SUBMIT FORM LOGIC
-sellForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    const fileInput = document.getElementById('prodFile');
-    
-    // Check Auth
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return alert("Please sign in first.");
-
-    btn.innerText = "Processing...";
-    btn.disabled = true;
-
-    try {
-        // A. Handle File Upload to Storage
-        const file = fileInput.files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`; // Use Date.now for better uniqueness
-        const filePath = `${user.id}/${fileName}`;
-
-        let { error: uploadError } = await _supabase.storage
-            .from('product-images')
-            .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        // B. Get Public URL
-        const { data: { publicUrl } } = _supabase.storage
-            .from('product-images')
-            .getPublicUrl(filePath);
-
-        // C. Prepare Data (Matching your Supabase columns)
-        const productData = {
-            name: document.getElementById('prodName').value,
-            status_condition: document.getElementById('status_condition').value,
-            price: parseFloat(document.getElementById('prodPrice').value),
-            category: document.getElementById('prodCategory').value,
-            description: document.getElementById('prodDesc').value,
-            image: publicUrl,
-            phone_number: document.getElementById('prodPhone').value, // Matches script.js
-            seller_name: user.user_metadata?.full_name || "Verified Seller",
-            user_id: user.id,
-            status: 'approved' // Set to 'approved' for testing, 'pending' for production
+        // 1. IMAGE PREVIEW
+        document.getElementById('prodFile').onchange = evt => {
+            const [file] = evt.target.files;
+            if (file) {
+                const preview = document.getElementById('imagePreview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
         };
 
-        // D. Insert into Database
-        const { error: dbError } = await _supabase
-            .from('products')
-            .insert([productData]);
+        // 2. SUBMIT FORM
+        const sellForm = document.getElementById('sellForm');
+        sellForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const fileInput = document.getElementById('prodFile');
+            
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return alert("Please sign in first.");
 
-        if (dbError) throw dbError;
+            btn.innerText = "Uploading Image...";
+            btn.disabled = true;
 
-        alert("Item posted successfully!");
-        window.location.href = 'index.html';
+            try {
+                // A. Upload Image
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${user.id}/${fileName}`;
 
-    } catch (err) {
-        alert("Error: " + err.message);
-        console.error(err);
-        btn.innerText = "Publish Listing";
-        btn.disabled = false;
-    }
-});
+                let { error: uploadError } = await _supabase.storage
+                    .from('product-images')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                // B. Get Public URL
+                const { data: { publicUrl } } = _supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+
+                // C. Prepare Data
+                const productData = {
+                    name: document.getElementById('prodName').value,
+                    status_condition: document.getElementById('status_condition').value,
+                    price: parseFloat(document.getElementById('prodPrice').value),
+                    category: document.getElementById('prodCategory').value,
+                    description: document.getElementById('prodDesc').value,
+                    image: publicUrl,
+                    phone_number: document.getElementById('prodPhone').value,
+                    seller_name: user.user_metadata?.full_name || "Verified Seller",
+                    user_id: user.id,
+                    status: 'approved' 
+                };
+
+                // D. Insert into Database
+                const { error: dbError } = await _supabase
+                    .from('products')
+                    .insert([productData]);
+
+                if (dbError) throw dbError;
+
+                alert("Item posted successfully!");
+                window.location.href = 'index.html';
+
+            } catch (err) {
+                alert("Error: " + err.message);
+                btn.innerText = "Publish Listing";
+                btn.disabled = false;
+            }
+        });
+    </script>
+
     <style>
         .input-group-sell { margin-bottom: 15px; }
         .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
