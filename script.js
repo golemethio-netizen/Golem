@@ -159,6 +159,19 @@ window.openProductDetails = function(product) {
     const tgUser = (product.telegram_username || product.seller_telegram || "").replace('@', '');
     const orderMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" for ${product.price?.toLocaleString()} ETB. Is it still available?`);
 
+
+const conditionDisplay = document.getElementById('modalCondition');
+    if (conditionDisplay) {
+        const cond = product.status_condition || 'New';
+        conditionDisplay.innerText = cond;
+        // Reset classes then add the specific one
+        conditionDisplay.className = 'condition-badge ' + getConditionClass(cond);
+    }
+
+
+
+
+        
     const waBtn = document.getElementById('whatsappOrder');
     if (waBtn && phone) {
         waBtn.href = `https://wa.me/${phone.replace(/\D/g, '')}?text=${orderMsg}`;
