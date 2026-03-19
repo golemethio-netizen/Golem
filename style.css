@@ -1,1560 +1,97 @@
 /* --- 1. Base & Reset --- */
+:root {
+    --primary-color: #007bff;
+    --whatsapp-green: #25D366;
+    --telegram-blue: #0088cc;
+    --dark-text: #2d3436;
+    --light-gray: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-
-
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
+    color: var(--dark-text);
+    line-height: 1.6;
+}
 
 /* --- 2. Header & Navigation --- */
-
 .golem-header {
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
     padding: 10px 5%;
-
-    background: rgba(255, 255, 255, 0.95);
-
+    background: var(--glass-bg);
     backdrop-filter: blur(10px);
-
     position: sticky;
-
     top: 0;
-
     z-index: 1000;
-
     border-bottom: 1px solid #eee;
-
 }
-
-
 
 .logo {
-
     font-size: 1.5rem;
-
     font-weight: 800;
-
     letter-spacing: 1px;
-
 }
-
-
 
 .search-wrapper {
-
     position: relative;
-
     flex-grow: 2;
-
     margin: 0 20px;
-
     max-width: 400px;
-
 }
-
-/* Update your product card in checkout/details */
-.details-card {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Takes full screen on mobile */
-    background: white;
-}
-
-.details-img {
-    width: 100%;
-    max-height: 45vh; /* Image takes 45% of screen height */
-    object-fit: contain; /* Shows full image without cropping */
-    background: #f0f0f0;
-}
-
-.details-content {
-    padding: 20px;
-    flex-grow: 1; /* Pushes buttons to the bottom */
-    display: flex;
-    flex-direction: column;
-}
-
-.fixed-bottom-actions {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    padding: 15px;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
-    display: grid;
-    gap: 10px;
-}
-
-
 
 .search-icon {
-
     position: absolute;
-
     left: 12px;
-
     top: 50%;
-
     transform: translateY(-50%);
-
     color: #999;
-
 }
-
-
 
 #headerSearch {
-
     width: 100%;
-
     padding: 10px 15px 10px 35px;
-
     border-radius: 20px;
-
     border: 1px solid #ddd;
-
     outline: none;
-
     transition: 0.3s;
-
 }
-
-
 
 .nav-container-horizontal {
-
     display: flex;
-
     gap: 12px;
-
     align-items: center;
-
 }
-
-
 
 .nav-item-box {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     padding: 6px 12px;
-
     border-radius: 12px;
-
     text-decoration: none;
-
     color: #333;
-
     min-width: 70px;
-
     transition: transform 0.2s;
-
+    position: relative;
 }
-
-
 
 .nav-item-box i { font-size: 1.1rem; margin-bottom: 2px; }
-
 .nav-item-box p { font-size: 0.75rem; font-weight: 600; margin: 0; }
-
 .nav-item-box:hover { transform: translateY(-3px); }
 
-
-
 .bg-home { background-color: #FFF4A3; }
-
 .bg-sell { background-color: #FFC0C7; }
-
 .bg-items { background-color: #D9EEE1; }
-
-
-
-/* --- 3. Masonry Layout --- */
-
-.container {
-
-    max-width: 1200px;
-
-    margin: 20px auto;
-
-    padding: 0 15px;
-
-}
-
-
-
-.masonry-wrapper {
-
-    column-count: 2; /* Mobile Default */
-
-    column-gap: 1.2rem;
-
-}
-
-
-
-@media (min-width: 768px) { .masonry-wrapper { column-count: 3; } }
-
-@media (min-width: 1024px) { .masonry-wrapper { column-count: 4; } }
-
-
-
-/* --- 4. Product Cards --- */
-
-.masonry-wrapper {
-
-    display: block !important;
-
-    width: 100%;
-
-    min-height: 400px;
-
-    padding: 20px;
-
-}
-
-
-
-
-
-
-.product-card img {
-
-    width: 100%;
-
-    display: block;
-
-    height: auto; /* Keeps the masonry look based on image height */
-
-}
-
-
-
-.product-info {
-
-    padding: 12px;
-
-    text-align: left;
-
-    overflow: visible !important;
-
-}
-
-
-
-.sold-badge {
-
-    position: absolute;
-
-    top: 10px;
-
-    left: 10px;
-
-    background: #ff4d4d;
-
-    color: white;
-
-    padding: 4px 10px;
-
-    font-weight: bold;
-
-    border-radius: 5px;
-
-    z-index: 10;
-
-    font-size: 0.75rem;
-
-}
-
-
-
-/* --- 5. Modal & Auth --- */
-
-.modal-overlay {
-
-    display: none;
-
-    position: fixed;
-
-    top: 0; left: 0;
-
-    width: 100%; height: 100%;
-
-    background: rgba(0, 0, 0, 0.6);
-
-    backdrop-filter: blur(5px);
-
-    z-index: 2000;
-
-    justify-content: center;
-
-    align-items: center;
-
-}
-
-
-
-.modal-content {
-
-    background: white;
-
-    padding: 30px;
-
-    border-radius: 20px;
-
-    width: 90%;
-
-    max-width: 400px;
-
-    position: relative;
-
-    text-align: center;
-
-}
-
-
-
-.input-group {
-
-    position: relative;
-
-    margin-bottom: 15px;
-
-}
-
-
-
-.input-group i {
-
-    position: absolute;
-
-    left: 15px;
-
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    color: #aaa;
-
-}
-
-
-
-.input-group input {
-
-    width: 100%;
-
-    padding: 12px 12px 12px 40px;
-
-    border: 1px solid #ddd;
-
-    border-radius: 10px;
-
-    outline: none;
-
-}
-
-
-
-.auth-submit {
-
-    width: 100%;
-
-    padding: 12px;
-
-    background: #007bff;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 10px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-}
-
-
-
-#productGrid {
-
-    display: block !important; /* Overrides any accidental grid/flex conflicts */
-
-    min-height: 500px; 
-
-    width: 100%;
-
-    clear: both;
-
-    visibility: visible !important;
-
-    opacity: 1 !important;
-
-}
-
-
-
-/* Ensure the button container is visible */
-
-
-
-
-/* Force Buy Button Visibility */
-
-.main-btn {
-
-    display: block !important;
-
-    width: 100%;
-
-    background-color: #007bff !important; /* Blue */
-
-    color: white !important;
-
-    padding: 10px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    text-align: center;
-
-}
-
-
-
-/* Force Share/Telegram Buttons Visibility */
-
-.tg-btn {
-
-    background-color: #0088cc !important; /* Telegram Blue */
-
-    color: white !important;
-
-    padding: 8px;
-
-    border-radius: 8px;
-
-    text-decoration: none;
-
-    font-size: 14px;
-
-}
-
-
-
-.share-btn {
-
-    background-color: #eeeeee !important;
-
-    color: #333 !important;
-
-    border: 1px solid #ddd !important;
-
-    padding: 8px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-}
-
-
-
-.fav-filter-btn.active {
-
-    background-color: #ff4d4d !important;
-
-    color: white !important;
-
-    border-color: #ff4d4d !important;
-
-}
-
-
-
-.modal-footer a {
-
-    color: #007bff;
-
-    text-decoration: none;
-
-    font-weight: 600;
-
-}
-
-
-
-.modal-footer a:hover {
-
-    text-decoration: underline;
-
-}
-
-
-
-
-
-/* Status Tags */
-
-.status-tag {
-
-    position: absolute;
-
-    top: 10px;
-
-    left: 10px;
-
-    padding: 5px 12px;
-
-    border-radius: 20px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    text-transform: capitalize;
-
-    z-index: 10;
-
-    color: white;
-
-}
-
-
-
-.status-tag.pending { background: #ff9800; }   /* Orange */
-
-.status-tag.approved { background: #4caf50; }  /* Green */
-
-.status-tag.rejected { background: #f44336; }  /* Red */
-
-
-
-/* Responsive Dashboard Header */
-
-.dashboard-header {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    flex-wrap: wrap;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* --- Image & Heart Wrapper --- */
-
-.img-wrapper {
-
-    position: relative;
-
-    width: 100%;
-
-}
-
-
-
-.img-wrapper img {
-
-    width: 100%;
-
-    display: block;
-
-    object-fit: cover;
-
-}
-
-
-
-/* The Heart Button */
-
-.fav-btn {
-
-    position: absolute;
-
-    top: 12px;
-
-    right: 12px;
-
-    background: rgba(255, 255, 255, 0.9);
-
-    border: none;
-
-    border-radius: 50%;
-
-    width: 36px;
-
-    height: 36px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    cursor: pointer;
-
-    z-index: 10;
-
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-
-    transition: all 0.2s ease;
-
-}
-
-
-
-.fav-btn i {
-
-    font-size: 18px;
-
-    color: #ccc; /* Default grey */
-
-}
-
-
-
-.fav-btn.active i {
-
-    color: #ff4d4d; /* Red when hearted */
-
-}
-
-
-
-.fav-btn:hover {
-
-    transform: scale(1.15);
-
-    background: white;
-
-}
-
-
-
-/* --- Action Buttons (Call & Share) --- */
-
-.action-buttons {
-
-    padding: 15px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-
-}
-
-
-
-.main-btn {
-
-    background: #007bff;
-
-    color: white;
-
-    border: none;
-
-    padding: 12px;
-
-    border-radius: 8px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    width: 100%;
-
-}
-
-
-
-.tg-btn {
-
-    background: #28a745; /* Green for Call/Phone */
-
-    color: white !important;
-
-    padding: 10px;
-
-    border-radius: 8px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-}
-
-
-
-.share-btn {
-
-    background: #f8f9fa;
-
-    border: 1px solid #ddd;
-
-    color: #555;
-
-    padding: 10px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-}
-
-
-
-/* --- Category Filter Bar Customizations --- */
-
-.fav-filter-btn {
-
-    border: 1px solid #ff4d4d !important;
-
-    color: #ff4d4d !important;
-
-}
-
-
-
-.fav-filter-btn.active {
-
-    background: #ff4d4d !important;
-
-    color: white !important;
-
-}
-
-
-
-
-
-/* Styling for featured cards */
-
-.product-card.featured {
-
-    border: 2px solid #ffd700; /* Gold Border */
-
-    background: #fffdf0; /* Very light yellow tint */
-
-}
-
-
-
-/* Add a badge */
-
-.vip-badge {
-
-    position: absolute;
-
-    top: 10px;
-
-    left: 10px;
-
-    background: #ffd700;
-
-    color: #000;
-
-    padding: 2px 8px;
-
-    border-radius: 4px;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    z-index: 5;
-
-}
-
-
-
-.stat-card {
-
-    background: white;
-
-    padding: 20px;
-
-    border-radius: 12px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 15px;
-
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-
-}
-
-
-
-.stat-card i {
-
-    font-size: 24px;
-
-    color: #007bff;
-
-    background: #e7f1ff;
-
-    padding: 15px;
-
-    border-radius: 10px;
-
-}
-
-
-
-.stat-card h4 {
-
-    margin: 0;
-
-    font-size: 20px;
-
-    color: #333;
-
-}
-
-
-
-.stat-card p {
-
-    margin: 0;
-
-    font-size: 13px;
-
-    color: #777;
-
-}
-
-
-
-.golem-footer {
-
-    background: #333;
-
-    color: white;
-
-    padding: 40px 20px;
-
-    margin-top: 50px;
-
-}
-
-
-
-.footer-content {
-
-    display: flex;
-
-    justify-content: space-around;
-
-    flex-wrap: wrap;
-
-    gap: 20px;
-
-    max-width: 1200px;
-
-    margin: 0 auto;
-
-}
-
-
-
-.footer-section h4 { margin-bottom: 15px; color: #ffd700; }
-
-.footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; }
-
-.footer-section a:hover { color: white; }
-
-
-
-.social-links i { margin-right: 8px; }
-
-.copyright { text-align: center; margin-top: 30px; font-size: 12px; color: #888; border-top: 1px solid #444; padding-top: 20px; }
-
-
-
-
-
-.modal-overlay {
-
-    position: fixed;
-
-    top: 0; left: 0;
-
-    width: 100%; height: 100%;
-
-    background: rgba(0,0,0,0.7);
-
-    display: none; /* Controlled by JS */
-
-    align-items: center;
-
-    justify-content: center;
-
-    z-index: 1000;
-
-}
-
-
-
-.modal-content {
-
-    background: white;
-
-    padding: 30px;
-
-    border-radius: 15px;
-
-    width: 90%;
-
-    max-width: 450px;
-
-    position: relative;
-
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-
-}
-
-
-
-
-
-
-
-.tab-btn {
-
-    background: #f0f2f5;
-
-    border: none;
-
-    padding: 10px 20px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-weight: 600;
-
-    color: #666;
-
-    transition: 0.3s;
-
-}
-
-
-
-.tab-btn.active {
-
-    background: #007bff;
-
-    color: white;
-
-}
-
-
-
-.btn-approve { background: #28a745; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
-
-.btn-reject { background: #dc3545; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
-
-.btn-feature { background: #ffd700; color: #333; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
-
-
-
-
-.status-badge.pending { background: #fff3cd; color: #856404; }   /* Yellow */
-
-.status-badge.approved { background: #d4edda; color: #155724; }  /* Green */
-
-.status-badge.rejected { background: #f8d7da; color: #721c24; }  /* Red */
-
-
-
-.item-card.rejected { border: 2px solid #f5c6cb; opacity: 0.8; }
-
-
-
-/* Add this to your style.css */
-
-.filter-bar {
-
-    position: sticky;
-
-    top: 70px; /* Adjust based on your header height */
-
-    background: white;
-
-    z-index: 100;
-
-    padding: 10px 0;
-
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-
-}
-
-
-
-.product-detail-content {
-
-    max-width: 900px;
-
-    width: 95%;
-
-    padding: 0;
-
-    overflow: hidden;
-
-}
-
-
-
-.product-detail-layout {
-
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-}
-
-
-
-.detail-image-side {
-
-    position: relative;
-
-    background: #f8f9fa;
-
-}
-
-
-
-.detail-image-side img {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-
-}
-
-
-
-.detail-info-side {
-
-    padding: 30px;
-
-}
-
-
-
-.full-description {
-
-    color: #444;
-
-    line-height: 1.6;
-
-    margin-bottom: 25px;
-
-    white-space: pre-wrap; /* Preserves line breaks from your DB */
-
-}
-
-
-
-.contact-btn {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 10px;
-
-    padding: 12px;
-
-    border-radius: 8px;
-
-    text-decoration: none;
-
-    color: white;
-
-    margin-bottom: 10px;
-
-    font-weight: bold;
-
-}
-
-
-
-/* Stack the columns on mobile devices */
-
-@media (max-width: 768px) {
-
-    .product-detail-layout {
-
-        grid-template-columns: 1fr;
-
-    }
-
-}
-
-
-
-
-
-/* Container for the image to allow absolute positioning of the badge */
-
-.image-container {
-
-    position: relative;
-
-    width: 100%;
-
-    height: 200px;
-
-    overflow: hidden;
-
-}
-
-
-
-.image-container img {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-
-}
-
-
-
-/* The Status Badge (New/Used) */
-
-
-
-
-/* Specific colors based on status */
-
-.status-badge.new { background: #28a745; }
-
-.status-badge.used { background: #ffc107; color: #333; }
-
-
-
-/* Description Text */
-
-.product-description {
-
-    font-size: 13px;
-
-    color: #666;
-
-    margin: 8px 0;
-
-    line-height: 1.4;
-
-    height: 40px; /* Limits height to keep cards uniform */
-
-    overflow: hidden;
-
-}
-
-
-
-.product-actions {
-
-    display: flex;
-
-    gap: 10px;
-
-    margin-top: 15px;
-
-    align-items: center;
-
-}
-
-
-
-.buy-btn {
-
-    flex: 1; /* Makes the Buy button take up most of the space */
-
-    background: #007bff;
-
-    color: white;
-
-    border: none;
-
-    padding: 10px;
-
-    border-radius: 6px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-}
-
-
-
-.buy-btn:hover {
-
-    background: #0056b3;
-
-}
-
-
-
-.share-btn {
-
-    background: #24A1DE; /* Telegram Blue */
-
-    color: white;
-
-    width: 40px;
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 6px;
-
-    text-decoration: none;
-
-    transition: 0.2s;
-
-}
-
-
-
-.share-btn:hover {
-
-    opacity: 0.8;
-
-}
-
-
-
-.call-btn {
-
-    background: #28a745; /* Success Green */
-
-    color: white;
-
-    font-size: 1.1rem;
-
-    padding: 15px;
-
-    margin-bottom: 15px; /* Give it more space */
-
-}
-
-
-
-.call-btn:hover {
-
-    background: #218838;
-
-}
-
-
-
-/* Ensure the icons have space */
-
-.contact-btn i {
-
-    font-size: 1.2rem;
-
-}
-
-
-
-/* Force badges to the top layer */
-
-.status-badge {
-
-    position: absolute !important;
-
-    top: 12px !important;
-
-    left: 12px !important;
-
-    z-index: 999 !important; /* Higher than the image */
-
-    background-color: #333; /* Fallback color */
-
-    color: white !important;
-
-    padding: 5px 12px;
-
-    border-radius: 4px;
-
-    font-weight: bold;
-
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-
-}
-
-
-
-.status-badge.new { background-color: #28a745 !important; }
-
-.status-badge.used { background-color: #ffc107 !important; color: black !important; }
-
-
-
-
-
-
-
-/* Ensure the image container is the "anchor" */
-
-.image-container {
-
-    position: relative;
-
-    width: 100%;
-
-    height: 200px;
-
-}
-
-
-
-/* Force the badge to the very front layer */
-
-.status-badge {
-
-    position: absolute !important;
-
-    top: 10px !important;
-
-    left: 10px !important;
-
-    z-index: 10 !important; /* This puts it on top of the image */
-
-    background-color: #28a745; /* Default Green */
-
-    color: white !important;
-
-    padding: 5px 10px;
-
-    border-radius: 4px;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-
-}
-/* Force the Call Button to be visible when the ID is present */
-#callContact {
-    display: flex !important; /* Overrides any other 'none' settings */
-    visibility: visible !important;
-    opacity: 1 !important;
-    background-color: #28a745 !important; /* Success Green */
-    color: white !important;
-    padding: 15px !important;
-    border-radius: 10px !important;
-    margin-bottom: 10px;
-    text-decoration: none;
-    font-weight: bold;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-#callContact i {
-    display: inline-block !important;
-}
-
-.seller-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.contact-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: 0.2s ease;
-}
-
-.call-btn { background-color: #28a745; color: white; }
-.wa-btn { background-color: #25D366; color: white; }
-.tg-btn { background-color: #0088cc; color: white; }
-
-.contact-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-
-.modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.contact-btn {
-    text-decoration: none;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.call-btn { background-color: #28a745; } /* Green for calling */
-
-
-.share-tg-btn {
-    background-color: #34a853; /* Success Green or a different blue */
-    color: white;
-}
-
-.wa-btn {
-    background-color: #25D366; /* WhatsApp Green */
-}
-
-/* Make buttons look clickable and uniform */
-.contact-btn {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.contact-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.seller-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two buttons per row */
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.contact-btn {
-    padding: 12px 5px;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    text-align: center;
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.call-btn { background-color: #28a745; }
-.wa-btn { background-color: #25D366; }
-.tg-btn { background-color: #0088cc; }
-.share-tg-btn { background-color: #6c757d; } /* Grey for sharing */
-
-@media (max-width: 480px) {
-    .seller-actions {
-        grid-template-columns: 1fr; /* Stack buttons on small phones */
-    }
-}
-
-
-.seller-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two buttons per row */
-    gap: 12px;
-    margin-top: 25px;
-}
-
-.contact-btn {
-    padding: 14px 8px;
-    font-size: 0.95rem;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.call-btn { background: #28a745; color: white; }
-.wa-btn { background: #25D366; color: white; }
-.share-tg-btn { background: #0088cc; color: white; }
-.cart-btn { background: #f8f9fa; color: #333; border: 1px solid #ddd; }
-
-.contact-btn:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-}
-
-@media (max-width: 400px) {
-    .seller-actions {
-        grid-template-columns: 1fr; /* Stack on very small screens */
-    }
-}
 
 #cartBadge {
     position: absolute;
@@ -1567,29 +104,39 @@
     height: 20px;
     font-size: 11px;
     font-weight: bold;
-    display: flex; /* Script toggles display:none/flex */
+    display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid white;
 }
 
-
-:root {
-    --primary-color: #007bff;
-    --dark-text: #2d3436;
-    --light-gray: #f8f9fa;
-    --glass-bg: rgba(255, 255, 255, 0.95);
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+/* --- 3. Masonry Layout & Grid --- */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
 }
 
+.masonry-wrapper {
+    column-count: 2;
+    column-gap: 1.2rem;
+    padding: 20px;
+    display: block !important;
+}
+
+@media (min-width: 768px) { .masonry-wrapper { column-count: 3; } }
+@media (min-width: 1024px) { .masonry-wrapper { column-count: 4; } }
+
+/* --- 4. Product Cards --- */
 .product-card {
     background: var(--glass-bg);
-    border: none; /* Remove harsh borders */
     border-radius: 20px;
     overflow: hidden;
+    margin-bottom: 1.2rem;
+    break-inside: avoid;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: var(--card-shadow);
-    backdrop-filter: blur(10px);
+    position: relative;
 }
 
 .product-card:hover {
@@ -1597,30 +144,10 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f0f2f5;
-    color: var(--dark-text);
-}
-
-.product-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    letter-spacing: -0.5px;
-}
-
-.product-price {
-    color: var(--primary-color);
-    font-size: 1.25rem;
-    font-weight: 700;
-}
-
-
 .card-img-container {
-    overflow: hidden;
     position: relative;
     height: 250px;
+    overflow: hidden;
 }
 
 .card-img-container img {
@@ -1630,21 +157,99 @@ body {
     transition: transform 0.5s ease;
 }
 
-.product-card:hover img {
-    transform: scale(1.1); /* Subtle zoom */
+.product-card:hover img { transform: scale(1.1); }
+
+.product-info { padding: 15px; }
+
+.product-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
 }
 
-/* Add a sleek gradient overlay on the image */
-.card-img-container::after {
-    content: '';
-    position: absolute;
+.product-price {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* --- 5. Detail View (Fix for Hiding Buttons) --- */
+.details-card {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: white;
+    overflow: hidden;
+}
+
+.details-img-container {
+    width: 100%;
+    height: 45vh;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.details-img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.details-scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 100px 20px; /* bottom padding for sticky bar space */
+}
+
+.fixed-bottom-actions {
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 40%;
-    background: linear-gradient(transparent, rgba(0,0,0,0.05));
+    background: white;
+    padding: 15px;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    z-index: 100;
 }
 
+/* --- 6. Buttons & Badges --- */
+.contact-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    color: white;
+    transition: 0.2s;
+}
+
+.call-btn { background: var(--whatsapp-green); }
+.wa-btn { background: #128C7E; }
+.tg-btn { background: var(--telegram-blue); }
+.main-btn { background: var(--primary-color); width: 100%; border: none; cursor: pointer; }
+
+.status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10;
+    color: white;
+}
+
+.status-badge.new { background: #28a745; }
+.status-badge.used { background: #ffc107; color: #333; }
 
 .category-badge {
     display: inline-block;
@@ -1654,172 +259,30 @@ body {
     border-radius: 50px;
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 10px;
 }
 
-
-.image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.card-img-container:hover .image-overlay {
-    opacity: 1;
-}
-
-.view-btn {
-    background: white;
-    color: #333;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-}
-
-.card-img-container:hover .view-btn {
-    transform: translateY(0);
-}
-
-@keyframes shimmer {
-    0% { background-position: -468px 0; }
-    100% { background-position: 468px 0; }
-}
-
-.skeleton {
-    background: #f6f7f8;
-    background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-    background-repeat: no-repeat;
-    background-size: 800px 104px;
-    animation: shimmer 1.5s infinite linear;
-}
-.btn-wa {
-    background-color: #25D366;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.btn-tg {
-    background-color: #0088cc;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-weight: bold;
-}
-
-.btn-wa:hover, .btn-tg:hover {
-    opacity: 0.9;
-    color: white;
-}
-/* Modal Layout */
+/* --- 7. Modals --- */
 .modal-overlay {
+    display: none;
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex; justify-content: center; align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
     z-index: 2000;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
     background: white;
-    width: 90%; max-width: 900px;
-    border-radius: 15px;
-    position: relative;
-    overflow: hidden;
-}
-
-.modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 30px; }
-
-/* Buttons Styling */
-.modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-
-.btn-order {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    padding: 12px; border-radius: 8px; text-decoration: none;
-    font-weight: bold; color: white; transition: 0.3s;
-}
-
-.btn-whatsapp { background-color: #25D366; }
-.btn-telegram { background-color: #0088cc; }
-.btn-call { background-color: #333; }
-
-.btn-order:hover { opacity: 0.8; transform: translateY(-2px); }
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .modal-body { grid-template-columns: 1fr; }
-}
-
-/* Base style for all condition tags */
-.condition-tag, .condition-badge {
-    padding: 4px 12px;
+    padding: 30px;
     border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    display: inline-block;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* Color logic based on status */
-.cond-new {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.cond-used-like-new {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-.cond-used-fair {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.cond-refurbished {
-    background-color: #cce5ff;
-    color: #004085;
-    border: 1px solid #b8daff;
-}
-
-/* Default fallback */
-.cond-default {
-    background-color: #e9ecef;
-    color: #495057;
-}
-
-
-/* Toast Notification Styling */
+/* --- 8. Toast Notifications --- */
 .toast-container {
     position: fixed;
     bottom: 20px;
@@ -1843,6 +306,25 @@ body {
     bottom: 40px;
 }
 
-.toast-icon {
-    color: #25D366; /* Green for success */
+.toast-icon { color: var(--whatsapp-green); }
+
+/* --- 9. Animations --- */
+@keyframes shimmer {
+    0% { background-position: -468px 0; }
+    100% { background-position: 468px 0; }
+}
+
+.skeleton {
+    background: #f6f7f8;
+    background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+    animation: shimmer 1.5s infinite linear;
+}
+
+/* --- 10. Responsive Tweaks --- */
+@media (max-width: 480px) {
+    .fixed-bottom-actions {
+        grid-template-columns: 1fr; /* Stack buttons on very small phones */
+    }
 }
