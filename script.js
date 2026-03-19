@@ -313,3 +313,30 @@ async function updateUIForUser() {
         if (adminLink) adminLink.style.display = 'none';
     }
 }
+
+
+// Toggle Support Modal
+window.toggleSupportModal = function() {
+    const modal = document.getElementById('supportModal');
+    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+};
+
+// Handle Support Submission
+window.handleSupportSubmit = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('supportEmail').value;
+    const subject = document.getElementById('supportSubject').value;
+    const msg = document.getElementById('supportMessage').value;
+
+    const { error } = await _supabase
+        .from('support_tickets')
+        .insert([{ user_email: email, subject: subject, message: msg }]);
+
+    if (error) {
+        alert("Error sending message: " + error.message);
+    } else {
+        alert("Message sent! Golem Admin will check it soon.");
+        e.target.reset();
+        toggleSupportModal();
+    }
+};
