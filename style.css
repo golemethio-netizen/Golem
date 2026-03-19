@@ -376,3 +376,111 @@ body {
     justify-content: center;
     gap: 8px;
 }
+
+
+/* The background dimming */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px); /* Modern blur effect */
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+/* The actual "Paper" content */
+#productModal .modal-content {
+    background: white;
+    width: 100%;
+    max-width: 450px; /* Limits the width so it's not full screen */
+    max-height: 90vh;
+    border-radius: 20px;
+    position: relative;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+
+/* Make the product image look like a hero section */
+.modal-img-wrapper {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    position: relative;
+}
+
+#modalProductImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #28a745;
+    margin: 10px 0;
+}
+
+.modal-description {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.modal-footer-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two side-by-side */
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.contact-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: transform 0.2s;
+}
+
+.contact-btn:active {
+    transform: scale(0.95);
+}
+
+/* Specific Colors */
+#callContact {
+    background-color: #007bff;
+    color: white;
+}
+
+#telegramOrder {
+    background-color: #229ED9;
+    color: white;
+}
+
+#whatsappOrder {
+    background-color: #25D366;
+    color: white;
+    grid-column: span 2; /* Make WhatsApp full width at the bottom */
+}
