@@ -52,6 +52,7 @@ function renderProducts(products) {
             const safeData = encodeURIComponent(JSON.stringify(p));
             const isSold = p.status === 'sold';
             const condition = p.status_condition || 'New';
+             const condClass = getConditionClass(condition);
             
             // 1. Verified Seller Logic
             const verifiedNames = ['Crown Time', 'Crown Time Furniture', 'Golem Admin'];
