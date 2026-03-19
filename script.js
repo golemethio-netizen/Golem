@@ -247,3 +247,15 @@ window.onclick = (e) => {
         e.target.style.display = 'none';
     }
 };
+
+function getConditionClass(condition) {
+    if (!condition) return 'cond-default';
+    const c = condition.toLowerCase();
+    
+    if (c.includes('new') && !c.includes('used')) return 'cond-new';
+    if (c.includes('like new')) return 'cond-used-like-new';
+    if (c.includes('fair') || c.includes('used')) return 'cond-used-fair';
+    if (c.includes('refurbished')) return 'cond-refurbished';
+    
+    return 'cond-default';
+}
