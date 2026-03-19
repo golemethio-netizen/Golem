@@ -1,61 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
-    <link rel="icon" href="data:,">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golem Marketplace | Buy & Sell</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header class="golem-header">
-    <div class="logo">GOLEM</div>
+    <header class="golem-header">
+        <div class="logo">GOLEM</div>
 
-    <div class="search-wrapper">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="headerSearch" placeholder="Search furniture...">
-    </div>
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="headerSearch" placeholder="Search furniture...">
+        </div>
 
-    <div class="nav-container-horizontal">
-        <a href="index.html" class="nav-item-box bg-home">
-            <i class="fas fa-home"></i>
-            <p>Home</p>
-        </a>
+        <div class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box bg-home">
+                <i class="fas fa-home"></i>
+                <p>Home</p>
+            </a>
 
-        <a href="#" onclick="checkAuthToSell()" class="nav-item-box bg-sell">
-            <i class="fas fa-plus-circle"></i>
-            <p>Sell</p>
-        </a>
+            <a href="#" onclick="checkAuthToSell()" class="nav-item-box bg-sell">
+                <i class="fas fa-plus-circle"></i>
+                <p>Sell</p>
+            </a>
 
             <a href="my-items.html" class="nav-item-box bg-items">
                 <i class="fas fa-box-open"></i>
                 <p>My Items</p>
             </a>
-     
 
-        
+            <a href="saved.html" class="nav-item-box bg-items">
+                <i class="fas fa-heart"></i>
+                <p>Saved</p>
+                <span id="cartBadge" style="display: none;">0</span>
+            </a>
 
-        <a href="saved.html" class="nav-item-box bg-items">
-            <i class="fas fa-heart"></i>
-            <p>Saved</p>
-            <span id="cartBadge" style="display: none;">0</span>
-        </a>
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none; background: #333; color: white;">
+                <i class="fas fa-user-shield"></i>
+                <p>Admin</p>
+            </a>
 
-        <button class="nav-item-box signin-btn" onclick="toggleModal()" style="border: none; cursor: pointer; background-color: #eee;">
-            <i class="fas fa-user"></i>
-            <p>Sign In</p>
-        </button>
-    </div>
-</header>
-
-
-
-
-    
+            <button class="nav-item-box signin-btn" onclick="toggleModal()" style="border: none; cursor: pointer; background-color: #eee;">
+                <i class="fas fa-user"></i>
+                <p>Sign In</p>
+            </button>
+        </div>
+    </header>
 
     <section class="filter-controls">
         <div class="sort-container">
@@ -75,7 +71,9 @@
 
     <main class="container">
         <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
+            <div class="loading-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading items...
+            </div>
         </div>
 
         <div class="invite-container">
@@ -83,92 +81,93 @@
             <h3>Help Golem Grow!</h3>
             <p>Know someone selling something? Invite them to Golem.</p>
             <div class="invite-btns">
-                <button onclick="shareToTelegram()" class="tg-btn" style="background:#0088cc;"><i class="fab fa-telegram-plane"></i> Telegram</button>
-                <button onclick="shareToWhatsApp()" class="tg-btn" style="background:#25d366;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                <button onclick="shareToTelegram()" class="tg-btn" style="background:#0088cc;">
+                    <i class="fab fa-telegram-plane"></i> Telegram
+                </button>
+                <button onclick="shareToWhatsApp()" class="tg-btn" style="background:#25d366;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
             </div>
         </div>
     </main>
 
-  <div id="authModal" class="modal-overlay" onclick="if(event.target == this) toggleModal()">
-    <div class="modal-content">
-        <button type="button" onclick="toggleModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #888;">&times;</button>
-        
-        <h2 id="modalTitle" style="margin-bottom: 20px;">Welcome Back</h2>
-        
-        <form onsubmit="handleAuth(event)">
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="authEmail" placeholder="Email Address" required>
-            </div>
+    <div id="authModal" class="modal-overlay" onclick="if(event.target == this) toggleModal()">
+        <div class="modal-content">
+            <button type="button" onclick="toggleModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #888;">&times;</button>
             
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="authPassword" placeholder="Password" required>
-            </div>
-
-            <div id="registerFields" style="display: none;">
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Welcome Back</h2>
+            
+            <form onsubmit="handleAuth(event)">
                 <div class="input-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="regName" placeholder="Full Name">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="authEmail" placeholder="Email Address" required>
                 </div>
+                
                 <div class="input-group">
-                    <i class="fas fa-phone"></i>
-                    <input type="text" id="regPhone" placeholder="Phone Number">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="authPassword" placeholder="Password" required>
                 </div>
+
+                <div id="registerFields" style="display: none;">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regName" placeholder="Full Name">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="text" id="regPhone" placeholder="Phone Number">
+                    </div>
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
+            </form>
+
+            <div class="modal-footer" style="margin-top: 20px; font-size: 0.9rem;">
+                <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                <a href="#" onclick="toggleModal()" style="color: #666; font-weight: 400;">Cancel and return to Home</a>
             </div>
-
-            <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
-        </form>
-
-        <div class="modal-footer" style="margin-top: 20px; font-size: 0.9rem;">
-            <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
-            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
-            <a href="#" onclick="toggleModal()" style="color: #666; font-weight: 400;">Cancel and return to Home</a>
         </div>
-    </div>
-</div>
-
-    
     </div>
 
     <div id="productModal" class="modal-overlay" onclick="if(event.target == this) closeProductModal()">
-    <div class="modal-content">
-        <button onclick="closeProductModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; z-index: 10;">&times;</button>
-        
-        <div class="modal-body">
-            <div class="details-img-container">
-                <img id="modalProductImg" src="" alt="Product Image">
-            </div>
-
-            <div class="details-scrollable-content">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <span id="modalCondition" class="condition-badge"></span>
+        <div class="modal-content">
+            <button onclick="closeProductModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; z-index: 10;">&times;</button>
+            
+            <div class="modal-body">
+                <div class="details-img-container">
+                    <img id="modalProductImg" src="" alt="Product Image">
                 </div>
-                
-                <h2 id="modalProductTitle" style="margin-bottom: 10px; font-size: 1.5rem;"></h2>
-                <h3 id="modalProductPrice" style="color: var(--primary-color); margin-bottom: 20px;"></h3>
-                
-                <p style="font-weight: 600; margin-bottom: 5px;">Description</p>
-                <p id="modalProductDesc" style="color: #666; font-size: 0.95rem; margin-bottom: 30px; white-space: pre-wrap;"></p>
 
-                <div class="fixed-bottom-actions">
-                    <a id="callContact" href="#" class="contact-btn call-btn">
-                        <i class="fas fa-phone"></i> Call
-                    </a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn wa-btn">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn tg-btn">
-                        <i class="fab fa-telegram-plane"></i> Telegram
-                    </a>
-                    <button class="contact-btn main-btn" onclick="addToCartFromModal()">
-                        <i class="fas fa-heart"></i> Save to List
-                    </button>
+                <div class="details-scrollable-content">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <span id="modalCondition" class="condition-badge"></span>
+                    </div>
+                    
+                    <h2 id="modalProductTitle" style="margin-bottom: 10px; font-size: 1.5rem;"></h2>
+                    <h3 id="modalProductPrice" style="color: var(--primary-color); margin-bottom: 20px;"></h3>
+                    
+                    <p style="font-weight: 600; margin-bottom: 5px;">Description</p>
+                    <p id="modalProductDesc" style="color: #666; font-size: 0.95rem; margin-bottom: 30px; white-space: pre-wrap;"></p>
+
+                    <div class="fixed-bottom-actions">
+                        <a id="callContact" href="#" class="contact-btn call-btn">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a id="whatsappOrder" href="#" target="_blank" class="contact-btn wa-btn">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a id="telegramOrder" href="#" target="_blank" class="contact-btn tg-btn">
+                            <i class="fab fa-telegram-plane"></i> Telegram
+                        </a>
+                        <button class="contact-btn main-btn" onclick="addToCartFromModal()">
+                            <i class="fas fa-heart"></i> Save to List
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
