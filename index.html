@@ -37,7 +37,10 @@
                 <p>Saved</p>
                 <span id="cartBadge">0</span>
             </a>
-            <button class="signin-btn" onclick="toggleModal()">Sign In</button>
+            // Example of how the button should look inside your map/template literal
+<button onclick="window.addToCart('${item.id}', '${item.name}', ${item.price}, '${item.image}')" class="cart-btn">
+    <i class="fas fa-heart"></i> Save Item
+</button>
         </div>
     </header>
 
