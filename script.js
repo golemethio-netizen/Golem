@@ -264,3 +264,7 @@ window.checkAuthToSell = async function() {
         window.toggleModal(); 
     }
 };
+
+
+// This makes the function accessible to the HTML button
+window.checkAuthToSell = checkAuthToSell;
