@@ -268,3 +268,29 @@ window.checkAuthToSell = async function() {
 
 // This makes the function accessible to the HTML button
 window.checkAuthToSell = checkAuthToSell;
+
+
+
+window.addToCart = function(id, name, price, image) {
+    // 1. Get existing cart or create empty array
+    let cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+
+    // 2. Check if item is already in cart to avoid duplicates
+    const exists = cart.find(item => item.id === id);
+    if (exists) {
+        alert("This item is already in your saved list!");
+        return;
+    }
+
+    // 3. Add new item
+    const newItem = { id, name, price, image };
+    cart.push(newItem);
+
+    // 4. Save back to localStorage
+    localStorage.setItem('golem_cart', JSON.stringify(cart));
+
+    alert("❤️ Item saved to your list!");
+    
+    // Optional: Redirect to cart immediately
+    // window.location.href = 'cart.html';
+};
