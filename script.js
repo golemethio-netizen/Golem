@@ -42,67 +42,70 @@ async function fetchProducts(category = 'All') {
 }
 
 function renderProducts(products) {
-    // Looks for both common IDs to prevent "Loading..." hang
     const grid = document.getElementById('productGrid') || document.getElementById('productsContainer');
     if (!grid) return;
 
     if (products.length === 0) {
-        grid.innerHTML = `
-            <div style="text-align:center; grid-column: 1/-1; padding: 60px 20px;">
-                <p style="color: #777;">No products found in this category.</p>
-            </div>`;
+        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found.</div>`;
     } else {
         grid.innerHTML = products.map(p => {
             const safeData = encodeURIComponent(JSON.stringify(p));
             const isSold = p.status === 'sold';
             const condition = p.status_condition || 'New';
+            
+            // 1. Dynamic Condition Colors
             const conditionColors = {
-    'New': { bg: '#d4edda', text: '#155724' },      // Green
-    'Used - Like New': { bg: '#fff3cd', text: '#856404' }, // Yellow
-    'Used - Fair': { bg: '#f8d7da', text: '#721c24' },     // Red
-    'Refurbished': { bg: '#cce5ff', text: '#004085' }      // Blue
-};
-            
+                'New': { bg: '#d4edda', text: '#155724' },      // Green
+                'Used - Like New': { bg: '#fff3cd', text: '#856404' }, // Yellow
+                'Used - Fair': { bg: '#f8d7da', text: '#721c24' },     // Red
+                'Refurbished': { bg: '#cce5ff', text: '#004085' }      // Blue
+            };
             const style = conditionColors[condition] || { bg: '#e9ecef', text: '#495057' };
-            // Inside renderProducts -> products.map(p => { ... })
-return `
-<div class="product-card ${isSold ? 'is-sold' : ''}">
-    <div class="img-wrapper">
-        ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-        <img src="${p.image}" alt="${p.name}" loading="lazy">
-    </div>
-    <div class="product-info">
-        <div class="badge-row" style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
-            <span class="category-tag">${p.category || 'General'}</span>
-            <span class="condition-tag" style="background:${style.bg}; color:${style.text}; padding:3px 10px; border-radius:12px; font-size:0.7rem; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">
-                ${condition}
-            </span>
-        </div>
-        
-        <h3 style="margin-bottom:5px;">${p.name}</h3>
-        
-        <div class="seller-info" style="display:flex; align-items:center; gap:5px; margin-bottom:10px; color:#666; font-size:0.85rem;">
-            <i class="fas fa-user-circle"></i>
-            <span>${p.seller_name || 'Verified Seller'}</span>
-        </div>
 
-        <p class="price" style="font-size:1.2rem; font-weight:bold; color:#28a745;">
-            ${p.price?.toLocaleString()} <small style="font-size:0.7rem; color:#333;">ETB</small>
-        </p>
+            // 2. Contact Shortcuts
+            const phone = p.phone_number ? p.phone_number.replace(/\D/g, '') : '';
+            const tg = p.telegram_username || p.seller_telegram || '';
 
-        <div class="action-buttons" style="margin-top:15px;">
-            ${isSold ? 
-                `<button class="main-btn" disabled style="background:#ccc; width:100%; padding:10px; border-radius:8px;">Sold Out</button>` : 
-                `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; background:#007bff; color:white; border:none; cursor:pointer; font-weight:bold;">🛒 View Details</button>`
-            }
-        </div>
-    </div>
-</div>`;
-            
+            return `
+                <div class="product-card ${isSold ? 'is-sold' : ''}">
+                    <div class="img-wrapper">
+                        ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="badge-row" style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
+                            <span class="category-tag">${p.category || 'General'}</span>
+                            <span class="condition-tag" style="background:${style.bg}; color:${style.text}; padding:3px 10px; border-radius:12px; font-size:0.7rem; font-weight:bold; text-transform:uppercase;">
+                                ${condition}
+                            </span>
+                        </div>
+                        
+                        <h3>${p.name}</h3>
+                        
+                        <div class="seller-line" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#666; font-size:0.85rem;">
+                            <span><i class="fas fa-user-circle"></i> ${p.seller_name || 'Verified'}</span>
+                            <span style="font-weight:bold; color:#28a745;">${p.price?.toLocaleString()} ETB</span>
+                        </div>
+
+                        <div class="quick-contact-bar" style="display:flex; gap:5px; margin-bottom:15px; border-top:1px solid #f0f0f0; padding-top:10px;">
+                            ${phone ? `<a href="tel:${phone}" class="mini-contact" title="Call Seller" style="flex:1; text-align:center; padding:5px; background:#f8f9fa; border-radius:5px; color:#007bff;"><i class="fas fa-phone"></i></a>` : ''}
+                            ${phone ? `<a href="https://wa.me/${phone}" target="_blank" class="mini-contact" title="WhatsApp" style="flex:1; text-align:center; padding:5px; background:#f8f9fa; border-radius:5px; color:#25d366;"><i class="fab fa-whatsapp"></i></a>` : ''}
+                            ${tg ? `<a href="https://t.me/${tg.replace('@','')}" target="_blank" class="mini-contact" title="Telegram" style="flex:1; text-align:center; padding:5px; background:#f8f9fa; border-radius:5px; color:#0088cc;"><i class="fab fa-telegram"></i></a>` : ''}
+                        </div>
+
+                        <div class="action-buttons">
+                            ${isSold ? 
+                                `<button class="main-btn" disabled style="background:#ccc; width:100%; border:none; padding:10px; border-radius:8px;">Sold Out</button>` : 
+                                `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; background:#007bff; color:white; border:none; cursor:pointer; font-weight:bold;">🛒 View Full Details</button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
         }).join('');
     }
 
-    // Hide Loading Message
     const loader = document.querySelector('.loading-spinner') || document.getElementById('loadingMessage');
     if (loader) loader.style.display = 'none';
 }
