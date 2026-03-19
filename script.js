@@ -55,34 +55,50 @@ function renderProducts(products) {
         grid.innerHTML = products.map(p => {
             const safeData = encodeURIComponent(JSON.stringify(p));
             const isSold = p.status === 'sold';
+            const condition = p.status_condition || 'New';
+            const conditionColors = {
+    'New': { bg: '#d4edda', text: '#155724' },      // Green
+    'Used - Like New': { bg: '#fff3cd', text: '#856404' }, // Yellow
+    'Used - Fair': { bg: '#f8d7da', text: '#721c24' },     // Red
+    'Refurbished': { bg: '#cce5ff', text: '#004085' }      // Blue
+};
             
+            const style = conditionColors[condition] || { bg: '#e9ecef', text: '#495057' };
             // Inside renderProducts -> products.map(p => { ... })
 return `
-    <div class="product-card ${isSold ? 'is-sold' : ''}">
-        <div class="img-wrapper">
-            ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-            <img src="${p.image}" alt="${p.name}" loading="lazy">
+<div class="product-card ${isSold ? 'is-sold' : ''}">
+    <div class="img-wrapper">
+        ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+    </div>
+    <div class="product-info">
+        <div class="badge-row" style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
+            <span class="category-tag">${p.category || 'General'}</span>
+            <span class="condition-tag" style="background:${style.bg}; color:${style.text}; padding:3px 10px; border-radius:12px; font-size:0.7rem; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">
+                ${condition}
+            </span>
         </div>
-        <div class="product-info">
-            <div class="badge-row" style="display:flex; gap:5px; margin-bottom:8px;">
-                <span class="category-tag">${p.category || 'General'}</span>
-                <span class="condition-tag" style="background:#e9ecef; color:#495057; padding:2px 8px; border-radius:4px; font-size:0.75rem;">
-                    ${p.status_condition || 'New'}
-                </span>
-            </div>
-            <h3>${p.name}</h3>
-            <p class="seller-preview" style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">
-                <i class="fas fa-user"></i> ${p.seller_name || 'Verified Seller'}
-            </p>
-            <p class="price">${p.price?.toLocaleString()} <small>ETB</small></p>
-            <div class="action-buttons">
-                ${isSold ? 
-                    `<button class="main-btn" disabled style="background:#ccc;">Sold</button>` : 
-                    `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')">🛒 View Details</button>`
-                }
-            </div>
+        
+        <h3 style="margin-bottom:5px;">${p.name}</h3>
+        
+        <div class="seller-info" style="display:flex; align-items:center; gap:5px; margin-bottom:10px; color:#666; font-size:0.85rem;">
+            <i class="fas fa-user-circle"></i>
+            <span>${p.seller_name || 'Verified Seller'}</span>
         </div>
-    </div>`;
+
+        <p class="price" style="font-size:1.2rem; font-weight:bold; color:#28a745;">
+            ${p.price?.toLocaleString()} <small style="font-size:0.7rem; color:#333;">ETB</small>
+        </p>
+
+        <div class="action-buttons" style="margin-top:15px;">
+            ${isSold ? 
+                `<button class="main-btn" disabled style="background:#ccc; width:100%; padding:10px; border-radius:8px;">Sold Out</button>` : 
+                `<button class="main-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; background:#007bff; color:white; border:none; cursor:pointer; font-weight:bold;">🛒 View Details</button>`
+            }
+        </div>
+    </div>
+</div>`;
+            
         }).join('');
     }
 
