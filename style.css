@@ -629,3 +629,31 @@ body {
     border: 1px solid #ddd;
     color: #555;
 }
+
+/* --- Mobile Responsive Fix --- */
+@media (max-width: 600px) {
+    .masonry-wrapper {
+        column-count: 1 !important; /* Force items to be full width */
+        padding: 10px;
+    }
+
+    .product-card {
+        margin-bottom: 20px;
+        width: 100%; /* Ensure card doesn't shrink */
+    }
+
+    .card-img-container {
+        height: 300px; /* Give the image more breathing room on mobile */
+    }
+
+    .golem-header {
+        flex-wrap: wrap; /* Allows search/nav to stack if needed */
+        padding: 10px 3%;
+    }
+
+    .search-wrapper {
+        order: 3; /* Moves search below logo/nav on small screens */
+        margin: 10px 0 0 0;
+        max-width: 100%;
+    }
+}
