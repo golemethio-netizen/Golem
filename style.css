@@ -96,266 +96,6 @@ body {
 #cartBadge {
     position: absolute;
     top: -5px;
-    right: -5px;
-    background: #ff4757;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 11px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
-}
-
-/* --- 3. Fixed 3-Column Grid --- */
-.container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 10px;
-}
-
-.masonry-wrapper {
-    display: grid !important; /* Forces Grid mode */
-    grid-template-columns: repeat(3, 1fr); /* FORCES 3 COLUMNS */
-    gap: 12px; /* Gap between furniture items */
-    padding: 10px 0;
-}
-
-/* Adjustments for Desktop (Larger screens) */
-@media (min-width: 1024px) {
-    .masonry-wrapper {
-        grid-template-columns: repeat(4, 1fr); /* 4 columns on big screens */
-        gap: 20px;
-    }
-}
-
-/* Responsive: Still 3 columns on mobile? (WARNING: Might be small) 
-   If you want 3 columns even on mobile, use this: */
-@media (max-width: 600px) {
-    .masonry-wrapper {
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 8px; /* Tighten gap for small screens */
-        padding: 5px;
-    }
-    
-    .product-info {
-        padding: 8px; /* Smaller padding so text fits */
-    }
-    
-    .product-title {
-        font-size: 0.8rem; /* Smaller font for 3-column mobile */
-    }
-    
-    .product-price {
-        font-size: 0.9rem;
-    }
-
-    .card-img-container {
-        height: 120px; /* Shorter height so they don't look like tall towers */
-    }
-}
-
-/* --- 4. Product Cards --- */
-.product-card {
-    background: var(--glass-bg);
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 1.2rem;
-    break-inside: avoid;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: var(--card-shadow);
-    position: relative;
-}
-
-.product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.card-img-container {
-    position: relative;
-    height: 250px;
-    overflow: hidden;
-}
-
-.card-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.product-card:hover img { transform: scale(1.1); }
-
-.product-info { padding: 15px; }
-
-.product-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-}
-
-.product-price {
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    font-weight: 700;
-}
-
-/* --- 5. Detail View (Fix for Hiding Buttons) --- */
-.details-card {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background: white;
-    overflow: hidden;
-}
-
-.details-img-container {
-    width: 100%;
-    height: 45vh;
-    background: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-
-.details-scrollable-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 20px 100px 20px; /* bottom padding for sticky bar space */
-}
-
-.fixed-bottom-actions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: white;
-    padding: 15px;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    z-index: 100;
-}
-
-/* --- 6. Buttons & Badges --- */
-
-
-.call-btn { background: var(--whatsapp-green); }
-.wa-btn { background: #128C7E; }
-.tg-btn { background: var(--telegram-blue); }
-.main-btn { background: var(--primary-color); width: 100%; border: none; cursor: pointer; }
-
-.status-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 10;
-    color: white;
-}
-
-.status-badge.new { background: #28a745; }
-.status-badge.used { background: #ffc107; color: #333; }
-
-.category-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    background: #e7f1ff;
-    color: #007bff;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-/* --- 7. Modals --- */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-/* --- 8. Toast Notifications --- */
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 12px 25px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    z-index: 10000;
-    opacity: 0;
-    transition: opacity 0.3s, bottom 0.3s;
-}
-
-.toast-container.show {
-    opacity: 1;
-    bottom: 40px;
-}
-
-.toast-icon { color: var(--whatsapp-green); }
-
-/* --- 9. Animations --- */
-@keyframes shimmer {
-    0% { background-position: -468px 0; }
-    100% { background-position: 468px 0; }
-}
-
-.skeleton {
-    background: #f6f7f8;
-    background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-    background-repeat: no-repeat;
-    background-size: 800px 104px;
-    animation: shimmer 1.5s infinite linear;
-}
-
-/* --- 10. Responsive Tweaks --- */
-@media (max-width: 480px) {
-    .fixed-bottom-actions {
-        grid-template-columns: 1fr; /* Stack buttons on very small phones */
-    }
-}
-
-.signin-btn {
-    transition: background 0.3s ease;
-}
-
-.signin-btn:hover {
-    background-color: #ddd !important;
-}
-
-/* Ensure the badge is visible on the Saved icon */
-#cartBadge {
-    position: absolute;
-    top: -5px;
     right: 5px;
     background: #ff4757;
     color: white;
@@ -365,77 +105,99 @@ body {
     border: 2px solid white;
 }
 
+/* --- 3. Main Grid Layout --- */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
 
+/* Default 3 Columns for Mobile/Tablets */
+.masonry-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px;
+    padding: 10px 0;
+}
 
-/* Center the modal and limit its size */
-#productModal .modal-content {
-    max-width: 500px;
-    width: 90%;
-    max-height: 85vh;
+/* 4 Columns for Desktop */
+@media (min-width: 1024px) {
+    .masonry-wrapper {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
+
+/* --- 4. Product Cards --- */
+.product-card {
+    background: var(--glass-bg);
     border-radius: 15px;
-    overflow-y: auto;
-    margin: 50px auto;
-    padding: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     position: relative;
 }
 
-/* Make images fit nicely */
-.details-img-container img {
+.card-img-container {
+    position: relative;
     width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 15px;
+    height: 200px; /* Base height */
+    overflow: hidden;
 }
 
-/* Grid for contact buttons */
-.fixed-bottom-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Secret fix for "half-images" */
+    display: block;
+    transition: transform 0.5s ease;
 }
 
-.contact-btn {
-    padding: 12px;
-    text-align: center;
-    border-radius: 8px;
-    text-decoration: none;
+.product-card:hover img { transform: scale(1.1); }
+
+.product-info { padding: 12px; flex-grow: 1; }
+
+.product-title {
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    /* Forces 3-column items to stay the same height */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
+.product-price {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
 
-/* The background dimming */
+/* --- 5. Modals (Quick View) --- */
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px); /* Modern blur effect */
+    backdrop-filter: blur(4px);
     z-index: 2000;
     justify-content: center;
     align-items: center;
-    padding: 15px;
 }
 
-/* The actual "Paper" content */
 #productModal .modal-content {
     background: white;
-    width: 100%;
-    max-width: 450px; /* Limits the width so it's not full screen */
+    width: 90%;
+    max-width: 450px;
     max-height: 90vh;
     border-radius: 20px;
-    position: relative;
     overflow-y: auto;
+    padding: 20px;
     animation: slideUp 0.3s ease-out;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
 @keyframes slideUp {
@@ -443,181 +205,19 @@ body {
     to { transform: translateY(0); opacity: 1; }
 }
 
-
-/* Make the product image look like a hero section */
 .modal-img-wrapper {
     width: 100%;
-    height: 300px;
-    overflow: hidden;
-    position: relative;
-}
-
-#modalProductImg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.modal-price {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #28a745;
-    margin: 10px 0;
-}
-
-.modal-description {
-    color: #666;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 25px;
-}
-
-.modal-footer-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two side-by-side */
-    gap: 12px;
-    margin-top: 15px;
-}
-
-.contact-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 14px;
+    height: 280px;
     border-radius: 12px;
-    text-decoration: none;
-    font-weight: 700;
-    transition: transform 0.2s;
-}
-
-.contact-btn:active {
-    transform: scale(0.95);
-}
-
-/* Specific Colors */
-#callContact {
-    background-color: #007bff;
-    color: white;
-}
-
-#telegramOrder {
-    background-color: #229ED9;
-    color: white;
-}
-
-#whatsappOrder {
-    background-color: #25D366;
-    color: white;
-    grid-column: span 2; /* Make WhatsApp full width at the bottom */
-}
-
-
-/* Styles specifically for the Saved Items Grid */
-#savedGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px 0;
-}
-
-#savedGrid .product-card {
-    background: white;
-    border-radius: 15px;
     overflow: hidden;
-    transition: transform 0.2s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
 }
 
-#savedGrid .product-card:hover {
-    transform: translateY(-5px);
-}
+.modal-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
-/* This is the magic fix for the "unattractive" images */
-#savedGrid .product-card img {
-    width: 100%;
-    height: 200px; /* Fixed height for uniformity */
-    object-fit: cover; /* Crops the image perfectly without stretching */
-    display: block;
-}
-
-#savedGrid .product-info {
-    padding: 15px;
-    flex-grow: 1;
-}
-
-#savedGrid .product-info h3 {
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-#savedGrid .price {
-    color: #28a745;
-    font-weight: 700;
-    font-size: 1.2rem;
-}
-
-/* Style for the Remove Button */
-.remove-btn {
-    background: #fff5f5;
-    color: #eb5757;
-    border: none;
-    padding: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border-top: 1px solid #ffebeb;
-    transition: background 0.2s;
-}
-
-.remove-btn:hover {
-    background: #ffebeb;
-}
-
-
-.filter-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-}
-
-.filter-btn:hover {
-    opacity: 0.9;
-    transform: scale(1.02);
-}
-
-.filter-bar {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto; /* Allows horizontal swiping on mobile */
-    padding: 10px 5%;
-    scrollbar-width: none; /* Hides scrollbar on Firefox */
-}
-
-.filter-bar::-webkit-scrollbar {
-    display: none; /* Hides scrollbar on Chrome/Safari */
-}
-
-.filter-btn {
-    white-space: nowrap; /* Prevents text from breaking into two lines */
-    flex-shrink: 0;
-}
 .modal-footer-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns */
-    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
     margin-top: 20px;
 }
 
@@ -627,148 +227,86 @@ body {
     border-radius: 10px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 0.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: none;
+    color: white;
+}
+
+#callContact { background: var(--primary-color); }
+#telegramOrder { background: var(--telegram-blue); }
+#whatsappOrder { background: var(--whatsapp-green); grid-column: span 2; }
+
+/* --- 6. Filters & Badges --- */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 5%;
+    scrollbar-width: none;
+}
+
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    white-space: nowrap;
     cursor: pointer;
-    transition: all 0.2s;
-}
-
-/* Full-width buttons for secondary actions */
-.full-width-btn {
-    grid-column: span 2;
-    background: #f0f0f0;
-    color: #333;
-}
-
-.save-btn {
-    background: #ff4757 !important;
-    color: white !important;
+    font-weight: 600;
 }
 
 .filter-btn.active {
     background: var(--primary-color);
     color: white;
-    border-color: var(--primary-color);
 }
 
-.filter-btn {
-    background: white;
-    border: 1px solid #ddd;
-    color: #555;
+.status-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    z-index: 5;
 }
 
-/* --- Mobile Responsive Fix --- */
-@media (max-width: 700px) {
-    .masonry-wrapper {
-    display: grid !important; /* Switch from column-count to Grid */
-    grid-template-columns: repeat(3, 1fr); /* FORCES 3 COLUMNS */
-    gap: 20px;
-    padding: 20px 0;
-}
- .product-card {
-    background: var(--glass-bg);
-    border-radius: 12px; /* Slightly smaller radius looks better on small cards */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Makes all cards in a row the same height */
-}
+.status-badge.new { background: #28a745; }
+.status-badge.used { background: #ffc107; color: #333; }
 
-   .card-img-container {
-    width: 100%;
-    height: 180px; /* Default height for desktop */
-    overflow: hidden;
-}
-
-    .golem-header {
-        flex-wrap: wrap; /* Allows search/nav to stack if needed */
-        padding: 10px 3%;
-    }
-
-    .search-wrapper {
-        order: 3; /* Moves search below logo/nav on small screens */
-        margin: 10px 0 0 0;
-        max-width: 100%;
-    }
-}
-
-
-.card-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* This prevents the "half-image" look by filling the box */
-    display: block;
-}
-
-@media (max-width: 480px) {
-    .modal-img-wrapper {
-        height: 220px; /* Slightly shorter for small screens so text fits */
-    }
-    
-    .modal-content {
-        padding: 15px;
-        width: 95%; /* Use more of the screen width */
-    }
-    
-    .modal-footer-actions {
-        grid-template-columns: 1fr; /* Stack buttons so they are easy to tap */
-    }
-}
-
-
-/* Responsive adjustments so it doesn't break on tiny phones */
-@media (max-width: 900px) {
-    .masonry-wrapper {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets */
-    }
-}
-
+/* --- 7. Mobile Specific Overrides --- */
 @media (max-width: 600px) {
     .masonry-wrapper {
-        grid-template-columns: 1fr; /* 1 column for small mobile to prevent 'half-image' look */
-    }
-}
-
-@media (max-width: 600px) {
-    .masonry-wrapper {
-        grid-template-columns: repeat(3, 1fr) !important; /* Keep 3 columns on mobile */
-        gap: 6px; /* Smaller gap to save space */
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px;
     }
 
     .card-img-container {
-        height: 110px; /* Shorter height so they don't look like tall towers */
+        height: 110px; /* Smaller height for mobile 3-column grid */
     }
 
-    .product-info {
-        padding: 8px 5px; /* Minimal padding */
-    }
+    .product-info { padding: 8px 5px; }
 
-    .product-title {
-        font-size: 0.75rem; /* Small font so titles don't wrap too much */
-        line-height: 1.2;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* Limits title to 2 lines */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
+    .product-title { font-size: 0.75rem; }
 
-    .product-price {
-        font-size: 0.85rem;
-        font-weight: 700;
-    }
+    .product-price { font-size: 0.85rem; }
 
-    .nav-item-box {
-        min-width: 60px;
-        padding: 5px;
-    }
+    .golem-header { flex-wrap: wrap; padding: 10px 3%; }
+    
+    .search-wrapper { order: 3; margin: 10px 0 0 0; max-width: 100%; }
+
+    .nav-item-box { min-width: 60px; padding: 5px; }
+
+    .modal-footer-actions { grid-template-columns: 1fr; }
 }
-.card-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Fills the square perfectly */
-    display: block;
+
+/* --- 8. Saved Items Grid --- */
+#savedGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
 }
