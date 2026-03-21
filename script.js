@@ -300,17 +300,26 @@ window.shareToWhatsApp = () => {
     const text = encodeURIComponent("Check out Golem Marketplace! " + window.location.href);
     window.open(`https://wa.me/?text=${text}`, '_blank');
 };
+
+
 window.addToCartFromModal = () => {
-    const productId = currentProduct.id; // Assuming you store the open product in a variable
+    if (!currentProduct) {
+        console.error("No product selected!");
+        return;
+    }
+
+    const productId = currentProduct.id;
     let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
 
     if (!saved.includes(productId)) {
         saved.push(productId);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
-        alert("Item saved to your wishlist!");
-        updateCartBadge(); // Update the number on the heart icon
+        
+        // Show the count on the heart icon
+        window.updateCartBadge();
+        alert("❤️ Item saved to your list!");
     } else {
-        alert("This item is already in your wishlist.");
+        alert("This item is already in your saved list.");
     }
 };
 
