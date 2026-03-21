@@ -304,5 +304,46 @@ function updateCartBadge() {
     }
 }
 
+
+// This makes the function global so the HTML onclick can find it
+window.filterCategory = (category, button) => {
+    // 1. Handle the UI (Active class)
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    // 2. Run the actual fetch/filter logic
+    // We pass the category to your fetch function
+    fetchProducts(category); 
+};
+
+// Also ensure fetchProducts is accessible if called from HTML
+window.fetchProducts = async (category = 'All') => {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '<div class="loading">Loading items...</div>';
+
+    let query = _supabase.from('products').select('*');
+
+    // Filter logic
+    if (category !== 'All') {
+        query = query.eq('category', category);
+    }
+
+    // Sort logic (using your existing sortSelect)
+    const sort = document.getElementById('sortSelect').value;
+    if (sort === 'price_low') query = query.order('price', { ascending: true });
+    else if (sort === 'price_high') query = query.order('price', { ascending: false });
+    else query = query.order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) {
+        console.error("Error fetching products:", error);
+        return;
+    }
+
+    renderProducts(data);
+};
+
 // Call updateCartBadge on page load
 document.addEventListener('DOMContentLoaded', updateCartBadge);
