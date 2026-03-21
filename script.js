@@ -266,11 +266,11 @@ window.handleSupportSubmit = async function(e) {
 };
 
 window.updateCartBadge = function() {
-    const cart = JSON.parse(localStorage.getItem('golem_cart') || '[]');
+    const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const badge = document.getElementById('cartBadge');
     if (badge) {
-        badge.innerText = cart.length;
-        badge.style.display = cart.length > 0 ? 'flex' : 'none';
+        badge.innerText = saved.length;
+        badge.style.display = saved.length > 0 ? 'flex' : 'none';
     }
 };
 
