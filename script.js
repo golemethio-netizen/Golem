@@ -1,4 +1,5 @@
 // --- 1. INITIALIZATION & HEARTBEAT ---
+let currentOpenedProduct = null; // This tracks which item is in the popup
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Golem System Initializing...");
     
@@ -95,6 +96,7 @@ window.openProductDetailsSafe = function(encodedData) {
 };
 
 window.openProductModal = function(product) {
+    currentProduct = product;
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
@@ -108,6 +110,23 @@ document.getElementById('viewFullDetails').href = `checkout.html?id=${product.id
     // --- Format Phone for Ethiopia (+251) ---
     const rawPhone = product.seller_phone || product.phone_number || '';
     const cleanPhone = rawPhone.replace(/\s+/g, '').replace(/-/g, '');
+
+
+
+// 3. Update the 'View Full Page' link
+    const detailsBtn = document.getElementById('viewFullDetails');
+    if (detailsBtn) {
+        detailsBtn.href = `checkout.html?id=${product.id}`;
+    }
+
+    // 4. Show the modal
+    document.getElementById('productModal').style.display = 'flex';
+
+
+
+
+
+
     
     let internationalPhone = cleanPhone;
     if (internationalPhone.startsWith('0')) {
