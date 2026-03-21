@@ -566,3 +566,66 @@ body {
     opacity: 0.9;
     transform: scale(1.02);
 }
+
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto; /* Allows horizontal swiping on mobile */
+    padding: 10px 5%;
+    scrollbar-width: none; /* Hides scrollbar on Firefox */
+}
+
+.filter-bar::-webkit-scrollbar {
+    display: none; /* Hides scrollbar on Chrome/Safari */
+}
+
+.filter-btn {
+    white-space: nowrap; /* Prevents text from breaking into two lines */
+    flex-shrink: 0;
+}
+.modal-footer-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.contact-btn {
+    padding: 12px;
+    text-align: center;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* Full-width buttons for secondary actions */
+.full-width-btn {
+    grid-column: span 2;
+    background: #f0f0f0;
+    color: #333;
+}
+
+.save-btn {
+    background: #ff4757 !important;
+    color: white !important;
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.filter-btn {
+    background: white;
+    border: 1px solid #ddd;
+    color: #555;
+}
