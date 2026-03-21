@@ -347,3 +347,29 @@ window.fetchProducts = async (category = 'All') => {
 
 // Call updateCartBadge on page load
 document.addEventListener('DOMContentLoaded', updateCartBadge);
+
+
+// Add this at the end of script.js
+window.checkAuthToSell = () => {
+    const user = supabase.auth.user();
+    if (!user) {
+        alert("Please Sign In to sell items!");
+        window.toggleModal(); // Opens the login modal
+    } else {
+        window.location.href = 'sell.html'; // Or wherever your sell page is
+    }
+};
+
+window.toggleModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+};
+
+window.toggleSupportModal = () => {
+    const modal = document.getElementById('supportModal');
+    if (modal) {
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+};
