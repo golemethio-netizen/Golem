@@ -387,3 +387,15 @@ window.toggleSupportModal = () => {
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
     }
 };
+
+// Function to toggle Full Image Mode on Computer
+function toggleFullScreenImage() {
+    const imgWrapper = document.querySelector('.modal-img-wrapper');
+    if (imgWrapper) {
+        imgWrapper.style.height = imgWrapper.style.height === '80vh' ? '300px' : '80vh';
+        imgWrapper.style.cursor = imgWrapper.style.height === '80vh' ? 'zoom-out' : 'zoom-in';
+    }
+}
+
+// Add event listener to the modal image wrapper
+document.querySelector('.modal-img-wrapper').addEventListener('dblclick', toggleFullScreenImage);
