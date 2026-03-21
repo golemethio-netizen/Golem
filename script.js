@@ -419,3 +419,19 @@ function createSavedItemCard(item) {
     </div>
     `;
 }
+
+function openProductModal(productId) {
+    const item = products.find(p => p.id === productId);
+    if (!item) return;
+
+    // Set the image
+    const modalImg = document.getElementById('modalProductImg');
+    modalImg.src = item.image;
+    
+    // Reset zoom and view
+    modalImg.style.transform = 'scale(1)';
+    document.querySelector('.modal-body').scrollTop = 0;
+
+    // Show modal
+    document.getElementById('productModal').style.display = 'flex';
+}
