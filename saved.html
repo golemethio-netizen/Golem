@@ -109,6 +109,39 @@
             }
         }
 
+
+
+        async function shareWishlist() {
+    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+    
+    if (savedIds.length === 0) {
+        alert("Your wishlist is empty!");
+        return;
+    }
+
+    // Fetch the latest data for these IDs to get names and prices
+    const { data: items, error } = await _supabase
+        .from('products')
+        .select('name, price')
+        .in('id', savedIds);
+
+    if (error || !items) return;
+
+    // Create the message header
+    let message = "🛒 *My Golem Marketplace Wishlist* \n\n";
+    
+    // Add each item to the message
+    items.forEach((item, index) => {
+        message += `${index + 1}. ${item.name} — *${item.price.toLocaleString()} ETB*\n`;
+    });
+
+    message += `\nCheck them out on Golem: ${window.location.origin}`;
+
+    // Encode for Telegram
+    const encodedText = encodeURIComponent(message);
+    window.open(`https://t.me/share/url?url=${window.location.origin}&text=${encodedText}`, '_blank');
+}
+
         document.addEventListener('DOMContentLoaded', loadSavedItems);
     </script>
 </body>
