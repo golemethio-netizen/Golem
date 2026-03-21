@@ -484,3 +484,67 @@ body {
     color: white;
     grid-column: span 2; /* Make WhatsApp full width at the bottom */
 }
+
+
+/* Styles specifically for the Saved Items Grid */
+#savedGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+#savedGrid .product-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+#savedGrid .product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* This is the magic fix for the "unattractive" images */
+#savedGrid .product-card img {
+    width: 100%;
+    height: 200px; /* Fixed height for uniformity */
+    object-fit: cover; /* Crops the image perfectly without stretching */
+    display: block;
+}
+
+#savedGrid .product-info {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+#savedGrid .product-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+#savedGrid .price {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Style for the Remove Button */
+.remove-btn {
+    background: #fff5f5;
+    color: #eb5757;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-top: 1px solid #ffebeb;
+    transition: background 0.2s;
+}
+
+.remove-btn:hover {
+    background: #ffebeb;
+}
