@@ -1,5 +1,5 @@
 // --- 1. INITIALIZATION & HEARTBEAT ---
-let currentOpenedProduct = null; // This tracks which item is in the popup
+let currentProduct = null; // Use this name everywhere to avoid errors
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Golem System Initializing...");
     
@@ -96,37 +96,25 @@ window.openProductDetailsSafe = function(encodedData) {
 };
 
 window.openProductModal = function(product) {
-    currentProduct = product;
+    currentProduct = product; // Set the global variable
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
-    // Fill UI
+    // 1. Fill UI
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
     document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
-// Inside your openProductModal function:
-document.getElementById('viewFullDetails').href = `checkout.html?id=${product.id}`;
-    // --- Format Phone for Ethiopia (+251) ---
-    const rawPhone = product.seller_phone || product.phone_number || '';
-    const cleanPhone = rawPhone.replace(/\s+/g, '').replace(/-/g, '');
 
-
-
-// 3. Update the 'View Full Page' link
+    // 2. Update the 'View Full Page' link
     const detailsBtn = document.getElementById('viewFullDetails');
     if (detailsBtn) {
         detailsBtn.href = `checkout.html?id=${product.id}`;
     }
 
-    // 4. Show the modal
-    document.getElementById('productModal').style.display = 'flex';
-
-
-
-
-
-
+    // 3. Format Phone for Ethiopia (+251)
+    const rawPhone = product.seller_phone || product.phone_number || '';
+    const cleanPhone = rawPhone.replace(/\s+/g, '').replace(/-/g, '');
     
     let internationalPhone = cleanPhone;
     if (internationalPhone.startsWith('0')) {
@@ -135,23 +123,21 @@ document.getElementById('viewFullDetails').href = `checkout.html?id=${product.id
         internationalPhone = internationalPhone.substring(1);
     }
 
-    // --- Update Call Link ---
+    // 4. Update Contact Buttons
     const callBtn = document.getElementById('callContact');
     if (callBtn) callBtn.href = cleanPhone ? `tel:${cleanPhone}` : '#';
 
-    // --- Update Telegram Link ---
     const tgBtn = document.getElementById('telegramOrder');
     const tgUser = (product.telegram_username || "").replace('@', '');
-    // If username exists, use it. Otherwise, fallback to phone link.
     if (tgBtn) {
         tgBtn.href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${internationalPhone}`;
     }
 
-    // --- Update WhatsApp Link ---
     const waBtn = document.getElementById('whatsappOrder');
-    const orderMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" for ${product.price?.toLocaleString()} ETB.`);
+    const orderMsg = encodeURIComponent(`Hello! I'm interested in "${product.name}" on Golem.`);
     if (waBtn) waBtn.href = `https://wa.me/${internationalPhone}?text=${orderMsg}`;
 
+    // 5. Show the modal
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden"; 
 };
