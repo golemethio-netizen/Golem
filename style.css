@@ -141,19 +141,22 @@ body {
     position: relative;
 }
 
+/* --- Desktop Image Fix --- */
 .card-img-container {
     position: relative;
     width: 100%;
-    height: 200px; /* Base height */
+    height: 300px; /* Increased height for desktop screens */
     overflow: hidden;
+    background-color: #f0f0f0; /* Placeholder color while loading */
 }
 
+/* Ensure images fill the space perfectly without stretching */
 .card-img-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Secret fix for "half-images" */
+    object-fit: cover; 
+    object-position: center; /* Keeps the center of the furniture in view */
     display: block;
-    transition: transform 0.5s ease;
 }
 
 .product-card:hover img { transform: scale(1.1); }
