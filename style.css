@@ -657,3 +657,26 @@ body {
         max-width: 100%;
     }
 }
+
+
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This prevents the "half-image" look by filling the box */
+    display: block;
+}
+
+@media (max-width: 480px) {
+    .modal-img-wrapper {
+        height: 220px; /* Slightly shorter for small screens so text fits */
+    }
+    
+    .modal-content {
+        padding: 15px;
+        width: 95%; /* Use more of the screen width */
+    }
+    
+    .modal-footer-actions {
+        grid-template-columns: 1fr; /* Stack buttons so they are easy to tap */
+    }
+}
