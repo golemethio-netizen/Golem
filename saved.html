@@ -65,23 +65,23 @@
             }
         }
 
-        function renderSaved(items) {
-            const grid = document.getElementById('savedGrid');
-            grid.innerHTML = items.map(p => `
-                <div class="product-card">
-                    <div onclick="location.href='checkout.html?id=${p.id}'" style="cursor:pointer;">
-                        <img src="${p.image}" alt="${p.name}">
-                        <div class="product-info">
-                            <h3>${p.name}</h3>
-                            <p class="price">${p.price.toLocaleString()} ETB</p>
-                        </div>
-                    </div>
-                    <button onclick="removeItem('${p.id}')" class="contact-btn" style="background:#fdeaea; color:#d9534f; border:none; width:100%; padding:8px; border-radius:0 0 10px 10px;">
-                        <i class="fas fa-times"></i> Remove
-                    </button>
+      function renderSaved(items) {
+    const grid = document.getElementById('savedGrid');
+    grid.innerHTML = items.map(p => `
+        <div class="product-card">
+            <div onclick="location.href='checkout.html?id=${p.id}'" style="cursor:pointer;">
+                <img src="${p.image}" alt="${p.name}">
+                <div class="product-info">
+                    <h3>${p.name}</h3>
+                    <p class="price">${p.price.toLocaleString()} ETB</p>
                 </div>
-            `).join('');
-        }
+            </div>
+            <button onclick="removeItem('${p.id}')" class="remove-btn">
+                <i class="fas fa-trash-alt"></i> Remove Item
+            </button>
+        </div>
+    `).join('');
+}
 
         function removeItem(id) {
             let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
