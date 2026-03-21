@@ -399,3 +399,23 @@ function toggleFullScreenImage() {
 
 // Add event listener to the modal image wrapper
 document.querySelector('.modal-img-wrapper').addEventListener('dblclick', toggleFullScreenImage);
+
+// --- Updated Saved Item Card Template ---
+function createSavedItemCard(item) {
+    return `
+    <div class="product-card" data-id="${item.id}">
+        <button class="remove-btn" onclick="removeItem(${item.id})" title="Remove from saved">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="card-img-container" onclick="openProductModal(${item.id})">
+            <img src="${item.image}" alt="${item.name}">
+        </div>
+        
+        <div class="product-info">
+            <h3 class="product-title">${item.name}</h3>
+            <p class="product-price">${item.price} ETB</p>
+        </div>
+    </div>
+    `;
+}
