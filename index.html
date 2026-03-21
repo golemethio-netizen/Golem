@@ -59,20 +59,20 @@
     </header>
 
     <section class="filter-controls">
-        <div class="sort-container">
-            <select id="sortSelect" onchange="window.fetchProducts()">
-                <option value="newest">🆕 Newest First</option>
-                <option value="price_low">💰 Price: Low to High</option>
-                <option value="price_high">💎 Price: High to Low</option>
-            </select>
-        </div>
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>
-           <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
-<button class="filter-btn" onclick="window.filterCategory('Home & Furniture', this)">Furniture</button>
-            <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
-        </div>
-    </section>
+    <div class="sort-container">
+        <select id="sortSelect" onchange="window.fetchProducts()">
+            <option value="newest">🆕 Newest First</option>
+            <option value="price_low">💰 Price: Low to High</option>
+            <option value="price_high">💎 Price: High to Low</option>
+        </select>
+    </div>
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>
+        <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
+        <button class="filter-btn" onclick="window.filterCategory('Furniture', this)">Furniture</button>
+        <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
+    </div>
+</section>
 
     <main class="container">
         <div id="productGrid" class="masonry-wrapper">
