@@ -310,3 +310,20 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
 }
+/* --- Extra: Modal Image Zoom Effect --- */
+.modal-img-wrapper {
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+}
+
+.modal-img-wrapper:hover img {
+    transform: scale(1.15); /* Adjust this for more or less zoom */
+}
+
+.modal-img-wrapper img {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+// Toggle zoom on mobile tap
+document.getElementById('modalProductImg').addEventListener('click', function() {
+    this.style.transform = this.style.transform === 'scale(1.5)' ? 'scale(1)' : 'scale(1.5)';
+});
