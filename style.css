@@ -117,13 +117,13 @@ body {
     padding: 0 15px;
 }
 
-.masonry-wrapper {
+/*.masonry-wrapper {
     column-count: 2;
     column-gap: 1.2rem;
     padding: 20px;
     display: block !important;
 }
-
+*/
 @media (min-width: 768px) { .masonry-wrapper { column-count: 3; } }
 @media (min-width: 1024px) { .masonry-wrapper { column-count: 4; } }
 
@@ -631,12 +631,13 @@ body {
 }
 
 /* --- Mobile Responsive Fix --- */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .masonry-wrapper {
-        column-count: 1 !important; /* Force items to be full width */
-        padding: 10px;
-    }
-
+    display: grid !important; /* Switch from column-count to Grid */
+    grid-template-columns: repeat(3, 1fr); /* FORCES 3 COLUMNS */
+    gap: 20px;
+    padding: 20px 0;
+}
     .product-card {
         margin-bottom: 20px;
         width: 100%; /* Ensure card doesn't shrink */
@@ -678,5 +679,19 @@ body {
     
     .modal-footer-actions {
         grid-template-columns: 1fr; /* Stack buttons so they are easy to tap */
+    }
+}
+
+
+/* Responsive adjustments so it doesn't break on tiny phones */
+@media (max-width: 900px) {
+    .masonry-wrapper {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets */
+    }
+}
+
+@media (max-width: 600px) {
+    .masonry-wrapper {
+        grid-template-columns: 1fr; /* 1 column for small mobile to prevent 'half-image' look */
     }
 }
