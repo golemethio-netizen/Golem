@@ -353,3 +353,96 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     cursor: zoom-out;
     transform: scale(2.5); /* How much it zooms in */
 }
+
+/* --- 1. Global Responsive Image Fix --- */
+.card-img-container {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Tall and professional for Desktop */
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures no stretching or "half-bodies" */
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+/* Mobile tweak for the 3-column grid */
+@media (max-width: 700px) {
+    .card-img-container {
+        height: 120px; 
+    }
+}
+
+/* --- 2. Premium Saved Items Grid --- */
+#savedGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
+}
+
+#savedGrid .product-card {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+}
+
+#savedGrid .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* --- 3. The "Circle" Remove Button --- */
+.remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 71, 87, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.remove-btn:hover {
+    background: #ff4757;
+    transform: scale(1.15) rotate(90deg);
+}
+
+/* --- 4. Computer-Only Full Screen Zoom Fix --- */
+@media (min-width: 1024px) {
+    .modal-content {
+        max-width: 800px; /* Wider modal for desktop users */
+        display: flex;
+        gap: 25px;
+        padding: 30px;
+    }
+
+    .modal-img-wrapper {
+        flex: 1;
+        height: 500px; /* Big hero image for the computer view */
+    }
+
+    .modal-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
