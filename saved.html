@@ -36,6 +36,26 @@
             <i class="fas fa-trash-alt"></i> Clear
         </button>
     </div>
+
+<div id="savedSummary" class="saved-summary-box">
+    <div class="summary-details">
+        <h3>Order Summary</h3>
+        <p>Total Items: <span id="totalItems">0</span></p>
+        <p class="total-price-row">Total Price: <span id="totalPrice">0</span> ETB</p>
+    </div>
+    <div class="summary-actions">
+        <button onclick="sendOrder('telegram')" class="order-btn tg-btn">
+            <i class="fab fa-telegram"></i> Order All via Telegram
+        </button>
+        <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn">
+            <i class="fab fa-whatsapp"></i> Order All via WhatsApp
+        </button>
+    </div>
+</div>
+
+
+
+                
         </div>
 
         <div id="savedGrid" class="masonry-wrapper">
