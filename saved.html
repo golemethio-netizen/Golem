@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Saved Items | Golem</title>
-
-    
-</div>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="background-color: #f9f9f9;">
+<body>
 
     <header class="golem-header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
@@ -23,46 +20,39 @@
     </header>
 
     <main class="container">
-        <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="font-weight: 600;">❤️ My Saved Items</h2>
-        
-            <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-   
-    <div style="display: flex; gap: 10px;">
-        <button onclick="shareWishlist()" class="filter-btn" style="background: #0088cc; color: white; border: none;">
-            <i class="fab fa-telegram-plane"></i> Share List
-        </button>
-        <button onclick="clearAllSaved()" style="background:none; border:none; color:#ff4b2b; cursor:pointer; font-size:0.9rem;">
-            <i class="fas fa-trash-alt"></i> Clear
-        </button>
-    </div>
-
-<div id="savedSummary" class="saved-summary-box">
-    <div class="summary-details">
-        <h3>Order Summary</h3>
-        <p>Total Items: <span id="totalItems">0</span></p>
-        <p class="total-price-row">Total Price: <span id="totalPrice">0</span> ETB</p>
-    </div>
-    <div class="summary-actions">
-        <button onclick="sendOrder('telegram')" class="order-btn tg-btn">
-            <i class="fab fa-telegram"></i> Order All via Telegram
-        </button>
-        <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn">
-            <i class="fab fa-whatsapp"></i> Order All via WhatsApp
-        </button>
-    </div>
-</div>
-
-
-
-                
+        <div class="wishlist-header" style="margin: 30px 0; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1 style="font-weight: 700; font-size: 1.8rem;">❤️ My Wishlist</h1>
+                <p style="color: #666; font-size: 0.9rem;">Your favorite furniture pieces in one place.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="clearAllSaved()" style="background:none; border:none; color:#ff4b2b; cursor:pointer; font-weight: 600;">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
         </div>
 
         <div id="savedGrid" class="masonry-wrapper">
-            <div id="emptyState" style="text-align:center; padding: 100px 20px; color: #888;">
+            <div id="emptyState" style="text-align:center; padding: 100px 20px; color: #888; grid-column: 1 / -1;">
                 <i class="fas fa-heart-broken fa-3x" style="margin-bottom: 15px; color: #ddd;"></i>
                 <p>You haven't saved any items yet.</p>
-                <a href="index.html" class="filter-btn" style="display:inline-block; margin-top:15px; text-decoration:none;">Start Shopping</a>
+                <a href="index.html" class="contact-btn" style="display:inline-flex; margin-top:15px; background: var(--primary-color); width: auto; padding: 10px 30px;">Start Shopping</a>
+            </div>
+        </div>
+
+        <div id="savedSummary" class="saved-summary-box" style="display: none;">
+            <div class="summary-details">
+                <h3 style="font-weight: 700; margin-bottom: 5px;">Order Summary</h3>
+                <p style="color: #666;">Items: <span id="totalItems" style="font-weight: 600; color: #333;">0</span></p>
+                <p class="total-price-row">Total: <span id="totalPrice">0</span> ETB</p>
+            </div>
+            <div class="summary-actions">
+                <button onclick="sendOrder('telegram')" class="order-btn tg-btn">
+                    <i class="fab fa-telegram"></i> Order via Telegram
+                </button>
+                <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn" style="background: var(--whatsapp-green);">
+                    <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                </button>
             </div>
         </div>
     </main>
@@ -70,50 +60,80 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        // Load saved items from LocalStorage
-        function loadSavedItems() {
+        // --- 1. Load Data ---
+        async function loadSavedItems() {
             const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
             const grid = document.getElementById('savedGrid');
             const empty = document.getElementById('emptyState');
+            const summary = document.getElementById('savedSummary');
 
             if (savedIds.length === 0) {
+                grid.innerHTML = ""; 
+                grid.appendChild(empty);
                 empty.style.display = 'block';
+                summary.style.display = 'none';
                 return;
             }
 
             empty.style.display = 'none';
-            fetchItems(savedIds);
-        }
+            summary.style.display = 'block';
 
-        async function fetchItems(ids) {
             const { data, error } = await _supabase
                 .from('products')
                 .select('*')
-                .in('id', ids);
+                .in('id', savedIds);
 
             if (data) {
                 renderSaved(data);
+                calculateTotal(data);
             }
         }
 
-      function renderSaved(items) {
-    const grid = document.getElementById('savedGrid');
-    grid.innerHTML = items.map(p => `
-        <div class="product-card">
-            <div onclick="location.href='checkout.html?id=${p.id}'" style="cursor:pointer;">
-                <img src="${p.image}" alt="${p.name}">
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <p class="price">${p.price.toLocaleString()} ETB</p>
+        // --- 2. Render Cards ---
+        function renderSaved(items) {
+            const grid = document.getElementById('savedGrid');
+            grid.innerHTML = items.map(p => `
+                <div class="product-card">
+                    <button class="remove-btn" onclick="removeItem('${p.id}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="card-img-container" onclick="location.href='checkout.html?id=${p.id}'">
+                        <img src="${p.image}" alt="${p.name}">
+                    </div>
+                    
+                    <div class="product-info">
+                        <h3 class="product-title">${p.name}</h3>
+                        <p class="product-price">${p.price.toLocaleString()} ETB</p>
+                    </div>
                 </div>
-            </div>
-            <button onclick="removeItem('${p.id}')" class="remove-btn">
-                <i class="fas fa-trash-alt"></i> Remove Item
-            </button>
-        </div>
-    `).join('');
-}
+            `).join('');
+        }
 
+        // --- 3. Calculations ---
+        function calculateTotal(items) {
+            const total = items.reduce((sum, item) => sum + parseInt(item.price), 0);
+            document.getElementById('totalItems').innerText = items.length;
+            document.getElementById('totalPrice').innerText = total.toLocaleString();
+        }
+
+        // --- 4. Order Logic ---
+        function sendOrder(platform) {
+            const total = document.getElementById('totalPrice').innerText;
+            const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
+            
+            let message = `Hello Golem Furniture! I want to order these items from my wishlist:%0A%0A`;
+            items.forEach((name, i) => message += `${i+1}. ${name}%0A`);
+            message += `%0A*Total: ${total} ETB*`;
+
+            if (platform === 'telegram') {
+                window.open(`https://t.me/YourUsername?text=${message}`, '_blank');
+            } else {
+                window.open(`https://wa.me/251911223344?text=${message}`, '_blank'); // Replace with your number
+            }
+        }
+
+        // --- 5. Utils ---
         function removeItem(id) {
             let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
             saved = saved.filter(savedId => savedId !== id);
@@ -122,44 +142,11 @@
         }
 
         function clearAllSaved() {
-            if(confirm("Clear all saved items?")) {
+            if(confirm("Are you sure you want to clear your wishlist?")) {
                 localStorage.removeItem('golem_saved');
                 loadSavedItems();
             }
         }
-
-
-
-        async function shareWishlist() {
-    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
-    
-    if (savedIds.length === 0) {
-        alert("Your wishlist is empty!");
-        return;
-    }
-
-    // Fetch the latest data for these IDs to get names and prices
-    const { data: items, error } = await _supabase
-        .from('products')
-        .select('name, price')
-        .in('id', savedIds);
-
-    if (error || !items) return;
-
-    // Create the message header
-    let message = "🛒 *My Golem Marketplace Wishlist* \n\n";
-    
-    // Add each item to the message
-    items.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} — *${item.price.toLocaleString()} ETB*\n`;
-    });
-
-    message += `\nCheck them out on Golem: ${window.location.origin}`;
-
-    // Encode for Telegram
-    const encodedText = encodeURIComponent(message);
-    window.open(`https://t.me/share/url?url=${window.location.origin}&text=${encodedText}`, '_blank');
-}
 
         document.addEventListener('DOMContentLoaded', loadSavedItems);
     </script>
