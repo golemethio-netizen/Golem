@@ -450,3 +450,42 @@ document.getElementById('downloadImgBtn').addEventListener('click', function() {
     link.click();
     document.body.removeChild(link);
 });
+// Function to update the Total Price and Item Count
+function updateSavedSummary() {
+    const savedItems = JSON.parse(localStorage.getItem('savedItems')) || [];
+    let total = 0;
+    
+    savedItems.forEach(item => {
+        // Convert price string "25,000" to number 25000
+        const priceNum = parseInt(item.price.replace(/,/g, ''));
+        total += priceNum;
+    });
+
+    document.getElementById('totalItems').innerText = savedItems.length;
+    document.getElementById('totalPrice').innerText = total.toLocaleString();
+
+    // Hide summary if list is empty
+    const summaryBox = document.getElementById('savedSummary');
+    summaryBox.style.display = savedItems.length > 0 ? 'block' : 'none';
+}
+
+// Function to Send the Order
+function sendOrder(platform) {
+    const savedItems = JSON.parse(localStorage.getItem('savedItems')) || [];
+    const total = document.getElementById('totalPrice').innerText;
+    
+    // Format the product list text
+    let itemDetails = savedItems.map((item, index) => `${index + 1}. ${item.name} (${item.price} ETB)`).join('%0A');
+    
+    const message = `Hello Golem Furniture! I want to order these items:%0A%0A${itemDetails}%0A%0A*Total Price: ${total} ETB*`;
+    
+    if (platform === 'telegram') {
+        // Replace 'YourTelegramUsername' with your actual username
+        window.open(`https://t.me/YourTelegramUsername?text=${message}`, '_blank');
+    } else {
+        // Replace '251912345678' with your actual phone number
+        window.open(`https://wa.me/251912345678?text=${message}`, '_blank');
+    }
+}
+
+// Call updateSavedSummary() whenever the saved page is loaded or an item is removed.
