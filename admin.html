@@ -258,6 +258,44 @@
                 card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
             });
         });
+
+
+
+
+window.generateSponsorReport = async () => {
+    const now = new Date();
+    const tomorrow = new Date();
+    tomorrow.setHours(now.getHours() + 24);
+
+    const { data: expiringSoon, error } = await _supabase
+        .from('products')
+        .select('name, seller_phone, sponsored_until')
+        .eq('is_sponsored', true)
+        .lt('sponsored_until', tomorrow.toISOString())
+        .gt('sponsored_until', now.toISOString());
+
+    if (error) {
+        alert("Error fetching report: " + error.message);
+        return;
+    }
+
+    if (expiringSoon.length === 0) {
+        alert("☀️ No sponsorships are expiring in the next 24 hours.");
+        return;
+    }
+
+    let reportText = "🚨 SPONSORSHIP EXPIRY REPORT (Next 24h):\n\n";
+    expiringSoon.forEach(item => {
+        const time = new Date(item.sponsored_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        reportText += `📍 ${item.name}\n   📞 Seller: ${item.seller_phone}\n   🕒 Expires: Today at ${time}\n\n`;
+    });
+
+    alert(reportText);
+    // Optional: You could also console.log it if you want to copy-paste it to Telegram
+    console.log(reportText);
+};
+        
+        
     </script>
 </body>
 </html>
