@@ -259,3 +259,34 @@ window.toggleAuthModal = () => {
         console.error("Auth Modal not found in HTML");
     }
 };
+
+
+// Add these to make them globally accessible
+window.toggleModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        document.body.style.overflow = (modal.style.display === 'flex') ? 'hidden' : 'auto';
+    }
+};
+
+window.checkAuthToSell = async () => {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        alert("Please Sign In to sell items!");
+        window.toggleModal();
+    } else {
+        window.location.href = 'sell.html';
+    }
+};
+
+window.filterSponsored = async () => {
+    const now = new Date().toISOString();
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('is_sponsored', true)
+        .gt('sponsored_until', now);
+    
+    if (data) renderProducts(data);
+};
