@@ -491,34 +491,26 @@ function sendOrder(platform) {
 // Call updateSavedSummary() whenever the saved page is loaded or an item is removed.
 
 async function loadSponsor() {
-    // This looks for the LATEST product marked 'is_sponsored' by the admin
+    const now = new Date().toISOString();
+
     const { data: product, error } = await _supabase
         .from('products')
         .select('*')
         .eq('is_sponsored', true)
-        .order('created_at', { ascending: false }) // Get the newest one
+        .gt('sponsored_until', now) // ONLY get if expiry date is in the FUTURE
+        .order('created_at', { ascending: false })
         .limit(1)
         .single();
 
     const sponsorSection = document.querySelector('.sponsored-section');
 
     if (product) {
-        // Fill the window with the sponsored product's data
         document.getElementById('sponsorImg').src = product.image;
         document.getElementById('sponsorTitle').innerText = product.name;
-        document.getElementById('sponsorDesc').innerText = "Premium Featured Item: " + product.description.substring(0, 100) + "...";
-        
-        // Link to the details page
-        document.getElementById('sponsorLink').href = `checkout.html?id=${product.id}`;
-        
-        // Update the Telegram link to include the product name
-        const tgBtn = document.querySelector('.sponsor-btn');
-        tgBtn.href = `https://t.me/YourUsername?text=I am interested in the Sponsored Product: ${product.name}`;
-        
+        // ... rest of your display code ...
         sponsorSection.style.display = 'block';
     } else {
-        // If no product is marked as sponsored, hide the window
-        sponsorSection.style.display = 'none';
+        sponsorSection.style.display = 'none'; // Hides if expired or none found
     }
 }
 
@@ -543,23 +535,55 @@ async function toggleSponsorship(productId, currentStatus) {
 
 function renderProducts(items) {
     const grid = document.getElementById('productGrid');
+    const now = new Date();
+
     grid.innerHTML = items.map(p => {
-        // Check if the product is sponsored
-        const sponsoredBadge = p.is_sponsored 
-            ? `<div class="grid-sponsor-badge"><i class="fas fa-star"></i> Featured</div>` 
-            : '';
+        let adminInfo = '';
+        
+        // If there is an expiry date, calculate the days left
+        if (p.is_sponsored && p.sponsored_until) {
+            const expiry = new Date(p.sponsored_until);
+            const diffTime = expiry - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const statusColor = diffDays <= 2 ? '#ff4757' : '#2ed573'; // Red if 2 days left
+            
+            adminInfo = `
+                <div class="admin-expiry-info" style="color: ${statusColor}">
+                    <i class="fas fa-clock"></i> ${diffDays > 0 ? diffDays + ' days left' : 'Expired'}
+                </div>
+            `;
+        }
 
         return `
             <div class="product-card">
-                <div class="card-img-container" onclick="openProductModal(${p.id})">
-                    ${sponsoredBadge} 
+                <div class="card-img-container">
+                    ${p.is_sponsored ? '<div class="grid-sponsor-badge">Featured</div>' : ''}
                     <img src="${p.image}" alt="${p.name}">
                 </div>
                 <div class="product-info">
                     <h3 class="product-title">${p.name}</h3>
                     <p class="product-price">${p.price.toLocaleString()} ETB</p>
-                </div>
+                    ${adminInfo} </div>
             </div>
         `;
     }).join('');
+}
+async function filterSponsored() {
+    const now = new Date().toISOString();
+    
+    // Highlight the button
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.sponsor-filter').classList.add('active');
+
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('is_sponsored', true)
+        .gt('sponsored_until', now)
+        .order('price', { ascending: false });
+
+    if (data) {
+        renderProducts(data);
+    }
 }
