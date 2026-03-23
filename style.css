@@ -105,25 +105,23 @@ body {
     border: 2px solid white;
 }
 
-/* --- 3. Main Grid Layout --- */
+/* --- 3. Main Product Grid --- */
 .container {
     max-width: 1200px;
     margin: 20px auto;
     padding: 0 10px;
 }
 
-/* Default 3 Columns for Mobile/Tablets */
 .masonry-wrapper {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr); 
+    grid-template-columns: repeat(3, 1fr); /* FORCES 3 COLUMNS ON MOBILE */
     gap: 12px;
     padding: 10px 0;
 }
 
-/* 4 Columns for Desktop */
 @media (min-width: 1024px) {
     .masonry-wrapper {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, 1fr); /* 4 Columns on Desktop */
         gap: 20px;
     }
 }
@@ -141,25 +139,23 @@ body {
     position: relative;
 }
 
-/* --- Desktop Image Fix --- */
 .card-img-container {
     position: relative;
     width: 100%;
-    height: 300px; /* Increased height for desktop screens */
+    height: 300px; /* High quality for desktop */
     overflow: hidden;
-    background-color: #f0f0f0; /* Placeholder color while loading */
+    background-color: #f8f9fa;
 }
 
-/* Ensure images fill the space perfectly without stretching */
 .card-img-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
-    object-position: center; /* Keeps the center of the furniture in view */
+    object-fit: cover; /* Prevents "half-image" or stretching */
     display: block;
+    transition: transform 0.5s ease;
 }
 
-.product-card:hover img { transform: scale(1.1); }
+.product-card:hover img { transform: scale(1.08); }
 
 .product-info { padding: 12px; flex-grow: 1; }
 
@@ -167,7 +163,6 @@ body {
     font-weight: 600;
     font-size: 1rem;
     margin-bottom: 5px;
-    /* Forces 3-column items to stay the same height */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -180,7 +175,7 @@ body {
     font-weight: 700;
 }
 
-/* --- 5. Modals (Quick View) --- */
+/* --- 5. Modal & Full Image View --- */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -192,8 +187,17 @@ body {
     align-items: center;
 }
 
-/* --- Desktop & Mobile Full Image View --- */
-
+#productModal .modal-content {
+    background: white;
+    width: 95%;
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
 
 @keyframes slideUp {
     from { transform: translateY(30px); opacity: 0; }
@@ -202,13 +206,51 @@ body {
 
 .modal-img-wrapper {
     width: 100%;
-    height: 280px;
-    border-radius: 12px;
+    height: 400px; 
+    background: #f0f0f0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
+    position: relative;
+    cursor: zoom-in;
 }
 
-.modal-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+#modalProductImg {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Full Image seen without crop */
+    transition: transform 0.3s ease;
+}
 
+/* Zoom state triggered by JS */
+.modal-img-wrapper.is-zoomed #modalProductImg {
+    cursor: zoom-out;
+    transform: scale(2);
+}
+
+.modal-body {
+    padding: 25px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Desktop Modal Side-by-Side */
+@media (min-width: 1024px) {
+    #productModal .modal-content {
+        flex-direction: row;
+    }
+    .modal-img-wrapper {
+        flex: 1.5;
+        height: auto;
+    }
+}
+
+/* --- 6. Buttons --- */
 .modal-footer-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -227,143 +269,16 @@ body {
     justify-content: center;
     gap: 8px;
     color: white;
+    transition: 0.2s;
 }
 
 #callContact { background: var(--primary-color); }
 #telegramOrder { background: var(--telegram-blue); }
 #whatsappOrder { background: var(--whatsapp-green); grid-column: span 2; }
 
-/* --- 6. Filters & Badges --- */
-.filter-bar {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 10px 5%;
-    scrollbar-width: none;
-}
+.contact-btn:active { transform: scale(0.95); }
 
-.filter-bar::-webkit-scrollbar { display: none; }
-
-.filter-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    background: white;
-    border: 1px solid #ddd;
-    white-space: nowrap;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.filter-btn.active {
-    background: var(--primary-color);
-    color: white;
-}
-
-.status-badge {
-    position: absolute;
-    top: 10px; left: 10px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: bold;
-    color: white;
-    z-index: 5;
-}
-
-.status-badge.new { background: #28a745; }
-.status-badge.used { background: #ffc107; color: #333; }
-
-/* --- 7. Mobile Specific Overrides --- */
-@media (max-width: 600px) {
-    .masonry-wrapper {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 6px;
-    }
-
-    .card-img-container {
-        height: 110px; /* Smaller height for mobile 3-column grid */
-    }
-
-    .product-info { padding: 8px 5px; }
-
-    .product-title { font-size: 0.75rem; }
-
-    .product-price { font-size: 0.85rem; }
-
-    .golem-header { flex-wrap: wrap; padding: 10px 3%; }
-    
-    .search-wrapper { order: 3; margin: 10px 0 0 0; max-width: 100%; }
-
-    .nav-item-box { min-width: 60px; padding: 5px; }
-
-    .modal-footer-actions { grid-template-columns: 1fr; }
-}
-
-/* --- 8. Saved Items Grid --- */
-#savedGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-}
-/* --- Extra: Modal Image Zoom Effect --- */
-.modal-img-wrapper {
-    cursor: zoom-in;
-    transition: transform 0.3s ease;
-}
-
-.modal-img-wrapper:hover img {
-    transform: scale(1.15); /* Adjust this for more or less zoom */
-}
-
-.modal-img-wrapper img {
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-// Toggle zoom on mobile tap
-document.getElementById('modalProductImg').addEventListener('click', function() {
-    this.style.transform = this.style.transform === 'scale(1.5)' ? 'scale(1)' : 'scale(1.5)';
-});
-
-    /* --- Desktop Magnifier Effect --- */
-.modal-img-wrapper {
-    position: relative;
-    cursor: zoom-in;
-    overflow: hidden; /* Keeps the zoom inside the box */
-    border-radius: 12px;
-    background: #f9f9f9;
-}
-
-
-/* When the "zoomed" class is added via JS */
-.modal-img-wrapper.is-zoomed #modalProductImg {
-    cursor: zoom-out;
-    transform: scale(2.5); /* How much it zooms in */
-}
-
-/* --- 1. Global Responsive Image Fix --- */
-.card-img-container {
-    position: relative;
-    width: 100%;
-    height: 300px; /* Tall and professional for Desktop */
-    overflow: hidden;
-    background-color: #f8f9fa;
-}
-
-.card-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures no stretching or "half-bodies" */
-    display: block;
-    transition: transform 0.5s ease;
-}
-
-/* Mobile tweak for the 3-column grid */
-@media (max-width: 700px) {
-    .card-img-container {
-        height: 120px; 
-    }
-}
-
-/* --- 2. Premium Saved Items Grid --- */
+/* --- 7. Saved Items Page --- */
 #savedGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -371,27 +286,10 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     padding: 20px 0;
 }
 
-#savedGrid .product-card {
-    position: relative;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
-    transition: all 0.3s ease;
-}
-
-#savedGrid .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-}
-
-/* --- 3. The "Circle" Remove Button --- */
 .remove-btn {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
+    top: 12px; right: 12px;
+    width: 32px; height: 32px;
     background: rgba(255, 71, 87, 0.9);
     color: white;
     border: none;
@@ -401,92 +299,11 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     justify-content: center;
     cursor: pointer;
     z-index: 20;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.2s;
 }
 
-.remove-btn:hover {
-    background: #ff4757;
-    transform: scale(1.15) rotate(90deg);
-}
+.remove-btn:hover { background: #ff4757; transform: rotate(90deg); }
 
-/* --- 4. Computer-Only Full Screen Zoom Fix --- */
-@media (min-width: 1024px) {
-    #productModal .modal-content {
-        flex-direction: row; /* Side-by-side layout for computers */
-        align-items: stretch;
-    }
-}
-
-.modal-img-wrapper {
-    width: 100%;
-    height: 400px; /* Fixed height for mobile */
-    background: #f0f0f0; /* Light gray background for "empty" spaces */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-    .modal-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-}
-
-
-/* --- Desktop & Mobile Full Image View --- */
-
-/* --- Desktop & Mobile Full Image View --- */
-#productModal .modal-content {
-    background: white;
-    width: 95%;
-    max-width: 900px; /* Wider for computer screens */
-    max-height: 90vh;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Prevent double scrollbars */
-}
-
-
-.modal-img-wrapper {
-    width: 100%;
-    height: 400px; /* Fixed height for mobile */
-    background: #f0f0f0; /* Light gray background for "empty" spaces */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-@media (min-width: 1024px) {
-    .modal-img-wrapper {
-        flex: 1.2; /* Takes up more space on computer */
-        height: 600px; 
-    }
-}
-
-#modalProductImg {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain; /* THIS ENSURES THE FULL IMAGE IS SEEN */
-    transition: transform 0.3s ease;
-}
-
-.modal-body {
-    padding: 25px;
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-
-/* --- Saved Order Summary Box --- */
 .saved-summary-box {
     margin-top: 30px;
     padding: 25px;
@@ -503,7 +320,6 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     font-size: 1.4rem;
     font-weight: 800;
     color: var(--primary-color);
-    margin: 10px 0;
 }
 
 .summary-actions {
@@ -513,24 +329,20 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     margin-top: 15px;
 }
 
-.order-btn {
-    padding: 15px;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: transform 0.2s;
-}
-
-.order-btn:active { transform: scale(0.95); }
-
-@media (max-width: 600px) {
+/* --- 8. Mobile Responsiveness --- */
+@media (max-width: 700px) {
+    .masonry-wrapper {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px;
+    }
+    .card-img-container {
+        height: 120px; /* Small square for 3-column mobile */
+    }
+    .product-info { padding: 8px 5px; }
+    .product-title { font-size: 0.75rem; }
+    .product-price { font-size: 0.85rem; }
+    
     .summary-actions {
-        grid-template-columns: 1fr; /* Stack buttons on mobile */
+        grid-template-columns: 1fr;
     }
 }
