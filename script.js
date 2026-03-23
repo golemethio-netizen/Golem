@@ -79,35 +79,39 @@ function renderProducts(products) {
     grid.innerHTML = products.map(p => {
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isSold = p.status === 'sold';
-        const condition = p.status_condition || 'New';
         
-        // Sponsorship & Admin Expiry Logic
-        let adminInfo = '';
-        let sponsorBadge = '';
-        
-        if (p.is_sponsored && p.sponsored_until) {
-            const expiry = new Date(p.sponsored_until);
-            if (expiry > now) {
-                sponsorBadge = `<div class="grid-sponsor-badge"><i class="fas fa-star"></i> Featured</div>`;
-                
-                // Expiry Days (Visible only if body has .is-admin)
-                const diffTime = expiry - now;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const statusColor = diffDays <= 2 ? '#ff4757' : '#2ed573';
-                
-                adminInfo = `
-                    <div class="admin-expiry-info" style="color: ${statusColor}; font-size: 0.75rem; font-weight: bold; margin-top: 5px;">
-                        <i class="fas fa-clock"></i> ${diffDays} days left
-                    </div>
-                `;
-            }
+        // 1. Determine Tier Status
+        const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
+        const isFeatured = p.is_featured;
+
+        // 2. Build the Visual Badge
+        let statusBadge = '';
+        if (isSponsored) {
+            statusBadge = `<div class="badge sponsor-badge"><i class="fas fa-ad"></i> Sponsored</div>`;
+        } else if (isFeatured) {
+            statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
         }
 
+        // 3. Admin Expiry Logic (Only shows if item is sponsored)
+        let adminInfo = '';
+        if (isSponsored) {
+            const expiry = new Date(p.sponsored_until);
+            const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            const statusColor = diffDays <= 2 ? '#ff4757' : '#2ed573';
+            
+            adminInfo = `
+                <div class="admin-expiry-info" style="color: ${statusColor}; font-size: 0.7rem; font-weight: bold; margin-top: 5px;">
+                    <i class="fas fa-clock"></i> ${diffDays}d remaining
+                </div>
+            `;
+        }
+
+        // 4. Return the HTML with dynamic classes for CSS styling
         return `
-            <div class="product-card ${isSold ? 'is-sold' : ''}">
+            <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
                 <div class="card-img-container">
                     ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    ${sponsorBadge}
+                    ${statusBadge}
                     <img src="${p.image}" alt="${p.name}" loading="lazy">
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
@@ -120,14 +124,15 @@ function renderProducts(products) {
                     ${adminInfo}
                     <div class="product-actions" style="margin-top:10px;">
                         <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')">Details</button>
-                        ${p.telegram_username ? `<a href="https://t.me/${p.telegram_username.replace('@','')}" target="_blank" class="share-btn"><i class="fab fa-telegram-plane"></i></a>` : ''}
+                        ${p.telegram_username ? 
+                            `<a href="https://t.me/${p.telegram_username.replace('@','')}" target="_blank" class="share-btn"><i class="fab fa-telegram-plane"></i></a>` 
+                            : ''}
                     </div>
                 </div>
             </div>
         `;
     }).join('');
 }
-
 // --- 4. SPONSORSHIP SYSTEM ---
 window.loadSponsor = async () => {
     try {
