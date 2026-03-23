@@ -92,6 +92,8 @@
 
         // 3. LOAD DATA
         async function loadItems(status = 'pending') {
+            const isExpiringSoon = (new Date(item.sponsored_until) - now) < (24 * 60 * 60 * 1000);
+// Add the class 'expiring-soon' to the product-card div if true.
             const grid = document.getElementById('adminGrid');
             grid.innerHTML = "<p>Loading products...</p>";
             
