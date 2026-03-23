@@ -438,3 +438,20 @@ body {
         margin: 15px 0 0 0;
     }
 }
+/* Make the sponsored card "Glow" slightly */
+.sponsor-card {
+    border: 2px solid #f1c40f;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.2);
+    transition: all 0.3s ease;
+}
+
+.sponsor-card:hover {
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.4);
+    transform: scale(1.01);
+}
+
+.sponsor-badge {
+    background: linear-gradient(90deg, #f1c40f, #f39c12);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
