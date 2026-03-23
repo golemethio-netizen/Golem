@@ -489,3 +489,20 @@ function sendOrder(platform) {
 }
 
 // Call updateSavedSummary() whenever the saved page is loaded or an item is removed.
+
+async function loadSponsor() {
+    // Assuming you create a 'sponsors' table in Supabase
+    const { data, error } = await _supabase
+        .from('sponsors')
+        .select('*')
+        .eq('active', true)
+        .limit(1)
+        .single();
+
+    if (data) {
+        document.getElementById('sponsorImg').src = data.image_url;
+        document.getElementById('sponsorTitle').innerText = data.title;
+        document.getElementById('sponsorDesc').innerText = data.description;
+        document.getElementById('sponsorLink').href = data.website_url;
+    }
+}
