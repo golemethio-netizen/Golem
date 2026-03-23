@@ -435,3 +435,18 @@ function openProductModal(productId) {
     // Show modal
     document.getElementById('productModal').style.display = 'flex';
 }
+
+
+
+document.getElementById('downloadImgBtn').addEventListener('click', function() {
+    const imgSrc = document.getElementById('modalProductImg').src;
+    const productName = document.getElementById('modalTitle').innerText;
+    
+    // Create a temporary link to trigger the download
+    const link = document.createElement('a');
+    link.href = imgSrc;
+    link.download = `${productName}-Golem-Furniture.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
