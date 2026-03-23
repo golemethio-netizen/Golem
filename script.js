@@ -115,27 +115,37 @@ function renderProducts(products) {
 
 // --- 4. SPONSORSHIP SYSTEM ---
 async function loadSponsor() {
-    const now = new Date().toISOString();
-    const { data: product } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('is_sponsored', true)
-        .gt('sponsored_until', now)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+    try {
+        const now = new Date().toISOString();
+        // Added .maybeSingle() to prevent the 406 error if 0 rows are found
+        const { data: product, error } = await _supabase
+            .from('products')
+            .select('*')
+            .eq('is_sponsored', true)
+            .gt('sponsored_until', now)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(); 
 
-    const sponsorSection = document.querySelector('.sponsored-section');
-    if (product && sponsorSection) {
-        document.getElementById('sponsorImg').src = product.image;
-        document.getElementById('sponsorTitle').innerText = product.name;
-        document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
-        document.getElementById('sponsorLink').href = `checkout.html?id=${product.id}`;
-        sponsorSection.style.display = 'block';
-    } else if (sponsorSection) {
-        sponsorSection.style.display = 'none';
+        if (error) throw error;
+
+        const sponsorSection = document.querySelector('.sponsored-section');
+        if (product && sponsorSection) {
+            const imgEl = document.getElementById('sponsorImg');
+            if(imgEl) imgEl.src = product.image;
+            
+            document.getElementById('sponsorTitle').innerText = product.name;
+            document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
+            document.getElementById('sponsorLink').href = `checkout.html?id=${product.id}`;
+            sponsorSection.style.display = 'block';
+        }
+    } catch (err) {
+        console.log("Sponsor Info: No active sponsors currently.");
+        const sponsorSection = document.querySelector('.sponsored-section');
+        if(sponsorSection) sponsorSection.style.display = 'none';
     }
 }
+
 
 window.filterSponsored = async () => {
     const now = new Date().toISOString();
@@ -237,3 +247,15 @@ function filterSearch(term) {
         card.style.display = title.includes(term) ? 'block' : 'none';
     });
 }
+
+
+// Make sure these are attached to the window object so HTML can see them
+window.toggleAuthModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+        document.body.style.overflow = (modal.style.display === "flex") ? "hidden" : "auto";
+    } else {
+        console.error("Auth Modal not found in HTML");
+    }
+};
