@@ -551,3 +551,30 @@ body.is-admin .admin-expiry-info {
     font-weight: bold;
     z-index: 10;
 }
+.quick-contact-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    margin: 10px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.contact-icon {
+    font-size: 1.1rem;
+    color: #555;
+    transition: transform 0.2s, color 0.2s;
+    padding: 5px;
+}
+
+.contact-icon:hover {
+    transform: translateY(-2px);
+}
+
+.contact-icon.call:hover { color: #2ed573; }
+.contact-icon.telegram:hover { color: #0088cc; }
+.contact-icon.whatsapp:hover { color: #25d366; }
+
+.product-actions {
+    margin-top: 5px;
+}
