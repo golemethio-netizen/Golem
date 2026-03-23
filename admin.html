@@ -98,16 +98,27 @@
                                 <button onclick="updateStatus('${item.id}', 'approved')" class="btn-approve">Approve</button>
                                 <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Reject</button>
                             ` : ''}
-                            ${status === 'approved' ? `
-                                <button onclick="toggleFeatured('${item.id}', ${item.is_featured})" class="btn-feature">${item.is_featured ? '❌ Unfeature' : '⭐ Feature'}</button>
-                                <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Remove</button>
-                            ` : ''}
-                            ${status === 'rejected' ? `<button onclick="updateStatus('${item.id}', 'pending')" class="btn-approve">Restore</button>` : ''}
-                            <button onclick="permanentlyDelete('${item.id}')" style="background:black; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; width:100%; margin-top:5px;">Delete Permanently</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                           ${status === 'approved' ? `
+    <div class="sponsor-controls" style="background: #fdf9f3; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ffeaa7;">
+        <label style="font-size: 0.75rem; font-weight: bold; color: #d35400;">💎 SPONSORSHIP</label>
+        <div style="display: flex; gap: 5px; margin-top: 5px;">
+            <select id="days-${item.id}" style="flex: 1; padding: 5px; border-radius: 4px; border: 1px solid #ddd;">
+                <option value="3">3 Days</option>
+                <option value="7">7 Days</option>
+                <option value="30">30 Days</option>
+            </select>
+            <button onclick="activateSponsor('${item.id}')" style="background: #f1c40f; color: #000; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">Set</button>
+        </div>
+        ${item.is_sponsored ? `
+            <p style="font-size: 0.7rem; color: #27ae60; margin-top: 5px;">
+                <i class="fas fa-check-circle"></i> Active until: ${new Date(item.sponsored_until).toLocaleDateString()}
+                <br><a href="#" onclick="cancelSponsor('${item.id}')" style="color: #c0392b;">Stop Sponsor</a>
+            </p>
+        ` : ''}
+    </div>
+    
+    <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject" style="width: 100%;">Remove Item</button>
+` : ''}
         }
 
         // --- LOAD TICKETS ---
@@ -185,6 +196,61 @@
                 card.style.display = text.includes(term) ? 'block' : 'none';
             });
         });
+
+
+// --- NEW: SPONSORSHIP MANAGEMENT ---
+
+async function activateSponsor(id) {
+    const days = parseInt(document.getElementById(`days-${id}`).value);
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + days);
+
+    const { error } = await _supabase
+        .from('products')
+        .update({ 
+            is_sponsored: true, 
+            sponsored_until: expiryDate.toISOString() 
+        })
+        .eq('id', id);
+
+    if (!error) {
+        alert(`🚀 Item is now Sponsored for ${days} days!`);
+        loadItems('approved'); // Refresh view
+    } else {
+        alert("Error: " + error.message);
+    }
+}
+
+async function cancelSponsor(id) {
+    if (!confirm("Stop sponsorship for this item?")) return;
+
+    const { error } = await _supabase
+        .from('products')
+        .update({ 
+            is_sponsored: false, 
+            sponsored_until: null 
+        })
+        .eq('id', id);
+
+    if (!error) {
+        loadItems('approved');
+    }
+}
+
+// Ensure loadStats also counts sponsored items
+async function loadStats() {
+    // ... your existing code ...
+    const { count: sponsoredCount } = await _supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_sponsored', true);
+    
+    // You could add a stat card for this if you want
+    console.log("Active Sponsors:", sponsoredCount);
+}
+
+
+        
     </script>
 </body>
 </html>
