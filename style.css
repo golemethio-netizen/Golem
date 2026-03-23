@@ -455,3 +455,34 @@ body {
     color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+/* --- Sponsored Badge on Grid --- */
+.grid-sponsor-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(241, 196, 15, 0.95); /* Premium Gold */
+    color: #000;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Add a subtle pulse animation to the Featured badge */
+.grid-sponsor-badge i {
+    animation: pulse-star 2s infinite;
+}
+
+@keyframes pulse-star {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
