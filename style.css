@@ -485,3 +485,52 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     flex-direction: column;
 }
 
+
+/* --- Saved Order Summary Box --- */
+.saved-summary-box {
+    margin-top: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    position: sticky;
+    bottom: 20px;
+    z-index: 100;
+}
+
+.total-price-row {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 10px 0;
+}
+
+.summary-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.order-btn {
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.2s;
+}
+
+.order-btn:active { transform: scale(0.95); }
+
+@media (max-width: 600px) {
+    .summary-actions {
+        grid-template-columns: 1fr; /* Stack buttons on mobile */
+    }
+}
