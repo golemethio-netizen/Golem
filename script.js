@@ -540,3 +540,26 @@ async function toggleSponsorship(productId, currentStatus) {
         location.reload(); // Refresh to see the change
     }
 }
+
+function renderProducts(items) {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = items.map(p => {
+        // Check if the product is sponsored
+        const sponsoredBadge = p.is_sponsored 
+            ? `<div class="grid-sponsor-badge"><i class="fas fa-star"></i> Featured</div>` 
+            : '';
+
+        return `
+            <div class="product-card">
+                <div class="card-img-container" onclick="openProductModal(${p.id})">
+                    ${sponsoredBadge} 
+                    <img src="${p.image}" alt="${p.name}">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">${p.name}</h3>
+                    <p class="product-price">${p.price.toLocaleString()} ETB</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
