@@ -503,3 +503,8 @@ body {
 body.is-admin .admin-expiry-info {
     display: block;
 }
+
+.expiring-soon {
+    border: 2px solid #ff7675 !important;
+    background: #fff5f5 !important;
+}
