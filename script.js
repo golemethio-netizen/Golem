@@ -491,21 +491,41 @@ function sendOrder(platform) {
 // Call updateSavedSummary() whenever the saved page is loaded or an item is removed.
 
 async function loadSponsor() {
-    // Assuming you create a 'sponsors' table in Supabase
-    const { data, error } = await _supabase
-        .from('sponsors')
+    // This looks for the LATEST product marked 'is_sponsored' by the admin
+    const { data: product, error } = await _supabase
+        .from('products')
         .select('*')
-        .eq('active', true)
+        .eq('is_sponsored', true)
+        .order('created_at', { ascending: false }) // Get the newest one
         .limit(1)
         .single();
 
-    if (data) {
-        document.getElementById('sponsorImg').src = data.image_url;
-        document.getElementById('sponsorTitle').innerText = data.title;
-        document.getElementById('sponsorDesc').innerText = data.description;
-        document.getElementById('sponsorLink').href = data.website_url;
+    const sponsorSection = document.querySelector('.sponsored-section');
+
+    if (product) {
+        // Fill the window with the sponsored product's data
+        document.getElementById('sponsorImg').src = product.image;
+        document.getElementById('sponsorTitle').innerText = product.name;
+        document.getElementById('sponsorDesc').innerText = "Premium Featured Item: " + product.description.substring(0, 100) + "...";
+        
+        // Link to the details page
+        document.getElementById('sponsorLink').href = `checkout.html?id=${product.id}`;
+        
+        // Update the Telegram link to include the product name
+        const tgBtn = document.querySelector('.sponsor-btn');
+        tgBtn.href = `https://t.me/YourUsername?text=I am interested in the Sponsored Product: ${product.name}`;
+        
+        sponsorSection.style.display = 'block';
+    } else {
+        // If no product is marked as sponsored, hide the window
+        sponsorSection.style.display = 'none';
     }
 }
+
+// Call this on page load
+document.addEventListener('DOMContentLoaded', loadSponsor);
+
+
 
 async function toggleSponsorship(productId, currentStatus) {
     const { data, error } = await _supabase
