@@ -486,3 +486,20 @@ body {
     50% { transform: scale(1.2); opacity: 0.7; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+/* --- Admin-Only Expiry Badge --- */
+.admin-expiry-info {
+    display: none; /* Change to 'block' when you are logged in as Admin */
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 5px;
+    padding: 2px 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    width: fit-content;
+}
+
+/* If the body has the 'is-admin' class, show the timers */
+body.is-admin .admin-expiry-info {
+    display: block;
+}
