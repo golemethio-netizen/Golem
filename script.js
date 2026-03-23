@@ -332,10 +332,6 @@ window.updateCartBadge = function() {
     }
 };
 
-
-
-
-
 // --- 4. HELPERS ---
 function getConditionClass(condition) {
     if (!condition) return 'cond-default';
