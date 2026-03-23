@@ -508,3 +508,13 @@ body.is-admin .admin-expiry-info {
     border: 2px solid #ff7675 !important;
     background: #fff5f5 !important;
 }
+/* Gold glow for Sponsored items */
+.product-card.is-sponsored {
+    border: 2px solid #f1c40f;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+}
+
+/* Subtle silver border for Featured items */
+.product-card.is-featured:not(.is-sponsored) {
+    border: 1px solid #bdc3c7;
+}
