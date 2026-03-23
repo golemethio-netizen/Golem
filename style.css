@@ -484,3 +484,38 @@ document.getElementById('modalProductImg').addEventListener('click', function() 
     display: flex;
     flex-direction: column;
 }
+
+@media (min-width: 1024px) {
+    #productModal .modal-content {
+        flex-direction: row !important; /* Image left, Text right */
+        max-width: 1000px;
+        height: 700px;
+    }
+
+    .modal-img-wrapper {
+        flex: 1.5; /* Larger area for the image */
+        height: 100% !important;
+        background: #222; /* Darker background makes furniture colors "pop" */
+    }
+
+    #modalProductImg {
+        object-fit: contain; /* Shows every inch of the photo */
+        max-height: 95%;
+    }
+
+    .modal-body {
+        flex: 1;
+        padding: 40px;
+        justify-content: center;
+    }
+}
+
+/* Mobile Tweak */
+@media (max-width: 600px) {
+    .modal-img-wrapper {
+        height: 350px;
+    }
+    #modalProductImg {
+        object-fit: contain;
+    }
+}
