@@ -24,19 +24,44 @@ window.fetchProducts = async (category = 'All') => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
+    // 1. Get the current sort preference from the dropdown
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
-    let query = _supabase.from('products').select('*').eq('status', 'approved');
 
-    if (category !== 'All') query = query.eq('category', category);
+    // 2. Start the base query
+    let query = _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved');
 
-    // Sorting Logic
-    if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
-    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
-    else query = query.order('created_at', { ascending: false });
+    // 3. Apply Category Filter
+    if (category !== 'All') {
+        query = query.eq('category', category);
+    }
 
+    // 4. THE MASTER SORTING LOGIC
+    // Always keep Sponsored and Featured at the top first
+    query = query
+        .order('is_sponsored', { ascending: false })
+        .order('is_featured', { ascending: false });
+
+    // 5. Apply the User's specific sort as the "Tie-Breaker"
+    if (sortOrder === 'price_low') {
+        query = query.order('price', { ascending: true });
+    } else if (sortOrder === 'price_high') {
+        query = query.order('price', { ascending: false });
+    } else {
+        // Default: Newest first within their tiers
+        query = query.order('created_at', { ascending: false });
+    }
+
+    // 6. Execute the single optimized query
     const { data, error } = await query;
-    if (!error) renderProducts(data);
-    else console.error("Fetch error:", error.message);
+
+    if (!error) {
+        renderProducts(data);
+    } else {
+        console.error("Fetch error:", error.message);
+    }
 };
 
 // --- 3. RENDERING ENGINE ---
