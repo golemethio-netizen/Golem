@@ -506,3 +506,17 @@ async function loadSponsor() {
         document.getElementById('sponsorLink').href = data.website_url;
     }
 }
+
+async function toggleSponsorship(productId, currentStatus) {
+    const { data, error } = await _supabase
+        .from('products')
+        .update({ is_sponsored: !currentStatus }) // Flips the status
+        .eq('id', productId);
+
+    if (error) {
+        alert("Error updating sponsorship: " + error.message);
+    } else {
+        alert("Product sponsorship updated!");
+        location.reload(); // Refresh to see the change
+    }
+}
