@@ -1,16 +1,16 @@
-// --- 1. INITIALIZATION & STATE ---
-let currentProduct = null; 
+// --- 1. INITIALIZATION & GLOBAL STATE ---
+let currentProduct = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Golem System Initializing...");
     
     // Auth & UI Setup
-    await updateUIForUser();
-    updateCartBadge();
+    await window.updateUIForUser();
+    window.updateCartBadge();
     
     // Initial Data Fetch
-    fetchProducts();
-    loadSponsor();
+    window.fetchProducts();
+    window.loadSponsor();
 
     // Search Logic
     const searchInput = document.getElementById('headerSearch');
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = 'All') => {
     const grid = document.getElementById('productGrid');
-    if (grid) grid.innerHTML = '<div class="loading">Loading items...</div>';
+    if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     let query = _supabase.from('products').select('*').eq('status', 'approved');
@@ -39,7 +39,7 @@ window.fetchProducts = async (category = 'All') => {
     else console.error("Fetch error:", error.message);
 };
 
-// --- 3. RENDERING (Integrated with Sponsored Logic) ---
+// --- 3. RENDERING ENGINE ---
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -55,13 +55,7 @@ function renderProducts(products) {
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isSold = p.status === 'sold';
         const condition = p.status_condition || 'New';
-        const condClass = getConditionClass(condition);
         
-        // Verified Sellers
-        const verifiedNames = ['Crown Time', 'Crown Time Furniture', 'Golem Admin'];
-        const isVerified = verifiedNames.includes(p.seller_name);
-        const verifiedBadge = isVerified ? `<i class="fas fa-check-circle" style="color: #007bff; margin-left: 4px;"></i>` : '';
-
         // Sponsorship & Admin Expiry Logic
         let adminInfo = '';
         let sponsorBadge = '';
@@ -71,7 +65,7 @@ function renderProducts(products) {
             if (expiry > now) {
                 sponsorBadge = `<div class="grid-sponsor-badge"><i class="fas fa-star"></i> Featured</div>`;
                 
-                // Calculate Days Left for Admin
+                // Expiry Days (Visible only if body has .is-admin)
                 const diffTime = expiry - now;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 const statusColor = diffDays <= 2 ? '#ff4757' : '#2ed573';
@@ -93,18 +87,14 @@ function renderProducts(products) {
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
                     </div>
-                    <span class="status-badge ${condClass}">${condition}</span>
                 </div>
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">${p.name}</h3>
-                    <div class="seller-line" style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">
-                        <i class="fas fa-user-circle"></i> ${p.seller_name || 'Seller'} ${verifiedBadge}
-                    </div>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
                     ${adminInfo}
                     <div class="product-actions" style="margin-top:10px;">
-                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')">View Details</button>
+                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')">Details</button>
                         ${p.telegram_username ? `<a href="https://t.me/${p.telegram_username.replace('@','')}" target="_blank" class="share-btn"><i class="fab fa-telegram-plane"></i></a>` : ''}
                     </div>
                 </div>
@@ -114,60 +104,52 @@ function renderProducts(products) {
 }
 
 // --- 4. SPONSORSHIP SYSTEM ---
-async function loadSponsor() {
+window.loadSponsor = async () => {
     try {
         const now = new Date().toISOString();
-        // Added .maybeSingle() to prevent the 406 error if 0 rows are found
-        const { data: product, error } = await _supabase
+        const { data: product } = await _supabase
             .from('products')
             .select('*')
             .eq('is_sponsored', true)
             .gt('sponsored_until', now)
             .order('created_at', { ascending: false })
             .limit(1)
-            .maybeSingle(); 
+            .maybeSingle();
 
-        if (error) throw error;
-
-        const sponsorSection = document.querySelector('.sponsored-section');
+        const sponsorSection = document.getElementById('mainSponsor');
         if (product && sponsorSection) {
-            const imgEl = document.getElementById('sponsorImg');
-            if(imgEl) imgEl.src = product.image;
-            
+            document.getElementById('sponsorImg').src = product.image;
             document.getElementById('sponsorTitle').innerText = product.name;
             document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
             document.getElementById('sponsorLink').href = `checkout.html?id=${product.id}`;
             sponsorSection.style.display = 'block';
         }
-    } catch (err) {
-        console.log("Sponsor Info: No active sponsors currently.");
-        const sponsorSection = document.querySelector('.sponsored-section');
-        if(sponsorSection) sponsorSection.style.display = 'none';
-    }
-}
-
+    } catch (err) { console.error("Sponsor load error", err); }
+};
 
 window.filterSponsored = async () => {
     const now = new Date().toISOString();
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('.sponsor-filter')?.classList.add('active');
-
     const { data } = await _supabase
         .from('products')
         .select('*')
         .eq('is_sponsored', true)
-        .gt('sponsored_until', now)
-        .order('price', { ascending: false });
-
+        .gt('sponsored_until', now);
+    
     if (data) renderProducts(data);
 };
 
-// --- 5. MODAL & INTERACTION ---
+window.filterCategory = (category, button) => {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    window.fetchProducts(category);
+};
+
+// --- 5. MODAL LOGIC ---
 window.openProductDetailsSafe = (encodedData) => {
     try {
         const product = JSON.parse(decodeURIComponent(encodedData));
         window.openProductModal(product);
-    } catch (e) { console.error("Error parsing product data", e); }
+    } catch (e) { console.error("Error parsing product", e); }
 };
 
 window.openProductModal = (product) => {
@@ -178,17 +160,15 @@ window.openProductModal = (product) => {
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
+    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
 
-    // Contact Formatting
-    const rawPhone = product.seller_phone || product.phone_number || '';
-    const cleanPhone = rawPhone.replace(/\D/g, '');
+    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
     let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
 
     document.getElementById('callContact').href = `tel:+${intPhone}`;
     const tgUser = (product.telegram_username || "").replace('@', '');
     document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
-    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=Interest in ${product.name}`;
+    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=I'm interested in ${product.name}`;
 
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
@@ -199,16 +179,44 @@ window.closeProductModal = () => {
     document.body.style.overflow = "auto";
 };
 
-// --- 6. USER & CART SYSTEM ---
+// --- 6. AUTH & ACCOUNT ---
+window.toggleModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        document.body.style.overflow = (modal.style.display === 'flex') ? 'hidden' : 'auto';
+    }
+};
+
 window.updateUIForUser = async () => {
     const { data: { user } } = await _supabase.auth.getUser();
     const adminLink = document.getElementById('adminNavLink');
     if (user && adminLink && user.email === 'yohannes.surafel@gmail.com') {
         adminLink.style.display = 'flex';
-        document.body.classList.add('is-admin'); // Automatically enable admin view for you
+        document.body.classList.add('is-admin');
     }
 };
 
+window.handleAuth = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) alert(error.message);
+    else window.location.reload();
+};
+
+window.checkAuthToSell = async () => {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        alert("Please Sign In first!");
+        window.toggleModal();
+    } else {
+        window.location.href = 'sell.html';
+    }
+};
+
+// --- 7. CART / SAVED ITEMS ---
 window.updateCartBadge = () => {
     const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const badge = document.getElementById('cartBadge');
@@ -224,22 +232,12 @@ window.addToCartFromModal = () => {
     if (!saved.includes(currentProduct.id)) {
         saved.push(currentProduct.id);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
-        updateCartBadge();
-        alert("❤️ Item saved!");
-    } else {
-        alert("Already in your list.");
+        window.updateCartBadge();
+        alert("❤️ Saved!");
     }
 };
 
-// --- 7. HELPERS ---
-function getConditionClass(condition) {
-    const c = condition?.toLowerCase() || '';
-    if (c.includes('new') && !c.includes('used')) return 'cond-new';
-    if (c.includes('like new')) return 'cond-used-like-new';
-    if (c.includes('fair') || c.includes('used')) return 'cond-used-fair';
-    return 'cond-default';
-}
-
+// --- 8. HELPERS ---
 function filterSearch(term) {
     const cards = document.querySelectorAll('.product-card');
     cards.forEach(card => {
@@ -248,45 +246,17 @@ function filterSearch(term) {
     });
 }
 
-
-// Make sure these are attached to the window object so HTML can see them
-window.toggleAuthModal = () => {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
-        document.body.style.overflow = (modal.style.display === "flex") ? "hidden" : "auto";
-    } else {
-        console.error("Auth Modal not found in HTML");
-    }
+window.shareToTelegram = () => {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://t.me/share/url?url=${url}&text=Check out Golem Furniture!`, '_blank');
 };
 
-
-// Add these to make them globally accessible
-window.toggleModal = () => {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        document.body.style.overflow = (modal.style.display === 'flex') ? 'hidden' : 'auto';
-    }
+window.shareToWhatsApp = () => {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://wa.me/?text=Check out Golem! ${url}`, '_blank');
 };
 
-window.checkAuthToSell = async () => {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) {
-        alert("Please Sign In to sell items!");
-        window.toggleModal();
-    } else {
-        window.location.href = 'sell.html';
-    }
-};
-
-window.filterSponsored = async () => {
-    const now = new Date().toISOString();
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('is_sponsored', true)
-        .gt('sponsored_until', now);
-    
-    if (data) renderProducts(data);
+window.toggleSupportModal = () => {
+    const modal = document.getElementById('supportModal');
+    if (modal) modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
 };
