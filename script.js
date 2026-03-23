@@ -80,11 +80,11 @@ function renderProducts(products) {
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isSold = p.status === 'sold';
         
-        // 1. Determine Tier Status
+        // Tier Status & Expiry Logic
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
         const isFeatured = p.is_featured;
 
-        // 2. Build the Visual Badge
+        // Unified Status Badge
         let statusBadge = '';
         if (isSponsored) {
             statusBadge = `<div class="badge sponsor-badge"><i class="fas fa-ad"></i> Sponsored</div>`;
@@ -92,21 +92,11 @@ function renderProducts(products) {
             statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
         }
 
-        // 3. Admin Expiry Logic (Only shows if item is sponsored)
-        let adminInfo = '';
-        if (isSponsored) {
-            const expiry = new Date(p.sponsored_until);
-            const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-            const statusColor = diffDays <= 2 ? '#ff4757' : '#2ed573';
-            
-            adminInfo = `
-                <div class="admin-expiry-info" style="color: ${statusColor}; font-size: 0.7rem; font-weight: bold; margin-top: 5px;">
-                    <i class="fas fa-clock"></i> ${diffDays}d remaining
-                </div>
-            `;
-        }
+        // Phone Formatting for Ethiopia
+        const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
+        const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+        const tgUser = (p.telegram_username || "").replace('@', '');
 
-        // 4. Return the HTML with dynamic classes for CSS styling
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
                 <div class="card-img-container">
@@ -121,12 +111,23 @@ function renderProducts(products) {
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">${p.name}</h3>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
-                    ${adminInfo}
-                    <div class="product-actions" style="margin-top:10px;">
-                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')">Details</button>
-                        ${p.telegram_username ? 
-                            `<a href="https://t.me/${p.telegram_username.replace('@','')}" target="_blank" class="share-btn"><i class="fab fa-telegram-plane"></i></a>` 
-                            : ''}
+                    
+                    <div class="quick-contact-bar">
+                        <a href="tel:+${cleanPhone}" class="contact-icon call" title="Call Seller">
+                            <i class="fas fa-phone-alt"></i>
+                        </a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram" title="Message on Telegram">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                        <a href="https://wa.me/${cleanPhone}?text=I'm interested in your ${p.name} on Golem" target="_blank" class="contact-icon whatsapp" title="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+
+                    <div class="product-actions">
+                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
+                            <i class="fas fa-info-circle"></i> Full Details
+                        </button>
                     </div>
                 </div>
             </div>
