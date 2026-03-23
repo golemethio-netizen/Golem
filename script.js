@@ -74,13 +74,16 @@ function renderProducts(products) {
         return;
     }
 
+    // Get current saved items from localStorage to highlight the heart icons
+    const savedItems = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isSold = p.status === 'sold';
+        const isSaved = savedItems.includes(p.id);
         
-        // Tier Status & Expiry Logic
+        // Tier Status
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
         const isFeatured = p.is_featured;
 
@@ -92,7 +95,7 @@ function renderProducts(products) {
             statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
         }
 
-        // Phone Formatting for Ethiopia
+        // Phone Formatting
         const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
         const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
         const tgUser = (p.telegram_username || "").replace('@', '');
@@ -102,6 +105,13 @@ function renderProducts(products) {
                 <div class="card-img-container">
                     ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                     ${statusBadge}
+                    
+                    <button class="wishlist-btn ${isSaved ? 'active' : ''}" 
+                            onclick="window.toggleWishlist('${p.id}', this)" 
+                            title="Save for Later">
+                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+
                     <img src="${p.image}" alt="${p.name}" loading="lazy">
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
@@ -113,15 +123,9 @@ function renderProducts(products) {
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
                     
                     <div class="quick-contact-bar">
-                        <a href="tel:+${cleanPhone}" class="contact-icon call" title="Call Seller">
-                            <i class="fas fa-phone-alt"></i>
-                        </a>
-                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram" title="Message on Telegram">
-                            <i class="fab fa-telegram-plane"></i>
-                        </a>
-                        <a href="https://wa.me/${cleanPhone}?text=I'm interested in your ${p.name} on Golem" target="_blank" class="contact-icon whatsapp" title="WhatsApp">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
+                        <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="https://wa.me/${cleanPhone}?text=I'm interested in ${p.name}" target="_blank" class="contact-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
                     </div>
 
                     <div class="product-actions">
@@ -525,3 +529,22 @@ function sendOrder(platform) {
         window.open(`https://wa.me/251912345678?text=${message}`, '_blank');
     }
 }
+window.toggleWishlist = (id, btn) => {
+    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const icon = btn.querySelector('i');
+
+    if (saved.includes(id)) {
+        // Remove from list
+        saved = saved.filter(itemId => itemId !== id);
+        btn.classList.remove('active');
+        icon.classList.replace('fas', 'far');
+    } else {
+        // Add to list
+        saved.push(id);
+        btn.classList.add('active');
+        icon.classList.replace('far', 'fas');
+    }
+
+    localStorage.setItem('golem_saved', JSON.stringify(saved));
+    window.updateCartBadge(); // Refresh the badge in the header
+};
