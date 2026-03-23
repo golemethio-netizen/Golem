@@ -47,10 +47,28 @@
                 <p>Admin</p>
             </a>
 
-            <button class="nav-item-box signin-btn" onclick="window.toggleModal()" style="border: none; cursor: pointer; background-color: #eee;">
-                <i class="fas fa-user"></i>
-                <p>Sign In</p>
-            </button>
+            <button class="nav-item-box signin-btn" onclick="window.toggleAuthModal()">
+    <i class="fas fa-user-circle"></i>
+    <p>Sign In</p>
+</button>
+
+<section class="sponsored-section container" style="display: none;">
+    <div class="sponsor-card">
+        <div class="sponsor-badge">Featured Partner</div>
+        <div class="sponsor-content">
+            <div class="sponsor-image">
+                <img id="sponsorImg" src="" alt="Sponsor">
+            </div>
+            <div class="sponsor-details">
+                <h2 id="sponsorTitle">Partner with Golem</h2>
+                <p id="sponsorDesc"></p>
+                <div class="sponsor-actions">
+                    <a href="#" id="sponsorLink" class="buy-btn">View Item</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
         </div>
 
         <a href="#" onclick="window.toggleSupportModal()" style="color: #666; font-size: 0.9rem; margin-top: 10px; display: inline-block;">
