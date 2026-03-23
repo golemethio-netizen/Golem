@@ -528,4 +528,3 @@ function sendOrder(platform) {
         window.open(`https://wa.me/251912345678?text=${message}`, '_blank');
     }
 }
-
