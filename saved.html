@@ -61,33 +61,45 @@
     <script src="config.js"></script>
     <script>
         // --- 1. Load Data ---
-        async function loadSavedItems() {
-            const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
-            const grid = document.getElementById('savedGrid');
-            const empty = document.getElementById('emptyState');
-            const summary = document.getElementById('savedSummary');
+        
+      async function loadSavedItems() {
+    // 1. Get the IDs from the browser's "Whitelist" (localStorage)
+    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+    const grid = document.getElementById('savedGrid');
+    const empty = document.getElementById('emptyState');
+    const summary = document.getElementById('savedSummary');
 
-            if (savedIds.length === 0) {
-                grid.innerHTML = ""; 
-                grid.appendChild(empty);
-                empty.style.display = 'block';
-                summary.style.display = 'none';
-                return;
-            }
+    // 2. If the list is empty, show the "Empty" message
+    if (savedIds.length === 0) {
+        grid.innerHTML = ""; 
+        grid.appendChild(empty);
+        empty.style.display = 'block';
+        summary.style.display = 'none';
+        return;
+    }
 
-            empty.style.display = 'none';
-            summary.style.display = 'block';
+    // 3. Fetch ONLY the saved items, but maintain the Golem Sorting Order
+    const { data, error } = await _supabase
+        .from('products')
+        .select('*')
+        .in('id', savedIds) // This is the "Whitelist" filter
+        .order('is_sponsored', { ascending: false })
+        .order('is_featured', { ascending: false })
+        .order('created_at', { ascending: false });
 
-            const { data, error } = await _supabase
-                .from('products')
-                .select('*')
-                .in('id', savedIds);
+    if (error) {
+        console.error("Whitelist Load Error:", error.message);
+        return;
+    }
 
-            if (data) {
-                renderSaved(data);
-                calculateTotal(data);
-            }
-        }
+    // 4. Update the UI
+    if (data) {
+        empty.style.display = 'none';
+        summary.style.display = 'block';
+        renderSaved(data);
+        calculateTotal(data);
+    }
+}
 
         // --- 2. Render Cards ---
         function renderSaved(items) {
