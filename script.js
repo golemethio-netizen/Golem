@@ -387,3 +387,15 @@ window.handleSupportSubmit = async function(e) {
         if (modal) modal.style.display = 'none';
     }
 };
+
+// --- SUPPORT MODAL LOGIC ---
+window.toggleSupportModal = function() {
+    const modal = document.getElementById('supportModal');
+    if (modal) {
+        const isCurrentlyFlex = modal.style.display === 'flex';
+        modal.style.display = isCurrentlyFlex ? 'none' : 'flex';
+        document.body.style.overflow = isCurrentlyFlex ? 'auto' : 'hidden';
+    } else {
+        console.error("Support Modal element not found in HTML");
+    }
+};
