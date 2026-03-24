@@ -45,7 +45,11 @@
                 <i class="fas fa-user-shield"></i>
                 <p>Admin</p>
             </a>
-
+<div class="lang-toggle-wrapper">
+    <button onclick="toggleLanguage()" class="lang-btn">
+        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+    </button>
+</div>
             <button class="nav-item-box signin-btn" onclick="window.toggleModal()">
                 <i class="fas fa-user-circle"></i>
                 <p>Sign In</p>
@@ -213,6 +217,12 @@
                 <a href="#"><i class="fab fa-facebook"></i></a>
             </div>
         </div>
+        <div class="footer-col">
+    <h4>Language / ቋንቋ</h4>
+    <button onclick="toggleLanguage()" class="lang-btn-footer">
+        English / አማርኛ
+    </button>
+</div>
     </div>
     <div class="footer-bottom">
         <p>&copy; 2026 Golem Marketplace. All rights reserved.</p>
