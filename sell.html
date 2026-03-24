@@ -131,17 +131,18 @@
 
                 // C. Prepare Data
                // --- Inside sell.html submit listener ---
+// --- Updated Data Object ---
 const productData = {
     name: document.getElementById('prodName').value,
     status_condition: document.getElementById('status_condition').value,
     price: parseFloat(document.getElementById('prodPrice').value),
-    category: document.getElementById('prodCategory').value,
+    category: document.getElementById('prodCategory').value, // Check this ID!
     description: document.getElementById('prodDesc').value,
     image: publicUrl,
-    phone_number: document.getElementById('prodPhone').value,
+    seller_phone: document.getElementById('prodPhone').value, // Changed from phone_number
     seller_name: user.user_metadata?.full_name || "Verified Seller",
     user_id: user.id,
-    status: 'pending' // 👈 CHANGE THIS FROM 'approved' TO 'pending'
+    status: 'pending' 
 };
 
                 // D. Insert into Database
