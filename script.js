@@ -591,3 +591,46 @@ window.shareWhitelist = () => {
         alert("Wishlist copied to clipboard! You can now paste it into Telegram.");
     }
 };
+
+
+// 1. Define the function GLOBALLY and safely
+window.toggleWishlist = function(id, btnElement) {
+    try {
+        let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+        const icon = btnElement.querySelector('i');
+
+        if (saved.includes(id)) {
+            saved = saved.filter(itemId => itemId !== id);
+            btnElement.classList.remove('active');
+            if (icon) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        } else {
+            saved.push(id);
+            btnElement.classList.add('active');
+            if (icon) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            }
+        }
+
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        
+        if (window.updateCartBadge) {
+            window.updateCartBadge();
+        }
+    } catch (e) {
+        console.error("Wishlist error:", e);
+    }
+};
+
+// 2. Simple Badge Update
+window.updateCartBadge = function() {
+    const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.innerText = saved.length;
+        badge.style.display = saved.length > 0 ? 'flex' : 'none';
+    }
+};
