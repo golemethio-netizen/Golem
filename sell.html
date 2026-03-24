@@ -31,36 +31,42 @@
                     <input type="text" id="prodName" placeholder="e.g., iPhone 15 Pro Max" required>
                 </div>
 
+                <div style="display: flex; gap: 15px;">
+                    <div class="input-group-sell" style="flex: 1;">
+                        <label><i class="fas fa-star"></i> Condition</label>
+                        <select id="status_condition" required>
+                            <option value="New">New</option>
+                            <option value="Used">Used</option>
+                            <option value="Refurbished">Refurbished</option>
+                        </select>
+                    </div>
+                    <div class="input-group-sell" style="flex: 1;">
+                        <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
+                        <input type="number" id="prodPrice" placeholder="0.00" required>
+                    </div>
+                </div>
+
                 <div class="input-group-sell">
-                    <label><i class="fas fa-star"></i> Condition</label>
-                    <select id="status_condition" required>
-                        <option value="New">New</option>
-                        <option value="Used">Used</option>
-                        <option value="Refurbished">Refurbished</option>
+                    <label><i class="fas fa-list"></i> Category</label>
+                    <select id="prodCategory" required>
+                        <option value="" disabled selected>Select Category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Fashion">Fashion</option>
+                        <option value="Vehicles">Vehicles</option>
+                        <option value="Property">Property</option>
+                        <option value="Home Supplies">Home Supplies</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
 
-             <div class="input-group-sell" style="flex: 1;">
-    <label><i class="fas fa-list"></i> Category</label>
-    <select id="prodCategory" required>
-        <option value="" disabled selected>Select Category</option>
-        <option value="Electronics">Electronics</option>
-        <option value="Furniture">Furniture</option>
-        <option value="Fashion">Fashion</option>
-        <option value="Vehicles">Vehicles</option>
-        <option value="Property">Property</option>
-        <option value="Home Supplies">Home Supplies</option>
-        <option value="Other">Other</option>
-    </select>
-</div>
-
                 <div class="input-group-sell">
                     <label><i class="fas fa-align-left"></i> Description</label>
-                    <textarea id="prodDesc" rows="4" placeholder="Describe the item condition..." required></textarea>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item condition, specs, etc..." required></textarea>
                 </div>
 
                 <div class="input-group-sell">
-                    <label><i class="fas fa-phone"></i> Phone Number</label>
+                    <label><i class="fas fa-phone"></i> Contact Phone</label>
                     <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
 
@@ -75,10 +81,8 @@
     <script src="config.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // --- AUTO-FILL USER DATA ---
             const { data: { user } } = await _supabase.auth.getUser();
             if (user) {
-                // Pre-fill phone number if it exists in metadata
                 if (user.user_metadata.phone_number) {
                     document.getElementById('prodPhone').value = user.user_metadata.phone_number;
                 }
@@ -108,7 +112,7 @@
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) return alert("Please sign in first.");
 
-            btn.innerText = "Uploading Image...";
+            btn.innerText = "Processing Listing...";
             btn.disabled = true;
 
             try {
@@ -129,21 +133,19 @@
                     .from('product-images')
                     .getPublicUrl(filePath);
 
-                // C. Prepare Data
-               // --- Inside sell.html submit listener ---
-// --- Updated Data Object ---
-const productData = {
-    name: document.getElementById('prodName').value,
-    status_condition: document.getElementById('status_condition').value,
-    price: parseFloat(document.getElementById('prodPrice').value),
-    category: document.getElementById('prodCategory').value, // Check this ID!
-    description: document.getElementById('prodDesc').value,
-    image: publicUrl,
-    seller_phone: document.getElementById('prodPhone').value, // Changed from phone_number
-    seller_name: user.user_metadata?.full_name || "Verified Seller",
-    user_id: user.id,
-    status: 'pending' 
-};
+                // C. Prepare Data (Matching your Admin Panel expectations)
+                const productData = {
+                    name: document.getElementById('prodName').value,
+                    status_condition: document.getElementById('status_condition').value,
+                    price: parseFloat(document.getElementById('prodPrice').value),
+                    category: document.getElementById('prodCategory').value,
+                    description: document.getElementById('prodDesc').value,
+                    image: publicUrl,
+                    seller_phone: document.getElementById('prodPhone').value,
+                    seller_name: user.user_metadata?.full_name || "Verified Seller",
+                    user_id: user.id,
+                    status: 'pending' 
+                };
 
                 // D. Insert into Database
                 const { error: dbError } = await _supabase
@@ -152,7 +154,7 @@ const productData = {
 
                 if (dbError) throw dbError;
 
-                alert("Your item has been sent! An admin will review it shortly.!");
+                alert("Success! Your item is now pending admin approval.");
                 window.location.href = 'index.html';
 
             } catch (err) {
@@ -167,9 +169,10 @@ const productData = {
         .input-group-sell { margin-bottom: 15px; }
         .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
         .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem;
         }
-        .auth-submit { background: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .auth-submit { background: #333; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .auth-submit:hover { background: #000; }
         .auth-submit:disabled { background: #ccc; }
     </style>
 </body>
