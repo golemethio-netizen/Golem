@@ -64,6 +64,27 @@ window.fetchProducts = async (category = 'All') => {
     }
 };
 
+window.toggleWishlist = (id, btn) => {
+    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const icon = btn.querySelector('i');
+
+    if (saved.includes(id)) {
+        // Remove from list
+        saved = saved.filter(itemId => itemId !== id);
+        btn.classList.remove('active');
+        icon.classList.replace('fas', 'far');
+    } else {
+        // Add to list
+        saved.push(id);
+        btn.classList.add('active');
+        icon.classList.replace('far', 'fas');
+    }
+
+    localStorage.setItem('golem_saved', JSON.stringify(saved));
+    window.updateCartBadge(); // Refresh the badge in the header
+};
+
+
 // --- 3. RENDERING ENGINE ---
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
@@ -532,25 +553,6 @@ function sendOrder(platform) {
         window.open(`https://wa.me/251912345678?text=${message}`, '_blank');
     }
 }
-window.toggleWishlist = (id, btn) => {
-    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
-    const icon = btn.querySelector('i');
-
-    if (saved.includes(id)) {
-        // Remove from list
-        saved = saved.filter(itemId => itemId !== id);
-        btn.classList.remove('active');
-        icon.classList.replace('fas', 'far');
-    } else {
-        // Add to list
-        saved.push(id);
-        btn.classList.add('active');
-        icon.classList.replace('far', 'fas');
-    }
-
-    localStorage.setItem('golem_saved', JSON.stringify(saved));
-    window.updateCartBadge(); // Refresh the badge in the header
-};
 
 window.shareWhitelist = () => {
     const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
