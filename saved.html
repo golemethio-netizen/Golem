@@ -140,18 +140,20 @@
 
         // --- 5. Utils ---
         function removeItem(id) {
-            let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
-            saved = saved.filter(savedId => savedId !== id);
-            localStorage.setItem('golem_saved', JSON.stringify(saved));
-            loadSavedItems();
-        }
+    // 1. Find the element and add a fade-out class
+    const card = document.querySelector(`button[onclick="removeItem('${id}')"]`).closest('.product-card');
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.8)';
+    card.style.transition = '0.3s ease';
 
-        function clearAllSaved() {
-            if(confirm("Are you sure you want to clear your wishlist?")) {
-                localStorage.removeItem('golem_saved');
-                loadSavedItems();
-            }
-        }
+    // 2. Wait for animation then update data
+    setTimeout(() => {
+        let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
+        saved = saved.filter(savedId => savedId !== id);
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        loadSavedItems();
+    }, 300);
+}
 
         document.addEventListener('DOMContentLoaded', loadSavedItems);
     </script>
