@@ -119,19 +119,24 @@
 
         // --- 4. Order Logic ---
         function sendOrder(platform) {
-            const total = document.getElementById('totalPrice').innerText;
-            const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
-            
-            let message = `Hello Golem Furniture! I want to order these items from my wishlist:%0A%0A`;
-            items.forEach((name, i) => message += `${i+1}. ${name}%0A`);
-            message += `%0A*Total: ${total} ETB*`;
+    const total = document.getElementById('totalPrice').innerText;
+    const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
+    
+    // Create a clean, professional message for the seller
+    let message = `🏠 *NEW ORDER FROM GOLEM*%0A`;
+    message += `I'm interested in the following items:%0A%0A`;
+    items.forEach((name, i) => message += `✅ ${name}%0A`);
+    message += `%0A💰 *Total Value: ${total} ETB*%0A`;
+    message += `Please let me know the availability!`;
 
-            if (platform === 'telegram') {
-                window.open(`https://t.me/YourUsername?text=${message}`, '_blank');
-            } else {
-                window.open(`https://wa.me/251911223344?text=${message}`, '_blank'); // Replace with your number
-            }
-        }
+    if (platform === 'telegram') {
+        // Use your Telegram username here
+        window.open(`https://t.me/yohannes_surafel?text=${message}`, '_blank'); 
+    } else {
+        // Use your business WhatsApp number (Include 251)
+        window.open(`https://wa.me/251900000000?text=${message}`, '_blank'); 
+    }
+}
 
         // --- 5. Utils ---
         function removeItem(id) {
