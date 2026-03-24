@@ -261,6 +261,9 @@ window.updateCartBadge = () => {
     }
 };
 
+// Call this every time the page loads
+document.addEventListener('DOMContentLoaded', window.updateCartBadge);
+
 window.addToCartFromModal = () => {
     if (!currentProduct) return;
     let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
