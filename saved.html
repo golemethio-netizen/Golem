@@ -62,17 +62,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script>
-        // --- 1. Load Data ---
-        
-      async function loadSavedItems() {
-    // 1. Get the IDs from the browser's "Whitelist" (localStorage)
+     <script>
+   // --- 1. Load Data ---
+async function loadSavedItems() {
     const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
     const grid = document.getElementById('savedGrid');
     const empty = document.getElementById('emptyState');
     const summary = document.getElementById('savedSummary');
 
-    // 2. If the list is empty, show the "Empty" message
     if (savedIds.length === 0) {
         grid.innerHTML = ""; 
         grid.appendChild(empty);
@@ -81,13 +78,10 @@
         return;
     }
 
-    // 3. Fetch ONLY the saved items, but maintain the Golem Sorting Order
     const { data, error } = await _supabase
         .from('products')
         .select('*')
-        .in('id', savedIds) // This is the "Whitelist" filter
-        .order('is_sponsored', { ascending: false })
-        .order('is_featured', { ascending: false })
+        .in('id', savedIds)
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -95,7 +89,6 @@
         return;
     }
 
-    // 4. Update the UI
     if (data) {
         empty.style.display = 'none';
         summary.style.display = 'block';
@@ -104,85 +97,86 @@
     }
 }
 
-        // --- 2. Render Cards ---
-        function renderSaved(items) {
-            const grid = document.getElementById('savedGrid');
-            grid.innerHTML = items.map(p => `
-                <div class="product-card">
-                    <button class="remove-btn" onclick="removeItem('${p.id}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    
-                    <div class="card-img-container" onclick="location.href='checkout.html?id=${p.id}'">
-                        <img src="${p.image}" alt="${p.name}">
-                    </div>
-                    
-                    <div class="product-info">
-                        <h3 class="product-title">${p.name}</h3>
-                        <p class="product-price">${p.price.toLocaleString()} ETB</p>
-                    </div>
-                </div>
-            `).join('');
-        }
+// --- 2. Render Cards ---
+function renderSaved(items) {
+    const grid = document.getElementById('savedGrid');
+    grid.innerHTML = items.map(p => `
+        <div class="product-card">
+            <button class="remove-btn" onclick="removeItem('${p.id}')">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="card-img-container" onclick="location.href='checkout.html?id=${p.id}'">
+                <img src="${p.image}" alt="${p.name}">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">${p.name}</h3>
+                <p class="product-price">${p.price.toLocaleString()} ETB</p>
+            </div>
+        </div>
+    `).join('');
+}
 
-        // --- 3. Calculations ---
-        function calculateTotal(items) {
-            const total = items.reduce((sum, item) => sum + parseInt(item.price), 0);
-            document.getElementById('totalItems').innerText = items.length;
-            document.getElementById('totalPrice').innerText = total.toLocaleString();
-        }
+// --- 3. Calculations ---
+function calculateTotal(items) {
+    const total = items.reduce((sum, item) => sum + parseInt(item.price), 0);
+    document.getElementById('totalItems').innerText = items.length;
+    document.getElementById('totalPrice').innerText = total.toLocaleString();
+}
 
-        // --- 4. Order Logic ---
-       async function sendOrder(platform) {
+// --- 4. Fixed Order Logic (Separates WhatsApp and Telegram) ---
+async function sendOrder(platform) {
     const total = document.getElementById('totalPrice').innerText;
     const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
     
-    // 1. YOUR BOT CONFIG (Keep these private!)
+    // BOT CONFIG
     const BOT_TOKEN = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
     const CHAT_ID = "6792892909";
 
-    // 2. Format the message for Telegram
+    // Format Message
     let message = `🛒 *NEW ORDER RECEIVED*\n\n`;
     message += `📦 *Items:*\n`;
     items.forEach((name) => message += `• ${name}\n`);
     message += `\n💰 *Total Value:* ${total} ETB\n`;
-    message += `────────────────\n`;
-    message += `👤 *Customer Action:* Waiting for confirmation.`;
 
-    // 3. Send to Telegram via API
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: message,
-                parse_mode: 'Markdown'
-            })
-        });
-
-        if (response.ok) {
-            alert("✅ Order sent to Golem Bot! We will contact you shortly.");
-        } else {
-            throw new Error("Failed to send");
+    if (platform === 'telegram') {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+            });
+            if (response.ok) alert("✅ Order sent to Golem Bot!");
+        } catch (error) {
+            alert("❌ Error sending to Telegram.");
         }
-    } catch (error) {
-        console.error("Bot Error:", error);
-        alert("❌ Error sending order. Please try again.");
+    } else if (platform === 'whatsapp') {
+        // Redirects to your WhatsApp with the message
+        const waNumber = "251900000000"; // REPLACE WITH YOUR ACTUAL NUMBER
+        const waMessage = window.encodeURIComponent(message.replace(/\*/g, ''));
+        window.open(`https://wa.me/${waNumber}?text=${waMessage}`, '_blank');
     }
 }
 
-        // --- 5. Utils ---
-        function removeItem(id) {
-    // 1. Find the element and add a fade-out class
+// --- 5. Fix for shareWhitelist ReferenceError ---
+window.shareWhitelist = function() {
+    const url = window.location.href;
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Golem Wishlist',
+            text: 'Check out these items I saved on Golem!',
+            url: url
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard!");
+    }
+};
+
+// --- 6. Utils ---
+function removeItem(id) {
     const card = document.querySelector(`button[onclick="removeItem('${id}')"]`).closest('.product-card');
     card.style.opacity = '0';
-    card.style.transform = 'scale(0.8)';
-    card.style.transition = '0.3s ease';
-
-    // 2. Wait for animation then update data
     setTimeout(() => {
         let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
         saved = saved.filter(savedId => savedId !== id);
@@ -190,24 +184,17 @@
         loadSavedItems();
     }, 300);
 }
-// --- CLEAR ALL SAVED ITEMS ---
-// --- CLEAR ALL SAVED ITEMS (FIXED) ---
+
 window.clearAllSaved = function() {
     if (confirm("Are you sure you want to remove all saved items?")) {
-        // 1. Clear using the CORRECT key name
         localStorage.removeItem('golem_saved'); 
-        
-        // 2. Hide the order summary box
         const summary = document.getElementById('savedSummary');
         if (summary) summary.style.display = 'none';
-        
-        // 3. Refresh the UI by calling your load function
         loadSavedItems();
-        
-        console.log("Wishlist cleared successfully.");
     }
 };
-        document.addEventListener('DOMContentLoaded', loadSavedItems);
+
+document.addEventListener('DOMContentLoaded', loadSavedItems);
     </script>
 </body>
 </html>
