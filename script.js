@@ -133,6 +133,13 @@ function renderProducts(products) {
                         <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                     </button>
 
+// Inside your renderProducts function map:
+`<button class="wishlist-btn ${isSaved ? 'active' : ''}" 
+         onclick="window.toggleWishlist('${p.id}', this)">
+    <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+</button>`
+
+
                     <img src="${p.image}" alt="${p.name}" loading="lazy">
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
