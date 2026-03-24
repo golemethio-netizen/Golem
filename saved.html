@@ -133,23 +133,44 @@
         }
 
         // --- 4. Order Logic ---
-        function sendOrder(platform) {
+       async function sendOrder(platform) {
     const total = document.getElementById('totalPrice').innerText;
     const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
     
-    // Create a clean, professional message for the seller
-    let message = `🏠 *NEW ORDER FROM GOLEM*%0A`;
-    message += `I'm interested in the following items:%0A%0A`;
-    items.forEach((name, i) => message += `✅ ${name}%0A`);
-    message += `%0A💰 *Total Value: ${total} ETB*%0A`;
-    message += `Please let me know the availability!`;
+    // 1. YOUR BOT CONFIG (Keep these private!)
+    const BOT_TOKEN = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
+    const CHAT_ID = "6792892909";
 
-    if (platform === 'telegram') {
-        // Use your Telegram username here
-        window.open(`https://t.me/yohannes_surafel?text=${message}`, '_blank'); 
-    } else {
-        // Use your business WhatsApp number (Include 251)
-        window.open(`https://wa.me/251900000000?text=${message}`, '_blank'); 
+    // 2. Format the message for Telegram
+    let message = `🛒 *NEW ORDER RECEIVED*\n\n`;
+    message += `📦 *Items:*\n`;
+    items.forEach((name) => message += `• ${name}\n`);
+    message += `\n💰 *Total Value:* ${total} ETB\n`;
+    message += `────────────────\n`;
+    message += `👤 *Customer Action:* Waiting for confirmation.`;
+
+    // 3. Send to Telegram via API
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        if (response.ok) {
+            alert("✅ Order sent to Golem Bot! We will contact you shortly.");
+        } else {
+            throw new Error("Failed to send");
+        }
+    } catch (error) {
+        console.error("Bot Error:", error);
+        alert("❌ Error sending order. Please try again.");
     }
 }
 
