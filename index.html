@@ -85,15 +85,21 @@
             </select>
         </div>
         
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>
-            <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
-            <button class="filter-btn" onclick="window.filterCategory('Furniture', this)">Furniture</button>
-            <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
-            <button class="filter-btn sponsor-filter" onclick="window.filterSponsored()">
-                <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
-            </button>
-        </div>
+      <div class="filter-bar">
+    <button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>
+    <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
+    <button class="filter-btn" onclick="window.filterCategory('Furniture', this)">Furniture</button>
+    <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
+    
+    <button class="filter-btn" onclick="window.filterCategory('Vehicles', this)">Vehicles</button>
+    <button class="filter-btn" onclick="window.filterCategory('Property', this)">Property</button>
+    <button class="filter-btn" onclick="window.filterCategory('Home Supplies', this)">Home Supplies</button>
+
+    <button class="filter-btn sponsor-filter" onclick="window.filterSponsored()">
+        <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
+    </button>
+</div>
+        
     </section>
 
     <main class="container">
