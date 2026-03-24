@@ -613,3 +613,59 @@ body.is-admin .admin-expiry-info {
     background: #fff;
     transform: scale(1.1);
 }
+
+
+.saved-summary-box {
+    position: sticky;
+    bottom: 20px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #eee;
+    z-index: 100;
+}
+
+.total-price-row {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-top: 5px;
+}
+
+.summary-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.order-btn {
+    padding: 12px 25px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s;
+}
+
+.tg-btn { background: #0088cc; color: white; }
+.wa-btn { background: #25d366; color: white; }
+
+.order-btn:hover { transform: translateY(-3px); }
+
+/* Small Screen Fix */
+@media (max-width: 768px) {
+    .saved-summary-box {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    .summary-actions { width: 100%; flex-direction: column; }
+    .order-btn { width: 100%; justify-content: center; }
+}
