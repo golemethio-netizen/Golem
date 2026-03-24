@@ -820,3 +820,38 @@ body.is-admin .admin-expiry-info {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Header Toggle Styling */
+.lang-btn {
+    background: #f0f2f5;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.lang-btn:hover {
+    background: #e4e6e9;
+}
+
+/* Footer Toggle Styling */
+.lang-btn-footer {
+    background: transparent;
+    border: 1px solid #444;
+    color: #bbb;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.lang-btn-footer:hover {
+    color: white;
+    border-color: white;
+}
