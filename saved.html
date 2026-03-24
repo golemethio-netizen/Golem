@@ -78,6 +78,9 @@ async function loadSavedItems() {
         return;
     }
 
+
+
+    // 3. Fetch ONLY the saved items, but maintain the Golem Sorting Order
     const { data, error } = await _supabase
         .from('products')
         .select('*')
