@@ -174,7 +174,7 @@ async function sendOrder(platform) {
         }
     } else if (platform === 'whatsapp') {
         // For WhatsApp, we use the same message but remove Markdown stars (*) for readability
-        const waNumber = "251900000000"; 
+        const waNumber = "251707022845"; 
         const waMessage = window.encodeURIComponent(message.replace(/\*/g, ''));
         window.open(`https://wa.me/${waNumber}?text=${waMessage}`, '_blank');
     }
