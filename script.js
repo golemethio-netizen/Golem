@@ -420,33 +420,46 @@ backToTopBtn.addEventListener('click', () => {
 });
 
 
-// --- LANGUAGE TOGGLE LOGIC ---
+// --- 1. SET INITIAL STATE ---
+// We check localStorage so the user's choice is remembered after refresh
 let currentLang = localStorage.getItem('golem_lang') || 'en';
 
-function toggleLanguage() {
+// --- 2. MAKE THE FUNCTION GLOBAL ---
+// Attaching it to 'window' fixes the ReferenceError
+window.toggleLanguage = function() {
     currentLang = currentLang === 'en' ? 'am' : 'en';
     localStorage.setItem('golem_lang', currentLang);
     applyLanguage();
-}
+    console.log("Language switched to: " + currentLang);
+};
 
+// --- 3. APPLY THE TRANSLATIONS ---
 function applyLanguage() {
     const langBtnText = document.getElementById('langText');
     
+    // Select all elements that have a 'data-am' attribute
+    const translatableElements = document.querySelectorAll('[data-am]');
+
     if (currentLang === 'am') {
-        // Change UI text to Amharic
-        if(langBtnText) langBtnText.innerText = "English";
-        document.querySelectorAll('[data-am]').forEach(el => {
-            el.dataset.en = el.innerText; // Store English temporarily
+        if (langBtnText) langBtnText.innerText = "English";
+        
+        translatableElements.forEach(el => {
+            // Save the original English text if we haven't already
+            if (!el.dataset.en) el.dataset.en = el.innerText; 
             el.innerText = el.dataset.am;
         });
     } else {
-        // Change UI text to English
-        if(langBtnText) langBtnText.innerText = "አማርኛ";
-        document.querySelectorAll('[data-am]').forEach(el => {
-            if(el.dataset.en) el.innerText = el.dataset.en;
+        if (langBtnText) langBtnText.innerText = "አማርኛ";
+        
+        translatableElements.forEach(el => {
+            // Restore the saved English text
+            if (el.dataset.en) el.innerText = el.dataset.en;
         });
     }
 }
+
+// --- 4. RUN ON LOAD ---
+document.addEventListener('DOMContentLoaded', applyLanguage);
 
 // Run on page load
 document.addEventListener('DOMContentLoaded', applyLanguage);
