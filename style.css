@@ -682,3 +682,11 @@ body.is-admin .admin-expiry-info {
     font-size: 0.8rem;
     color: #999;
 }
+
+.expiring-soon { border: 2px solid #ff4757 !important; position: relative; }
+.expiring-soon::after { 
+    content: '⚠️ EXPIRING SOON'; 
+    position: absolute; top: 10px; right: 10px; 
+    background: #ff4757; color: white; 
+    padding: 5px 10px; font-size: 0.7rem; font-weight: bold; border-radius: 5px;
+}
