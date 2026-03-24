@@ -669,3 +669,16 @@ body.is-admin .admin-expiry-info {
     .summary-actions { width: 100%; flex-direction: column; }
     .order-btn { width: 100%; justify-content: center; }
 }
+#totalPrice {
+    color: #2ed573;
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.05);
+}
+
+.summary-details h3 {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    color: #999;
+}
