@@ -89,17 +89,16 @@
             </select>
         </div>
         
-      <div class="filter-bar">
-    <button class="filter-btn active" onclick="window.filterCategory('All', this)">All</button>
-    <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
-    <button class="filter-btn" onclick="window.filterCategory('Furniture', this)">Furniture</button>
-    <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
-    
-    <button class="filter-btn" onclick="window.filterCategory('Vehicles', this)">Vehicles</button>
-    <button class="filter-btn" onclick="window.filterCategory('Property', this)">Property</button>
-    <button class="filter-btn" onclick="window.filterCategory('Home Supplies', this)">Home Supplies</button>
+ <div class="filter-bar">
+    <button class="filter-btn active" data-am="ሁሉም" onclick="window.filterCategory('All', this)">All</button>
+    <button class="filter-btn" data-am="ኤሌክትሮኒክስ" onclick="window.filterCategory('Electronics', this)">Electronics</button>
+    <button class="filter-btn" data-am="የቤት ዕቃዎች" onclick="window.filterCategory('Furniture', this)">Furniture</button>
+    <button class="filter-btn" data-am="አልባሳት" onclick="window.filterCategory('Fashion', this)">Fashion</button>
+    <button class="filter-btn" data-am="ተሽከርካሪዎች" onclick="window.filterCategory('Vehicles', this)">Vehicles</button>
+    <button class="filter-btn" data-am="ንብረት" onclick="window.filterCategory('Property', this)">Property</button>
+    <button class="filter-btn" data-am="የቤት ቁሳቁሶች" onclick="window.filterCategory('Home Supplies', this)">Home Supplies</button>
 
-    <button class="filter-btn sponsor-filter" onclick="window.filterSponsored()">
+    <button class="filter-btn sponsor-filter" data-am="ልዩ ዕቃዎች" onclick="window.filterSponsored()">
         <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
     </button>
 </div>
