@@ -131,15 +131,28 @@ async function sendOrder(platform) {
     const total = document.getElementById('totalPrice').innerText;
     const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
     
-    // BOT CONFIG
+    // 1. Ask for Customer Info
+    const customerName = prompt("Please enter your Full Name:");
+    if (!customerName) return; // Cancel if no name
+
+    const customerPhone = prompt("Please enter your Phone Number (e.g., 09...):");
+    if (!customerPhone) return; // Cancel if no phone
+
+    // 2. BOT CONFIG
     const BOT_TOKEN = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
     const CHAT_ID = "6792892909";
 
-    // Format Message
-    let message = `🛒 *NEW ORDER RECEIVED*\n\n`;
+    // 3. Format Message for Telegram
+    let message = `🔔 *NEW ORDER RECEIVED*\n`;
+    message += `────────────────\n`;
+    message += `👤 *Customer:* ${customerName}\n`;
+    message += `📞 *Phone:* ${customerPhone}\n`;
+    message += `────────────────\n`;
     message += `📦 *Items:*\n`;
     items.forEach((name) => message += `• ${name}\n`);
     message += `\n💰 *Total Value:* ${total} ETB\n`;
+    message += `────────────────\n`;
+    message += `🚀 *Source:* Golem Web`;
 
     if (platform === 'telegram') {
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
@@ -147,35 +160,26 @@ async function sendOrder(platform) {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+                body: JSON.stringify({ 
+                    chat_id: CHAT_ID, 
+                    text: message, 
+                    parse_mode: 'Markdown' 
+                })
             });
-            if (response.ok) alert("✅ Order sent to Golem Bot!");
+            if (response.ok) {
+                alert(`Thank you ${customerName}! Your order has been sent to our bot.`);
+            }
         } catch (error) {
-            alert("❌ Error sending to Telegram.");
+            alert("❌ Connection error. Please try again.");
         }
     } else if (platform === 'whatsapp') {
-        // Redirects to your WhatsApp with the message
-        const waNumber = "251900000000"; // REPLACE WITH YOUR ACTUAL NUMBER
+        // For WhatsApp, we use the same message but remove Markdown stars (*) for readability
+        const waNumber = "251900000000"; 
         const waMessage = window.encodeURIComponent(message.replace(/\*/g, ''));
         window.open(`https://wa.me/${waNumber}?text=${waMessage}`, '_blank');
     }
 }
-
-// --- 5. Fix for shareWhitelist ReferenceError ---
-window.shareWhitelist = function() {
-    const url = window.location.href;
-    if (navigator.share) {
-        navigator.share({
-            title: 'My Golem Wishlist',
-            text: 'Check out these items I saved on Golem!',
-            url: url
-        }).catch(console.error);
-    } else {
-        navigator.clipboard.writeText(url);
-        alert("Link copied to clipboard!");
-    }
-};
-
+         
 // --- 6. Utils ---
 function removeItem(id) {
     const card = document.querySelector(`button[onclick="removeItem('${id}')"]`).closest('.product-card');
