@@ -170,24 +170,20 @@
     }, 300);
 }
 // --- CLEAR ALL SAVED ITEMS ---
+// --- CLEAR ALL SAVED ITEMS (FIXED) ---
 window.clearAllSaved = function() {
     if (confirm("Are you sure you want to remove all saved items?")) {
-        // 1. Clear from localStorage
-        localStorage.removeItem('golem_saved_items');
+        // 1. Clear using the CORRECT key name
+        localStorage.removeItem('golem_saved'); 
         
-        // 2. Clear the UI
-        const grid = document.getElementById('savedGrid');
-        if (grid) {
-            grid.innerHTML = `
-                <div style="text-align:center; padding:50px; color:#888;">
-                    <i class="fas fa-heart-broken" style="font-size:3rem; margin-bottom:15px;"></i>
-                    <p>Your wishlist is empty.</p>
-                    <button onclick="location.href='index.html'" class="signin-btn" style="margin-top:15px;">Go Shopping</button>
-                </div>`;
-        }
+        // 2. Hide the order summary box
+        const summary = document.getElementById('savedSummary');
+        if (summary) summary.style.display = 'none';
         
-        // 3. Optional: Update a counter if you have one in the header
-        console.log("Wishlist cleared.");
+        // 3. Refresh the UI by calling your load function
+        loadSavedItems();
+        
+        console.log("Wishlist cleared successfully.");
     }
 };
         document.addEventListener('DOMContentLoaded', loadSavedItems);
