@@ -551,3 +551,34 @@ window.toggleWishlist = (id, btn) => {
     localStorage.setItem('golem_saved', JSON.stringify(saved));
     window.updateCartBadge(); // Refresh the badge in the header
 };
+
+window.shareWhitelist = () => {
+    const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
+    const total = document.getElementById('totalPrice').innerText;
+    
+    if (items.length === 0) return alert("Your wishlist is empty!");
+
+    // Create the text message
+    let shareText = `🛒 Check out my furniture wishlist from Golem!%0A%0A`;
+    items.forEach((name, i) => shareText += `${i + 1}. ${name}%0A`);
+    shareText += `%0A💰 Total Value: ${total} ETB%0A`;
+    shareText += `%0AView these on Golem: ${window.location.origin}`;
+
+    // 1. Try Native Sharing (Works best on Mobile/Telegram/WhatsApp)
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Golem Wishlist',
+            text: decodeURIComponent(shareText),
+            url: window.location.origin
+        }).catch(err => console.log('Error sharing', err));
+    } else {
+        // 2. Fallback: Copy to Clipboard
+        const textArea = document.createElement("textarea");
+        textArea.value = decodeURIComponent(shareText);
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert("Wishlist copied to clipboard! You can now paste it into Telegram.");
+    }
+};
