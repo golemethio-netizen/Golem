@@ -179,6 +179,32 @@ async function sendOrder(platform) {
         window.open(`https://wa.me/${waNumber}?text=${waMessage}`, '_blank');
     }
 }
+
+         // --- SHARE WHITELIST FUNCTION ---
+window.shareWhitelist = function() {
+    // 1. Get the current page URL
+    const shareUrl = window.location.href;
+    const shareTitle = "My Golem Wishlist";
+    const shareText = "Check out these items I saved on Golem!";
+
+    // 2. Use the Web Share API (Mobile/Modern Browsers)
+    if (navigator.share) {
+        navigator.share({
+            title: shareTitle,
+            text: shareText,
+            url: shareUrl
+        })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing', error));
+    } else {
+        // 3. Fallback: Copy to Clipboard for Desktop/Older Browsers
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert("Link copied to clipboard! You can now paste it in Telegram or WhatsApp.");
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    }
+};
          
 // --- 6. Utils ---
 function removeItem(id) {
