@@ -40,21 +40,19 @@
                     </select>
                 </div>
 
-                <div style="display: flex; gap: 15px;">
-                    <div class="input-group-sell" style="flex: 1;">
-                        <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
-                        <input type="number" id="prodPrice" placeholder="0.00" required>
-                    </div>
-                    <div class="input-group-sell" style="flex: 1;">
-                        <label><i class="fas fa-list"></i> Category</label>
-                        <select id="prodCategory" required>
-                            <option value="Electronics">Electronics</option>
-                            <option value="Fashion">Fashion</option>
-                            <option value="Home & Furniture">Home & Furniture</option>
-                            <option value="Vehicles">Vehicles</option>
-                        </select>
-                    </div>
-                </div>
+             <div class="input-group-sell" style="flex: 1;">
+    <label><i class="fas fa-list"></i> Category</label>
+    <select id="prodCategory" required>
+        <option value="" disabled selected>Select Category</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Furniture">Furniture</option>
+        <option value="Fashion">Fashion</option>
+        <option value="Vehicles">Vehicles</option>
+        <option value="Property">Property</option>
+        <option value="Home Supplies">Home Supplies</option>
+        <option value="Other">Other</option>
+    </select>
+</div>
 
                 <div class="input-group-sell">
                     <label><i class="fas fa-align-left"></i> Description</label>
