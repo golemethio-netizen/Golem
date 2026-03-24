@@ -85,6 +85,26 @@ window.toggleWishlist = function(id, btnElement) {
     }
 };
 
+// THE MISSING FUNCTION FIXED
+window.addToCartFromModal = function() {
+    if (!currentProduct) return;
+    
+    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    
+    if (!saved.includes(currentProduct.id)) {
+        saved.push(currentProduct.id);
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        window.updateCartBadge();
+        
+        // Refresh the grid in the background so the heart icon updates there too
+        window.fetchProducts();
+        
+        alert("❤️ Added to your Whitelist!");
+    } else {
+        alert("This item is already in your Whitelist!");
+    }
+};
+
 window.updateCartBadge = function() {
     const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const badge = document.getElementById('cartBadge');
@@ -193,6 +213,17 @@ window.filterCategory = (category, button) => {
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     window.fetchProducts(category);
+};
+
+window.filterSponsored = async () => {
+    const now = new Date().toISOString();
+    const { data } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('is_sponsored', true)
+        .gt('sponsored_until', now);
+    
+    if (data) renderProducts(data);
 };
 
 function filterSearch(term) {
