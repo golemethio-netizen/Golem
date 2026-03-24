@@ -399,3 +399,22 @@ window.toggleSupportModal = function() {
         console.error("Support Modal element not found in HTML");
     }
 };
+
+const backToTopBtn = document.getElementById('backToTop');
+
+// Show button when user scrolls down 400px
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+});
+
+// Smooth scroll to top when clicked
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
