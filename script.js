@@ -418,3 +418,35 @@ backToTopBtn.addEventListener('click', () => {
         behavior: 'smooth'
     });
 });
+
+
+// --- LANGUAGE TOGGLE LOGIC ---
+let currentLang = localStorage.getItem('golem_lang') || 'en';
+
+function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'am' : 'en';
+    localStorage.setItem('golem_lang', currentLang);
+    applyLanguage();
+}
+
+function applyLanguage() {
+    const langBtnText = document.getElementById('langText');
+    
+    if (currentLang === 'am') {
+        // Change UI text to Amharic
+        if(langBtnText) langBtnText.innerText = "English";
+        document.querySelectorAll('[data-am]').forEach(el => {
+            el.dataset.en = el.innerText; // Store English temporarily
+            el.innerText = el.dataset.am;
+        });
+    } else {
+        // Change UI text to English
+        if(langBtnText) langBtnText.innerText = "አማርኛ";
+        document.querySelectorAll('[data-am]').forEach(el => {
+            if(el.dataset.en) el.innerText = el.dataset.en;
+        });
+    }
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', applyLanguage);
