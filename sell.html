@@ -32,14 +32,16 @@
                 </div>
 
                 <div style="display: flex; gap: 15px;">
-                    <div class="input-group-sell" style="flex: 1;">
-                        <label><i class="fas fa-star"></i> Condition</label>
-                        <select id="status_condition" required>
-                            <option value="New">New</option>
-                            <option value="Used">Used</option>
-                            <option value="Refurbished">Refurbished</option>
-                        </select>
-                    </div>
+                  <div class="input-group-sell" style="flex: 1;">
+    <label><i class="fas fa-star"></i> Condition</label>
+    <select id="status_condition" required>
+        <option value="New">New</option>
+        <option value="Used">Used</option>
+        <option value="Refurbished">Refurbished</option>
+        <option value="Damage">Damage / For Parts</option>
+        <option value="We work on order">We work on order (Custom)</option>
+    </select>
+</div>
                     <div class="input-group-sell" style="flex: 1;">
                         <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
                         <input type="number" id="prodPrice" placeholder="0.00" required>
