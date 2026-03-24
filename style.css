@@ -855,3 +855,27 @@ body.is-admin .admin-expiry-info {
     color: white;
     border-color: white;
 }
+
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    padding: 15px 0;
+    overflow-x: auto; /* Allows swiping left/right on mobile */
+    white-space: nowrap; /* Prevents buttons from stacking */
+    scrollbar-width: none; /* Hides scrollbar on Firefox */
+}
+
+.filter-bar::-webkit-scrollbar {
+    display: none; /* Hides scrollbar on Chrome/Safari */
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+    flex-shrink: 0; /* Prevents buttons from squishing */
+}
