@@ -164,6 +164,12 @@ async function loadItems(status = 'pending') {
                 </div>
             </div>
         </div>`;
+
+<p style="font-size:0.85rem; color:#666; margin-top:5px;">
+    Seller: <a href="tel:${item.seller_phone}" style="color:#007bff; text-decoration:none;">${item.seller_phone}</a>
+</p>
+
+        
     }).join('');
 }
 
@@ -216,7 +222,7 @@ window.permanentlyDelete = async (id) => {
 async function loadStats() {
     const { count: totalItems } = await _supabase.from('products').select('*', { count: 'exact', head: true });
     const { count: sponsoredCount } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_sponsored', true).gt('sponsored_until', new Date().toISOString());
-    const { data: priceData } = await _supabase.from('products').select('price');
+  const { data: priceData } = await _supabase.from('products').select('price').eq('status', 'approved');
     const { count: ticketCount } = await _supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('is_resolved', false);
 
     const marketValue = priceData?.reduce((sum, item) => sum + (item.price || 0), 0) || 0;
