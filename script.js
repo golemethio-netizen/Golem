@@ -466,55 +466,42 @@ document.addEventListener('DOMContentLoaded', applyLanguage);
 
 
 
+// --- MASTER CHAT LOGIC ---
 function toggleChatMenu() {
     const menu = document.getElementById('chatMenu');
-    menu.classList.toggle('active');
+    const toast = document.getElementById('chatToast');
+    
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+    
+    // Hide the welcome bubble once the user clicks the button
+    if (toast) {
+        toast.style.display = 'none';
+    }
 }
 
-// Close menu if user clicks anywhere else on the screen
+// Global click listener to close menu when clicking outside
 window.addEventListener('click', function(e) {
     const chatContainer = document.querySelector('.floating-chat');
-    if (!chatContainer.contains(e.target)) {
-        document.getElementById('chatMenu').classList.remove('active');
-    }
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-    // Show the welcome message after 5 seconds
-    setTimeout(() => {
-        const toast = document.getElementById('chatToast');
-        if (toast) {
-            toast.style.display = 'block';
-        }
-    }, 5000);
-});
-
-// Update your existing toggleChatMenu to hide the toast when clicked
-function toggleChatMenu() {
     const menu = document.getElementById('chatMenu');
-    const toast = document.getElementById('chatToast');
     
-    menu.classList.toggle('active');
-    
-    // Hide toast once the user interacts
-    if (toast) {
-        toast.style.display = 'none';
+    if (chatContainer && !chatContainer.contains(e.target) && menu) {
+        menu.classList.remove('active');
     }
-}
+});
 
-
+// Logic for the 'X' button on the toast
 function closeToast(event) {
-    // Prevent the click from opening the chat menu
-    if (event) event.stopPropagation();
-    
+    if (event) event.stopPropagation(); // Prevents opening the menu
     const toast = document.getElementById('chatToast');
     if (toast) {
         toast.style.display = 'none';
     }
 }
 
-// Ensure your toggleChatMenu also hides the toast
-function toggleChatMenu() {
+//Ensure your toggleChatMenu also hides the toast
+/*function toggleChatMenu() {
     const menu = document.getElementById('chatMenu');
     const toast = document.getElementById('chatToast');
     
@@ -523,7 +510,7 @@ function toggleChatMenu() {
     if (toast) {
         toast.style.display = 'none';
     }
-}
+} 
 window.addEventListener('DOMContentLoaded', () => {
     const now = new Date();
     const hour = now.getHours();
@@ -537,4 +524,4 @@ window.addEventListener('DOMContentLoaded', () => {
             dot.style.display = 'none'; // Hide when you are likely asleep!
         }
     }
-});
+});*/
