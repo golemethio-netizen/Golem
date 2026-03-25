@@ -1101,3 +1101,21 @@ body.is-admin .admin-expiry-info {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.chat-toast {
+    position: relative; /* Allows absolute positioning of the X inside */
+}
+
+.close-toast {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-toast:hover {
+    color: white;
+}
