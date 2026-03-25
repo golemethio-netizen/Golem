@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Golem Furniture</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .product-page-container { max-width: 800px; margin: 100px auto; padding: 20px; }
+        .product-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .product-display img { width: 100%; border-radius: 10px; object-fit: cover; max-height: 500px; }
+        .details-side { display: flex; flex-direction: column; gap: 15px; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: 600; }
+        .price-tag { font-size: 1.5rem; color: #2ed573; font-weight: bold; }
+        .order-buttons { display: grid; gap: 10px; margin-top: 20px; }
+        .order-buttons a { text-align: center; padding: 15px; border-radius: 8px; text-decoration: none; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .tg-btn { background: #0088cc; }
+        .wa-btn { background: #25d366; }
+        .call-btn { background: #333; }
+    </style>
+</head>
+<body style="background: #f8f9fa;">
+
+    <div class="product-page-container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Catalog</a>
+        
+        <div id="productContent" class="product-display">
+            <p>Loading furniture details...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        async function loadSingleProduct() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (!productId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const { data: p, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('id', productId)
+                .single();
+
+            if (error || !p) {
+                document.getElementById('productContent').innerHTML = `
+                    <div style="text-align:center; padding: 50px;">
+                        <h3>Item Not Found</h3>
+                        <p>This item may have been sold or removed.</p>
+                        <a href="index.html" class="btn">Return Home</a>
+                    </div>`;
+                return;
+            }
+
+            // Set Page Title
+            document.title = `${p.name} | Golem Furniture`;
+
+            // Clean Phone for Links
+            const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
+            const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+            const tgUser = (p.telegram_username || "").replace('@', '');
+
+            document.getElementById('productContent').innerHTML = `
+                <div class="image-side">
+                    <img src="${p.image}" alt="${p.name}">
+                </div>
+                <div class="details-side">
+                    <span class="category-badge" style="background:#eee; padding:5px 10px; border-radius:5px; width:fit-content;">${p.category || 'Furniture'}</span>
+                    <h1>${p.name}</h1>
+                    <p class="price-tag">${p.price.toLocaleString()} ETB</p>
+                    <p style="color:#666; line-height:1.6;">${p.description || 'No description provided.'}</p>
+                    
+                    <div class="order-buttons">
+                        <a href="tel:+${cleanPhone}" class="call-btn"><i class="fas fa-phone"></i> Call Seller</a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="tg-btn"><i class="fab fa-telegram-plane"></i> Order via Telegram</a>
+                        <a href="https://wa.me/${cleanPhone}?text=I'm interested in ${p.name}" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.onload = loadSingleProduct;
+    </script>
+</body>
+</html>
