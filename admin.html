@@ -91,13 +91,24 @@
     <script>
         let currentView = 'pending';
 
-        async function checkAdmin() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user || user.email !== 'yohannes.surafel@gmail.com') {
-                alert("Restricted Access: Admin Only.");
-                window.location.href = 'index.html';
-            }
-        }
+      async function checkAdmin() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+
+    if (!profile?.is_admin) {
+        alert("Restricted Access: Admin Only.");
+        window.location.href = 'index.html';
+    }
+}
 
       
         async function switchTab(status, btn) {
