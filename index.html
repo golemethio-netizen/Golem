@@ -258,6 +258,34 @@
         </a>
     </div>
 </div>
+
+
+
+
+<script>
+// --- FLOATING CHAT LOGIC ---
+function toggleChatMenu() {
+    const menu = document.getElementById('chatMenu');
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+}
+
+// Close the menu if the user clicks anywhere else on the page
+window.addEventListener('click', function(e) {
+    const chatContainer = document.querySelector('.floating-chat');
+    const menu = document.getElementById('chatMenu');
+    
+    // If the click is NOT inside the chat button or menu, close it
+    if (chatContainer && !chatContainer.contains(e.target)) {
+        menu.classList.remove('active');
+    }
+});
+</script>
+
+
+
+
     
 </body>
 </html>
