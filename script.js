@@ -501,3 +501,26 @@ function toggleChatMenu() {
         toast.style.display = 'none';
     }
 }
+
+
+function closeToast(event) {
+    // Prevent the click from opening the chat menu
+    if (event) event.stopPropagation();
+    
+    const toast = document.getElementById('chatToast');
+    if (toast) {
+        toast.style.display = 'none';
+    }
+}
+
+// Ensure your toggleChatMenu also hides the toast
+function toggleChatMenu() {
+    const menu = document.getElementById('chatMenu');
+    const toast = document.getElementById('chatToast');
+    
+    menu.classList.toggle('active');
+    
+    if (toast) {
+        toast.style.display = 'none';
+    }
+}
