@@ -1011,3 +1011,34 @@ body.is-admin .admin-expiry-info {
     70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
 }
+
+.chat-toast {
+    position: absolute;
+    bottom: 80px; /* Sits right above the button */
+    left: 0;
+    background: #333;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    width: 200px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 1001;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast-arrow {
+    position: absolute;
+    bottom: -8px;
+    left: 25px;
+    width: 0; 
+    height: 0; 
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #333;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.8); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
