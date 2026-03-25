@@ -164,7 +164,8 @@ function renderProducts(products) {
 
         // Generate a specific share link for this product
         const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Furniture! Price: ${p.price.toLocaleString()} ETB.`);
-        const shareUrl = encodeURIComponent(`${window.location.origin}/product.html?id=${p.id}`); // Assuming you'll have a product page, otherwise use origin
+       // Inside your renderProducts loop:
+const shareUrl = encodeURIComponent(`${window.location.origin}/product.html?id=${p.id}`);
 
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
