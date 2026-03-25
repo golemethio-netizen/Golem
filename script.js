@@ -567,3 +567,46 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });*/
+
+
+async function loadUsers() {
+    const list = document.getElementById('userList');
+    list.innerHTML = "<p>Loading user database...</p>";
+
+    // Replace 'profiles' with your actual table name if different
+    const { data: users, error } = await _supabase
+        .from('profiles') 
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error || !users) {
+        list.innerHTML = `<p style="color:red;">Error loading users: ${error?.message || 'Access Denied'}</p>`;
+        return;
+    }
+
+    list.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="border-bottom: 2px solid #eee;">
+                <tr>
+                    <th style="padding: 10px;">Name</th>
+                    <th style="padding: 10px;">Email / ID</th>
+                    <th style="padding: 10px;">Phone</th>
+                    <th style="padding: 10px;">Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${users.map(u => `
+                    <tr style="border-bottom: 1px solid #f9f9f9;">
+                        <td style="padding: 12px; font-weight: bold;">${u.full_name || 'Anonymous'}</td>
+                        <td style="padding: 12px; color: #666;">${u.email || u.id.substring(0,8)}...</td>
+                        <td style="padding: 12px;">${u.phone_number || 'No Phone'}</td>
+                        <td style="padding: 12px; font-size: 0.8rem;">${new Date(u.created_at).toLocaleDateString()}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    // Update the stat card
+    document.getElementById('totalUsers').innerText = users.length;
+}
