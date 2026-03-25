@@ -11,7 +11,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial Data Fetch
     window.fetchProducts();
     window.loadSponsor();
-
+//includes the "Online Dot" check:
+    const now = new Date();
+    const hour = now.getHours();
+    const dot = document.querySelector('.online-dot');
+    if (dot) {
+        dot.style.display = (hour >= 8 && hour < 20) ? 'block' : 'none';
+    }
+    // Welcome Toast Timer
+    setTimeout(() => {
+        const toast = document.getElementById('chatToast');
+        if (toast && !document.getElementById('chatMenu').classList.contains('active')) {
+            toast.style.display = 'block';
+        }
+    }, 5000);
+    
     // Search Logic
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
