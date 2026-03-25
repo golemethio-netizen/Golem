@@ -45,6 +45,19 @@
             <button onclick="generateSponsorReport()" style="background: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
                 <i class="fas fa-file-invoice"></i> View Expiry Report (Next 24h)
             </button>
+
+            <button onclick="switchTab('users', this)" class="tab-btn">Registered Users</button>
+
+<div class="stat-card">
+    <i class="fas fa-users" style="color:#3498db; opacity:1;"></i>
+    <div><h4 id="totalUsers">0</h4><p>Total Users</p></div>
+</div>
+
+<section id="usersSection" style="display: none; margin-top: 20px;">
+    <h2 style="margin-bottom: 20px;">REGISTERED ACCOUNTS</h2>
+    <div id="userList" style="display: grid; gap: 10px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        </div>
+</section>
         </div>
 
         <div class="admin-search-bar" style="margin-bottom: 25px;">
@@ -86,13 +99,29 @@
             }
         }
 
-        async function switchTab(status, btn) {
-            currentView = status;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('viewTitle').innerText = status.toUpperCase() + " ITEMS";
-            loadItems(status);
-        }
+       async function switchTab(status, btn) {
+    currentView = status;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Toggle visibility of sections
+    const adminGrid = document.getElementById('adminGrid');
+    const usersSection = document.getElementById('usersSection');
+    const viewTitle = document.getElementById('viewTitle');
+
+    if (status === 'users') {
+        adminGrid.style.display = 'none';
+        viewTitle.style.display = 'none';
+        usersSection.style.display = 'block';
+        loadUsers();
+    } else {
+        adminGrid.style.display = 'grid'; // or 'block' depending on your layout
+        viewTitle.style.display = 'block';
+        usersSection.style.display = 'none';
+        viewTitle.innerText = status.toUpperCase() + " ITEMS";
+        loadItems(status);
+    }
+}
 
         async function loadItems(status = 'pending') {
             const grid = document.getElementById('adminGrid');
