@@ -130,6 +130,7 @@ window.updateCartBadge = function() {
 
 // --- 4. RENDERING ENGINE ---
 // Replace your existing renderProducts function with this updated version
+// Replace your existing renderProducts function with this updated version
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
