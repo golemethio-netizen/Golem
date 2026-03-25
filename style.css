@@ -969,3 +969,34 @@ body.is-admin .admin-expiry-info {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* The Pulse Animation */
+@keyframes pulse-blue {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 15px rgba(0, 123, 255, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+/* Apply it to your chat button */
+.chat-btn {
+    animation: pulse-blue 2s infinite;
+    /* Ensure the button has a solid background so the pulse looks like it's behind it */
+    background: #007bff; 
+    position: relative;
+    z-index: 1;
+}
+
+/* Optional: Stop pulsing when the menu is open to keep it clean */
+.chat-menu.active ~ .chat-btn {
+    animation: none;
+    background: #333; /* Changes color slightly when active */
+}
