@@ -115,6 +115,7 @@ window.updateCartBadge = function() {
 };
 
 // --- 4. RENDERING ENGINE ---
+// Replace your existing renderProducts function with this updated version
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -146,6 +147,10 @@ function renderProducts(products) {
         const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
         const tgUser = (p.telegram_username || "").replace('@', '');
 
+        // Generate a specific share link for this product
+        const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Furniture! Price: ${p.price.toLocaleString()} ETB.`);
+        const shareUrl = encodeURIComponent(`${window.location.origin}/product.html?id=${p.id}`); // Assuming you'll have a product page, otherwise use origin
+
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
                 <div class="card-img-container">
@@ -169,9 +174,11 @@ function renderProducts(products) {
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
                     
                     <div class="quick-contact-bar">
-                        <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
-                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
-                        <a href="https://wa.me/${cleanPhone}?text=I'm interested in ${p.name}" target="_blank" class="contact-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="tel:+${cleanPhone}" class="contact-icon call" title="Call Seller"><i class="fas fa-phone-alt"></i></a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram" title="Telegram Seller"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;" title="Share with Friends">
+                            <i class="fas fa-share-alt"></i>
+                        </a>
                     </div>
 
                     <div class="product-actions">
