@@ -1000,3 +1000,14 @@ body.is-admin .admin-expiry-info {
     animation: none;
     background: #333; /* Changes color slightly when active */
 }
+
+.expiring-soon {
+    border: 2px solid #ff4757 !important;
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
