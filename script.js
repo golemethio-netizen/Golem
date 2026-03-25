@@ -503,6 +503,32 @@ function toggleChatMenu() {
     }
 }
 
+// --- MASTER CHAT LOGIC (GLOBAL) ---
+window.toggleChatMenu = function() {
+    const menu = document.getElementById('chatMenu');
+    const toast = document.getElementById('chatToast');
+    
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+    
+    // Hide the welcome bubble once the user interacts
+    if (toast) {
+        toast.style.display = 'none';
+    }
+};
+
+// --- CLOSE TOAST LOGIC (GLOBAL) ---
+window.closeToast = function(event) {
+    if (event) {
+        event.stopPropagation(); // Prevents the click from opening the menu
+    }
+    const toast = document.getElementById('chatToast');
+    if (toast) {
+        toast.style.display = 'none';
+    }
+};
+
 // Global click listener to close menu when clicking outside
 window.addEventListener('click', function(e) {
     const chatContainer = document.querySelector('.floating-chat');
@@ -512,15 +538,6 @@ window.addEventListener('click', function(e) {
         menu.classList.remove('active');
     }
 });
-
-// Logic for the 'X' button on the toast
-function closeToast(event) {
-    if (event) event.stopPropagation(); // Prevents opening the menu
-    const toast = document.getElementById('chatToast');
-    if (toast) {
-        toast.style.display = 'none';
-    }
-}
 
 //Ensure your toggleChatMenu also hides the toast
 /*function toggleChatMenu() {
