@@ -463,3 +463,18 @@ document.addEventListener('DOMContentLoaded', applyLanguage);
 
 // Run on page load
 document.addEventListener('DOMContentLoaded', applyLanguage);
+
+
+
+function toggleChatMenu() {
+    const menu = document.getElementById('chatMenu');
+    menu.classList.toggle('active');
+}
+
+// Close menu if user clicks anywhere else on the screen
+window.addEventListener('click', function(e) {
+    const chatContainer = document.querySelector('.floating-chat');
+    if (!chatContainer.contains(e.target)) {
+        document.getElementById('chatMenu').classList.remove('active');
+    }
+});
