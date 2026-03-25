@@ -164,8 +164,10 @@ function renderProducts(products) {
 
         // Generate a specific share link for this product
         const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Furniture! Price: ${p.price.toLocaleString()} ETB.`);
-       // Inside your renderProducts loop:
-const shareUrl = encodeURIComponent(`${window.location.origin}/product.html?id=${p.id}`);
+      // This dynamically finds the correct folder path
+
+        const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
+const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
