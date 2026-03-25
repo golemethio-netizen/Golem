@@ -241,22 +241,28 @@
 </button>
 
 <div class="floating-chat">
-    <button class="chat-btn" onclick="toggleChatMenu()">
-        <i class="fas fa-comment-dots"></i>
-        <span class="chat-label" data-am="ያግኙን">Contact Us</span>
-    </button>
     
+    <div id="chatToast" class="chat-toast">
+        <p>👋 Hello! Need help with furniture or prices?</p>
+        <div class="toast-arrow"></div>
+    </div>
+
     <div id="chatMenu" class="chat-menu">
-        <a href="tel:+251707022845" class="menu-item call">
+        <a href="tel:+251911223344" class="menu-item call">
             <i class="fas fa-phone"></i> <span>Call Now</span>
         </a>
         <a href="https://t.me/yohannes_surafel" target="_blank" class="menu-item telegram">
             <i class="fab fa-telegram-plane"></i> <span>Telegram</span>
         </a>
-        <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp">
+        <a href="https://wa.me/251911223344" target="_blank" class="menu-item whatsapp">
             <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
         </a>
     </div>
+
+    <button class="chat-btn" onclick="toggleChatMenu()">
+        <i class="fas fa-comment-dots"></i>
+        <span class="chat-label">Contact Us</span>
+    </button>
 </div>
 
 
