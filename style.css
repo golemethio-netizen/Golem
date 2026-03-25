@@ -1119,3 +1119,35 @@ body.is-admin .admin-expiry-info {
 .close-toast:hover {
     color: white;
 }
+/* Container for the icon and the dot */
+.status-dot-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* The Green Dot */
+.online-dot {
+    height: 10px;
+    width: 10px;
+    background-color: #2ed573; /* Modern Green */
+    border-radius: 50%;
+    position: absolute;
+    top: -2px;
+    right: -5px;
+    border: 2px solid #007bff; /* Matches the button color to look seamless */
+    animation: blink-green 2s infinite;
+}
+
+/* Breathing Animation for the dot */
+@keyframes blink-green {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Optional: Mobile adjustment to keep it compact */
+@media (max-width: 480px) {
+    .chat-label { display: none; } /* On tiny screens, just show the icon + green dot */
+    .chat-btn { padding: 12px; border-radius: 50%; }
+}
