@@ -524,3 +524,17 @@ function toggleChatMenu() {
         toast.style.display = 'none';
     }
 }
+window.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const dot = document.querySelector('.online-dot');
+
+    // Show "Online" only between 8 AM and 8 PM
+    if (dot) {
+        if (hour >= 8 && hour < 20) {
+            dot.style.display = 'block';
+        } else {
+            dot.style.display = 'none'; // Hide when you are likely asleep!
+        }
+    }
+});
