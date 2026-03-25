@@ -906,3 +906,66 @@ body.is-admin .admin-expiry-info {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.floating-chat {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* Placed on the left to not overlap with "Back to Top" */
+    z-index: 1000;
+}
+
+.chat-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.chat-btn:hover { transform: scale(1.05); }
+
+.chat-menu {
+    position: absolute;
+    bottom: 70px;
+    left: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    overflow: hidden;
+    width: 180px;
+}
+
+.menu-item {
+    padding: 15px;
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.menu-item:hover { background: #f8f9fa; }
+.menu-item i { width: 20px; text-align: center; }
+
+.menu-item.call i { color: #007bff; }
+.menu-item.telegram i { color: #0088cc; }
+.menu-item.whatsapp i { color: #25d366; }
+
+/* Show menu class */
+.chat-menu.active { display: flex; animation: slideUp 0.3s ease; }
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
