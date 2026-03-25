@@ -478,3 +478,26 @@ window.addEventListener('click', function(e) {
         document.getElementById('chatMenu').classList.remove('active');
     }
 });
+
+window.addEventListener('DOMContentLoaded', () => {
+    // Show the welcome message after 5 seconds
+    setTimeout(() => {
+        const toast = document.getElementById('chatToast');
+        if (toast) {
+            toast.style.display = 'block';
+        }
+    }, 5000);
+});
+
+// Update your existing toggleChatMenu to hide the toast when clicked
+function toggleChatMenu() {
+    const menu = document.getElementById('chatMenu');
+    const toast = document.getElementById('chatToast');
+    
+    menu.classList.toggle('active');
+    
+    // Hide toast once the user interacts
+    if (toast) {
+        toast.style.display = 'none';
+    }
+}
