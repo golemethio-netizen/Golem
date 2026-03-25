@@ -242,10 +242,12 @@
 
 <div class="floating-chat">
     
-    <div id="chatToast" class="chat-toast">
-        <p>👋 Hello! Need help with furniture or prices?</p>
-        <div class="toast-arrow"></div>
-    </div>
+   <div id="chatToast" class="chat-toast" style="display: none;">
+    <span class="close-toast" onclick="closeToast(event)">&times;</span>
+    
+    <p>👋 Hello! Need help with furniture or prices?</p>
+    <div class="toast-arrow"></div>
+</div>
 
     <div id="chatMenu" class="chat-menu">
         <a href="tel:+251911223344" class="menu-item call">
