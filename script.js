@@ -672,3 +672,63 @@ async function notifyAdminOfNewPost(product) {
         })
     });
 }
+
+
+window.openProductModal = async (product) => {
+    currentProduct = product;
+    const modal = document.getElementById('productModal');
+    if (!modal) return;
+
+    // ... [Keep your existing image/title/price code here] ...
+
+    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
+    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
+
+    // --- NEW WHITELIST CHECK ---
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('is_verified')
+        .eq('phone', product.seller_phone)
+        .single();
+
+    const isVerified = profile?.is_verified || false;
+
+    // If NOT verified, the "Order" goes to the Golem Admin (You)
+    const whatsappTarget = isVerified ? intPhone : GolemConfig.myPhone;
+    const waPrefix = isVerified ? "" : "[UNVERIFIED SELLER] ";
+    
+    document.getElementById('whatsappOrder').href = 
+        `https://wa.me/${whatsappTarget}?text=${encodeURIComponent(waPrefix + "I'm interested in " + product.name + " ID: " + product.id)}`;
+
+    // Telegram Logic
+    const tgUser = (product.telegram_username || "").replace('@', '');
+    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
+    document.getElementById('callContact').href = `tel:+${intPhone}`;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = "hidden";
+};
+
+// Inside your users.map(u => ...) template:
+<td style="padding: 10px 15px;">
+    ${u.is_verified ? 
+        '<span style="background:#2ed573; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Verified</span>' : 
+        '<span style="background:#ffa502; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Standard</span>'}
+</td>
+<td style="padding: 10px 15px; text-align: right;">
+    <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
+            style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; margin-right:5px;">
+        ${u.is_verified ? 'Unverify' : 'Verify Seller'}
+    </button>
+    </td>
+
+
+window.toggleVerification = async (userId, currentStatus) => {
+    const { error } = await _supabase
+        .from('profiles')
+        .update({ is_verified: !currentStatus })
+        .eq('id', userId);
+
+    if (!error) loadUsers();
+    else alert("Error: " + error.message);
+};
