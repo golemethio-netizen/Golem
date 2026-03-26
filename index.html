@@ -305,7 +305,7 @@ window.addEventListener('click', function(e) {
         // 2. Show the modal
         document.getElementById('successModal').style.display = 'flex';
         
-        
+        if (window.navigator.vibrate) window.navigator.vibrate(100);
         // Clean the URL so the modal doesn't pop up again on refresh
         window.history.replaceState({}, document.title, "index.html");
         const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
