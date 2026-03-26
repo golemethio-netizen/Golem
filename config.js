@@ -15,7 +15,7 @@ const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
 });
 const GolemConfig = {
     myPhone: "251707022845", // Replace with your actual number
-    myTelegram: "allInOneEthiopia1",
+    myTelegram: "@allInOneEthiopia1",
     botToken: "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o",
     chatId: "6792892909"
 };
