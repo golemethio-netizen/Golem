@@ -170,8 +170,9 @@
                 if (dbError) throw dbError;
 
                 // Success!
-                alert("Success! Your item is now pending admin approval.");
-                window.location.href = 'index.html';
+               // Inside the success part of sell.html
+alert("Success! Your item is now pending admin approval.");
+window.location.href = `index.html?posted=${encodeURIComponent(productData.name)}`;
 
             } catch (err) {
                 console.error("Submission Error:", err);
