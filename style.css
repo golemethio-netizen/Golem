@@ -1151,3 +1151,13 @@ body.is-admin .admin-expiry-info {
     .chat-label { display: none; } /* On tiny screens, just show the icon + green dot */
     .chat-btn { padding: 12px; border-radius: 50%; }
 }
+.admin-badge {
+    background: #ff4757;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    margin-left: 5px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(255, 71, 87, 0.3);
+}
