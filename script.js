@@ -337,11 +337,11 @@ window.handleAuth = async function(e) {
 
     if (isSignUpMode) {
         const fullName = document.getElementById('regName').value;
-        const phone = document.getElementById('regPhone').value;
+    const phone = document.getElementById('regPhone').value; // You have this in HTML
         const { error } = await _supabase.auth.signUp({
             email,
             password,
-            options: { data: { full_name: fullName, phone_number: phone } }
+            options: { data: { full_name: fullName, phone: phone } }
         });
         if (error) alert("Error: " + error.message);
         else { alert("Check your email for confirmation!"); window.toggleModal(); }
