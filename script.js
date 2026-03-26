@@ -612,30 +612,39 @@ async function loadUsers() {
                         <th style="padding: 15px; text-align: right;">ACTIONS</th>
                     </tr>
                 </thead>
-                <tbody>
-                    ${users.map(u => `
-                        <tr style="border-bottom: 1px solid #f4f7f6; transition: 0.2s; height: 60px;">
-                            <td style="padding: 10px 15px; font-weight: 600;">${u.full_name || 'New Member'}</td>
-                            <td style="padding: 10px 15px; color: #555;">${u.email}</td>
-                            <td style="padding: 10px 15px;">
-                                ${u.is_admin ? 
-                                    '<span style="background:#6c5ce7; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Admin</span>' : 
-                                    '<span style="background:#eee; color:#666; padding:4px 10px; border-radius:20px; font-size:0.75rem;">User</span>'}
-                            </td>
-                            <td style="padding: 10px 15px; font-size: 0.85rem; color: #999;">
-                                ${new Date(u.created_at).toLocaleDateString('en-GB')}
-                            </td>
-                            <td style="padding: 10px 15px; text-align: right;">
-                                ${u.email !== 'yohannes.surafel@gmail.com' ? `
-                                    <button onclick="toggleAdminPrivilege('${u.id}', ${u.is_admin})" 
-                                            style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem;">
-                                        ${u.is_admin ? 'Demote' : 'Make Admin'}
-                                    </button>
-                                ` : '<i class="fas fa-lock" title="Master Admin"></i>'}
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
+                // Update the row mapping inside loadUsers() to look like this:
+<tbody>
+    ${users.map(u => `
+        <tr style="border-bottom: 1px solid #f4f7f6; transition: 0.2s; height: 60px;">
+            <td style="padding: 10px 15px; font-weight: 600;">${u.full_name || 'New Member'}</td>
+            <td style="padding: 10px 15px; color: #555;">${u.email}</td>
+            <td style="padding: 10px 15px;">
+                ${u.is_admin ? 
+                    '<span style="background:#6c5ce7; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Admin</span>' : 
+                    '<span style="background:#eee; color:#666; padding:4px 10px; border-radius:20px; font-size:0.75rem;">User</span>'}
+                ${u.is_verified ? 
+                    '<span style="background:#2ed573; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem; margin-left:5px;">Verified</span>' : 
+                    '<span style="background:#ffa502; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem; margin-left:5px;">Standard</span>'}
+            </td>
+            <td style="padding: 10px 15px; font-size: 0.85rem; color: #999;">
+                ${new Date(u.created_at).toLocaleDateString('en-GB')}
+            </td>
+            <td style="padding: 10px 15px; text-align: right;">
+                <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
+                        style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; margin-right:5px;">
+                    ${u.is_verified ? 'Unverify' : 'Verify Seller'}
+                </button>
+                ${u.email !== 'yohannes.surafel@gmail.com' ? `
+                    <button onclick="toggleAdminPrivilege('${u.id}', ${u.is_admin})" 
+                            style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem;">
+                        ${u.is_admin ? 'Demote' : 'Make Admin'}
+                    </button>
+                ` : '<i class="fas fa-lock" title="Master Admin"></i>'}
+            </td>
+        </tr>
+    `).join('')}
+</tbody>
+
             </table>
         </div>
     `;
@@ -709,18 +718,7 @@ window.openProductModal = async (product) => {
     document.body.style.overflow = "hidden";
 };
 
-// Inside your users.map(u => ...) template:
-<td style="padding: 10px 15px;">
-    ${u.is_verified ? 
-        '<span style="background:#2ed573; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Verified</span>' : 
-        '<span style="background:#ffa502; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Standard</span>'}
-</td>
-<td style="padding: 10px 15px; text-align: right;">
-    <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
-            style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; margin-right:5px;">
-        ${u.is_verified ? 'Unverify' : 'Verify Seller'}
-    </button>
-    </td>
+
 
 
 window.toggleVerification = async (userId, currentStatus) => {
