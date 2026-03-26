@@ -150,14 +150,27 @@
                 };
 
                 // D. Insert into Database
-                const { error: dbError } = await _supabase
-                    .from('products')
-                    .insert([productData]);
+               // D. Insert into Database
+const { error: dbError } = await _supabase
+    .from('products')
+    .insert([{
+        name: document.getElementById('prodName').value,
+        status_condition: document.getElementById('status_condition').value,
+        price: parseFloat(document.getElementById('prodPrice').value),
+        category: document.getElementById('prodCategory').value,
+        description: document.getElementById('prodDesc').value,
+        image: publicUrl,
+        seller_phone: document.getElementById('prodPhone').value,
+        // Fallback to "Anonymous" if metadata is missing to avoid 400 errors
+        seller_name: user.user_metadata?.full_name || user.email.split('@')[0] || "Seller",
+        user_id: user.id,
+        status: 'pending' 
+    }]);
 
-                if (dbError) throw dbError;
-
-                alert("Success! Your item is now pending admin approval.");
-                window.location.href = 'index.html';
+if (dbError) {
+    console.error("Database Error Details:", dbError);
+    throw new Error(`Database rejected: ${dbError.message}`);
+}
 
             } catch (err) {
                 alert("Error: " + err.message);
