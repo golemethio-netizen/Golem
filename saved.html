@@ -142,8 +142,8 @@ async function sendOrder(platform) {
     loader.style.display = 'flex';
 
     // 3. BOT CONFIG
-    const BOT_TOKEN = "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
-    const CHAT_ID = "6792892909";
+    const BOT_TOKEN = GolemConfig.botToken;
+const CHAT_ID = GolemConfig.chatId;
 
     let message = `🛒 *NEW GOLEM ORDER*\n👤 Name: ${customerName}\n📞 Phone: ${customerPhone}\n💰 Total: ${total} ETB\n📦 Items: ${items.join(', ')}`;
 
