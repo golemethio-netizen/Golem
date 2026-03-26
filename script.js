@@ -655,3 +655,20 @@ window.toggleAdminPrivilege = async (userId, currentStatus) => {
         loadUsers(); // Refresh the list
     }
 };
+
+
+
+// Add this helper to script.js or ensure it's in config.js
+async function notifyAdminOfNewPost(product) {
+    const message = `🆕 *NEW POST PENDING*\n📦 Item: ${product.name}\n💰 Price: ${product.price} ETB\n📞 Seller: ${product.seller_phone}\n\nCheck admin.html to approve!`;
+    
+    await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: GolemConfig.chatId,
+            text: message,
+            parse_mode: 'Markdown'
+        })
+    });
+}
