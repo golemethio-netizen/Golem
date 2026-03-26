@@ -211,6 +211,23 @@
                 return;
             }
 
+
+
+// 1. Fetch the count of PENDING items specifically
+    const { count: pendingCount } = await _supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+    // 2. Update the Badge
+    const badge = document.getElementById('pendingBadge');
+    if (badge) {
+        badge.innerText = pendingCount || 0;
+        badge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+    }
+const { count: userCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
+    document.getElementById('totalUsers').innerText = userCount || 0;
+                 
             const now = new Date();
             const twentyFourHours = 24 * 60 * 60 * 1000;
 
