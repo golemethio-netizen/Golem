@@ -150,37 +150,54 @@
                 };
 
                 // D. Insert into Database
-               // D. Insert into Database
-// D. Insert into Database
-                const { error: dbError } = await _supabase
-                    .from('products')
-                    .insert([{
-                        name: document.getElementById('prodName').value,
-                        status_condition: document.getElementById('status_condition').value,
-                        price: parseFloat(document.getElementById('prodPrice').value),
-                        category: document.getElementById('prodCategory').value,
-                        description: document.getElementById('prodDesc').value,
-                        image: publicUrl,
-                        seller_phone: document.getElementById('prodPhone').value,
-                        seller_name: user.user_metadata?.full_name || user.email.split('@')[0] || "Seller",
-                        user_id: user.id,
-                        status: 'pending' 
-                    }]);
+          // D. Insert into Database
+const { error: dbError } = await _supabase
+    .from('products')
+    .insert([{
+        name: document.getElementById('prodName').value,
+        status_condition: document.getElementById('status_condition').value,
+        price: parseFloat(document.getElementById('prodPrice').value),
+        category: document.getElementById('prodCategory').value,
+        description: document.getElementById('prodDesc').value,
+        image: publicUrl,
+        seller_phone: document.getElementById('prodPhone').value,
+        seller_name: user.user_metadata?.full_name || user.email.split('@')[0] || "Seller",
+        user_id: user.id,
+        status: 'pending' // Keeps it hidden until you approve
+    }]);
 
-                if (dbError) throw dbError;
+if (dbError) throw dbError;
 
-                // Success!
-               // Inside the success part of sell.html
+// --- NEW: TELEGRAM NOTIFICATION FOR ADMIN ---
+const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
+    `📦 *Item:* ${document.getElementById('prodName').value}\n` +
+    `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
+    `📞 *Seller:* ${document.getElementById('prodPhone').value}\n` +
+    `📂 *Category:* ${document.getElementById('prodCategory').value}\n\n` +
+    `👉 _Login to Admin Panel to Approve_`;
+
+try {
+    await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: GolemConfig.chatId,
+            text: telegramMessage,
+            parse_mode: 'Markdown'
+        })
+    });
+} catch (tgErr) {
+    console.error("Telegram notification failed:", tgErr);
+    // We don't throw this error so the user still sees their success message
+}
+
+// Success!
 alert("Success! Your item is now pending admin approval.");
-window.location.href = `index.html?posted=${encodeURIComponent(productData.name)}`;
+window.location.href = `index.html?posted=${encodeURIComponent(document.getElementById('prodName').value)}`;
 
-            } catch (err) {
-                console.error("Submission Error:", err);
-                alert("Error: " + err.message);
-                btn.innerText = "Publish Listing";
-                btn.disabled = false;
-            }
-        });
+
+
+                
     </script>
 
     <style>
