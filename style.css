@@ -1275,3 +1275,12 @@ body.is-admin .admin-expiry-info {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
+.chat-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+    font-size: 14px;
+}
