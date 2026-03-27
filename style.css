@@ -1198,3 +1198,80 @@ body.is-admin .admin-expiry-info {
         font-size: 0.85rem;
     }
 }
+
+
+/* Floating Menu Styles */
+.chat-menu {
+    position: fixed;
+    bottom: 90px;
+    right: 25px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: 0.3s;
+}
+
+.menu-item:hover { transform: scale(1.05); }
+
+/* Icons Colors */
+.menu-item.call i { color: #2ed573; }
+.menu-item.telegram i { color: #0088cc; }
+.menu-item.whatsapp i { color: #25d366; }
+
+/* The Main Button */
+.chat-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #333;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.status-dot-container { position: relative; }
+
+.online-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #2ed573;
+    border-radius: 50%;
+    border: 2px solid #333;
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(46, 213, 115, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
