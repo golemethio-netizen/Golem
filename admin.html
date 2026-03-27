@@ -223,12 +223,12 @@ async function toggleAdmin(userId, currentStatus) {
         // --- Other functions (loadItems, updateStatus, etc.) ---
         // ... Keep your existing loadItems, updateStatus, and resolveTicket functions here ...
 
-        window.onload = async () => { 
+      /*  window.onload = async () => { 
             await checkAdmin(); 
             loadStats(); 
             loadItems('pending'); 
             loadTickets(); 
-        };
+        };   */
 
              async function loadItems(status = 'pending') {
             const grid = document.getElementById('adminGrid');
