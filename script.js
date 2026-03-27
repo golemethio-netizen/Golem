@@ -355,38 +355,51 @@ window.handleAuth = async function(e) {
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    const signinBtn = document.querySelector('.signin-btn');
-    const adminLink = document.getElementById('adminNavLink');
+    
+    const userNav = document.getElementById('userNav');
+    const signInBtn = document.getElementById('signInBtn'); // The one with "nav-item-box" class
+    const adminNavLink = document.getElementById('adminNavLink');
 
     if (user) {
-        // 1. Update Sign In button to Sign Out
-        if (signinBtn) {
-            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
-            signinBtn.onclick = async () => { 
-                await _supabase.auth.signOut(); 
-                window.location.reload(); 
-            };
-        }
+        // 1. Toggle Visibility
+        if (signInBtn) signInBtn.style.display = 'none';
+        if (userNav) userNav.style.display = 'flex';
 
-        // 2. CHECK DATABASE FOR ADMIN STATUS
-        const { data: profile, error } = await _supabase
+        // 2. Fetch Profile
+        const { data: profile } = await _supabase
             .from('profiles')
-            .select('is_admin')
+            .select('full_name, avatar_url, is_admin')
             .eq('id', user.id)
             .single();
 
-        if (!error && adminLink && profile?.is_admin) {
-            adminLink.style.display = 'flex';
-            document.body.classList.add('is-admin');
-            console.log("🛡️ Admin Mode Active");
-        } else {
-            if (adminLink) adminLink.style.display = 'none';
+        if (profile) {
+            // Update Avatar and Name
+            const navName = document.getElementById('navName');
+            const navAvatar = document.getElementById('navAvatar');
+            
+            if (navName) navName.innerText = profile.full_name || "Account";
+            if (navAvatar) {
+                navAvatar.src = profile.avatar_url || `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=333&color=fff`;
+            }
+
+            // 3. Routing (Admin vs Seller)
+            const profileTrigger = document.getElementById('profileTrigger');
+            if (profile.is_admin) {
+                if (adminNavLink) adminNavLink.style.display = 'flex';
+                if (profileTrigger) profileTrigger.onclick = () => location.href='admin.html';
+            } else {
+                if (adminNavLink) adminNavLink.style.display = 'none';
+                if (profileTrigger) profileTrigger.onclick = () => location.href='seller.html';
+            }
         }
     } else {
         // No user logged in
-        if (adminLink) adminLink.style.display = 'none';
+        if (signInBtn) signInBtn.style.display = 'flex';
+        if (userNav) userNav.style.display = 'none';
+        if (adminNavLink) adminNavLink.style.display = 'none';
     }
 };
+
 
 window.checkAuthToSell = async () => {
     const { data: { user } } = await _supabase.auth.getUser();
