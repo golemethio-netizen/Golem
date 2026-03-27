@@ -41,18 +41,21 @@
         </div>
 
         <div id="savedSummary" class="saved-summary-box" style="display: none;">
-            <div class="summary-details">
-                <h3 style="font-weight: 700; margin-bottom: 5px;">Order Summary</h3>
-                <p style="color: #666;">Items: <span id="totalItems" style="font-weight: 600; color: #333;">0</span></p>
-                <p class="total-price-row">Total: <span id="totalPrice">0</span> ETB</p>
-            </div>
+          <div class="summary-details">
+        <h3 style="font-weight: 700; margin: 0; font-size: 1.1rem;">Order Summary</h3>
+        <p style="color: #666; margin: 5px 0;">
+            Items: <span id="totalItems" style="font-weight: 600; color: #333;">0</span> | 
+            Total: <span id="totalPrice" style="font-weight: 800; color: #000;">0</span> ETB
+        </p>
+    </div>
+            
             <div class="summary-actions">
-                <button onclick="sendOrder('telegram')" class="order-btn tg-btn">
-                    <i class="fab fa-telegram"></i> Order via Telegram
-                </button>
-                <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn" style="background: var(--whatsapp-green);">
-                    <i class="fab fa-whatsapp"></i> Order via WhatsApp
-                </button>
+                <button onclick="sendOrder('telegram')" class="order-btn tg-btn" style="background: #0088cc; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fab fa-telegram"></i> Telegram
+        </button>
+        <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn" style="background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </button>
                 <button onclick="shareWhitelist()" class="order-btn" style="background: #6c5ce7; color: white;">
     <i class="fas fa-share-alt"></i> Share List
 </button>
