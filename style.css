@@ -1161,3 +1161,40 @@ body.is-admin .admin-expiry-info {
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(255, 71, 87, 0.3);
 }
+/* Sticky Summary Box for Golem Mobile */
+.saved-summary-box {
+    position: sticky;
+    bottom: 20px; /* Floats slightly above the bottom */
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1); /* Shadow points up */
+    z-index: 999;
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+    .saved-summary-box {
+        bottom: 0;
+        border-radius: 20px 20px 0 0; /* Rounded top corners only */
+        padding: 15px;
+        flex-direction: column; /* Stack buttons on small screens */
+        gap: 15px;
+    }
+    
+    .summary-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Side-by-side buttons */
+        gap: 10px;
+    }
+    
+    .order-btn {
+        padding: 12px 5px;
+        font-size: 0.85rem;
+    }
+}
