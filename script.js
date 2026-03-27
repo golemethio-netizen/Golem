@@ -846,12 +846,15 @@ async function checkUserSession() {
 
 // Simple Sign Out Function
 async function signOut() {
-    await _supabase.auth.signOut();
-    location.reload();
+    // 1. Call the Supabase sign out method correctly
+    await _supabase.auth.signOut(); 
+    
+    // 2. Reload the page to clear the session and update the UI
+    location.reload(); 
 }
 
-// Call this function when the page loads
-window.addEventListener('DOMContentLoaded', checkUserSession);
+// Ensure it is globally accessible if called from an 'onclick' in HTML
+window.signOut = signOut;
 
 
 
