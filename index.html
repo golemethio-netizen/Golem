@@ -5,9 +5,26 @@
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golem Marketplace | Buy & Sell</title>
+   
+    <div id="userNav" style="display: none; align-items: center; gap: 12px;">
+    <div onclick="location.href='seller.html'" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: #f4f4f4; padding: 5px 12px; border-radius: 50px; border: 1px solid #ddd;">
+        <img id="navAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+        <span id="navName" style="font-weight: 600; font-size: 0.9rem; color: #333;">Profile</span>
+    </div>
+    <button onclick="signOut()" style="background: none; border: none; color: #ff4757; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+        <i class="fas fa-sign-out-alt"></i>
+    </button>
+</div>
+
+<button id="signInBtn" class="signin-btn" onclick="location.href='auth.html'">Sign In</button>
+    
+    
+    
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    
 </head>
 
 <body>
