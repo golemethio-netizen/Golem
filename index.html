@@ -29,54 +29,62 @@
 
 <body>
     <header class="golem-header">
-        <div class="logo">GOLEM</div>
+    <div class="logo">GOLEM</div>
 
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search items...">
+    <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="headerSearch" placeholder="Search items...">
+    </div>
+
+    <div id="userNav" style="display: none; align-items: center; gap: 10px; margin-left: 15px;">
+        <div id="profileTrigger" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: #eee; padding: 5px 12px; border-radius: 50px;">
+            <img id="navAvatar" src="" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
+            <span id="navName" style="font-weight: 600; font-size: 0.85rem; color: #333;">Profile</span>
         </div>
+        <button onclick="signOut()" title="Sign Out" style="background: none; border: none; color: #ff4757; cursor: pointer; padding: 5px;">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
 
-        <div class="nav-container-horizontal">
-            <a href="index.html" class="nav-item-box bg-home">
-                <i class="fas fa-home"></i>
-                <p>Home</p>
-            </a>
-
-            <a href="#" onclick="window.checkAuthToSell()" class="nav-item-box bg-sell">
-                <i class="fas fa-plus-circle"></i>
-                <p>Sell</p>
-            </a>
-
-            <a href="my-items.html" class="nav-item-box bg-items">
-                <i class="fas fa-box-open"></i>
-                <p>My Items</p>
-            </a>
-
-            <a href="saved.html" class="nav-item-box bg-items">
-                <i class="fas fa-heart"></i>
-                <p>Saved</p>
-                <span id="cartBadge" style="display: none;">0</span>
-            </a>
-
-            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none; background: #333; color: white;">
-                <i class="fas fa-user-shield"></i>
-                <p>Admin</p>
-            </a>
-<div class="lang-toggle-wrapper">
-    <button onclick="toggleLanguage()" class="lang-btn">
-        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+    <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()" style="display: flex;">
+        <i class="fas fa-user-circle"></i>
+        <p>Sign In</p>
     </button>
-</div>
-            <button class="nav-item-box signin-btn" onclick="window.toggleModal()">
-                <i class="fas fa-user-circle"></i>
-                <p>Sign In</p>
+
+    <div class="nav-container-horizontal">
+        <a href="index.html" class="nav-item-box bg-home">
+            <i class="fas fa-home"></i>
+            <p>Home</p>
+        </a>
+
+        <a href="#" onclick="window.checkAuthToSell()" class="nav-item-box bg-sell">
+            <i class="fas fa-plus-circle"></i>
+            <p>Sell</p>
+        </a>
+
+        <a href="my-items.html" class="nav-item-box bg-items">
+            <i class="fas fa-box-open"></i>
+            <p>My Items</p>
+        </a>
+
+        <a href="saved.html" class="nav-item-box bg-items">
+            <i class="fas fa-heart"></i>
+            <p>Saved</p>
+            <span id="cartBadge" style="display: none;">0</span>
+        </a>
+
+        <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none; background: #333; color: white;">
+            <i class="fas fa-user-shield"></i>
+            <p>Admin</p>
+        </a>
+
+        <div class="lang-toggle-wrapper">
+            <button onclick="toggleLanguage()" class="lang-btn">
+                <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
             </button>
         </div>
-
-        <a href="#" onclick="window.toggleSupportModal()" style="color: #666; font-size: 0.9rem; margin-top: 10px; display: inline-block;">
-            <i class="fas fa-question-circle"></i> Need Help? Contact Us
-        </a>
-    </header>
+    </div>
+</header>
 
     <section class="sponsored-section container" id="mainSponsor" style="display: none; margin-top: 20px;">
         <div class="sponsor-card">
