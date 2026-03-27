@@ -366,7 +366,7 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
             if (!error) { loadTickets(); loadStats(); }
         };
 
-        window.onload = async () => { await checkAdmin(); loadStats(); loadItems('pending'); loadTickets(); };
+        window.onload = async () => { await checkAdmin();  loadUserProfile(); loadStats(); loadItems('pending'); loadTickets(); };
 
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
