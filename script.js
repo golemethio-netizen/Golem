@@ -452,24 +452,29 @@ window.toggleSupportModal = function() {
     }
 };
 
+// --- FIX FOR LINE 776 ---
 const backToTopBtn = document.getElementById('backToTop');
-
-// Show button when user scrolls down 400px
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 400) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-
-// Smooth scroll to top when clicked
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+if (backToTopBtn) { // <--- ADD THIS CHECK
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
     });
-});
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
+
+// --- FIX FOR AVATAR UPLOAD (Line 752 approx) ---
+const avatarInput = document.getElementById('avatarUpload');
+if (avatarInput) { // <--- ADD THIS CHECK
+    avatarInput.addEventListener('change', async (e) => {
+        // ... your existing upload code ...
+    });
+}
 
 
 // --- 1. SET INITIAL STATE ---
