@@ -360,27 +360,31 @@ window.updateUIForUser = async function() {
     const signInBtn = document.getElementById('signInBtn'); // The one with "nav-item-box" class
     const adminNavLink = document.getElementById('adminNavLink');
 
-    if (user) {
-        // 1. Toggle Visibility
-        if (signInBtn) signInBtn.style.display = 'none';
+   if (user) {
+        // Logged In State
         if (userNav) userNav.style.display = 'flex';
-
-        // 2. Fetch Profile
+        if (signInBtn) signInBtn.style.display = 'none';
+        
+        // Fetch and show profile info (Name/Avatar)
         const { data: profile } = await _supabase
             .from('profiles')
-            .select('full_name, avatar_url, is_admin')
+            .select('full_name, avatar_url')
             .eq('id', user.id)
             .single();
+       
 
-        if (profile) {
-            // Update Avatar and Name
-            const navName = document.getElementById('navName');
-            const navAvatar = document.getElementById('navAvatar');
-            
-            if (navName) navName.innerText = profile.full_name || "Account";
-            if (navAvatar) {
-                navAvatar.src = profile.avatar_url || `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=333&color=fff`;
+       if (profile) {
+            document.getElementById('navName').innerText = profile.full_name || "User";
+            if (profile.avatar_url) {
+                document.getElementById('navAvatar').src = profile.avatar_url;
             }
+        }
+    } else {
+        // Logged Out State
+        if (userNav) userNav.style.display = 'none';
+        if (signInBtn) signInBtn.style.display = 'flex';
+    }
+};
 
             // 3. Routing (Admin vs Seller)
             const profileTrigger = document.getElementById('profileTrigger');
@@ -854,8 +858,20 @@ async function signOut() {
 }
 
 // Ensure it is globally accessible if called from an 'onclick' in HTML
-window.signOut = signOut;
+window.signOut = async function() {
+    try {
+        const { error } = await _supabase.auth.signOut();
+        if (error) throw error;
+        
+        // Clear any local storage if needed
+        // localStorage.removeItem('some_key'); 
 
-
+        // Force reload to reset the UI state
+        window.location.reload();
+    } catch (err) {
+        console.error("Logout failed:", err.message);
+        alert("Error signing out. Please try again.");
+    }
+};
 
 
