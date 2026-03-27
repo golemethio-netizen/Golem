@@ -730,3 +730,62 @@ window.toggleVerification = async (userId, currentStatus) => {
     if (!error) loadUsers();
     else alert("Error: " + error.message);
 };
+
+
+
+
+async function loadUserProfile() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: profile, error } = await _supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+    if (profile) {
+        document.getElementById('userName').innerText = profile.full_name || "New Golem Member";
+        document.getElementById('userRole').innerText = profile.is_admin ? "🛡️ System Admin" : "🛒 Golem Seller";
+        document.getElementById('userJoined').innerHTML = `<i class="fas fa-calendar-alt"></i> Joined: ${new Date(profile.created_at).toLocaleDateString()}`;
+        
+        if (profile.avatar_url) {
+            document.getElementById('userAvatar').src = profile.avatar_url;
+        } else {
+            // Fallback to initials if no photo
+            document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=333&color=fff`;
+        }
+    }
+}
+
+// Handle Avatar Upload
+document.getElementById('avatarUpload').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const { data: { user } } = await _supabase.auth.getUser();
+    const filePath = `avatars/${user.id}-${Date.now()}`;
+
+    // 1. Upload to Storage
+    const { error: uploadError } = await _supabase.storage
+        .from('product-images') // You can reuse your existing bucket or create 'avatars'
+        .upload(filePath, file);
+
+    if (uploadError) return alert("Upload failed");
+
+    // 2. Get Public URL
+    const { data: { publicUrl } } = _supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+    // 3. Update Profile Table
+    const { error: updateError } = await _supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+    if (!updateError) {
+        document.getElementById('userAvatar').src = publicUrl;
+        alert("Profile photo updated!");
+    }
+});
