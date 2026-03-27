@@ -789,3 +789,47 @@ document.getElementById('avatarUpload').addEventListener('change', async (e) => 
         alert("Profile photo updated!");
     }
 });
+
+
+async function checkUserSession() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    const userNav = document.getElementById('userNav');
+    const signInBtn = document.getElementById('signInBtn');
+
+    if (user) {
+        // 1. Hide Sign In, Show User Nav
+        signInBtn.style.display = 'none';
+        userNav.style.display = 'flex';
+
+        // 2. Get Profile Data (Name and Photo)
+        const { data: profile } = await _supabase
+            .from('profiles')
+            .select('full_name, avatar_url, is_admin')
+            .eq('id', user.id)
+            .single();
+
+        if (profile) {
+            document.getElementById('navName').innerText = profile.full_name || "Account";
+            document.getElementById('navAvatar').src = profile.avatar_url || `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=333&color=fff`;
+            
+            // Optional: If Admin, change the click link to admin.html
+            if (profile.is_admin) {
+                document.getElementById('userNav').firstElementChild.onclick = () => location.href='admin.html';
+            }
+        }
+    } else {
+        // No user logged in
+        signInBtn.style.display = 'block';
+        userNav.style.display = 'none';
+    }
+}
+
+// Simple Sign Out Function
+async function signOut() {
+    await _supabase.auth.signOut();
+    location.reload();
+}
+
+// Call this function when the page loads
+window.addEventListener('DOMContentLoaded', checkUserSession);
