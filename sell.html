@@ -257,7 +257,83 @@ document.getElementById('avatarUpload').onchange = async (e) => {
     document.getElementById('userAvatar').src = publicUrl;
     alert("Profile photo updated!");
 };
+
+
+
+
+
+        // Open the Modal and fill current data
+async function openEditProfile() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    // Get current profile data
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('id', user.id)
+        .single();
+
+    if (profile) {
+        document.getElementById('editFullName').value = profile.full_name || "";
+        document.getElementById('editPhone').value = profile.phone || "";
+    }
+    
+    document.getElementById('editProfileModal').style.display = 'flex';
+}
+
+// Close the Modal
+function closeEditProfile() {
+    document.getElementById('editProfileModal').style.display = 'none';
+}
+
+// Save Changes to Supabase
+async function saveProfileChanges() {
+    const btn = document.getElementById('saveProfileBtn');
+    const newName = document.getElementById('editFullName').value;
+    const newPhone = document.getElementById('editPhone').value;
+
+    if (!newName || !newPhone) return alert("Please fill in all fields.");
+
+    btn.innerText = "Saving...";
+    btn.disabled = true;
+
+    try {
+        const { data: { user } } = await _supabase.auth.getUser();
         
+        // Update the 'profiles' table
+        const { error } = await _supabase
+            .from('profiles')
+            .update({ 
+                full_name: newName, 
+                phone: newPhone 
+            })
+            .eq('id', user.id);
+
+        if (error) throw error;
+
+        // Also update Auth Metadata so the system remembers the name/phone globally
+        await _supabase.auth.updateUser({
+            data: { full_name: newName, phone_number: newPhone }
+        });
+
+        alert("Profile updated successfully!");
+        closeEditProfile();
+        
+        // Refresh the UI on the page
+        loadUserProfile(); 
+        if (document.getElementById('prodPhone')) {
+            document.getElementById('prodPhone').value = newPhone;
+        }
+        
+    } catch (error) {
+        console.error("Update error:", error);
+        alert("Error updating profile.");
+    } finally {
+        btn.innerText = "Save Changes";
+        btn.disabled = false;
+    }
+}
 </script>
 
     <style>
