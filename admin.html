@@ -380,6 +380,22 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
             if (!expiringSoon || expiringSoon.length === 0) { alert("No expiries in 24h."); return; }
             alert("🚨 EXPIRING SOON:\n" + expiringSoon.map(i => `${i.name} (${i.seller_phone})`).join('\n'));
         };
+
+
+
+// Add this inside your admin.html script
+async function updateAdminPresence() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    await _supabase
+        .from('profiles')
+        .update({ last_seen: new Date().toISOString() })
+        .eq('id', user.id);
+}
+
+// Call it when the page loads
+window.addEventListener('load', updateAdminPresence);
            
        </script>
 </body>
