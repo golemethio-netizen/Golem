@@ -1324,3 +1324,18 @@ body.is-admin .admin-expiry-info {
     #navName { display: none; }
     .search-wrapper { width: 100%; order: 3; margin-top: 10px; }
 }
+
+
+.modal-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.6); 
+    z-index: 1000;
+    align-items: center; 
+    justify-content: center;
+    backdrop-filter: blur(4px); /* Adds a modern touch */
+}
