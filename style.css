@@ -1284,3 +1284,23 @@ body.is-admin .admin-expiry-info {
     line-height: 1.2;
     font-size: 14px;
 }
+
+
+.golem-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 5%;
+    flex-wrap: wrap; /* Helps on mobile */
+}
+
+#userNav #profileTrigger:hover {
+    background: #e0e0e0 !important;
+    transition: 0.2s;
+}
+
+/* Hide navigation labels on very small screens if necessary */
+@media (max-width: 600px) {
+    #navName { display: none; }
+    .search-wrapper { width: 100%; order: 3; margin-top: 10px; }
+}
