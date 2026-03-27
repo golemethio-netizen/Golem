@@ -289,19 +289,19 @@
 // --- FLOATING CHAT LOGIC ---
 function toggleChatMenu() {
     const menu = document.getElementById('chatMenu');
-    if (menu) {
-        menu.classList.toggle('active');
+    if (menu.style.display === 'flex') {
+        menu.style.display = 'none';
+    } else {
+        menu.style.display = 'flex';
     }
 }
 
-// Close the menu if the user clicks anywhere else on the page
-window.addEventListener('click', function(e) {
-    const chatContainer = document.querySelector('.floating-chat');
+// Close menu if user clicks anywhere else on the screen
+document.addEventListener('click', function(event) {
     const menu = document.getElementById('chatMenu');
-    
-    // If the click is NOT inside the chat button or menu, close it
-    if (chatContainer && !chatContainer.contains(e.target)) {
-        menu.classList.remove('active');
+    const btn = document.querySelector('.chat-btn');
+    if (!btn.contains(event.target) && !menu.contains(event.target)) {
+        menu.style.display = 'none';
     }
 });
 
