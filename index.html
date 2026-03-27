@@ -1,30 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Marketplace | Buy & Sell</title>
-   
-    <div id="userNav" style="display: none; align-items: center; gap: 12px;">
-    <div onclick="location.href='sell.html'" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: #f4f4f4; padding: 5px 12px; border-radius: 50px; border: 1px solid #ddd;">
-        <img id="navAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-        <span id="navName" style="font-weight: 600; font-size: 0.9rem; color: #333;">Profile</span>
-    </div>
-    <button onclick="signOut()" style="background: none; border: none; color: #ff4757; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
-        <i class="fas fa-sign-out-alt"></i>
-    </button>
-</div>
+<header class="golem-header">
+        <div class="logo">GOLEM</div>
 
-<button id="signInBtn" class="signin-btn" onclick="location.href='auth.html'">Sign In</button>
-    
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    
-</head>
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="headerSearch" placeholder="Search items...">
+        </div>
 
+        <div class="auth-wrapper" style="display: flex; align-items: center; gap: 10px; margin-left: 15px;">
+            <div id="userNav" style="display: none; align-items: center; gap: 10px;">
+                <div id="profileTrigger" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: #eee; padding: 5px 12px; border-radius: 50px;">
+                    <img id="navAvatar" src="" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
+                    <span id="navName" style="font-weight: 600; font-size: 0.85rem; color: #333;">Profile</span>
+                </div>
+                <button onclick="signOut()" title="Sign Out" style="background: none; border: none; color: #ff4757; cursor: pointer; padding: 5px;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+
+            <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()" style="display: flex;">
+                <i class="fas fa-user-circle"></i>
+                <p>Sign In</p>
+            </button>
+        </div>
+
+        <div class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box bg-home">
+                <i class="fas fa-home"></i>
+                <p>Home</p>
+            </a>
+            <a href="#" onclick="window.checkAuthToSell()" class="nav-item-box bg-sell">
+                <i class="fas fa-plus-circle"></i>
+                <p>Sell</p>
+            </a>
+            <a href="my-items.html" class="nav-item-box bg-items">
+                <i class="fas fa-box-open"></i>
+                <p>My Items</p>
+            </a>
+            <a href="saved.html" class="nav-item-box bg-items">
+                <i class="fas fa-heart"></i>
+                <p>Saved</p>
+                <span id="cartBadge" style="display: none;">0</span>
+            </a>
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none; background: #333; color: white;">
+                <i class="fas fa-user-shield"></i>
+                <p>Admin</p>
+            </a>
+            <div class="lang-toggle-wrapper">
+                <button onclick="toggleLanguage()" class="lang-btn">
+                    <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script type="module" src="script.js"></script>
+</header>
+    
 <body>
     <header class="golem-header">
     <div class="logo">GOLEM</div>
