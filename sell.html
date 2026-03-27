@@ -221,6 +221,19 @@
             btn.disabled = false;
         }
     }); // This closes the event listener
+
+
+
+window.onload = async () => {
+    await checkAdmin(); // or checkSeller()
+    loadUserProfile(); // <--- Add this
+    loadStats();
+    // ... rest of your code
+};
+
+
+
+        
 </script>
 
     <style>
