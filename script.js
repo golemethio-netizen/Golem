@@ -389,7 +389,8 @@ window.updateUIForUser = async function() {
                 if (profileTrigger) profileTrigger.onclick = () => location.href='admin.html';
             } else {
                 if (adminNavLink) adminNavLink.style.display = 'none';
-                if (profileTrigger) profileTrigger.onclick = () => location.href='seller.html';
+                // Change the redirection to sell.html
+            if (profileTrigger) profileTrigger.onclick = () => location.href='sell.html';
             }
         }
     } else {
@@ -846,3 +847,7 @@ async function signOut() {
 
 // Call this function when the page loads
 window.addEventListener('DOMContentLoaded', checkUserSession);
+
+
+
+
