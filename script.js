@@ -549,3 +549,32 @@ window.deleteProduct = async function(productId) {
         }
     }
 };
+
+
+// --- 10. PROFILE EDITING ---
+
+window.updateProfileInfo = async function(event) {
+    if (event) event.preventDefault();
+    
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    const newName = document.getElementById('editFullName').value;
+    const newPhone = document.getElementById('editPhone').value;
+
+    const { error } = await _supabase
+        .from('profiles')
+        .update({ 
+            full_name: newName,
+            phone: newPhone,
+            updated_at: new Date() 
+        })
+        .eq('id', user.id);
+
+    if (error) {
+        alert("Error updating profile: " + error.message);
+    } else {
+        alert("Profile updated successfully!");
+        location.reload(); // Refresh to show new name
+    }
+};
