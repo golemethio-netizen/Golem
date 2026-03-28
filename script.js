@@ -311,41 +311,37 @@ window.updateUIForUser = async function() {
     const nameSpan = document.getElementById('userName');
 
     if (user) {
-        // 1. Hide Sign In, Show Sign Out
+        // Switch buttons
         if (signInBtn) signInBtn.style.display = 'none';
         if (signOutBtn) signOutBtn.style.display = 'flex';
 
-        // 2. Fetch the user's Profile Info (Name)
+        // Fetch user metadata for the name
         const { data: profile } = await _supabase
             .from('profiles')
-            .select('full_name, is_owner')
+            .select('full_name')
             .eq('id', user.id)
             .maybeSingle();
 
-        if (profile) {
-            // Display the name (fallback to email if name is empty)
-            if (welcomeDiv && nameSpan) {
-                nameSpan.innerText = profile.full_name || user.email.split('@')[0];
-                welcomeDiv.style.display = 'block';
-            }
-
-            // 3. Show Admin Link if they are the owner
-            const adminLink = document.getElementById('adminNavLink');
-            if (profile.is_owner && adminLink) {
-                adminLink.style.display = 'flex';
-            }
+        if (welcomeDiv && nameSpan) {
+            // Priority: Database Name -> Metadata Name -> Email prefix
+            const displayName = profile?.full_name || 
+                                user.user_metadata?.full_name || 
+                                user.email.split('@')[0];
+            
+            nameSpan.innerText = displayName;
+            welcomeDiv.style.display = 'flex';
         }
-
     } else {
-        // User is logged out
+        // Reset to Guest mode
         if (signInBtn) signInBtn.style.display = 'flex';
         if (signOutBtn) signOutBtn.style.display = 'none';
         if (welcomeDiv) welcomeDiv.style.display = 'none';
     }
 };
 
-// Run this automatically on page load
+// Important: Run this every time the page loads
 document.addEventListener('DOMContentLoaded', window.updateUIForUser);
+
 
 // --- 8. ADMIN & USER MGMT ---
 async function loadUsers() {
