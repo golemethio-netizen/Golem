@@ -321,8 +321,9 @@ window.toggleAuthMode = function() {
 window.toggleModal = () => {
     const modal = document.getElementById('authModal');
     if (modal) {
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        document.body.style.overflow = (modal.style.display === 'flex') ? 'hidden' : 'auto';
+        const isFlex = modal.style.display === 'flex';
+        modal.style.display = isFlex ? 'none' : 'flex';
+        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
     }
 };
 
