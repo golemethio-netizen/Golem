@@ -264,72 +264,98 @@ window.toggleModal = () => {
     }
 };
 
-window.handleAuth = async function(e) {
-    e.preventDefault();
+window.handleAuth = async (event) => {
+    event.preventDefault();
+    
     const email = document.getElementById('authEmail').value;
     const password = document.getElementById('authPassword').value;
     const btn = document.getElementById('authSubmitBtn');
+    
+    // Check if we are currently showing the registration fields
+    const registerFields = document.getElementById('registerFields');
+    const isSignUpMode = registerFields && registerFields.style.display === 'block';
 
+    // UI feedback: Disable button while waiting
+    const originalText = btn.innerText;
     btn.disabled = true;
     btn.innerText = "Processing...";
 
-    if (isSignUpMode) {
-        const fullName = document.getElementById('regName').value;
-        const phone = document.getElementById('regPhone').value;
-        const { error } = await _supabase.auth.signUp({
-            email,
-            password,
-            options: { data: { full_name: fullName, phone: phone } }
-        });
-        if (error) alert("Error: " + error.message);
-        else { alert("Check your email for confirmation!"); window.toggleModal(); }
-    } else {
-        const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert("Login failed: " + error.message);
+    try {
+        if (isSignUpMode) {
+            // --- SIGN UP LOGIC ---
+            const fullName = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+
+            const { data, error } = await _supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        phone: phone
+                    }
+                }
+            });
+
+            if (error) throw error;
+            
+            alert("Success! Please check your email inbox to confirm your account.");
+            if (window.toggleModal) window.toggleModal();
+
         } else {
-            window.toggleModal();
-            await window.updateUIForUser();
+            // --- SIGN IN LOGIC ---
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) throw error;
+            
+            // Refresh to update the header and show "My Items", etc.
+            window.location.reload(); 
         }
+    } catch (err) {
+        alert(err.message);
+    } finally {
+        // Re-enable button
+        btn.disabled = false;
+        btn.innerText = originalText;
     }
-    btn.disabled = false;
 };
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    const signinBtn = document.getElementById('signInBtn');
+    
+    const signInBtn = document.getElementById('signInBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
     const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
-        if (signinBtn) {
-            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
-            signinBtn.onclick = async () => { 
-                await _supabase.auth.signOut(); 
-                window.location.reload(); 
-            };
-        }
-
+        // User is logged in
+        if (signInBtn) signInBtn.style.display = 'none';
+        if (signOutBtn) signOutBtn.style.display = 'flex';
+        
+        // Show Admin link only if they have the 'is_owner' flag
         const { data: profile } = await _supabase
             .from('profiles')
-            .select('is_admin, full_name')
+            .select('is_owner')
             .eq('id', user.id)
             .maybeSingle();
 
-        if (profile?.full_name && signinBtn) {
-            signinBtn.querySelector('p').innerText = profile.full_name.split(' ')[0]; 
-        }
-
-        if (adminLink && profile?.is_admin) {
+        if (profile && profile.is_owner && adminLink) {
             adminLink.style.display = 'flex';
         }
+
     } else {
-        if (signinBtn) {
-            signinBtn.innerHTML = `<i class="fas fa-user-circle"></i> <p>Sign In</p>`;
-            signinBtn.onclick = () => window.toggleModal();
-        }
+        // User is logged out
+        if (signInBtn) signInBtn.style.display = 'flex';
+        if (signOutBtn) signOutBtn.style.display = 'none';
         if (adminLink) adminLink.style.display = 'none';
     }
 };
+
+// Run this automatically on page load
+document.addEventListener('DOMContentLoaded', window.updateUIForUser);
 
 // --- 8. ADMIN & USER MGMT ---
 async function loadUsers() {
@@ -435,4 +461,15 @@ window.toggleLanguage = function() {
     currentLang = currentLang === 'en' ? 'am' : 'en';
     localStorage.setItem('golem_lang', currentLang);
     location.reload(); 
+};
+
+window.handleSignOut = async function() {
+    const { error } = await _supabase.auth.signOut();
+    if (error) {
+        alert("Error signing out: " + error.message);
+    } else {
+        // Clear any local storage if you're using it for "Saved Items"
+        // localStorage.removeItem('golem_wishlist'); 
+        window.location.reload(); 
+    }
 };
