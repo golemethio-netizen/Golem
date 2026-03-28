@@ -273,7 +273,7 @@ window.toggleModal = () => {
     }
 };
 
-/ 2. Handle the actual Auth
+// 2. Handle the actual Auth
 window.handleAuth = async (event) => {
     event.preventDefault();
     const email = document.getElementById('authEmail').value;
