@@ -189,12 +189,30 @@
     <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()">
         <i class="fas fa-user-circle"></i>
         <p>Sign In</p>
+
     </button>
 
     <button id="signOutBtn" class="nav-item-box signout-btn" onclick="window.handleSignOut()" style="display: none; background: #ff4757; color: white;">
         <i class="fas fa-sign-out-alt"></i>
         <p>Sign Out</p>
     </button>
+
+<div class="auth-controls" style="display: flex; align-items: center; gap: 15px;">
+    <div id="userWelcome" style="display: none; color: #333; font-weight: 600; font-size: 0.9rem;">
+        <span>Hello, <span id="userName">Guest</span>!</span>
+    </div>
+
+    <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()">
+        <i class="fas fa-user-circle"></i>
+        <p>Sign In</p>
+    </button>
+
+    <button id="signOutBtn" class="nav-item-box signout-btn" onclick="window.handleSignOut()" style="display: none; background: #ff4757; color: white;">
+        <i class="fas fa-sign-out-alt"></i>
+        <p>Sign Out</p>
+    </button>
+</div>
+               
 </div>
         </form>
 
