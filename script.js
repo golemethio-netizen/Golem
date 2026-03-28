@@ -262,7 +262,6 @@ window.toggleAuthMode = function() {
         btn.innerText = "Sign In";
         toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
     }
-};
 
 window.toggleModal = () => {
     const modal = document.getElementById('authModal');
@@ -273,7 +272,7 @@ window.toggleModal = () => {
     }
 };
 
-// 2. Handle the actual Auth
+// 2. Handle the actual Auth (FIXED THE SLASH ERROR HERE)
 window.handleAuth = async (event) => {
     event.preventDefault();
     const email = document.getElementById('authEmail').value;
@@ -282,24 +281,31 @@ window.handleAuth = async (event) => {
     const btn = document.getElementById('authSubmitBtn');
 
     btn.disabled = true;
+    const originalText = btn.innerText;
     btn.innerText = "Processing...";
 
-    if (isSignUp) {
-        const { error } = await _supabase.auth.signUp({
-            email, password,
-            options: { data: { 
-                full_name: document.getElementById('regName').value,
-                phone: document.getElementById('regPhone').value 
-            }}
-        });
-        if (error) alert(error.message);
-        else alert("Success! Check your email to confirm.");
-    } else {
-        const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) alert(error.message);
-        else window.location.reload();
+    try {
+        if (isSignUp) {
+            const { error } = await _supabase.auth.signUp({
+                email, password,
+                options: { data: { 
+                    full_name: document.getElementById('regName').value,
+                    phone: document.getElementById('regPhone').value 
+                }}
+            });
+            if (error) throw error;
+            alert("Success! Check your email to confirm.");
+        } else {
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            window.location.reload();
+        }
+    } catch (err) {
+        alert(err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
     }
-    btn.disabled = false;
 };
 
 window.updateUIForUser = async function() {
