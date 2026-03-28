@@ -1284,3 +1284,14 @@ body.is-admin .admin-expiry-info {
     line-height: 1.2;
     font-size: 14px;
 }
+
+
+.signout-btn {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.signout-btn:hover {
+    background: #ff6b81 !important; /* A slightly lighter red on hover */
+    transform: translateY(-2px);
+}
