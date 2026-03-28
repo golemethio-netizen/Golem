@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Golem Furniture</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo" onclick="location.href='index.html'">GOLEM</div>
+        <nav>
+            <button onclick="location.href='index.html'" class="filter-btn">Back to Shop</button>
+        </nav>
+    </header>
+
+    <main class="container" style="margin-top: 100px;">
+        <section class="profile-header">
+            <div class="user-info-card">
+                <h1 id="profileName">Loading...</h1>
+                <p id="profileEmail"></p>
+                <div id="verificationBadge" class="badge">Checking Status...</div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section class="my-listings">
+            <h2>Your Furniture Listings</h2>
+            <div id="myProductGrid" class="product-grid">
+                </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.loadUserProfile();
+            window.loadUserListings();
+        });
+    </script>
+</body>
+</html>
