@@ -355,56 +355,38 @@ window.handleAuth = async function(e) {
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    
-    const userNav = document.getElementById('userNav');
-    const signInBtn = document.getElementById('signInBtn'); // The one with "nav-item-box" class
-    const adminNavLink = document.getElementById('adminNavLink');
+    const signinBtn = document.querySelector('.signin-btn');
+    const adminLink = document.getElementById('adminNavLink');
 
-   if (user) {
-        // Logged In State
-        if (userNav) userNav.style.display = 'flex';
-        if (signInBtn) signInBtn.style.display = 'none';
-        
-        // Fetch and show profile info (Name/Avatar)
-        const { data: profile } = await _supabase
+    if (user) {
+        // 1. Update Sign In button to Sign Out
+        if (signinBtn) {
+            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
+            signinBtn.onclick = async () => { 
+                await _supabase.auth.signOut(); 
+                window.location.reload(); 
+            };
+        }
+
+        // 2. CHECK DATABASE FOR ADMIN STATUS
+        const { data: profile, error } = await _supabase
             .from('profiles')
-            .select('full_name, avatar_url')
+            .select('is_admin')
             .eq('id', user.id)
             .single();
-       
 
-       if (profile) {
-            document.getElementById('navName').innerText = profile.full_name || "User";
-            if (profile.avatar_url) {
-                document.getElementById('navAvatar').src = profile.avatar_url;
-            }
-        }
-    } else {
-        // Logged Out State
-        if (userNav) userNav.style.display = 'none';
-        if (signInBtn) signInBtn.style.display = 'flex';
-    }
-};
-
-            // 3. Routing (Admin vs Seller)
-            const profileTrigger = document.getElementById('profileTrigger');
-            if (profile.is_admin) {
-                if (adminNavLink) adminNavLink.style.display = 'flex';
-                if (profileTrigger) profileTrigger.onclick = () => location.href='admin.html';
-            } else {
-                if (adminNavLink) adminNavLink.style.display = 'none';
-                // Change the redirection to sell.html
-            if (profileTrigger) profileTrigger.onclick = () => location.href='sell.html';
-            }
+        if (!error && adminLink && profile?.is_admin) {
+            adminLink.style.display = 'flex';
+            document.body.classList.add('is-admin');
+            console.log("🛡️ Admin Mode Active");
+        } else {
+            if (adminLink) adminLink.style.display = 'none';
         }
     } else {
         // No user logged in
-        if (signInBtn) signInBtn.style.display = 'flex';
-        if (userNav) userNav.style.display = 'none';
-        if (adminNavLink) adminNavLink.style.display = 'none';
+        if (adminLink) adminLink.style.display = 'none';
     }
 };
-
 
 window.checkAuthToSell = async () => {
     const { data: { user } } = await _supabase.auth.getUser();
@@ -456,29 +438,24 @@ window.toggleSupportModal = function() {
     }
 };
 
-// --- FIX FOR LINE 776 ---
 const backToTopBtn = document.getElementById('backToTop');
-if (backToTopBtn) { // <--- ADD THIS CHECK
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 400) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
-        }
-    });
 
-    backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-}
+// Show button when user scrolls down 400px
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+});
 
-// --- FIX FOR AVATAR UPLOAD (Line 752 approx) ---
-const avatarInput = document.getElementById('avatarUpload');
-if (avatarInput) { // <--- ADD THIS CHECK
-    avatarInput.addEventListener('change', async (e) => {
-        // ... your existing upload code ...
+// Smooth scroll to top when clicked
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
     });
-}
+});
 
 
 // --- 1. SET INITIAL STATE ---
@@ -753,125 +730,3 @@ window.toggleVerification = async (userId, currentStatus) => {
     if (!error) loadUsers();
     else alert("Error: " + error.message);
 };
-
-
-
-
-async function loadUserProfile() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: profile, error } = await _supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-    if (profile) {
-        document.getElementById('userName').innerText = profile.full_name || "New Golem Member";
-        document.getElementById('userRole').innerText = profile.is_admin ? "🛡️ System Admin" : "🛒 Golem Seller";
-        document.getElementById('userJoined').innerHTML = `<i class="fas fa-calendar-alt"></i> Joined: ${new Date(profile.created_at).toLocaleDateString()}`;
-        
-        if (profile.avatar_url) {
-            document.getElementById('userAvatar').src = profile.avatar_url;
-        } else {
-            // Fallback to initials if no photo
-            document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=333&color=fff`;
-        }
-    }
-}
-
-// Handle Avatar Upload
-document.getElementById('avatarUpload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const { data: { user } } = await _supabase.auth.getUser();
-    const filePath = `avatars/${user.id}-${Date.now()}`;
-
-    // 1. Upload to Storage
-    const { error: uploadError } = await _supabase.storage
-        .from('product-images') // You can reuse your existing bucket or create 'avatars'
-        .upload(filePath, file);
-
-    if (uploadError) return alert("Upload failed");
-
-    // 2. Get Public URL
-    const { data: { publicUrl } } = _supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-    // 3. Update Profile Table
-    const { error: updateError } = await _supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
-
-    if (!updateError) {
-        document.getElementById('userAvatar').src = publicUrl;
-        alert("Profile photo updated!");
-    }
-});
-
-
-async function checkUserSession() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    const userNav = document.getElementById('userNav');
-    const signInBtn = document.getElementById('signInBtn');
-
-    if (user) {
-        // 1. Hide Sign In, Show User Nav
-        signInBtn.style.display = 'none';
-        userNav.style.display = 'flex';
-
-        // 2. Get Profile Data (Name and Photo)
-        const { data: profile } = await _supabase
-            .from('profiles')
-            .select('full_name, avatar_url, is_admin')
-            .eq('id', user.id)
-            .single();
-
-        if (profile) {
-            document.getElementById('navName').innerText = profile.full_name || "Account";
-            document.getElementById('navAvatar').src = profile.avatar_url || `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=333&color=fff`;
-            
-            // Optional: If Admin, change the click link to admin.html
-            if (profile.is_admin) {
-                document.getElementById('userNav').firstElementChild.onclick = () => location.href='admin.html';
-            }
-        }
-    } else {
-        // No user logged in
-        signInBtn.style.display = 'block';
-        userNav.style.display = 'none';
-    }
-}
-
-// Simple Sign Out Function
-async function signOut() {
-    // 1. Call the Supabase sign out method correctly
-    await _supabase.auth.signOut(); 
-    
-    // 2. Reload the page to clear the session and update the UI
-    location.reload(); 
-}
-
-// Ensure it is globally accessible if called from an 'onclick' in HTML
-window.signOut = async function() {
-    try {
-        const { error } = await _supabase.auth.signOut();
-        if (error) throw error;
-        
-        // Clear any local storage if needed
-        // localStorage.removeItem('some_key'); 
-
-        // Force reload to reset the UI state
-        window.location.reload();
-    } catch (err) {
-        console.error("Logout failed:", err.message);
-        alert("Error signing out. Please try again.");
-    }
-};
-
-

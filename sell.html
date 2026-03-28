@@ -16,25 +16,6 @@
 
     <main class="container" style="max-width: 600px; padding: 20px;">
         <div class="form-card" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-
-<div id="profileSection" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; align-items: center; gap: 20px; border: 1px solid #eee;">
-    <div style="position: relative;">
-        <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #f4f7f6;">
-        <label for="avatarUpload" style="position: absolute; bottom: 0; right: 0; background: #333; color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;">
-            <i class="fas fa-camera"></i>
-        </label>
-        <input type="file" id="avatarUpload" hidden accept="image/*">
-    </div>
-    <div style="flex: 1;">
-        <h2 id="userName" style="margin: 0; font-size: 1.4rem;">Loading...</h2>
-        <p id="userRole" style="margin: 2px 0; color: #666; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;"></p>
-        <p id="userJoined" style="margin: 5px 0 0; color: #999; font-size: 0.8rem;"><i class="fas fa-calendar-alt"></i> Joined: --</p>
-    </div>
-    <button onclick="openEditProfile()" style="background: #f4f7f6; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-        <i class="fas fa-user-edit"></i> Edit
-    </button>
-</div>
-            
             <h2 style="margin-bottom: 10px;">Post New Listing</h2>
             <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
 
@@ -221,119 +202,6 @@
             btn.disabled = false;
         }
     }); // This closes the event listener
-
-
-
-window.onload = async () => {
-    await checkAdmin(); // or checkSeller()
-    loadUserProfile(); // <--- Add this
-    loadStats();
-    // ... rest of your code
-};
-
-
-document.getElementById('avatarUpload').onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const { data: { user } } = await _supabase.auth.getUser();
-    const fileExt = file.name.split('.').pop();
-    const filePath = `avatars/${user.id}.${fileExt}`;
-
-    // Upload to 'product-images' bucket (or create a 'profiles' bucket)
-    const { error: uploadError } = await _supabase.storage
-        .from('product-images') 
-        .upload(filePath, file, { upsert: true });
-
-    if (uploadError) return alert("Upload failed");
-
-    const { data: { publicUrl } } = _supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-    // Update the profile table
-    await _supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
-    
-    document.getElementById('userAvatar').src = publicUrl;
-    alert("Profile photo updated!");
-};
-
-
-
-
-
-        // Open the Modal and fill current data
-async function openEditProfile() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return;
-
-    // Get current profile data
-    const { data: profile } = await _supabase
-        .from('profiles')
-        .select('full_name, phone')
-        .eq('id', user.id)
-        .single();
-
-    if (profile) {
-        document.getElementById('editFullName').value = profile.full_name || "";
-        document.getElementById('editPhone').value = profile.phone || "";
-    }
-    
-    document.getElementById('editProfileModal').style.display = 'flex';
-}
-
-// Close the Modal
-function closeEditProfile() {
-    document.getElementById('editProfileModal').style.display = 'none';
-}
-
-// Save Changes to Supabase
-async function saveProfileChanges() {
-    const btn = document.getElementById('saveProfileBtn');
-    const newName = document.getElementById('editFullName').value;
-    const newPhone = document.getElementById('editPhone').value;
-
-    if (!newName || !newPhone) return alert("Please fill in all fields.");
-
-    btn.innerText = "Saving...";
-    btn.disabled = true;
-
-    try {
-        const { data: { user } } = await _supabase.auth.getUser();
-        
-        // Update the 'profiles' table
-        const { error } = await _supabase
-            .from('profiles')
-            .update({ 
-                full_name: newName, 
-                phone: newPhone 
-            })
-            .eq('id', user.id);
-
-        if (error) throw error;
-
-        // Also update Auth Metadata so the system remembers the name/phone globally
-        await _supabase.auth.updateUser({
-            data: { full_name: newName, phone_number: newPhone }
-        });
-
-        alert("Profile updated successfully!");
-        closeEditProfile();
-        
-        // Refresh the UI on the page
-        loadUserProfile(); 
-        if (document.getElementById('prodPhone')) {
-            document.getElementById('prodPhone').value = newPhone;
-        }
-        
-    } catch (error) {
-        console.error("Update error:", error);
-        alert("Error updating profile.");
-    } finally {
-        btn.innerText = "Save Changes";
-        btn.disabled = false;
-    }
-}
 </script>
 
     <style>
@@ -346,31 +214,5 @@ async function saveProfileChanges() {
         .auth-submit:hover { background: #000; }
         .auth-submit:disabled { background: #ccc; }
     </style>
-
-
-
-
-    <div id="editProfileModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center;">
-    <div style="background:white; padding:30px; border-radius:20px; width:90%; max-width:400px; position:relative;">
-        <button onclick="closeEditProfile()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
-        
-        <h2 style="margin-bottom:10px;">Edit Profile</h2>
-        <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Update your public information for Golem.</p>
-        
-        <div class="input-group-sell">
-            <label><i class="fas fa-user"></i> Full Name</label>
-            <input type="text" id="editFullName" placeholder="Enter your name">
-        </div>
-        
-        <div class="input-group-sell">
-            <label><i class="fas fa-phone"></i> Contact Phone</label>
-            <input type="text" id="editPhone" placeholder="09...">
-        </div>
-
-        <button onclick="saveProfileChanges()" id="saveProfileBtn" class="auth-submit" style="width: 100%; margin-top: 10px;">
-            Save Changes
-        </button>
-    </div>
-</div>
 </body>
 </html>
