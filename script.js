@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial Data Fetch
     window.fetchProducts();
     window.loadSponsor();
-//includes the "Online Dot" check:
+
     const now = new Date();
     const hour = now.getHours();
     const dot = document.querySelector('.online-dot');
     if (dot) {
         dot.style.display = (hour >= 8 && hour < 20) ? 'block' : 'none';
     }
-    // Welcome Toast Timer
+
     setTimeout(() => {
         const toast = document.getElementById('chatToast');
         if (toast && !document.getElementById('chatMenu').classList.contains('active')) {
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }, 5000);
     
-    // Search Logic
     const searchInput = document.getElementById('headerSearch');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => filterSearch(e.target.value.toLowerCase()));
@@ -49,7 +48,6 @@ window.fetchProducts = async (category = 'All') => {
         query = query.eq('category', category);
     }
 
-    // Master Sorting: Sponsored > Featured > User Preference
     query = query
         .order('is_sponsored', { ascending: false })
         .order('is_featured', { ascending: false });
@@ -99,20 +97,14 @@ window.toggleWishlist = function(id, btnElement) {
     }
 };
 
-// THE MISSING FUNCTION FIXED
 window.addToCartFromModal = function() {
     if (!currentProduct) return;
-    
     let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
-    
     if (!saved.includes(currentProduct.id)) {
         saved.push(currentProduct.id);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
         window.updateCartBadge();
-        
-        // Refresh the grid in the background so the heart icon updates there too
         window.fetchProducts();
-        
         alert("❤️ Added to your Whitelist!");
     } else {
         alert("This item is already in your Whitelist!");
@@ -129,8 +121,6 @@ window.updateCartBadge = function() {
 };
 
 // --- 4. RENDERING ENGINE ---
-// Replace your existing renderProducts function with this updated version
-// Replace your existing renderProducts function with this updated version
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -147,7 +137,6 @@ function renderProducts(products) {
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
-        
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
         const isFeatured = p.is_featured;
 
@@ -162,25 +151,18 @@ function renderProducts(products) {
         const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
         const tgUser = (p.telegram_username || "").replace('@', '');
 
-        // Generate a specific share link for this product
-        const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Furniture! Price: ${p.price.toLocaleString()} ETB.`);
-      // This dynamically finds the correct folder path
-
+        const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Furniture!`);
         const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
-const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
+        const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
                 <div class="card-img-container">
                     ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                     ${statusBadge}
-                    
-                    <button class="wishlist-btn ${isSaved ? 'active' : ''}" 
-                            onclick="window.toggleWishlist('${p.id}', this)" 
-                            title="Save for Later">
+                    <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
                         <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                     </button>
-
                     <img src="${p.image}" alt="${p.name}" loading="lazy">
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
@@ -190,23 +172,20 @@ const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">${p.name}</h3>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
-                    
                     <div class="quick-contact-bar">
-                        <a href="tel:+${cleanPhone}" class="contact-icon call" title="Call Seller"><i class="fas fa-phone-alt"></i></a>
-                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram" title="Telegram Seller"><i class="fab fa-telegram-plane"></i></a>
-                        <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;" title="Share with Friends">
+                        <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;">
                             <i class="fas fa-share-alt"></i>
                         </a>
                     </div>
-
                     <div class="product-actions">
                         <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
                             <i class="fas fa-info-circle"></i> Full Details
                         </button>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }).join('');
 }
 
@@ -240,17 +219,6 @@ window.filterCategory = (category, button) => {
     window.fetchProducts(category);
 };
 
-window.filterSponsored = async () => {
-    const now = new Date().toISOString();
-    const { data } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('is_sponsored', true)
-        .gt('sponsored_until', now);
-    
-    if (data) renderProducts(data);
-};
-
 function filterSearch(term) {
     const cards = document.querySelectorAll('.product-card');
     cards.forEach(card => {
@@ -265,28 +233,6 @@ window.openProductDetailsSafe = (encodedData) => {
         const product = JSON.parse(decodeURIComponent(encodedData));
         window.openProductModal(product);
     } catch (e) { console.error("Error parsing product", e); }
-};
-
-window.openProductModal = (product) => {
-    currentProduct = product;
-    const modal = document.getElementById('productModal');
-    if (!modal) return;
-
-    document.getElementById('modalProductImg').src = product.image;
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
-
-    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
-    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
-
-    document.getElementById('callContact').href = `tel:+${intPhone}`;
-    const tgUser = (product.telegram_username || "").replace('@', '');
-    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
-    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=I'm interested in ${product.name}`;
-
-    modal.style.display = 'flex';
-    document.body.style.overflow = "hidden";
 };
 
 window.closeProductModal = () => {
@@ -338,7 +284,7 @@ window.handleAuth = async function(e) {
 
     if (isSignUpMode) {
         const fullName = document.getElementById('regName').value;
-    const phone = document.getElementById('regPhone').value; // You have this in HTML
+        const phone = document.getElementById('regPhone').value;
         const { error } = await _supabase.auth.signUp({
             email,
             password,
@@ -347,22 +293,23 @@ window.handleAuth = async function(e) {
         if (error) alert("Error: " + error.message);
         else { alert("Check your email for confirmation!"); window.toggleModal(); }
     } else {
-    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-        alert("Login failed: " + error.message);
-    } else {
-        window.toggleModal(); // Close the modal
-        await window.updateUIForUser(); // Refresh the UI immediately
+        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+            alert("Login failed: " + error.message);
+        } else {
+            window.toggleModal();
+            await window.updateUIForUser();
+        }
     }
-}
+    btn.disabled = false;
+};
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    const signinBtn = document.getElementById('signInBtn'); // Matches the HTML ID
+    const signinBtn = document.getElementById('signInBtn');
     const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
-        // 1. Change Sign In to Sign Out
         if (signinBtn) {
             signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
             signinBtn.onclick = async () => { 
@@ -371,24 +318,20 @@ window.updateUIForUser = async function() {
             };
         }
 
-        // 2. Try to get their Name/Admin status
         const { data: profile } = await _supabase
             .from('profiles')
             .select('is_admin, full_name')
             .eq('id', user.id)
             .maybeSingle();
 
-        // Update name if profile exists
         if (profile?.full_name && signinBtn) {
             signinBtn.querySelector('p').innerText = profile.full_name.split(' ')[0]; 
         }
 
-        // Show Admin link if they are admin
         if (adminLink && profile?.is_admin) {
             adminLink.style.display = 'flex';
         }
     } else {
-        // If logged out, ensure button says Sign In
         if (signinBtn) {
             signinBtn.innerHTML = `<i class="fas fa-user-circle"></i> <p>Sign In</p>`;
             signinBtn.onclick = () => window.toggleModal();
@@ -397,200 +340,7 @@ window.updateUIForUser = async function() {
     }
 };
 
-window.checkAuthToSell = async () => {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) {
-        alert("Please Sign In first!");
-        window.toggleModal();
-    } else {
-        window.location.href = 'sell.html';
-    }
-};
-
-// --- 8. UTILITIES & SHARING ---
-window.shareToTelegram = () => {
-    const url = encodeURIComponent(window.location.origin);
-    window.open(`https://t.me/share/url?url=${url}&text=Check out Golem Furniture!`, '_blank');
-};
-
-window.shareToWhatsApp = () => {
-    const url = encodeURIComponent(window.location.origin);
-    window.open(`https://wa.me/?text=Check out Golem! ${url}`, '_blank');
-};
-
-window.handleSupportSubmit = async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('supportEmail').value;
-    const subject = document.getElementById('supportSubject').value;
-    const msg = document.getElementById('supportMessage').value;
-
-    const { error } = await _supabase.from('support_tickets').insert([{ user_email: email, subject: subject, message: msg }]);
-
-    if (error) alert("Error: " + error.message);
-    else {
-        alert("Message sent! We'll get back to you soon.");
-        e.target.reset();
-        const modal = document.getElementById('supportModal');
-        if (modal) modal.style.display = 'none';
-    }
-};
-
-// --- SUPPORT MODAL LOGIC ---
-window.toggleSupportModal = function() {
-    const modal = document.getElementById('supportModal');
-    if (modal) {
-        const isCurrentlyFlex = modal.style.display === 'flex';
-        modal.style.display = isCurrentlyFlex ? 'none' : 'flex';
-        document.body.style.overflow = isCurrentlyFlex ? 'auto' : 'hidden';
-    } else {
-        console.error("Support Modal element not found in HTML");
-    }
-};
-
-const backToTopBtn = document.getElementById('backToTop');
-
-// Show button when user scrolls down 400px
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 400) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-
-// Smooth scroll to top when clicked
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-});
-
-
-// --- 1. SET INITIAL STATE ---
-// We check localStorage so the user's choice is remembered after refresh
-let currentLang = localStorage.getItem('golem_lang') || 'en';
-
-// --- 2. MAKE THE FUNCTION GLOBAL ---
-// Attaching it to 'window' fixes the ReferenceError
-window.toggleLanguage = function() {
-    currentLang = currentLang === 'en' ? 'am' : 'en';
-    localStorage.setItem('golem_lang', currentLang);
-    applyLanguage();
-    console.log("Language switched to: " + currentLang);
-};
-
-// --- 3. APPLY THE TRANSLATIONS ---
-function applyLanguage() {
-    const langBtnText = document.getElementById('langText');
-    
-    // Select all elements that have a 'data-am' attribute
-    const translatableElements = document.querySelectorAll('[data-am]');
-
-    if (currentLang === 'am') {
-        if (langBtnText) langBtnText.innerText = "English";
-        
-        translatableElements.forEach(el => {
-            // Save the original English text if we haven't already
-            if (!el.dataset.en) el.dataset.en = el.innerText; 
-            el.innerText = el.dataset.am;
-        });
-    } else {
-        if (langBtnText) langBtnText.innerText = "አማርኛ";
-        
-        translatableElements.forEach(el => {
-            // Restore the saved English text
-            if (el.dataset.en) el.innerText = el.dataset.en;
-        });
-    }
-}
-
-// --- 4. RUN ON LOAD ---
-document.addEventListener('DOMContentLoaded', applyLanguage);
-
-// Run on page load
-document.addEventListener('DOMContentLoaded', applyLanguage);
-
-
-
-// --- MASTER CHAT LOGIC ---
-function toggleChatMenu() {
-    const menu = document.getElementById('chatMenu');
-    const toast = document.getElementById('chatToast');
-    
-    if (menu) {
-        menu.classList.toggle('active');
-    }
-    
-    // Hide the welcome bubble once the user clicks the button
-    if (toast) {
-        toast.style.display = 'none';
-    }
-}
-
-// --- MASTER CHAT LOGIC (GLOBAL) ---
-window.toggleChatMenu = function() {
-    const menu = document.getElementById('chatMenu');
-    const toast = document.getElementById('chatToast');
-    
-    if (menu) {
-        menu.classList.toggle('active');
-    }
-    
-    // Hide the welcome bubble once the user interacts
-    if (toast) {
-        toast.style.display = 'none';
-    }
-};
-
-// --- CLOSE TOAST LOGIC (GLOBAL) ---
-window.closeToast = function(event) {
-    if (event) {
-        event.stopPropagation(); // Prevents the click from opening the menu
-    }
-    const toast = document.getElementById('chatToast');
-    if (toast) {
-        toast.style.display = 'none';
-    }
-};
-
-// Global click listener to close menu when clicking outside
-window.addEventListener('click', function(e) {
-    const chatContainer = document.querySelector('.floating-chat');
-    const menu = document.getElementById('chatMenu');
-    
-    if (chatContainer && !chatContainer.contains(e.target) && menu) {
-        menu.classList.remove('active');
-    }
-});
-
-//Ensure your toggleChatMenu also hides the toast
-/*function toggleChatMenu() {
-    const menu = document.getElementById('chatMenu');
-    const toast = document.getElementById('chatToast');
-    
-    menu.classList.toggle('active');
-    
-    if (toast) {
-        toast.style.display = 'none';
-    }
-} 
-window.addEventListener('DOMContentLoaded', () => {
-    const now = new Date();
-    const hour = now.getHours();
-    const dot = document.querySelector('.online-dot');
-
-    // Show "Online" only between 8 AM and 8 PM
-    if (dot) {
-        if (hour >= 8 && hour < 20) {
-            dot.style.display = 'block';
-        } else {
-            dot.style.display = 'none'; // Hide when you are likely asleep!
-        }
-    }
-});*/
-
-
+// --- 8. ADMIN & USER MGMT ---
 async function loadUsers() {
     const list = document.getElementById('userList');
     if (!list) return;
@@ -632,68 +382,41 @@ async function loadUsers() {
             </table>
         </div>`;
 }
-    
-window.toggleAdminPrivilege = async (userId, currentStatus) => {
-    const action = currentStatus ? "remove admin rights from" : "grant admin rights to";
-    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
 
+window.toggleVerification = async (userId, currentStatus) => {
     const { error } = await _supabase
         .from('profiles')
-        .update({ is_admin: !currentStatus })
+        .update({ is_verified: !currentStatus })
         .eq('id', userId);
-
-    if (error) {
-        alert("Failed to update: " + error.message);
-    } else {
-        loadUsers(); // Refresh the list
-    }
+    if (!error) loadUsers();
+    else alert("Error: " + error.message);
 };
-
-
-
-// Add this helper to script.js or ensure it's in config.js
-async function notifyAdminOfNewPost(product) {
-    const message = `🆕 *NEW POST PENDING*\n📦 Item: ${product.name}\n💰 Price: ${product.price} ETB\n📞 Seller: ${product.seller_phone}\n\nCheck admin.html to approve!`;
-    
-    await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: GolemConfig.chatId,
-            text: message,
-            parse_mode: 'Markdown'
-        })
-    });
-}
-
 
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
-    // ... [Keep your existing image/title/price code here] ...
+    document.getElementById('modalProductImg').src = product.image;
+    document.getElementById('modalProductTitle').innerText = product.name;
+    document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
+    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
 
     const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
     let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
 
-    // --- NEW WHITELIST CHECK ---
     const { data: profile } = await _supabase
         .from('profiles')
         .select('is_verified')
         .eq('phone', product.seller_phone)
-        .single();
+        .maybeSingle();
 
     const isVerified = profile?.is_verified || false;
-
-    // If NOT verified, the "Order" goes to the Golem Admin (You)
     const whatsappTarget = isVerified ? intPhone : GolemConfig.myPhone;
     const waPrefix = isVerified ? "" : "[UNVERIFIED SELLER] ";
     
-    document.getElementById('whatsappOrder').href = 
-        `https://wa.me/${whatsappTarget}?text=${encodeURIComponent(waPrefix + "I'm interested in " + product.name + " ID: " + product.id)}`;
+    document.getElementById('whatsappOrder').href = `https://wa.me/${whatsappTarget}?text=${encodeURIComponent(waPrefix + "I'm interested in " + product.name)}`;
 
-    // Telegram Logic
     const tgUser = (product.telegram_username || "").replace('@', '');
     document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
     document.getElementById('callContact').href = `tel:+${intPhone}`;
@@ -702,15 +425,23 @@ window.openProductModal = async (product) => {
     document.body.style.overflow = "hidden";
 };
 
+// --- CHAT & UI UTILS ---
+window.toggleChatMenu = function() {
+    const menu = document.getElementById('chatMenu');
+    const toast = document.getElementById('chatToast');
+    if (menu) menu.classList.toggle('active');
+    if (toast) toast.style.display = 'none';
+};
 
+window.closeToast = function(event) {
+    if (event) event.stopPropagation();
+    const toast = document.getElementById('chatToast');
+    if (toast) toast.style.display = 'none';
+};
 
-
-window.toggleVerification = async (userId, currentStatus) => {
-    const { error } = await _supabase
-        .from('profiles')
-        .update({ is_verified: !currentStatus })
-        .eq('id', userId);
-
-    if (!error) loadUsers();
-    else alert("Error: " + error.message);
+window.toggleLanguage = function() {
+    let currentLang = localStorage.getItem('golem_lang') || 'en';
+    currentLang = currentLang === 'en' ? 'am' : 'en';
+    localStorage.setItem('golem_lang', currentLang);
+    location.reload(); 
 };
