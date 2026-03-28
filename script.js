@@ -471,3 +471,81 @@ window.handleSignOut = async function() {
     await _supabase.auth.signOut();
     window.location.reload();
 };
+
+
+
+// --- 9. PROFILE & USER LISTINGS ---
+
+window.loadUserProfile = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        window.location.href = 'index.html'; // Redirect if not logged in
+        return;
+    }
+
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    document.getElementById('profileName').innerText = profile?.full_name || user.email.split('@')[0];
+    document.getElementById('profileEmail').innerText = user.email;
+    
+    const badge = document.getElementById('verificationBadge');
+    if (profile?.is_verified) {
+        badge.innerText = "Verified Seller";
+        badge.style.background = "#2ecc71";
+    } else {
+        badge.innerText = "Unverified Account";
+        badge.style.background = "#f1c40f";
+    }
+};
+
+window.loadUserListings = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const grid = document.getElementById('myProductGrid');
+    if (!grid) return;
+
+    const { data: products, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', user.id) // Only get items posted by this user
+        .order('created_at', { ascending: false });
+
+    if (error || !products.length) {
+        grid.innerHTML = "<p>You haven't posted any furniture yet.</p>";
+        return;
+    }
+
+    grid.innerHTML = products.map(p => `
+        <div class="product-card">
+            <img src="${p.image}" alt="${p.name}">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <p>${p.price.toLocaleString()} ETB</p>
+                <div class="product-actions">
+                    <button class="buy-btn" onclick="window.deleteProduct('${p.id}')" style="background:#ff4757;">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+};
+
+window.deleteProduct = async function(productId) {
+    if (confirm("Are you sure you want to remove this listing?")) {
+        const { error } = await _supabase
+            .from('products')
+            .delete()
+            .eq('id', productId);
+        
+        if (!error) {
+            alert("Item removed.");
+            window.loadUserListings();
+        } else {
+            alert("Error: " + error.message);
+        }
+    }
+};
