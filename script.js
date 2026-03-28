@@ -244,15 +244,24 @@ window.closeProductModal = () => {
 // --- 7. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
 
+// 1. Toggle between Login and Register
 window.toggleAuthMode = function() {
-    const isSignUp = document.getElementById('registerFields').style.display === 'none';
-    
-    document.getElementById('registerFields').style.display = isSignUp ? 'block' : 'none';
-    document.getElementById('modalTitle').innerText = isSignUp ? 'Create Account' : 'Welcome Back';
-    document.getElementById('authSubmitBtn').innerText = isSignUp ? 'Sign Up' : 'Sign In';
-    document.getElementById('toggleText').innerHTML = isSignUp 
-        ? 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>' 
-        : 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
+    const fields = document.getElementById('registerFields');
+    const title = document.getElementById('modalTitle');
+    const btn = document.getElementById('authSubmitBtn');
+    const toggleText = document.getElementById('toggleText');
+
+    if (fields.style.display === 'none' || fields.style.display === '') {
+        fields.style.display = 'block';
+        title.innerText = "Create Account";
+        btn.innerText = "Sign Up";
+        toggleText.innerHTML = 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>';
+    } else {
+        fields.style.display = 'none';
+        title.innerText = "Welcome Back";
+        btn.innerText = "Sign In";
+        toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
+    }
 };
 
 window.toggleModal = () => {
@@ -264,63 +273,33 @@ window.toggleModal = () => {
     }
 };
 
+/ 2. Handle the actual Auth
 window.handleAuth = async (event) => {
     event.preventDefault();
-    
     const email = document.getElementById('authEmail').value;
     const password = document.getElementById('authPassword').value;
+    const isSignUp = document.getElementById('registerFields').style.display === 'block';
     const btn = document.getElementById('authSubmitBtn');
-    
-    // Check if we are currently showing the registration fields
-    const registerFields = document.getElementById('registerFields');
-    const isSignUpMode = registerFields && registerFields.style.display === 'block';
 
-    // UI feedback: Disable button while waiting
-    const originalText = btn.innerText;
     btn.disabled = true;
     btn.innerText = "Processing...";
 
-    try {
-        if (isSignUpMode) {
-            // --- SIGN UP LOGIC ---
-            const fullName = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-
-            const { data, error } = await _supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        full_name: fullName,
-                        phone: phone
-                    }
-                }
-            });
-
-            if (error) throw error;
-            
-            alert("Success! Please check your email inbox to confirm your account.");
-            if (window.toggleModal) window.toggleModal();
-
-        } else {
-            // --- SIGN IN LOGIC ---
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) throw error;
-            
-            // Refresh to update the header and show "My Items", etc.
-            window.location.reload(); 
-        }
-    } catch (err) {
-        alert(err.message);
-    } finally {
-        // Re-enable button
-        btn.disabled = false;
-        btn.innerText = originalText;
+    if (isSignUp) {
+        const { error } = await _supabase.auth.signUp({
+            email, password,
+            options: { data: { 
+                full_name: document.getElementById('regName').value,
+                phone: document.getElementById('regPhone').value 
+            }}
+        });
+        if (error) alert(error.message);
+        else alert("Success! Check your email to confirm.");
+    } else {
+        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) alert(error.message);
+        else window.location.reload();
     }
+    btn.disabled = false;
 };
 
 window.updateUIForUser = async function() {
@@ -474,13 +453,8 @@ window.toggleLanguage = function() {
     location.reload(); 
 };
 
+// 3. Handle Sign Out
 window.handleSignOut = async function() {
-    const { error } = await _supabase.auth.signOut();
-    if (error) {
-        alert("Error signing out: " + error.message);
-    } else {
-        // Clear any local storage if you're using it for "Saved Items"
-        // localStorage.removeItem('golem_wishlist'); 
-        window.location.reload(); 
-    }
+    await _supabase.auth.signOut();
+    window.location.reload();
 };
