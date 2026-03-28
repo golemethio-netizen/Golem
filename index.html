@@ -311,14 +311,14 @@ document.addEventListener('click', function(event) {
 
 
 async function loadAdminStatus() {
-    // Replace with your actual Admin User ID from Supabase
-    const ADMIN_ID = "YOUR_ADMIN_UUID_HERE"; 
+    // PASTE YOUR COPIED ID BETWEEN THE QUOTES BELOW
+    const ADMIN_ID = "PASTE-YOUR-UUID-HERE"; 
 
     const { data, error } = await _supabase
         .from('profiles')
         .select('last_seen')
         .eq('id', ADMIN_ID)
-        .single();
+        .maybeSingle(); // Use maybeSingle to prevent errors if not found
 
     if (data && data.last_seen) {
         const lastSeenDate = new Date(data.last_seen);
@@ -326,20 +326,23 @@ async function loadAdminStatus() {
         const diffInMinutes = Math.floor((now - lastSeenDate) / 60000);
 
         let statusText = "";
+        const dot = document.querySelector('.online-dot');
         const label = document.querySelector('.chat-label');
 
         if (diffInMinutes < 5) {
             statusText = "Online Now";
-            document.querySelector('.online-dot').style.background = "#2ed573"; // Green
+            if (dot) dot.style.background = "#2ed573"; 
         } else if (diffInMinutes < 60) {
             statusText = `Active ${diffInMinutes}m ago`;
-            document.querySelector('.online-dot').style.background = "#f1c40f"; // Yellow
+            if (dot) dot.style.background = "#f1c40f"; 
         } else {
             statusText = "Offline";
-            document.querySelector('.online-dot').style.background = "#ccc"; // Grey
+            if (dot) dot.style.background = "#ccc"; 
         }
 
-        label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">${statusText}</small>`;
+        if (label) {
+            label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">${statusText}</small>`;
+        }
     }
 }
 
