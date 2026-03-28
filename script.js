@@ -476,10 +476,12 @@ window.handleSignOut = async function() {
 
 // --- 9. PROFILE & USER LISTINGS ---
 
+// --- 9. PROFILE & USER LISTINGS ---
+
 window.loadUserProfile = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) {
-        window.location.href = 'index.html'; // Redirect if not logged in
+        window.location.href = 'index.html';
         return;
     }
 
@@ -489,18 +491,30 @@ window.loadUserProfile = async function() {
         .eq('id', user.id)
         .maybeSingle();
 
-    document.getElementById('profileName').innerText = profile?.full_name || user.email.split('@')[0];
+    // Fill Display
+    document.getElementById('profileName').innerText = profile?.full_name || user.user_metadata?.full_name || "Member";
     document.getElementById('profileEmail').innerText = user.email;
     
+    // Fill Edit Form Inputs (Pre-filling)
+    document.getElementById('editFullName').value = profile?.full_name || user.user_metadata?.full_name || "";
+    document.getElementById('editPhone').value = profile?.phone || user.user_metadata?.phone || "";
+
     const badge = document.getElementById('verificationBadge');
     if (profile?.is_verified) {
         badge.innerText = "Verified Seller";
-        badge.style.background = "#2ecc71";
+        badge.className = "badge sponsor-badge"; 
     } else {
         badge.innerText = "Unverified Account";
-        badge.style.background = "#f1c40f";
+        badge.style.background = "#bdc3c7";
     }
 };
+
+// Open Modal Helper
+window.openEditModal = () => {
+    document.getElementById('editProfileModal').style.display = 'flex';
+};
+
+
 
 window.loadUserListings = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
@@ -553,28 +567,27 @@ window.deleteProduct = async function(productId) {
 
 // --- 10. PROFILE EDITING ---
 
-window.updateProfileInfo = async function(event) {
-    if (event) event.preventDefault();
-    
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return;
 
+window.updateProfileInfo = async function(event) {
+    event.preventDefault();
+    const { data: { user } } = await _supabase.auth.getUser();
+    
     const newName = document.getElementById('editFullName').value;
     const newPhone = document.getElementById('editPhone').value;
 
     const { error } = await _supabase
         .from('profiles')
-        .update({ 
-            full_name: newName,
+        .upsert({ 
+            id: user.id,
+            full_name: newName, 
             phone: newPhone,
-            updated_at: new Date() 
-        })
-        .eq('id', user.id);
+            email: user.email 
+        });
 
     if (error) {
-        alert("Error updating profile: " + error.message);
+        alert("Update failed: " + error.message);
     } else {
-        alert("Profile updated successfully!");
-        location.reload(); // Refresh to show new name
+        alert("Profile Updated!");
+        location.reload();
     }
 };
