@@ -592,7 +592,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadUsers() {
     const list = document.getElementById('userList');
-    list.innerHTML = "<div class='loading-spinner'><i class='fas fa-sync fa-spin'></i> Syncing database...</div>";
+    if (!list) return;
+    list.innerHTML = "<div class='loading-spinner'><i class='fas fa-sync fa-spin'></i> Syncing...</div>";
 
     const { data: users, error } = await _supabase
         .from('profiles') 
@@ -600,63 +601,37 @@ async function loadUsers() {
         .order('created_at', { ascending: false });
 
     if (error || !users) {
-        list.innerHTML = `<p style="color:#ff4757; padding:20px;">Error: ${error?.message || 'Unauthorized access to profiles'}</p>`;
+        list.innerHTML = `<p style="color:#ff4757; padding:20px;">Error: ${error?.message || 'Unauthorized'}</p>`;
         return;
     }
 
-    // Update Top Stat Card
-    const userCountEl = document.getElementById('totalUsers');
-    if (userCountEl) userCountEl.innerText = users.length;
-
     list.innerHTML = `
         <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="text-align: left; border-bottom: 2px solid #f4f7f6; color: #888; font-size: 0.85rem;">
-                        <th style="padding: 15px;">FULL NAME</th>
-                        <th style="padding: 15px;">EMAIL ADDRESS</th>
+                    <tr style="text-align: left; border-bottom: 2px solid #f4f7f6; color: #888;">
+                        <th style="padding: 15px;">NAME</th>
+                        <th style="padding: 15px;">EMAIL</th>
                         <th style="padding: 15px;">STATUS</th>
-                        <th style="padding: 15px;">JOINED</th>
                         <th style="padding: 15px; text-align: right;">ACTIONS</th>
                     </tr>
                 </thead>
-                // Update the row mapping inside loadUsers() to look like this:
-<tbody>
-    ${users.map(u => `
-        <tr style="border-bottom: 1px solid #f4f7f6; transition: 0.2s; height: 60px;">
-            <td style="padding: 10px 15px; font-weight: 600;">${u.full_name || 'New Member'}</td>
-            <td style="padding: 10px 15px; color: #555;">${u.email}</td>
-            <td style="padding: 10px 15px;">
-                ${u.is_admin ? 
-                    '<span style="background:#6c5ce7; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem;">Admin</span>' : 
-                    '<span style="background:#eee; color:#666; padding:4px 10px; border-radius:20px; font-size:0.75rem;">User</span>'}
-                ${u.is_verified ? 
-                    '<span style="background:#2ed573; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem; margin-left:5px;">Verified</span>' : 
-                    '<span style="background:#ffa502; color:white; padding:4px 10px; border-radius:20px; font-size:0.75rem; margin-left:5px;">Standard</span>'}
-            </td>
-            <td style="padding: 10px 15px; font-size: 0.85rem; color: #999;">
-                ${new Date(u.created_at).toLocaleDateString('en-GB')}
-            </td>
-            <td style="padding: 10px 15px; text-align: right;">
-                <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
-                        style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; margin-right:5px;">
-                    ${u.is_verified ? 'Unverify' : 'Verify Seller'}
-                </button>
-                ${u.email !== 'yohannes.surafel@gmail.com' ? `
-                    <button onclick="toggleAdminPrivilege('${u.id}', ${u.is_admin})" 
-                            style="background: none; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.75rem;">
-                        ${u.is_admin ? 'Demote' : 'Make Admin'}
-                    </button>
-                ` : '<i class="fas fa-lock" title="Master Admin"></i>'}
-            </td>
-        </tr>
-    `).join('')}
-</tbody>
-
+                <tbody>
+                    ${users.map(u => `
+                        <tr style="border-bottom: 1px solid #f4f7f6;">
+                            <td style="padding: 10px 15px;">${u.full_name || 'Member'}</td>
+                            <td style="padding: 10px 15px;">${u.email}</td>
+                            <td style="padding: 10px 15px;">${u.is_admin ? 'Admin' : 'User'}</td>
+                            <td style="padding: 10px 15px; text-align: right;">
+                                <button onclick="window.toggleVerification('${u.id}', ${u.is_verified})">Verify</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
             </table>
-        </div>
-    `;
+        </div>`;
 }
+    
 window.toggleAdminPrivilege = async (userId, currentStatus) => {
     const action = currentStatus ? "remove admin rights from" : "grant admin rights to";
     if (!confirm(`Are you sure you want to ${action} this user?`)) return;
