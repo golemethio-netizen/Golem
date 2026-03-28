@@ -1307,3 +1307,45 @@ body.is-admin .admin-expiry-info {
 #userName {
     color: #0088cc; /* Matches your Telegram/Brand blue */
 }
+/* Welcome Badge Styling */
+#userWelcome {
+    display: flex;
+    align-items: center;
+    background: #f1f2f6;
+    padding: 8px 15px;
+    border-radius: 50px;
+    border: 1px solid #dfe4ea;
+    font-size: 0.85rem;
+    color: #2f3542;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#userName {
+    color: #0088cc; /* Golem Brand Blue */
+    margin-left: 5px;
+}
+
+/* Sign Out Button - Specific Red Theme */
+.signout-btn {
+    background: #ff4757 !important;
+    color: white !important;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.signout-btn:hover {
+    background: #ff6b81 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+}
+
+/* Responsive fix for small screens */
+@media (max-width: 600px) {
+    #userWelcome {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+    #userWelcome span:first-child {
+        display: none; /* Hides "Hello" on tiny screens, keeps the Name */
+    }
+}
