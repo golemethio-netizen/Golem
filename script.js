@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-// Move this near the top of script.js
+/// 1. Toggle Modal Visibility
 window.toggleModal = () => {
     const modal = document.getElementById('authModal');
     if (modal) {
@@ -260,6 +260,7 @@ window.closeProductModal = () => {
 let isSignUpMode = false;
 
 // 1. Toggle between Login and Register
+// 2. Toggle between Login and Register
 window.toggleAuthMode = function() {
     const fields = document.getElementById('registerFields');
     const title = document.getElementById('modalTitle');
@@ -277,10 +278,10 @@ window.toggleAuthMode = function() {
         btn.innerText = "Sign In";
         toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
     }
+};
 
 
-
-// 2. Handle the actual Auth (FIXED THE SLASH ERROR HERE)
+// 3. Handle the actual Auth
 window.handleAuth = async (event) => {
     event.preventDefault();
     const email = document.getElementById('authEmail').value;
@@ -315,6 +316,8 @@ window.handleAuth = async (event) => {
         btn.innerText = originalText;
     }
 };
+
+
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
