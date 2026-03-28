@@ -328,29 +328,40 @@ window.updateUIForUser = async function() {
     
     const signInBtn = document.getElementById('signInBtn');
     const signOutBtn = document.getElementById('signOutBtn');
-    const adminLink = document.getElementById('adminNavLink');
+    const welcomeDiv = document.getElementById('userWelcome');
+    const nameSpan = document.getElementById('userName');
 
     if (user) {
-        // User is logged in
+        // 1. Hide Sign In, Show Sign Out
         if (signInBtn) signInBtn.style.display = 'none';
         if (signOutBtn) signOutBtn.style.display = 'flex';
-        
-        // Show Admin link only if they have the 'is_owner' flag
+
+        // 2. Fetch the user's Profile Info (Name)
         const { data: profile } = await _supabase
             .from('profiles')
-            .select('is_owner')
+            .select('full_name, is_owner')
             .eq('id', user.id)
             .maybeSingle();
 
-        if (profile && profile.is_owner && adminLink) {
-            adminLink.style.display = 'flex';
+        if (profile) {
+            // Display the name (fallback to email if name is empty)
+            if (welcomeDiv && nameSpan) {
+                nameSpan.innerText = profile.full_name || user.email.split('@')[0];
+                welcomeDiv.style.display = 'block';
+            }
+
+            // 3. Show Admin Link if they are the owner
+            const adminLink = document.getElementById('adminNavLink');
+            if (profile.is_owner && adminLink) {
+                adminLink.style.display = 'flex';
+            }
         }
 
     } else {
         // User is logged out
         if (signInBtn) signInBtn.style.display = 'flex';
         if (signOutBtn) signOutBtn.style.display = 'none';
-        if (adminLink) adminLink.style.display = 'none';
+        if (welcomeDiv) welcomeDiv.style.display = 'none';
     }
 };
 
