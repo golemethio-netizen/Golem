@@ -328,31 +328,27 @@ window.updateUIForUser = async function() {
     const nameSpan = document.getElementById('userName');
 
     if (user) {
-        // Switch buttons
+        // Hide sign in, show welcome and sign out
         if (signInBtn) signInBtn.style.display = 'none';
-        if (signOutBtn) signOutBtn.style.display = 'flex';
+        if (welcomeDiv) welcomeDiv.style.display = 'flex';
+        if (signOutBtn) signOutBtn.style.display = 'inline-block'; // Use inline-block or flex
 
-        // Fetch user metadata for the name
         const { data: profile } = await _supabase
             .from('profiles')
             .select('full_name')
             .eq('id', user.id)
             .maybeSingle();
 
-        if (welcomeDiv && nameSpan) {
-            // Priority: Database Name -> Metadata Name -> Email prefix
-            const displayName = profile?.full_name || 
+        if (nameSpan) {
+            nameSpan.innerText = profile?.full_name || 
                                 user.user_metadata?.full_name || 
                                 user.email.split('@')[0];
-            
-            nameSpan.innerText = displayName;
-            welcomeDiv.style.display = 'flex';
         }
     } else {
         // Reset to Guest mode
         if (signInBtn) signInBtn.style.display = 'flex';
-        if (signOutBtn) signOutBtn.style.display = 'none';
         if (welcomeDiv) welcomeDiv.style.display = 'none';
+        if (signOutBtn) signOutBtn.style.display = 'none';
     }
 };
 
