@@ -245,23 +245,14 @@ window.closeProductModal = () => {
 let isSignUpMode = false;
 
 window.toggleAuthMode = function() {
-    isSignUpMode = !isSignUpMode;
-    const title = document.getElementById('modalTitle');
-    const submitBtn = document.getElementById('authSubmitBtn');
-    const regFields = document.getElementById('registerFields');
-    const toggleLink = document.getElementById('toggleText');
-
-    if (isSignUpMode) {
-        title.innerText = "Create Account";
-        submitBtn.innerText = "Sign Up";
-        regFields.style.display = "block";
-        toggleLink.innerHTML = 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>';
-    } else {
-        title.innerText = "Welcome Back";
-        submitBtn.innerText = "Sign In";
-        regFields.style.display = "none";
-        toggleLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
-    }
+    const isSignUp = document.getElementById('registerFields').style.display === 'none';
+    
+    document.getElementById('registerFields').style.display = isSignUp ? 'block' : 'none';
+    document.getElementById('modalTitle').innerText = isSignUp ? 'Create Account' : 'Welcome Back';
+    document.getElementById('authSubmitBtn').innerText = isSignUp ? 'Sign Up' : 'Sign In';
+    document.getElementById('toggleText').innerHTML = isSignUp 
+        ? 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>' 
+        : 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
 };
 
 window.toggleModal = () => {
