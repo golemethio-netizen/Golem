@@ -311,37 +311,36 @@ document.addEventListener('click', function(event) {
 
 
 async function loadAdminStatus() {
-    // PASTE YOUR COPIED ID BETWEEN THE QUOTES BELOW
-    const ADMIN_ID = "PASTE-YOUR-UUID-HERE"; 
-
     const { data, error } = await _supabase
         .from('profiles')
         .select('last_seen')
-        .eq('id', ADMIN_ID)
-        .maybeSingle(); // Use maybeSingle to prevent errors if not found
+        .eq('is_owner', true)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Error fetching admin status:", error);
+        return;
+    }
 
     if (data && data.last_seen) {
         const lastSeenDate = new Date(data.last_seen);
         const now = new Date();
         const diffInMinutes = Math.floor((now - lastSeenDate) / 60000);
 
-        let statusText = "";
         const dot = document.querySelector('.online-dot');
         const label = document.querySelector('.chat-label');
+        
+        if (!dot || !label) return;
 
         if (diffInMinutes < 5) {
-            statusText = "Online Now";
-            if (dot) dot.style.background = "#2ed573"; 
+            dot.style.background = "#2ed573"; // Green
+            label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">Online Now</small>`;
         } else if (diffInMinutes < 60) {
-            statusText = `Active ${diffInMinutes}m ago`;
-            if (dot) dot.style.background = "#f1c40f"; 
+            dot.style.background = "#f1c40f"; // Yellow
+            label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">Active ${diffInMinutes}m ago</small>`;
         } else {
-            statusText = "Offline";
-            if (dot) dot.style.background = "#ccc"; 
-        }
-
-        if (label) {
-            label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">${statusText}</small>`;
+            dot.style.background = "#ccc"; // Grey
+            label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">Offline</small>`;
         }
     }
 }
