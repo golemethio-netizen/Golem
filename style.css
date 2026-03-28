@@ -1382,3 +1382,14 @@ body.is-admin .admin-expiry-info {
     justify-content: center;
     font-weight: bold;
 }
+.nav-auth-controls {
+    display: flex;
+    align-items: center;
+    min-width: 150px; /* Gives the buttons room to breathe */
+    justify-content: flex-end;
+}
+
+#signOutBtn:hover {
+    transform: scale(1.1);
+    color: #ff6b81;
+}
