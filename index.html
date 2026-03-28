@@ -50,17 +50,17 @@
         <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
     </button>
 </div>
-         <div class="nav-auth-controls">
+        <div class="nav-auth-controls">
     <button id="signInBtn" class="filter-btn" onclick="window.toggleModal()">
         <i class="fas fa-user"></i> Sign In
     </button>
 
     <div id="userWelcome" style="display:none; align-items:center; gap:10px;">
-        <span onclick="location.href='profile.html'" style="cursor:pointer;">
-            Hello, <strong id="userName"></strong>
+        <span onclick="location.href='profile.html'" style="cursor:pointer; font-weight:600;">
+            Hello, <span id="userName"></span>
         </span>
-        <button id="signOutBtn" class="signout-btn" onclick="window.handleSignOut()" style="display:none;">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
+        <button id="signOutBtn" class="signout-btn" onclick="window.handleSignOut()" style="border:1px solid #ddd; padding:5px 10px; border-radius:5px;">
+            <i class="fas fa-sign-out-alt"></i>
         </button>
     </div>
 </div>
