@@ -1349,3 +1349,36 @@ body.is-admin .admin-expiry-info {
         display: none; /* Hides "Hello" on tiny screens, keeps the Name */
     }
 }
+.nav-auth-controls {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+#userWelcome strong {
+    color: #2d3436;
+    font-weight: 600;
+}
+
+.signout-btn:hover {
+    background-color: #ff7675 !important;
+    color: white !important;
+    border-color: #ff7675 !important;
+}
+
+/* Ensure the cart badge looks good on the "Saved" icon */
+#cartBadge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
