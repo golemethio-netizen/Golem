@@ -50,10 +50,20 @@
         <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
     </button>
 </div>
-          <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()">
-    <i class="fas fa-user-circle"></i>
-    <p>Sign In</p>
-</button>
+         <div class="nav-auth-controls">
+    <button id="signInBtn" class="filter-btn" onclick="window.toggleModal()">
+        <i class="fas fa-user"></i> Sign In
+    </button>
+
+    <div id="userWelcome" style="display:none; align-items:center; gap:10px;">
+        <span onclick="location.href='profile.html'" style="cursor:pointer;">
+            Hello, <strong id="userName"></strong>
+        </span>
+        <button id="signOutBtn" class="signout-btn" onclick="window.handleSignOut()" style="display:none;">
+            <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+    </div>
+</div>
         </div>
 
         <a href="#" onclick="window.toggleSupportModal()" style="color: #666; font-size: 0.9rem; margin-top: 10px; display: inline-block;">
