@@ -32,6 +32,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+
+
+// Move this near the top of script.js
+window.toggleModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        const isFlex = modal.style.display === 'flex';
+        modal.style.display = isFlex ? 'none' : 'flex';
+        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
+    }
+};
+
+
+
+
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = 'All') => {
     const grid = document.getElementById('productGrid');
@@ -263,14 +278,7 @@ window.toggleAuthMode = function() {
         toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
     }
 
-window.toggleModal = () => {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        const isFlex = modal.style.display === 'flex';
-        modal.style.display = isFlex ? 'none' : 'flex';
-        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
-    }
-};
+
 
 // 2. Handle the actual Auth (FIXED THE SLASH ERROR HERE)
 window.handleAuth = async (event) => {
