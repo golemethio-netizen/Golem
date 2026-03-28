@@ -185,7 +185,17 @@
                 </div>
             </div>
 
-            <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
+           <div class="auth-controls">
+    <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()">
+        <i class="fas fa-user-circle"></i>
+        <p>Sign In</p>
+    </button>
+
+    <button id="signOutBtn" class="nav-item-box signout-btn" onclick="window.handleSignOut()" style="display: none; background: #ff4757; color: white;">
+        <i class="fas fa-sign-out-alt"></i>
+        <p>Sign Out</p>
+    </button>
+</div>
         </form>
 
         <div class="modal-footer">
