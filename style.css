@@ -1295,3 +1295,15 @@ body.is-admin .admin-expiry-info {
     background: #ff6b81 !important; /* A slightly lighter red on hover */
     transform: translateY(-2px);
 }
+
+#userWelcome {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #eee;
+    white-space: nowrap;
+}
+
+#userName {
+    color: #0088cc; /* Matches your Telegram/Brand blue */
+}
