@@ -147,7 +147,7 @@
 
 
     
-    <div id="authModal" class="modal-overlay" onclick="if(event.target == this) window.toggleModal()">
+  <div id="authModal" class="modal-overlay" onclick="if(event.target == this) window.toggleModal()">
     <div class="modal-content">
         <button type="button" onclick="window.toggleModal()" class="close-modal-btn">&times;</button>
         <h2 id="modalTitle">Welcome Back</h2>
@@ -176,44 +176,16 @@
 
                 <div class="input-group">
                     <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" id="regLocation" placeholder="Location (e.g. Bole, Addis Ababa)">
+                    <input type="text" id="regLocation" placeholder="Location (e.g. Bole)">
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-info-circle"></i>
-                    <textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit;"></textarea>
+                    <textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit; border-radius: 8px; background: #f9f9f9;"></textarea>
                 </div>
             </div>
 
-           <div class="auth-controls">
-    <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()">
-        <i class="fas fa-user-circle"></i>
-        <p>Sign In</p>
-
-    </button>
-
-    <button id="signOutBtn" class="nav-item-box signout-btn" onclick="window.handleSignOut()" style="display: none; background: #ff4757; color: white;">
-        <i class="fas fa-sign-out-alt"></i>
-        <p>Sign Out</p>
-    </button>
-
-<div class="auth-controls" style="display: flex; align-items: center; gap: 15px;">
-    <div id="userWelcome" style="display: none; color: #333; font-weight: 600; font-size: 0.9rem;">
-        <span>Hello, <span id="userName">Guest</span>!</span>
-    </div>
-
-    <button id="signInBtn" class="nav-item-box signin-btn" onclick="window.toggleModal()">
-        <i class="fas fa-user-circle"></i>
-        <p>Sign In</p>
-    </button>
-
-    <button id="signOutBtn" class="nav-item-box signout-btn" onclick="window.handleSignOut()" style="display: none; background: #ff4757; color: white;">
-        <i class="fas fa-sign-out-alt"></i>
-        <p>Sign Out</p>
-    </button>
-</div>
-               
-</div>
+            <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
         </form>
 
         <div class="modal-footer">
