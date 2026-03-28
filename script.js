@@ -328,11 +328,16 @@ window.updateUIForUser = async function() {
     const nameSpan = document.getElementById('userName');
 
     if (user) {
-        // Hide sign in, show welcome and sign out
+        // 1. Hide Sign In
         if (signInBtn) signInBtn.style.display = 'none';
+        
+        // 2. Show the Welcome Container
         if (welcomeDiv) welcomeDiv.style.display = 'flex';
-        if (signOutBtn) signOutBtn.style.display = 'inline-block'; // Use inline-block or flex
+        
+        // 3. Show the Sign Out Button specifically
+        if (signOutBtn) signOutBtn.style.display = 'inline-block';
 
+        // 4. Get the Name
         const { data: profile } = await _supabase
             .from('profiles')
             .select('full_name')
@@ -340,13 +345,11 @@ window.updateUIForUser = async function() {
             .maybeSingle();
 
         if (nameSpan) {
-            nameSpan.innerText = profile?.full_name || 
-                                user.user_metadata?.full_name || 
-                                user.email.split('@')[0];
+            nameSpan.innerText = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
         }
     } else {
-        // Reset to Guest mode
-        if (signInBtn) signInBtn.style.display = 'flex';
+        // Guest Mode
+        if (signInBtn) signInBtn.style.display = 'block';
         if (welcomeDiv) welcomeDiv.style.display = 'none';
         if (signOutBtn) signOutBtn.style.display = 'none';
     }
