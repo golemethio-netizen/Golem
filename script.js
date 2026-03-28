@@ -346,20 +346,22 @@ window.handleAuth = async function(e) {
         if (error) alert("Error: " + error.message);
         else { alert("Check your email for confirmation!"); window.toggleModal(); }
     } else {
-        const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) alert("Login failed: " + error.message);
-        else window.location.reload(); 
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+        alert("Login failed: " + error.message);
+    } else {
+        window.toggleModal(); // Close the modal
+        await window.updateUIForUser(); // Refresh the UI immediately
     }
-    btn.disabled = false;
-};
+}
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    const signinBtn = document.querySelector('.signin-btn');
+    const signinBtn = document.getElementById('signInBtn'); // Matches the HTML ID
     const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
-        // 1. Update Sign In button to Sign Out
+        // 1. Change Sign In to Sign Out
         if (signinBtn) {
             signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
             signinBtn.onclick = async () => { 
@@ -368,22 +370,28 @@ window.updateUIForUser = async function() {
             };
         }
 
-        // 2. CHECK DATABASE FOR ADMIN STATUS
-        const { data: profile, error } = await _supabase
+        // 2. Try to get their Name/Admin status
+        const { data: profile } = await _supabase
             .from('profiles')
-            .select('is_admin')
+            .select('is_admin, full_name')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
-        if (!error && adminLink && profile?.is_admin) {
+        // Update name if profile exists
+        if (profile?.full_name && signinBtn) {
+            signinBtn.querySelector('p').innerText = profile.full_name.split(' ')[0]; 
+        }
+
+        // Show Admin link if they are admin
+        if (adminLink && profile?.is_admin) {
             adminLink.style.display = 'flex';
-            document.body.classList.add('is-admin');
-            console.log("🛡️ Admin Mode Active");
-        } else {
-            if (adminLink) adminLink.style.display = 'none';
         }
     } else {
-        // No user logged in
+        // If logged out, ensure button says Sign In
+        if (signinBtn) {
+            signinBtn.innerHTML = `<i class="fas fa-user-circle"></i> <p>Sign In</p>`;
+            signinBtn.onclick = () => window.toggleModal();
+        }
         if (adminLink) adminLink.style.display = 'none';
     }
 };
