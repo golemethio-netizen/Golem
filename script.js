@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => filterSearch(e.target.value.toLowerCase()));
     }
-});
+
 
 
 // --- 2. DATA FETCHING ---
