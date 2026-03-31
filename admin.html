@@ -156,57 +156,57 @@
         renderUserTable(users);
     }
 }
-async function renderUserTable(users) {
-    const list = document.getElementById('userList');
-    
-    // Get current logged-in admin ID
-    const { data: { user } } = await _supabase.auth.getUser();
-    const currentAdminId = user?.id;
 
+function renderUserTable(users) {
+    const list = document.getElementById('userList');
     list.innerHTML = `
         <table style="width: 100%; border-collapse: collapse; margin-top:10px;">
             <thead>
                 <tr style="border-bottom: 2px solid #eee; text-align:left; color: #666; font-size: 0.9rem;">
                     <th style="padding:12px;">Name</th>
                     <th>Email</th>
-                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Admin</th>
+                    <th>Trust Level</th>
                     <th style="text-align:right; padding-right:12px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                ${users.map(u => {
-                    const isMe = u.id === currentAdminId;
-                    return `
+                ${users.map(u => `
                     <tr style="border-bottom: 1px solid #eee; height:60px;">
                         <td style="padding:12px;">
-                            <strong>${u.full_name || 'User'}</strong> ${isMe ? '<small style="color:#999;">(You)</small>' : ''}
+                            <strong>${u.full_name || 'User'}</strong>
                         </td>
                         <td>${u.email}</td>
+                        <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            <button onclick="toggleAdmin('${u.id}', ${u.is_admin})" 
+                                    style="border:none; background:none; cursor:pointer; font-size:1.2rem;">
+                                ${u.is_admin ? '🛡️' : '👤'}
+                            </button>
+                        </td>
                         <td>
                             ${u.is_verified ? 
-                                '<span style="color:#2ed573; font-weight:bold; font-size:0.75rem;">VERIFIED</span>' : 
-                                '<span style="color:#ff4757; font-weight:bold; font-size:0.75rem;">UNVERIFIED</span>'}
+                                '<span style="background:#e8fdf5; color:#2ed573; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">VERIFIED</span>' : 
+                                '<span style="background:#f1f2f6; color:#a4b0be; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">GUEST</span>'}
                         </td>
                         <td style="text-align:right; padding-right:12px;">
-                            <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
-                                
+                            <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
                                 <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
-                                        style="padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: white; 
-                                        background: ${u.is_verified ? '#ff4757' : '#2ed573'};">
-                                    ${u.is_verified ? 'Unverify' : 'Verify'}
+                                        class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" 
+                                        style="padding: 5px 10px; font-size: 0.75rem; width: auto; margin: 0;">
+                                    ${u.is_verified ? 'Unverify' : 'Verify Seller'}
                                 </button>
                                 
-                                ${!isMe ? `
-                                    <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" 
-                                            style="background:none; border:none; color: #ff4757; cursor: pointer; font-size: 1.1rem;" 
-                                            title="Delete User">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                ` : '<span style="width:20px;"></span>'}
+                                <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" 
+                                        style="border:none; background:none; cursor:pointer; font-size:1.1rem; padding: 5px;"
+                                        title="Delete User">
+                                    🗑️
+                                </button>
                             </div>
                         </td>
-                    </tr>`;
-                }).join('')}
+                    </tr>
+                `).join('')}
             </tbody>
         </table>`;
 }
@@ -279,16 +279,15 @@ async function toggleAdmin(userId, currentStatus) {
             loadTickets(); 
         };   */
 
-            async function loadItems(status = 'pending') {
-    const grid = document.getElementById('adminGrid');
-    grid.innerHTML = "<p>Loading products...</p>";
-    
-    // UPDATED QUERY: Fetches is_verified from the profiles table
-    const { data: items, error } = await _supabase
-        .from('products')
-        .select('*, profiles(is_verified)') 
-        .eq('status', status)
-        .order('created_at', { ascending: false });
+             async function loadItems(status = 'pending') {
+            const grid = document.getElementById('adminGrid');
+            grid.innerHTML = "<p>Loading products...</p>";
+            
+            const { data: items, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('status', status)
+                .order('created_at', { ascending: false });
 
             if (error || !items || items.length === 0) {
                 grid.innerHTML = `<div style="padding:40px; text-align:center; color:#888;">No items found in ${status}.</div>`;
@@ -316,7 +315,6 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
             const twentyFourHours = 24 * 60 * 60 * 1000;
 
             grid.innerHTML = items.map(item => {
-                const isVerified = item.profiles?.is_verified;
                 const isSponsorActive = item.is_sponsored && item.sponsored_until && new Date(item.sponsored_until) > now;
                 let expiringClass = '';
                 if (isSponsorActive) {
@@ -325,19 +323,21 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
                 }
 
                 return `
-               <div class="product-card ${expiringClass}" id="card-${item.id}" style="background:white; border-radius:12px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px;">
-        <img src="${item.image}" style="width:100%; height:200px; object-fit:cover;">
-        <div class="product-info" style="padding:15px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="margin:0;">${item.name}</h3>
-                <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ff4757'}; font-size:1.2rem;" title="${isVerified ? 'Verified' : 'Unverified'}"></i>
-            </div>
-            <p style="color:#2ed573; font-weight:bold; font-size:1.1rem; margin-top:5px;">${item.price?.toLocaleString()} ETB</p>
-            <div class="admin-actions" style="margin-top:15px; border-top: 1px solid #eee; padding-top:10px;">
-                ${status === 'pending' ? `
-                    <button onclick="updateStatus('${item.id}', 'approved')" class="btn-approve">Approve & Go Live</button>
-                    <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Reject Item</button>
-                ` : ''}
+                <div class="product-card ${expiringClass}" id="card-${item.id}" style="background:white; border-radius:12px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px;">
+                    <img src="${item.image}" style="width:100%; height:200px; object-fit:cover;">
+                    <div class="product-info" style="padding:15px;">
+                        <h3 style="margin-bottom:5px;">${item.name}</h3>
+                        <p style="color:#2ed573; font-weight:bold; font-size:1.1rem;">${item.price?.toLocaleString()} ETB</p>
+                        <p style="font-size:0.85rem; color:#666; margin-top:5px;">
+                            Seller: <a href="tel:${item.seller_phone}" style="color:#007bff; text-decoration:none;">${item.seller_phone}</a>
+                        </p>
+                        
+                        <div class="admin-actions" style="margin-top:15px; border-top: 1px solid #eee; padding-top:10px;">
+                            ${status === 'pending' ? `
+                                <button onclick="updateStatus('${item.id}', 'approved')" class="btn-approve">Approve & Go Live</button>
+                                <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Reject Item</button>
+                            ` : ''}
+
                             ${status === 'approved' ? `
                                 <div class="sponsor-controls">
                                     <label style="font-size: 0.7rem; font-weight: 800; color: #b8860b;">💎 FEATURED DURATION</label>
