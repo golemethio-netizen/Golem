@@ -386,11 +386,19 @@ window.loadUsers = async function() {
                                 ${u.is_verified ? '<span style="color:#2ed573;">Verified</span>' : '<span style="color:#888;">Unverified</span>'}
                             </td>
                             <td style="padding: 10px 15px; text-align: right;">
-                                <button class="btn-verify" 
-                                        onclick="window.toggleVerification('${u.id}', ${u.is_verified})"
-                                        style="background:${u.is_verified ? '#ff4757' : '#2ed573'}; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                                    ${u.is_verified ? 'Unverify' : 'Verify'}
-                                </button>
+                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                    <button class="btn-verify" 
+                                            onclick="window.toggleVerification('${u.id}', ${u.is_verified})"
+                                            style="background:${u.is_verified ? '#ff4757' : '#2ed573'}; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                                        ${u.is_verified ? 'Unverify' : 'Verify'}
+                                    </button>
+                                    
+                                    <button class="btn-delete" 
+                                            onclick="window.deleteUser('${u.id}', '${u.full_name || 'this user'}')"
+                                            style="background:#eb4d4b; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `).join('')}
@@ -398,6 +406,40 @@ window.loadUsers = async function() {
             </table>
         </div>`;
 }
+
+
+
+
+window.deleteUser = async (userId, name) => {
+    // Confirmation before deletion
+    if (!confirm(`⚠️ Are you sure you want to delete ${name}? This action cannot be undone.`)) {
+        return;
+    }
+
+    const { error } = await _supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+    if (error) {
+        alert("Delete failed: " + error.message);
+    } else {
+        alert("User removed successfully.");
+        window.loadUsers(); // Refresh the list immediately
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 window.toggleVerification = async (userId, currentStatus) => {
     // Added confirmation dialog
