@@ -283,11 +283,11 @@ window.deleteUserAccount = async function(userId, identifier) {
 
 
 // 4. MODAL LOGIC
-window.openProductModal = async function(id) {
-    const { data: item, error } = await _supabase.from('products')
-
+// Modal Logic
+async function openProductModal(id) {
+    const { data: item, error } = await _supabase
         .from('products')
-        .select('*, profiles(is_verified, phone, full_name)')
+        .select('*, profiles(is_verified, phone)')
         .eq('id', id)
         .single();
 
@@ -298,27 +298,42 @@ window.openProductModal = async function(id) {
     document.getElementById('modalProductPrice').innerText = `${item.price.toLocaleString()} ETB`;
     document.getElementById('modalProductDesc').innerText = item.description;
 
-    // Update Seller Badge in Modal
     const badgeContainer = document.getElementById('sellerBadgeContainer');
-    const isVerified = item.profiles?.is_verified;
-    badgeContainer.innerHTML = isVerified 
-        ? `<span style="color:#2ed573; font-weight:bold; font-size:0.8rem;"><i class="fas fa-check-circle"></i> VERIFIED SELLER</span>`
-        : `<span style="color:#888; font-size:0.8rem;">Standard Seller</span>`;
-
-    // Contact Buttons
-    document.getElementById('callContact').href = `tel:${item.seller_phone || item.profiles?.phone}`;
-    
-    const message = `Hello, I am interested in your item: ${item.name} (${item.price} ETB). Is it available?`;
-    document.getElementById('telegramOrder').href = `https://t.me/allInOneEthiopia1?text=${encodeURIComponent(message)}`;
-    document.getElementById('whatsappOrder').href = `https://wa.me/251707022845?text=${encodeURIComponent(message)}`;
+    badgeContainer.innerHTML = item.profiles?.is_verified 
+        ? `<span style="color:#2ed573; font-weight:bold;"><i class="fas fa-check-circle"></i> VERIFIED</span>`
+        : `<span style="color:#888;">Standard Seller</span>`;
 
     document.getElementById('productModal').style.display = 'flex';
-};
+}
+
+// --- 2. ASSIGN TO WINDOW FOR HTML ONCLICK ACCESS ---
+window.fetchProducts = fetchProducts;
+window.openProductModal = openProductModal;
+window.updateUIForUser = updateUIForUser;
+window.currentCategory = 'All';
 
 window.closeProductModal = () => {
     document.getElementById('productModal').style.display = 'none';
 };
 
+window.filterCategory = function(category, btn) {
+    window.currentCategory = category;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fetchProducts();
+};
+
+// --- 3. RUN ON LOAD ---
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check Auth State
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) {
+        await updateUIForUser(user);
+    }
+    
+    // Load Products
+    await fetchProducts();
+});
 // 5. FILTERING & SEARCH
 window.filterCategory = function(category, btn) {
     window.currentCategory = category;
@@ -363,4 +378,95 @@ function updateCartBadge() {
         badge.innerText = saved.length;
         badge.style.display = 'block';
     }
+}
+
+
+
+async function updateUIForUser(user) {
+    const signInBtn = document.getElementById('signInBtn');
+    const userWelcome = document.getElementById('userWelcome');
+    const userName = document.getElementById('userName');
+    const adminLink = document.getElementById('adminNavLink');
+
+    if (user) {
+        if (signInBtn) signInBtn.style.display = 'none';
+        if (userWelcome) userWelcome.style.display = 'flex';
+        if (userName) {
+            userName.innerText = user.user_metadata?.full_name || user.email.split('@')[0];
+        }
+        
+        // Check Admin Status
+        const { data: profile } = await _supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (profile?.is_admin && adminLink) {
+            adminLink.style.display = 'flex';
+        }
+    }
+}
+
+// Fetch Products Function
+async function fetchProducts() {
+    const grid = document.getElementById('productGrid');
+    const sort = document.getElementById('sortSelect')?.value || 'newest';
+    
+    // JOIN: profiles(is_verified) fixes the buyer-side color issue
+    let query = _supabase
+        .from('products')
+        .select('*, profiles(is_verified)') 
+        .eq('status', 'approved');
+
+    if (window.currentCategory && window.currentCategory !== 'All') {
+        query = query.eq('category', window.currentCategory);
+    }
+
+    // Sorting
+    if (sort === 'price_low') query = query.order('price', { ascending: true });
+    else if (sort === 'price_high') query = query.order('price', { ascending: false });
+    else query = query.order('created_at', { ascending: false });
+
+    const { data: fetchedItems, error } = await query;
+
+    if (error) {
+        console.error("Fetch error:", error);
+        if (grid) grid.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+        return;
+    }
+
+    renderProducts(fetchedItems);
+}
+
+
+
+/ Render Logic
+function renderProducts(productsList) {
+    const grid = document.getElementById('productGrid');
+    if (!grid) return;
+
+    if (productsList.length === 0) {
+        grid.innerHTML = '<div style="padding:50px; text-align:center; width:100%;">No items found.</div>';
+        return;
+    }
+
+    grid.innerHTML = productsList.map(item => {
+        const isVerified = item.profiles?.is_verified === true;
+        return `
+        <div class="product-card" onclick="openProductModal('${item.id}')">
+            <div class="product-img-wrapper">
+                <img src="${item.image}" alt="${item.name}" loading="lazy">
+            </div>
+            <div class="product-info">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 class="product-title">${item.name}</h3>
+                    <i class="fas fa-check-circle" 
+                       style="color: ${isVerified ? '#2ed573' : '#ccc'};">
+                    </i>
+                </div>
+                <p class="product-price">${item.price.toLocaleString()} ETB</p>
+            </div>
+        </div>`;
+    }).join('');
 }
