@@ -528,3 +528,32 @@ window.toggleLanguage = function() {
     localStorage.setItem('golem_lang', currentLang);
     location.reload(); 
 };
+
+
+// Add this to your script.js
+window.deleteUserAccount = async function(userId, identifier) {
+    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
+    
+    if (!isConfirmed) return;
+
+    try {
+        const { error } = await _supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+
+        if (error) throw error;
+
+        alert("User deleted successfully.");
+        
+        // This triggers the refresh of your table
+        if (typeof window.loadUsers === "function") {
+            await window.loadUsers();
+        } else {
+            location.reload(); // Fallback if loadUsers isn't global
+        }
+    } catch (err) {
+        console.error("Delete Error:", err.message);
+        alert("Failed to delete user: " + err.message);
+    }
+};
