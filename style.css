@@ -1406,3 +1406,32 @@ body.is-admin .admin-expiry-info {
 #userList tr:hover {
     background-color: #fafafa;
 }
+
+#sellerBadgeContainer {
+    margin-top: -5px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.verified-badge {
+    color: #2ed573; /* Green */
+    background: rgba(46, 213, 115, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.unverified-badge {
+    color: #ffa502; /* Orange/Gold */
+    background: rgba(255, 165, 2, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+}
