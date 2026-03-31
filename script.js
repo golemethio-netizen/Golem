@@ -195,7 +195,7 @@ window.loadSponsor = async () => {
         const now = new Date().toISOString();
         const { data: product } = await _supabase
             .from('products')
-            .select('*')
+            .select('*, profiles(is_verified)')
             .eq('is_sponsored', true)
             .gt('sponsored_until', now)
             .order('created_at', { ascending: false })
