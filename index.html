@@ -238,7 +238,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-   <script type="module" src="script.js"></script>
+   <script src="script.js"></script>
     <footer class="golem-footer">
         <div class="footer-container">
             <div class="footer-col">
@@ -390,6 +390,7 @@ async function loadAdminStatus() {
 // Check status every 2 minutes
 loadAdminStatus();
 setInterval(loadAdminStatus, 120000);
+
 
 </script>
     
