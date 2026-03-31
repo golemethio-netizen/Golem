@@ -441,7 +441,7 @@ async function fetchProducts() {
 
 
 
-/ Render Logic
+// Render Logic
 function renderProducts(productsList) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
