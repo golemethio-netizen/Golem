@@ -465,23 +465,7 @@ window.openProductModal = async (product) => {
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
 };
-    // 4. Contact/Order Logic
-    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
-    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
 
-    // If verified, link to seller. If not, link to Golem Admin for safety.
-    const whatsappTarget = isVerified ? intPhone : GolemConfig.myPhone;
-    const waPrefix = isVerified ? "" : "[UNVERIFIED SELLER] ";
-    
-    document.getElementById('whatsappOrder').href = `https://wa.me/${whatsappTarget}?text=${encodeURIComponent(waPrefix + "I'm interested in " + product.name)}`;
-
-    const tgUser = (product.telegram_username || "").replace('@', '');
-    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
-    document.getElementById('callContact').href = `tel:+${intPhone}`;
-
-    modal.style.display = 'flex';
-    document.body.style.overflow = "hidden";
-};
 // --- CHAT & UI UTILS ---
 window.toggleChatMenu = function() {
     const menu = document.getElementById('chatMenu');
