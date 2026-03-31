@@ -394,6 +394,40 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
             }
         };
 
+
+// Add this to your <script> block in admin.html
+window.deleteUserAccount = async function(userId, identifier) {
+    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
+    
+    if (!isConfirmed) return;
+
+    try {
+        // Step 1: Delete from your 'profiles' table
+        const { error } = await _supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+
+        if (error) throw error;
+
+        alert("User account removed from database.");
+        
+        // Step 2: Refresh the table
+        if (typeof loadUsers === "function") {
+            await loadUsers();
+        } else {
+            location.reload(); 
+        }
+    } catch (err) {
+        console.error("Delete Error:", err.message);
+        alert("Failed to delete user: " + err.message);
+    }
+};
+
+
+
+
+           
  async function loadTickets() {
             const list = document.getElementById('ticketList');
             const { data: tickets } = await _supabase.from('support_tickets').select('*').eq('is_resolved', false).order('created_at', { ascending: false });
