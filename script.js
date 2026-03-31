@@ -427,21 +427,39 @@ window.openProductModal = async (product) => {
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
+    // 1. Basic Product Info
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
     document.getElementById('modalProductDesc').innerText = product.description || "No description.";
 
-    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
-    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
-
+    // 2. Fetch Seller Verification Status
     const { data: profile } = await _supabase
         .from('profiles')
         .select('is_verified')
-        .eq('phone', product.seller_phone)
+        .eq('phone', product.seller_phone) // Assumes phone is unique
         .maybeSingle();
 
     const isVerified = profile?.is_verified || false;
+    
+    // 3. UI: Add the Verification Badge to the Modal
+    // Create or find an element to hold the badge
+    const badgeContainer = document.getElementById('sellerBadgeContainer');
+    if (badgeContainer) {
+        badgeContainer.innerHTML = isVerified 
+            ? `<div style="color: #2ed573; font-weight: bold; margin-bottom: 10px;">
+                <i class="fas fa-check-circle"></i> Verified Golem Seller
+               </div>`
+            : `<div style="color: #ffa502; font-weight: bold; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle"></i> Unverified Seller (Proceed with Caution)
+               </div>`;
+    }
+
+    // 4. Contact/Order Logic
+    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
+    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
+
+    // If verified, link to seller. If not, link to Golem Admin for safety.
     const whatsappTarget = isVerified ? intPhone : GolemConfig.myPhone;
     const waPrefix = isVerified ? "" : "[UNVERIFIED SELLER] ";
     
@@ -454,7 +472,6 @@ window.openProductModal = async (product) => {
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
 };
-
 // --- CHAT & UI UTILS ---
 window.toggleChatMenu = function() {
     const menu = document.getElementById('chatMenu');
