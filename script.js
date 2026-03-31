@@ -228,7 +228,7 @@ function renderProducts(products) {
 
 
 
-/ --- CHAT & UI UTILS ---
+// --- CHAT & UI UTILS ---
 window.toggleChatMenu = function() {
     const menu = document.getElementById('chatMenu');
     const toast = document.getElementById('chatToast');
