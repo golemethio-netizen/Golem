@@ -39,10 +39,11 @@ window.fetchProducts = async (category = 'All') => {
 
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
 
-    let query = _supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'approved');
+  // Update this line in fetchProducts:
+let query = _supabase
+    .from('products')
+    .select('*, profiles(is_verified)') // This joins the verification status automatically
+    .eq('status', 'approved');
 
     if (category !== 'All') {
         query = query.eq('category', category);
@@ -122,6 +123,7 @@ window.updateCartBadge = function() {
 
 // --- 4. RENDERING ENGINE ---
 function renderProducts(products) {
+    const isVerified = p.profiles?.is_verified === true;
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
