@@ -43,16 +43,11 @@
             }
 
            // This fetches the product AND the linked user profile status in one go
-const { data: products, error } = await _supabase
+const { data, error } = await _supabase
     .from('products')
-    .select(`
-        *,
-        profiles (
-            is_verified
-        )
-    `)
+    .select('*, profiles(is_verified)') // This fetches the seller's verification status
     .eq('status', 'approved');
-
+            
             if (error || !p) {
                 document.getElementById('productContent').innerHTML = `
                     <div style="text-align:center; padding: 50px;">
