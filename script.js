@@ -160,34 +160,37 @@ async function checkUser() {
 window.currentCategory = 'All';
 
 window.fetchProducts = async function() {
-    const { data: products, error } = await query;
     const grid = document.getElementById('productGrid');
     const sort = document.getElementById('sortSelect').value;
     
-    // JOIN: profiles(is_verified) is required to see the green checkmark
+    // 1. Prepare the query
     let query = _supabase
         .from('products')
         .select('*, profiles(is_verified, full_name)') 
         .eq('status', 'approved');
 
-    // Category Filter
     if (window.currentCategory !== 'All') {
         query = query.eq('category', window.currentCategory);
     }
 
-    // Sorting Logic
     if (sort === 'price_low') query = query.order('price', { ascending: true });
     else if (sort === 'price_high') query = query.order('price', { ascending: false });
     else query = query.order('created_at', { ascending: false });
 
+    // 2. Execute the query
+    // We use { data, error } here. 'data' becomes our list of items.
+    const { data: fetchedItems, error } = await query;
 
     if (error) {
-        grid.innerHTML = `<p style="color:red;">Error loading items: ${error.message}</p>`;
+        console.error("Fetch error:", error);
+        grid.innerHTML = `<p style="color:red; padding:20px;">Error: ${error.message}</p>`;
         return;
     }
 
-    renderProducts(products);
+    // 3. Pass the unique variable to the render function
+    renderProducts(fetchedItems);
 };
+
 
 // 3. RENDERING LOGIC
 function renderProducts(products) {
