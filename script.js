@@ -180,7 +180,6 @@ window.fetchProducts = async function() {
     else if (sort === 'price_high') query = query.order('price', { ascending: false });
     else query = query.order('created_at', { ascending: false });
 
-    const { data: products, error } = await query;
 
     if (error) {
         grid.innerHTML = `<p style="color:red;">Error loading items: ${error.message}</p>`;
