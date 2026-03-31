@@ -42,11 +42,16 @@
                 return;
             }
 
-            const { data: p, error } = await _supabase
-                .from('products')
-                .select('*')
-                .eq('id', productId)
-                .single();
+           // This fetches the product AND the linked user profile status in one go
+const { data: products, error } = await _supabase
+    .from('products')
+    .select(`
+        *,
+        profiles (
+            is_verified
+        )
+    `)
+    .eq('status', 'approved');
 
             if (error || !p) {
                 document.getElementById('productContent').innerHTML = `
