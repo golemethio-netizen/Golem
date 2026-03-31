@@ -4,11 +4,150 @@
  */
 
 // 1. INITIALIZATION & AUTH STATE
+
+let currentProduct = null;
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     checkUser();
     fetchProducts();
     updateCartBadge();
 });
+
+
+// Auth & UI Setup
+    await window.updateUIForUser();
+    window.updateCartBadge();
+    
+// Initial Data Fetch
+    window.fetchProducts();
+    window.loadSponsor();
+
+ const now = new Date();
+    const hour = now.getHours();
+    const dot = document.querySelector('.online-dot');
+    if (dot) {
+        dot.style.display = (hour >= 8 && hour < 20) ? 'block' : 'none';
+    }
+
+    setTimeout(() => {
+        const toast = document.getElementById('chatToast');
+        if (toast && !document.getElementById('chatMenu').classList.contains('active')) {
+            toast.style.display = 'block';
+        }
+    }, 5000);
+    
+    const searchInput = document.getElementById('headerSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => filterSearch(e.target.value.toLowerCase()));
+    }
+});
+
+
+// --- 2. DATA FETCHING ---
+window.fetchProducts = async (category = 'All') => {
+    const grid = document.getElementById('productGrid');
+    if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
+
+    const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
+
+    let query = _supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'approved');
+
+    if (category !== 'All') {
+        query = query.eq('category', category);
+    }
+
+    query = query
+        .order('is_sponsored', { ascending: false })
+        .order('is_featured', { ascending: false });
+
+    if (sortOrder === 'price_low') {
+        query = query.order('price', { ascending: true });
+    } else if (sortOrder === 'price_high') {
+        query = query.order('price', { ascending: false });
+    } else {
+        query = query.order('created_at', { ascending: false });
+    }
+
+    const { data, error } = await query;
+    if (!error) {
+        renderProducts(data);
+    } else {
+        console.error("Fetch error:", error.message);
+    }
+};
+
+// --- 3. WISHLIST / WHITELIST LOGIC ---
+window.toggleWishlist = function(id, btnElement) {
+    try {
+        let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+        const icon = btnElement.querySelector('i');
+
+        if (saved.includes(id)) {
+            saved = saved.filter(itemId => itemId !== id);
+            btnElement.classList.remove('active');
+            if (icon) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        } else {
+            saved.push(id);
+            btnElement.classList.add('active');
+            if (icon) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            }
+        }
+
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        window.updateCartBadge();
+    } catch (e) {
+        console.error("Wishlist error:", e);
+    }
+};
+
+window.addToCartFromModal = function() {
+    if (!currentProduct) return;
+    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    if (!saved.includes(currentProduct.id)) {
+        saved.push(currentProduct.id);
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        window.updateCartBadge();
+        window.fetchProducts();
+        alert("❤️ Added to your Whitelist!");
+    } else {
+        alert("This item is already in your Whitelist!");
+    }
+};
+window.updateCartBadge = function() {
+    const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.innerText = saved.length;
+        badge.style.display = saved.length > 0 ? 'flex' : 'none';
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 async function checkUser() {
     const { data: { user } } = await _supabase.auth.getUser();
@@ -93,6 +232,63 @@ function renderProducts(products) {
         </div>`;
     }).join('');
 }
+
+
+
+
+/ --- CHAT & UI UTILS ---
+window.toggleChatMenu = function() {
+    const menu = document.getElementById('chatMenu');
+    const toast = document.getElementById('chatToast');
+    if (menu) menu.classList.toggle('active');
+    if (toast) toast.style.display = 'none';
+};
+
+window.closeToast = function(event) {
+    if (event) event.stopPropagation();
+    const toast = document.getElementById('chatToast');
+    if (toast) toast.style.display = 'none';
+};
+
+window.toggleLanguage = function() {
+    let currentLang = localStorage.getItem('golem_lang') || 'en';
+    currentLang = currentLang === 'en' ? 'am' : 'en';
+    localStorage.setItem('golem_lang', currentLang);
+    location.reload(); 
+};
+
+// Add this to your script.js
+window.deleteUserAccount = async function(userId, identifier) {
+    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
+    
+    if (!isConfirmed) return;
+
+    try {
+        const { error } = await _supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+
+        if (error) throw error;
+
+        alert("User deleted successfully.");
+        
+        // This triggers the refresh of your table
+        if (typeof window.loadUsers === "function") {
+            await window.loadUsers();
+        } else {
+            location.reload(); // Fallback if loadUsers isn't global
+        }
+    } catch (err) {
+        console.error("Delete Error:", err.message);
+        alert("Failed to delete user: " + err.message);
+    }
+};
+
+
+
+
+
 
 // 4. MODAL LOGIC
 window.openProductModal = async function(id) {
