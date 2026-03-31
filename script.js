@@ -349,6 +349,7 @@ window.updateUIForUser = async function() {
 };
 
 // --- 8. ADMIN & USER MGMT ---
+// --- 8. ADMIN & USER MGMT ---
 window.loadUsers = async function() {
     const list = document.getElementById('userList');
     if (!list) return;
@@ -363,6 +364,9 @@ window.loadUsers = async function() {
         list.innerHTML = `<p style="color:#ff4757; padding:20px;">Error: ${error?.message || 'Unauthorized'}</p>`;
         return;
     }
+
+    // Get current logged in user ID to prevent self-deletion
+    const { data: { user } } = await _supabase.auth.getUser();
 
     list.innerHTML = `
         <div style="overflow-x: auto;">
@@ -381,9 +385,9 @@ window.loadUsers = async function() {
                         <tr style="border-bottom: 1px solid #f4f7f6;">
                             <td style="padding: 10px 15px;">${u.full_name || 'Member'}</td>
                             <td style="padding: 10px 15px;">${u.email || 'N/A'}</td>
-                            <td style="padding: 10px 15px;">${u.is_admin ? 'Admin' : 'User'}</td>
+                            <td style="padding: 10px 15px;">${u.is_admin ? 'Admin 🛡️' : 'User 👤'}</td>
                             <td style="padding: 10px 15px;">
-                                ${u.is_verified ? '<span style="color:#2ed573;">Verified</span>' : '<span style="color:#888;">Unverified</span>'}
+                                ${u.is_verified ? '<span style="color:#2ed573; font-weight:bold;">VERIFIED</span>' : '<span style="color:#888;">GUEST</span>'}
                             </td>
                             <td style="padding: 10px 15px; text-align: right;">
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
@@ -393,11 +397,14 @@ window.loadUsers = async function() {
                                         ${u.is_verified ? 'Unverify' : 'Verify'}
                                     </button>
                                     
-                                    <button class="btn-delete" 
-                                            onclick="window.deleteUser('${u.id}', '${u.full_name || 'this user'}')"
-                                            style="background:#eb4d4b; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    ${u.id !== user?.id ? `
+                                        <button class="btn-delete" 
+                                                onclick="window.deleteUser('${u.id}', '${u.full_name || u.email}')"
+                                                style="background:#eb4d4b; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;"
+                                                title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    ` : '<span style="font-size:12px; color:#aaa; padding:5px;">(You)</span>'}
                                 </div>
                             </td>
                         </tr>
@@ -405,27 +412,26 @@ window.loadUsers = async function() {
                 </tbody>
             </table>
         </div>`;
-}
+};
 
+window.deleteUser = async function(userId, identifier) {
+    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?\n\nThis will remove their profile from the Golem database.`);
+    
+    if (!isConfirmed) return;
 
+    try {
+        const { error } = await _supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
 
+        if (error) throw error;
 
-window.deleteUser = async (userId, name) => {
-    // Confirmation before deletion
-    if (!confirm(`⚠️ Are you sure you want to delete ${name}? This action cannot be undone.`)) {
-        return;
-    }
-
-    const { error } = await _supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
-
-    if (error) {
-        alert("Delete failed: " + error.message);
-    } else {
-        alert("User removed successfully.");
-        window.loadUsers(); // Refresh the list immediately
+        alert("User deleted successfully.");
+        await window.loadUsers(); 
+    } catch (err) {
+        console.error("Delete Error:", err.message);
+        alert("Failed to delete user: " + err.message);
     }
 };
 
