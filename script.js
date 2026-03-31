@@ -137,18 +137,6 @@ window.updateCartBadge = function() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 async function checkUser() {
     
     const { data: { user } } = await _supabase.auth.getUser();
