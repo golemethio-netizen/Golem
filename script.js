@@ -400,16 +400,25 @@ window.loadUsers = async function() {
 }
 
 window.toggleVerification = async (userId, currentStatus) => {
+    // Added confirmation dialog
+    const action = currentStatus ? "unverify" : "verify";
+    if (!confirm(`Are you sure you want to ${action} this seller?`)) {
+        return;
+    }
+
     const { error } = await _supabase
         .from('profiles')
         .update({ is_verified: !currentStatus })
         .eq('id', userId);
     
     if (!error) {
-        alert("User status updated!");
+        // Success! Reload the table to show the new status
+        alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
         window.loadUsers();
     } else {
-        alert("Error: " + error.message);
+        // If the 500 error happens, it will show here
+        console.error("Verification Error:", error);
+        alert("Verification update failed: " + error.message);
     }
 };
 
