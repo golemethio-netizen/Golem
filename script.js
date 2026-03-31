@@ -304,12 +304,14 @@ window.handleAuth = async function(e) {
     btn.disabled = false;
 };
 
+// FIXED: UI Update with Admin Check
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signinBtn = document.getElementById('signInBtn');
     const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
+        // Sign Out Logic
         if (signinBtn) {
             signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
             signinBtn.onclick = async () => { 
@@ -318,20 +320,26 @@ window.updateUIForUser = async function() {
             };
         }
 
+        // Fetch User Profile
         const { data: profile } = await _supabase
             .from('profiles')
             .select('is_admin, full_name')
             .eq('id', user.id)
             .maybeSingle();
 
+        // Show User Name
         if (profile?.full_name && signinBtn) {
             signinBtn.querySelector('p').innerText = profile.full_name.split(' ')[0]; 
         }
 
+        // IMPORTANT: Show Admin Link if user is admin
         if (adminLink && profile?.is_admin) {
-            adminLink.style.display = 'flex';
+            adminLink.style.display = 'flex'; // Or 'block' depending on your CSS
+        } else if (adminLink) {
+            adminLink.style.display = 'none';
         }
     } else {
+        // Guest View
         if (signinBtn) {
             signinBtn.innerHTML = `<i class="fas fa-user-circle"></i> <p>Sign In</p>`;
             signinBtn.onclick = () => window.toggleModal();
@@ -341,7 +349,7 @@ window.updateUIForUser = async function() {
 };
 
 // --- 8. ADMIN & USER MGMT ---
-async function loadUsers() {
+window.loadUsers = async function() {
     const list = document.getElementById('userList');
     if (!list) return;
     list.innerHTML = "<div class='loading-spinner'><i class='fas fa-sync fa-spin'></i> Syncing...</div>";
@@ -363,6 +371,7 @@ async function loadUsers() {
                     <tr style="text-align: left; border-bottom: 2px solid #f4f7f6; color: #888;">
                         <th style="padding: 15px;">NAME</th>
                         <th style="padding: 15px;">EMAIL</th>
+                        <th style="padding: 15px;">ROLE</th>
                         <th style="padding: 15px;">STATUS</th>
                         <th style="padding: 15px; text-align: right;">ACTIONS</th>
                     </tr>
@@ -371,10 +380,17 @@ async function loadUsers() {
                     ${users.map(u => `
                         <tr style="border-bottom: 1px solid #f4f7f6;">
                             <td style="padding: 10px 15px;">${u.full_name || 'Member'}</td>
-                            <td style="padding: 10px 15px;">${u.email}</td>
+                            <td style="padding: 10px 15px;">${u.email || 'N/A'}</td>
                             <td style="padding: 10px 15px;">${u.is_admin ? 'Admin' : 'User'}</td>
+                            <td style="padding: 10px 15px;">
+                                ${u.is_verified ? '<span style="color:#2ed573;">Verified</span>' : '<span style="color:#888;">Unverified</span>'}
+                            </td>
                             <td style="padding: 10px 15px; text-align: right;">
-                                <button onclick="window.toggleVerification('${u.id}', ${u.is_verified})">Verify</button>
+                                <button class="btn-verify" 
+                                        onclick="window.toggleVerification('${u.id}', ${u.is_verified})"
+                                        style="background:${u.is_verified ? '#ff4757' : '#2ed573'}; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                                    ${u.is_verified ? 'Unverify' : 'Verify'}
+                                </button>
                             </td>
                         </tr>
                     `).join('')}
@@ -388,8 +404,13 @@ window.toggleVerification = async (userId, currentStatus) => {
         .from('profiles')
         .update({ is_verified: !currentStatus })
         .eq('id', userId);
-    if (!error) loadUsers();
-    else alert("Error: " + error.message);
+    
+    if (!error) {
+        alert("User status updated!");
+        window.loadUsers();
+    } else {
+        alert("Error: " + error.message);
+    }
 };
 
 window.openProductModal = async (product) => {
