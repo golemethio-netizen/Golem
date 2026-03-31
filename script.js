@@ -123,14 +123,13 @@ window.updateCartBadge = function() {
 // --- 4. RENDERING ENGINE ---
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
-    grid.innerHTML = items.map(item => {
     if (!grid) return;
 
     if (products.length === 0) {
         grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found.</div>`;
         return;
     }
-const isVerified = item.profiles?.is_verified === true;
+
     const savedItems = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const now = new Date();
 
@@ -157,20 +156,18 @@ const isVerified = item.profiles?.is_verified === true;
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
         return `
-            <div class="product-card" onclick="window.openProductModal('${item.id}')">
-            <div class="product-img-container">
-                <img src="${item.image}" alt="${item.name}">
-            </div>
-            <div class="product-info">
-                <h3>${item.name} 
-                    <i class="fas fa-check-circle" 
-                       style="color: ${isVerified ? '#2ed573' : '#ccc'};" 
-                       title="${isVerified ? 'Verified Seller' : 'Unverified'}">
-                    </i>
-                </h3>
-                <p class="price">${item.price.toLocaleString()} ETB</p>
-            </div>
-        </div>`;
+            <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
+                <div class="card-img-container">
+                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                    ${statusBadge}
+                    <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
+                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                    <img src="${p.image}" alt="${p.name}" loading="lazy">
+                    <div class="image-overlay">
+                        <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
+                    </div>
+                </div>
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">${p.name}</h3>
@@ -198,7 +195,7 @@ window.loadSponsor = async () => {
         const now = new Date().toISOString();
         const { data: product } = await _supabase
             .from('products')
-            .select('*, profiles(is_verified)')
+            .select('*')
             .eq('is_sponsored', true)
             .gt('sponsored_until', now)
             .order('created_at', { ascending: false })
