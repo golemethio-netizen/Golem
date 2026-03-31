@@ -212,26 +212,29 @@
 </div>
 
     <div id="productModal" class="modal-overlay" onclick="if(event.target == this) window.closeProductModal()">
-        <div class="modal-content">
-            <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
-            <div class="modal-img-wrapper">
-                <img id="modalProductImg" src="" alt="Product">
-            </div>
-            <div class="modal-body">
-                <h2 id="modalProductTitle"></h2>
-                <div id="modalProductPrice" class="modal-price"></div>
-                <p id="modalProductDesc" class="modal-description"></p>
-                <div class="modal-footer-actions">
-                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal()" style="grid-column: span 3;">
-                        <i class="fas fa-heart"></i> Save to Wishlist
-                    </button>
-                </div>
+    <div class="modal-content">
+        <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
+        <div class="modal-img-wrapper">
+            <img id="modalProductImg" src="" alt="Product">
+        </div>
+        <div class="modal-body">
+            <h2 id="modalProductTitle"></h2>
+            
+            <div id="sellerBadgeContainer"></div>
+            
+            <div id="modalProductPrice" class="modal-price"></div>
+            <p id="modalProductDesc" class="modal-description"></p>
+            <div class="modal-footer-actions">
+                <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
+                <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                <button class="contact-btn save-btn" onclick="window.addToCartFromModal()" style="grid-column: span 3;">
+                    <i class="fas fa-heart"></i> Save to Wishlist
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
