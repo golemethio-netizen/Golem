@@ -279,15 +279,16 @@ async function toggleAdmin(userId, currentStatus) {
             loadTickets(); 
         };   */
 
-             async function loadItems(status = 'pending') {
-            const grid = document.getElementById('adminGrid');
-            grid.innerHTML = "<p>Loading products...</p>";
-            
-            const { data: items, error } = await _supabase
-                .from('products')
-                .select('*')
-                .eq('status', status)
-                .order('created_at', { ascending: false });
+            async function loadItems(status = 'pending') {
+    const grid = document.getElementById('adminGrid');
+    grid.innerHTML = "<p>Loading products...</p>";
+    
+    // UPDATED QUERY: Fetches is_verified from the profiles table
+    const { data: items, error } = await _supabase
+        .from('products')
+        .select('*, profiles(is_verified)') 
+        .eq('status', status)
+        .order('created_at', { ascending: false });
 
             if (error || !items || items.length === 0) {
                 grid.innerHTML = `<div style="padding:40px; text-align:center; color:#888;">No items found in ${status}.</div>`;
@@ -315,6 +316,7 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
             const twentyFourHours = 24 * 60 * 60 * 1000;
 
             grid.innerHTML = items.map(item => {
+                const isVerified = item.profiles?.is_verified;
                 const isSponsorActive = item.is_sponsored && item.sponsored_until && new Date(item.sponsored_until) > now;
                 let expiringClass = '';
                 if (isSponsorActive) {
@@ -323,14 +325,15 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
                 }
 
                 return `
-                <div class="product-card ${expiringClass}" id="card-${item.id}" style="background:white; border-radius:12px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px;">
-                    <img src="${item.image}" style="width:100%; height:200px; object-fit:cover;">
-                    <div class="product-info" style="padding:15px;">
-                        <h3 style="margin-bottom:5px;">${item.name}</h3>
-                        <p style="color:#2ed573; font-weight:bold; font-size:1.1rem;">${item.price?.toLocaleString()} ETB</p>
-                        <p style="font-size:0.85rem; color:#666; margin-top:5px;">
-                            Seller: <a href="tel:${item.seller_phone}" style="color:#007bff; text-decoration:none;">${item.seller_phone}</a>
-                        </p>
+                <<div class="product-card ${expiringClass}" id="card-${item.id}" style="background:white; border-radius:12px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px;">
+            <img src="${item.image}" style="width:100%; height:200px; object-fit:cover;">
+            <div class="product-info" style="padding:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;">${item.name}</h3>
+                    <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ff4757'}; font-size:1.2rem;" title="${isVerified ? 'Verified' : 'Unverified'}"></i>
+                </div>
+                <p style="color:#2ed573; font-weight:bold; font-size:1.1rem; margin-top:5px;">${item.price?.toLocaleString()} ETB</p>
+                `;
                         
                         <div class="admin-actions" style="margin-top:15px; border-top: 1px solid #eee; padding-top:10px;">
                             ${status === 'pending' ? `
