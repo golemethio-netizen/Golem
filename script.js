@@ -32,21 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-
-
-/// 1. Toggle Modal Visibility
-window.toggleModal = () => {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        const isFlex = modal.style.display === 'flex';
-        modal.style.display = isFlex ? 'none' : 'flex';
-        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
-    }
-};
-
-
-
-
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = 'All') => {
     const grid = document.getElementById('productGrid');
@@ -259,105 +244,101 @@ window.closeProductModal = () => {
 // --- 7. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
 
-// 1. Toggle between Login and Register
-// 2. Toggle between Login and Register
 window.toggleAuthMode = function() {
-    const fields = document.getElementById('registerFields');
+    isSignUpMode = !isSignUpMode;
     const title = document.getElementById('modalTitle');
-    const btn = document.getElementById('authSubmitBtn');
-    const toggleText = document.getElementById('toggleText');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const regFields = document.getElementById('registerFields');
+    const toggleLink = document.getElementById('toggleText');
 
-    if (fields.style.display === 'none' || fields.style.display === '') {
-        fields.style.display = 'block';
+    if (isSignUpMode) {
         title.innerText = "Create Account";
-        btn.innerText = "Sign Up";
-        toggleText.innerHTML = 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>';
+        submitBtn.innerText = "Sign Up";
+        regFields.style.display = "block";
+        toggleLink.innerHTML = 'Already have an account? <a href="#" onclick="window.toggleAuthMode()">Sign In</a>';
     } else {
-        fields.style.display = 'none';
         title.innerText = "Welcome Back";
-        btn.innerText = "Sign In";
-        toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
+        submitBtn.innerText = "Sign In";
+        regFields.style.display = "none";
+        toggleLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
     }
 };
 
+window.toggleModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        const isFlex = modal.style.display === 'flex';
+        modal.style.display = isFlex ? 'none' : 'flex';
+        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
+    }
+};
 
-// 3. Handle the actual Auth
-window.handleAuth = async (event) => {
-    event.preventDefault();
+window.handleAuth = async function(e) {
+    e.preventDefault();
     const email = document.getElementById('authEmail').value;
     const password = document.getElementById('authPassword').value;
-    const isSignUp = document.getElementById('registerFields').style.display === 'block';
     const btn = document.getElementById('authSubmitBtn');
 
     btn.disabled = true;
-    const originalText = btn.innerText;
     btn.innerText = "Processing...";
 
-    try {
-        if (isSignUp) {
-            const { error } = await _supabase.auth.signUp({
-                email, password,
-                options: { data: { 
-                    full_name: document.getElementById('regName').value,
-                    phone: document.getElementById('regPhone').value 
-                }}
-            });
-            if (error) throw error;
-            alert("Success! Check your email to confirm.");
+    if (isSignUpMode) {
+        const fullName = document.getElementById('regName').value;
+        const phone = document.getElementById('regPhone').value;
+        const { error } = await _supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName, phone: phone } }
+        });
+        if (error) alert("Error: " + error.message);
+        else { alert("Check your email for confirmation!"); window.toggleModal(); }
+    } else {
+        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+            alert("Login failed: " + error.message);
         } else {
-            const { error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            window.location.reload();
+            window.toggleModal();
+            await window.updateUIForUser();
         }
-    } catch (err) {
-        alert(err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = originalText;
     }
+    btn.disabled = false;
 };
-
-
 
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    
-    const signInBtn = document.getElementById('signInBtn');
-    const signOutBtn = document.getElementById('signOutBtn');
-    const welcomeDiv = document.getElementById('userWelcome');
-    const nameSpan = document.getElementById('userName');
+    const signinBtn = document.getElementById('signInBtn');
+    const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
-        // 1. Hide Sign In
-        if (signInBtn) signInBtn.style.display = 'none';
-        
-        // 2. Show the Welcome Container
-        if (welcomeDiv) welcomeDiv.style.display = 'flex';
-        
-        // 3. Show the Sign Out Button specifically
-        if (signOutBtn) signOutBtn.style.display = 'inline-block';
+        if (signinBtn) {
+            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
+            signinBtn.onclick = async () => { 
+                await _supabase.auth.signOut(); 
+                window.location.reload(); 
+            };
+        }
 
-        // 4. Get the Name
         const { data: profile } = await _supabase
             .from('profiles')
-            .select('full_name')
+            .select('is_admin, full_name')
             .eq('id', user.id)
             .maybeSingle();
 
-        if (nameSpan) {
-            nameSpan.innerText = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0];
+        if (profile?.full_name && signinBtn) {
+            signinBtn.querySelector('p').innerText = profile.full_name.split(' ')[0]; 
+        }
+
+        if (adminLink && profile?.is_admin) {
+            adminLink.style.display = 'flex';
         }
     } else {
-        // Guest Mode
-        if (signInBtn) signInBtn.style.display = 'block';
-        if (welcomeDiv) welcomeDiv.style.display = 'none';
-        if (signOutBtn) signOutBtn.style.display = 'none';
+        if (signinBtn) {
+            signinBtn.innerHTML = `<i class="fas fa-user-circle"></i> <p>Sign In</p>`;
+            signinBtn.onclick = () => window.toggleModal();
+        }
+        if (adminLink) adminLink.style.display = 'none';
     }
 };
-
-// Important: Run this every time the page loads
-document.addEventListener('DOMContentLoaded', window.updateUIForUser);
-
 
 // --- 8. ADMIN & USER MGMT ---
 async function loadUsers() {
@@ -463,130 +444,4 @@ window.toggleLanguage = function() {
     currentLang = currentLang === 'en' ? 'am' : 'en';
     localStorage.setItem('golem_lang', currentLang);
     location.reload(); 
-};
-
-// 3. Handle Sign Out
-window.handleSignOut = async function() {
-    await _supabase.auth.signOut();
-    window.location.reload();
-};
-
-
-
-// --- 9. PROFILE & USER LISTINGS ---
-
-// --- 9. PROFILE & USER LISTINGS ---
-
-window.loadUserProfile = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    const { data: profile } = await _supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-    // Fill Display
-    document.getElementById('profileName').innerText = profile?.full_name || user.user_metadata?.full_name || "Member";
-    document.getElementById('profileEmail').innerText = user.email;
-    
-    // Fill Edit Form Inputs (Pre-filling)
-    document.getElementById('editFullName').value = profile?.full_name || user.user_metadata?.full_name || "";
-    document.getElementById('editPhone').value = profile?.phone || user.user_metadata?.phone || "";
-
-    const badge = document.getElementById('verificationBadge');
-    if (profile?.is_verified) {
-        badge.innerText = "Verified Seller";
-        badge.className = "badge sponsor-badge"; 
-    } else {
-        badge.innerText = "Unverified Account";
-        badge.style.background = "#bdc3c7";
-    }
-};
-
-// Open Modal Helper
-window.openEditModal = () => {
-    document.getElementById('editProfileModal').style.display = 'flex';
-};
-
-
-
-window.loadUserListings = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    const grid = document.getElementById('myProductGrid');
-    if (!grid) return;
-
-    const { data: products, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('user_id', user.id) // Only get items posted by this user
-        .order('created_at', { ascending: false });
-
-    if (error || !products.length) {
-        grid.innerHTML = "<p>You haven't posted any furniture yet.</p>";
-        return;
-    }
-
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <img src="${p.image}" alt="${p.name}">
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p>${p.price.toLocaleString()} ETB</p>
-                <div class="product-actions">
-                    <button class="buy-btn" onclick="window.deleteProduct('${p.id}')" style="background:#ff4757;">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-};
-
-window.deleteProduct = async function(productId) {
-    if (confirm("Are you sure you want to remove this listing?")) {
-        const { error } = await _supabase
-            .from('products')
-            .delete()
-            .eq('id', productId);
-        
-        if (!error) {
-            alert("Item removed.");
-            window.loadUserListings();
-        } else {
-            alert("Error: " + error.message);
-        }
-    }
-};
-
-
-// --- 10. PROFILE EDITING ---
-
-
-window.updateProfileInfo = async function(event) {
-    event.preventDefault();
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    const newName = document.getElementById('editFullName').value;
-    const newPhone = document.getElementById('editPhone').value;
-
-    const { error } = await _supabase
-        .from('profiles')
-        .upsert({ 
-            id: user.id,
-            full_name: newName, 
-            phone: newPhone,
-            email: user.email 
-        });
-
-    if (error) {
-        alert("Update failed: " + error.message);
-    } else {
-        alert("Profile Updated!");
-        location.reload();
-    }
 };
