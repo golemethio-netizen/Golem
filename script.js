@@ -9,9 +9,9 @@ let currentProduct = null;
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    checkUser();
-    fetchProducts();
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkUser();
+    await fetchProducts();
     updateCartBadge();
 });
 
@@ -150,6 +150,7 @@ window.updateCartBadge = function() {
 
 
 async function checkUser() {
+    
     const { data: { user } } = await _supabase.auth.getUser();
     const signInBtn = document.getElementById('signInBtn');
     const userWelcome = document.getElementById('userWelcome');
@@ -171,6 +172,7 @@ async function checkUser() {
 window.currentCategory = 'All';
 
 window.fetchProducts = async function() {
+    const { data: products, error } = await query;
     const grid = document.getElementById('productGrid');
     const sort = document.getElementById('sortSelect').value;
     
@@ -292,7 +294,8 @@ window.deleteUserAccount = async function(userId, identifier) {
 
 // 4. MODAL LOGIC
 window.openProductModal = async function(id) {
-    const { data: item, error } = await _supabase
+    const { data: item, error } = await _supabase.from('products')
+
         .from('products')
         .select('*, profiles(is_verified, phone, full_name)')
         .eq('id', id)
