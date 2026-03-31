@@ -425,36 +425,46 @@ window.toggleVerification = async (userId, currentStatus) => {
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
+    const badgeContainer = document.getElementById('sellerBadgeContainer');
     if (!modal) return;
 
-    // 1. Basic Product Info
+    // Fill basic data
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
     document.getElementById('modalProductDesc').innerText = product.description || "No description.";
 
-    // 2. Fetch Seller Verification Status
+    // Fetch Seller Verification Status
     const { data: profile } = await _supabase
         .from('profiles')
         .select('is_verified')
-        .eq('phone', product.seller_phone) // Assumes phone is unique
+        .eq('phone', product.seller_phone)
         .maybeSingle();
 
     const isVerified = profile?.is_verified || false;
-    
-    // 3. UI: Add the Verification Badge to the Modal
-    // Create or find an element to hold the badge
-    const badgeContainer = document.getElementById('sellerBadgeContainer');
+
+    // Update the Badge UI
     if (badgeContainer) {
         badgeContainer.innerHTML = isVerified 
-            ? `<div style="color: #2ed573; font-weight: bold; margin-bottom: 10px;">
-                <i class="fas fa-check-circle"></i> Verified Golem Seller
-               </div>`
-            : `<div style="color: #ffa502; font-weight: bold; margin-bottom: 10px;">
-                <i class="fas fa-exclamation-triangle"></i> Unverified Seller (Proceed with Caution)
-               </div>`;
+            ? `<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified Seller</span>`
+            : `<span class="unverified-badge"><i class="fas fa-shield-alt"></i> Community Seller</span>`;
     }
 
+    // Handle Contact Links
+    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
+    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
+
+    // Redirect unverified sellers to your safety/admin line if needed
+    const whatsappTarget = isVerified ? intPhone : GolemConfig.myPhone;
+    const waPrefix = isVerified ? "" : "[UNVERIFIED] ";
+    
+    document.getElementById('whatsappOrder').href = `https://wa.me/${whatsappTarget}?text=${encodeURIComponent(waPrefix + "I'm interested in " + product.name)}`;
+    document.getElementById('telegramOrder').href = `https://t.me/+${intPhone}`;
+    document.getElementById('callContact').href = `tel:+${intPhone}`;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = "hidden";
+};
     // 4. Contact/Order Logic
     const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
     let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
