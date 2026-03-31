@@ -160,70 +160,28 @@
 function renderUserTable(users) {
     const list = document.getElementById('userList');
     list.innerHTML = `
-        <table style="width: 100%; border-collapse: collapse; margin-top:10px;">
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr style="border-bottom: 2px solid #eee; text-align:left; color: #666; font-size: 0.9rem;">
-                    <th style="padding:12px;">Name</th>
+                <tr style="border-bottom: 2px solid #eee; text-align:left;">
+                    <th>Name</th>
                     <th>Email</th>
                     <th>Joined</th>
                     <th>Admin</th>
-                    <th>Trust Level</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 ${users.map(u => `
-                    <tr style="border-bottom: 1px solid #eee; height:60px;">
-                        <td style="padding:12px;">
-                            <strong>${u.full_name || 'User'}</strong>
-                        </td>
+                    <tr style="border-bottom: 1px solid #eee; height:50px;">
+                        <td>${u.full_name || 'User'}</td>
                         <td>${u.email}</td>
                         <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
-                        <td>
-                            <button onclick="toggleAdmin('${u.id}', ${u.is_admin})" 
-                                    style="border:none; background:none; cursor:pointer; font-size:1.2rem;">
-                                ${u.is_admin ? '🛡️' : '👤'}
-                            </button>
-                        </td>
-                        <td>
-                            ${u.is_verified ? 
-                                '<span style="background:#e8fdf5; color:#2ed573; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">VERIFIED</span>' : 
-                                '<span style="background:#f1f2f6; color:#a4b0be; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">GUEST</span>'}
-                        </td>
-                        <td>
-                            <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
-                                    class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" 
-                                    style="padding: 5px 10px; font-size: 0.75rem; width: auto; margin: 0;">
-                                ${u.is_verified ? 'Unverify' : 'Verify Seller'}
-                            </button>
-                        </td>
+                        <td>${u.is_admin ? '✅' : '❌'}</td>
                     </tr>
                 `).join('')}
             </tbody>
         </table>`;
 }
 
-
-// Add this helper function to toggle the Verified badge
-async function toggleVerification(userId, currentStatus) {
-    const action = currentStatus ? "remove verification from" : "verify";
-    if (!confirm(`Are you sure you want to ${action} this seller?`)) return;
-
-    const { error } = await _supabase
-        .from('profiles')
-        .update({ is_verified: !currentStatus }) // Flips true to false, or false to true
-        .eq('id', userId);
-
-    if (error) {
-        alert("Verification update failed: " + error.message);
-    } else {
-        // Show a quick success message and refresh the list
-        console.log("User verification updated successfully");
-        loadUsers(); 
-    }
-}
-
-           
 // Add this helper function to handle the Admin toggle
 async function toggleAdmin(userId, currentStatus) {
     if (!confirm(`Are you sure you want to ${currentStatus ? 'remove' : 'grant'} admin rights?`)) return;
