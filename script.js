@@ -128,15 +128,16 @@ function renderProducts(products) {
     if (!grid) return;
 
     if (products.length === 0) {
-        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found.</div>`;
+        grid.innerHTML = `<div style="text-align:center; width:100%; padding:60px; color:#888;">No items found.</div>`;
         return;
     }
-
     const savedItems = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
+        const isVerified = p.profiles?.is_verified === true;
         const safeData = encodeURIComponent(JSON.stringify(p));
+       
         const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
@@ -157,19 +158,20 @@ function renderProducts(products) {
         const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
-        return `
-            <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''} ${isFeatured && !isSponsored ? 'is-featured' : ''}">
+     return `
+            <div class="product-card">
                 <div class="card-img-container">
-                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    ${statusBadge}
-                    <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
-                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
-                    </button>
-                    <img src="${p.image}" alt="${p.name}" loading="lazy">
-                    <div class="image-overlay">
-                        <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
-                    </div>
+                    <img src="${p.image}" alt="${p.name}">
                 </div>
+                <div class="product-info">
+                    <h3 class="product-title">
+                        ${p.name} 
+                        <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
+                    </h3>
+                    <div class="product-price">${p.price?.toLocaleString()} ETB</div>
+                    <button onclick="window.openProductDetailsSafe('${safeData}')">View Details</button>
+                </div>
+            </div>`;
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">${p.name}</h3>
