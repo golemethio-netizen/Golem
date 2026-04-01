@@ -131,31 +131,25 @@ function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // 1. Handle Empty State
     if (!products || products.length === 0) {
         grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found.</div>`;
         return;
     }
 
-    // 2. Setup Variables
     const savedItems = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const now = new Date();
 
-    // 3. Map through products
     grid.innerHTML = products.map(p => {
-        // --- DATA PREPARATION ---
+        // --- 1. DATA PREP (Fixed Semicolons) ---
         const safeData = encodeURIComponent(JSON.stringify(p));
-        
-        // Verification Logic: Checks the joined 'profiles' table
         const isVerified = p.profiles?.is_verified === true;
         
-        // Status & Badges Logic
+        // --- 2. STATUS & BADGES ---
         const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
         const isFeatured = p.is_featured;
 
-        // --- BADGE TEMPLATE ---
         let statusBadge = '';
         if (isSponsored) {
             statusBadge = `<div class="badge sponsor-badge"><i class="fas fa-ad"></i> Sponsored</div>`;
@@ -163,63 +157,53 @@ function renderProducts(products) {
             statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
         }
 
-        // --- CONTACT FORMATTING ---
+        // --- 3. CONTACT LINKS ---
         const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
         const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
         const tgUser = (p.telegram_username || "").replace('@', '');
 
-        // --- SHARING LINKS ---
         const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Furniture!`);
         const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
-        // --- RETURN HTML TEMPLATE ---
+        // --- 4. HTML RETURN ---
         return `
-            <div class="product-card ${isSold ? 'is-sold' : ''} ${isSponsored ? 'is-sponsored' : ''}">
+            <div class="product-card ${isSold ? 'is-sold' : ''}">
                 <div class="card-img-container">
                     ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                     ${statusBadge}
                     <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
                         <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                     </button>
-                    <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='assets/placeholder.png'">
+                    <img src="${p.image}" alt="${p.name}" loading="lazy">
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
                     </div>
                 </div>
-                
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">
                         ${p.name} 
-                        <i class="fas fa-check-circle" 
-                           style="color: ${isVerified ? '#2ed573' : '#ccc'};" 
-                           title="${isVerified ? 'Verified Seller' : 'Community Seller'}">
-                        </i>
+                        <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};" title="${isVerified ? 'Verified Seller' : 'Community Seller'}"></i>
                     </h3>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
-                    
                     <div class="quick-contact-bar">
-                        <a href="tel:+${cleanPhone}" class="contact-icon call" title="Call Seller">
-                            <i class="fas fa-phone-alt"></i>
-                        </a>
-                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram" title="Telegram">
-                            <i class="fab fa-telegram-plane"></i>
-                        </a>
-                        <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;" title="Share">
+                        <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;">
                             <i class="fas fa-share-alt"></i>
                         </a>
                     </div>
-
                     <div class="product-actions">
                         <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
-                            <i class="fas fa-info-circle"></i> Full Details
+                            Full Details
                         </button>
                     </div>
                 </div>
             </div>`;
     }).join('');
 }
+
 // --- 5. SPONSORSHIP & FILTERING ---
 window.loadSponsor = async () => {
     try {
