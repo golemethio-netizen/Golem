@@ -682,3 +682,4 @@ window.updateProfileInfo = async function(e) {
     btn.disabled = false;
     btn.innerText = "Save Changes";
 };
+
