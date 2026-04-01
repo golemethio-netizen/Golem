@@ -503,7 +503,6 @@ window.openProductModal = async (product) => {
         .eq('phone', product.seller_phone)
         .maybeSingle();
 
-    const isVerified = profile?.is_verified || false;
 
     // Update the Badge UI
     if (badgeContainer) {
