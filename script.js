@@ -591,3 +591,94 @@ window.deleteUserAccount = async function(userId, identifier) {
         alert("Failed to delete user: " + err.message);
     }
 };
+
+
+// --- PROFILE & ACCOUNT MANAGEMENT ---
+
+// Load Profile Data
+window.loadUserProfile = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        window.location.href = 'index.html'; // Redirect if not logged in
+        return;
+    }
+
+    // Fetch the detailed profile from the 'profiles' table
+    const { data: profile, error } = await _supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    if (profile) {
+        // Update HTML elements
+        const nameElem = document.getElementById('profileName');
+        const emailElem = document.getElementById('profileEmail');
+        const badgeElem = document.getElementById('verificationBadge');
+
+        if (nameElem) nameElem.innerText = profile.full_name || "New Member";
+        if (emailElem) emailElem.innerText = user.email;
+        
+        if (badgeElem) {
+            badgeElem.innerText = profile.is_verified ? "Verified Seller" : "Community Seller";
+            badgeElem.style.background = profile.is_verified ? "#2ed573" : "#888";
+        }
+    }
+};
+
+// Handle Sign Out
+window.handleSignOut = async function() {
+    const { error } = await _supabase.auth.signOut();
+    if (error) {
+        alert("Error signing out: " + error.message);
+    } else {
+        window.location.href = 'index.html';
+    }
+};
+
+// Open Edit Modal & Pre-fill data
+window.openEditModal = async function() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    if (profile) {
+        document.getElementById('editFullName').value = profile.full_name || '';
+        document.getElementById('editPhone').value = profile.phone || '';
+        document.getElementById('editProfileModal').style.display = 'flex';
+    }
+};
+
+// Save Changes to Supabase
+window.updateProfileInfo = async function(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+
+    const { data: { user } } = await _supabase.auth.getUser();
+    const newName = document.getElementById('editFullName').value;
+    const newPhone = document.getElementById('editPhone').value;
+
+    const { error } = await _supabase
+        .from('profiles')
+        .update({ 
+            full_name: newName, 
+            phone: newPhone 
+        })
+        .eq('id', user.id);
+
+    if (!error) {
+        alert("Profile updated successfully!");
+        document.getElementById('editProfileModal').style.display = 'none';
+        window.loadUserProfile(); // Refresh the page info
+    } else {
+        alert("Update failed: " + error.message);
+    }
+    
+    btn.disabled = false;
+    btn.innerText = "Save Changes";
+};
