@@ -482,58 +482,64 @@ window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
     const badgeContainer = document.getElementById('sellerBadgeContainer');
+    const sellerNameElem = document.getElementById('modalSellerName'); // Target for the name
     
     if (!modal) return;
 
-    // 2. DATA PREPARATION (Fixes the ReferenceError)
+    // 2. DATA PREPARATION
     const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
-    // Converts 09... to 2519... for Ethiopia
     const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
     const tgUser = (product.telegram_username || "").replace('@', '');
 
-    // 3. UI INJECTION
+    // 3. UI INJECTION (Product Details)
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
     document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
 
-    // 4. VERIFICATION LOGIC
-    // We check the 'profiles' object that was joined in fetchProducts
+    // 4. SELLER DETAILS (Name & Verification)
     const isVerified = product.profiles?.is_verified === true;
+    const sellerName = product.profiles?.full_name || "Community Member";
 
+    // Update the Name element
+    if (sellerNameElem) {
+        sellerNameElem.innerText = `Seller: ${sellerName}`;
+    }
+
+    // Update the Badge
     if (badgeContainer) {
         badgeContainer.innerHTML = isVerified 
-            ? `<div class="verified-badge" style="color: #2ed573; font-weight: bold;">
+            ? `<div class="verified-badge" style="color: #2ed573; font-weight: bold; margin-top: 5px;">
                 <i class="fas fa-check-circle"></i> Verified Seller
                </div>`
-            : `<div class="unverified-badge" style="color: #888; font-weight: normal;">
+            : `<div class="unverified-badge" style="color: #888; font-weight: normal; margin-top: 5px;">
                 <i class="fas fa-shield-alt"></i> Community Seller
                </div>`;
     }
 
     // 5. CONTACT LINKS
-    // WhatsApp
-    const waLink = document.getElementById('whatsappOrder');
-    if (waLink) {
-        waLink.href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name)}`;
+    if (document.getElementById('whatsappOrder')) {
+        document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name)}`;
     }
 
-    // Telegram (Prioritize Username, fallback to Phone)
-    const tgLink = document.getElementById('telegramOrder');
-    if (tgLink) {
-        tgLink.href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
+    if (document.getElementById('telegramOrder')) {
+        document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
     }
 
-    // Direct Call
-    const callLink = document.getElementById('callContact');
-    if (callLink) {
-        callLink.href = `tel:+${intPhone}`;
+    if (document.getElementById('callContact')) {
+        document.getElementById('callContact').href = `tel:+${intPhone}`;
     }
 
     // 6. DISPLAY MODAL
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
 };
+
+
+
+
+
+
 
 // --- CHAT & UI UTILS ---
 window.toggleChatMenu = function() {
