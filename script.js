@@ -41,14 +41,15 @@ window.fetchProducts = async (category = 'All') => {
 
   // Inside script.js -> fetchProducts
 let query = _supabase
-    .from('products')
-    .select(`
-        *,
-        profiles:seller_id (
-            is_verified
-        )
-    `) // This part fetches the "is_verified" column from the profiles table
-    .eq('status', 'approved');
+        .from('products')
+        .select(`
+            *,
+            profiles:seller_id (
+                is_verified,
+                full_name
+            )
+        `) // ADDED 'full_name' HERE
+        .eq('status', 'approved');
 
     if (category !== 'All') {
         query = query.eq('category', category);
