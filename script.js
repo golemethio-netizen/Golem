@@ -182,10 +182,15 @@ function renderProducts(products) {
                 </div>
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
-                    <h3 class="product-title">
-                        ${p.name} 
-                        <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};" title="${isVerified ? 'Verified Seller' : 'Community Seller'}"></i>
-                    </h3>
+                  <h3 class="product-title">
+    ${p.name} 
+    <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
+        <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
+        <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
+            ${isVerified ? 'Verified Seller' : 'Community Seller'}
+        </span>
+    </span>
+</h3>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
                     <div class="quick-contact-bar">
                         <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
