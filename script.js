@@ -128,6 +128,7 @@ window.updateCartBadge = function() {
 
 // --- 4. RENDERING ENGINE ---
 function renderProducts(products) {
+    console.log("Check this out:", products[0]); // Look at the browser console (F12)
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
@@ -144,7 +145,8 @@ function renderProducts(products) {
     // 3. Map through products
     grid.innerHTML = products.map(p => {
         // Essential Data
-        const isVerified = p.profiles?.is_verified === true;
+        onst isVerified = p.profiles?.is_verified === true;
+        const checkmarkColor = isVerified ? '#2ed573' : 'transparent';
         const safeData = encodeURIComponent(JSON.stringify(p));
         
         // Status & Badges
