@@ -456,9 +456,6 @@ window.deleteUser = async function(userId, identifier) {
 };
 
 
-
-
-
 window.toggleVerification = async (userId, currentStatus) => {
     // Added confirmation dialog
     const action = currentStatus ? "unverify" : "verify";
