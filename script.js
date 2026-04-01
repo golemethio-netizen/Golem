@@ -128,7 +128,6 @@ window.updateCartBadge = function() {
 
 // --- 4. RENDERING ENGINE ---
 function renderProducts(products) {
-    const safeData = encodeURIComponent(JSON.stringify(p));
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
@@ -141,11 +140,11 @@ function renderProducts(products) {
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
-        // --- 1. DATA PREP (Fixed Semicolons) ---
+        // --- 1. DATA PREP ---
+        // 'p' is defined here by the .map loop, so this works now:
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isVerified = p.profiles?.is_verified === true;
         
-        // --- 2. STATUS & BADGES ---
         const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
@@ -158,7 +157,6 @@ function renderProducts(products) {
             statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
         }
 
-        // --- 3. CONTACT LINKS ---
         const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
         const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
         const tgUser = (p.telegram_username || "").replace('@', '');
@@ -167,7 +165,6 @@ function renderProducts(products) {
         const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
-        // --- 4. HTML RETURN ---
         return `
             <div class="product-card ${isSold ? 'is-sold' : ''}">
                 <div class="card-img-container">
@@ -183,15 +180,15 @@ function renderProducts(products) {
                 </div>
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
-                  <h3 class="product-title">
-    ${p.name} 
-    <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
-        <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
-        <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
-            ${isVerified ? 'Verified Seller' : 'Community Seller'}
-        </span>
-    </span>
-</h3>
+                    <h3 class="product-title">
+                        ${p.name} 
+                        <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
+                            <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
+                            <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
+                                ${isVerified ? 'Verified Seller' : 'Community Seller'}
+                            </span>
+                        </span>
+                    </h3>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
                     <div class="quick-contact-bar">
                         <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
@@ -201,9 +198,9 @@ function renderProducts(products) {
                         </a>
                     </div>
                     <div class="product-actions">
-                       <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
-    Full Details
-</button>
+                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
+                            Full Details
+                        </button>
                     </div>
                 </div>
             </div>`;
