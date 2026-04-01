@@ -132,29 +132,25 @@
         }
 
         // 3. LOAD REGISTERED USERS (The missing piece)
-      async function loadUsers() {
+      // 3. LOAD REGISTERED USERS (With Filtering)
+async function loadUsers(filter = 'all') {
     const list = document.getElementById('userList');
     list.innerHTML = "<p>Loading users...</p>";
 
-    const { data: users, error } = await _supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false }); // Changed to created_at
+    let query = _supabase.from('profiles').select('*');
+
+    // Apply Filters
+    if (filter === 'verified') query = query.eq('is_verified', true);
+    if (filter === 'guest') query = query.eq('is_verified', false);
+
+    const { data: users, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
-        // If 'created_at' fails, try 'create_at' as a fallback
-        const { data: retryUsers, error: retryError } = await _supabase
-            .from('profiles')
-            .select('*');
-        
-        if (retryError) {
-            list.innerHTML = `<p style="color:red;">Error: ${retryError.message}</p>`;
-            return;
-        }
-        renderUserTable(retryUsers);
-    } else {
-        renderUserTable(users);
+        list.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+        return;
     }
+    
+    renderUserTable(users, filter);
 }
 
 function renderUserTable(users) {
