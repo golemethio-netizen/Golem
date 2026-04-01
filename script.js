@@ -497,10 +497,12 @@ window.openProductModal = async (product) => {
     if (!modal) return;
 
     // Fill basic data
-    document.getElementById('modalProductImg').src = product.image;
+    
+  document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description.";
+    document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
+    const isVerified = product.profiles?.is_verified === true;
 
     // Fetch Seller Verification Status
     const { data: profile } = await _supabase
@@ -514,22 +516,27 @@ window.openProductModal = async (product) => {
     // Update the Badge UI
     if (badgeContainer) {
         badgeContainer.innerHTML = isVerified 
-            ? `<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified Seller</span>`
-            : `<span class="unverified-badge"><i class="fas fa-shield-alt"></i> Community Seller</span>`;
+            ? `<div class="verified-badge" style="background: #e8fdf5; color: #2ed573; padding: 8px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; font-weight: bold; border: 1px solid #2ed573;">
+                <i class="fas fa-check-circle"></i> VERIFIED SELLER
+               </div>`
+            : `<div class="unverified-badge" style="background: #f1f2f6; color: #888; padding: 8px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; font-weight: bold; border: 1px solid #ddd;">
+                <i class="fas fa-shield-alt"></i> COMMUNITY SELLER
+               </div>`;
     }
-
-    // Handle Contact Links
-    const cleanPhone = (product.seller_phone || "").replace(/\D/g, '');
-    let intPhone = cleanPhone.startsWith('0') ? '251' + cleanPhone.substring(1) : cleanPhone;
+    // 4. Handle Dynamic Contact Links
+    const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
+    const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
 
     // Redirect unverified sellers to your safety/admin line if needed
+    const telegramTarget = (product.telegram_username || "").replace('@', '');
     const whatsappTarget = isVerified ? intPhone : GolemConfig.myPhone;
     const waPrefix = isVerified ? "" : "[UNVERIFIED] ";
     
-    document.getElementById('whatsappOrder').href = `https://wa.me/${whatsappTarget}?text=${encodeURIComponent(waPrefix + "I'm interested in " + product.name)}`;
-    document.getElementById('telegramOrder').href = `https://t.me/+${intPhone}`;
-    document.getElementById('callContact').href = `tel:+${intPhone}`;
-
+   document.getElementById('whatsappOrder').href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent("I'm interested in: " + product.name)}`;
+    document.getElementById('telegramOrder').href = telegramTarget ? `https://t.me/${telegramTarget}` : `https://t.me/+${cleanPhone}`;
+    document.getElementById('callContact').href = `tel:+${cleanPhone}`;
+    
+    // 5. Show Modal
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
 };
