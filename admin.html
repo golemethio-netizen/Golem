@@ -153,51 +153,60 @@ async function loadUsers(filter = 'all') {
     renderUserTable(users, filter);
 }
 
-function renderUserTable(users) {
+function renderUserTable(users, currentFilter) {
     const list = document.getElementById('userList');
-    list.innerHTML = `
-        <table style="width: 100%; border-collapse: collapse; margin-top:10px;">
+    
+    // Add Filter Buttons at the top of the table
+    const filterHTML = `
+        <div style="margin-bottom: 20px; display: flex; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <button onclick="loadUsers('all')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #ddd; background: ${currentFilter === 'all' ? '#333' : 'white'}; color: ${currentFilter === 'all' ? 'white' : '#333'}; cursor:pointer;">All Users (${users.length})</button>
+            <button onclick="loadUsers('verified')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #2ed573; background: ${currentFilter === 'verified' ? '#2ed573' : 'white'}; color: ${currentFilter === 'verified' ? 'white' : '#2ed573'}; cursor:pointer;">Verified Sellers</button>
+            <button onclick="loadUsers('guest')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #a4b0be; background: ${currentFilter === 'guest' ? '#a4b0be' : 'white'}; color: ${currentFilter === 'guest' ? 'white' : '#a4b0be'}; cursor:pointer;">Guest Users</button>
+        </div>
+    `;
+
+    list.innerHTML = filterHTML + `
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="border-bottom: 2px solid #eee; text-align:left; color: #666; font-size: 0.9rem;">
-                    <th style="padding:12px;">Name</th>
-                    <th>Email</th>
+                    <th style="padding:12px;">User Info</th>
                     <th>Joined</th>
                     <th>Admin</th>
-                    <th>Trust Level</th>
-                    <th style="text-align:right; padding-right:12px;">Actions</th>
+                    <th>Trust Status</th>
+                    <th style="text-align:right; padding-right:12px;">Quick Actions</th>
                 </tr>
             </thead>
             <tbody>
                 ${users.map(u => `
-                    <tr style="border-bottom: 1px solid #eee; height:60px;">
+                    <tr style="border-bottom: 1px solid #eee; height:70px;">
                         <td style="padding:12px;">
-                            <strong>${u.full_name || 'User'}</strong>
+                            <div style="display:flex; flex-direction:column;">
+                                <strong>${u.full_name || 'Anonymous User'}</strong>
+                                <span style="font-size:0.75rem; color:#888;">${u.email}</span>
+                            </div>
                         </td>
-                        <td>${u.email}</td>
-                        <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td style="font-size:0.85rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            <button onclick="toggleAdmin('${u.id}', ${u.is_admin})" 
+                            <button onclick="toggleAdmin('${u.id}', ${u.is_admin})" title="Toggle Admin Rights"
                                     style="border:none; background:none; cursor:pointer; font-size:1.2rem;">
-                                ${u.is_admin ? '🛡️' : '👤'}
+                                ${u.is_admin ? '🛡️ <small style="font-size:0.6rem; display:block;">Admin</small>' : '👤'}
                             </button>
                         </td>
                         <td>
                             ${u.is_verified ? 
-                                '<span style="background:#e8fdf5; color:#2ed573; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">VERIFIED</span>' : 
-                                '<span style="background:#f1f2f6; color:#a4b0be; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">GUEST</span>'}
+                                '<span style="background:#e8fdf5; color:#2ed573; border:1px solid #2ed573; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:bold;"><i class="fas fa-check"></i> VERIFIED</span>' : 
+                                '<span style="background:#f1f2f6; color:#a4b0be; border:1px solid #ddd; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:bold;">COMMUNITY</span>'}
                         </td>
                         <td style="text-align:right; padding-right:12px;">
-                            <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                 <button onclick="toggleVerification('${u.id}', ${u.is_verified})" 
                                         class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" 
-                                        style="padding: 5px 10px; font-size: 0.75rem; width: auto; margin: 0;">
-                                    ${u.is_verified ? 'Unverify' : 'Verify Seller'}
+                                        style="padding: 6px 12px; font-size: 0.75rem; width: auto; margin: 0; min-width: 100px;">
+                                    ${u.is_verified ? 'Revoke' : 'Verify Seller'}
                                 </button>
-                                
                                 <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" 
-                                        style="border:none; background:none; cursor:pointer; font-size:1.1rem; padding: 5px;"
-                                        title="Delete User">
-                                    🗑️
+                                        style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </td>
