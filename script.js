@@ -40,9 +40,15 @@ window.fetchProducts = async (category = 'All') => {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
 
   // Update this line in fetchProducts:
+// Inside fetchProducts in script.js
 let query = _supabase
     .from('products')
-    .select('*, profiles(is_verified)') // This joins the verification status automatically
+    .select(`
+        *,
+        profiles!seller_id (
+            is_verified
+        )
+    `)
     .eq('status', 'approved');
 
     if (category !== 'All') {
