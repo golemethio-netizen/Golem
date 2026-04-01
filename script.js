@@ -128,6 +128,7 @@ window.updateCartBadge = function() {
 
 // --- 4. RENDERING ENGINE ---
 function renderProducts(products) {
+    const safeData = encodeURIComponent(JSON.stringify(p));
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
@@ -200,9 +201,9 @@ function renderProducts(products) {
                         </a>
                     </div>
                     <div class="product-actions">
-                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
-                            Full Details
-                        </button>
+                       <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
+    Full Details
+</button>
                     </div>
                 </div>
             </div>`;
