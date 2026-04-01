@@ -145,9 +145,10 @@ function renderProducts(products) {
     // 3. Map through products
     grid.innerHTML = products.map(p => {
         // Essential Data
-        onst isVerified = p.profiles?.is_verified === true;
+        const safeData = encodeURIComponent(JSON.stringify(p)); // Semicolon added
+const isVerified = p.profiles?.is_verified === true;
         const checkmarkColor = isVerified ? '#2ed573' : 'transparent';
-        const safeData = encodeURIComponent(JSON.stringify(p));
+       
         
         // Status & Badges
         const isSold = p.status === 'sold';
