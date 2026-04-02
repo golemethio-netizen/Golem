@@ -33,6 +33,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+
+// At the top of your profile-related script
+window.openEditModal = function(profileData) {
+    console.log("Opening modal with:", profileData);
+    const modal = document.getElementById('editProfileModal');
+    if (modal) {
+        // Fill your form fields here
+        document.getElementById('editName').value = profileData.full_name || '';
+        modal.style.display = 'flex';
+    } else {
+        console.error("Modal element not found!");
+    }
+};
+
+
+
+
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = 'All') => {
     const grid = document.getElementById('productGrid');
