@@ -71,7 +71,10 @@
                     <label><i class="fas fa-phone"></i> Contact Phone</label>
                     <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
-
+<div class="input-group-sell">
+    <label><i class="fas fa-map-marker-alt"></i> Location (Area)</label>
+    <input type="text" id="prodLocation" placeholder="e.g. Bole, Addis Ababa" required>
+</div>
                 <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
                     Publish Listing
                 </button>
@@ -84,6 +87,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { user } } = await _supabase.auth.getUser();
+           
+            
+            
+            
             if (user) {
                 if (user.user_metadata.phone_number) {
                     document.getElementById('prodPhone').value = user.user_metadata.phone_number;
@@ -92,6 +99,9 @@
                 alert("Please log in to sell items.");
                 window.location.href = 'index.html';
             }
+            if (user.user_metadata.location) {
+    document.getElementById('prodLocation').value = user.user_metadata.location;
+}
         });
 
         // 1. IMAGE PREVIEW
@@ -153,6 +163,9 @@
           // D. Insert into Database
 // D. Insert into Database
             // --- D. Insert into Database ---
+// --- D. Insert into Database ---
+const locationValue = document.getElementById('prodLocation').value;
+
 const { error: dbError } = await _supabase
     .from('products')
     .insert([{
@@ -161,27 +174,27 @@ const { error: dbError } = await _supabase
         price: parseFloat(document.getElementById('prodPrice').value),
         category: document.getElementById('prodCategory').value,
         description: document.getElementById('prodDesc').value,
+        location: locationValue, // MAKE SURE YOUR TABLE HAS THIS COLUMN
         image: publicUrl,
         seller_phone: document.getElementById('prodPhone').value,
         seller_name: user.user_metadata?.full_name || user.email.split('@')[0] || "Seller",
-        
-        // ADD THIS LINE BELOW:
         seller_id: user.id, 
-        
-        user_id: user.id, // Keep this if you use it for RLS policies
+        user_id: user.id,
         status: 'pending' 
     }]);
 
             if (dbError) throw dbError;
 
             // --- TELEGRAM NOTIFICATION FOR ADMIN ---
-            const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
-                `📦 *Item:* ${document.getElementById('prodName').value}\n` +
-                `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
-                `📞 *Seller:* ${document.getElementById('prodPhone').value}\n` +
-                `📂 *Category:* ${document.getElementById('prodCategory').value}\n\n` +
-                `👉 _Login to Admin Panel to Approve_`;
-
+           // --- TELEGRAM NOTIFICATION FOR ADMIN ---
+const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
+    `📦 *Item:* ${document.getElementById('prodName').value}\n` +
+    `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
+    `📍 *Location:* ${document.getElementById('prodLocation').value}\n` + // Added this
+    `📞 *Seller:* ${document.getElementById('prodPhone').value}\n` +
+    `📂 *Category:* ${document.getElementById('prodCategory').value}\n\n` +
+    `👉 _Login to Admin Panel to Approve_`;
+                
             try {
                 await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
                     method: 'POST',
