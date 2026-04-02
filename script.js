@@ -169,47 +169,53 @@ function renderProducts(products) {
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
         return `
-            <div class="product-card ${isSold ? 'is-sold' : ''}">
-                <div class="card-img-container">
-                    ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
-                    ${statusBadge}
-                    <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
-                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
-                    </button>
-                    <img src="${p.image}" alt="${p.name}" loading="lazy">
-                    <div class="image-overlay">
-                        <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
-                    </div>
-                </div>
-                
-                <div class="product-info">
-                    <span class="category-badge">${p.category || 'General'}</span>
-                    <h3 class="product-title">
-                        ${p.name} 
-                        <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
-                            <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
-                            <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
-                                ${isVerified ? 'Verified' : 'Community'}
-                            </span>
-                        </span>
-                    </h3>
-                    <div class="product-price">${p.price?.toLocaleString()} ETB</div>
-                    
-                    <div class="quick-contact-bar">
-                        <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
-                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
-                        <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;">
-                            <i class="fas fa-share-alt"></i>
-                        </a>
-                    </div>
+           return `
+    <div class="product-card ${isSold ? 'is-sold' : ''}">
+        <div class="card-img-container">
+            ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+            ${statusBadge}
+            <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
+                <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+            </button>
+            <img src="${p.image}" alt="${p.name}" loading="lazy">
+            <div class="image-overlay">
+                <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
+            </div>
+        </div>
+        
+        <div class="product-info">
+            <span class="category-badge">${p.category || 'General'}</span>
+            <h3 class="product-title">
+                ${p.name} 
+                <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
+                    <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
+                    <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
+                        ${isVerified ? 'Verified' : 'Community'}
+                    </span>
+                </span>
+            </h3>
+            
+            <div class="product-price">${p.price?.toLocaleString()} ETB</div>
 
-                    <div class="product-actions" style="margin-top: 15px;">
-                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%; padding: 10px; border-radius: 8px; cursor: pointer;">
-                            Full Details
-                        </button>
-                    </div>
-                </div>
-            </div>`;
+            <div class="product-location" style="display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #666; margin-top: 5px;">
+                <i class="fas fa-map-marker-alt" style="color: #ff4757;"></i>
+                <span>${p.location || 'Addis Ababa'}</span>
+            </div>
+            <div class="quick-contact-bar" style="margin-top: 12px;">
+                <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
+                <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;">
+                    <i class="fas fa-share-alt"></i>
+                </a>
+            </div>
+
+            <div class="product-actions" style="margin-top: 15px;">
+                <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%; padding: 10px; border-radius: 8px; cursor: pointer;">
+                    Full Details
+                </button>
+            </div>
+        </div>
+    </div>`;
     }).join('');
 }
 // --- 5. SPONSORSHIP & FILTERING ---
