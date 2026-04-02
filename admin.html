@@ -414,6 +414,31 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
         };
 
 
+
+
+window.permanentlyDelete = async (id, imageUrl) => {
+    if (confirm("Delete forever? This will also remove the image from storage.")) {
+        // 1. Extract filename from URL
+        const fileName = imageUrl.split('/').pop();
+        
+        // 2. Delete from Storage
+        await _supabase.storage.from('product-images').remove([fileName]);
+
+        // 3. Delete from Database
+        const { error } = await _supabase.from('products').delete().eq('id', id);
+        
+        if (!error) {
+            document.getElementById(`card-${id}`)?.remove();
+            checkStorageUsage(); // Refresh your storage stat
+        }
+    }
+};
+
+
+
+
+           
+
 // Add this to your <script> block in admin.html
 window.deleteUserAccount = async function(userId, identifier) {
     const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
