@@ -333,6 +333,14 @@
 -->
 
 <script>
+// Add this to the top of script.js to ensure it's always available
+window.closeToast = function(event) {
+    if (event) event.stopPropagation();
+    const toast = document.getElementById('chatToast');
+    if (toast) toast.style.display = 'none';
+};
+
+    
 // --- FLOATING CHAT LOGIC ---
 function toggleChatMenu() {
     const menu = document.getElementById('chatMenu');
