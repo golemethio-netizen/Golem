@@ -524,6 +524,50 @@ async function updateAdminPresence() {
 
 // Call it when the page loads
 window.addEventListener('load', updateAdminPresence);
+
+
+
+
+async function checkStorageUsage() {
+    try {
+        // 1. List all files in your 'product-images' bucket
+        const { data, error } = await _supabase
+            .storage
+            .from('product-images')
+            .list('');
+
+        if (error) throw error;
+
+        // 2. Sum up the sizes (Supabase returns size in Bytes)
+        const totalBytes = data.reduce((acc, file) => acc + file.metadata.size, 0);
+        
+        // 3. Convert to Megabytes (1 MB = 1,048,576 Bytes)
+        const totalMB = (totalBytes / 1048576).toFixed(2);
+        const usagePercent = (totalMB / 1024 * 100).toFixed(1); // Percentage of 1GB (1024MB)
+
+        // 4. Update the UI
+        const usageText = document.getElementById('storageUsage');
+        const usageBar = document.getElementById('storageBar');
+
+        if (usageText) usageText.innerText = `${totalMB} MB`;
+        if (usageBar) {
+            usageBar.style.width = `${usagePercent}%`;
+            // Change color to red if usage is over 80%
+            if (usagePercent > 80) usageBar.style.background = "#ff4757";
+        }
+
+    } catch (err) {
+        console.error("Storage Check Error:", err.message);
+    }
+}
+
+// Add this to your window.onload so it runs when you open Admin
+// window.onload = async () => { ... checkStorageUsage(); ... };
+
+
+
+
+
            
        </script>
 </body>
