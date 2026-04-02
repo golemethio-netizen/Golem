@@ -40,16 +40,18 @@ window.fetchProducts = async (category = 'All') => {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
 
   // Inside script.js -> fetchProducts
+// --- Inside script.js -> fetchProducts ---
 let query = _supabase
-        .from('products')
-        .select(`
-            *,
-            profiles:seller_id (
-                is_verified,
-                full_name
-            )
-        `) // ADDED 'full_name' HERE
-        .eq('status', 'approved');
+    .from('products')
+    .select(`
+        *,
+        profiles:seller_id (
+            is_verified,
+            full_name,
+            avatar_url
+        )
+    `) // ADDED avatar_url HERE
+    .eq('status', 'approved');
 
     if (category !== 'All') {
         query = query.eq('category', category);
@@ -481,8 +483,9 @@ window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
     const badgeContainer = document.getElementById('sellerBadgeContainer');
-    const sellerNameElem = document.getElementById('modalSellerName'); // Target for the name
-    
+   // Target for the name and avator
+    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
+    const sellerNameElem = document.getElementById('modalSellerName');
     if (!modal) return;
 
     // 2. DATA PREPARATION
@@ -490,6 +493,8 @@ window.openProductModal = async (product) => {
     const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
     const tgUser = (product.telegram_username || "").replace('@', '');
 
+
+    
     // 3. UI INJECTION (Product Details)
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
@@ -499,10 +504,12 @@ window.openProductModal = async (product) => {
     // 4. SELLER DETAILS (Name & Verification)
     const isVerified = product.profiles?.is_verified === true;
     const sellerName = product.profiles?.full_name || "Community Member";
-
+const avatarUrl = profile?.avatar_url || 'https://via.placeholder.com/150'; // Fallback
+    
     // Update the Name element
     if (sellerNameElem) {
         sellerNameElem.innerText = `Seller: ${sellerName}`;
+        if (sellerAvatarElem) sellerAvatarElem.src = avatarUrl;
     }
 
     // Update the Badge
