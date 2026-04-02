@@ -326,43 +326,41 @@ window.handleAuth = async function(e) {
 // FIXED: UI Update with Admin Check
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    const signinBtn = document.getElementById('signInBtn');
+    
+    const signInBtn = document.getElementById('signInBtn');
+    const userWelcome = document.getElementById('userWelcome');
+    const userNameElem = document.getElementById('userName');
+    const signOutBtn = document.getElementById('signOutBtn');
     const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
-        // Sign Out Logic
-        if (signinBtn) {
-            signinBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> <p>Sign Out</p>`;
-            signinBtn.onclick = async () => { 
-                await _supabase.auth.signOut(); 
-                window.location.reload(); 
-            };
-        }
+        // 1. Hide Sign In, Show User Info
+        if (signInBtn) signInBtn.style.display = 'none';
+        if (userWelcome) userWelcome.style.display = 'flex';
+        if (signOutBtn) signOutBtn.style.display = 'block';
 
-        // Fetch User Profile
+        // 2. Fetch Profile Name
         const { data: profile } = await _supabase
             .from('profiles')
-            .select('is_admin, full_name')
+            .select('full_name, is_admin')
             .eq('id', user.id)
             .maybeSingle();
 
-        // Show User Name
-        if (profile?.full_name && signinBtn) {
-            signinBtn.querySelector('p').innerText = profile.full_name.split(' ')[0]; 
+        if (userNameElem) {
+            // Display first name or "Member"
+            userNameElem.innerText = profile?.full_name ? profile.full_name.split(' ')[0] : "Member";
         }
 
-        // IMPORTANT: Show Admin Link if user is admin
+        // 3. Show Admin Link if applicable
         if (adminLink && profile?.is_admin) {
-            adminLink.style.display = 'flex'; // Or 'block' depending on your CSS
-        } else if (adminLink) {
-            adminLink.style.display = 'none';
+            adminLink.style.display = 'flex';
         }
+
     } else {
-        // Guest View
-        if (signinBtn) {
-            signinBtn.innerHTML = `<i class="fas fa-user-circle"></i> <p>Sign In</p>`;
-            signinBtn.onclick = () => window.toggleModal();
-        }
+        // Guest View: Show Sign In, Hide User Info
+        if (signInBtn) signInBtn.style.display = 'block';
+        if (userWelcome) userWelcome.style.display = 'none';
+        if (signOutBtn) signOutBtn.style.display = 'none';
         if (adminLink) adminLink.style.display = 'none';
     }
 };
