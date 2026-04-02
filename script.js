@@ -594,12 +594,28 @@ window.deleteUserAccount = async function(userId, identifier) {
 // --- PROFILE & ACCOUNT MANAGEMENT ---
 
 // Load Profile Data
+// 1. Updated Load Profile to include Avatar
 window.loadUserProfile = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) {
-        window.location.href = 'index.html'; // Redirect if not logged in
-        return;
+    if (!user) return;
+
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    if (profile) {
+        document.getElementById('profileName').innerText = profile.full_name || "Member";
+        // Display Avatar or fallback to placeholder
+        const avatarUrl = profile.avatar_url || 'https://via.placeholder.com/150';
+        document.getElementById('profileAvatar').src = avatarUrl;
+        
+        const badge = document.getElementById('verificationBadge');
+        badge.innerText = profile.is_verified ? "Verified Seller" : "Community Seller";
+        badge.style.background = profile.is_verified ? "#2ed573" : "#888";
     }
+};
 
     // Fetch the detailed profile from the 'profiles' table
     const { data: profile, error } = await _supabase
@@ -652,33 +668,58 @@ window.openEditModal = async function() {
 };
 
 // Save Changes to Supabase
+// 2. Updated Update Profile to handle File Upload
 window.updateProfileInfo = async function(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button');
+    const fileInput = document.getElementById('editAvatar');
+    const file = fileInput.files[0];
+    
     btn.disabled = true;
-    btn.innerText = "Saving...";
+    btn.innerText = "Uploading...";
 
     const { data: { user } } = await _supabase.auth.getUser();
-    const newName = document.getElementById('editFullName').value;
-    const newPhone = document.getElementById('editPhone').value;
+    let avatarUrl = null;
+
+    // --- UPLOAD LOGIC ---
+    if (file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
+
+        // Upload to 'avatars' bucket (Make sure this bucket exists in Supabase!)
+        const { error: uploadError } = await _supabase.storage
+            .from('avatars')
+            .upload(filePath, file);
+
+        if (uploadError) {
+            alert("Upload failed: " + uploadError.message);
+        } else {
+            // Get Public URL
+            const { data } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+            avatarUrl = data.publicUrl;
+        }
+    }
+
+    // --- DATABASE UPDATE ---
+    const updates = {
+        full_name: document.getElementById('editFullName').value,
+        phone: document.getElementById('editPhone').value,
+    };
+    
+    if (avatarUrl) updates.avatar_url = avatarUrl;
 
     const { error } = await _supabase
         .from('profiles')
-        .update({ 
-            full_name: newName, 
-            phone: newPhone 
-        })
+        .update(updates)
         .eq('id', user.id);
 
     if (!error) {
-        alert("Profile updated successfully!");
-        document.getElementById('editProfileModal').style.display = 'none';
-        window.loadUserProfile(); // Refresh the page info
+        alert("Profile Updated!");
+        location.reload();
     } else {
-        alert("Update failed: " + error.message);
+        alert("Error: " + error.message);
     }
-    
     btn.disabled = false;
-    btn.innerText = "Save Changes";
 };
 
