@@ -73,7 +73,35 @@
                 </div>
 <div class="input-group-sell">
     <label><i class="fas fa-map-marker-alt"></i> Location (Area)</label>
-    <input type="text" id="prodLocation" placeholder="e.g. Bole, Addis Ababa" required>
+   <div class="location-selectors" style="display: flex; gap: 15px; margin-bottom: 15px;">
+    <div class="input-group-sell" style="flex: 1;">
+        <label><i class="fas fa-map-marker-alt"></i> Region/State</label>
+        <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
+            <option value="Addis Ababa">Addis Ababa</option>
+            <option value="Oromia">Oromia</option>
+            <option value="Amhara">Amhara</option>
+            <option value="Sidama">Sidama</option>
+            <option value="SNNP">SNNP</option>
+            <option value="Dire Dawa">Dire Dawa</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div id="districtWrapper" class="input-group-sell" style="flex: 1;">
+        <label><i class="fas fa-city"></i> District (Kifle Ketema)</label>
+        <select id="prodDistrict">
+            <option value="Bole">Bole</option>
+            <option value="Kirkos">Kirkos</option>
+            <option value="Arada">Arada</option>
+            <option value="Yeka">Yeka</option>
+            <option value="Nifas Silk">Nifas Silk</option>
+            <option value="Lideta">Lideta</option>
+            <option value="Gullele">Gullele</option>
+            <option value="Kolfe Keranio">Kolfe Keranio</option>
+            <option value="Akaki Kality">Akaki Kality</option>
+        </select>
+    </div>
+</div>
 </div>
                 <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
                     Publish Listing
@@ -100,7 +128,16 @@
                 window.location.href = 'index.html';
             }
             if (user.user_metadata.location) {
-    document.getElementById('prodLocation').value = user.user_metadata.location;
+                
+   const locParts = user.user_metadata.location.split(', ');
+    if (locParts.length > 1) {
+        document.getElementById('prodRegion').value = locParts[1];
+        window.toggleDistricts(locParts[1]);
+        document.getElementById('prodDistrict').value = locParts[0];
+    } else {
+        document.getElementById('prodRegion').value = locParts[0];
+        window.toggleDistricts(locParts[0]);
+    }
 }
         });
 
@@ -166,6 +203,12 @@
 // --- D. Insert into Database ---
 const locationValue = document.getElementById('prodLocation').value;
 
+
+                // --- Updated Location Logic ---
+const region = document.getElementById('prodRegion').value;
+const district = document.getElementById('prodDistrict').value;
+const locationValue = district ? `${district}, ${region}` : region;
+
 const { error: dbError } = await _supabase
     .from('products')
     .insert([{
@@ -220,6 +263,23 @@ const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
             btn.disabled = false;
         }
     }); // This closes the event listener
+
+
+
+window.toggleDistricts = function(region) {
+    const wrapper = document.getElementById('districtWrapper');
+    const districtSelect = document.getElementById('prodDistrict');
+    if (region === 'Addis Ababa') {
+        wrapper.style.display = 'block';
+        districtSelect.required = true;
+    } else {
+        wrapper.style.display = 'none';
+        districtSelect.required = false;
+        districtSelect.value = ""; // Clear district if not in AA
+    }
+};
+
+        
 </script>
 
     <style>
