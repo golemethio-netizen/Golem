@@ -434,19 +434,45 @@ window.deleteUserAccount = async function(userId, identifier) {
 
            
  async function loadTickets() {
-            const list = document.getElementById('ticketList');
-            const { data: tickets } = await _supabase.from('support_tickets').select('*').eq('is_resolved', false).order('created_at', { ascending: false });
-            if (!tickets || tickets.length === 0) { list.innerHTML = "<p>No new messages.</p>"; return; }
-            list.innerHTML = tickets.map(t => `
-                <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #ff4757;">
-                    <h4>${t.subject}</h4>
-                    <p>${t.message}</p>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                        <span>${t.user_email}</span>
-                        <button onclick="resolveTicket('${t.id}')" style="background:#2ed573; color:white; border:none; padding:5px 10px; border-radius:5px;">Resolve</button>
-                    </div>
-                </div>`).join('');
-        }
+    const list = document.getElementById('ticketList');
+    const ticketCountDisplay = document.getElementById('pendingTickets'); // The ID from your stat card
+
+    const { data: tickets, error } = await _supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('is_resolved', false)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Ticket Load Error:", error);
+        return;
+    }
+
+    // Update the Stat Card Number
+    if (ticketCountDisplay) {
+        ticketCountDisplay.innerText = tickets ? tickets.length : 0;
+    }
+
+    if (!tickets || tickets.length === 0) {
+        list.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>No active support tickets.</p>";
+        return;
+    }
+
+    list.innerHTML = tickets.map(t => `
+        <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #ff4757; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+                <div>
+                    <h4 style="color:#333;">${t.subject || 'No Subject'}</h4>
+                    <p style="margin: 10px 0; color:#555; line-height:1.4;">${t.message}</p>
+                    <small style="color:#888;">From: <strong>${t.user_email}</strong> • ${new Date(t.created_at).toLocaleDateString()}</small>
+                </div>
+                <button onclick="resolveTicket('${t.id}')" 
+                        style="background:#2ed573; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                    Mark Resolved
+                </button>
+            </div>
+        </div>`).join('');
+}
 
         window.resolveTicket = async (id) => {
             const { error } = await _supabase.from('support_tickets').update({ is_resolved: true }).eq('id', id);
