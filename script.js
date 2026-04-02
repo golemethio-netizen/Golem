@@ -175,6 +175,11 @@ function renderProducts(products) {
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
                     </div>
+                    <div class="product-actions">
+            <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')">
+                Full Details
+            </button>
+        </div>
                 </div>
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
