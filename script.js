@@ -564,8 +564,13 @@ window.updateProfileInfo = async function(e) {
     let avatarUrl = null;
 
     if (file) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+
+
+const file = document.getElementById('editAvatar').files[0];
+const fileExt = file.name.split('.').pop();
+const fileName = `${Math.random()}.${fileExt}`;
+const filePath = `${fileName}`; // Make sure there are no slashes / unless needed
+
         const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file);
 
         if (!uploadError) {
