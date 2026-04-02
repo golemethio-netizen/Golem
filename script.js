@@ -436,43 +436,31 @@ window.loadUsers = async function() {
     list.innerHTML = `
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="text-align: left; border-bottom: 2px solid #f4f7f6; color: #888;">
-                        <th style="padding: 15px;">NAME</th>
-                        <th style="padding: 15px;">EMAIL</th>
-                        <th style="padding: 15px;">ROLE</th>
-                        <th style="padding: 15px;">STATUS</th>
-                        <th style="padding: 15px; text-align: right;">ACTIONS</th>
-                    </tr>
-                </thead>
+         <thead>
+    <tr style="text-align: left; border-bottom: 2px solid #f4f7f6; color: #888;">
+        <th style="padding: 15px;">USER INFO</th>
+        <th style="padding: 15px;">LOCATION</th> <th style="padding: 15px;">JOINED</th>
+        <th style="padding: 15px;">ROLE</th>
+        <th style="padding: 15px;">STATUS</th>
+        <th style="padding: 15px; text-align: right;">ACTIONS</th>
+    </tr>
+</thead>
                 <tbody>
                     ${users.map(u => `
                         <tr style="border-bottom: 1px solid #f4f7f6;">
-                            <td style="padding: 10px 15px;">${u.full_name || 'Member'}</td>
-                            <td style="padding: 10px 15px;">${u.email || 'N/A'}</td>
-                            <td style="padding: 10px 15px;">${u.is_admin ? 'Admin 🛡️' : 'User 👤'}</td>
-                            <td style="padding: 10px 15px;">
-                                ${u.is_verified ? '<span style="color:#2ed573; font-weight:bold;">VERIFIED</span>' : '<span style="color:#888;">GUEST</span>'}
-                            </td>
-                            <td style="padding: 10px 15px; text-align: right;">
-                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                    <button class="btn-verify" 
-                                            onclick="window.toggleVerification('${u.id}', ${u.is_verified})"
-                                            style="background:${u.is_verified ? '#ff4757' : '#2ed573'}; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                                        ${u.is_verified ? 'Unverify' : 'Verify'}
-                                    </button>
-                                    
-                                    ${u.id !== user?.id ? `
-                                        <button class="btn-delete" 
-                                                onclick="window.deleteUser('${u.id}', '${u.full_name || u.email}')"
-                                                style="background:#eb4d4b; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;"
-                                                title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    ` : '<span style="font-size:12px; color:#aaa; padding:5px;">(You)</span>'}
-                                </div>
-                            </td>
-                        </tr>
+        <td style="padding: 10px 15px;">
+             <strong>${u.full_name || 'Member'}</strong><br>
+             <small style="color:#888;">${u.email || 'N/A'}</small>
+        </td>
+        <td style="padding: 10px 15px; font-size: 0.85rem;">${u.location || 'Addis Ababa'}</td>
+        <td style="padding: 10px 15px; font-size: 0.85rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
+        <td style="padding: 10px 15px;">${u.is_admin ? 'Admin 🛡️' : 'User 👤'}</td>
+        <td style="padding: 10px 15px;">
+            ${u.is_verified ? '<span style="color:#2ed573; font-weight:bold;">VERIFIED</span>' : '<span style="color:#888;">GUEST</span>'}
+        </td>
+        <td style="padding: 10px 15px; text-align: right;">
+            </td>
+    </tr>
                     `).join('')}
                 </tbody>
             </table>
