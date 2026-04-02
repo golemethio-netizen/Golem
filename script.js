@@ -168,7 +168,7 @@ function renderProducts(products) {
         const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
-        return `
+    
            return `
     <div class="product-card ${isSold ? 'is-sold' : ''}">
         <div class="card-img-container">
