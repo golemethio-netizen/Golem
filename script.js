@@ -39,19 +39,17 @@ window.fetchProducts = async (category = 'All') => {
 
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
 
-  // Inside script.js -> fetchProducts
-// --- Inside script.js -> fetchProducts ---
-let query = _supabase
-    .from('products')
-    .select(`
-        *,
-        profiles:seller_id (
-            is_verified,
-            full_name,
-            avatar_url
-        )
-    `) // ADDED avatar_url HERE
-    .eq('status', 'approved');
+    let query = _supabase
+        .from('products')
+        .select(`
+            *,
+            profiles:seller_id (
+                is_verified,
+                full_name,
+                avatar_url
+            )
+        `)
+        .eq('status', 'approved');
 
     if (category !== 'All') {
         query = query.eq('category', category);
@@ -77,7 +75,7 @@ let query = _supabase
     }
 };
 
-// --- 3. WISHLIST / WHITELIST LOGIC ---
+// --- 3. WISHLIST LOGIC ---
 window.toggleWishlist = function(id, btnElement) {
     try {
         let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
@@ -113,7 +111,6 @@ window.addToCartFromModal = function() {
         saved.push(currentProduct.id);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
         window.updateCartBadge();
-        window.fetchProducts();
         alert("❤️ Added to your Whitelist!");
     } else {
         alert("This item is already in your Whitelist!");
@@ -143,11 +140,8 @@ function renderProducts(products) {
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
-        // --- 1. DATA PREP ---
-        // 'p' is defined here by the .map loop, so this works now:
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isVerified = p.profiles?.is_verified === true;
-        
         const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
         const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
@@ -188,7 +182,7 @@ function renderProducts(products) {
                         <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
                             <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
                             <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
-                                ${isVerified ? 'Verified Seller' : 'Community Seller'}
+                                ${isVerified ? 'Verified' : 'Community'}
                             </span>
                         </span>
                     </h3>
@@ -200,60 +194,57 @@ function renderProducts(products) {
                             <i class="fas fa-share-alt"></i>
                         </a>
                     </div>
-                    <div class="product-actions">
-                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
-                            Full Details
-                        </button>
-                    </div>
                 </div>
             </div>`;
     }).join('');
 }
 
-// --- 5. SPONSORSHIP & FILTERING ---
-window.loadSponsor = async () => {
-    try {
-        const now = new Date().toISOString();
-        const { data: product } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('is_sponsored', true)
-            .gt('sponsored_until', now)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-        const sponsorSection = document.getElementById('mainSponsor');
-        if (product && sponsorSection) {
-            document.getElementById('sponsorImg').src = product.image;
-            document.getElementById('sponsorTitle').innerText = product.name;
-            document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
-            document.getElementById('sponsorLink').href = `checkout.html?id=${product.id}`;
-            sponsorSection.style.display = 'block';
-        }
-    } catch (err) { console.error("Sponsor load error", err); }
-};
-
-window.filterCategory = (category, button) => {
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    window.fetchProducts(category);
-};
-
-function filterSearch(term) {
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach(card => {
-        const title = card.querySelector('.product-title').innerText.toLowerCase();
-        card.style.display = title.includes(term) ? 'block' : 'none';
-    });
-}
-
-// --- 6. MODAL & VIEW LOGIC ---
+// --- 5. MODAL & VIEW LOGIC ---
 window.openProductDetailsSafe = (encodedData) => {
     try {
         const product = JSON.parse(decodeURIComponent(encodedData));
         window.openProductModal(product);
     } catch (e) { console.error("Error parsing product", e); }
+};
+
+window.openProductModal = async (product) => {
+    currentProduct = product;
+    const modal = document.getElementById('productModal');
+    const badgeContainer = document.getElementById('sellerBadgeContainer');
+    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
+    const sellerNameElem = document.getElementById('modalSellerName');
+    
+    if (!modal) return;
+
+    const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
+    const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+    const tgUser = (product.telegram_username || "").replace('@', '');
+
+    document.getElementById('modalProductImg').src = product.image;
+    document.getElementById('modalProductTitle').innerText = product.name;
+    document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
+    document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
+
+    const profile = product.profiles; // Accessing the joined profile data
+    const isVerified = profile?.is_verified === true;
+    const sellerName = profile?.full_name || "Community Member";
+    const avatarUrl = profile?.avatar_url || 'https://via.placeholder.com/150';
+    
+    if (sellerNameElem) sellerNameElem.innerText = `Seller: ${sellerName}`;
+    if (sellerAvatarElem) sellerAvatarElem.src = avatarUrl;
+
+    if (badgeContainer) {
+        badgeContainer.innerHTML = isVerified 
+            ? `<div style="color: #2ed573; font-weight: bold; margin-top: 5px;"><i class="fas fa-check-circle"></i> Verified Seller</div>`
+            : `<div style="color: #888; margin-top: 5px;"><i class="fas fa-shield-alt"></i> Community Seller</div>`;
+    }
+
+    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name)}`;
+    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
+    document.getElementById('callContact').href = `tel:+${intPhone}`;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = "hidden";
 };
 
 window.closeProductModal = () => {
@@ -262,7 +253,7 @@ window.closeProductModal = () => {
     document.body.style.overflow = "auto";
 };
 
-// --- 7. AUTHENTICATION SYSTEM ---
+// --- 6. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
 
 window.toggleAuthMode = function() {
@@ -282,15 +273,6 @@ window.toggleAuthMode = function() {
         submitBtn.innerText = "Sign In";
         regFields.style.display = "none";
         toggleLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>';
-    }
-};
-
-window.toggleModal = () => {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        const isFlex = modal.style.display === 'flex';
-        modal.style.display = isFlex ? 'none' : 'flex';
-        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
     }
 };
 
@@ -315,20 +297,14 @@ window.handleAuth = async function(e) {
         else { alert("Check your email for confirmation!"); window.toggleModal(); }
     } else {
         const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert("Login failed: " + error.message);
-        } else {
-            window.toggleModal();
-            await window.updateUIForUser();
-        }
+        if (error) alert("Login failed: " + error.message);
+        else { window.toggleModal(); await window.updateUIForUser(); }
     }
     btn.disabled = false;
 };
 
-// FIXED: UI Update with Admin Check
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
-    
     const signInBtn = document.getElementById('signInBtn');
     const userWelcome = document.getElementById('userWelcome');
     const userNameElem = document.getElementById('userName');
@@ -336,30 +312,19 @@ window.updateUIForUser = async function() {
     const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
-        // 1. Hide Sign In, Show User Info
         if (signInBtn) signInBtn.style.display = 'none';
         if (userWelcome) userWelcome.style.display = 'flex';
         if (signOutBtn) signOutBtn.style.display = 'block';
 
-        // 2. Fetch Profile Name
         const { data: profile } = await _supabase
             .from('profiles')
             .select('full_name, is_admin')
             .eq('id', user.id)
             .maybeSingle();
 
-        if (userNameElem) {
-            // Display first name or "Member"
-            userNameElem.innerText = profile?.full_name ? profile.full_name.split(' ')[0] : "Member";
-        }
-
-        // 3. Show Admin Link if applicable
-        if (adminLink && profile?.is_admin) {
-            adminLink.style.display = 'flex';
-        }
-
+        if (userNameElem) userNameElem.innerText = profile?.full_name ? profile.full_name.split(' ')[0] : "Member";
+        if (adminLink && profile?.is_admin) adminLink.style.display = 'flex';
     } else {
-        // Guest View: Show Sign In, Hide User Info
         if (signInBtn) signInBtn.style.display = 'block';
         if (userWelcome) userWelcome.style.display = 'none';
         if (signOutBtn) signOutBtn.style.display = 'none';
@@ -367,241 +332,7 @@ window.updateUIForUser = async function() {
     }
 };
 
-// --- 8. ADMIN & USER MGMT ---
-// --- 8. ADMIN & USER MGMT ---
-window.loadUsers = async function() {
-    const list = document.getElementById('userList');
-    if (!list) return;
-    list.innerHTML = "<div class='loading-spinner'><i class='fas fa-sync fa-spin'></i> Syncing...</div>";
-
-    const { data: users, error } = await _supabase
-        .from('profiles') 
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error || !users) {
-        list.innerHTML = `<p style="color:#ff4757; padding:20px;">Error: ${error?.message || 'Unauthorized'}</p>`;
-        return;
-    }
-
-    // Get current logged in user ID to prevent self-deletion
-    const { data: { user } } = await _supabase.auth.getUser();
-
-    list.innerHTML = `
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="text-align: left; border-bottom: 2px solid #f4f7f6; color: #888;">
-                        <th style="padding: 15px;">NAME</th>
-                        <th style="padding: 15px;">EMAIL</th>
-                        <th style="padding: 15px;">ROLE</th>
-                        <th style="padding: 15px;">STATUS</th>
-                        <th style="padding: 15px; text-align: right;">ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${users.map(u => `
-                        <tr style="border-bottom: 1px solid #f4f7f6;">
-                            <td style="padding: 10px 15px;">${u.full_name || 'Member'}</td>
-                            <td style="padding: 10px 15px;">${u.email || 'N/A'}</td>
-                            <td style="padding: 10px 15px;">${u.is_admin ? 'Admin 🛡️' : 'User 👤'}</td>
-                            <td style="padding: 10px 15px;">
-                                ${u.is_verified ? '<span style="color:#2ed573; font-weight:bold;">VERIFIED</span>' : '<span style="color:#888;">GUEST</span>'}
-                            </td>
-                            <td style="padding: 10px 15px; text-align: right;">
-                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                    <button class="btn-verify" 
-                                            onclick="window.toggleVerification('${u.id}', ${u.is_verified})"
-                                            style="background:${u.is_verified ? '#ff4757' : '#2ed573'}; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                                        ${u.is_verified ? 'Unverify' : 'Verify'}
-                                    </button>
-                                    
-                                    ${u.id !== user?.id ? `
-                                        <button class="btn-delete" 
-                                                onclick="window.deleteUser('${u.id}', '${u.full_name || u.email}')"
-                                                style="background:#eb4d4b; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;"
-                                                title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    ` : '<span style="font-size:12px; color:#aaa; padding:5px;">(You)</span>'}
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>`;
-};
-
-window.deleteUser = async function(userId, identifier) {
-    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?\n\nThis will remove their profile from the Golem database.`);
-    
-    if (!isConfirmed) return;
-
-    try {
-        const { error } = await _supabase
-            .from('profiles')
-            .delete()
-            .eq('id', userId);
-
-        if (error) throw error;
-
-        alert("User deleted successfully.");
-        await window.loadUsers(); 
-    } catch (err) {
-        console.error("Delete Error:", err.message);
-        alert("Failed to delete user: " + err.message);
-    }
-};
-
-
-window.toggleVerification = async (userId, currentStatus) => {
-    // Added confirmation dialog
-    const action = currentStatus ? "unverify" : "verify";
-    if (!confirm(`Are you sure you want to ${action} this seller?`)) {
-        return;
-    }
-
-    const { error } = await _supabase
-        .from('profiles')
-        .update({ is_verified: !currentStatus })
-        .eq('id', userId);
-    
-    if (!error) {
-        // Success! Reload the table to show the new status
-        alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
-        window.loadUsers();
-    } else {
-        // If the 500 error happens, it will show here
-        console.error("Verification Error:", error);
-        alert("Verification update failed: " + error.message);
-    }
-};
-
-window.openProductModal = async (product) => {
-    // 1. SET GLOBAL STATE
-    currentProduct = product;
-    const modal = document.getElementById('productModal');
-    const badgeContainer = document.getElementById('sellerBadgeContainer');
-   // Target for the name and avator
-    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
-    const sellerNameElem = document.getElementById('modalSellerName');
-    if (!modal) return;
-
-    // 2. DATA PREPARATION
-    const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
-    const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
-    const tgUser = (product.telegram_username || "").replace('@', '');
-
-
-    
-    // 3. UI INJECTION (Product Details)
-    document.getElementById('modalProductImg').src = product.image;
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
-
-    // 4. SELLER DETAILS (Name & Verification)
-    const isVerified = product.profiles?.is_verified === true;
-    const sellerName = product.profiles?.full_name || "Community Member";
-const avatarUrl = profile?.avatar_url || 'https://via.placeholder.com/150'; // Fallback
-    
-    // Update the Name element
-    if (sellerNameElem) {
-        sellerNameElem.innerText = `Seller: ${sellerName}`;
-        if (sellerAvatarElem) sellerAvatarElem.src = avatarUrl;
-    }
-
-    // Update the Badge
-    if (badgeContainer) {
-        badgeContainer.innerHTML = isVerified 
-            ? `<div class="verified-badge" style="color: #2ed573; font-weight: bold; margin-top: 5px;">
-                <i class="fas fa-check-circle"></i> Verified Seller
-               </div>`
-            : `<div class="unverified-badge" style="color: #888; font-weight: normal; margin-top: 5px;">
-                <i class="fas fa-shield-alt"></i> Community Seller
-               </div>`;
-    }
-
-    // 5. CONTACT LINKS
-    if (document.getElementById('whatsappOrder')) {
-        document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name)}`;
-    }
-
-    if (document.getElementById('telegramOrder')) {
-        document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
-    }
-
-    if (document.getElementById('callContact')) {
-        document.getElementById('callContact').href = `tel:+${intPhone}`;
-    }
-
-    // 6. DISPLAY MODAL
-    modal.style.display = 'flex';
-    document.body.style.overflow = "hidden";
-};
-
-
-
-
-
-
-
-// --- CHAT & UI UTILS ---
-window.toggleChatMenu = function() {
-    const menu = document.getElementById('chatMenu');
-    const toast = document.getElementById('chatToast');
-    if (menu) menu.classList.toggle('active');
-    if (toast) toast.style.display = 'none';
-};
-
-window.closeToast = function(event) {
-    if (event) event.stopPropagation();
-    const toast = document.getElementById('chatToast');
-    if (toast) toast.style.display = 'none';
-};
-
-window.toggleLanguage = function() {
-    let currentLang = localStorage.getItem('golem_lang') || 'en';
-    currentLang = currentLang === 'en' ? 'am' : 'en';
-    localStorage.setItem('golem_lang', currentLang);
-    location.reload(); 
-};
-
-
-// Add this to your script.js
-window.deleteUserAccount = async function(userId, identifier) {
-    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
-    
-    if (!isConfirmed) return;
-
-    try {
-        const { error } = await _supabase
-            .from('profiles')
-            .delete()
-            .eq('id', userId);
-
-        if (error) throw error;
-
-        alert("User deleted successfully.");
-        
-        // This triggers the refresh of your table
-        if (typeof window.loadUsers === "function") {
-            await window.loadUsers();
-        } else {
-            location.reload(); // Fallback if loadUsers isn't global
-        }
-    } catch (err) {
-        console.error("Delete Error:", err.message);
-        alert("Failed to delete user: " + err.message);
-    }
-};
-
-
-// --- PROFILE & ACCOUNT MANAGEMENT ---
-
-// Load Profile Data
-// 1. Updated Load Profile to include Avatar
+// --- 7. PROFILE MANAGEMENT ---
 window.loadUserProfile = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) return;
@@ -613,32 +344,14 @@ window.loadUserProfile = async function() {
         .maybeSingle();
 
     if (profile) {
-        document.getElementById('profileName').innerText = profile.full_name || "Member";
-        // Display Avatar or fallback to placeholder
-        const avatarUrl = profile.avatar_url || 'https://via.placeholder.com/150';
-        document.getElementById('profileAvatar').src = avatarUrl;
-        
-        const badge = document.getElementById('verificationBadge');
-        badge.innerText = profile.is_verified ? "Verified Seller" : "Community Seller";
-        badge.style.background = profile.is_verified ? "#2ed573" : "#888";
-    }
-};
-
-    // Fetch the detailed profile from the 'profiles' table
-    const { data: profile, error } = await _supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-    if (profile) {
-        // Update HTML elements
         const nameElem = document.getElementById('profileName');
         const emailElem = document.getElementById('profileEmail');
+        const avatarElem = document.getElementById('profileAvatar');
         const badgeElem = document.getElementById('verificationBadge');
 
-        if (nameElem) nameElem.innerText = profile.full_name || "New Member";
+        if (nameElem) nameElem.innerText = profile.full_name || "Member";
         if (emailElem) emailElem.innerText = user.email;
+        if (avatarElem) avatarElem.src = profile.avatar_url || 'https://via.placeholder.com/150';
         
         if (badgeElem) {
             badgeElem.innerText = profile.is_verified ? "Verified Seller" : "Community Seller";
@@ -647,35 +360,6 @@ window.loadUserProfile = async function() {
     }
 };
 
-// Handle Sign Out
-window.handleSignOut = async function() {
-    const { error } = await _supabase.auth.signOut();
-    if (error) {
-        alert("Error: " + error.message);
-    } else {
-        // Clear any local storage if needed and reload
-        window.location.href = 'index.html'; 
-    }
-};
-
-// Open Edit Modal & Pre-fill data
-window.openEditModal = async function() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    const { data: profile } = await _supabase
-        .from('profiles')
-        .select('full_name, phone')
-        .eq('id', user.id)
-        .maybeSingle();
-
-    if (profile) {
-        document.getElementById('editFullName').value = profile.full_name || '';
-        document.getElementById('editPhone').value = profile.phone || '';
-        document.getElementById('editProfileModal').style.display = 'flex';
-    }
-};
-
-// Save Changes to Supabase
-// 2. Updated Update Profile to handle File Upload
 window.updateProfileInfo = async function(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button');
@@ -683,43 +367,29 @@ window.updateProfileInfo = async function(e) {
     const file = fileInput.files[0];
     
     btn.disabled = true;
-    btn.innerText = "Uploading...";
+    btn.innerText = "Processing...";
 
     const { data: { user } } = await _supabase.auth.getUser();
     let avatarUrl = null;
 
-    // --- UPLOAD LOGIC ---
     if (file) {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}-${Math.random()}.${fileExt}`;
-        const filePath = `avatars/${fileName}`;
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file);
 
-        // Upload to 'avatars' bucket (Make sure this bucket exists in Supabase!)
-        const { error: uploadError } = await _supabase.storage
-            .from('avatars')
-            .upload(filePath, file);
-
-        if (uploadError) {
-            alert("Upload failed: " + uploadError.message);
-        } else {
-            // Get Public URL
-            const { data } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+        if (!uploadError) {
+            const { data } = _supabase.storage.from('avatars').getPublicUrl(fileName);
             avatarUrl = data.publicUrl;
         }
     }
 
-    // --- DATABASE UPDATE ---
     const updates = {
         full_name: document.getElementById('editFullName').value,
         phone: document.getElementById('editPhone').value,
     };
-    
     if (avatarUrl) updates.avatar_url = avatarUrl;
 
-    const { error } = await _supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+    const { error } = await _supabase.from('profiles').update(updates).eq('id', user.id);
 
     if (!error) {
         alert("Profile Updated!");
@@ -730,3 +400,16 @@ window.updateProfileInfo = async function(e) {
     btn.disabled = false;
 };
 
+window.handleSignOut = async function() {
+    await _supabase.auth.signOut();
+    window.location.href = 'index.html';
+};
+
+window.toggleModal = () => {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        const isFlex = modal.style.display === 'flex';
+        modal.style.display = isFlex ? 'none' : 'flex';
+        document.body.style.overflow = isFlex ? 'auto' : 'hidden';
+    }
+};
