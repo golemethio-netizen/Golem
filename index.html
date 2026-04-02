@@ -208,34 +208,30 @@
     </div>
 </div>
 
-    <div id="productModal" class="modal-overlay" onclick="if(event.target == this) window.closeProductModal()">
+   <div id="productModal" class="modal-overlay" onclick="if(event.target == this) window.closeProductModal()">
     <div class="modal-content">
         <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
+        
         <div class="modal-img-wrapper">
             <img id="modalProductImg" src="" alt="Product">
         </div>
+
         <div class="modal-body">
             <h2 id="modalProductTitle"></h2>
 
-<div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 8px;">
-    <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 1.1rem;">Seller: Loading...</h4>
-    <div id="sellerBadgeContainer"></div>
-    
-</div>
-<div class="seller-details-wrapper" style="margin: 15px 0; padding: 12px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid #eee;">
-    <img id="modalSellerAvatar" src="https://via.placeholder.com/50" 
-         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
-    
-    <div style="flex: 1;">
-        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 1rem; font-weight: 600;">Seller: Loading...</h4>
-        <div id="sellerBadgeContainer"></div>
-    </div>
-</div>
-            
-            <div id="sellerBadgeContainer"></div>
+            <div class="seller-details-wrapper" style="margin: 15px 0; padding: 12px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid #eee;">
+                <img id="modalSellerAvatar" src="https://via.placeholder.com/50" 
+                     style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
+                
+                <div style="flex: 1;">
+                    <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 1rem; font-weight: 600;">Seller: Loading...</h4>
+                    <div id="sellerBadgeContainer"></div>
+                </div>
+            </div>
             
             <div id="modalProductPrice" class="modal-price"></div>
             <p id="modalProductDesc" class="modal-description"></p>
+
             <div class="modal-footer-actions">
                 <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
                 <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
@@ -247,6 +243,7 @@
         </div>
     </div>
 </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
