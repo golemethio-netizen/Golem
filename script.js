@@ -508,7 +508,12 @@ window.toggleVerification = async (userId, currentStatus) => {
     }
 };
 
-
+// Add this to the top of script.js to ensure it's always available
+window.closeToast = function(event) {
+    if (event) event.stopPropagation();
+    const toast = document.getElementById('chatToast');
+    if (toast) toast.style.display = 'none';
+};
 
 
 // --- 7. PROFILE MANAGEMENT ---
