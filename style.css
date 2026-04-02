@@ -178,6 +178,7 @@ body {
 }
 
 /* --- 5. Modal & Full Image View --- */
+/*
 .modal-overlay {
     display: none;
     position: fixed;
@@ -188,7 +189,7 @@ body {
     justify-content: center;
     align-items: center;
 }
-
+*/
 #productModal .modal-content {
     background: white;
     width: 95%;
