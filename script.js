@@ -127,7 +127,7 @@ window.updateCartBadge = function() {
     }
 };
 
-// --- 4. RENDERING ENGINE ---
+// --- 4. RENDERING ENGINE (FIXED) ---
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -175,14 +175,8 @@ function renderProducts(products) {
                     <div class="image-overlay">
                         <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
                     </div>
-                    <div class="product-actions">
-         <div class="product-actions">
-                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%;">
-                            Full Details
-                        </button>
-                    </div>
-        </div>
                 </div>
+                
                 <div class="product-info">
                     <span class="category-badge">${p.category || 'General'}</span>
                     <h3 class="product-title">
@@ -195,6 +189,7 @@ function renderProducts(products) {
                         </span>
                     </h3>
                     <div class="product-price">${p.price?.toLocaleString()} ETB</div>
+                    
                     <div class="quick-contact-bar">
                         <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
                         <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
@@ -202,11 +197,16 @@ function renderProducts(products) {
                             <i class="fas fa-share-alt"></i>
                         </a>
                     </div>
+
+                    <div class="product-actions" style="margin-top: 15px;">
+                        <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%; padding: 10px; border-radius: 8px; cursor: pointer;">
+                            Full Details
+                        </button>
+                    </div>
                 </div>
             </div>`;
     }).join('');
 }
-
 // --- 5. SPONSORSHIP & FILTERING ---
 window.loadSponsor = async () => {
     try {
