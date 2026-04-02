@@ -609,3 +609,58 @@ window.toggleModal = () => {
         document.body.style.overflow = isFlex ? 'auto' : 'hidden';
     }
 };
+
+// --- SUPPORT MODAL LOGIC ---
+
+// 1. Toggle the Modal visibility
+window.toggleSupportModal = function() {
+    const modal = document.getElementById('supportModal');
+    if (!modal) return;
+    
+    const isHidden = modal.style.display === 'none' || modal.style.display === '';
+    modal.style.display = isHidden ? 'flex' : 'none';
+};
+
+// 2. Handle Form Submission
+window.handleSupportSubmit = async function(event) {
+    event.preventDefault(); // Stop page from refreshing
+
+    const email = document.getElementById('supportEmail').value;
+    const subject = document.getElementById('supportSubject').value;
+    const message = document.getElementById('supportMessage').value;
+
+    // Show a loading state on the button if you want, or just proceed
+    const submitBtn = event.target.querySelector('button');
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Sending...";
+    submitBtn.disabled = true;
+
+    try {
+        const { error } = await _supabase
+            .from('support_tickets')
+            .insert([
+                { 
+                    user_email: email, 
+                    subject: subject, 
+                    message: message,
+                    is_resolved: false 
+                }
+            ]);
+
+        if (error) throw error;
+
+        // Success!
+        alert("Thank you! Your message has been sent to Golem Support. We will contact you soon.");
+        
+        // Reset form and close modal
+        event.target.reset();
+        window.toggleSupportModal();
+
+    } catch (err) {
+        console.error("Support Error:", err.message);
+        alert("Failed to send message: " + err.message);
+    } finally {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+    }
+};
