@@ -113,33 +113,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { user } } = await _supabase.auth.getUser();
-           
-            
-            
-            
-            if (user) {
-                if (user.user_metadata.phone_number) {
-                    document.getElementById('prodPhone').value = user.user_metadata.phone_number;
-                }
+       document.addEventListener('DOMContentLoaded', async () => {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const pageBody = document.getElementById('pageBody');
+
+    if (user) {
+        // Show the page content
+        pageBody.style.display = 'block';
+
+        // Fill phone number
+        if (user.user_metadata.phone_number) {
+            document.getElementById('prodPhone').value = user.user_metadata.phone_number;
+        }
+
+        // Fill location logic
+        if (user.user_metadata.location) {
+            const locParts = user.user_metadata.location.split(', ');
+            if (locParts.length > 1) {
+                document.getElementById('prodRegion').value = locParts[1];
+                window.toggleDistricts(locParts[1]);
+                document.getElementById('prodDistrict').value = locParts[0];
             } else {
-                alert("Please log in to sell items.");
-                window.location.href = 'index.html';
+                document.getElementById('prodRegion').value = locParts[0];
+                window.toggleDistricts(locParts[0]);
             }
-            if (user.user_metadata.location) {
-                
-   const locParts = user.user_metadata.location.split(', ');
-    if (locParts.length > 1) {
-        document.getElementById('prodRegion').value = locParts[1];
-        window.toggleDistricts(locParts[1]);
-        document.getElementById('prodDistrict').value = locParts[0];
+        }
     } else {
-        document.getElementById('prodRegion').value = locParts[0];
-        window.toggleDistricts(locParts[0]);
+        // No user? Redirect to index immediately
+        window.location.href = 'index.html?auth=required';
     }
-}
-        });
+});
 
         // 1. IMAGE PREVIEW
         document.getElementById('prodFile').onchange = evt => {
