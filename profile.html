@@ -65,29 +65,38 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
-    <script>
-
-
-// At the top of your profile-related script
+<script>
+// 1. Define the function globally
 window.openEditModal = function(profileData) {
-    console.log("Opening modal with:", profileData);
+    console.log("Opening modal...");
     const modal = document.getElementById('editProfileModal');
+    
     if (modal) {
-        // Fill your form fields here
-        document.getElementById('editName').value = profileData.full_name || '';
+        // If profileData exists (from Supabase), fill the fields
+        if (profileData) {
+            if(document.getElementById('editFullName')) 
+                document.getElementById('editFullName').value = profileData.full_name || '';
+            if(document.getElementById('editPhone')) 
+                document.getElementById('editPhone').value = profileData.phone || '';
+        }
+        
+        // Show the modal
         modal.style.display = 'flex';
     } else {
         console.error("Modal element not found!");
     }
 };
 
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            window.loadUserProfile();
-            window.loadUserListings();
-        
-
-            
-    </script>
+// 2. Initialize page on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if functions exist in script.js before calling
+    if (typeof window.loadUserProfile === 'function') {
+        window.loadUserProfile();
+    }
+    if (typeof window.loadUserListings === 'function') {
+        window.loadUserListings();
+    }
+}); // Fixed missing bracket
+</script>
 </body>
 </html>
