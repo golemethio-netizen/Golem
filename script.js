@@ -628,9 +628,10 @@ window.loadUserProfile = async function() {
 window.handleSignOut = async function() {
     const { error } = await _supabase.auth.signOut();
     if (error) {
-        alert("Error signing out: " + error.message);
+        alert("Error: " + error.message);
     } else {
-        window.location.href = 'index.html';
+        // Clear any local storage if needed and reload
+        window.location.href = 'index.html'; 
     }
 };
 
