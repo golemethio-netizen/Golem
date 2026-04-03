@@ -1,23 +1,115 @@
-<div class="tracker-container" style="max-width: 600px; margin: 30px auto; font-family: sans-serif;">
-    <h2 style="color: #2c3e50; text-align: center;">My Loan Status | የብድር ሁኔታ</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Loan Status | የብድር ሁኔታ</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     
-    <div id="loanStatusDisplay">
-        <p style="text-align:center; color:#888;">Checking for active applications...</p>
-    </div>
-</div>
+    <style>
+        /* Progress Stepper CSS */
+        .tracker-container { max-width: 600px; margin: 30px auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .status-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 5px solid #3498db; }
+        .stepper { display: flex; justify-content: space-between; position: relative; margin-top: 30px; }
+        .step { text-align: center; flex: 1; position: relative; z-index: 1; }
+        .step-dot { width: 30px; height: 30px; background: #dfe4ea; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; transition: 0.3s; }
+        .step.active .step-dot { background: #3498db; box-shadow: 0 0 0 5px rgba(52, 152, 219, 0.2); }
+        .step.completed .step-dot { background: #2ed573; }
+        .step-label { font-size: 11px; color: #747d8c; font-weight: bold; text-transform: uppercase; }
+        .stepper::before { content: ""; position: absolute; top: 15px; left: 10%; right: 10%; height: 2px; background: #dfe4ea; z-index: 0; }
+    </style>
+</head>
+<body style="background: #f4f7f6;">
 
-<style>
-    .status-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 5px solid #3498db; }
-    .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .amount-badge { background: #f1f2f6; padding: 5px 12px; border-radius: 20px; font-weight: bold; color: #2f3542; }
-    
-    /* Stepper Styling */
-    .stepper { display: flex; justify-content: space-between; position: relative; margin-top: 30px; }
-    .step { text-align: center; flex: 1; position: relative; z-index: 1; }
-    .step-dot { width: 30px; height: 30px; background: #dfe4ea; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; transition: 0.3s; }
-    .step.active .step-dot { background: #3498db; box-shadow: 0 0 0 5px rgba(52, 152, 219, 0.2); }
-    .step.completed .step-dot { background: #2ed573; }
-    .step-label { font-size: 11px; color: #747d8c; font-weight: bold; text-transform: uppercase; }
-    
-    .stepper::before { content: ""; position: absolute; top: 15px; left: 10%; right: 10%; height: 2px; background: #dfe4ea; z-index: 0; }
-</style>
+    <div class="tracker-container">
+        <h2 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">Loan Tracking Dashboard</h2>
+        <div id="loanStatusDisplay">
+            <p style="text-align:center; color:#888;">Checking your application status...</p>
+        </div>
+    </div>
+
+    <script>
+        // 2. The logic to fetch and display loan status
+        async function trackMyLoans() {
+            const display = document.getElementById('loanStatusDisplay');
+            
+            // Get the current logged-in user
+            const { data: { user } } = await _supabase.auth.getUser();
+
+            if (!user) {
+                display.innerHTML = `
+                    <div class="status-card" style="text-align:center;">
+                        <p>Please sign in to view your loan applications.</p>
+                        <button onclick="window.location.href='login.html'" style="padding:10px 20px; background:#3498db; color:white; border:none; border-radius:5px; cursor:pointer;">Sign In</button>
+                    </div>`;
+                return;
+            }
+
+            // Fetch loans for this specific user
+            const { data: loans, error } = await _supabase
+                .from('loan_applications')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error || !loans || loans.length === 0) {
+                display.innerHTML = `
+                    <div class="status-card" style="text-align:center; color:#888;">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No loan applications found. <a href="apply-loan.html" style="color:#3498db;">Apply now</a></p>
+                    </div>`;
+                return;
+            }
+
+            // Render each loan application
+            display.innerHTML = loans.map(loan => {
+                const stages = ['pending', 'under_review', 'approved'];
+                let currentIndex = stages.indexOf(loan.status);
+                
+                // Handle "rejected" state separately
+                const isRejected = loan.status === 'rejected';
+
+                return `
+                    <div class="status-card" style="${isRejected ? 'border-top-color: #ff4757;' : ''}">
+                        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:15px;">
+                            <div>
+                                <h3 style="margin:0; color:#2d3436;">${loan.loan_purpose}</h3>
+                                <small style="color:#b2bec3;">ID: ${loan.id.substring(0,8).toUpperCase()}</small>
+                            </div>
+                            <span style="font-weight:bold; color:#2ed573; background:#e8fdf5; padding:5px 10px; border-radius:8px;">
+                                ${loan.amount.toLocaleString()} ETB
+                            </span>
+                        </div>
+
+                        ${isRejected ? `
+                            <div style="background:#fff1f0; padding:15px; border-radius:10px; border:1px solid #ffa39e; color:#cf1322;">
+                                <strong>Declined:</strong> ${loan.admin_notes || "Your application did not meet our current requirements."}
+                            </div>
+                        ` : `
+                            <div class="stepper">
+                                <div class="step ${currentIndex >= 0 ? (currentIndex > 0 ? 'completed' : 'active') : ''}">
+                                    <div class="step-dot">${currentIndex > 0 ? '✓' : '1'}</div>
+                                    <div class="step-label">Submitted</div>
+                                </div>
+                                <div class="step ${currentIndex >= 1 ? (currentIndex > 1 ? 'completed' : 'active') : ''}">
+                                    <div class="step-dot">${currentIndex > 1 ? '✓' : '2'}</div>
+                                    <div class="step-label">Under Review</div>
+                                </div>
+                                <div class="step ${currentIndex >= 2 ? 'active' : ''}">
+                                    <div class="step-dot">3</div>
+                                    <div class="step-label">Disbursed</div>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 3. Run the function when the page loads
+        window.onload = trackMyLoans;
+    </script>
+</body>
+</html>
