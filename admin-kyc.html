@@ -26,6 +26,90 @@
                 </tr>
             </thead>
             <tbody id="loanList">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<script>
+    // --- 1. SECURITY CHECK (Run immediately) ---
+    async function checkKYCPermissions() {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const { data: profile } = await _supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        // If not a KYC officer or Super Admin, kick them out
+        if (profile?.role !== 'kyc_officer' && profile?.role !== 'super_admin') {
+            alert("Unauthorized Access!");
+            window.location.href = 'admin-market.html'; 
+        }
+    }
+
+    // --- 2. DATA LOADING FUNCTION ---
+    async function loadLoans(status = 'pending') {
+        const list = document.getElementById('loanList');
+        list.innerHTML = "<tr><td colspan='5'>Loading applications...</td></tr>";
+
+        const { data: loans, error } = await _supabase
+            .from('loan_applications')
+            .select(`
+                *,
+                profiles:user_id (full_name, phone, email)
+            `)
+            .eq('status', status)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        list.innerHTML = loans.map(loan => `
+            <tr>
+                <td style="padding:15px;">
+                    <strong>${loan.profiles?.full_name || 'Unknown'}</strong><br>
+                    <small>${loan.profiles?.phone || 'No Phone'}</small>
+                </td>
+                <td>${loan.amount.toLocaleString()} ETB</td>
+                <td>
+                    <button onclick="viewSecureID('${loan.kyc_url}')" style="cursor:pointer;">
+                        View Document
+                    </button>
+                </td>
+                <td><span class="status-pill">${loan.status}</span></td>
+                <td style="text-align:right;">
+                    <button onclick="updateLoanStatus('${loan.id}', 'approved')" class="btn-approve">Approve</button>
+                    <button onclick="updateLoanStatus('${loan.id}', 'rejected')" class="btn-reject">Reject</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // --- 3. SECURE VIEW FUNCTION ---
+    // This generates a temporary link so the ID isn't public forever
+    async function viewSecureID(path) {
+        const { data, error } = await _supabase.storage
+            .from('kyc-docs')
+            .createSignedUrl(path, 60); // Link expires in 60 seconds
+
+        if (data) window.open(data.signedUrl, '_blank');
+    }
+
+    // --- 4. INITIALIZE PAGE ---
+    window.onload = async () => {
+        await checkKYCPermissions();
+        loadLoans('pending'); // Default view
+    };
+</script>
+
+                
                 </tbody>
         </table>
     </div>
