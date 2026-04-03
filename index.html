@@ -95,6 +95,8 @@
     </section>
 
     <section class="filter-controls">
+        <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+        
         <div class="sort-container">
             <select id="sortSelect" onchange="window.fetchProducts()">
                 <option value="newest">🆕 Newest First</option>
@@ -102,8 +104,21 @@
                 <option value="price_high">💎 Price: High to Low</option>
             </select>
         </div>
+            <div class="location-filter-container">
+            <select id="locationSelect" onchange="window.fetchProducts()">
+                <option value="all">🌍 All Regions</option>
+                <option value="Addis Ababa">Addis Ababa</option>
+                <option value="Oromia">Oromia</option>
+                <option value="Amhara">Amhara</option>
+                <option value="Tigray">Tigray</option>
+                <option value="Sidama">Sidama</option>
+                <option value="Somali">Somali</option>
+                </select>
+        </div>
+    </div>
         
  <div class="filter-bar">
+     
     <button class="filter-btn active" data-am="ሁሉም" onclick="window.filterCategory('All', this)">All</button>
     <button class="filter-btn" data-am="ኤሌክትሮኒክስ" onclick="window.filterCategory('Electronics', this)">Electronics</button>
     <button class="filter-btn" data-am="የቤት ዕቃዎች" onclick="window.filterCategory('Furniture', this)">Furniture</button>
