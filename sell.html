@@ -146,9 +146,13 @@ sellForm.addEventListener('submit', async (e) => {
             .getPublicUrl(filePath);
 
         // B. Handle New Location Logic (Region + District)
-        const region = document.getElementById('prodRegion').value;
-        const district = document.getElementById('prodDistrict').value;
-        const finalLocation = district ? `${district}, ${region}` : region;
+       // Use the new dropdown IDs instead
+const region = document.getElementById('prodRegion').value;
+const districtSelect = document.getElementById('prodDistrict');
+const district = districtSelect ? districtSelect.value : "";
+
+// Combine them: "Bole, Addis Ababa" or just "Oromia"
+const finalLocation = district ? `${district}, ${region}` : region;
 
         // C. Insert into Database
         const { error: dbError } = await _supabase
