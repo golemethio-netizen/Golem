@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Application | የብድር ማመልከቻ</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        .loan-card { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 1rem; }
+        .btn-submit { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: #219150; }
+        #statusMsg { margin-top: 15px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body style="background: #f8f9fa;">
+
+<div class="loan-card">
+    <h2 style="text-align: center; color: #2c3e50;">Loan Application</h2>
+    <p style="text-align: center; color: #7f8c8d; margin-bottom: 25px;">የብድር ማመልከቻ ቅፅ</p>
+
+    <form id="loanForm">
+        <div class="form-group">
+            <label>Requested Amount (ETB) / የብድር መጠን</label>
+            <input type="number" id="amount" placeholder="e.g. 50000" required min="1000">
+        </div>
+
+        <div class="form-group">
+            <label>Loan Purpose / የብድሩ ዓላማ</label>
+            <select id="purpose" required>
+                <option value="">Select Purpose...</option>
+                <option value="Business">Small Business / ንግድ</option>
+                <option value="Agriculture">Agriculture / እርሻ</option>
+                <option value="Personal">Personal / ለግል ጉዳይ</option>
+                <option value="Emergency">Emergency / ድንገተኛ</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Upload ID (Kebele/Passport) / መታወቂያ</label>
+            <input type="file" id="kycFile" accept="image/*,.pdf" required>
+            <small style="color: #999;">Clear photo or PDF scanned copy</small>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
+        <div id="statusMsg"></div>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('loanForm');
+    const statusMsg = document.getElementById('statusMsg');
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Processing...";
+
+        try {
+            // 1. Get Logged In User
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) throw new Error("Please sign in first!");
+
+            // 2. Upload KYC Document to Private Bucket
+            const file = document.getElementById('kycFile').files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`; // Organized by User ID folder
+
+            const { data: uploadData, error: uploadError } = await _supabase.storage
+                .from('kyc-docs')
+                .upload(fileName, file);
+
+            if (uploadError) throw uploadError;
+
+            // 3. Save Data to loan_applications Table
+            const { error: dbError } = await _supabase
+                .from('loan_applications')
+                .insert([{
+                    user_id: user.id,
+                    amount: document.getElementById('amount').value,
+                    loan_purpose: document.getElementById('purpose').value,
+                    kyc_url: fileName, // Save the path, not the public URL
+                    status: 'pending'
+                }]);
+
+            if (dbError) throw dbError;
+
+            // 4. Success Response
+            statusMsg.style.color = "green";
+            statusMsg.innerText = "✅ Application submitted successfully! We will contact you soon.";
+            form.reset();
+
+            // Optional: Alert Admin via Telegram (if you have your bot URL set up)
+            // sendTelegramNotification(`New Loan Request: ${amount} ETB from ${user.email}`);
+
+        } catch (err) {
+            statusMsg.style.color = "red";
+            statusMsg.innerText = "❌ Error: " + err.message;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Application";
+        }
+    };
+</script>
+
+</body>
+</html>
