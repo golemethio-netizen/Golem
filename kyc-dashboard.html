@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+async function loadPendingKYC() {
+    const { data: loans, error } = await _supabase
+        .from('loan_applications')
+        .select(`
+            *,
+            profiles:user_id (full_name, email, phone)
+        `)
+        .eq('status', 'pending');
+
+    // Render a table similar to your User Table
+    // but focusing on "View ID Document" and "Approve Credit"
+}
+</script>
+</html>
