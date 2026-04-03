@@ -1,0 +1,24 @@
+<div class="loan-container" style="max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+    <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Loan Application</h2>
+    <form id="loanForm" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+        <label>Full Name (as per ID)</label>
+        <input type="text" id="borrowerName" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        
+        <label>Loan Amount (ETB)</label>
+        <input type="number" id="loanAmount" placeholder="e.g. 50000" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        
+        <label>Purpose of Loan</label>
+        <select id="loanPurpose" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="business">Business Expansion</option>
+            <option value="personal">Personal / Emergency</option>
+            <option value="equipment">Equipment Purchase</option>
+        </select>
+
+        <label>Upload Kebele ID / Passport (KYC)</label>
+        <input type="file" id="kycDocument" accept="image/*,.pdf" required>
+
+        <button type="submit" style="background: #3498db; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Submit Application
+        </button>
+    </form>
+</div>
