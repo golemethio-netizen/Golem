@@ -39,11 +39,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 // --- 2. DATA FETCHING ---
+// --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = 'All') => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
+    // Capture both Sort and Location values
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
+    const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
     let query = _supabase
         .from('products')
@@ -57,14 +60,23 @@ window.fetchProducts = async (category = 'All') => {
         `)
         .eq('status', 'approved');
 
+    // 1. Category Filter
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
+    // 2. Location Filter (NEW)
+    if (locationFilter !== 'all') {
+        // Use 'ilike' for flexible matching (e.g., "Bole" matches "Bole, Addis Ababa")
+        query = query.ilike('location', `%${locationFilter}%`);
+    }
+
+    // 3. Sponsorship/Featured Priority
     query = query
         .order('is_sponsored', { ascending: false })
         .order('is_featured', { ascending: false });
 
+    // 4. Sorting Logic
     if (sortOrder === 'price_low') {
         query = query.order('price', { ascending: true });
     } else if (sortOrder === 'price_high') {
