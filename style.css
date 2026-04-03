@@ -910,12 +910,6 @@ body.is-admin .admin-expiry-info {
     100% { transform: rotate(360deg); }
 }
 
-.floating-chat {
-    position: fixed;
-    bottom: 30px;
-    left: 30px; /* Placed on the left to not overlap with "Back to Top" */
-    z-index: 1000;
-}
 
 .chat-btn {
     background: #007bff;
@@ -934,19 +928,22 @@ body.is-admin .admin-expiry-info {
 
 .chat-btn:hover { transform: scale(1.05); }
 
+/* 2. The Chat Menu - Opens directly above the button */
 .chat-menu {
-    position: absolute;
-    bottom: 70px;
-    left: 0;
+    position: relative; /* Relative to the flex container */
+    margin-bottom: 15px; /* Space between menu and button */
     background: white;
-    border-radius: 12px;
+    border-radius: 15px;
     box-shadow: 0 5px 25px rgba(0,0,0,0.15);
     display: none; /* Hidden by default */
     flex-direction: column;
+    width: 200px; /* Slightly wider for text */
     overflow: hidden;
-    width: 180px;
+    animation: slideUp 0.3s ease-out;
 }
 
+
+/* Menu Item Styling */
 .menu-item {
     padding: 15px;
     text-decoration: none;
@@ -954,10 +951,13 @@ body.is-admin .admin-expiry-info {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.9rem;
-    transition: 0.2s;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f0f0f0;
 }
 
+.menu-item:last-child { border-bottom: none; }
 .menu-item:hover { background: #f8f9fa; }
 .menu-item i { width: 20px; text-align: center; }
 
@@ -1046,15 +1046,15 @@ body.is-admin .admin-expiry-info {
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Parent Container */
+/* 1. The Main Wrapper - Pinned to the Bottom Right */
 .floating-chat {
     position: fixed;
     bottom: 30px;
-    left: 30px; /* Positioned on the left side */
+    right: 30px; /* Align to Right */
     z-index: 2000;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end; /* CRITICAL: Forces children to align to the right edge */
 }
 
 /* The Pulsing Button */
@@ -1082,26 +1082,15 @@ body.is-admin .admin-expiry-info {
 }
 
 /* Chat Menu Styling */
-.chat-menu {
-    position: absolute;
-    bottom: 70px;
-    left: 0;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-    display: none; /* Hidden until clicked */
-    flex-direction: column;
-    width: 180px;
-    overflow: hidden;
-}
 
 .chat-menu.active {
     display: flex;
     animation: slideUp 0.3s ease;
 }
 
+/* Animation */
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
 .chat-toast {
@@ -1203,31 +1192,9 @@ body.is-admin .admin-expiry-info {
 }
 
 
-/* Floating Menu Styles */
-.chat-menu {
-    position: fixed;
-    bottom: 90px;
-    right: 25px;
-    display: none; /* Hidden by default */
-    flex-direction: column;
-    gap: 12px;
-    z-index: 1000;
-    animation: slideUp 0.3s ease-out;
-}
 
-.menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    transition: 0.3s;
-}
+
+
 
 .menu-item:hover { transform: scale(1.05); }
 
@@ -1238,9 +1205,6 @@ body.is-admin .admin-expiry-info {
 
 /* The Main Button */
 .chat-btn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
     background: #333;
     color: white;
     border: none;
@@ -1250,8 +1214,8 @@ body.is-admin .admin-expiry-info {
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    z-index: 1001;
     box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    transition: 0.3s;
 }
 
 .status-dot-container { position: relative; }
