@@ -72,8 +72,41 @@
                     <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
 <div class="input-group-sell">
-    <label><i class="fas fa-map-marker-alt"></i> Location (Area)</label>
-    <input type="text" id="prodLocation" placeholder="e.g. Bole, Addis Ababa" required>
+    <label><i class="fas fa-map-marker-alt"></i> Region</label>
+    <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
+        <option value="" disabled selected>Select Region</option>
+        <option value="Addis Ababa">Addis Ababa</option>
+        <option value="Afar">Afar</option>
+        <option value="Amhara">Amhara</option>
+        <option value="Benishangul-Gumuz">Benishangul-Gumuz</option>
+        <option value="Central Ethiopia">Central Ethiopia</option>
+        <option value="Gambela">Gambela</option>
+        <option value="Harari">Harari</option>
+        <option value="Oromia">Oromia</option>
+        <option value="Sidama">Sidama</option>
+        <option value="Somali">Somali</option>
+        <option value="South Ethiopia">South Ethiopia</option>
+        <option value="South West Ethiopia">South West Ethiopia</option>
+        <option value="Tigray">Tigray</option>
+    </select>
+</div>
+
+<div class="input-group-sell" id="districtWrapper" style="display: none;">
+    <label><i class="fas fa-city"></i> Sub-City / District</label>
+    <select id="prodDistrict">
+        <option value="" disabled selected>Select Sub-City</option>
+        <option value="Addis Ketema">Addis Ketema</option>
+        <option value="Akaki Kality">Akaki Kality</option>
+        <option value="Arada">Arada</option>
+        <option value="Bole">Bole</option>
+        <option value="Gullele">Gullele</option>
+        <option value="Kirkos">Kirkos</option>
+        <option value="Kolfe Keranio">Kolfe Keranio</option>
+        <option value="Lideta">Lideta</option>
+        <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
+        <option value="Lemi Kura">Lemi Kura</option>
+        <option value="Yeka">Yeka</option>
+    </select>
 </div>
                 <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
                     Publish Listing
