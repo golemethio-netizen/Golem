@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- 2. DATA FETCHING ---
 // --- 2. DATA FETCHING ---
-window.fetchProducts = async (category = 'All') => {
+window.fetchProducts = async (category = window.currentCategory || 'All') => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
@@ -254,8 +254,9 @@ window.loadSponsor = async () => {
     } catch (err) { console.error("Sponsor load error", err); }
 };
 
-
+window.currentCategory = 'All'; // Global variable
 window.filterCategory = (category, button) => {
+    window.currentCategory = category; // Store it
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     window.fetchProducts(category);
