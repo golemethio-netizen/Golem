@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="background: #f8f9fa;">
+<body style="background: #f8f9fa; display: none;" id="sellPageBody">
 
     <header class="golem-header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
@@ -85,141 +85,140 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { user } } = await _supabase.auth.getUser();
-           
+       document.addEventListener('DOMContentLoaded', async () => {
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    // --- AUTH GUARD ---
+    if (!user) {
+        alert("Please log in to sell items.");
+        window.location.href = 'index.html?auth=required';
+        return; // Stop execution
+    }
+
+    // User exists, so show the page
+    document.getElementById('sellPageBody').style.display = 'block';
+
+    // --- PRE-FILL USER DATA ---
+    if (user.user_metadata.phone_number) {
+        document.getElementById('prodPhone').value = user.user_metadata.phone_number;
+    }
+
+    if (user.user_metadata.location) {
+        const locParts = user.user_metadata.location.split(', ');
+        if (locParts.length > 1) {
+            document.getElementById('prodRegion').value = locParts[1];
+            window.toggleDistricts(locParts[1]);
+            document.getElementById('prodDistrict').value = locParts[0];
+        } else {
+            document.getElementById('prodRegion').value = locParts[0];
+            window.toggleDistricts(locParts[0]);
+        }
+    }
+});
+       // --- SUBMIT FORM LOGIC ---
+const sellForm = document.getElementById('sellForm');
+sellForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const fileInput = document.getElementById('prodFile');
+    
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return alert("Session expired. Please sign in again.");
+
+    btn.innerText = "Processing Listing...";
+    btn.disabled = true;
+
+    try {
+        // A. Upload Image
+        const file = fileInput.files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        let { error: uploadError } = await _supabase.storage
+            .from('product-images')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = _supabase.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+        // B. Handle New Location Logic (Region + District)
+        const region = document.getElementById('prodRegion').value;
+        const district = document.getElementById('prodDistrict').value;
+        const finalLocation = district ? `${district}, ${region}` : region;
+
+        // C. Insert into Database
+        const { error: dbError } = await _supabase
+            .from('products')
+            .insert([{
+                name: document.getElementById('prodName').value,
+                status_condition: document.getElementById('status_condition').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                category: document.getElementById('prodCategory').value,
+                description: document.getElementById('prodDesc').value,
+                location: finalLocation,
+                image: publicUrl,
+                seller_phone: document.getElementById('prodPhone').value,
+                seller_name: user.user_metadata?.full_name || user.email.split('@')[0],
+                user_id: user.id,
+                status: 'pending' 
+            }]);
+
+        if (dbError) throw dbError;
+
             
-            
-            
-            if (user) {
-                if (user.user_metadata.phone_number) {
-                    document.getElementById('prodPhone').value = user.user_metadata.phone_number;
-                }
-            } else {
-                alert("Please log in to sell items.");
-                window.location.href = 'index.html';
-            }
-            if (user.user_metadata.location) {
-    document.getElementById('prodLocation').value = user.user_metadata.location;
-}
+
+            // D. Telegram Notification
+        const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
+            `📦 *Item:* ${document.getElementById('prodName').value}\n` +
+            `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
+            `📍 *Loc:* ${finalLocation}\n` +
+            `📞 *Phone:* ${document.getElementById('prodPhone').value}\n` +
+            `👉 _Check Admin Panel_`;
+                
+        await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: GolemConfig.chatId,
+                text: telegramMessage,
+                parse_mode: 'Markdown'
+            })
         });
 
-        // 1. IMAGE PREVIEW
-        document.getElementById('prodFile').onchange = evt => {
-            const [file] = evt.target.files;
-            if (file) {
-                const preview = document.getElementById('imagePreview');
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = 'block';
-            }
-        };
+        alert("Success! Your item is now pending admin approval.");
+        window.location.href = `index.html?posted=${encodeURIComponent(document.getElementById('prodName').value)}`;
 
-        // 2. SUBMIT FORM
-        const sellForm = document.getElementById('sellForm');
-        sellForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const fileInput = document.getElementById('prodFile');
-            
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) return alert("Please sign in first.");
+    } catch (error) {
+        console.error(error);
+        alert("❌ Error: " + error.message);
+    } finally {
+        btn.innerText = "Publish Listing";
+        btn.disabled = false;
+    }
+});
 
-            btn.innerText = "Processing Listing...";
-            btn.disabled = true;
 
-            try {
-                // A. Upload Image
-                const file = fileInput.files[0];
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}.${fileExt}`;
-                const filePath = `${user.id}/${fileName}`;
+// Helper for Location Dropdowns
+window.toggleDistricts = function(region) {
+    const wrapper = document.getElementById('districtWrapper');
+    const districtSelect = document.getElementById('prodDistrict');
+    if (region === 'Addis Ababa') {
+        wrapper.style.display = 'block';
+        districtSelect.required = true;
+    } else {
+        wrapper.style.display = 'none';
+        districtSelect.required = false;
+        districtSelect.value = ""; 
+    }
+};
 
-                let { error: uploadError } = await _supabase.storage
-                    .from('product-images')
-                    .upload(filePath, file);
 
-                if (uploadError) throw uploadError;
 
-                // B. Get Public URL
-                const { data: { publicUrl } } = _supabase.storage
-                    .from('product-images')
-                    .getPublicUrl(filePath);
-
-                // C. Prepare Data (Matching your Admin Panel expectations)
-                const productData = {
-                    name: document.getElementById('prodName').value,
-                    status_condition: document.getElementById('status_condition').value,
-                    price: parseFloat(document.getElementById('prodPrice').value),
-                    category: document.getElementById('prodCategory').value,
-                    description: document.getElementById('prodDesc').value,
-                    image: publicUrl,
-                    seller_phone: document.getElementById('prodPhone').value,
-                    seller_name: user.user_metadata?.full_name || "Verified Seller",
-                    user_id: user.id,
-                    status: 'pending' 
-                };
-
-                // D. Insert into Database
-          // D. Insert into Database
-// D. Insert into Database
-            // --- D. Insert into Database ---
-// --- D. Insert into Database ---
-const locationValue = document.getElementById('prodLocation').value;
-
-const { error: dbError } = await _supabase
-    .from('products')
-    .insert([{
-        name: document.getElementById('prodName').value,
-        status_condition: document.getElementById('status_condition').value,
-        price: parseFloat(document.getElementById('prodPrice').value),
-        category: document.getElementById('prodCategory').value,
-        description: document.getElementById('prodDesc').value,
-        location: locationValue, // MAKE SURE YOUR TABLE HAS THIS COLUMN
-        image: publicUrl,
-        seller_phone: document.getElementById('prodPhone').value,
-        seller_name: user.user_metadata?.full_name || user.email.split('@')[0] || "Seller",
-        seller_id: user.id, 
-        user_id: user.id,
-        status: 'pending' 
-    }]);
-
-            if (dbError) throw dbError;
-
-            // --- TELEGRAM NOTIFICATION FOR ADMIN ---
-           // --- TELEGRAM NOTIFICATION FOR ADMIN ---
-const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
-    `📦 *Item:* ${document.getElementById('prodName').value}\n` +
-    `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
-    `📍 *Location:* ${document.getElementById('prodLocation').value}\n` + // Added this
-    `📞 *Seller:* ${document.getElementById('prodPhone').value}\n` +
-    `📂 *Category:* ${document.getElementById('prodCategory').value}\n\n` +
-    `👉 _Login to Admin Panel to Approve_`;
-                
-            try {
-                await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: GolemConfig.chatId,
-                        text: telegramMessage,
-                        parse_mode: 'Markdown'
-                    })
-                });
-            } catch (tgErr) {
-                console.error("Telegram notification failed:", tgErr);
-            }
-
-            alert("Success! Your item is now pending admin approval.");
-            window.location.href = `index.html?posted=${encodeURIComponent(document.getElementById('prodName').value)}`;
-
-        } catch (error) {
-            console.error("Submission error:", error);
-            alert("❌ Error: " + (error.message || "Could not post item."));
-        } finally {
-            btn.innerText = "Publish Listing";
-            btn.disabled = false;
-        }
-    }); // This closes the event listener
+        
 </script>
 
     <style>
