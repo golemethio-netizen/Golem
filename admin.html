@@ -60,6 +60,9 @@
     <div id="userList" style="display: grid; gap: 10px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         </div>
 </section>
+            <button onclick="switchTab('approved', this)" class="tab-btn">Live Items</button>
+<button onclick="switchTab('sold', this)" class="tab-btn">Sold Items</button> 
+<button onclick="switchTab('rejected', this)" class="tab-btn">Archive/Rejected</button>
         </div>
 
         <div class="admin-search-bar" style="margin-bottom: 25px;">
@@ -100,6 +103,7 @@
             <h2 style="margin-bottom: 20px;"><i class="fas fa-envelope-open-text"></i> Support Tickets</h2>
             <div id="ticketList" style="display: grid; gap: 15px;"></div>
         </section>
+        <button onclick="switchTab('sold', this)" class="tab-btn">Sold Items</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -169,7 +173,7 @@ async function loadUsers(filter = 'all') {
 
 function renderUserTable(users, currentFilter) {
     const list = document.getElementById('userList');
-    
+    const isSold = item.status === 'sold';
     const filterHTML = `
         <div style="margin-bottom: 20px; display: flex; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
             <button onclick="loadUsers('all')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #ddd; background: ${currentFilter === 'all' ? '#333' : 'white'}; color: ${currentFilter === 'all' ? 'white' : '#333'}; cursor:pointer;">All Users (${users.length})</button>
@@ -177,6 +181,28 @@ function renderUserTable(users, currentFilter) {
             <button onclick="loadUsers('guest')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #a4b0be; background: ${currentFilter === 'guest' ? '#a4b0be' : 'white'}; color: ${currentFilter === 'guest' ? 'white' : '#a4b0be'}; cursor:pointer;">Guest Users</button>
         </div>
     `;
+    return `
+<div class="product-card" style="${isSold ? 'opacity: 0.7; position: relative;' : ''}">
+    ${isSold ? `
+        <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 5px; font-weight: bold; z-index: 10;">
+            SOLD
+        </div>
+    ` : ''}
+    
+    <img src="${item.image}" style="${isSold ? 'filter: grayscale(100%);' : ''}">
+    
+    <div class="product-info">
+        <h3>${item.name}</h3>
+        <p>${item.price} ETB</p>
+        
+        ${!isSold ? `
+            <a href="https://t.me/yourbot?start=${item.id}" class="buy-btn">Order via Telegram</a>
+        ` : `
+            <button disabled style="background: #ccc; cursor: not-allowed; width: 100%; border: none; padding: 10px; border-radius: 5px;">Item Sold</button>
+        `}
+    </div>
+</div>
+`;
 
     list.innerHTML = filterHTML + `
         <table style="width: 100%; border-collapse: collapse;">
@@ -374,6 +400,33 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
                         </select>
                         <button onclick="activateSponsor('${item.id}')" style="width:auto; padding:0 15px; background:#f1c40f; color:black;">Set</button>
                     </div>
+                    <div class="sponsor-controls">
+        <button onclick="updateStatus('${item.id}', 'sold')" 
+                style="margin-top:10px; background:#ffa502; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
+            <i class="fas fa-check-circle"></i> Mark as Sold (Stay on Site)
+        </button>
+        <button onclick="updateStatus('${item.id}', 'rejected')" 
+                class="btn-reject" style="margin-top:10px;">
+            <i class="fas fa-trash"></i> Remove from Site (Archive)
+        </button>
+    </div>
+                    ${status === 'sold' ? `
+    <div style="background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px solid #ffe0b2; margin-top: 10px;">
+        <p style="font-size: 0.8rem; color: #e65100; font-weight: bold; margin-bottom: 8px;">
+            <i class="fas fa-check-circle"></i> THIS ITEM IS MARKED AS SOLD
+        </p>
+        <div style="display: flex; gap: 5px;">
+            <button onclick="updateStatus('${item.id}', 'approved')" 
+                    style="background: #2ed573; color: white; flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer;">
+                Put Back on Sale
+            </button>
+            <button onclick="permanentlyDelete('${item.id}', '${item.image}')" 
+                    style="background: #000; color: white; flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer;">
+                Delete Forever
+            </button>
+        </div>
+    </div>
+` : ''}
                     ${isSponsorActive ? `
                         <p style="font-size: 0.75rem; color: #27ae60; margin-top: 8px; font-weight:600;">
                             ✅ Sponsored until ${new Date(item.sponsored_until).toLocaleDateString()}
@@ -420,8 +473,6 @@ const { count: userCount } = await _supabase.from('profiles').select('*', { coun
         };
 
 
-
-
 window.permanentlyDelete = async (id, imageUrl) => {
     if (confirm("Delete forever? This will also remove the image from storage.")) {
         // 1. Extract filename from URL
@@ -440,10 +491,7 @@ window.permanentlyDelete = async (id, imageUrl) => {
     }
 };
 
-
-
-
-           
+indow.permanentlyDelete = async (id, imageUrl) =>
 
 // Add this to your <script> block in admin.html
 window.deleteUserAccount = async function(userId, identifier) {
@@ -524,7 +572,14 @@ window.deleteUserAccount = async function(userId, identifier) {
             if (!error) { loadTickets(); loadStats(); }
         };
 
-        window.onload = async () => { await checkAdmin(); loadStats(); loadItems('pending'); loadTickets(); };
+      window.onload = async () => { 
+    await checkAdmin(); 
+    loadStats(); 
+    loadItems('pending'); 
+    loadTickets(); 
+    checkStorageUsage(); // Added this
+    updateAdminPresence(); // Added this
+};
 
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
@@ -560,40 +615,35 @@ window.addEventListener('load', updateAdminPresence);
 
 async function checkStorageUsage() {
     const bucketName = 'product-images';
-    
-    // Step 1: Get all folders (user IDs)
-    const { data: folders, error: folderError } = await _supabase.storage.from(bucketName).list();
-    if (folderError) return;
+    const storageDisplay = document.getElementById('storageUsage');
+    const storageBar = document.getElementById('storageBar');
 
-    let totalBytes = 0;
+    try {
+        // List all files in the bucket (Recursive listing depends on bucket structure)
+        const { data: files, error } = await _supabase.storage.from(bucketName).list('', {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'name', order: 'desc' }
+        });
 
-    // Step 2: Loop through folders to sum up file sizes
-    for (const folder of folders) {
-        if (!folder.metadata) { // It's a folder
-            const { data: files } = await _supabase.storage.from(bucketName).list(folder.name);
-            if (files) {
-                files.forEach(file => {
-                    totalBytes += (file.metadata ? file.metadata.size : 0);
-                });
-            }
-        } else { // It's a file in the root
-            totalBytes += folder.metadata.size;
-        }
+        if (error) throw error;
+
+        let totalBytes = files.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+        
+        // Convert to MB
+        const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+        const limitMB = 1000; // 1GB Limit
+        const percentage = (totalMB / limitMB) * 100;
+
+        if (storageDisplay) storageDisplay.innerText = `${totalMB} MB`;
+        if (storageBar) storageBar.style.width = `${Math.min(percentage, 100)}%`;
+        
+        // Change color if getting full
+        if (percentage > 80) storageBar.style.background = '#ff4757';
+    } catch (err) {
+        console.error("Storage check failed:", err.message);
     }
-
-    const totalMB = (totalBytes / 1048576).toFixed(2);
-    const percentage = (totalMB / 1000) * 100; // Assuming 1GB (1000MB) limit
-
-    document.getElementById('storageUsage').innerText = `${totalMB} MB`;
-    document.getElementById('storageBar').style.width = `${percentage}%`;
 }
-// Add this to your window.onload so it runs when you open Admin
-// window.onload = async () => { ... checkStorageUsage(); ... };
-
-
-
-
-
            
        </script>
 </body>
