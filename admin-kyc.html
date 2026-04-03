@@ -1,1 +1,32 @@
 
+<div class="kyc-container" style="padding: 20px;">
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2>🏦 LOAN & KYC CONTROL CENTER</h2>
+        <div class="kyc-stats" style="display: flex; gap: 20px;">
+            <div class="stat-box"><strong>Pending Apps:</strong> <span id="pendingLoans">0</span></div>
+            <div class="stat-box"><strong>Total Disbursed:</strong> <span id="disbursedAmount">0 ETB</span></div>
+        </div>
+    </header>
+
+    <div class="filter-tabs" style="margin-bottom: 20px;">
+        <button onclick="loadLoans('pending')" class="tab-btn active">New Applications</button>
+        <button onclick="loadLoans('under_review')">Under Credit Review</button>
+        <button onclick="loadLoans('approved')">Approved Loans</button>
+    </div>
+
+    <div id="kycTableWrapper" style="background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+            <thead style="background: #f8f9fa; border-bottom: 2px solid #eee;">
+                <tr>
+                    <th style="padding: 15px; text-align: left;">Borrower</th>
+                    <th>Requested Amount</th>
+                    <th>ID Document</th>
+                    <th>Risk Level</th>
+                    <th style="text-align: right; padding-right: 15px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="loanList">
+                </tbody>
+        </table>
+    </div>
+</div>
