@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Africa Village | Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #1e293b; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* Table Styles */
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px; border-bottom: 2px solid #e2e8f0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
+        td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .pending { background: #fef3c7; color: #92400e; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; }
+        .modal-content { background: white; width: 90%; max-width: 800px; margin: 50px auto; padding: 30px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
+        .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .doc-item { border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; text-align: center; }
+        .doc-item img { width: 100%; height: 100px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; }
+        .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn-view { background: var(--primary); color: white; }
+        .btn-download { background: #10b981; color: white; font-size: 0.8rem; }
+        .close-modal { float: right; cursor: pointer; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Loan Applications</h1>
+        <button onclick="fetchApplications()" class="btn btn-view">Refresh List</button>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Applicant Name</th>
+                    <th>Amount (ETB)</th>
+                    <th>Duration</th>
+                    <th>Total Repayable</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="appTableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modalName">Applicant Details</h2>
+        <hr>
+        <div id="modalDetails"></div>
+        
+        <h3>Documents</h3>
+        <div class="doc-grid" id="modalDocs">
+            </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_URL = "https://ryeylhawdmykbbmnfrrh.supabase.co/storage/v1/object/public/kyc-docs/";
+
+    async function fetchApplications() {
+        const { data, error } = await _supabase
+            .from('loan_applications')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            alert("Error fetching data: " + error.message);
+            return;
+        }
+
+        const tbody = document.getElementById('appTableBody');
+        tbody.innerHTML = data.map(app => `
+            <tr>
+                <td><strong>${app.first_name} ${app.father_name}</strong></td>
+                <td>${app.loan_amount.toLocaleString()}</td>
+                <td>${app.loan_duration} Days</td>
+                <td>${app.total_repayable.toLocaleString()} ETB</td>
+                <td><span class="status-badge ${app.status}">${app.status}</span></td>
+                <td><button onclick='viewDetails(${JSON.stringify(app)})' class="btn btn-view">Review</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function viewDetails(app) {
+        document.getElementById('modalName').innerText = `${app.first_name}'s Application`;
+        
+        document.getElementById('modalDetails').innerHTML = `
+            <p><strong>Phone:</strong> ${app.phone_number} / ${app.phone_number_2}</p>
+            <p><strong>Organization:</strong> ${app.org_name} (Salary: ${app.monthly_salary} ETB)</p>
+            <p><strong>Address:</strong> ${app.org_address}</p>
+            <p><strong>National ID:</strong> ${app.national_id_number}</p>
+        `;
+
+        const docs = [
+            { label: 'National ID Front', path: app.nat_id_front },
+            { label: 'National ID Back', path: app.nat_id_back },
+            { label: 'Employee ID Front', path: app.emp_id_front },
+            { label: 'Employee ID Back', path: app.emp_id_back },
+            { label: 'Employment Letter', path: app.employment_letter },
+            { label: 'Personal Photo', path: app.personal_photo }
+        ];
+
+        document.getElementById('modalDocs').innerHTML = docs.map(doc => {
+            if (!doc.path) return '';
+            const fullUrl = STORAGE_URL + doc.path;
+            return `
+                <div class="doc-item">
+                    <p style="font-size:0.7rem; margin:5px 0;">${doc.label}</p>
+                    <img src="${fullUrl}" onerror="this.src='https://via.placeholder.com/150?text=File+Not+Image'">
+                    <br>
+                    <a href="${fullUrl}" target="_blank" download class="btn btn-download">Download</a>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('detailsModal').style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById('detailsModal').style.display = "none";
+    }
+
+    // Load on start
+    fetchApplications();
+</script>
+
+</body>
+</html>
