@@ -10,13 +10,12 @@
     <style>
         :root {
             --primary-color: #2563eb;
-            --secondary-color: #64748b;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
@@ -33,20 +32,14 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
-            color: #1e293b;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
+        h2 { color: #1e293b; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
 
         .section-title {
             font-size: 1.1rem;
             font-weight: bold;
             color: var(--primary-color);
-            margin: 20px 0 15px 0;
+            margin: 25px 0 15px 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .form-grid {
@@ -55,50 +48,33 @@
             gap: 20px;
         }
 
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
-        }
+        .form-group { display: flex; flex-direction: column; }
+        label { margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: #475569; }
+        input, select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .full-width { grid-column: 1 / -1; }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #475569;
-        }
-
-        input, select {
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 1rem;
-            outline-color: var(--primary-color);
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
         }
 
         .btn-submit {
             margin-top: 30px;
             padding: 15px;
+            width: 100%;
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
         }
 
-        .btn-submit:hover {
-            background-color: #1d4ed8;
-        }
+        .btn-submit:disabled { background-color: #94a3b8; }
 
         .status-msg {
             margin-top: 20px;
@@ -117,64 +93,47 @@
     <form id="loanForm">
         <div class="section-title">Personal Information</div>
         <div class="form-grid">
-            <div class="form-group">
-                <label>First Name</label>
-                <input type="text" id="firstName" required>
-            </div>
-            <div class="form-group">
-                <label>Father's Name</label>
-                <input type="text" id="fatherName" required>
-            </div>
-            <div class="form-group">
-                <label>Grandfather's Name</label>
-                <input type="text" id="grandFatherName" required>
-            </div>
-            <div class="form-group">
-                <label>Mother's Name</label>
-                <input type="text" id="motherName" required>
-            </div>
+            <div class="form-group"><label>First Name</label><input type="text" id="firstName" required></div>
+            <div class="form-group"><label>Father's Name</label><input type="text" id="fatherName" required></div>
+            <div class="form-group"><label>Grandfather's Name</label><input type="text" id="grandFatherName" required></div>
+            <div class="form-group"><label>Mother's Name</label><input type="text" id="motherName" required></div>
             <div class="form-group">
                 <label>Gender</label>
                 <select id="gender" required>
-                    <option value="">Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Birthday</label>
-                <input type="date" id="birthday" required>
-            </div>
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="phoneNumber" placeholder="09..." required>
-            </div>
+            <div class="form-group"><label>Birthday</label><input type="date" id="birthday" required></div>
+            <div class="form-group"><label>Phone Number 1</label><input type="tel" id="phoneNumber" required></div>
+            <div class="form-group"><label>Phone Number 2</label><input type="tel" id="phoneNumber2" required></div>
         </div>
 
-        <div class="section-title">Employment & Financials</div>
+        <div class="section-title">Employment Information</div>
         <div class="form-grid">
-            <div class="form-group">
-                <label>Organization Name</label>
-                <input type="text" id="orgName" required>
-            </div>
-            <div class="form-group">
-                <label>Monthly Net Salary (ETB)</label>
-                <input type="number" id="monthlySalary" required>
-            </div>
-            <div class="form-group">
-                <label>Organization Phone</label>
-                <input type="tel" id="orgPhone" required>
-            </div>
-            <div class="form-group full-width">
-                <label>Organization Address</label>
-                <input type="text" id="orgAddress" required>
-            </div>
+            <div class="form-group"><label>Organization Name</label><input type="text" id="orgName" required></div>
+            <div class="form-group"><label>Monthly Net Salary (ETB)</label><input type="number" id="monthlySalary" required></div>
+            <div class="form-group"><label>Organization Phone</label><input type="tel" id="orgPhone" required></div>
+            <div class="form-group full-width"><label>Organization Address</label><input type="text" id="orgAddress" required></div>
         </div>
 
-        <div class="section-title">Loan Details & Identification</div>
-        <div class="form-grid">
+        <div class="section-title">Identification Documents (Photos)</div>
+        
+        <label>National ID Photos (Front & Back)</label>
+        <div class="upload-grid" style="margin-bottom: 20px;">
+            <div class="form-group"><label>National ID Front</label><input type="file" id="natIdFront" accept="image/*" required></div>
+            <div class="form-group"><label>National ID Back</label><input type="file" id="natIdBack" accept="image/*" required></div>
+        </div>
+
+        <label>Employee ID Photos (Front & Back)</label>
+        <div class="upload-grid">
+            <div class="form-group"><label>Employee ID Front</label><input type="file" id="empIdFront" accept="image/*" required></div>
+            <div class="form-group"><label>Employee ID Back</label><input type="file" id="empIdBack" accept="image/*" required></div>
+        </div>
+
+        <div class="form-grid" style="margin-top: 20px;">
             <div class="form-group">
-                <label>Loan Duration (Days)</label>
+                <label>Loan Duration</label>
                 <select id="loanDuration" required>
                     <option value="7">7 Days</option>
                     <option value="30">30 Days</option>
@@ -182,14 +141,7 @@
                     <option value="90">90 Days</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>National ID Number</label>
-                <input type="text" id="nationalID" required>
-            </div>
-            <div class="form-group full-width">
-                <label>Employee ID Photo (Upload)</label>
-                <input type="file" id="employeeIDPhoto" accept="image/*" required>
-            </div>
+            <div class="form-group"><label>National ID Number</label><input type="text" id="nationalIDNum" required></div>
         </div>
 
         <button type="submit" class="btn-submit" id="submitBtn">Submit Loan Request</button>
@@ -201,62 +153,68 @@
     const form = document.getElementById('loanForm');
     const statusMsg = document.getElementById('statusMsg');
 
+    // Helper function to upload files
+    async function uploadDoc(file, folder, userId) {
+        if (!file) return null;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${userId}/${folder}-${Date.now()}.${fileExt}`;
+        const { data, error } = await _supabase.storage.from('kyc-docs').upload(fileName, file);
+        if (error) throw error;
+        return data.path;
+    }
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerText = "Uploading Application...";
+        btn.innerText = "Uploading Photos...";
 
         try {
-            // 1. Check Auth
             const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) throw new Error("Please log in to submit a loan request.");
+            if (!user) throw new Error("Please log in first.");
 
-            // 2. Upload Employee ID Photo to Storage
-            const file = document.getElementById('employeeIDPhoto').files[0];
-            const fileExt = file.name.split('.').pop();
-            const filePath = `loan-docs/${user.id}-${Date.now()}.${fileExt}`;
+            // Upload all 4 photos
+            const [natFront, natBack, empFront, empBack] = await Promise.all([
+                uploadDoc(document.getElementById('natIdFront').files[0], 'nat_front', user.id),
+                uploadDoc(document.getElementById('natIdBack').files[0], 'nat_back', user.id),
+                uploadDoc(document.getElementById('empIdFront').files[0], 'emp_front', user.id),
+                uploadDoc(document.getElementById('empIdBack').files[0], 'emp_back', user.id)
+            ]);
 
-            const { error: uploadError } = await _supabase.storage
-                .from('kyc-docs')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            // 3. Save Data to Database
-            const { error: dbError } = await _supabase
-                .from('loan_applications')
-                .insert([{
-                    user_id: user.id,
-                    first_name: document.getElementById('firstName').value,
-                    father_name: document.getElementById('fatherName').value,
-                    grandfather_name: document.getElementById('grandFatherName').value,
-                    mother_name: document.getElementById('motherName').value,
-                    gender: document.getElementById('gender').value,
-                    birthday: document.getElementById('birthday').value,
-                    phone_number: document.getElementById('phoneNumber').value,
-                    org_name: document.getElementById('orgName').value,
-                    monthly_salary: document.getElementById('monthlySalary').value,
-                    org_phone: document.getElementById('orgPhone').value,
-                    org_address: document.getElementById('orgAddress').value,
-                    loan_duration: document.getElementById('loanDuration').value,
-                    national_id: document.getElementById('nationalID').value,
-                    id_photo_url: filePath,
-                    status: 'pending'
-                }]);
+            // Save to database
+            const { error: dbError } = await _supabase.from('loan_applications').insert([{
+                user_id: user.id,
+                first_name: document.getElementById('firstName').value,
+                father_name: document.getElementById('fatherName').value,
+                grandfather_name: document.getElementById('grandFatherName').value,
+                mother_name: document.getElementById('motherName').value,
+                gender: document.getElementById('gender').value,
+                birthday: document.getElementById('birthday').value,
+                phone_number: document.getElementById('phoneNumber').value,
+                phone_number_2: document.getElementById('phoneNumber2').value,
+                org_name: document.getElementById('orgName').value,
+                monthly_salary: document.getElementById('monthlySalary').value,
+                org_phone: document.getElementById('orgPhone').value,
+                org_address: document.getElementById('orgAddress').value,
+                loan_duration: document.getElementById('loanDuration').value,
+                national_id_number: document.getElementById('nationalIDNum').value,
+                nat_id_front: natFront,
+                nat_id_back: natBack,
+                emp_id_front: empFront,
+                emp_id_back: empBack,
+                status: 'pending'
+            }]);
 
             if (dbError) throw dbError;
 
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#dcfce7";
-            statusMsg.style.color = "#166534";
-            statusMsg.innerText = "Success! Your loan application has been submitted.";
+            statusMsg.innerText = "Application Submitted Successfully!";
             form.reset();
 
         } catch (err) {
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#fee2e2";
-            statusMsg.style.color = "#991b1b";
             statusMsg.innerText = "Error: " + err.message;
         } finally {
             btn.disabled = false;
@@ -264,6 +222,5 @@
         }
     };
 </script>
-
 </body>
 </html>
