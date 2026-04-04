@@ -107,6 +107,21 @@
             <div class="form-group"><label>Birthday</label><input type="date" id="birthday" required></div>
             <div class="form-group"><label>Phone Number 1</label><input type="tel" id="phoneNumber" required></div>
             <div class="form-group"><label>Phone Number 2</label><input type="tel" id="phoneNumber2" required></div>
+
+
+ <div class="form-grid" style="margin-top: 20px;">
+            <div class="form-group">
+                <label>Loan Duration</label>
+                <select id="loanDuration" required>
+                    <option value="7">7 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="60">60 Days</option>
+                    <option value="90">90 Days</option>
+                </select>
+            </div>
+            <div class="form-group"><label>National ID Number</label><input type="text" id="nationalIDNum" required></div>
+        </div>
+            
         </div>
 
         <div class="section-title">Employment Information</div>
@@ -131,18 +146,7 @@
             <div class="form-group"><label>Employee ID Back</label><input type="file" id="empIdBack" accept="image/*" required></div>
         </div>
 
-        <div class="form-grid" style="margin-top: 20px;">
-            <div class="form-group">
-                <label>Loan Duration</label>
-                <select id="loanDuration" required>
-                    <option value="7">7 Days</option>
-                    <option value="30">30 Days</option>
-                    <option value="60">60 Days</option>
-                    <option value="90">90 Days</option>
-                </select>
-            </div>
-            <div class="form-group"><label>National ID Number</label><input type="text" id="nationalIDNum" required></div>
-        </div>
+       
 
         <button type="submit" class="btn-submit" id="submitBtn">Submit Loan Request</button>
         <div id="statusMsg" class="status-msg"></div>
