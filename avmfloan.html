@@ -66,18 +66,30 @@
         </div>
 
         <div id="repaymentSummary" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; display: none;">
-            <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Repayment Summary</h4>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                <span>Principal:</span> <span id="summaryPrincipal" style="font-weight: 600;">0.00 ETB</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                <span>Fees & Interest:</span> <span id="summaryFees" style="font-weight: 600; color: #dc2626;">0.00 ETB</span>
-            </div>
-            <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
-            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem;">
-                <span>Total Repayable:</span> <span id="summaryTotal">0.00 ETB</span>
-            </div>
-        </div>
+    <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Repayment Summary</h4>
+    
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+        <span>Principal:</span> 
+        <span id="summaryPrincipal" style="font-weight: 600;">0.00 ETB</span>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+        <span>Service Charge (6%):</span> 
+        <span id="summaryServiceCharge" style="font-weight: 600; color: #475569;">0.00 ETB</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+        <span id="interestLabel">Interest:</span> 
+        <span id="summaryInterest" style="font-weight: 600; color: #dc2626;">0.00 ETB</span>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
+    
+    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem;">
+        <span>Total Repayable:</span> 
+        <span id="summaryTotal">0.00 ETB</span>
+    </div>
+</div>
 
         <div class="section-title">Employment Information</div>
         <div class="form-grid">
@@ -123,25 +135,40 @@
         return data.path;
     }
 
-    function calculateRepayment() {
-        const amount = parseFloat(document.getElementById('loanAmount').value);
-        const duration = document.getElementById('loanDuration').value;
-        const summaryBox = document.getElementById('repaymentSummary');
-        if (isNaN(amount) || amount <= 0) { summaryBox.style.display = "none"; return; }
-
-        let interestRate = 0.17;
-        if (duration === '30') interestRate = 0.00;
-        else if (duration === '60') interestRate = 0.18;
-        else if (duration === '90') interestRate = 0.18;
-
-        const fees = amount * (interestRate + 0.06); // +6% for infra/other
-        const total = amount + fees;
-
-        summaryBox.style.display = "block";
-        document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
-        document.getElementById('summaryFees').innerText = fees.toLocaleString() + " ETB";
-        document.getElementById('summaryTotal').innerText = total.toLocaleString() + " ETB";
+   function calculateRepayment() {
+    const amount = parseFloat(document.getElementById('loanAmount').value);
+    const duration = document.getElementById('loanDuration').value;
+    const summaryBox = document.getElementById('repaymentSummary');
+    
+    if (isNaN(amount) || amount <= 0) { 
+        summaryBox.style.display = "none"; 
+        return; 
     }
+
+    // Rates defined
+    const serviceChargeRate = 0.06; // Flat 6%
+    let interestRate = 0;
+
+    // Logic: 7-30 days = 0%, 31-90 days = 18%
+    if (duration === '60' || duration === '90') {
+        interestRate = 0.18;
+    } else {
+        interestRate = 0.00;
+    }
+
+    // Calculations
+    const serviceChargeAmt = amount * serviceChargeRate;
+    const interestAmt = amount * interestRate;
+    const totalRepayable = amount + serviceChargeAmt + interestAmt;
+
+    // Update UI
+    summaryBox.style.display = "block";
+    document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
+    document.getElementById('summaryServiceCharge').innerText = serviceChargeAmt.toLocaleString() + " ETB";
+    document.getElementById('summaryInterest').innerText = interestAmt.toLocaleString() + " ETB";
+    document.getElementById('interestLabel').innerText = `Interest (${(interestRate * 100)}%):`;
+    document.getElementById('summaryTotal').innerText = totalRepayable.toLocaleString() + " ETB";
+}
 
     form.onsubmit = async (e) => {
         e.preventDefault();
