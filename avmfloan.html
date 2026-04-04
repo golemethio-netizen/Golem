@@ -110,17 +110,45 @@
 
 
  <div class="form-grid" style="margin-top: 20px;">
-            <div class="form-group">
-                <label>Loan Type</label>
-                <select id="loanDuration" required>
-                    <option value="7">7 Days</option>
-                    <option value="30">30 Days</option>
-                    <option value="60">60 Days</option>
-                    <option value="90">90 Days</option>
-                </select>
-            </div>
-            
-        </div>
+    <div class="form-group">
+        <label>Requested Loan Amount (ETB)</label>
+        <input type="number" id="loanAmount" placeholder="e.g. 10000" required min="500" oninput="calculateRepayment()">
+    </div>
+    <div class="form-group">
+        <label>Loan Duration (Days)</label>
+        <select id="loanDuration" required onchange="calculateRepayment()">
+            <option value="7">7 Days</option>
+            <option value="30">30 Days</option>
+            <option value="60">60 Days</option>
+            <option value="90">90 Days</option>
+        </select>
+    </div>
+</div>
+
+<div id="repaymentSummary" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; display: none;">
+    <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Africa Village Repayment Summary</h4>
+    
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #374151; margin-bottom: 5px;">
+        <span>Principal Amount:</span> 
+        <span id="summaryPrincipal" style="font-weight: 600;">0.00 ETB</span>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #374151; margin-bottom: 5px;">
+        <span>Interest & Service Fees:</span> 
+        <span id="summaryFees" style="font-weight: 600; color: #dc2626;">0.00 ETB</span>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
+    
+    <div style="display: flex; justify-content: space-between; font-weight: bold; color: #111827; font-size: 1rem;">
+        <span>Total Repayable:</span> 
+        <span id="summaryTotal">0.00 ETB</span>
+    </div>
+    
+    <p style="font-size: 0.7rem; color: #6b7280; margin-top: 10px; font-style: italic;">
+        *Includes Interest, 2% Infrastructure, and 2% Admin fees.
+    </p>
+</div>
             
         </div>
 
@@ -160,12 +188,45 @@
 
     // Helper function to upload files
     async function uploadDoc(file, folder, userId) {
-        if (!file) return null;
+        if (!file || !file.name) return null;
         const fileExt = file.name.split('.').pop();
         const fileName = `${userId}/${folder}-${Date.now()}.${fileExt}`;
         const { data, error } = await _supabase.storage.from('kyc-docs').upload(fileName, file);
         if (error) throw error;
         return data.path;
+    }
+
+    // Function to calculate interest on the fly
+    function calculateRepayment() {
+        const amount = parseFloat(document.getElementById('loanAmount').value);
+        const duration = document.getElementById('loanDuration').value;
+        const summaryBox = document.getElementById('repaymentSummary');
+        
+        if (isNaN(amount) || amount <= 0) {
+            summaryBox.style.display = "none";
+            return;
+        }
+
+        // Fixed Rates (Infrastructure 2% + Other 2%)
+        const fixedFeesRate = 0.04; 
+        let interestRate = 0;
+
+        switch (duration) {
+            case '7':   interestRate = 0.17; break;
+            case '30':  interestRate = 0.20; break;
+            case '60':  interestRate = 0.24; break;
+            case '90':  interestRate = 0.27; break;
+            default:    interestRate = 0.17;
+        }
+
+        const totalRate = interestRate + fixedFeesRate;
+        const fees = amount * totalRate;
+        const totalRepay = amount + fees;
+
+        summaryBox.style.display = "block";
+        document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
+        document.getElementById('summaryFees').innerText = fees.toLocaleString() + " ETB";
+        document.getElementById('summaryTotal').innerText = totalRepay.toLocaleString() + " ETB";
     }
 
     form.onsubmit = async (e) => {
@@ -199,10 +260,13 @@
                 phone_number_2: document.getElementById('phoneNumber2').value,
                 org_name: document.getElementById('orgName').value,
                 monthly_salary: document.getElementById('monthlySalary').value,
+                loan_amount: document.getElementById('loanAmount').value,
                 org_phone: document.getElementById('orgPhone').value,
                 org_address: document.getElementById('orgAddress').value,
                 loan_duration: document.getElementById('loanDuration').value,
                 national_id_number: document.getElementById('nationalIDNum').value,
+                total_repayable: parseFloat(document.getElementById('summaryTotal').innerText.replace(/,/g, '')),
+                interest_applied: document.getElementById('loanDuration').value,
                 nat_id_front: natFront,
                 nat_id_back: natBack,
                 emp_id_front: empFront,
@@ -214,12 +278,15 @@
 
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#dcfce7";
+            statusMsg.style.color = "#166534";
             statusMsg.innerText = "Application Submitted Successfully!";
             form.reset();
+            document.getElementById('repaymentSummary').style.display = "none";
 
         } catch (err) {
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#fee2e2";
+            statusMsg.style.color = "#991b1b";
             statusMsg.innerText = "Error: " + err.message;
         } finally {
             btn.disabled = false;
