@@ -56,56 +56,70 @@
     const statusMsg = document.getElementById('statusMsg');
 
     form.onsubmit = async (e) => {
-        e.preventDefault();
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Processing...";
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = "Uploading Photos...";
 
-        try {
-            // 1. Get Logged In User
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) throw new Error("Please sign in first!");
+    try {
+        // --- BYPASSING AUTH FOR TESTING ---
+        // const { data: { user } } = await _supabase.auth.getUser();
+        // if (!user) throw new Error("Please log in first.");
+        const tempUserId = "guest_test_001"; 
 
-            // 2. Upload KYC Document to Private Bucket
-            const file = document.getElementById('kycFile').files[0];
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${user.id}/${Date.now()}.${fileExt}`; // Organized by User ID folder
+        // Upload all 4 photos using the temp ID
+        const [natFront, natBack, empFront, empBack] = await Promise.all([
+            uploadDoc(document.getElementById('natIdFront').files[0], 'nat_front', tempUserId),
+            uploadDoc(document.getElementById('natIdBack').files[0], 'nat_back', tempUserId),
+            uploadDoc(document.getElementById('empIdFront').files[0], 'emp_front', tempUserId),
+            uploadDoc(document.getElementById('empIdBack').files[0], 'emp_back', tempUserId)
+        ]);
 
-            const { data: uploadData, error: uploadError } = await _supabase.storage
-                .from('kyc-docs')
-                .upload(fileName, file);
+        // Save to database
+        const { error: dbError } = await _supabase.from('loan_applications').insert([{
+            user_id: null, // Set to null or a UUID string for testing
+            first_name: document.getElementById('firstName').value,
+            father_name: document.getElementById('fatherName').value,
+            grandfather_name: document.getElementById('grandFatherName').value,
+            mother_name: document.getElementById('motherName').value,
+            gender: document.getElementById('gender').value,
+            birthday: document.getElementById('birthday').value,
+            phone_number: document.getElementById('phoneNumber').value,
+            phone_number_2: document.getElementById('phoneNumber2').value,
+            org_name: document.getElementById('orgName').value,
+            monthly_salary: document.getElementById('monthlySalary').value,
+            loan_amount: document.getElementById('loanAmount').value,
+            org_phone: document.getElementById('orgPhone').value,
+            org_address: document.getElementById('orgAddress').value,
+            loan_duration: document.getElementById('loanDuration').value,
+            national_id_number: document.getElementById('nationalIDNum').value,
+            total_repayable: parseFloat(document.getElementById('summaryTotal').innerText.replace(/,/g, '')),
+            interest_applied: document.getElementById('loanDuration').value,
+            nat_id_front: natFront,
+            nat_id_back: natBack,
+            emp_id_front: empFront,
+            emp_id_back: empBack,
+            status: 'pending'
+        }]);
 
-            if (uploadError) throw uploadError;
+        if (dbError) throw dbError;
 
-            // 3. Save Data to loan_applications Table
-            const { error: dbError } = await _supabase
-                .from('loan_applications')
-                .insert([{
-                    user_id: user.id,
-                    amount: document.getElementById('amount').value,
-                    loan_purpose: document.getElementById('purpose').value,
-                    kyc_url: fileName, // Save the path, not the public URL
-                    status: 'pending'
-                }]);
+        statusMsg.style.display = "block";
+        statusMsg.style.backgroundColor = "#dcfce7";
+        statusMsg.style.color = "#166534";
+        statusMsg.innerText = "Test Success! Application inserted without login.";
+        form.reset();
 
-            if (dbError) throw dbError;
-
-            // 4. Success Response
-            statusMsg.style.color = "green";
-            statusMsg.innerText = "✅ Application submitted successfully! We will contact you soon.";
-            form.reset();
-
-            // Optional: Alert Admin via Telegram (if you have your bot URL set up)
-            // sendTelegramNotification(`New Loan Request: ${amount} ETB from ${user.email}`);
-
-        } catch (err) {
-            statusMsg.style.color = "red";
-            statusMsg.innerText = "❌ Error: " + err.message;
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Application";
-        }
-    };
+    } catch (err) {
+        statusMsg.style.display = "block";
+        statusMsg.style.backgroundColor = "#fee2e2";
+        statusMsg.style.color = "#991b1b";
+        statusMsg.innerText = "Error: " + err.message;
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Submit Loan Request";
+    }
+};
 </script>
 
 </body>
