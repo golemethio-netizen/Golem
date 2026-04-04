@@ -127,30 +127,20 @@
         const amount = parseFloat(document.getElementById('loanAmount').value);
         const duration = document.getElementById('loanDuration').value;
         const summaryBox = document.getElementById('repaymentSummary');
-        
-        if (isNaN(amount) || amount <= 0) { 
-            summaryBox.style.display = "none"; 
-            return; 
-        }
+        if (isNaN(amount) || amount <= 0) { summaryBox.style.display = "none"; return; }
 
-        // Updated Business Logic
-        const serviceChargeRate = 0.06; // 6% flat for all
-        let interestRate = 0;
+        let interestRate = 0.17;
+        if (duration === '30') interestRate = 0.00;
+        else if (duration === '60') interestRate = 0.18;
+        else if (duration === '90') interestRate = 0.18;
 
-        // 7 and 30 days are 0% interest. 60 and 90 days are 18% interest.
-        if (duration === '7' || duration === '30') {
-            interestRate = 0.00;
-        } else if (duration === '60' || duration === '90') {
-            interestRate = 0.18;
-        }
-
-        const totalFees = amount * (interestRate + serviceChargeRate);
-        const totalRepayable = amount + totalFees;
+        const fees = amount * (interestRate + 0.06); // +6% for infra/other
+        const total = amount + fees;
 
         summaryBox.style.display = "block";
         document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
-        document.getElementById('summaryFees').innerText = totalFees.toLocaleString() + " ETB";
-        document.getElementById('summaryTotal').innerText = totalRepayable.toLocaleString() + " ETB";
+        document.getElementById('summaryFees').innerText = fees.toLocaleString() + " ETB";
+        document.getElementById('summaryTotal').innerText = total.toLocaleString() + " ETB";
     }
 
     form.onsubmit = async (e) => {
@@ -160,11 +150,12 @@
         btn.innerText = "Uploading documents...";
 
         try {
+            // For testing purposes, we'll use a placeholder if not logged in
             let userId = "anonymous_test";
             const { data: { user } } = await _supabase.auth.getUser();
             if (user) userId = user.id;
 
-            // Upload 6 documents
+            // Upload 6 documents now
             const [natF, natB, empF, empB, letter, photo] = await Promise.all([
                 uploadDoc(document.getElementById('natIdFront').files[0], 'nat_front', userId),
                 uploadDoc(document.getElementById('natIdBack').files[0], 'nat_back', userId),
@@ -185,7 +176,7 @@
                 phone_number: document.getElementById('phoneNumber').value,
                 phone_number_2: document.getElementById('phoneNumber2').value,
                 loan_amount: document.getElementById('loanAmount').value,
-                loan_duration: document.getElementById('loanDuration').value,
+               
                 org_name: document.getElementById('orgName').value,
                 monthly_salary: document.getElementById('monthlySalary').value,
                 pension_number: document.getElementById('pensionNumber').value,
@@ -193,10 +184,8 @@
                 org_address: document.getElementById('orgAddress').value,
                 national_id_number: document.getElementById('nationalIDNum').value,
                 total_repayable: parseFloat(document.getElementById('summaryTotal').innerText.replace(/,/g, '')),
-                nat_id_front: natF, 
-                nat_id_back: natB,
-                emp_id_front: empF, 
-                emp_id_back: empB,
+                nat_id_front: natF, nat_id_back: natB,
+                emp_id_front: empF, emp_id_back: empB,
                 employment_letter: letter,
                 personal_photo: photo,
                 status: 'pending'
@@ -206,7 +195,6 @@
 
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#dcfce7";
-            statusMsg.style.color = "#166534";
             statusMsg.innerText = "Application Submitted Successfully!";
             form.reset();
             document.getElementById('repaymentSummary').style.display = "none";
@@ -214,7 +202,6 @@
         } catch (err) {
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#fee2e2";
-            statusMsg.style.color = "#991b1b";
             statusMsg.innerText = "Error: " + err.message;
         } finally {
             btn.disabled = false;
