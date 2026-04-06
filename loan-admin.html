@@ -98,40 +98,66 @@
         `).join('');
     }
 
-    function viewDetails(app) {
-        document.getElementById('modalName').innerText = `${app.first_name}'s Application`;
-        
-        document.getElementById('modalDetails').innerHTML = `
-            <p><strong>Phone:</strong> ${app.phone_number} / ${app.phone_number_2}</p>
-            <p><strong>Organization:</strong> ${app.org_name} (Salary: ${app.monthly_salary} ETB)</p>
-            <p><strong>Address:</strong> ${app.org_address}</p>
-            <p><strong>National ID:</strong> ${app.national_id_number}</p>
+    async function viewDetails(app) {
+    const modalBody = document.getElementById('modalBody');
+    const modalDocs = document.getElementById('modalDocs');
+    
+    modalBody.innerHTML = `
+        <div class="info-section">
+            <div class="info-group">
+                <h4>Personal & Residence</h4>
+                <div class="info-item"><span>Full Name:</span> ${app.first_name} ${app.father_name}</div>
+                <div class="info-item"><span>Nationality:</span> ${app.nationality}</div>
+                <div class="info-item"><span>Region:</span> ${app.res_region} | <span>City:</span> ${app.res_city}</div>
+                <div class="info-item"><span>Woreda/House:</span> ${app.res_woreda}, # ${app.res_house_num}</div>
+                <div class="info-item"><span>Phones:</span> ${app.phone_number}, ${app.phone_number_2}</div>
+            </div>
+            <div class="info-group">
+                <h4>Employment & Income</h4>
+                <div class="info-item"><span>Organization:</span> ${app.org_name}</div>
+                <div class="info-item"><span>Job Title:</span> ${app.job_title}</div>
+                <div class="info-item"><span>Monthly Net:</span> ${Number(app.monthly_salary).toLocaleString()} ETB</div>
+                <div class="info-item"><span>Pension No:</span> ${app.pension_number}</div>
+            </div>
+            <div class="info-group">
+                <h4>Loan Request</h4>
+                <div class="info-item"><span>Amount:</span> ${Number(app.loan_amount).toLocaleString()} ETB</div>
+                <div class="info-item"><span>Duration:</span> ${app.loan_duration} Days</div>
+                <div class="info-item"><span>Repayable:</span> ${Number(app.total_repayable).toLocaleString()} ETB</div>
+                <div class="info-item"><span>National ID:</span> ${app.national_id_number}</div>
+            </div>
+        </div>
+    `;
+
+    // Updated document list including the Digital Signature
+    const docList = [
+        { label: 'Personal Photo', path: app.personal_photo },
+        { label: 'Digital Signature', path: app.digital_signature }, // New Field
+        { label: 'National ID (F)', path: app.nat_id_front },
+        { label: 'National ID (B)', path: app.nat_id_back },
+        { label: 'Employee ID (F)', path: app.emp_id_front },
+        { label: 'Employee ID (B)', path: app.emp_id_back },
+        { label: 'Employment Letter', path: app.employment_letter }
+    ];
+
+    modalDocs.innerHTML = "Generating secure previews...";
+
+    const docCards = await Promise.all(docList.map(async (doc) => {
+        if (!doc.path) return '';
+        const { data, error } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 300);
+        const url = error ? '#' : data.signedUrl;
+        return `
+            <div class="doc-item">
+                <p style="font-size:0.75rem; margin-top:0"><strong>${doc.label}</strong></p>
+                <img src="${url}" onerror="this.src='https://via.placeholder.com/150?text=No+Preview'">
+                <a href="${url}" target="_blank" class="btn btn-download">View Full File</a>
+            </div>
         `;
+    }));
 
-        const docs = [
-            { label: 'National ID Front', path: app.nat_id_front },
-            { label: 'National ID Back', path: app.nat_id_back },
-            { label: 'Employee ID Front', path: app.emp_id_front },
-            { label: 'Employee ID Back', path: app.emp_id_back },
-            { label: 'Employment Letter', path: app.employment_letter },
-            { label: 'Personal Photo', path: app.personal_photo }
-        ];
-
-        document.getElementById('modalDocs').innerHTML = docs.map(doc => {
-            if (!doc.path) return '';
-            const fullUrl = STORAGE_URL + doc.path;
-            return `
-                <div class="doc-item">
-                    <p style="font-size:0.7rem; margin:5px 0;">${doc.label}</p>
-                    <img src="${fullUrl}" onerror="this.src='https://via.placeholder.com/150?text=File+Not+Image'">
-                    <br>
-                    <a href="${fullUrl}" target="_blank" download class="btn btn-download">Download</a>
-                </div>
-            `;
-        }).join('');
-
-        document.getElementById('detailsModal').style.display = "block";
-    }
+    modalDocs.innerHTML = docCards.join('');
+    document.getElementById('detailsModal').style.display = "block";
+}
 
     function closeModal() {
         document.getElementById('detailsModal').style.display = "none";
