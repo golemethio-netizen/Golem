@@ -7,184 +7,98 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
 
-   <style>
-    :root { 
-        --primary: #2563eb; 
-        --primary-hover: #1d4ed8;
-        --bg: #f8fafc; 
-        --card-bg: #ffffff;
-        --text-main: #0f172a; 
-        --text-muted: #64748b;
-        --border: #e2e8f0;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --radius: 12px;
-        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    }
+    <style>
+        :root { 
+            --primary: #2563eb; 
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc; 
+            --card-bg: #ffffff;
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
 
-    body { 
-        font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-        background: var(--bg); 
-        color: var(--text-main); 
-        margin: 0; 
-        padding: 24px; 
-        line-height: 1.5;
-    }
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 40px 20px; 
+            line-height: 1.5;
+            display: flex;
+            justify-content: center;
+        }
 
-    .container { max-width: 1200px; margin: 0 auto; }
+        .form-container { 
+            background: var(--card-bg); 
+            width: 100%; 
+            max-width: 800px; 
+            padding: 40px; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--border);
+        }
 
-    .header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 32px; 
-    }
+        h2 { margin-top: 0; color: var(--text-main); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        
+        .section-title { 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            color: var(--primary); 
+            margin: 30px 0 15px 0; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::after { content: ""; height: 1px; background: var(--border); flex-grow: 1; margin-left: 15px; }
 
-    /* Table & Card Styles */
-    .card { 
-        background: var(--card-bg); 
-        padding: 24px; 
-        border-radius: var(--radius); 
-        box-shadow: var(--shadow); 
-        border: 1px solid var(--border);
-        overflow: hidden;
-    }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .full-width { grid-column: 1 / -1; }
 
-    table { 
-        width: 100%; 
-        border-collapse: separate; 
-        border-spacing: 0;
-        text-align: left; 
-    }
+        label { margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #475569; }
+        input, select { 
+            padding: 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
 
-    th { 
-        padding: 12px 16px; 
-        background: #f1f5f9;
-        border-bottom: 2px solid var(--border); 
-        font-size: 0.75rem; 
-        font-weight: 700;
-        color: var(--text-muted); 
-        text-transform: uppercase; 
-        letter-spacing: 0.05em;
-    }
+        .upload-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            background: #f1f5f9; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+        }
 
-    td { 
-        padding: 16px; 
-        border-bottom: 1px solid var(--border); 
-        font-size: 0.875rem; 
-        transition: background 0.2s;
-    }
+        .btn-submit { 
+            margin-top: 30px; 
+            padding: 16px; 
+            width: 100%; 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background-color: var(--primary-hover); }
+        .btn-submit:disabled { background-color: #94a3b8; cursor: not-allowed; }
 
-    tr:hover td { background: #f8fafc; }
+        .status-msg { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: 500; }
 
-    /* Status Badges */
-    .status-badge { 
-        padding: 6px 12px; 
-        border-radius: 9999px; 
-        font-size: 0.75rem; 
-        font-weight: 600; 
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .pending { background: #fffbeb; color: #92400e; border: 1px solid #fef3c7; }
-
-    /* Improved Modal */
-    .modal { 
-        display: none; 
-        position: fixed; 
-        inset: 0; 
-        background: rgba(15, 23, 42, 0.75); 
-        backdrop-filter: blur(4px);
-        z-index: 100; 
-        padding: 20px;
-    }
-
-    .modal-content { 
-        background: white; 
-        width: 100%;
-        max-width: 750px; 
-        margin: 40px auto; 
-        padding: 32px; 
-        border-radius: var(--radius); 
-        max-height: 85vh; 
-        overflow-y: auto; 
-        position: relative;
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    }
-
-    /* Document Grid */
-    .doc-grid { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-        gap: 20px; 
-        margin-top: 24px; 
-    }
-
-    .doc-item { 
-        border: 1px solid var(--border); 
-        padding: 12px; 
-        border-radius: 10px; 
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .doc-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-
-    .doc-item img { 
-        width: 100%; 
-        height: 120px; 
-        object-fit: cover; 
-        border-radius: 6px; 
-        margin-bottom: 12px; 
-        background: #f1f5f9;
-    }
-
-    /* Buttons */
-    .btn { 
-        padding: 10px 20px; 
-        border-radius: 8px; 
-        cursor: pointer; 
-        border: none; 
-        font-weight: 600; 
-        font-size: 0.875rem;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-view { background: var(--primary); color: white; }
-    .btn-view:hover { background: var(--primary-hover); }
-
-    .btn-download { 
-        background: white; 
-        color: var(--text-main); 
-        border: 1px solid var(--border);
-        width: 100%;
-        justify-content: center;
-    }
-    .btn-download:hover { background: #f1f5f9; }
-
-    .close-modal { 
-        position: absolute;
-        right: 24px;
-        top: 24px;
-        color: var(--text-muted);
-        cursor: pointer; 
-        font-size: 1.25rem; 
-        background: #f1f5f9;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-</style>
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
 
@@ -201,48 +115,34 @@
             <div class="form-group">
                 <label>Gender</label>
                 <select id="gender" required>
+                    <option value="">Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </select>
             </div>
-            <div class="section-title">Employment Information</div>
-        <div class="form-grid">
-             <div class="form-group full-width"><label>Nationality</label><input type="text" id="orgAddress" required></div>
-            <div class="form-group"><label>address</label><input type="text" id="orgName" required></div>
-            <div class="form-group"><label>Monthly Net Salary (ETB)</label><input type="number" id="monthlySalary" required></div>
-            <div class="form-group"><label>Region</label><input type="tel" id="orgPhone" required></div>
-            <div class="form-group"><label> City</label><input type="text" id="pensionNumber" required></div>
-            <div class="form-group full-width"><label>Sub City</label><input type="text" id="orgAddress" required></div>
-            <div class="form-group"><label> Woreda</label><input type="text" id="pensionNumber" required></div>
-            <div class="form-group full-width"><label>House Number</label><input type="text" id="orgAddress" required></div>
-        
             <div class="form-group"><label>Birthday</label><input type="date" id="birthday" required></div>
-            <div class="form-group"><label>Personal active  Phone number</label><input type="tel" id="phoneNumber" required></div>
-            <div class="form-group"><label>Phone Number 2</label><input type="tel" id="phoneNumber2" required></div>
-             <div class="form-group"><label>Digital Sig</label><input type="file" id="natIdFront" accept="image/*" required></div>
-            <div class="form-group"><label>Pesonal Photo</label><input type="file" id="natIdFront" accept="image/*" required></div>
+            <div class="form-group"><label>Nationality</label><input type="text" id="nationality" required></div>
+            <div class="form-group"><label>Active Phone Number</label><input type="tel" id="phoneNumber" required></div>
+            <div class="form-group"><label>Alternative Phone</label><input type="tel" id="phoneNumber2"></div>
         </div>
-<div class="section-title">Personal Information</div>
+
+        <div class="section-title">Residential Address</div>
         <div class="form-grid">
-            <div class="form-group"><label>Full  Name</label><input type="text" id="firstName" required></div>
-            <div class="form-group"><label>Adders</label><input type="text" id="fatherName" required></div>
-            <div class="form-group"><label> Phone number</label><input type="text" id="grandFatherName" required></div>
-            iv class="form-group"><label> ID </label><input type="file" id="empIdFront" accept="image/*" required></div>
-            <div class="form-group">
-                <label>Gender</label>
-                <select id="gender" required>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
+            <div class="form-group"><label>Region</label><input type="text" id="resRegion" required></div>
+            <div class="form-group"><label>City</label><input type="text" id="resCity" required></div>
+            <div class="form-group"><label>Sub City</label><input type="text" id="resSubCity" required></div>
+            <div class="form-group"><label>Woreda</label><input type="text" id="resWoreda" required></div>
+            <div class="form-group"><label>House Number</label><input type="text" id="resHouseNum" required></div>
+        </div>
+
         <div class="section-title">Loan Details</div>
         <div class="form-grid">
             <div class="form-group">
-                <label>Requested Loan Amount (ETB)</label>
-                <input type="number" id="loanAmount" placeholder="e.g. 10000" required min="500" oninput="calculateRepayment()">
+                <label>Requested Amount (ETB)</label>
+                <input type="number" id="loanAmount" placeholder="Min 500" required min="500" oninput="calculateRepayment()">
             </div>
             <div class="form-group">
-                <label>Loan Duration (Days)</label>
+                <label>Duration</label>
                 <select id="loanDuration" required onchange="calculateRepayment()">
                     <option value="7">7 Days</option>
                     <option value="30">30 Days</option>
@@ -255,10 +155,10 @@
         <div id="repaymentSummary" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; display: none;">
             <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Repayment Summary</h4>
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                <span>Principal:</span> <span id="summaryPrincipal" style="font-weight: 600;">0.00 ETB</span>
+                <span>Principal:</span> <span id="summaryPrincipal">0.00 ETB</span>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                <span>Fees & Interest:</span> <span id="summaryFees" style="font-weight: 600; color: #dc2626;">0.00 ETB</span>
+                <span>Fees & Interest:</span> <span id="summaryFees" style="color: #dc2626;">0.00 ETB</span>
             </div>
             <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
             <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem;">
@@ -269,30 +169,28 @@
         <div class="section-title">Employment Information</div>
         <div class="form-grid">
             <div class="form-group"><label>Organization Name</label><input type="text" id="orgName" required></div>
-              <div class="form-group"><label>Job title</label><input type="text" id="orgName" required></div>
-              <div class="form-group"><label>Employment Type</label><input type="text" id="orgName" required></div>
-            <div class="form-group"><label>Growth salary (ETB)</label><input type="number" id="monthlySalary" required></div>
-            <div class="form-group"><label>Monthly Net Salary (ETB)</label><input type="number" id="monthlySalary" required></div>
+            <div class="form-group"><label>Job Title</label><input type="text" id="jobTitle" required></div>
+            <div class="form-group"><label>Employment Type</label><input type="text" id="empType" required></div>
+            <div class="form-group"><label>Gross Salary (ETB)</label><input type="number" id="grossSalary" required></div>
+            <div class="form-group"><label>Net Salary (ETB)</label><input type="number" id="netSalary" required></div>
             <div class="form-group"><label>Organization Phone</label><input type="tel" id="orgPhone" required></div>
             <div class="form-group"><label>Pension Number</label><input type="text" id="pensionNumber" required></div>
             <div class="form-group full-width"><label>Organization Address</label><input type="text" id="orgAddress" required></div>
         </div>
 
         <div class="section-title">Required Documents</div>
+        <div class="form-grid" style="margin-bottom: 15px;">
+            <div class="form-group full-width"><label>National ID Number (FID)</label><input type="text" id="nationalIDNum" required></div>
+        </div>
         
-        <label>ID Cards (Front & Back)</label>
         <div class="upload-grid">
-            <div class="form-group"><label>National ID (FID)</label><input type="text" id="nationalIDNum" required></div>
             <div class="form-group"><label>National ID Front</label><input type="file" id="natIdFront" accept="image/*" required></div>
             <div class="form-group"><label>National ID Back</label><input type="file" id="natIdBack" accept="image/*" required></div>
             <div class="form-group"><label>Employee ID Front</label><input type="file" id="empIdFront" accept="image/*" required></div>
             <div class="form-group"><label>Employee ID Back</label><input type="file" id="empIdBack" accept="image/*" required></div>
-        </div>
-
-        <label>Employment Documents</label>
-        <div class="upload-grid">
             <div class="form-group"><label>Employment Letter</label><input type="file" id="empLetter" accept="image/*,application/pdf" required></div>
             <div class="form-group"><label>Personal Photo</label><input type="file" id="userPhoto" accept="image/*" required></div>
+            <div class="form-group"><label>Digital Signature</label><input type="file" id="digitalSig" accept="image/*" required></div>
         </div>
 
         <button type="submit" class="btn-submit" id="submitBtn">Submit Loan Request</button>
@@ -317,14 +215,18 @@
         const amount = parseFloat(document.getElementById('loanAmount').value);
         const duration = document.getElementById('loanDuration').value;
         const summaryBox = document.getElementById('repaymentSummary');
-        if (isNaN(amount) || amount <= 0) { summaryBox.style.display = "none"; return; }
+        
+        if (isNaN(amount) || amount <= 0) { 
+            summaryBox.style.display = "none"; 
+            return; 
+        }
 
-        let interestRate = 0.17;
-        if (duration === '30') interestRate = 0.00;
-        else if (duration === '60') interestRate = 0.18;
-        else if (duration === '90') interestRate = 0.18;
+        let interestRate = 0.17; 
+        if (duration === '7') interestRate = 0.05; // Example for 7 days
+        else if (duration === '30') interestRate = 0.15;
+        else if (duration === '60' || duration === '90') interestRate = 0.18;
 
-        const fees = amount * (interestRate + 0.06); // +6% for infra/other
+        const fees = amount * (interestRate + 0.06); 
         const total = amount + fees;
 
         summaryBox.style.display = "block";
@@ -337,22 +239,22 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerText = "Uploading documents...";
+        btn.innerText = "Processing Application...";
 
         try {
-            // For testing purposes, we'll use a placeholder if not logged in
-            let userId = "anonymous_test";
+            let userId = "anonymous_" + Math.floor(Math.random() * 1000);
             const { data: { user } } = await _supabase.auth.getUser();
             if (user) userId = user.id;
 
-            // Upload 6 documents now
-            const [natF, natB, empF, empB, letter, photo] = await Promise.all([
+            // Upload all 7 documents
+            const [natF, natB, empF, empB, letter, photo, sig] = await Promise.all([
                 uploadDoc(document.getElementById('natIdFront').files[0], 'nat_front', userId),
                 uploadDoc(document.getElementById('natIdBack').files[0], 'nat_back', userId),
                 uploadDoc(document.getElementById('empIdFront').files[0], 'emp_front', userId),
                 uploadDoc(document.getElementById('empIdBack').files[0], 'emp_back', userId),
                 uploadDoc(document.getElementById('empLetter').files[0], 'employment_letter', userId),
-                uploadDoc(document.getElementById('userPhoto').files[0], 'passport_photo', userId)
+                uploadDoc(document.getElementById('userPhoto').files[0], 'passport_photo', userId),
+                uploadDoc(document.getElementById('digitalSig').files[0], 'signature', userId)
             ]);
 
             const { error: dbError } = await _supabase.from('loan_applications').insert([{
@@ -364,20 +266,16 @@
                 gender: document.getElementById('gender').value,
                 birthday: document.getElementById('birthday').value,
                 phone_number: document.getElementById('phoneNumber').value,
-                phone_number_2: document.getElementById('phoneNumber2').value,
                 loan_amount: document.getElementById('loanAmount').value,
-               
                 org_name: document.getElementById('orgName').value,
-                monthly_salary: document.getElementById('monthlySalary').value,
-                pension_number: document.getElementById('pensionNumber').value,
-                org_phone: document.getElementById('orgPhone').value,
-                org_address: document.getElementById('orgAddress').value,
+                net_salary: document.getElementById('netSalary').value,
                 national_id_number: document.getElementById('nationalIDNum').value,
-                total_repayable: parseFloat(document.getElementById('summaryTotal').innerText.replace(/,/g, '')),
+                total_repayable: parseFloat(document.getElementById('summaryTotal').innerText.replace(/[^0-9.]/g, '')),
                 nat_id_front: natF, nat_id_back: natB,
                 emp_id_front: empF, emp_id_back: empB,
                 employment_letter: letter,
                 personal_photo: photo,
+                digital_signature: sig,
                 status: 'pending'
             }]);
 
@@ -385,6 +283,7 @@
 
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#dcfce7";
+            statusMsg.style.color = "#166534";
             statusMsg.innerText = "Application Submitted Successfully!";
             form.reset();
             document.getElementById('repaymentSummary').style.display = "none";
@@ -392,7 +291,8 @@
         } catch (err) {
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#fee2e2";
-            statusMsg.innerText = "Error: " + err.message;
+            statusMsg.style.color = "#991b1b";
+            statusMsg.innerText = "Submission Error: " + err.message;
         } finally {
             btn.disabled = false;
             btn.innerText = "Submit Loan Request";
