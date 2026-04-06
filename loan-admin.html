@@ -6,31 +6,18 @@
     <title>Africa Village | Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #1e293b; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        
-        /* Table Styles */
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { padding: 12px; border-bottom: 2px solid #e2e8f0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
-        td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .pending { background: #fef3c7; color: #92400e; }
-        
-        /* Modal Styles */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; }
-        .modal-content { background: white; width: 90%; max-width: 800px; margin: 50px auto; padding: 30px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
-        .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-        .doc-item { border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; text-align: center; }
-        .doc-item img { width: 100%; height: 100px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; }
-        .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; text-decoration: none; display: inline-block; }
-        .btn-view { background: var(--primary); color: white; }
-        .btn-download { background: #10b981; color: white; font-size: 0.8rem; }
-        .close-modal { float: right; cursor: pointer; font-size: 1.5rem; }
-    </style>
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
 </head>
 <body>
 
