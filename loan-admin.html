@@ -10,18 +10,16 @@
     <style>
         :root { 
             --primary: #2563eb; 
-            --primary-hover: #1d4ed8;
             --bg: #f8fafc; 
             --card-bg: #ffffff;
             --text-main: #0f172a; 
             --text-muted: #64748b;
             --border: #e2e8f0;
             --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            font-family: 'Inter', sans-serif; 
             background: var(--bg); 
             color: var(--text-main); 
             margin: 0; 
@@ -29,113 +27,44 @@
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
-
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 32px; 
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
 
         .card { 
             background: var(--card-bg); 
             padding: 24px; 
             border-radius: var(--radius); 
-            box-shadow: var(--shadow); 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
             border: 1px solid var(--border);
-            overflow-x: auto;
         }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { 
-            padding: 12px 16px; 
-            background: #f1f5f9; 
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            color: var(--text-muted);
-            border-bottom: 2px solid var(--border);
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 12px; background: #f1f5f9; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
         td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
 
-        /* Status Badges */
-        .status-badge { 
-            padding: 4px 12px; 
-            border-radius: 9999px; 
-            font-size: 0.7rem; 
-            font-weight: 700; 
-            text-transform: uppercase;
-        }
+        .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
         .pending { background: #fef3c7; color: #92400e; }
         .approved { background: #ecfdf5; color: #065f46; }
         .rejected { background: #fef2f2; color: #991b1b; }
 
-        /* Modal */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(15, 23, 42, 0.7); 
-            backdrop-filter: blur(4px); 
-            z-index: 100; 
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .modal-content { 
-            background: white; 
-            max-width: 900px; 
-            margin: 20px auto; 
-            padding: 32px; 
-            border-radius: var(--radius); 
-            position: relative; 
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 100; overflow-y: auto; padding: 20px; }
+        .modal-content { background: white; max-width: 900px; margin: 20px auto; padding: 32px; border-radius: var(--radius); position: relative; }
         
-        .info-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 24px; 
-            margin-top: 20px;
-        }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 20px; }
         .info-group h4 { margin: 0 0 12px 0; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .info-item { font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted); }
-        .info-item span { font-weight: 600; color: var(--text-main); }
+        .info-item { font-size: 0.85rem; margin-bottom: 6px; }
+        .info-item span { font-weight: 600; color: var(--text-muted); margin-right: 5px; }
 
-        .doc-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 15px; 
-            margin-top: 20px; 
-        }
-        .doc-item { border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; }
-        .doc-item img { width: 100%; height: 120px; object-fit: cover; border-radius: 4px; background: #f8fafc; }
+        .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
+        .doc-item { border: 1px solid var(--border); padding: 12px; border-radius: 8px; background: #fff; }
+        .img-container { background: #000; height: 140px; border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 10px; }
+        .doc-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .btn { 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            border: none; 
-            font-weight: 600; 
-            transition: 0.2s; 
-        }
+        .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; transition: 0.2s; }
         .btn-view { background: var(--primary); color: white; }
-        .btn-download { background: #f1f5f9; color: var(--text-main); width: 100%; margin-top: 8px; font-size: 0.75rem; border: 1px solid var(--border); text-decoration: none; display: inline-block;}
-        .close-modal { position: absolute; right: 20px; top: 20px; cursor: pointer; font-size: 1.5rem; }
-
-        @media (max-width: 768px) { .header { flex-direction: column; align-items: flex-start; gap: 10px; } }
-
-
-
-        .doc-item img {
-    width: 100%;
-    height: 120px;
-    object-fit: contain; /* Changed from 'cover' to 'contain' so you see the whole ID card */
-    background: #000;    /* Dark background makes light-colored documents pop */
-    display: block;
-}
-
-.btn-download:hover {
-    background: #1d4ed8 !important;
-    color: #ffffff !important;
-}
+        .btn-download { display: block; text-align: center; text-decoration: none; background: #f1f5f9; color: var(--text-main); font-size: 0.75rem; padding: 8px; border-radius: 4px; border: 1px solid var(--border); }
+        .btn-download:hover { background: var(--primary); color: white; }
+        
+        .close-modal { position: absolute; right: 24px; top: 24px; cursor: pointer; font-size: 1.5rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -150,16 +79,16 @@
         <table>
             <thead>
                 <tr>
-                    <th>Applicant Name</th>
+                    <th>Applicant</th>
                     <th>Amount (ETB)</th>
                     <th>Duration</th>
-                    <th>Total Repayable</th>
+                    <th>Repayable</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="appTableBody">
-                <tr><td colspan="6" style="text-align:center">Loading applications...</td></tr>
+                <tr><td colspan="6" style="text-align:center">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -168,10 +97,10 @@
 <div id="detailsModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal()">&times;</span>
-        <h2 id="modalName">Review Application</h2>
+        <h2>Review Application</h2>
         <div id="modalDetails" class="info-grid"></div>
         
-        <h3 style="margin-top:30px">Submitted Documents</h3>
+        <h3 style="margin-top:32px">Submitted Documents</h3>
         <div class="doc-grid" id="modalDocs"></div>
     </div>
 </div>
@@ -180,118 +109,94 @@
     let currentApplications = [];
 
     async function fetchApplications() {
-        const { data, error } = await _supabase
-            .from('loan_applications')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            alert("Error: " + error.message);
-            return;
-        }
+        const { data, error } = await _supabase.from('loan_applications').select('*').order('created_at', { ascending: false });
+        if (error) return alert("Error: " + error.message);
 
         currentApplications = data;
         const tbody = document.getElementById('appTableBody');
-        
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No applications found.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = data.map((app, index) => `
+        tbody.innerHTML = data.length ? data.map((app, i) => `
             <tr>
                 <td><strong>${app.first_name} ${app.father_name}</strong></td>
                 <td>${Number(app.loan_amount).toLocaleString()}</td>
                 <td>${app.loan_duration} Days</td>
-                <td>${Number(app.total_repayable).toLocaleString()} ETB</td>
+                <td>${Number(app.total_repayable).toLocaleString()}</td>
                 <td><span class="status-badge ${app.status}">${app.status}</span></td>
-                <td><button onclick="viewDetails(${index})" class="btn btn-view">Review</button></td>
+                <td><button onclick="viewDetails(${i})" class="btn btn-view">Review</button></td>
             </tr>
-        `).join('');
+        `).join('') : '<tr><td colspan="6" style="text-align:center">No records found.</td></tr>';
+    }
+
+    async function downloadFile(url, fileName) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+            window.open(url, '_blank');
+        }
     }
 
     async function viewDetails(index) {
         const app = currentApplications[index];
-        const modalDetails = document.getElementById('modalDetails');
-        const modalDocs = document.getElementById('modalDocs');
-        
-        modalDetails.innerHTML = `
+        document.getElementById('modalDetails').innerHTML = `
             <div class="info-group">
-                <h4>Personal & Residence</h4>
+                <h4>Applicant Info</h4>
                 <div class="info-item"><span>Full Name:</span> ${app.first_name} ${app.father_name}</div>
-                <div class="info-item"><span>Nationality:</span> ${app.nationality || 'N/A'}</div>
-                <div class="info-item"><span>Region/City:</span> ${app.res_region || ''}, ${app.res_city || ''}</div>
-                <div class="info-item"><span>Phones:</span> ${app.phone_number}, ${app.phone_number_2 || 'N/A'}</div>
+                <div class="info-item"><span>Phone:</span> ${app.phone_number}</div>
+                <div class="info-item"><span>Address:</span> ${app.res_region || 'N/A'}, ${app.res_city || ''}</div>
             </div>
             <div class="info-group">
                 <h4>Employment</h4>
                 <div class="info-item"><span>Organization:</span> ${app.org_name}</div>
-                <div class="info-item"><span>Job Title:</span> ${app.job_title || 'N/A'}</div>
-                <div class="info-item"><span>Monthly Net:</span> ${Number(app.net_salary || 0).toLocaleString()} ETB</div>
+                <div class="info-item"><span>Net Salary:</span> ${Number(app.net_salary || 0).toLocaleString()} ETB</div>
             </div>
             <div class="info-group">
                 <h4>Loan Summary</h4>
-                <div class="info-item"><span>Request:</span> ${Number(app.loan_amount).toLocaleString()} ETB</div>
-                <div class="info-item"><span>Total Due:</span> ${Number(app.total_repayable).toLocaleString()} ETB</div>
-                <div class="info-item"><span>National ID:</span> ${app.national_id_number}</div>
+                <div class="info-item"><span>Amount:</span> ${Number(app.loan_amount).toLocaleString()} ETB</div>
+                <div class="info-item"><span>Status:</span> <strong style="text-transform:uppercase">${app.status}</strong></div>
             </div>
         `;
 
         const docList = [
-            { label: 'Personal Photo', path: app.personal_photo },
-            { label: 'Digital Signature', path: app.digital_signature },
-            { label: 'National ID (F)', path: app.nat_id_front },
-            { label: 'National ID (B)', path: app.nat_id_back },
-            { label: 'Employee ID (F)', path: app.emp_id_front },
-            { label: 'Employee ID (B)', path: app.emp_id_back },
-            { label: 'Employment Letter', path: app.employment_letter }
+            { name: 'Photo', path: app.personal_photo },
+            { name: 'Signature', path: app.digital_signature },
+            { name: 'ID_Front', path: app.nat_id_front },
+            { name: 'ID_Back', path: app.nat_id_back },
+            { name: 'Emp_ID_Front', path: app.emp_id_front },
+            { name: 'Emp_ID_Back', path: app.emp_id_back },
+            { name: 'Emp_Letter', path: app.employment_letter }
         ];
 
-        modalDocs.innerHTML = "Generating secure links...";
+        const docContainer = document.getElementById('modalDocs');
+        docContainer.innerHTML = "Securely generating links...";
 
         const docCards = await Promise.all(docList.map(async (doc) => {
-        if (!doc.path) return '';
-        
-        // Generate a signed URL that lasts 10 minutes (600 seconds)
-        const { data, error } = await _supabase.storage
-            .from('kyc-docs')
-            .createSignedUrl(doc.path, 600);
-        
-        if (error || !data) return `<div class="doc-item"><p>Error loading ${doc.label}</p></div>`;
-        
-        const url = data.signedUrl;
-        
-        // We append '&download=' to the Supabase signed URL to force a download response
-        const downloadUrl = `${url}&download=`;
+            if (!doc.path) return '';
+            const { data } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 600);
+            const url = data?.signedUrl || '';
+            const fileName = `${app.first_name}_${doc.name}.png`;
 
-        return `
-            <div class="doc-item">
-                <p style="font-size:0.7rem; margin:0 0 8px 0; color: #64748b;">
-                    <strong>${doc.label}</strong>
-                </p>
-                <div style="background: #f1f5f9; border-radius: 4px; overflow: hidden; height: 120px;">
-                    <img src="${url}" 
-                         style="width: 100%; height: 100%; object-fit: contain;"
-                         onerror="this.src='https://via.placeholder.com/150?text=No+Preview'">
+            return `
+                <div class="doc-item">
+                    <div class="img-container">
+                        <img src="${url}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                    </div>
+                    <p style="font-size: 0.75rem; margin-bottom: 8px;"><strong>${doc.name}</strong></p>
+                    <button onclick="downloadFile('${url}', '${fileName}')" class="btn-download" style="width:100%; cursor:pointer">Download File</button>
                 </div>
-                <a href="${downloadUrl}" 
-                   download="${doc.label.replace(/\s+/g, '_')}.png" 
-                   class="btn-download" 
-                   style="display: block; text-decoration: none; margin-top: 8px; background: #2563eb; color: white; border-radius: 4px; padding: 6px 0;">
-                   Download File
-                </a>
-            </div>
-        `;
-    }));
-        modalDocs.innerHTML = docCards.join('');
+            `;
+        }));
+
+        docContainer.innerHTML = docCards.join('');
         document.getElementById('detailsModal').style.display = "block";
     }
 
-    function closeModal() {
-        document.getElementById('detailsModal').style.display = "none";
-    }
-
-    // Initialize
+    function closeModal() { document.getElementById('detailsModal').style.display = "none"; }
     fetchApplications();
 </script>
 </body>
