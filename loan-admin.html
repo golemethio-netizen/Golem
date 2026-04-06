@@ -6,7 +6,10 @@
     <title>Africa Village | Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-.empty-state {
+
+    
+    <style>
+    .empty-state {
     text-align: center;
     padding: 60px 20px;
     color: var(--text-muted);
@@ -18,6 +21,45 @@
     margin-bottom: 16px;
     opacity: 0.5;
 }
+.approved { 
+    background: #ecfdf5; 
+    color: #065f46; 
+    border: 1px solid #d1fae5; 
+}
+
+.rejected { 
+    background: #fef2f2; 
+    color: #991b1b; 
+    border: 1px solid #fee2e2; 
+}
+.btn:active {
+    transform: scale(0.96);
+}
+
+/* Tooltip style for long filenames in the doc-grid */
+.doc-item span {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-main);
+    font-weight: 500;
+}
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .card {
+        padding: 16px;
+        margin: -8px; /* Slight bleed for better mobile use */
+    }
+}
+        </style>
 </head>
 <body>
 
