@@ -127,111 +127,111 @@
 </div>
 
 <script>
-    let currentApplications = [];
+   let currentApplications = [];
 
-    async function fetchApplications() {
-        const { data, error } = await _supabase.from('loan_applications').select('*').order('created_at', { ascending: false });
-        if (error) return alert("Error: " + error.message);
+async function fetchApplications() {
+    const { data, error } = await _supabase.from('loan_applications').select('*').order('created_at', { ascending: false });
+    if (error) return alert("Error: " + error.message);
 
-        currentApplications = data;
-        const tbody = document.getElementById('appTableBody');
-        tbody.innerHTML = data.length ? data.map((app, i) => `
-            <tr>
-                <td><strong>${app.first_name} ${app.father_name}</strong></td>
-                <td>${Number(app.loan_amount).toLocaleString()}</td>
-                <td>${app.loan_duration} Days</td>
-                <td>${Number(app.total_repayable).toLocaleString()}</td>
-                <td><span class="status-badge ${app.status}">${app.status}</span></td>
-                <td><button onclick="viewDetails(${i})" class="btn btn-view">Review</button></td>
-            </tr>
-        `).join('') : '<tr><td colspan="6" style="text-align:center">No records found.</td></tr>';
+    currentApplications = data;
+    const tbody = document.getElementById('appTableBody');
+    tbody.innerHTML = data.length ? data.map((app, i) => `
+        <tr>
+            <td><strong>${app.first_name} ${app.father_name}</strong></td>
+            <td>${Number(app.loan_amount).toLocaleString()}</td>
+            <td>${app.loan_duration} Days</td>
+            <td>${Number(app.total_repayable).toLocaleString()}</td>
+            <td><span class="status-badge ${app.status}">${app.status}</span></td>
+            <td><button onclick="viewDetails(${i})" class="btn btn-view">Review</button></td>
+        </tr>
+    `).join('') : '<tr><td colspan="6" style="text-align:center">No records found.</td></tr>';
+}
+
+async function downloadFile(url, fileName) {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        window.open(url, '_blank');
     }
+}
 
-    async function downloadFile(url, fileName) {
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (e) {
-            window.open(url, '_blank');
-        }
-    }
-
-    async function viewDetails(index) {
-        const app = currentApplications[index];
-        document.getElementById('modalDetails').innerHTML = `
-            <div class="info-group">
-                <h4>Applicant Info</h4>
-                <div class="info-item"><span>Full Name:</span> ${app.first_name} ${app.father_name}</div>
-                <div class="info-item"><span>Phone:</span> ${app.phone_number}</div>
-                <div class="info-item"><span>Address:</span> ${app.res_region || 'N/A'}, ${app.res_city || ''}</div>
-            </div>
-            <div class="info-group">
-                <h4>Employment</h4>
-                <div class="info-item"><span>Organization:</span> ${app.org_name}</div>
-                <div class="info-item"><span>Net Salary:</span> ${Number(app.net_salary || 0).toLocaleString()} ETB</div>
-            </div>
-            <div class="info-group">
-                <h4>Loan Summary</h4>
-                <div class="info-item"><span>Amount:</span> ${Number(app.loan_amount).toLocaleString()} ETB</div>
-                <div class="info-item"><span>Status:</span> <strong style="text-transform:uppercase">${app.status}</strong></div>
-            </div>
-        `;
-
-        const docList = [
-            { name: 'Photo', path: app.personal_photo },
-            { name: 'Signature', path: app.digital_signature },
-            { name: 'ID_Front', path: app.nat_id_front },
-            { name: 'ID_Back', path: app.nat_id_back },
-            { name: 'Emp_ID_Front', path: app.emp_id_front },
-            { name: 'Emp_ID_Back', path: app.emp_id_back },
-            { name: 'Emp_Letter', path: app.employment_letter }
-        ];
-
-        const docContainer = document.getElementById('modalDocs');
-        docContainer.innerHTML = "Securely generating links...";
-
-        const docCards = await Promise.all(docList.map(async (doc) => {
-            if (!doc.path) return '';
-   
-       const { data, error } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 600);
-                     // Log the path to verify it looks correct (e.g., "userid/photo-123.png")
-    console.log("Fetching signed URL for path:", doc.path);
-            
-            const url = data?.signedUrl || '';
-            const fileName = `${app.first_name}_${doc.name}.png`;
-if (error || !data) {
-        console.error("Error loading document:", doc.name, error);
-        return `<div class="doc-item">Error loading ${doc.name}</div>`;
-    }
-            
-            const signedUrl = data.signedUrl; // Renamed here
-          const fileName = `${app.first_name}_${doc.name}.png`;
-            
-           return `
-        <div class="doc-item">
-            <div class="img-container" style="background: #eee;">
-                <img src="${signedUrl}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
-            </div>
-            <p style="font-size: 0.75rem; margin-bottom: 8px;"><strong>${doc.name}</strong></p>
-            <button onclick="downloadFile('${signedUrl}', '${fileName}')" class="btn-download" style="width:100%; cursor:pointer">
-                Download File
-            </button>
+async function viewDetails(index) {
+    const app = currentApplications[index];
+    
+    // 1. Fill in text details
+    document.getElementById('modalDetails').innerHTML = `
+        <div class="info-group">
+            <h4>Applicant Info</h4>
+            <div class="info-item"><span>Full Name:</span> ${app.first_name} ${app.father_name}</div>
+            <div class="info-item"><span>Phone:</span> ${app.phone_number}</div>
+            <div class="info-item"><span>Address:</span> ${app.res_region || 'N/A'}, ${app.res_city || ''}</div>
+        </div>
+        <div class="info-group">
+            <h4>Employment</h4>
+            <div class="info-item"><span>Organization:</span> ${app.org_name}</div>
+            <div class="info-item"><span>Net Salary:</span> ${Number(app.net_salary || 0).toLocaleString()} ETB</div>
+        </div>
+        <div class="info-group">
+            <h4>Loan Summary</h4>
+            <div class="info-item"><span>Amount:</span> ${Number(app.loan_amount).toLocaleString()} ETB</div>
+            <div class="info-item"><span>Status:</span> <strong style="text-transform:uppercase">${app.status}</strong></div>
         </div>
     `;
-}));
 
-        docContainer.innerHTML = docCards.join('');
-        document.getElementById('detailsModal').style.display = "block";
-    }
+    // 2. Define documents to show
+    const docList = [
+        { name: 'Photo', path: app.personal_photo },
+        { name: 'Signature', path: app.digital_signature },
+        { name: 'ID_Front', path: app.nat_id_front },
+        { name: 'ID_Back', path: app.nat_id_back },
+        { name: 'Emp_ID_Front', path: app.emp_id_front },
+        { name: 'Emp_ID_Back', path: app.emp_id_back },
+        { name: 'Emp_Letter', path: app.employment_letter }
+    ];
 
-    function closeModal() { document.getElementById('detailsModal').style.display = "none"; }
-    fetchApplications();
+    const docContainer = document.getElementById('modalDocs');
+    docContainer.innerHTML = "Generating secure links...";
+
+    // 3. Map through documents and get signed URLs
+    const docCards = await Promise.all(docList.map(async (doc) => {
+        if (!doc.path) return '';
+
+        const { data, error } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 600);
+        
+        if (error || !data) {
+            console.error(`Error loading ${doc.name}:`, error);
+            return `<div class="doc-item"><p style="color:red; font-size:0.7rem;">Failed to load ${doc.name}</p></div>`;
+        }
+
+        const signedUrl = data.signedUrl;
+        const downloadName = `${app.first_name}_${doc.name}.png`;
+
+        return `
+            <div class="doc-item">
+                <div class="img-container">
+                    <img src="${signedUrl}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                </div>
+                <p style="font-size: 0.75rem; margin-bottom: 8px;"><strong>${doc.name}</strong></p>
+                <button onclick="downloadFile('${signedUrl}', '${downloadName}')" class="btn-download" style="width:100%; cursor:pointer">
+                    Download File
+                </button>
+            </div>
+        `;
+    }));
+
+    docContainer.innerHTML = docCards.join('');
+    document.getElementById('detailsModal').style.display = "block";
+}
+
+function closeModal() { document.getElementById('detailsModal').style.display = "none"; }
+fetchApplications();
 </script>
 </body>
 </html>
