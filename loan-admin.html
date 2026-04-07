@@ -198,26 +198,33 @@
 
         const docCards = await Promise.all(docList.map(async (doc) => {
             if (!doc.path) return '';
-            // Log the path to verify it looks correct (e.g., "userid/photo-123.png")
+   
+       const { data, error } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 600);
+                     // Log the path to verify it looks correct (e.g., "userid/photo-123.png")
     console.log("Fetching signed URL for path:", doc.path);
-            const { data } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 600);
+            
             const url = data?.signedUrl || '';
             const fileName = `${app.first_name}_${doc.name}.png`;
-if (error) {
-        console.error("Supabase Storage Error:", error.message);
-        return `<div class="doc-item"><p>Error: ${error.message}</p></div>`;
+if (error || !data) {
+        console.error("Error loading document:", doc.name, error);
+        return `<div class="doc-item">Error loading ${doc.name}</div>`;
     }
-            const url = data?.signedUrl || '';
-            return `
-                <div class="doc-item">
-                    <div class="img-container">
-                        <img src="${url}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
-                    </div>
-                    <p style="font-size: 0.75rem; margin-bottom: 8px;"><strong>${doc.name}</strong></p>
-                    <button onclick="downloadFile('${url}', '${fileName}')" class="btn-download" style="width:100%; cursor:pointer">Download File</button>
-                </div>
-            `;
-        }));
+            
+            const signedUrl = data.signedUrl; // Renamed here
+          const fileName = `${app.first_name}_${doc.name}.png`;
+            
+           return `
+        <div class="doc-item">
+            <div class="img-container" style="background: #eee;">
+                <img src="${signedUrl}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
+            </div>
+            <p style="font-size: 0.75rem; margin-bottom: 8px;"><strong>${doc.name}</strong></p>
+            <button onclick="downloadFile('${signedUrl}', '${fileName}')" class="btn-download" style="width:100%; cursor:pointer">
+                Download File
+            </button>
+        </div>
+    `;
+}));
 
         docContainer.innerHTML = docCards.join('');
         document.getElementById('detailsModal').style.display = "block";
