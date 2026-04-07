@@ -152,46 +152,37 @@
             </div>
         </div>
 
-        <div id="repaymentSummary" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; display: none;">
-    <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Loan Summary & Repayment</h4>
-    
-    <div style="background: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px inset #e2e8f0;">
-        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
-            <span>Requested Amount:</span> <span id="summaryPrincipal">0.00 ETB</span>
-        </div>
-        
-        <div style="font-size: 0.75rem; color: #64748b; padding-left: 10px; border-left: 2px solid #e2e8f0; margin: 8px 0;">
-            <div style="display: flex; justify-content: space-between;">
-                <span>Service Charge (6%):</span> <span id="feeService">0.00 ETB</span>
+        <div id="repaymentSummary" style="margin-top: 15px; display: none;">
+    <div style="padding: 15px; background: #fffbeb; border-radius: 8px; border: 1px solid #fef3c7; margin-bottom: 12px;">
+        <h4 style="margin: 0 0 10px 0; color: #92400e; font-size: 0.9rem;">Disbursement Summary (Cash You Receive)</h4>
+        <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px inset #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Requested Amount:</span> <span id="summaryPrincipal">0.00 ETB</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Insurance (3%):</span> <span id="feeInsurance">0.00 ETB</span>
+            <div style="font-size: 0.75rem; color: #64748b; padding-left: 10px; border-left: 2px solid #fde68a; margin: 8px 0;">
+                <div style="display: flex; justify-content: space-between;"><span>Service Charge (6%):</span> <span id="feeService">0.00 ETB</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Insurance (3%):</span> <span id="feeInsurance">0.00 ETB</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Disaster Risk (1%):</span> <span id="feeDisaster">0.00 ETB</span></div>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Disaster Risk (1%):</span> <span id="feeDisaster">0.00 ETB</span>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.95rem; color: #2563eb; border-top: 1px solid #eee; pt: 8px; margin-top: 5px;">
+                <span>Net Disbursed:</span> <span id="summaryNet">0.00 ETB</span>
             </div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-top: 4px;">
-    <span>Principal: <span id="percentPrincipal">0%</span></span>
-    <span>Interest: <span id="percentInterest">0%</span></span>
-</div>
-
-        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #dc2626; font-weight: 600;">
-            <span>Total Deductions (10%):</span> <span id="summaryFees">0.00 ETB</span>
-        </div>
-        
-        <hr style="margin: 8px 0; border: 0; border-top: 1px solid #eee;">
-        
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.95rem; color: #2563eb;">
-            <span>Net Disbursed to You:</span> <span id="summaryNet">0.00 ETB</span>
         </div>
     </div>
 
-    <div id="installmentList" style="font-size: 0.85rem;"></div>
+    <div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+        <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Repayment Details (Total to Pay Back)</h4>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #475569; margin-bottom: 8px; padding: 0 5px;">
+            <span>Principal: <strong id="percentPrincipal">0%</strong></span>
+            <span>Interest: <strong id="percentInterest">0%</strong></span>
+        </div>
 
-    <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
-    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem; color: #166534;">
-        <span>Total Repayable:</span> <span id="summaryTotal">0.00 ETB</span>
+        <div id="installmentList" style="font-size: 0.85rem; background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #dcfce7;"></div>
+
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; color: #166534; margin-top: 12px; padding: 0 5px;">
+            <span>Total Repayable:</span> <span id="summaryTotal">0.00 ETB</span>
+        </div>
     </div>
 </div>
         
@@ -242,7 +233,6 @@
         return data.path;
     }
 
-    // Dynamic calculation of fees and repayment
    function calculateRepayment() {
     const amount = parseFloat(document.getElementById('loanAmount').value);
     const duration = document.getElementById('loanDuration').value;
@@ -254,55 +244,60 @@
         return; 
     }
 
-    // 1. Fee Rates (Upfront Deductions)
+    // 1. Fee Constants (Deducted from Principal)
     const serviceRate = 0.06;
     const insuranceRate = 0.03;
     const disasterRate = 0.01;
-    const totalDeductionRate = serviceRate + insuranceRate + disasterRate;
-
-    // 2. Interest Rates
+    
+    // 2. Interest Rate (Added to Principal for Repayment)
     let interestRate = 0.15;
     if (duration === '7') interestRate = 0.05;
     else if (duration === '60' || duration === '90') interestRate = 0.18;
 
-    // 3. Calculations
-    const totalDeducted = amount * totalDeductionRate;
-    const netDisbursed = amount - totalDeducted;
+    // 3. Mathematical Calculations
+    const valService = amount * serviceRate;
+    const valInsurance = amount * insuranceRate;
+    const valDisaster = amount * disasterRate;
+    const totalDeductions = valService + valInsurance + valDisaster;
+    
+    const netDisbursed = amount - totalDeductions;
     const interestAmount = amount * interestRate;
     const totalRepayable = amount + interestAmount;
 
-    // 4. Percentage Breakdown (Principal vs Interest in the Repayment)
+    // 4. Percentage of Repayment Breakdown
     const principalPercent = (amount / totalRepayable) * 100;
     const interestPercent = (interestAmount / totalRepayable) * 100;
 
-    // 5. Update UI
+    // 5. Update UI - Disbursement Section
     summaryBox.style.display = "block";
     document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
-    document.getElementById('summaryFees').innerText = "- " + totalDeducted.toLocaleString() + " ETB";
+    document.getElementById('feeService').innerText = valService.toLocaleString() + " ETB";
+    document.getElementById('feeInsurance').innerText = valInsurance.toLocaleString() + " ETB";
+    document.getElementById('feeDisaster').innerText = valDisaster.toLocaleString() + " ETB";
     document.getElementById('summaryNet').innerText = netDisbursed.toLocaleString() + " ETB";
+
+    // 6. Update UI - Repayment Section
     document.getElementById('summaryTotal').innerText = totalRepayable.toLocaleString() + " ETB";
-    
-    // Update Percentage Labels
     document.getElementById('percentPrincipal').innerText = principalPercent.toFixed(1) + "%";
     document.getElementById('percentInterest').innerText = interestPercent.toFixed(1) + "%";
 
-    // 6. Installment Logic
+    // 7. Installment Generation
     let installments = 1;
     if (duration === '60') installments = 2;
     if (duration === '90') installments = 3;
     const amountPerInstallment = totalRepayable / installments;
 
-    let html = `<p style="margin: 5px 0; font-weight: 600; color: #166534;">Repayment Schedule:</p>`;
+    let html = "";
     for(let i = 1; i <= installments; i++) {
         const dayLabel = i * 30 > parseInt(duration) ? duration : i * 30;
         html += `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 3px; padding-left: 5px; border-left: 2px solid #bbf7d0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #eee;">
                 <span>Installment ${i} (Day ${dayLabel}):</span>
-                <span>${amountPerInstallment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ETB</span>
+                <span style="font-weight: 600;">${amountPerInstallment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ETB</span>
             </div>
         `;
     }
-    installmentList.innerHTML = html;
+    installmentList.innerHTML = html || "Error calculating schedule";
 }
 
     // Handle Form Submission
