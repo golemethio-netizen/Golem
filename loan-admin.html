@@ -169,6 +169,44 @@ async function downloadFile(url, fileName) {
     }
 }
 
+
+function exportToExcel() {
+    if (!currentApplications || currentApplications.length === 0) {
+        return alert("No data available to export.");
+    }
+
+    // 1. Prepare and clean the data for Excel
+    const dataToExport = currentApplications.map(app => ({
+        "Applied Date": new Date(app.created_at).toLocaleDateString(),
+        "Status": app.status.toUpperCase(),
+        "First Name": app.first_name,
+        "Father Name": app.father_name,
+        "Grandfather Name": app.grandfather_name,
+        "Phone": app.phone_number,
+        "Gender": app.gender,
+        "Loan Amount (ETB)": app.loan_amount,
+        "Duration (Days)": app.loan_duration,
+        "Total Repayable": app.total_repayable,
+        "Organization": app.org_name,
+        "Job Title": app.job_title,
+        "Net Salary": app.net_salary,
+        "National ID Num": app.national_id_number,
+        "Region": app.res_region,
+        "City": app.res_city
+    }));
+
+    // 2. Create a new workbook and worksheet
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Applications");
+
+    // 3. Generate and download the file
+    const dateStr = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(workbook, `AfricaVillage_Loans_${dateStr}.xlsx`);
+}
+
+
+    
 async function viewDetails(index) {
     const app = currentApplications[index];
     
