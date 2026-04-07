@@ -177,10 +177,16 @@
 
         const docCards = await Promise.all(docList.map(async (doc) => {
             if (!doc.path) return '';
+            // Log the path to verify it looks correct (e.g., "userid/photo-123.png")
+    console.log("Fetching signed URL for path:", doc.path);
             const { data } = await _supabase.storage.from('kyc-docs').createSignedUrl(doc.path, 600);
             const url = data?.signedUrl || '';
             const fileName = `${app.first_name}_${doc.name}.png`;
-
+if (error) {
+        console.error("Supabase Storage Error:", error.message);
+        return `<div class="doc-item"><p>Error: ${error.message}</p></div>`;
+    }
+            const url = data?.signedUrl || '';
             return `
                 <div class="doc-item">
                     <div class="img-container">
