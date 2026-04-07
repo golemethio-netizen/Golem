@@ -233,7 +233,7 @@
         return data.path;
     }
 
-   function calculateRepayment() {
+  function calculateRepayment() {
     const amount = parseFloat(document.getElementById('loanAmount').value);
     const duration = document.getElementById('loanDuration').value;
     const summaryBox = document.getElementById('repaymentSummary');
@@ -249,10 +249,10 @@
     const insuranceRate = 0.03;
     const disasterRate = 0.01;
     
-    // 2. Interest Rate (Added to Principal for Repayment)
-    let interestRate = 0.15;
-    if (duration === '7') interestRate = 0.05;
-    else if (duration === '60' || duration === '90') interestRate = 0.18;
+    // 2. Updated Interest Rates
+    let interestRate = 0; // Default (7 and 30 days are free)
+    if (duration === '60') interestRate = 0.12;
+    else if (duration === '90') interestRate = 0.18;
 
     // 3. Mathematical Calculations
     const valService = amount * serviceRate;
