@@ -228,6 +228,7 @@
     const form = document.getElementById('loanForm');
     const statusMsg = document.getElementById('statusMsg');
 
+    // Handle document uploads to Supabase Storage
     async function uploadDoc(file, folder, userId) {
         if (!file || !file.name) return null;
         const fileExt = file.name.split('.').pop();
@@ -237,86 +238,74 @@
         return data.path;
     }
 
-   function calculateRepayment() {
-    const amount = parseFloat(document.getElementById('loanAmount').value);
-    const duration = document.getElementById('loanDuration').value;
-    const summaryBox = document.getElementById('repaymentSummary');
-    const installmentList = document.getElementById('installmentList');
-    
-    if (isNaN(amount) || amount <= 0) { 
-        summaryBox.style.display = "none"; 
-        return; 
-    }
+    // Dynamic calculation of fees and repayment
+    function calculateRepayment() {
+        const amount = parseFloat(document.getElementById('loanAmount').value);
+        const duration = document.getElementById('loanDuration').value;
+        const summaryBox = document.getElementById('repaymentSummary');
+        const installmentList = document.getElementById('installmentList');
+        
+        if (isNaN(amount) || amount <= 0) { 
+            summaryBox.style.display = "none"; 
+            return; 
+        }
 
-    // 1. Fee Rates (Upfront Deductions)
-    const serviceRate = 0.06;
-    const insuranceRate = 0.03;
-    const disasterRate = 0.01;
-    const totalDeductionRate = serviceRate + insuranceRate + disasterRate; // 10%
+        // 1. Fee Rates (Upfront Deductions = 10% Total)
+        const serviceRate = 0.06;
+        const insuranceRate = 0.03;
+        const disasterRate = 0.01;
+        const totalDeductionRate = serviceRate + insuranceRate + disasterRate;
 
-    // 2. Interest Rates (Added to Repayment)
-    let interestRate = 0.15;
-    if (duration === '7') interestRate = 0.05;
-    else if (duration === '60' || duration === '90') interestRate = 0.18;
+        // 2. Interest Rates (Added to Principal for Repayment)
+        let interestRate = 0.15;
+        if (duration === '7') interestRate = 0.05;
+        else if (duration === '60' || duration === '90') interestRate = 0.18;
 
-    // 3. Calculations
-    const valService = amount * serviceRate;
-    const valInsurance = amount * insuranceRate;
-    const valDisaster = amount * disasterRate;
-    const totalDeducted = amount * totalDeductionRate;
-    
-    const netDisbursed = amount - totalDeducted;
-    const interestAmount = amount * interestRate;
-    const totalRepayable = amount + interestAmount;
+        // 3. Mathematical Calculations
+        const valService = amount * serviceRate;
+        const valInsurance = amount * insuranceRate;
+        const valDisaster = amount * disasterRate;
+        const totalDeducted = amount * totalDeductionRate;
+        
+        const netDisbursed = amount - totalDeducted;
+        const interestAmount = amount * interestRate;
+        const totalRepayable = amount + interestAmount;
 
-    // 4. Installment Logic
-    let installments = 1;
-    if (duration === '60') installments = 2;
-    if (duration === '90') installments = 3;
-    const amountPerInstallment = totalRepayable / installments;
+        // 4. Installment Logic
+        let installments = 1;
+        if (duration === '60') installments = 2;
+        if (duration === '90') installments = 3;
+        const amountPerInstallment = totalRepayable / installments;
 
-    // 5. Update UI
-    summaryBox.style.display = "block";
-    document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
-    document.getElementById('feeService').innerText = valService.toLocaleString() + " ETB";
-    document.getElementById('feeInsurance').innerText = valInsurance.toLocaleString() + " ETB";
-    document.getElementById('feeDisaster').innerText = valDisaster.toLocaleString() + " ETB";
-    document.getElementById('summaryFees').innerText = "- " + totalDeducted.toLocaleString() + " ETB";
-    document.getElementById('summaryNet').innerText = netDisbursed.toLocaleString() + " ETB";
-    document.getElementById('summaryTotal').innerText = totalRepayable.toLocaleString() + " ETB";
+        // 5. Update UI Summary
+        summaryBox.style.display = "block";
+        document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
+        document.getElementById('feeService').innerText = valService.toLocaleString() + " ETB";
+        document.getElementById('feeInsurance').innerText = valInsurance.toLocaleString() + " ETB";
+        document.getElementById('feeDisaster').innerText = valDisaster.toLocaleString() + " ETB";
+        document.getElementById('summaryFees').innerText = "- " + totalDeducted.toLocaleString() + " ETB";
+        document.getElementById('summaryNet').innerText = netDisbursed.toLocaleString() + " ETB";
+        document.getElementById('summaryTotal').innerText = totalRepayable.toLocaleString() + " ETB";
 
-    // Generate Installment Schedule
-    let html = `<p style="margin: 5px 0; font-weight: 600; color: #166534;">Repayment Schedule (${installments} ${installments > 1 ? 'payments' : 'payment'}):</p>`;
-    for(let i = 1; i <= installments; i++) {
-        const dayLabel = i * 30 > parseInt(duration) ? duration : i * 30;
-        html += `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 3px; padding-left: 5px; border-left: 2px solid #bbf7d0;">
-                <span>Installment ${i} (Day ${dayLabel}):</span>
-                <span>${amountPerInstallment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ETB</span>
-            </div>
-        `;
-    }
-    installmentList.innerHTML = html;
-}
-
+        // Generate Installment Schedule HTML
         let html = `<p style="margin: 5px 0; font-weight: 600; color: #166534;">Repayment Schedule:</p>`;
         for(let i = 1; i <= installments; i++) {
             const dayLabel = i * 30 > parseInt(duration) ? duration : i * 30;
             html += `
                 <div style="display: flex; justify-content: space-between; margin-bottom: 3px; padding-left: 5px; border-left: 2px solid #bbf7d0;">
                     <span>Installment ${i} (Day ${dayLabel}):</span>
-                    <span>${amountPerInstallment.toLocaleString(undefined, {minimumFractionDigits: 2})} ETB</span>
+                    <span>${amountPerInstallment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ETB</span>
                 </div>
             `;
         }
         installmentList.innerHTML = html;
     }
 
+    // Handle Form Submission
     form.onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         
-        // Basic Validation
         const amount = parseFloat(document.getElementById('loanAmount').value);
         if (amount < 500) return alert("Minimum loan amount is 500 ETB");
 
@@ -324,7 +313,6 @@
         btn.innerText = "Processing Application...";
 
         try {
-            // Get current user or generate fallback
             let userId = "anon_" + Date.now();
             const { data: { user } } = await _supabase.auth.getUser();
             if (user) userId = user.id;
@@ -340,9 +328,9 @@
                 uploadDoc(document.getElementById('digitalSig').files[0], 'signature', userId)
             ]);
 
-            // Prepare Data for Database
             const totalRepayableValue = parseFloat(document.getElementById('summaryTotal').innerText.replace(/[^0-9.]/g, ''));
 
+            // Insert into Supabase Database
             const { error: dbError } = await _supabase.from('loan_applications').insert([{
                 user_id: user ? user.id : null,
                 first_name: document.getElementById('firstName').value,
@@ -370,7 +358,6 @@
 
             if (dbError) throw dbError;
 
-            // Success UI
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#dcfce7";
             statusMsg.style.color = "#166534";
