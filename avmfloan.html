@@ -153,18 +153,30 @@
         </div>
 
         <div id="repaymentSummary" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; display: none;">
-            <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Repayment Summary</h4>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                <span>Principal:</span> <span id="summaryPrincipal">0.00 ETB</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                <span>Fees & Interest:</span> <span id="summaryFees" style="color: #dc2626;">0.00 ETB</span>
-            </div>
-            <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
-            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem;">
-                <span>Total Repayable:</span> <span id="summaryTotal">0.00 ETB</span>
-            </div>
+    <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem;">Loan Summary & Repayment</h4>
+    
+    <div style="background: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px inset #e2e8f0;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>Requested Amount:</span> <span id="summaryPrincipal">0.00 ETB</span>
         </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #dc2626;">
+            <span>Service Charge (Deducted):</span> <span id="summaryFees">0.00 ETB</span>
+        </div>
+        <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; color: #2563eb;">
+            <span>Net Disbursed to You:</span> <span id="summaryNet">0.00 ETB</span>
+        </div>
+    </div>
+
+    <div id="installmentList" style="font-size: 0.85rem;">
+        </div>
+
+    <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 10px 0;">
+    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem;">
+        <span>Total Repayable:</span> <span id="summaryTotal">0.00 ETB</span>
+    </div>
+</div>
+        
 
         <div class="section-title">Employment Information</div>
         <div class="form-grid">
@@ -215,38 +227,67 @@
         const amount = parseFloat(document.getElementById('loanAmount').value);
         const duration = document.getElementById('loanDuration').value;
         const summaryBox = document.getElementById('repaymentSummary');
+        const installmentList = document.getElementById('installmentList');
         
         if (isNaN(amount) || amount <= 0) { 
             summaryBox.style.display = "none"; 
             return; 
         }
 
-        let interestRate = 0.17; 
-        if (duration === '7') interestRate = 0.05; // Example for 7 days
-        else if (duration === '30') interestRate = 0.15;
+        const serviceChargeRate = 0.06; 
+        let interestRate = 0.15;        
+        
+        if (duration === '7') interestRate = 0.05;
         else if (duration === '60' || duration === '90') interestRate = 0.18;
 
-        const fees = amount * (interestRate + 0.06); 
-        const total = amount + fees;
+        const serviceCharge = amount * serviceChargeRate;
+        const netDisbursed = amount - serviceCharge; 
+        const interestAmount = amount * interestRate;
+        const totalRepayable = amount + interestAmount;
+
+        let installments = 1;
+        if (duration === '60') installments = 2;
+        if (duration === '90') installments = 3;
+
+        const amountPerInstallment = totalRepayable / installments;
 
         summaryBox.style.display = "block";
         document.getElementById('summaryPrincipal').innerText = amount.toLocaleString() + " ETB";
-        document.getElementById('summaryFees').innerText = fees.toLocaleString() + " ETB";
-        document.getElementById('summaryTotal').innerText = total.toLocaleString() + " ETB";
+        document.getElementById('summaryFees').innerText = "- " + serviceCharge.toLocaleString() + " ETB";
+        document.getElementById('summaryNet').innerText = netDisbursed.toLocaleString() + " ETB";
+        document.getElementById('summaryTotal').innerText = totalRepayable.toLocaleString() + " ETB";
+
+        let html = `<p style="margin: 5px 0; font-weight: 600; color: #166534;">Repayment Schedule:</p>`;
+        for(let i = 1; i <= installments; i++) {
+            const dayLabel = i * 30 > parseInt(duration) ? duration : i * 30;
+            html += `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 3px; padding-left: 5px; border-left: 2px solid #bbf7d0;">
+                    <span>Installment ${i} (Day ${dayLabel}):</span>
+                    <span>${amountPerInstallment.toLocaleString(undefined, {minimumFractionDigits: 2})} ETB</span>
+                </div>
+            `;
+        }
+        installmentList.innerHTML = html;
     }
 
     form.onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
+        
+        // Basic Validation
+        const amount = parseFloat(document.getElementById('loanAmount').value);
+        if (amount < 500) return alert("Minimum loan amount is 500 ETB");
+
         btn.disabled = true;
         btn.innerText = "Processing Application...";
 
         try {
-            let userId = "anonymous_" + Math.floor(Math.random() * 1000);
+            // Get current user or generate fallback
+            let userId = "anon_" + Date.now();
             const { data: { user } } = await _supabase.auth.getUser();
             if (user) userId = user.id;
 
-            // Upload all 7 documents
+            // Upload all 7 documents in parallel
             const [natF, natB, empF, empB, letter, photo, sig] = await Promise.all([
                 uploadDoc(document.getElementById('natIdFront').files[0], 'nat_front', userId),
                 uploadDoc(document.getElementById('natIdBack').files[0], 'nat_back', userId),
@@ -257,6 +298,9 @@
                 uploadDoc(document.getElementById('digitalSig').files[0], 'signature', userId)
             ]);
 
+            // Prepare Data for Database
+            const totalRepayableValue = parseFloat(document.getElementById('summaryTotal').innerText.replace(/[^0-9.]/g, ''));
+
             const { error: dbError } = await _supabase.from('loan_applications').insert([{
                 user_id: user ? user.id : null,
                 first_name: document.getElementById('firstName').value,
@@ -266,13 +310,16 @@
                 gender: document.getElementById('gender').value,
                 birthday: document.getElementById('birthday').value,
                 phone_number: document.getElementById('phoneNumber').value,
-                loan_amount: document.getElementById('loanAmount').value,
+                loan_amount: amount,
+                loan_duration: document.getElementById('loanDuration').value,
                 org_name: document.getElementById('orgName').value,
-                net_salary: document.getElementById('netSalary').value,
+                net_salary: parseFloat(document.getElementById('netSalary').value),
                 national_id_number: document.getElementById('nationalIDNum').value,
-                total_repayable: parseFloat(document.getElementById('summaryTotal').innerText.replace(/[^0-9.]/g, '')),
-                nat_id_front: natF, nat_id_back: natB,
-                emp_id_front: empF, emp_id_back: empB,
+                total_repayable: totalRepayableValue,
+                nat_id_front: natF, 
+                nat_id_back: natB,
+                emp_id_front: empF, 
+                emp_id_back: empB,
                 employment_letter: letter,
                 personal_photo: photo,
                 digital_signature: sig,
@@ -281,12 +328,15 @@
 
             if (dbError) throw dbError;
 
+            // Success UI
             statusMsg.style.display = "block";
             statusMsg.style.backgroundColor = "#dcfce7";
             statusMsg.style.color = "#166534";
             statusMsg.innerText = "Application Submitted Successfully!";
+            
             form.reset();
             document.getElementById('repaymentSummary').style.display = "none";
+            document.getElementById('installmentList').innerHTML = "";
 
         } catch (err) {
             statusMsg.style.display = "block";
