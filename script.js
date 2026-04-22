@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = window.currentCategory || 'All') => {
+    // 1. Declare 'grid' once at the top
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
@@ -54,17 +55,17 @@ window.fetchProducts = async (category = window.currentCategory || 'All') => {
         `)
         .eq('status', 'approved');
 
-    // 1. Category Filter
+    // Category Filter
     if (category !== 'All') {
         query = query.eq('category', category);
     }
 
-    // 2. Location Filter
+    // Location Filter
     if (locationFilter !== 'all') {
         query = query.ilike('location', `%${locationFilter}%`);
     }
 
-    // 3. Sorting Logic
+    // Sorting Logic
     if (sortOrder === 'price_low') {
         query = query.order('price', { ascending: true });
     } else if (sortOrder === 'price_high') {
@@ -73,14 +74,26 @@ window.fetchProducts = async (category = window.currentCategory || 'All') => {
         query = query.order('created_at', { ascending: false });
     }
 
+    // Execute the query
     const { data, error } = await query;
+    
+    // Check for errors
     if (!error) {
         renderProducts(data);
     } else {
         console.error("Fetch error:", error.message);
+        // Display the database error on the screen
+        if (grid) {
+            grid.innerHTML = `
+                <div style="text-align:center; grid-column:1/-1; padding:50px; color:#ff4757; background:#fff; border-radius:12px; border:1px solid #ff4757;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:30px; margin-bottom:10px;"></i>
+                    <h3>Database Error</h3>
+                    <p>${error.message}</p>
+                    <p style="font-size:0.8rem; color:#666; margin-top:10px;">Check your Supabase RLS policies or Table relationships.</p>
+                </div>`;
+        }
     }
 };
-
 window.filterSponsored = async () => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
