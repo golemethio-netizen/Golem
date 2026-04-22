@@ -4,8 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sell an Item | Golem</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .input-group-sell { margin-bottom: 15px; }
+        .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
+        .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem;
+        }
+        .auth-submit { background: #333; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .auth-submit:hover { background: #000; }
+        .auth-submit:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
 </head>
 <body style="background: #f8f9fa; display: none;" id="sellPageBody">
 
@@ -21,9 +33,14 @@
 
             <form id="sellForm">
                 <div class="input-group-sell">
-                    <label><i class="fas fa-camera"></i> Upload Product Photo</label>
-                    <img id="imagePreview" src="#" alt="Preview" style="display:none; width:100%; border-radius:10px; margin-top:10px; margin-bottom:10px;">
-                    <input type="file" id="prodFile" accept="image/*" required style="border: 2px dashed #ddd; padding: 20px; text-align: center; width: 100%;">
+                    <label><i class="fas fa-camera"></i> Upload Product Photo (Max 5MB)</label>
+                    
+                    <!-- Image Preview Container -->
+                    <div style="text-align: center;">
+                        <img id="imagePreview" src="#" alt="Preview" style="display:none; width:100%; max-height: 300px; object-fit: cover; border-radius:10px; margin: 10px 0;">
+                    </div>
+                    
+                    <input type="file" id="prodFile" accept="image/*" required style="border: 2px dashed #ddd; padding: 20px; text-align: center; width: 100%; cursor: pointer;">
                 </div>
 
                 <div class="input-group-sell">
@@ -32,16 +49,16 @@
                 </div>
 
                 <div style="display: flex; gap: 15px;">
-                  <div class="input-group-sell" style="flex: 1;">
-    <label><i class="fas fa-star"></i> Condition</label>
-    <select id="status_condition" required>
-        <option value="New">New</option>
-        <option value="Used">Used</option>
-        <option value="Refurbished">Refurbished</option>
-        <option value="Damage">Damage / For Parts</option>
-        <option value="We work on order">We work on order (Custom)</option>
-    </select>
-</div>
+                    <div class="input-group-sell" style="flex: 1;">
+                        <label><i class="fas fa-star"></i> Condition</label>
+                        <select id="status_condition" required>
+                            <option value="New">New</option>
+                            <option value="Used">Used</option>
+                            <option value="Refurbished">Refurbished</option>
+                            <option value="Damage">Damage / For Parts</option>
+                            <option value="We work on order">We work on order (Custom)</option>
+                        </select>
+                    </div>
                     <div class="input-group-sell" style="flex: 1;">
                         <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
                         <input type="number" id="prodPrice" placeholder="0.00" required>
@@ -71,43 +88,45 @@
                     <label><i class="fas fa-phone"></i> Contact Phone</label>
                     <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
-<div class="input-group-sell">
-    <label><i class="fas fa-map-marker-alt"></i> Region</label>
-    <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
-        <option value="" disabled selected>Select Region</option>
-        <option value="Addis Ababa">Addis Ababa</option>
-        <option value="Afar">Afar</option>
-        <option value="Amhara">Amhara</option>
-        <option value="Benishangul-Gumuz">Benishangul-Gumuz</option>
-        <option value="Central Ethiopia">Central Ethiopia</option>
-        <option value="Gambela">Gambela</option>
-        <option value="Harari">Harari</option>
-        <option value="Oromia">Oromia</option>
-        <option value="Sidama">Sidama</option>
-        <option value="Somali">Somali</option>
-        <option value="South Ethiopia">South Ethiopia</option>
-        <option value="South West Ethiopia">South West Ethiopia</option>
-        <option value="Tigray">Tigray</option>
-    </select>
-</div>
+                
+                <div class="input-group-sell">
+                    <label><i class="fas fa-map-marker-alt"></i> Region</label>
+                    <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
+                        <option value="" disabled selected>Select Region</option>
+                        <option value="Addis Ababa">Addis Ababa</option>
+                        <option value="Afar">Afar</option>
+                        <option value="Amhara">Amhara</option>
+                        <option value="Benishangul-Gumuz">Benishangul-Gumuz</option>
+                        <option value="Central Ethiopia">Central Ethiopia</option>
+                        <option value="Gambela">Gambela</option>
+                        <option value="Harari">Harari</option>
+                        <option value="Oromia">Oromia</option>
+                        <option value="Sidama">Sidama</option>
+                        <option value="Somali">Somali</option>
+                        <option value="South Ethiopia">South Ethiopia</option>
+                        <option value="South West Ethiopia">South West Ethiopia</option>
+                        <option value="Tigray">Tigray</option>
+                    </select>
+                </div>
 
-<div class="input-group-sell" id="districtWrapper" style="display: none;">
-    <label><i class="fas fa-city"></i> Sub-City / District</label>
-    <select id="prodDistrict">
-        <option value="" disabled selected>Select Sub-City</option>
-        <option value="Addis Ketema">Addis Ketema</option>
-        <option value="Akaki Kality">Akaki Kality</option>
-        <option value="Arada">Arada</option>
-        <option value="Bole">Bole</option>
-        <option value="Gullele">Gullele</option>
-        <option value="Kirkos">Kirkos</option>
-        <option value="Kolfe Keranio">Kolfe Keranio</option>
-        <option value="Lideta">Lideta</option>
-        <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
-        <option value="Lemi Kura">Lemi Kura</option>
-        <option value="Yeka">Yeka</option>
-    </select>
-</div>
+                <div class="input-group-sell" id="districtWrapper" style="display: none;">
+                    <label><i class="fas fa-city"></i> Sub-City / District</label>
+                    <select id="prodDistrict">
+                        <option value="" disabled selected>Select Sub-City</option>
+                        <option value="Addis Ketema">Addis Ketema</option>
+                        <option value="Akaki Kality">Akaki Kality</option>
+                        <option value="Arada">Arada</option>
+                        <option value="Bole">Bole</option>
+                        <option value="Gullele">Gullele</option>
+                        <option value="Kirkos">Kirkos</option>
+                        <option value="Kolfe Keranio">Kolfe Keranio</option>
+                        <option value="Lideta">Lideta</option>
+                        <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
+                        <option value="Lemi Kura">Lemi Kura</option>
+                        <option value="Yeka">Yeka</option>
+                    </select>
+                </div>
+                
                 <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
                     Publish Listing
                 </button>
@@ -118,155 +137,165 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-       document.addEventListener('DOMContentLoaded', async () => {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    // --- AUTH GUARD ---
-    if (!user) {
-        alert("Please log in to sell items.");
-        window.location.href = 'index.html?auth=required';
-        return; // Stop execution
-    }
-
-    // User exists, so show the page
-    document.getElementById('sellPageBody').style.display = 'block';
-
-    // --- PRE-FILL USER DATA ---
-    if (user.user_metadata.phone_number) {
-        document.getElementById('prodPhone').value = user.user_metadata.phone_number;
-    }
-
-    if (user.user_metadata.location) {
-        const locParts = user.user_metadata.location.split(', ');
-        if (locParts.length > 1) {
-            document.getElementById('prodRegion').value = locParts[1];
-            window.toggleDistricts(locParts[1]);
-            document.getElementById('prodDistrict').value = locParts[0];
-        } else {
-            document.getElementById('prodRegion').value = locParts[0];
-            window.toggleDistricts(locParts[0]);
-        }
-    }
-});
-       // --- SUBMIT FORM LOGIC ---
-const sellForm = document.getElementById('sellForm');
-sellForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    const fileInput = document.getElementById('prodFile');
-    
-    const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return alert("Session expired. Please sign in again.");
-
-    btn.innerText = "Processing Listing...";
-    btn.disabled = true;
-
-    try {
-        // A. Upload Image
-        const file = fileInput.files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const filePath = `${user.id}/${fileName}`;
-
-        let { error: uploadError } = await _supabase.storage
-            .from('product-images')
-            .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = _supabase.storage
-            .from('product-images')
-            .getPublicUrl(filePath);
-
-        // B. Handle New Location Logic (Region + District)
-       // Use the new dropdown IDs instead
-const region = document.getElementById('prodRegion').value;
-const districtSelect = document.getElementById('prodDistrict');
-const district = districtSelect ? districtSelect.value : "";
-
-// Combine them: "Bole, Addis Ababa" or just "Oromia"
-const finalLocation = district ? `${district}, ${region}` : region;
-
-        // C. Insert into Database
-        const { error: dbError } = await _supabase
-            .from('products')
-            .insert([{
-                name: document.getElementById('prodName').value,
-                status_condition: document.getElementById('status_condition').value,
-                price: parseFloat(document.getElementById('prodPrice').value),
-                category: document.getElementById('prodCategory').value,
-                description: document.getElementById('prodDesc').value,
-                location: finalLocation,
-                image: publicUrl,
-                seller_phone: document.getElementById('prodPhone').value,
-                seller_name: user.user_metadata?.full_name || user.email.split('@')[0],
-                user_id: user.id,
-                status: 'pending' 
-            }]);
-
-        if (dbError) throw dbError;
-
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { user } } = await _supabase.auth.getUser();
             
+            // --- AUTH GUARD ---
+            if (!user) {
+                alert("Please log in to sell items.");
+                window.location.href = 'index.html?auth=required';
+                return; // Stop execution
+            }
 
-            // D. Telegram Notification
-        const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
-            `📦 *Item:* ${document.getElementById('prodName').value}\n` +
-            `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
-            `📍 *Loc:* ${finalLocation}\n` +
-            `📞 *Phone:* ${document.getElementById('prodPhone').value}\n` +
-            `👉 _Check Admin Panel_`;
-                
-        await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: GolemConfig.chatId,
-                text: telegramMessage,
-                parse_mode: 'Markdown'
-            })
+            // User exists, so show the page
+            document.getElementById('sellPageBody').style.display = 'block';
+
+            // --- PRE-FILL USER DATA ---
+            if (user.user_metadata.phone_number) {
+                document.getElementById('prodPhone').value = user.user_metadata.phone_number;
+            }
+
+            if (user.user_metadata.location) {
+                const locParts = user.user_metadata.location.split(', ');
+                if (locParts.length > 1) {
+                    document.getElementById('prodRegion').value = locParts[1];
+                    window.toggleDistricts(locParts[1]);
+                    document.getElementById('prodDistrict').value = locParts[0];
+                } else {
+                    document.getElementById('prodRegion').value = locParts[0];
+                    window.toggleDistricts(locParts[0]);
+                }
+            }
         });
 
-        alert("Success! Your item is now pending admin approval.");
-        window.location.href = `index.html?posted=${encodeURIComponent(document.getElementById('prodName').value)}`;
+        // --- IMAGE PREVIEW & SIZE VALIDATION ---
+        document.getElementById('prodFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                // Check if file is larger than 5MB
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image is too large! Please select an image smaller than 5MB.');
+                    this.value = ''; // Reset file input
+                    preview.style.display = 'none';
+                    return;
+                }
 
-    } catch (error) {
-        console.error(error);
-        alert("❌ Error: " + error.message);
-    } finally {
-        btn.innerText = "Publish Listing";
-        btn.disabled = false;
-    }
-});
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
 
+        // --- SUBMIT FORM LOGIC ---
+        const sellForm = document.getElementById('sellForm');
+        sellForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const fileInput = document.getElementById('prodFile');
+            
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return alert("Session expired. Please sign in again.");
 
-// Helper for Location Dropdowns
-window.toggleDistricts = function(region) {
-    const wrapper = document.getElementById('districtWrapper');
-    const districtSelect = document.getElementById('prodDistrict');
-    if (region === 'Addis Ababa') {
-        wrapper.style.display = 'block';
-        districtSelect.required = true;
-    } else {
-        wrapper.style.display = 'none';
-        districtSelect.required = false;
-        districtSelect.value = ""; 
-    }
-};
+            btn.innerText = "Processing Listing...";
+            btn.disabled = true;
 
+            try {
+                // A. Upload Image
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${user.id}/${fileName}`;
 
+                let { error: uploadError } = await _supabase.storage
+                    .from('product-images')
+                    .upload(filePath, file);
 
-        
-</script>
+                if (uploadError) throw uploadError;
 
-    <style>
-        .input-group-sell { margin-bottom: 15px; }
-        .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
-        .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem;
-        }
-        .auth-submit { background: #333; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .auth-submit:hover { background: #000; }
-        .auth-submit:disabled { background: #ccc; }
-    </style>
+                const { data: { publicUrl } } = _supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+
+                // B. Handle New Location Logic (Region + District)
+                const region = document.getElementById('prodRegion').value;
+                const districtSelect = document.getElementById('prodDistrict');
+                const district = districtSelect ? districtSelect.value : "";
+
+                // Combine them: "Bole, Addis Ababa" or just "Oromia"
+                const finalLocation = district && region === 'Addis Ababa' ? `${district}, ${region}` : region;
+
+                // C. Insert into Database
+                const { error: dbError } = await _supabase
+                    .from('products')
+                    .insert([{
+                        name: document.getElementById('prodName').value,
+                        status_condition: document.getElementById('status_condition').value,
+                        price: parseFloat(document.getElementById('prodPrice').value),
+                        category: document.getElementById('prodCategory').value,
+                        description: document.getElementById('prodDesc').value,
+                        location: finalLocation,
+                        image: publicUrl,
+                        seller_phone: document.getElementById('prodPhone').value,
+                        seller_name: user.user_metadata?.full_name || user.email.split('@')[0],
+                        user_id: user.id,
+                        status: 'pending' 
+                    }]);
+
+                if (dbError) throw dbError;
+
+                // D. Telegram Notification
+                const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
+                    `📦 *Item:* ${document.getElementById('prodName').value}\n` +
+                    `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
+                    `📍 *Loc:* ${finalLocation}\n` +
+                    `📞 *Phone:* ${document.getElementById('prodPhone').value}\n` +
+                    `👉 _Check Admin Panel_`;
+                        
+                // Assuming GolemConfig is defined in config.js
+                if (typeof GolemConfig !== 'undefined' && GolemConfig.botToken) {
+                    await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: GolemConfig.chatId,
+                            text: telegramMessage,
+                            parse_mode: 'Markdown'
+                        })
+                    }).catch(e => console.log("Telegram notification failed (non-critical):", e));
+                }
+
+                // Redirect to index with success parameter
+                window.location.href = `index.html?posted=true&item=${encodeURIComponent(document.getElementById('prodName').value)}`;
+
+            } catch (error) {
+                console.error(error);
+                alert("❌ Error: " + error.message);
+            } finally {
+                btn.innerText = "Publish Listing";
+                btn.disabled = false;
+            }
+        });
+
+        // Helper for Location Dropdowns
+        window.toggleDistricts = function(region) {
+            const wrapper = document.getElementById('districtWrapper');
+            const districtSelect = document.getElementById('prodDistrict');
+            if (region === 'Addis Ababa') {
+                wrapper.style.display = 'block';
+                districtSelect.required = true;
+            } else {
+                wrapper.style.display = 'none';
+                districtSelect.required = false;
+                districtSelect.value = ""; 
+            }
+        };
+    </script>
 </body>
 </html>
