@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golem Admin | Control Center</title>
+    <title>WanaGebya Admin | Control Center</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -44,7 +44,7 @@
 <body style="background: #f4f7f6;">
 
     <header class="golem-header">
-        <div class="logo">GOLEM ADMIN</div>
+        <div class="logo">WanaGebya ADMIN</div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
             <button class="signin-btn" onclick="location.href='index.html'" style="background:#666;">View Site</button>
@@ -640,7 +640,7 @@
             
             // Build the base domain logic (accounting for localhost/production)
             const baseUrl = (window.location.origin.includes('127.0') || window.location.origin.includes('localhost')) 
-                ? 'https://golem.com' // Switch to your actual domain if on local testing
+                ? 'https://wanagebya.com' // Switch to your actual domain if on local testing
                 : window.location.origin;
                 
             document.getElementById('utmUrl').value = `${baseUrl}/product.html?id=${id}`;
