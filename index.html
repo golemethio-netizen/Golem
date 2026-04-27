@@ -15,11 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
@@ -101,7 +98,7 @@
                     <h2 id="sponsorTitle">Loading Sponsor...</h2>
                     <p id="sponsorDesc"></p>
                     <div class="sponsor-actions">
-                        <a href="#" id="sponsorLink" class="buy-btn">View Item</a>
+                        <a href="#" id="sponsorLink" class="buy-btn" onclick="window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText)">View Item</a>
                         <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor →</a>
                     </div>
                 </div>
@@ -157,7 +154,7 @@
 
         <div class="invite-container">
             <i class="fas fa-users"></i>
-            <h3> Help WanaGebya Grow!By Sharing </h3>
+            <h3> Help WanaGebya Grow! By Sharing </h3>
             <p>Know someone selling something? Invite them to WanaGebya .</p>
             <div class="invite-btns">
                 <button onclick="window.shareToTelegram()" class="tg-btn" style="background:#0088cc;">
@@ -306,7 +303,7 @@
         </div>
     </div>
 
-    <!-- 3. Product Details Modal -->
+    <!-- 3. Product Details Modal (UPDATED WITH LOGGING INJECTION) -->
     <div id="productModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.closeProductModal()">
         <div class="modal-content">
             <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
@@ -331,11 +328,12 @@
                 <div id="modalProductPrice" class="modal-price"></div>
                 <p id="modalProductDesc" class="modal-description"></p>
 
+                <!-- BUYER LOGGING ADDED ON THESE CLICKS -->
                 <div class="modal-footer-actions">
-                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Telegram</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal()" style="grid-column: span 3;">
+                    <a id="callContact" href="#" class="contact-btn" onclick="window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn" onclick="window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn" onclick="window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);" style="grid-column: span 3;">
                         <i class="fas fa-heart"></i> Save to Wishlist
                     </button>
                 </div>
@@ -445,16 +443,46 @@
                 }
             }
         }
-// Whenever a buyer clicks a button, run this code:
-const logBuyerAction = async (buyerEmail, actionDescription) => {
-    await _supabase.from('audit_logs').insert([{
-        admin_email: buyerEmail || 'Guest/Unknown', 
-        action: '[BUYER] Action Taken',
-        details: actionDescription
-    }]);
-};
 
-// Example Usage: logBuyerAction('buyer@gmail.com', 'Clicked on iPhone 15 Phone Number');
+        // ==========================================
+        //  --- ADVANCED BUYER AUDIT LOG SYSTEM ---
+        // ==========================================
+        window.logBuyerAction = async (buyerEmail, actionDescription) => {
+            try {
+                if (typeof _supabase === 'undefined') return;
+
+                // 1. Identify the user (If email isn't provided, fetch it from session)
+                let userEmail = buyerEmail;
+                if (!userEmail) {
+                    const { data: { user } } = await _supabase.auth.getUser();
+                    if (user) {
+                        userEmail = user.email || user.user_metadata?.full_name || 'Logged-In User';
+                    } else {
+                        userEmail = 'Guest/Unknown';
+                    }
+                }
+
+                // 2. Insert into the database
+                await _supabase.from('audit_logs').insert([{
+                    admin_email: userEmail, 
+                    action: '[BUYER] Interaction',
+                    details: actionDescription
+                }]);
+            } catch (err) {
+                console.log("Audit log recording skipped:", err);
+            }
+        };
+
+        // TRACK UTM / MARKETING TRAFFIC ON PAGE LOAD
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmSource = urlParams.get('utm_source');
+            if (utmSource) {
+                const campaign = urlParams.get('utm_campaign') || 'Un-named Campaign';
+                window.logBuyerAction(null, `Arrived on site via Tracked Link (Source: ${utmSource} | Campaign: ${campaign})`);
+            }
+        });
+
         // Check Admin status immediately, then every 2 minutes
         loadAdminStatus();
         setInterval(loadAdminStatus, 120000);
