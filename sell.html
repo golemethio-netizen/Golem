@@ -230,14 +230,16 @@
 
                 // Combine them: "Bole, Addis Ababa" or just "Oromia"
                 const finalLocation = district && region === 'Addis Ababa' ? `${district}, ${region}` : region;
+                const itemName = document.getElementById('prodName').value;
+                const itemPrice = document.getElementById('prodPrice').value;
 
                 // C. Insert into Database
                 const { error: dbError } = await _supabase
                     .from('products')
                     .insert([{
-                        name: document.getElementById('prodName').value,
+                        name: itemName,
                         status_condition: document.getElementById('status_condition').value,
-                        price: parseFloat(document.getElementById('prodPrice').value),
+                        price: parseFloat(itemPrice),
                         category: document.getElementById('prodCategory').value,
                         description: document.getElementById('prodDesc').value,
                         location: finalLocation,
@@ -250,10 +252,21 @@
 
                 if (dbError) throw dbError;
 
-                // D. Telegram Notification
+                // ---> D. NEW: SELLER AUDIT LOG INJECTION <---
+                try {
+                    await _supabase.from('audit_logs').insert([{
+                        admin_email: user.email, // Passing the seller's email to the log table
+                        action: '[SELLER] Posted New Listing',
+                        details: `Item: ${itemName} | Price: ${itemPrice} ETB | Location: ${finalLocation}`
+                    }]);
+                } catch(logErr) {
+                    console.log("Audit log recording skipped:", logErr);
+                }
+
+                // E. Telegram Notification
                 const telegramMessage = `🔔 *NEW LISTING PENDING*\n\n` +
-                    `📦 *Item:* ${document.getElementById('prodName').value}\n` +
-                    `💰 *Price:* ${document.getElementById('prodPrice').value} ETB\n` +
+                    `📦 *Item:* ${itemName}\n` +
+                    `💰 *Price:* ${itemPrice} ETB\n` +
                     `📍 *Loc:* ${finalLocation}\n` +
                     `📞 *Phone:* ${document.getElementById('prodPhone').value}\n` +
                     `👉 _Check Admin Panel_`;
@@ -272,7 +285,7 @@
                 }
 
                 // Redirect to index with success parameter
-                window.location.href = `index.html?posted=true&item=${encodeURIComponent(document.getElementById('prodName').value)}`;
+                window.location.href = `index.html?posted=true&item=${encodeURIComponent(itemName)}`;
 
             } catch (error) {
                 console.error(error);
