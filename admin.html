@@ -515,7 +515,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
             });
         });
+        
+     async function exportToExcel() {
+    const { data: allProducts, error } = await _supabase
+        .from('products')
+        .select('name, price, status, location, seller_phone, traffic_source, created_at');
 
+    if (error) {
+        alert("Export failed: " + error.message);
+        return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(allProducts);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Golem_Market_Report");
+    
+    // Generate filename with current date
+    const date = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(workbook, `Golem_Report_${date}.xlsx`);
+}
+async function performGlobalSearch() {
+    const term = document.getElementById('adminSearchInput').value;
+    if (term.length < 3) return; // Only search after 3 characters
+
+    const grid = document.getElementById('adminGrid');
+    grid.innerHTML = "<p>Searching Database...</p>";
+
+    const { data: results, error } = await _supabase
+        .from('products')
+        .select('*')
+        .or(`name.ilike.%${term}%,location.ilike.%${term}%,seller_phone.ilike.%${term}%`);
+
+    if (results) {
+        // Reuse your loadItems logic here to render 'results'
+        renderSearchResults(results);
+    }
+}
     </script>
 </body>
 </html>
