@@ -20,21 +20,55 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- ================= MOBILE OPTIMIZATION CSS ================= -->
+    <!-- ================= MOBILE OPTIMIZATION & HEADER CSS ================= -->
     <style>
         /* Base header restructuring for better flow */
         .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
-        .header-actions { display: flex; align-items: center; gap: 10px; }
+        
+        .header-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+
+        .help-link {
+            color: #555;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .help-link:hover { color: #007bff; }
 
         @media (max-width: 768px) {
             /* 1. Header & Search Fixes */
             .golem-header { padding: 15px 10px; }
             .header-top-row { flex-wrap: nowrap; }
-            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; }
+            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
             .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
             
+            /* Smart Hide for Mobile Header */
+            .hide-text-mobile { display: none !important; }
+            .header-actions { gap: 10px; }
+            .help-link i { font-size: 1.3rem !important; }
+            
+            .sign-in-btn { 
+                padding: 8px !important; 
+                border-radius: 50% !important; 
+                width: 36px; 
+                height: 36px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+            }
+            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
+
             /* 2. App-like Bottom Navigation Bar */
-            body { padding-bottom: 70px; /* Prevent content from hiding behind nav */ }
+            body { padding-bottom: 70px; }
             .nav-container-horizontal {
                 position: fixed;
                 bottom: 0;
@@ -61,7 +95,6 @@
             .nav-item-box i { font-size: 1.3rem; color: #3498db; }
             .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
             
-            /* Admin Tab special color on mobile */
             #adminNavLink i { color: #e74c3c; }
 
             /* 3. Swipeable Horizontal Filters */
@@ -69,11 +102,11 @@
                 display: flex;
                 flex-wrap: nowrap;
                 overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+                -webkit-overflow-scrolling: touch;
                 padding-bottom: 5px;
                 gap: 8px;
             }
-            .filter-bar::-webkit-scrollbar { display: none; } /* Hide scrollbar */
+            .filter-bar::-webkit-scrollbar { display: none; }
             .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
 
             /* 4. 2-Column Grid for Phones */
@@ -82,12 +115,12 @@
                 gap: 12px;
             }
             
-            /* 5. Modals taking full screen */
+            /* 5. Modals */
             .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
             .modal-footer-actions { flex-direction: column; }
             .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
 
-            /* 6. Fix Floating Chat overlapping bottom nav */
+            /* 6. Floating Chat Fix */
             .floating-chat { bottom: 85px; right: 15px; }
             #chatMenu { bottom: 70px; right: 0; }
 
@@ -104,23 +137,32 @@
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
         
-        <!-- Top Row: Logo & Auth -->
+        <!-- Top Row: Logo & Utility Actions -->
         <div class="header-top-row">
             <div class="logo">WanaGebya | ዋና ገበያ</div>
 
             <div class="header-actions">
+                
+                <!-- 1. Need Help Button -->
+                <a href="#" onclick="window.toggleSupportModal()" class="help-link">
+                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i> 
+                    <span class="hide-text-mobile">Help</span>
+                </a>
+
+                <!-- 2. Language Button -->
                 <div class="lang-toggle-wrapper">
-                    <button onclick="window.toggleLanguage()" class="lang-btn" style="padding: 8px 12px; border-radius: 20px;">
+                    <button onclick="window.toggleLanguage()" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
                         <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
                     </button>
                 </div>
 
+                <!-- 3. Sign In / User Profile -->
                 <div class="nav-auth-controls">
-                    <button id="signInBtn" class="filter-btn" onclick="window.toggleModal()" style="padding: 8px 15px; background: #333; color: white;">
-                        <i class="fas fa-user"></i> Sign In
+                    <button id="signInBtn" class="filter-btn sign-in-btn" onclick="window.toggleModal()" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
                     </button>
 
-                    <div id="userWelcome" style="display:none; align-items:center; gap:10px;">
+                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
                         <span onclick="location.href='profile.html'" style="cursor:pointer; font-size: 0.85rem;">
                             <strong id="userName"></strong>
                         </span>
@@ -129,6 +171,7 @@
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -164,12 +207,6 @@
             <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;">
                 <i class="fas fa-user-shield"></i>
                 <p>Admin</p>
-            </a>
-        </div>
-        
-        <div style="width: 100%; text-align: center; margin-top: 10px;">
-            <a href="#" onclick="window.toggleSupportModal()" style="color: #888; font-size: 0.8rem; text-decoration: none;">
-                <i class="fas fa-question-circle"></i> Need Help? Contact Us
             </a>
         </div>
     </header>
@@ -324,7 +361,7 @@
     <div id="supportModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.toggleSupportModal()">
         <div class="modal-content" style="max-width: 400px;">
             <button onclick="window.toggleSupportModal()" class="close-modal-btn">&times;</button>
-            <h2>Contact WanaGebya  Support</h2>
+            <h2>Contact WanaGebya Support</h2>
             <form onsubmit="window.handleSupportSubmit(event)">
                 <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
                 <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
