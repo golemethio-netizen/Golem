@@ -34,6 +34,11 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
+
+        /* UTM Form Styles */
+        .utm-input-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
+        .utm-input-group input { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 0.95rem; outline: none; }
+        .utm-input-group input:focus { border-color: #3498db; }
     </style>
 </head>
 <body style="background: #f4f7f6;">
@@ -57,17 +62,15 @@
             <button onclick="switchTab('sold', this)" class="tab-btn">Sold Items</button> 
             <button onclick="switchTab('rejected', this)" class="tab-btn">Archive/Rejected</button>
             <button onclick="switchTab('users', this)" class="tab-btn">Registered Users</button>
+            <button onclick="switchTab('utm', this)" class="tab-btn" style="background: #e1f5fe; color: #0288d1;"><i class="fas fa-link"></i> Marketing (UTM)</button>
             
             <button onclick="generateSponsorReport()" style="background: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
                 <i class="fas fa-file-invoice"></i> Expiry Report (24h)
             </button>
-            <button onclick="exportToExcel()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px;">
-    <i class="fas fa-file-excel"></i> Export All
-</button>
         </div>
 
         <!-- SEARCH BAR -->
-        <div class="admin-search-bar" style="margin-bottom: 25px;">
+        <div class="admin-search-bar" id="searchContainer" style="margin-bottom: 25px;">
             <input type="text" id="adminSearchInput" placeholder="Search by name, phone, or category..." 
                    style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #ddd; outline: none; font-size: 1rem;">
         </div>
@@ -110,6 +113,47 @@
                 <div id="userList" style="display: grid; gap: 10px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 </div>
             </section>
+
+            <!-- UTM Builder View -->
+            <section id="utmSection" style="display: none; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2 style="margin-bottom: 20px; color:#333;"><i class="fas fa-bullhorn" style="color:#3498db;"></i> Marketing & UTM Link Builder</h2>
+                <p style="color:#666; margin-bottom: 25px;">Generate tracking URLs to see where your traffic comes from (Facebook, Telegram, Google, etc.).</p>
+                
+                <div style="display: grid; gap: 20px; max-width: 600px;">
+                    <div class="utm-input-group">
+                        <label>Target URL (Link to your site) *</label>
+                        <input type="url" id="utmUrl" placeholder="e.g. https://yourdomain.com/product.html?id=123">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="utm-input-group">
+                            <label>Campaign Source (utm_source) *</label>
+                            <input type="text" id="utmSource" placeholder="e.g. telegram, facebook, newsletter">
+                        </div>
+                        <div class="utm-input-group">
+                            <label>Campaign Medium (utm_medium)</label>
+                            <input type="text" id="utmMedium" placeholder="e.g. social, email, cpc">
+                        </div>
+                    </div>
+
+                    <div class="utm-input-group">
+                        <label>Campaign Name (utm_campaign)</label>
+                        <input type="text" id="utmCampaign" placeholder="e.g. spring_promo, sponsored_ad_01">
+                    </div>
+
+                    <button onclick="generateUTM()" style="background: #3498db; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                        Generate Trackable URL
+                    </button>
+                    
+                    <div style="margin-top: 10px; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px dashed #ccc;">
+                        <label style="font-weight:bold; display:block; margin-bottom:10px; color:#27ae60;">Generated URL Result:</label>
+                        <textarea id="utmResult" readonly style="width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #ddd; height: 90px; resize:none; font-family:monospace; background:#fff;"></textarea>
+                        <button onclick="copyUTM()" style="margin-top: 15px; background: #2ed573; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight:bold;">
+                            <i class="fas fa-copy"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <!-- TICKETS -->
@@ -130,7 +174,7 @@
             await checkAdmin();
             updateAdminPresence();
             loadStats();
-            ('pending');
+            loadItems('pending');
             loadTickets();
             checkStorageUsage();
         });
@@ -164,15 +208,24 @@
 
             const itemsSection = document.getElementById('itemsSection');
             const usersSection = document.getElementById('usersSection');
+            const utmSection = document.getElementById('utmSection');
+            const searchContainer = document.getElementById('searchContainer');
             const viewTitle = document.getElementById('viewTitle');
 
+            // Hide all by default
+            itemsSection.style.display = 'none';
+            usersSection.style.display = 'none';
+            utmSection.style.display = 'none';
+            searchContainer.style.display = 'block';
+
             if (status === 'users') {
-                itemsSection.style.display = 'none';
                 usersSection.style.display = 'block';
                 loadUsers();
+            } else if (status === 'utm') {
+                utmSection.style.display = 'block';
+                searchContainer.style.display = 'none'; // hide search on builder
             } else {
                 itemsSection.style.display = 'block';
-                usersSection.style.display = 'none';
                 viewTitle.innerText = status.toUpperCase() + " ITEMS";
                 loadItems(status);
             }
@@ -250,18 +303,16 @@
                     if (timeLeft < twentyFourHours) expiringClass = 'expiring-soon';
                 }
 
+                // Show UTM Source visually if it exists in db
+                const utmDisplay = item.utm_source ? 
+                    `<p style="font-size:0.75rem; color:#27ae60; margin-top:5px; font-weight:600;"><i class="fas fa-satellite-dish"></i> Traffic: ${item.utm_source}</p>` : '';
+
                 return `
                 <div class="product-card ${expiringClass}" id="card-${item.id}" style="background:white; border-radius:12px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px;">
                     <img src="${item.image}" style="width:100%; height:200px; object-fit:cover; ${status === 'sold' ? 'filter: grayscale(100%);' : ''}">
                     
                     <div class="product-info" style="padding:15px;">
                         <h3 style="margin-bottom:5px;">${item.name}</h3>
-
-                        ${item.traffic_source ? `
-            <span style="background: #e1f5fe; color: #039be5; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">
-                <i class="fab fa-youtube"></i> SOURCE: ${item.traffic_source.toUpperCase()}
-            </span>
-        ` : ''}
                         <p style="color:#2ed573; font-weight:bold; font-size:1.1rem;">${item.price?.toLocaleString()} ETB</p>
                         
                         <p style="font-size:0.85rem; color:#666; margin-top:5px; display: flex; align-items: center; gap: 5px;">
@@ -270,6 +321,7 @@
                         <p style="font-size:0.85rem; color:#666; margin-top:5px;">
                             Seller: <a href="tel:${item.seller_phone}" style="color:#007bff; text-decoration:none;">${item.seller_phone}</a>
                         </p>
+                        ${utmDisplay}
                         
                         <div class="admin-actions" style="margin-top:15px; border-top: 1px solid #eee; padding-top:10px;">
                             ${status === 'pending' ? `
@@ -295,6 +347,9 @@
                                         </p>
                                     ` : ''}
                                 </div>
+                                <button onclick="openUTMBuilderForProduct('${item.id}')" style="margin-top:10px; background:#3498db; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
+                                    <i class="fas fa-link"></i> Create UTM Link
+                                </button>
                                 <button onclick="updateStatus('${item.id}', 'sold')" style="margin-top:10px; background:#ffa502; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
                                     <i class="fas fa-check-circle"></i> Mark as Sold
                                 </button>
@@ -402,11 +457,12 @@
 
             list.innerHTML = filterHTML + `
                 <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; min-width: 700px;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
                     <thead>
                         <tr style="border-bottom: 2px solid #eee; text-align:left; color: #666; font-size: 0.9rem;">
                             <th style="padding:12px;">User Info</th>
                             <th>Location</th>
+                            <th>Source (UTM)</th>
                             <th>Joined</th>
                             <th>Admin</th>
                             <th>Status</th>
@@ -423,6 +479,9 @@
                                     </div>
                                 </td>
                                 <td style="font-size:0.85rem; color:#555;">${u.location || 'Unknown'}</td>
+                                <td style="font-size:0.85rem; color:#555;">
+                                    ${u.utm_source ? `<span style="background:#e1f5fe; color:#0288d1; padding:3px 8px; border-radius:12px; font-weight:600; font-size:0.75rem;">${u.utm_source}</span>` : 'Organic'}
+                                </td>
                                 <td style="font-size:0.85rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                                 <td>
                                     <button onclick="toggleAdmin('${u.id}', ${u.is_admin})" title="Toggle Admin Rights" style="border:none; background:none; cursor:pointer; font-size:1.2rem;">
@@ -473,7 +532,59 @@
             } catch (err) { alert("Failed to delete user: " + err.message); }
         };
 
-        // --- 7. SUPPORT TICKETS ---
+        // --- 7. UTM GENERATOR LOGIC ---
+        window.openUTMBuilderForProduct = (id) => {
+            // Find the UTM tab button and simulate click
+            const utmBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Marketing'));
+            if(utmBtn) switchTab('utm', utmBtn);
+            
+            // Build the base domain logic (accounting for localhost/production)
+            const baseUrl = (window.location.origin.includes('127.0') || window.location.origin.includes('localhost')) 
+                ? 'https://golem.com' // Switch to your actual domain if on local testing
+                : window.location.origin;
+                
+            document.getElementById('utmUrl').value = `${baseUrl}/product.html?id=${id}`;
+            document.getElementById('utmSource').value = 'telegram'; // default assumption for quick sharing
+            document.getElementById('utmMedium').value = 'social';
+            document.getElementById('utmCampaign').value = 'featured_ad';
+            document.getElementById('utmResult').value = '';
+            
+            // Pre-generate URL
+            generateUTM();
+        };
+
+        window.generateUTM = () => {
+            const url = document.getElementById('utmUrl').value.trim();
+            const source = document.getElementById('utmSource').value.trim();
+            const medium = document.getElementById('utmMedium').value.trim();
+            const campaign = document.getElementById('utmCampaign').value.trim();
+
+            if (!url || !source) {
+                alert("Target URL and Campaign Source are required!");
+                return;
+            }
+
+            try {
+                const urlObj = new URL(url);
+                urlObj.searchParams.set('utm_source', source);
+                if (medium) urlObj.searchParams.set('utm_medium', medium);
+                if (campaign) urlObj.searchParams.set('utm_campaign', campaign);
+                
+                document.getElementById('utmResult').value = urlObj.toString();
+            } catch (e) {
+                alert("Please enter a valid Target URL (e.g., https://yoursite.com)");
+            }
+        };
+
+        window.copyUTM = () => {
+            const res = document.getElementById('utmResult');
+            if(!res.value) return;
+            res.select();
+            document.execCommand('copy');
+            alert("UTM Link copied to clipboard!");
+        };
+
+        // --- 8. SUPPORT TICKETS ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             const { data: tickets, error } = await _supabase.from('support_tickets').select('*').eq('is_resolved', false).order('created_at', { ascending: false });
@@ -502,15 +613,7 @@
             const { error } = await _supabase.from('support_tickets').update({ is_resolved: true }).eq('id', id);
             if (!error) { loadTickets(); loadStats(); }
         };
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const source = urlParams.get('utm_source');
-    
-    if (source) {
-        // Store it in session storage so it persists while they browse
-        sessionStorage.setItem('wanagebya_source', source);
-    }
-});
+
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
@@ -518,42 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
             });
         });
-        
-     async function exportToExcel() {
-    const { data: allProducts, error } = await _supabase
-        .from('products')
-        .select('name, price, status, location, seller_phone, traffic_source, created_at');
 
-    if (error) {
-        alert("Export failed: " + error.message);
-        return;
-    }
-
-    const worksheet = XLSX.utils.json_to_sheet(allProducts);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Golem_Market_Report");
-    
-    // Generate filename with current date
-    const date = new Date().toISOString().split('T')[0];
-    XLSX.writeFile(workbook, `Golem_Report_${date}.xlsx`);
-}
-async function performGlobalSearch() {
-    const term = document.getElementById('adminSearchInput').value;
-    if (term.length < 3) return; // Only search after 3 characters
-
-    const grid = document.getElementById('adminGrid');
-    grid.innerHTML = "<p>Searching Database...</p>";
-
-    const { data: results, error } = await _supabase
-        .from('products')
-        .select('*')
-        .or(`name.ilike.%${term}%,location.ilike.%${term}%,seller_phone.ilike.%${term}%`);
-
-    if (results) {
-        // Reuse your loadItems logic here to render 'results'
-        renderSearchResults(results);
-    }
-}
     </script>
 </body>
 </html>
