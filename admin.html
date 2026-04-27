@@ -14,7 +14,7 @@
         .btn-feature { background: #f1c40f; color: #000; }
         .sponsor-controls { background: #fff9e6; border: 1px solid #f1c40f; padding: 12px; border-radius: 8px; margin-top: 10px; }
         
-        .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px; font-weight: 600; }
+        .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px; font-weight: 600; transition: 0.2s; }
         .tab-btn.active { background: #333; color: white; }
         
         .stat-card { background: white; padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -45,7 +45,8 @@
 
     <header class="golem-header">
         <div class="logo">GOLEM ADMIN</div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
             <button class="signin-btn" onclick="location.href='index.html'" style="background:#666;">View Site</button>
             <button class="signin-btn" onclick="_supabase.auth.signOut().then(() => location.reload())">Sign Out</button>
         </div>
@@ -63,6 +64,7 @@
             <button onclick="switchTab('rejected', this)" class="tab-btn">Archive/Rejected</button>
             <button onclick="switchTab('users', this)" class="tab-btn">Registered Users</button>
             <button onclick="switchTab('utm', this)" class="tab-btn" style="background: #e1f5fe; color: #0288d1;"><i class="fas fa-link"></i> Marketing (UTM)</button>
+            <button onclick="switchTab('logs', this)" class="tab-btn" style="background: #fff3e0; color: #e65100;"><i class="fas fa-history"></i> Audit Logs</button>
             
             <button onclick="generateSponsorReport()" style="background: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
                 <i class="fas fa-file-invoice"></i> Expiry Report (24h)
@@ -111,6 +113,14 @@
             <section id="usersSection" style="display: none;">
                 <h2 style="margin-bottom: 20px;">REGISTERED ACCOUNTS</h2>
                 <div id="userList" style="display: grid; gap: 10px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                </div>
+            </section>
+
+            <!-- Audit Logs View -->
+            <section id="logsSection" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-history" style="color:#e65100;"></i> SYSTEM AUDIT LOGS</h2>
+                <p style="color:#666; margin-bottom:15px;">A history of all actions taken on the platform by Admins, Sellers, and Buyers.</p>
+                <div id="auditLogList" style="overflow-x: auto;">
                 </div>
             </section>
 
@@ -169,6 +179,7 @@
     <script src="config.js"></script>
     <script>
         let currentView = 'pending';
+        let currentAdminEmail = 'System'; // Added for Audit Logging
 
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAdmin();
@@ -179,17 +190,20 @@
             checkStorageUsage();
         });
 
-        // --- 1. ADMIN AUTH & STATUS ---
+        // --- 1. ADMIN AUTH & LOGGING ---
         async function checkAdmin() {
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) {
                 window.location.href = 'index.html';
                 return;
             }
-            const { data: profile } = await _supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+            const { data: profile } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single();
             if (!profile?.is_admin) {
                 alert("Restricted Access: Admin Only.");
                 window.location.href = 'index.html';
+            } else {
+                currentAdminEmail = user.email || profile.email || 'Admin';
+                document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
             }
         }
 
@@ -197,6 +211,19 @@
             const { data: { user } } = await _supabase.auth.getUser();
             if (user) {
                 await _supabase.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', user.id);
+            }
+        }
+
+        // Action Tracker Helper
+        async function logAction(actionName, details) {
+            try {
+                await _supabase.from('audit_logs').insert([{
+                    admin_email: currentAdminEmail,
+                    action: `[ADMIN] ${actionName}`,
+                    details: details
+                }]);
+            } catch (err) {
+                console.error("Audit log failed:", err);
             }
         }
 
@@ -209,6 +236,7 @@
             const itemsSection = document.getElementById('itemsSection');
             const usersSection = document.getElementById('usersSection');
             const utmSection = document.getElementById('utmSection');
+            const logsSection = document.getElementById('logsSection');
             const searchContainer = document.getElementById('searchContainer');
             const viewTitle = document.getElementById('viewTitle');
 
@@ -216,6 +244,7 @@
             itemsSection.style.display = 'none';
             usersSection.style.display = 'none';
             utmSection.style.display = 'none';
+            logsSection.style.display = 'none';
             searchContainer.style.display = 'block';
 
             if (status === 'users') {
@@ -224,6 +253,10 @@
             } else if (status === 'utm') {
                 utmSection.style.display = 'block';
                 searchContainer.style.display = 'none'; // hide search on builder
+            } else if (status === 'logs') {
+                logsSection.style.display = 'block';
+                searchContainer.style.display = 'none'; // hide search on logs
+                loadLogs();
             } else {
                 itemsSection.style.display = 'block';
                 viewTitle.innerText = status.toUpperCase() + " ITEMS";
@@ -382,10 +415,14 @@
             }).join('');
         }
 
-        // --- 5. ITEM ACTIONS ---
+        // --- 5. ITEM ACTIONS WITH AUDIT LOGGING ---
         window.updateStatus = async (id, newStatus) => {
             const { error } = await _supabase.from('products').update({ status: newStatus }).eq('id', id);
-            if (!error) { document.getElementById(`card-${id}`)?.remove(); loadStats(); }
+            if (!error) { 
+                logAction('Status Change', `Item ID: ${id} changed to ${newStatus.toUpperCase()}`);
+                document.getElementById(`card-${id}`)?.remove(); 
+                loadStats(); 
+            }
         };
 
         window.activateSponsor = async (id) => {
@@ -393,12 +430,19 @@
             const expiry = new Date();
             expiry.setDate(expiry.getDate() + days);
             const { error } = await _supabase.from('products').update({ is_sponsored: true, sponsored_until: expiry.toISOString() }).eq('id', id);
-            if (!error) { alert("Featured activated!"); loadItems('approved'); loadStats(); }
+            if (!error) { 
+                logAction('Feature Activated', `Item ID: ${id} featured for ${days} days`);
+                alert("Featured activated!"); 
+                loadItems('approved'); loadStats(); 
+            }
         };
 
         window.cancelSponsor = async (id) => {
             const { error } = await _supabase.from('products').update({ is_sponsored: false, sponsored_until: null }).eq('id', id);
-            if (!error) loadItems('approved');
+            if (!error) {
+                logAction('Feature Canceled', `Removed feature status from Item ID: ${id}`);
+                loadItems('approved');
+            }
         };
 
         window.permanentlyDelete = async (id, imageUrl) => {
@@ -415,6 +459,7 @@
 
                 const { error } = await _supabase.from('products').delete().eq('id', id);
                 if (!error) {
+                    logAction('Item Permanently Deleted', `Deleted Item ID: ${id}`);
                     document.getElementById(`card-${id}`)?.remove();
                     checkStorageUsage();
                     loadStats();
@@ -430,7 +475,7 @@
             alert("🚨 EXPIRING SOON:\n\n" + expiringSoon.map(i => `• ${i.name} (Phone: ${i.seller_phone})`).join('\n'));
         };
 
-        // --- 6. USER MANAGEMENT ---
+        // --- 6. USER MANAGEMENT WITH AUDIT LOGGING ---
         async function loadUsers(filter = 'all') {
             const list = document.getElementById('userList');
             list.innerHTML = "<p>Loading users...</p>";
@@ -511,15 +556,22 @@
         }
 
         window.toggleVerification = async (userId, currentStatus) => {
-            if (!confirm(`Are you sure you want to ${currentStatus ? "remove verification from" : "verify"} this seller?`)) return;
+            const verb = currentStatus ? "revoke verification from" : "verify";
+            if (!confirm(`Are you sure you want to ${verb} this seller?`)) return;
             const { error } = await _supabase.from('profiles').update({ is_verified: !currentStatus }).eq('id', userId);
-            if (!error) loadUsers(); else alert("Error: " + error.message);
+            if (!error) {
+                logAction('User Verification Update', `Set verification status to ${!currentStatus} for User ID: ${userId}`);
+                loadUsers(); 
+            } else alert("Error: " + error.message);
         };
 
         window.toggleAdmin = async (userId, currentStatus) => {
             if (!confirm(`Are you sure you want to ${currentStatus ? 'remove' : 'grant'} admin rights?`)) return;
             const { error } = await _supabase.from('profiles').update({ is_admin: !currentStatus }).eq('id', userId);
-            if (!error) { loadUsers(); loadStats(); } else alert("Error: " + error.message);
+            if (!error) { 
+                logAction('Admin Rights Update', `Set Admin to ${!currentStatus} for User ID: ${userId}`);
+                loadUsers(); loadStats(); 
+            } else alert("Error: " + error.message);
         };
 
         window.deleteUserAccount = async (userId, identifier) => {
@@ -527,12 +579,60 @@
             try {
                 const { error } = await _supabase.from('profiles').delete().eq('id', userId);
                 if (error) throw error;
+                logAction('Account Deleted', `Permanently deleted user account: ${identifier} (ID: ${userId})`);
                 alert("User deleted.");
                 loadUsers();
             } catch (err) { alert("Failed to delete user: " + err.message); }
         };
 
-        // --- 7. UTM GENERATOR LOGIC ---
+        // --- 7. LOAD AUDIT LOGS ---
+        async function loadLogs() {
+            const list = document.getElementById('auditLogList');
+            list.innerHTML = "<p>Loading logs...</p>";
+            
+            const { data: logs, error } = await _supabase
+                .from('audit_logs')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(100);
+
+            if (error) {
+                list.innerHTML = `<p style="color:#ff4757;">⚠️ Error Loading Logs. Ensure you created the 'audit_logs' table.</p><p>${error.message}</p>`;
+                return;
+            }
+
+            if (!logs || logs.length === 0) {
+                list.innerHTML = `<p style="color:#888;">No audit logs recorded yet.</p>`;
+                return;
+            }
+
+            list.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #ddd; text-align:left; color: #333; font-size: 0.9rem;">
+                            <th style="padding:12px;">Date & Time</th>
+                            <th>User / Admin Account</th>
+                            <th>Action Performed</th>
+                            <th>Details / Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logs.map(log => `
+                            <tr style="border-bottom: 1px solid #eee; font-size:0.85rem;">
+                                <td style="padding:12px; color:#666; white-space:nowrap;">
+                                    ${new Date(log.created_at).toLocaleDateString()} at ${new Date(log.created_at).toLocaleTimeString()}
+                                </td>
+                                <td><strong>${log.admin_email || 'Unknown'}</strong></td>
+                                <td><span style="background:#f1f2f6; padding:3px 8px; border-radius:12px; font-weight:600; color:#333;">${log.action}</span></td>
+                                <td style="color:#555;">${log.details || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // --- 8. UTM GENERATOR LOGIC ---
         window.openUTMBuilderForProduct = (id) => {
             // Find the UTM tab button and simulate click
             const utmBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Marketing'));
@@ -582,9 +682,10 @@
             res.select();
             document.execCommand('copy');
             alert("UTM Link copied to clipboard!");
+            logAction('UTM URL Created & Copied', `Generated for Campaign: ${document.getElementById('utmCampaign').value || 'N/A'}`);
         };
 
-        // --- 8. SUPPORT TICKETS ---
+        // --- 9. SUPPORT TICKETS ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             const { data: tickets, error } = await _supabase.from('support_tickets').select('*').eq('is_resolved', false).order('created_at', { ascending: false });
@@ -611,7 +712,10 @@
 
         window.resolveTicket = async (id) => {
             const { error } = await _supabase.from('support_tickets').update({ is_resolved: true }).eq('id', id);
-            if (!error) { loadTickets(); loadStats(); }
+            if (!error) { 
+                logAction('Ticket Resolved', `Marked Support Ticket ID: ${id} as resolved`);
+                loadTickets(); loadStats(); 
+            }
         };
 
         // Search Bar Event Listener
