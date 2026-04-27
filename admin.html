@@ -127,7 +127,7 @@
             await checkAdmin();
             updateAdminPresence();
             loadStats();
-            loadItems('pending');
+            ('pending');
             loadTickets();
             checkStorageUsage();
         });
@@ -253,6 +253,12 @@
                     
                     <div class="product-info" style="padding:15px;">
                         <h3 style="margin-bottom:5px;">${item.name}</h3>
+
+                        ${item.traffic_source ? `
+            <span style="background: #e1f5fe; color: #039be5; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">
+                <i class="fab fa-youtube"></i> SOURCE: ${item.traffic_source.toUpperCase()}
+            </span>
+        ` : ''}
                         <p style="color:#2ed573; font-weight:bold; font-size:1.1rem;">${item.price?.toLocaleString()} ETB</p>
                         
                         <p style="font-size:0.85rem; color:#666; margin-top:5px; display: flex; align-items: center; gap: 5px;">
@@ -493,7 +499,15 @@
             const { error } = await _supabase.from('support_tickets').update({ is_resolved: true }).eq('id', id);
             if (!error) { loadTickets(); loadStats(); }
         };
-
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const source = urlParams.get('utm_source');
+    
+    if (source) {
+        // Store it in session storage so it persists while they browse
+        sessionStorage.setItem('wanagebya_source', source);
+    }
+});
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
