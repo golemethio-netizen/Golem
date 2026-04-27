@@ -85,7 +85,24 @@ const { data, error } = await _supabase
             `;
         }
 
+// Whenever a buyer clicks a button, run this code:
+const logBuyerAction = async (buyerEmail, actionDescription) => {
+    await _supabase.from('audit_logs').insert([{
+        admin_email: buyerEmail || 'Guest/Unknown', 
+        action: '[BUYER] Action Taken',
+        details: actionDescription
+    }]);
+};
+
+// Example Usage: logBuyerAction('buyer@gmail.com', 'Clicked on iPhone 15 Phone Number');
+
+
+        
         window.onload = loadSingleProduct;
+
+
+
+        
     </script>
 </body>
 </html>
