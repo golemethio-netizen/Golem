@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
     <meta name="google-site-verification" content="googleaee343d4e7f7a439" />
     <meta name="geo.region" content="ET" />
@@ -14,24 +14,131 @@
     <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- ================= MOBILE OPTIMIZATION CSS ================= -->
+    <style>
+        /* Base header restructuring for better flow */
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+
+        @media (max-width: 768px) {
+            /* 1. Header & Search Fixes */
+            .golem-header { padding: 15px 10px; }
+            .header-top-row { flex-wrap: nowrap; }
+            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; }
+            .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
+            
+            /* 2. App-like Bottom Navigation Bar */
+            body { padding-bottom: 70px; /* Prevent content from hiding behind nav */ }
+            .nav-container-horizontal {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+                display: flex;
+                justify-content: space-around;
+                padding: 10px 5px;
+                z-index: 1000;
+                margin: 0;
+                border-top: 1px solid #eee;
+            }
+            .nav-item-box { 
+                flex-direction: column; 
+                gap: 4px; 
+                background: transparent !important; 
+                color: #555 !important;
+                box-shadow: none; 
+                padding: 5px;
+                min-width: 60px;
+            }
+            .nav-item-box i { font-size: 1.3rem; color: #3498db; }
+            .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
+            
+            /* Admin Tab special color on mobile */
+            #adminNavLink i { color: #e74c3c; }
+
+            /* 3. Swipeable Horizontal Filters */
+            .filter-bar {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+                padding-bottom: 5px;
+                gap: 8px;
+            }
+            .filter-bar::-webkit-scrollbar { display: none; } /* Hide scrollbar */
+            .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
+
+            /* 4. 2-Column Grid for Phones */
+            .masonry-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            
+            /* 5. Modals taking full screen */
+            .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
+            .modal-footer-actions { flex-direction: column; }
+            .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
+
+            /* 6. Fix Floating Chat overlapping bottom nav */
+            .floating-chat { bottom: 85px; right: 15px; }
+            #chatMenu { bottom: 70px; right: 0; }
+
+            /* 7. Stack Sponsored Section */
+            .sponsor-content { flex-direction: column; text-align: center; }
+            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
+            .sponsor-actions { flex-direction: column; gap: 10px; }
+            .sponsor-actions a { margin-left: 0 !important; }
+        }
+    </style>
 </head>
 
 <body>
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
-        <div class="logo">WanaGebya | ዋና ገበያ - Buy & Sell</div>
+        
+        <!-- Top Row: Logo & Auth -->
+        <div class="header-top-row">
+            <div class="logo">WanaGebya | ዋና ገበያ</div>
 
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search items...">
+            <div class="header-actions">
+                <div class="lang-toggle-wrapper">
+                    <button onclick="window.toggleLanguage()" class="lang-btn" style="padding: 8px 12px; border-radius: 20px;">
+                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                    </button>
+                </div>
+
+                <div class="nav-auth-controls">
+                    <button id="signInBtn" class="filter-btn" onclick="window.toggleModal()" style="padding: 8px 15px; background: #333; color: white;">
+                        <i class="fas fa-user"></i> Sign In
+                    </button>
+
+                    <div id="userWelcome" style="display:none; align-items:center; gap:10px;">
+                        <span onclick="location.href='profile.html'" style="cursor:pointer; font-size: 0.85rem;">
+                            <strong id="userName"></strong>
+                        </span>
+                        <button id="signOutBtn" class="signout-btn" onclick="window.handleSignOut()" style="padding: 5px 10px; font-size: 0.8rem;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- Search Bar -->
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+        </div>
+
+        <!-- Bottom/Horizontal Navigation Links -->
         <div class="nav-container-horizontal">
             <a href="index.html" class="nav-item-box bg-home">
                 <i class="fas fa-home"></i>
@@ -48,42 +155,23 @@
                 <p>My Items</p>
             </a>
 
-            <a href="saved.html" class="nav-item-box bg-items">
+            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;">
                 <i class="fas fa-heart"></i>
                 <p>Saved</p>
-                <span id="cartBadge" style="display: none;">0</span>
+                <span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span>
             </a>
 
-            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none; background: #333; color: white;">
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;">
                 <i class="fas fa-user-shield"></i>
                 <p>Admin</p>
             </a>
-
-            <div class="lang-toggle-wrapper">
-                <button onclick="window.toggleLanguage()" class="lang-btn">
-                    <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
-                </button>
-            </div>
-
-            <div class="nav-auth-controls">
-                <button id="signInBtn" class="filter-btn" onclick="window.toggleModal()">
-                    <i class="fas fa-user"></i> Sign In
-                </button>
-
-                <div id="userWelcome" style="display:none; align-items:center; gap:10px;">
-                    <span onclick="location.href='profile.html'" style="cursor:pointer;">
-                        Hello, <strong id="userName"></strong>
-                    </span>
-                    <button id="signOutBtn" class="signout-btn" onclick="window.handleSignOut()">
-                        <i class="fas fa-sign-out-alt"></i> Sign Out
-                    </button>
-                </div>
-            </div>
         </div>
-
-        <a href="#" onclick="window.toggleSupportModal()" style="color: #666; font-size: 0.9rem; margin-top: 10px; display: inline-block;">
-            <i class="fas fa-question-circle"></i> Need Help? Contact Us
-        </a>
+        
+        <div style="width: 100%; text-align: center; margin-top: 10px;">
+            <a href="#" onclick="window.toggleSupportModal()" style="color: #888; font-size: 0.8rem; text-decoration: none;">
+                <i class="fas fa-question-circle"></i> Need Help? Contact Us
+            </a>
+        </div>
     </header>
 
     <!-- ======================= SPONSORED SECTION ======================= -->
@@ -109,15 +197,15 @@
     <!-- ======================= FILTER & SORT CONTROLS ======================= -->
     <section class="filter-controls">
         <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-            <div class="sort-container">
-                <select id="sortSelect" onchange="window.fetchProducts()">
+            <div class="sort-container" style="flex: 1; min-width: 140px;">
+                <select id="sortSelect" onchange="window.fetchProducts()" style="width: 100%;">
                     <option value="newest">🆕 Newest First</option>
                     <option value="price_low">💰 Price: Low to High</option>
                     <option value="price_high">💎 Price: High to Low</option>
                 </select>
             </div>
-            <div class="location-filter-container">
-                <select id="locationSelect" onchange="window.fetchProducts()">
+            <div class="location-filter-container" style="flex: 1; min-width: 140px;">
+                <select id="locationSelect" onchange="window.fetchProducts()" style="width: 100%;">
                     <option value="all">🌍 All Regions</option>
                     <option value="Addis Ababa">Addis Ababa</option>
                     <option value="Oromia">Oromia</option>
@@ -129,18 +217,18 @@
             </div>
         </div>
         
+        <!-- Horizontal Swipeable Filter Bar -->
         <div class="filter-bar">
             <button class="filter-btn active" data-am="ሁሉም" onclick="window.filterCategory('All', this)">All</button>
+            <button class="filter-btn sponsor-filter" data-am="ልዩ ዕቃዎች" onclick="window.filterSponsored()">
+                <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
+            </button>
             <button class="filter-btn" data-am="ኤሌክትሮኒክስ" onclick="window.filterCategory('Electronics', this)">Electronics</button>
             <button class="filter-btn" data-am="የቤት ዕቃዎች" onclick="window.filterCategory('Furniture', this)">Furniture</button>
             <button class="filter-btn" data-am="አልባሳት" onclick="window.filterCategory('Fashion', this)">Fashion</button>
             <button class="filter-btn" data-am="ተሽከርካሪዎች" onclick="window.filterCategory('Vehicles', this)">Vehicles</button>
             <button class="filter-btn" data-am="ንብረት" onclick="window.filterCategory('Property', this)">Property</button>
             <button class="filter-btn" data-am="የቤት ቁሳቁሶች" onclick="window.filterCategory('Home Supplies', this)">Home Supplies</button>
-
-            <button class="filter-btn sponsor-filter" data-am="ልዩ ዕቃዎች" onclick="window.filterSponsored()">
-                <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
-            </button>
         </div>
     </section>
 
@@ -154,8 +242,8 @@
 
         <div class="invite-container">
             <i class="fas fa-users"></i>
-            <h3> Help WanaGebya Grow! By Sharing </h3>
-            <p>Know someone selling something? Invite them to WanaGebya .</p>
+            <h3> Help WanaGebya Grow By Sharing!</h3>
+            <p>Know someone selling something? Invite them to WanaGebya.</p>
             <div class="invite-btns">
                 <button onclick="window.shareToTelegram()" class="tg-btn" style="background:#0088cc;">
                     <i class="fab fa-telegram-plane"></i> Telegram
@@ -168,7 +256,7 @@
     </main>
 
     <!-- ======================= FOOTER ======================= -->
-    <footer class="golem-footer">
+    <footer class="golem-footer" style="padding-bottom: 80px;"> <!-- Extra padding for bottom nav -->
         <div class="footer-container">
             <div class="footer-col">
                 <h2 class="footer-logo">WanaGebya </h2>
@@ -176,20 +264,11 @@
             </div>
 
             <div class="footer-col">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="#" onclick="window.checkAuthToSell()">Sell Item</a></li>
-                    <li><a href="saved.html">Wishlist</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
                 <h4>Contact Us</h4>
                 <p><i class="fas fa-phone"></i> +251707022845</p>
                 <div class="social-links">
                     <a href="https://t.me/allInOneEthiopia1" target="_blank" aria-label="Join our Telegram Channel"><i class="fab fa-telegram"></i></a>
-                   <a href="https://wa.me/0707022845" target="_blank" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                   <a href="https://wa.me/251707022845" target="_blank" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
 
@@ -201,12 +280,12 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 WanaGebya  Marketplace. All rights reserved.</p>
+            <p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p>
         </div>
     </footer>
 
     <!-- Back to top button -->
-    <button id="backToTop" aria-label="Scroll to top" class="back-to-top">
+    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;">
         <i class="fas fa-chevron-up"></i>
     </button>
 
@@ -303,37 +382,38 @@
         </div>
     </div>
 
-    <!-- 3. Product Details Modal (UPDATED WITH LOGGING INJECTION) -->
+    <!-- 3. Product Details Modal -->
     <div id="productModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.closeProductModal()">
         <div class="modal-content">
             <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
             
             <div class="modal-img-wrapper">
-                <img id="modalProductImg" src="" alt="Product">
+                <img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;">
             </div>
 
             <div class="modal-body">
-                <h2 id="modalProductTitle"></h2>
+                <h2 id="modalProductTitle" style="font-size: 1.2rem; margin-bottom: 5px;"></h2>
 
-                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 12px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid #eee;">
+                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
                     <img id="modalSellerAvatar" src="https://via.placeholder.com/50" 
-                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
+                         style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
                     
                     <div style="flex: 1;">
-                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 1rem; font-weight: 600;">Seller: Loading...</h4>
+                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4>
                         <div id="sellerBadgeContainer"></div>
                     </div>
                 </div>
                 
-                <div id="modalProductPrice" class="modal-price"></div>
-                <p id="modalProductDesc" class="modal-description"></p>
+                <div id="modalProductPrice" class="modal-price" style="font-size: 1.3rem;"></div>
+                <p id="modalProductDesc" class="modal-description" style="font-size: 0.9rem; line-height: 1.5;"></p>
 
                 <!-- BUYER LOGGING ADDED ON THESE CLICKS -->
-                <div class="modal-footer-actions">
-                    <a id="callContact" href="#" class="contact-btn" onclick="window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn" onclick="window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-telegram-plane"></i> Telegram</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn" onclick="window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);" style="grid-column: span 3;">
+                <div class="modal-footer-actions" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
+                    <a id="callContact" href="#" class="contact-btn" style="flex: 1;" onclick="window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn" style="flex: 1;" onclick="window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-telegram-plane"></i> Message</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn" style="flex: 1;" onclick="window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    
+                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);" style="width: 100%;">
                         <i class="fas fa-heart"></i> Save to Wishlist
                     </button>
                 </div>
