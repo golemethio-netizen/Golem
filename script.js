@@ -442,13 +442,14 @@ window.updateUIForUser = async function() {
     }
 };
 
-window.checkAuthToSell = async function() {
-    event.preventDefault(); // Stop the link from redirecting immediately
+// Add 'event' inside the parentheses here!
+window.checkAuthToSell = async function(event) { 
+    event.preventDefault(); // Now this works properly
     const { data: { user } } = await _supabase.auth.getUser();
     if (user) {
-        window.location.href = "sell.html"; // If logged in, proceed
+        window.location.href = "sell.html"; 
     } else {
-        window.toggleModal(); // If not logged in, show auth modal
+        window.toggleModal(); 
     }
 };
 
