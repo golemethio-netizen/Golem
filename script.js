@@ -680,3 +680,39 @@ window.toggleLanguage = function() {
         el.setAttribute('data-am', currentText); // Swap them back and forth
     });
 };
+
+
+async function postToSocialMedia(product) {
+    const botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
+    const chatId = '@your_public_channel_username'; // Your public channel
+    const message = `
+🌟 *New Item Approved!*
+📦 *Product:* ${product.name}
+💰 *Price:* ${product.price} ETB
+📍 *Location:* ${product.location}
+
+🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
+    `;
+
+    // Send to Telegram
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'Markdown'
+        })
+    });
+}
+
+window.shareToFacebook = function() {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+};
+
+window.shareToTelegram = function() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("Check out this awesome find on WanaGebya!");
+    window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+};
