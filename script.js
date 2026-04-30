@@ -668,7 +668,7 @@ window.handleSupportSubmit = async function(event) {
     }
 };
 
-window.shareToTelegram = function() {
+window. = function() {
     const url = encodeURIComponent(window.location.href);
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
