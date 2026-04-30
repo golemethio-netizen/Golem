@@ -543,24 +543,21 @@ window.toggleVerification = async (userId, currentStatus) => {
         .update({ is_verified: !currentStatus })
         .eq('id', userId);
     
-    if (!error) {
-        alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
-        window.loadUsers();
-    } else {
+    if (error) {
         console.error("Verification Error:", error);
         alert("Verification update failed: " + error.message);
+        return;
     }
 
-    if (!error) {
     alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
     
-    // Trigger the auto-post if they were just verified
+    // Trigger the auto-post logic if they were just verified
     if (!currentStatus) {
-        // You can pass the user/profile data here to notify your channel
-        console.log("New verified seller alert sent to Telegram");
+        console.log("New verified seller alert triggered.");
+        // Optional: postToSocialMedia(someUserData);
     }
+    
     window.loadUsers();
-}
 };
 
 // --- 9. PROFILE MANAGEMENT ---
@@ -669,12 +666,11 @@ window.handleSupportSubmit = async function(event) {
     }
 };
 
-window. = function() {
+window.shareToTelegramMain = function() {
     const url = encodeURIComponent(window.location.href);
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
 };
-
 window.shareToWhatsApp = function() {
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia! " + window.location.href);
     window.open(`https://wa.me/?text=${text}`, '_blank');
