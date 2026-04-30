@@ -717,7 +717,38 @@
                 loadTickets(); loadStats(); 
             }
         };
+        
+window.approveProduct = async (productId, productDetails) => {
+    // 1. Update status in Supabase
+    const { error } = await _supabase
+        .from('products')
+        .update({ status: 'approved' })
+        .eq('id', productId);
 
+    if (!error) {
+        alert("Product Approved!");
+        
+        // 2. TRIGGER AUTO-POST TO TELEGRAM CHANNEL
+        const botToken = "YOUR_BOT_TOKEN";
+        const channelId = "@YourChannelName"; // Example: @WanagebyaMarket
+        
+        const text = `🚀 *New Listing on WanaGebya!*\n\n` +
+                     `📦 *Item:* ${productDetails.name}\n` +
+                     `💰 *Price:* ${productDetails.price} ETB\n` +
+                     `📍 *Location:* ${productDetails.location}\n\n` +
+                     `🔗 View on Site: https://golemethio-netizen.github.io/shope/product.html?id=${productId}`;
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: channelId,
+                text: text,
+                parse_mode: 'Markdown'
+            })
+        });
+    }
+};
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
