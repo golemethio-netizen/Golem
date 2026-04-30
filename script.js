@@ -549,6 +549,17 @@ window.toggleVerification = async (userId, currentStatus) => {
         console.error("Verification Error:", error);
         alert("Verification update failed: " + error.message);
     }
+
+    if (!error) {
+    alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
+    
+    // Trigger the auto-post if they were just verified
+    if (!currentStatus) {
+        // You can pass the user/profile data here to notify your channel
+        console.log("New verified seller alert sent to Telegram");
+    }
+    window.loadUsers();
+}
 };
 
 // --- 9. PROFILE MANAGEMENT ---
