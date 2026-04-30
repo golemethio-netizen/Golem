@@ -33,72 +33,82 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        async function loadSingleProduct() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
+       async function loadSingleProduct() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
 
-            if (!productId) {
-                window.location.href = 'index.html';
-                return;
-            }
+    if (!productId) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-           // This fetches the product AND the linked user profile status in one go
-const { data, error } = await _supabase
-    .from('products')
-    .select('*, profiles(is_verified)') // This fetches the seller's verification status
-    .eq('status', 'approved');
+    // FIXED: Added .eq() to find specific product and .single() to get one object
+    const { data: p, error } = await _supabase
+        .from('products')
+        .select('*, profiles(is_verified)') 
+        .eq('id', productId)
+        .single();
+    
+    if (error || !p) {
+        document.getElementById('productContent').innerHTML = `
+            <div style="text-align:center; padding: 50px;">
+                <h3>Item Not Found</h3>
+                <p>This item may have been sold or removed.</p>
+                <a href="index.html" class="back-link">Return Home</a>
+            </div>`;
+        return;
+    }
+
+    // Set Page Title
+    document.title = `${p.name} | Golem Furniture`;
+
+    // Clean Phone for Links
+    const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
+    const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+    const tgUser = (p.telegram_username || "").replace('@', '');
+
+    document.getElementById('productContent').innerHTML = `
+        <div class="image-side">
+            <img src="${p.image}" alt="${p.name}">
+        </div>
+        <div class="details-side">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="category-badge" style="background:#eee; padding:5px 10px; border-radius:5px;">${p.category || 'Furniture'}</span>
+                ${p.profiles?.is_verified ? '<span style="color:#2ed573; font-size:0.8rem;"><i class="fas fa-check-circle"></i> Verified Seller</span>' : ''}
+            </div>
+            <h1>${p.name}</h1>
+            <p class="price-tag">${p.price.toLocaleString()} ETB</p>
+            <p style="color:#666; line-height:1.6;">${p.description || 'No description provided.'}</p>
             
-            if (error || !p) {
-                document.getElementById('productContent').innerHTML = `
-                    <div style="text-align:center; padding: 50px;">
-                        <h3>Item Not Found</h3>
-                        <p>This item may have been sold or removed.</p>
-                        <a href="index.html" class="btn">Return Home</a>
-                    </div>`;
-                return;
-            }
+            <div class="order-buttons">
+                <a href="tel:+${cleanPhone}" class="call-btn" onclick="logBuyerAction(null, 'Called Seller for ${p.name}')">
+                    <i class="fas fa-phone"></i> Call Seller
+                </a>
+                <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="tg-btn" onclick="logBuyerAction(null, 'Telegram Inquiry for ${p.name}')">
+                    <i class="fab fa-telegram-plane"></i> Order via Telegram
+                </a>
+                <a href="https://wa.me/${cleanPhone}?text=I'm interested in ${p.name}" target="_blank" class="wa-btn" onclick="logBuyerAction(null, 'WhatsApp Inquiry for ${p.name}')">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+    `;
+}
 
-            // Set Page Title
-            document.title = `${p.name} | Golem Furniture`;
-
-            // Clean Phone for Links
-            const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
-            const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
-            const tgUser = (p.telegram_username || "").replace('@', '');
-
-            document.getElementById('productContent').innerHTML = `
-                <div class="image-side">
-                    <img src="${p.image}" alt="${p.name}">
-                </div>
-                <div class="details-side">
-                    <span class="category-badge" style="background:#eee; padding:5px 10px; border-radius:5px; width:fit-content;">${p.category || 'Furniture'}</span>
-                    <h1>${p.name}</h1>
-                    <p class="price-tag">${p.price.toLocaleString()} ETB</p>
-                    <p style="color:#666; line-height:1.6;">${p.description || 'No description provided.'}</p>
-                    
-                    <div class="order-buttons">
-                        <a href="tel:+${cleanPhone}" class="call-btn"><i class="fas fa-phone"></i> Call Seller</a>
-                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="tg-btn"><i class="fab fa-telegram-plane"></i> Order via Telegram</a>
-                        <a href="https://wa.me/${cleanPhone}?text=I'm interested in ${p.name}" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    </div>
-                </div>
-            `;
-        }
-
-// Whenever a buyer clicks a button, run this code:
+// Optimized Audit Log
 const logBuyerAction = async (buyerEmail, actionDescription) => {
-    await _supabase.from('audit_logs').insert([{
-        admin_email: buyerEmail || 'Guest/Unknown', 
-        action: '[BUYER] Action Taken',
-        details: actionDescription
-    }]);
+    try {
+        await _supabase.from('audit_logs').insert([{
+            admin_email: buyerEmail || 'Guest/Unknown', 
+            action: '[BUYER] Action Taken',
+            details: actionDescription
+        }]);
+    } catch (e) {
+        console.error("Audit log failed", e);
+    }
 };
 
-// Example Usage: logBuyerAction('buyer@gmail.com', 'Clicked on iPhone 15 Phone Number');
-
-
-        
-        window.onload = loadSingleProduct;
+window.onload = loadSingleProduct;
 
 
 
