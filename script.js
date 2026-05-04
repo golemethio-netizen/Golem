@@ -2,17 +2,6 @@
 let currentProduct = null;
 window.currentCategory = 'All'; // Global variable
 
-// Helper function for safe localStorage parsing
-function getSavedItems() {
-    try {
-        return JSON.parse(localStorage.getItem('golem_saved') || '[]');
-    } catch (e) {
-        console.warn("Cleared corrupted local storage.");
-        localStorage.removeItem('golem_saved');
-        return[];
-    }
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Golem System Initializing...");
     
@@ -33,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setTimeout(() => {
         const toast = document.getElementById('chatToast');
-        if (toast && !document.getElementById('chatMenu')?.classList.contains('active')) {
+        if (toast && !document.getElementById('chatMenu').classList.contains('active')) {
             toast.style.display = 'block';
         }
     }, 5000);
@@ -46,9 +35,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = window.currentCategory || 'All') => {
+    // 1. Declare 'grid' once at the top
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
+    // Capture both Sort and Location values
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
@@ -64,36 +55,52 @@ window.fetchProducts = async (category = window.currentCategory || 'All') => {
         `)
         .eq('status', 'approved');
 
-    if (category !== 'All') query = query.eq('category', category);
-    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+    // Category Filter
+    if (category !== 'All') {
+        query = query.eq('category', category);
+    }
 
-    if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
-    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
-    else query = query.order('created_at', { ascending: false });
+    // Location Filter
+    if (locationFilter !== 'all') {
+        query = query.ilike('location', `%${locationFilter}%`);
+    }
 
+    // Sorting Logic
+    if (sortOrder === 'price_low') {
+        query = query.order('price', { ascending: true });
+    } else if (sortOrder === 'price_high') {
+        query = query.order('price', { ascending: false });
+    } else {
+        query = query.order('created_at', { ascending: false });
+    }
+
+    // Execute the query
     const { data, error } = await query;
     
+    // Check for errors
     if (!error) {
         renderProducts(data);
     } else {
         console.error("Fetch error:", error.message);
+        // Display the database error on the screen
         if (grid) {
             grid.innerHTML = `
                 <div style="text-align:center; grid-column:1/-1; padding:50px; color:#ff4757; background:#fff; border-radius:12px; border:1px solid #ff4757;">
                     <i class="fas fa-exclamation-triangle" style="font-size:30px; margin-bottom:10px;"></i>
                     <h3>Database Error</h3>
                     <p>${error.message}</p>
+                    <p style="font-size:0.8rem; color:#666; margin-top:10px;">Check your Supabase RLS policies or Table relationships.</p>
                 </div>`;
         }
     }
 };
-
 window.filterSponsored = async () => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
+    // Highlight the correct button
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('.sponsor-filter')?.classList.add('active');
+    document.querySelector('.sponsor-filter').classList.add('active');
 
     const { data, error } = await _supabase
         .from('products')
@@ -102,38 +109,45 @@ window.filterSponsored = async () => {
         .or('is_sponsored.eq.true,is_featured.eq.true')
         .order('created_at', { ascending: false });
 
-    if (!error) renderProducts(data);
-    else console.error("Fetch error:", error.message);
+    if (!error) {
+        renderProducts(data);
+    } else {
+        console.error("Fetch error:", error.message);
+    }
 };
 
 // --- 3. WISHLIST LOGIC ---
 window.toggleWishlist = function(id, btnElement) {
-    let saved = getSavedItems();
-    const icon = btnElement.querySelector('i');
+    try {
+        let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+        const icon = btnElement.querySelector('i');
 
-    if (saved.includes(id)) {
-        saved = saved.filter(itemId => itemId !== id);
-        btnElement.classList.remove('active');
-        if (icon) {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
+        if (saved.includes(id)) {
+            saved = saved.filter(itemId => itemId !== id);
+            btnElement.classList.remove('active');
+            if (icon) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        } else {
+            saved.push(id);
+            btnElement.classList.add('active');
+            if (icon) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            }
         }
-    } else {
-        saved.push(id);
-        btnElement.classList.add('active');
-        if (icon) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-        }
+
+        localStorage.setItem('golem_saved', JSON.stringify(saved));
+        window.updateCartBadge();
+    } catch (e) {
+        console.error("Wishlist error:", e);
     }
-
-    localStorage.setItem('golem_saved', JSON.stringify(saved));
-    window.updateCartBadge();
 };
 
 window.addToCartFromModal = function() {
     if (!currentProduct) return;
-    let saved = getSavedItems();
+    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     if (!saved.includes(currentProduct.id)) {
         saved.push(currentProduct.id);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
@@ -145,7 +159,7 @@ window.addToCartFromModal = function() {
 };
 
 window.updateCartBadge = function() {
-    const saved = getSavedItems();
+    const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
     const badge = document.getElementById('cartBadge');
     if (badge) {
         badge.innerText = saved.length;
@@ -153,63 +167,86 @@ window.updateCartBadge = function() {
     }
 };
 
-// --- 3. RENDERING ENGINE (DISPLAYING MATCHED SELLER INFO) ---
+// --- 4. RENDERING ENGINE ---
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
     if (!products || products.length === 0) {
-        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found.</div>`;
+        grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found in this category.</div>`;
         return;
     }
 
-    const savedItems = getSavedItems();
+    const savedItems = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const now = new Date();
 
     grid.innerHTML = products.map(p => {
         const safeData = encodeURIComponent(JSON.stringify(p));
         const isVerified = p.profiles?.is_verified === true;
+        const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
-        
-        // Use Profile name if available, otherwise fallback to item seller_name
-        const sellerName = p.profiles?.full_name || p.seller_name || "Community Seller";
-        const sellerAvatar = p.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=random`;
+        const isSponsored = p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > now;
+        const isFeatured = p.is_featured;
 
-        const rawPhone = (p.profiles?.phone || p.seller_phone || "").replace(/\D/g, '');
+        let statusBadge = '';
+        if (isSponsored) {
+            statusBadge = `<div class="badge sponsor-badge"><i class="fas fa-ad"></i> Sponsored</div>`;
+        } else if (isFeatured) {
+            statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
+        }
+
+        const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
         const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+        const tgUser = (p.telegram_username || "").replace('@', '');
+
+        const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Marketplace!`);
+        const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
+        const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
         return `
-        <div class="product-card">
+        <div class="product-card ${isSold ? 'is-sold' : ''}">
             <div class="card-img-container">
+                ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
+                ${statusBadge}
                 <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
                     <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                 </button>
-                <img src="${p.image}" alt="${p.name}" loading="lazy" onclick="window.openProductDetailsSafe('${safeData}')">
+                <img src="${p.image}" alt="${p.name}" loading="lazy">
+                <div class="image-overlay">
+                    <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
+                </div>
             </div>
             
             <div class="product-info">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <span class="category-badge">${p.category || 'Furniture'}</span>
-                    ${isVerified ? '<span style="color:#2ed573; font-size:0.7rem;"><i class="fas fa-check-circle"></i> VERIFIED</span>' : ''}
-                </div>
+                <span class="category-badge">${p.category || 'General'}</span>
+                <h3 class="product-title">
+                    ${p.name} 
+                    <span class="verification-wrapper" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; margin-left: 5px;">
+                        <i class="fas fa-check-circle" style="color: ${isVerified ? '#2ed573' : '#ccc'};"></i>
+                        <span style="color: ${isVerified ? '#2ed573' : '#888'}; font-weight: normal;">
+                            ${isVerified ? 'Verified' : 'Community'}
+                        </span>
+                    </span>
+                </h3>
                 
-                <h3 class="product-title" onclick="window.openProductDetailsSafe('${safeData}')">${p.name}</h3>
                 <div class="product-price">${p.price?.toLocaleString()} ETB</div>
 
-                <!-- Seller Linkage UI -->
-                <div class="seller-mini-profile" style="display:flex; align-items:center; gap:8px; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
-                    <img src="${sellerAvatar}" style="width:25px; height:25px; border-radius:50%; object-fit:cover;">
-                    <span style="font-size:0.8rem; color:#666;">${sellerName}</span>
+                <div class="product-location" style="display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #666; margin-top: 5px;">
+                    <i class="fas fa-map-marker-alt" style="color: #ff4757;"></i>
+                    <span>${p.location || 'Addis Ababa'}</span>
                 </div>
                 
-                <div class="quick-contact-bar" style="margin-top: 12px; display:flex; gap:10px;">
-                    <a href="tel:+${cleanPhone}" class="contact-icon call" style="background:#333; color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;">
-                        <i class="fas fa-phone-alt" style="font-size:0.9rem;"></i>
+                <div class="quick-contact-bar" style="margin-top: 12px;">
+                    <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
+                    <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" class="contact-icon share" style="background:#6c5ce7; color:white;">
+                        <i class="fas fa-share-alt"></i>
                     </a>
-                    <a href="https://wa.me/${cleanPhone}" target="_blank" class="contact-icon wa" style="background:#25d366; color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;">
-                        <i class="fab fa-whatsapp" style="font-size:1rem;"></i>
-                    </a>
-                    <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="flex-grow:1; background:#6c5ce7; color:white; border:none; border-radius:8px; font-size:0.8rem; cursor:pointer;">
-                        Details
+                </div>
+
+                <div class="product-actions" style="margin-top: 15px;">
+                    <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width: 100%; padding: 10px; border-radius: 8px; cursor: pointer;">
+                        Full Details
                     </button>
                 </div>
             </div>
@@ -235,6 +272,7 @@ window.loadSponsor = async () => {
             document.getElementById('sponsorImg').src = product.image;
             document.getElementById('sponsorTitle').innerText = product.name;
             document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
+            // Removed checkout.html logic since this is a classifieds marketplace
             document.getElementById('sponsorLink').onclick = (e) => {
                 e.preventDefault();
                 window.openProductModal(product);
@@ -267,90 +305,54 @@ window.openProductDetailsSafe = (encodedData) => {
     } catch (e) { console.error("Error parsing product", e); }
 };
 
-// --- 4. MODAL LOGIC (DETAILED SELLER MATCHING) ---
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
+    const badgeContainer = document.getElementById('sellerBadgeContainer');
+    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
+    const sellerNameElem = document.getElementById('modalSellerName');
+    
     if (!modal) return;
 
-    const profile = product.profiles || {}; 
-    const sellerName = profile.full_name || product.seller_name || "Community Member";
-    const rawPhone = (profile.phone || product.seller_phone || "").replace(/\D/g, '');
+    // DATA PREPARATION
+    const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
     const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+    const tgUser = (product.telegram_username || "").replace('@', '');
 
+    // UI INJECTION
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description provided.";
+    document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
 
-    // Modal Seller Info
-    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
-    if (sellerAvatarElem) {
-        sellerAvatarElem.src = profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=6c5ce7&color=fff`;
-    }
+    // SELLER DETAILS
+    const profile = product.profiles || {}; 
+    const isVerified = profile.is_verified === true;
+    const sellerName = profile.full_name || product.seller_name || "Community Member";
+    const avatarUrl = profile.avatar_url || 'https://via.placeholder.com/150';
     
-    const sellerNameElem = document.getElementById('modalSellerName');
-    if (sellerNameElem) sellerNameElem.innerText = sellerName;
-    
-    const badgeContainer = document.getElementById('sellerBadgeContainer');
+    if (sellerNameElem) sellerNameElem.innerText = `Seller: ${sellerName}`;
+    if (sellerAvatarElem) sellerAvatarElem.src = avatarUrl;
+
     if (badgeContainer) {
-        badgeContainer.innerHTML = profile.is_verified 
-            ? `<span style="color: #2ed573; font-weight: bold;"><i class="fas fa-check-circle"></i> Verified Merchant</span>`
-            : `<span style="color: #888;"><i class="fas fa-user"></i> Community Seller</span>`;
+        badgeContainer.innerHTML = isVerified 
+            ? `<div style="color: #2ed573; font-weight: bold; margin-top: 5px;"><i class="fas fa-check-circle"></i> Verified Seller</div>`
+            : `<div style="color: #888; margin-top: 5px;"><i class="fas fa-shield-alt"></i> Community Seller</div>`;
     }
 
-    // Contact Actions
-    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=I'm interested in your ${product.name}`;
-    document.getElementById('telegramOrder').href = `https://t.me/+${intPhone}`;
+    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on Golem Marketplace")}`;
+    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
     document.getElementById('callContact').href = `tel:+${intPhone}`;
 
     modal.style.display = 'flex';
+    document.body.style.overflow = "hidden";
 };
 
-// --- 5. PROFILE UPDATES ---
-window.updateProfileInfo = async function(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    const fileInput = document.getElementById('editAvatar');
-    const file = fileInput ? fileInput.files[0] : null;
-    
-    btn.disabled = true;
-    btn.innerText = "Saving...";
-
-    const { data: { user } } = await _supabase.auth.getUser();
-    let avatarUrl = document.getElementById('profileAvatar').src;
-
-    if (file) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-
-        const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file);
-
-        if (!uploadError) {
-            const { data } = _supabase.storage.from('avatars').getPublicUrl(fileName);
-            avatarUrl = data.publicUrl;
-        }
-    }
-
-    const updates = {
-        full_name: document.getElementById('editFullName').value,
-        phone: document.getElementById('editPhone').value, // Standardized to 'phone'
-        avatar_url: avatarUrl,
-        updated_at: new Date()
-    };
-
-    const { error } = await _supabase.from('profiles').upsert({ id: user.id, ...updates });
-
-    if (!error) {
-        alert("Profile Updated!");
-        location.reload(); 
-    } else {
-        alert("Update Error: " + error.message);
-        btn.disabled = false;
-        btn.innerText = "Save Changes";
-    }
+window.closeProductModal = () => {
+    const modal = document.getElementById('productModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = "auto";
 };
-
 
 // --- 7. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
@@ -411,16 +413,18 @@ window.handleAuth = async function(e) {
     btn.disabled = false;
 };
 
-// --- 6. AUTH UI SYNC ---
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signInBtn = document.getElementById('signInBtn');
     const userWelcome = document.getElementById('userWelcome');
     const userNameElem = document.getElementById('userName');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const adminLink = document.getElementById('adminNavLink');
 
     if (user) {
         if (signInBtn) signInBtn.style.display = 'none';
         if (userWelcome) userWelcome.style.display = 'flex';
+        if (signOutBtn) signOutBtn.style.display = 'block';
 
         const { data: profile } = await _supabase
             .from('profiles')
@@ -428,12 +432,19 @@ window.updateUIForUser = async function() {
             .eq('id', user.id)
             .maybeSingle();
 
-        if (userNameElem) userNameElem.innerText = profile?.full_name?.split(' ')[0] || "Member";
+        if (userNameElem) userNameElem.innerText = profile?.full_name ? profile.full_name.split(' ')[0] : "Member";
+        if (adminLink && profile?.is_admin) adminLink.style.display = 'flex';
+    } else {
+        if (signInBtn) signInBtn.style.display = 'block';
+        if (userWelcome) userWelcome.style.display = 'none';
+        if (signOutBtn) signOutBtn.style.display = 'none';
+        if (adminLink) adminLink.style.display = 'none';
     }
 };
 
+// Add 'event' inside the parentheses here!
 window.checkAuthToSell = async function(event) { 
-    event.preventDefault(); 
+    event.preventDefault(); // Now this works properly
     const { data: { user } } = await _supabase.auth.getUser();
     if (user) {
         window.location.href = "sell.html"; 
@@ -509,17 +520,17 @@ window.loadUsers = async function() {
 };
 
 window.deleteUser = async function(userId, identifier) {
-    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete profile for ${identifier}? (Note: Auth user deletion requires Edge Functions)`);
+    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
     if (!isConfirmed) return;
 
     try {
         const { error } = await _supabase.from('profiles').delete().eq('id', userId);
         if (error) throw error;
-        alert("User profile deleted successfully.");
+        alert("User deleted successfully.");
         await window.loadUsers(); 
     } catch (err) {
         console.error("Delete Error:", err.message);
-        alert("Failed to delete user profile: " + err.message);
+        alert("Failed to delete user: " + err.message);
     }
 };
 
@@ -539,6 +550,13 @@ window.toggleVerification = async (userId, currentStatus) => {
     }
 
     alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
+    
+    // Trigger the auto-post logic if they were just verified
+    if (!currentStatus) {
+        console.log("New verified seller alert triggered.");
+        // Optional: postToSocialMedia(someUserData);
+    }
+    
     window.loadUsers();
 };
 
@@ -558,25 +576,14 @@ window.loadUserProfile = async function() {
         const emailElem = document.getElementById('profileEmail');
         const avatarElem = document.getElementById('profileAvatar');
         const badgeElem = document.getElementById('verificationBadge');
-        
-        // Populate inputs if edit modal is opened
-        const editFullName = document.getElementById('editFullName');
-        const editPhone = document.getElementById('editPhone');
 
         if (nameElem) nameElem.innerText = profile.full_name || "Member";
         if (emailElem) emailElem.innerText = user.email;
-       if (avatarElem) {
-    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || "Member")}&background=6c5ce7&color=fff&size=150`;
-    avatarElem.src = profile.avatar_url || defaultAvatar;
-}
+        if (avatarElem) avatarElem.src = profile.avatar_url || 'https://via.placeholder.com/150';
         
-        if (editFullName) editFullName.value = profile.full_name || "";
-        if (editPhone) editPhone.value = profile.phone_number || "";
-
         if (badgeElem) {
             badgeElem.innerText = profile.is_verified ? "Verified Seller" : "Community Seller";
-            badgeElem.style.background = profile.is_verified ? "#2ed573" : "#eee";
-            badgeElem.style.color = profile.is_verified ? "#fff" : "#555";
+            badgeElem.style.background = profile.is_verified ? "#2ed573" : "#888";
         }
     }
 };
@@ -593,27 +600,22 @@ window.updateProfileInfo = async function(e) {
     const { data: { user } } = await _supabase.auth.getUser();
     let avatarUrl = null;
 
+    // Fixed path to include user.id so users don't overwrite each other
     if (file) {
         const fileExt = file.name.split('.').pop();
-        // Overwrite the exact same file to save storage limit size
-        const fileName = `${user.id}/avatar.${fileExt}`;
+        const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`;
 
-        const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file, {
-            upsert: true
-        });
+        const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file);
 
         if (!uploadError) {
-            // Append timestamp so browser ignores cache and shows newly uploaded image
             const { data } = _supabase.storage.from('avatars').getPublicUrl(fileName);
-            avatarUrl = `${data.publicUrl}?t=${Date.now()}`; 
-        } else {
-            console.error("Upload error:", uploadError);
+            avatarUrl = data.publicUrl;
         }
     }
 
     const updates = {
         full_name: document.getElementById('editFullName').value,
-        phone_number: document.getElementById('editPhone').value, // Standardized property
+        phone: document.getElementById('editPhone').value,
     };
     if (avatarUrl) updates.avatar_url = avatarUrl;
 
@@ -621,14 +623,11 @@ window.updateProfileInfo = async function(e) {
 
     if (!error) {
         alert("Profile Updated!");
-        window.closeEditModal(); // Custom function in your HTML to close modal
-        window.loadUserProfile(); // Re-render without full page reload
+        location.reload();
     } else {
         alert("Error: " + error.message);
     }
-    
     btn.disabled = false;
-    btn.innerText = "Save Changes";
 };
 
 // --- 10. SUPPORT & MISC LOGIC ---
@@ -672,7 +671,6 @@ window.shareToTelegramMain = function() {
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
 };
-
 window.shareToWhatsApp = function() {
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia! " + window.location.href);
     window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -681,25 +679,39 @@ window.shareToWhatsApp = function() {
 let isAmharic = false;
 window.toggleLanguage = function() {
     isAmharic = !isAmharic;
-    const langBtn = document.getElementById('langText');
-    if(langBtn) langBtn.innerText = isAmharic ? "English" : "አማርኛ";
+    document.getElementById('langText').innerText = isAmharic ? "English" : "አማርኛ";
     
+    // Example localization - grab elements with data-am attribute
     document.querySelectorAll('[data-am]').forEach(el => {
         const currentText = el.innerText;
         el.innerText = el.getAttribute('data-am');
-        el.setAttribute('data-am', currentText); 
+        el.setAttribute('data-am', currentText); // Swap them back and forth
     });
 };
 
-/* 
- * 🔒 SECURITY FIX: 
- * Do NOT put Telegram Bot Tokens on the frontend. Malicious users can steal it.
- * You should use a Supabase Database Webhook or an Edge Function to trigger this securely.
- */
+
 async function postToSocialMedia(product) {
-    console.warn("Security Notice: Moving social media auto-posts to the backend.");
-    // NOTE: Replace this with an invocation to your Supabase Edge Function:
-    // await _supabase.functions.invoke('telegram-bot', { body: { product: product } });
+    const botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
+    const chatId = '@your_public_channel_username'; // Your public channel
+    const message = `
+🌟 *New Item Approved!*
+📦 *Product:* ${product.name}
+💰 *Price:* ${product.price} ETB
+📍 *Location:* ${product.location}
+
+🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
+    `;
+
+    // Send to Telegram
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'Markdown'
+        })
+    });
 }
 
 window.shareToFacebook = function() {
@@ -709,29 +721,6 @@ window.shareToFacebook = function() {
 
 window.shareToTelegram = function() {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("Check out this awesome find on Golem Marketplace!");
+    const text = encodeURIComponent("Check out this awesome find on WanaGebya!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
-};
-
-
-// --- MODAL CLOSING LOGIC ---
-window.closeProductModal = () => {
-    const modal = document.getElementById('productModal');
-    if (modal) {
-        modal.style.display = 'none';
-        // Restore scrolling to the main page
-        document.body.style.overflow = "auto";
-    }
-};
-
-// Also add this to allow closing by clicking outside the modal content
-window.onclick = function(event) {
-    const modal = document.getElementById('productModal');
-    const authModal = document.getElementById('authModal');
-    if (event.target == modal) {
-        window.closeProductModal();
-    }
-    if (event.target == authModal) {
-        window.toggleModal();
-    }
 };
