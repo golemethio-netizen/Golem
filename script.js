@@ -712,3 +712,26 @@ window.shareToTelegram = function() {
     const text = encodeURIComponent("Check out this awesome find on Golem Marketplace!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
 };
+
+
+// --- MODAL CLOSING LOGIC ---
+window.closeProductModal = () => {
+    const modal = document.getElementById('productModal');
+    if (modal) {
+        modal.style.display = 'none';
+        // Restore scrolling to the main page
+        document.body.style.overflow = "auto";
+    }
+};
+
+// Also add this to allow closing by clicking outside the modal content
+window.onclick = function(event) {
+    const modal = document.getElementById('productModal');
+    const authModal = document.getElementById('authModal');
+    if (event.target == modal) {
+        window.closeProductModal();
+    }
+    if (event.target == authModal) {
+        window.toggleModal();
+    }
+};
