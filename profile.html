@@ -123,6 +123,29 @@
                 window.loadUserProfile();
             }
         });
+
+
+
+        // === INSTANT IMAGE PREVIEW LOGIC ===
+        document.getElementById('editAvatar').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Check if file is an image
+                if (!file.type.startsWith('image/')) {
+                    alert("Please select a valid image file.");
+                    this.value = ''; // Clear the input
+                    return;
+                }
+                
+                // Create a temporary URL to preview the image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Update the avatar on the screen immediately for preview
+                    document.getElementById('profileAvatar').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
 </body>
 </html>
