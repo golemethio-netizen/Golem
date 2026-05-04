@@ -3,614 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
-    <meta name="google-site-verification" content="googleaee343d4e7f7a439" />
-    <meta property="og:title" content="Product Name - Wanagebya">
-<meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
-<meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
-<meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-<meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
-    <meta name="geo.region" content="ET" />
-    <meta name="geo.placename" content="Addis Ababa" />
-    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
-    <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
+    <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell in Ethiopia</title>
+    
+    <!-- SEO & Social Media -->
+    <meta name="description" content="WanaGebya - Ethiopia's premium marketplace. Buy and sell electronics, furniture, and more.">
+    <meta property="og:title" content="WanaGebya | ዋና ገበያ">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    
-    <!-- Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- ================= MOBILE OPTIMIZATION & HEADER CSS ================= -->
     <style>
-        /* Base header restructuring for better flow */
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
-        
-        .header-actions { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
-
-        .help-link {
-            color: #555;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
-        }
-
-        .help-link:hover { color: #007bff; }
-
+        /* MOBILE-FIRST OPTIMIZATIONS */
         @media (max-width: 768px) {
-            /* 1. Header & Search Fixes */
+            /* 1. Header Layout */
             .golem-header { padding: 15px 10px; }
-            .header-top-row { flex-wrap: nowrap; }
-            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
-            .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
+            .logo { font-size: 1.1rem; }
+            .header-top-row { gap: 5px; }
             
-            /* Smart Hide for Mobile Header */
-            .hide-text-mobile { display: none !important; }
-            .header-actions { gap: 10px; }
-            .help-link i { font-size: 1.3rem !important; }
-            
-            .sign-in-btn { 
-                padding: 8px !important; 
-                border-radius: 50% !important; 
-                width: 36px; 
-                height: 36px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-            }
-            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
-
-            /* 2. App-like Bottom Navigation Bar */
-            body { padding-bottom: 70px; }
+            /* 2. Bottom Navigation (App Style) */
+            body { padding-bottom: 75px; } /* Space for nav */
             .nav-container-horizontal {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: white;
-                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-                display: flex;
-                justify-content: space-around;
-                padding: 10px 5px;
-                z-index: 1000;
-                margin: 0;
-                border-top: 1px solid #eee;
+                position: fixed; bottom: 0; left: 0; width: 100%;
+                background: white; display: flex; justify-content: space-around;
+                padding: 10px 0; z-index: 1000; border-top: 1px solid #eee;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             }
-            .nav-item-box { 
-                flex-direction: column; 
-                gap: 4px; 
-                background: transparent !important; 
-                color: #555 !important;
-                box-shadow: none; 
-                padding: 5px;
-                min-width: 60px;
-            }
-            .nav-item-box i { font-size: 1.3rem; color: #3498db; }
-            .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
-            
-            #adminNavLink i { color: #e74c3c; }
+            .nav-item-box { flex-direction: column; gap: 3px; background: transparent !important; color: #555 !important; }
+            .nav-item-box i { font-size: 1.2rem; }
+            .nav-item-box p { font-size: 0.65rem; display: block; font-weight: 600; }
 
-            /* 3. Swipeable Horizontal Filters */
+            /* 3. Grid: 2 Columns on Mobile */
+            .masonry-wrapper {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 5px;
+            }
+
+            /* 4. Filter Bar: Swipeable */
             .filter-bar {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 5px;
-                gap: 8px;
+                display: flex; flex-wrap: nowrap; overflow-x: auto;
+                padding: 10px 0; gap: 8px; -webkit-overflow-scrolling: touch;
             }
             .filter-bar::-webkit-scrollbar { display: none; }
-            .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
-
-            /* 4. 2-Column Grid for Phones */
-            .masonry-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 12px;
-            }
+            .filter-btn { flex: 0 0 auto; white-space: nowrap; font-size: 0.85rem; padding: 8px 15px; }
             
-            /* 5. Modals */
-            .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
-            .modal-footer-actions { flex-direction: column; }
-            .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
-
-            /* 6. Floating Chat Fix */
-            .floating-chat { bottom: 85px; right: 15px; }
-            #chatMenu { bottom: 70px; right: 0; }
-
-            /* 7. Stack Sponsored Section */
-            .sponsor-content { flex-direction: column; text-align: center; }
-            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
-            .sponsor-actions { flex-direction: column; gap: 10px; }
-            .sponsor-actions a { margin-left: 0 !important; }
+            .hide-mobile { display: none !important; }
         }
+
+        /* Modal Seller Profile Styling */
+        .seller-mini-card {
+            display: flex; align-items: center; gap: 12px;
+            background: #f8f9fa; padding: 12px; border-radius: 12px;
+            margin: 15px 0; border: 1px solid #eee;
+        }
+        .seller-mini-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7; }
+        .seller-mini-info h4 { margin: 0; font-size: 0.9rem; }
+        .seller-mini-info p { margin: 0; font-size: 0.75rem; color: #777; }
     </style>
 </head>
 
 <body>
-    <!-- ======================= HEADER ======================= -->
+
+    <!-- HEADER -->
     <header class="golem-header">
-        
-        <!-- Top Row: Logo & Utility Actions -->
         <div class="header-top-row">
             <div class="logo">WanaGebya | ዋና ገበያ</div>
-
             <div class="header-actions">
-                
-                <!-- 1. Need Help Button -->
-                <a href="#" onclick="window.toggleSupportModal()" class="help-link">
-                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i> 
-                    <span class="hide-text-mobile">Help</span>
-                </a>
-
-                <!-- 2. Language Button -->
-                <div class="lang-toggle-wrapper">
-                    <button onclick="window.toggleLanguage()" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
-                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                <button onclick="window.toggleLanguage()" class="lang-btn">
+                    <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                </button>
+                <div id="navAuth">
+                    <button id="signInBtn" class="auth-btn-small" onclick="window.toggleModal()">
+                        <i class="fas fa-user-circle"></i> <span>Sign In</span>
                     </button>
-                </div>
-
-                <!-- 3. Sign In / User Profile -->
-                <div class="nav-auth-controls">
-                    <button id="signInBtn" class="filter-btn sign-in-btn" onclick="window.toggleModal()" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
-                    </button>
-
-                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
-                        <span onclick="location.href='profile.html'" style="cursor:pointer; font-size: 0.85rem;">
-                            <strong id="userName"></strong>
-                        </span>
-                        <button id="signOutBtn" class="signout-btn" onclick="window.handleSignOut()" style="padding: 5px 10px; font-size: 0.8rem;">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
+                    <div id="userWelcome" style="display:none; align-items:center; gap:10px;">
+                        <span onclick="location.href='profile.html'" style="cursor:pointer; font-weight:600;" id="userName">User</span>
+                        <i class="fas fa-sign-out-alt" onclick="window.handleSignOut()" style="cursor:pointer; color:#ff4757;"></i>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Search Bar -->
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+            <input type="text" id="headerSearch" placeholder="Search furniture, electronics...">
         </div>
 
-        <!-- Bottom/Horizontal Navigation Links -->
-        <div class="nav-container-horizontal">
-            <a href="index.html" class="nav-item-box bg-home">
-                <i class="fas fa-home"></i>
-                <p>Home</p>
+        <!-- NAVIGATION (Desktop: Top / Mobile: Bottom via CSS) -->
+        <nav class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
+            <a href="#" onclick="window.checkAuthToSell(event)" class="nav-item-box"><i class="fas fa-plus-circle" style="color:#2ed573;"></i><p>Sell</p></a>
+            <a href="saved.html" class="nav-item-box" style="position:relative;">
+                <i class="fas fa-heart"></i><p>Saved</p>
+                <span id="cartBadge" class="badge-count" style="display:none;">0</span>
             </a>
-
-            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box" onclick="window.checkAuthToSell(event)">
-    <i class="fas fa-plus-circle" style="color: #2ed573;"></i>
-    <p>Sell Item</p>
-</a>
-                
-               
-            <a href="my-items.html" class="nav-item-box bg-items">
-                <i class="fas fa-box-open"></i>
-                <p>My Items</p>
-            </a>
-
-            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;">
-                <i class="fas fa-heart"></i>
-                <p>Saved</p>
-                <span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span>
-            </a>
-
-            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;">
-                <i class="fas fa-user-shield"></i>
-                <p>Admin</p>
-            </a>
-        </div>
+            <a href="my-items.html" class="nav-item-box"><i class="fas fa-box"></i><p>Items</p></a>
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
+        </nav>
     </header>
 
-    <!-- ======================= SPONSORED SECTION ======================= -->
-    <section class="sponsored-section container" id="mainSponsor" style="display: none; margin-top: 20px;">
+    <!-- SPONSORED ITEM -->
+    <section class="container" id="mainSponsor" style="display: none; margin-top: 20px;">
         <div class="sponsor-card">
-            <div class="sponsor-badge">Featured Partner</div>
             <div class="sponsor-content">
-                <div class="sponsor-image">
-                    <img id="sponsorImg" src="" alt="Sponsor">
-                </div>
+                <div class="sponsor-image"><img id="sponsorImg" src="" alt="Featured"></div>
                 <div class="sponsor-details">
-                    <h2 id="sponsorTitle">Loading Sponsor...</h2>
-                    <p id="sponsorDesc"></p>
-                    <div class="sponsor-actions">
-                        <a href="#" id="sponsorLink" class="buy-btn" onclick="window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText)">View Item</a>
-                        <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor →</a>
-                    </div>
+                    <span class="badge sponsor-badge">Featured</span>
+                    <h2 id="sponsorTitle">Title</h2>
+                    <p id="sponsorDesc">Description</p>
+                    <a href="#" id="sponsorLink" class="buy-btn">View Deal</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ======================= FILTER & SORT CONTROLS ======================= -->
-    <section class="filter-controls">
-        <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-            <div class="sort-container" style="flex: 1; min-width: 140px;">
-                <select id="sortSelect" onchange="window.fetchProducts()" style="width: 100%;">
-                    <option value="newest">🆕 Newest First</option>
-                    <option value="price_low">💰 Price: Low to High</option>
-                    <option value="price_high">💎 Price: High to Low</option>
-                </select>
-            </div>
-            <div class="location-filter-container" style="flex: 1; min-width: 140px;">
-                <select id="locationSelect" onchange="window.fetchProducts()" style="width: 100%;">
-                    <option value="all">🌍 All Regions</option>
-                    <option value="Addis Ababa">Addis Ababa</option>
-                    <option value="Oromia">Oromia</option>
-                    <option value="Amhara">Amhara</option>
-                    <option value="Tigray">Tigray</option>
-                    <option value="Sidama">Sidama</option>
-                    <option value="Somali">Somali</option>
-                </select>
-            </div>
-        </div>
-        
-        <!-- Horizontal Swipeable Filter Bar -->
+    <!-- CATEGORY FILTERS -->
+    <section class="filter-controls container">
         <div class="filter-bar">
-            <button class="filter-btn active" data-am="ሁሉም" onclick="window.filterCategory('All', this)">All</button>
-            <button class="filter-btn sponsor-filter" data-am="ልዩ ዕቃዎች" onclick="window.filterSponsored()">
-                <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
-            </button>
-            <button class="filter-btn" data-am="ኤሌክትሮኒክስ" onclick="window.filterCategory('Electronics', this)">Electronics</button>
-            <button class="filter-btn" data-am="የቤት ዕቃዎች" onclick="window.filterCategory('Furniture', this)">Furniture</button>
-            <button class="filter-btn" data-am="አልባሳት" onclick="window.filterCategory('Fashion', this)">Fashion</button>
-            <button class="filter-btn" data-am="ተሽከርካሪዎች" onclick="window.filterCategory('Vehicles', this)">Vehicles</button>
-            <button class="filter-btn" data-am="ንብረት" onclick="window.filterCategory('Property', this)">Property</button>
-            <button class="filter-btn" data-am="የቤት ቁሳቁሶች" onclick="window.filterCategory('Home Supplies', this)">Home Supplies</button>
+            <button class="filter-btn active" onclick="window.filterCategory('All', this)">All Items</button>
+            <button class="filter-btn" onclick="window.filterCategory('Electronics', this)">Electronics</button>
+            <button class="filter-btn" onclick="window.filterCategory('Furniture', this)">Furniture</button>
+            <button class="filter-btn" onclick="window.filterCategory('Vehicles', this)">Vehicles</button>
+            <button class="filter-btn" onclick="window.filterCategory('Fashion', this)">Fashion</button>
+            <button class="filter-btn" onclick="window.filterCategory('Property', this)">Property</button>
         </div>
     </section>
 
-    <!-- ======================= MAIN GRID ======================= -->
+    <!-- MAIN PRODUCT GRID -->
     <main class="container">
         <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner">
-                <i class="fas fa-circle-notch fa-spin"></i> Loading items...
-            </div>
-        </div>
-
-        <div class="invite-container">
-            <i class="fas fa-users"></i>
-            <h3> Help WanaGebya Grow By Sharing!</h3>
-            <p>Know someone selling something? Invite them to WanaGebya.</p>
-            <div class="invite-btns">
-                <button onclick="window.shareToTelegram()" class="tg-btn" style="background:#0088cc;">
-                    <i class="fab fa-telegram-plane"></i> Telegram
-                </button>
-                <button onclick="window.shareToWhatsApp()" class="tg-btn" style="background:#25d366;">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </button>
-                <button onclick="window.shareToFacebook()" class="tg-btn" style="background:#1877F2;">
-    <i class="fab fa-facebook-f"></i> Facebook
-</button>
+            <!-- Items injected by script.js -->
+            <div class="loading-state" style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading the market...</p>
             </div>
         </div>
     </main>
 
-    <!-- ======================= FOOTER ======================= -->
-    <footer class="golem-footer" style="padding-bottom: 80px;"> <!-- Extra padding for bottom nav -->
+    <!-- FOOTER -->
+    <footer class="golem-footer">
         <div class="footer-container">
             <div class="footer-col">
-                <h2 class="footer-logo">WanaGebya </h2>
-                <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
+                <h3>WanaGebya</h3>
+                <p>Buy and Sell with confidence in Ethiopia.</p>
             </div>
-
             <div class="footer-col">
-                <h4>Contact Us</h4>
-                <p><i class="fas fa-phone"></i> +251707022845</p>
-                <div class="social-links">
-                    <a href="https://t.me/allInOneEthiopia1" target="_blank" aria-label="Join our Telegram Channel"><i class="fab fa-telegram"></i></a>
-                   <a href="https://wa.me/251707022845" target="_blank" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                </div>
+                <h4>Support</h4>
+                <a href="#" onclick="window.toggleSupportModal()">Help Center</a>
+                <a href="https://t.me/allInOneEthiopia1">Telegram Support</a>
             </div>
-
-            <div class="footer-col">
-                <h4>Language / ቋንቋ</h4>
-                <button onclick="window.toggleLanguage()" class="lang-btn-footer">
-                    English / አማርኛ
-                </button>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Back to top button -->
-    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-
-    <!-- ======================= FLOATING CHAT WIDGET ======================= -->
-    <div class="floating-chat">
-        <div id="chatToast" class="chat-toast" style="display: none;">
-            <span class="close-toast" onclick="window.closeToast(event)">&times;</span>
-            <p>👋 Hello! Welcome! Need help with buying or selling?</p>
-            <div class="toast-arrow"></div>
-        </div>
-
-        <div id="chatMenu" class="chat-menu" style="display: none;">
-            <a href="tel:+251707022845" class="menu-item call">
-                <i class="fas fa-phone"></i> <span>Call Now</span>
-            </a>
-            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram">
-                <i class="fab fa-telegram-plane"></i> <span>Telegram</span>
-            </a>
-            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp">
-                <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
-            </a>
-        </div>
-
-        <button class="chat-btn" onclick="window.toggleChatMenu()">
-            <div class="status-dot-container">
-                <i class="fas fa-comment-dots"></i>
-                <span class="online-dot"></span>
-            </div>
-            <span class="chat-label" data-am="ያግኙን">Contact Us</span>
-        </button>
-    </div>
-
-    <!-- ======================= MODALS ======================= -->
-    
-    <!-- 1. Support Modal -->
-    <div id="supportModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.toggleSupportModal()">
-        <div class="modal-content" style="max-width: 400px;">
-            <button onclick="window.toggleSupportModal()" class="close-modal-btn">&times;</button>
-            <h2>Contact WanaGebya Support</h2>
-            <form onsubmit="window.handleSupportSubmit(event)">
-                <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
-                <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
-                <textarea id="supportMessage" placeholder="How can we help?" required class="modal-input" style="height:100px;"></textarea>
-                <button type="submit" class="auth-submit" style="width: 100%;">Send Message</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. Auth/Login Modal -->
-    <div id="authModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.toggleModal()">
-        <div class="modal-content">
-            <button type="button" onclick="window.toggleModal()" class="close-modal-btn">&times;</button>
-            <h2 id="modalTitle">Welcome Back</h2>
-            
-            <form onsubmit="window.handleAuth(event)">
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="authEmail" placeholder="Email Address" required>
-                </div>
-                
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="authPassword" placeholder="Password" required>
-                </div>
-
-                <div id="registerFields" style="display: none;">
-                    <div class="input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="regName" placeholder="Full Name">
-                    </div>
-                    
-                    <div class="input-group">
-                        <i class="fas fa-phone"></i>
-                        <input type="text" id="regPhone" placeholder="Phone Number">
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" id="regLocation" placeholder="Location (e.g. Bole)">
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fas fa-info-circle"></i>
-                        <textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit; border-radius: 8px; background: #f9f9f9;"></textarea>
-                    </div>
-                </div>
-
-                <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
-            </form>
-
-            <div class="modal-footer">
-                <p id="toggleText">Don't have an account? <a href="#" onclick="window.toggleAuthMode()">Sign Up</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. Product Details Modal -->
+    <!-- PRODUCT MODAL (WITH SELLER MATCHING) -->
     <div id="productModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.closeProductModal()">
         <div class="modal-content">
             <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
-            
             <div class="modal-img-wrapper">
-                <img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;">
+                <img id="modalProductImg" src="" alt="Product">
             </div>
-
             <div class="modal-body">
-                <h2 id="modalProductTitle" style="font-size: 1.2rem; margin-bottom: 5px;"></h2>
-
-            <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <img id="modalSellerAvatar" src="https://ui-avatars.com/api/?name=User&background=ececec&color=333&size=150" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;"> 
-                    
-                    <div style="flex: 1;">
-                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4>
+                <h2 id="modalProductTitle">Product Title</h2>
+                <div id="modalProductPrice" class="modal-price">0 ETB</div>
+                
+                <!-- Seller Profile Match Section -->
+                <div class="seller-mini-card">
+                    <img id="modalSellerAvatar" src="" class="seller-mini-avatar" alt="Seller">
+                    <div class="seller-mini-info">
+                        <h4 id="modalSellerName">Seller Name</h4>
                         <div id="sellerBadgeContainer"></div>
                     </div>
                 </div>
-                
-                <div id="modalProductPrice" class="modal-price" style="font-size: 1.3rem;"></div>
-                <p id="modalProductDesc" class="modal-description" style="font-size: 0.9rem; line-height: 1.5;"></p>
 
-                <!-- BUYER LOGGING ADDED ON THESE CLICKS -->
-                <div class="modal-footer-actions" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
-                    <a id="callContact" href="#" class="contact-btn" style="flex: 1;" onclick="window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn" style="flex: 1;" onclick="window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-telegram-plane"></i> Message</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn" style="flex: 1;" onclick="window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    
-                    <button class="contact-btn save-btn" onclick="window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);" style="width: 100%;">
-                        <i class="fas fa-heart"></i> Save to Wishlist
-                    </button>
+                <p id="modalProductDesc" class="modal-description"></p>
+
+                <div class="modal-footer-actions">
+                    <a id="callContact" href="#" class="contact-btn call"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn tg"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                 </div>
+                <button class="wishlist-add-btn" onclick="window.addToCartFromModal()" style="width:100%; margin-top:10px; border:none; background:#eee; padding:12px; border-radius:8px; cursor:pointer;">
+                    <i class="fas fa-heart"></i> Save to Wishlist
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 4. Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <p>Sending your order to WanaGebya ...</p>
-    </div>
-
-    <!-- 5. Success Post Modal -->
-    <div id="successModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:white; padding:40px; border-radius:20px; text-align:center; max-width:400px; width:90%; position:relative;">
-            <div style="font-size: 50px; color: #2ed573; margin-bottom: 20px;">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2 style="margin-bottom:10px;">Listing Received!</h2>
-            <p style="color:#666; line-height:1.5;">Your item <strong id="postedItemName" style="color:#333;"></strong> has been sent to our team for review.</p>
-            <p style="font-size:0.85rem; color:#999; margin-top:10px;">It usually takes less than 2 hours to go live.</p>
-            <button onclick="document.getElementById('successModal').style.display='none'" style="margin-top:25px; width:100%; padding:15px; background:#333; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">
-                Back to Marketplace
-            </button>
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.toggleModal()">
+        <div class="modal-content" style="max-width: 400px;">
+            <button onclick="window.toggleModal()" class="close-modal-btn">&times;</button>
+            <h2 id="modalTitle">Welcome</h2>
+            <form onsubmit="window.handleAuth(event)">
+                <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="authEmail" placeholder="Email" required></div>
+                <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="authPassword" placeholder="Password" required></div>
+                <div id="registerFields" style="display: none;">
+                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="regName" placeholder="Full Name"></div>
+                    <div class="input-group"><i class="fas fa-phone"></i><input type="text" id="regPhone" placeholder="Phone Number"></div>
+                </div>
+                <button type="submit" id="authSubmitBtn" class="auth-submit">Sign In</button>
+            </form>
+            <p id="toggleText" style="text-align:center; margin-top:15px; font-size:0.9rem;">
+                New here? <a href="#" onclick="window.toggleAuthMode()">Create Account</a>
+            </p>
         </div>
     </div>
 
-    <!-- ======================= SCRIPTS ======================= -->
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
-    
     <script>
-        // --- FLOATING CHAT LOGIC ---
-        window.closeToast = function(event) {
-            if (event) event.stopPropagation();
-            const toast = document.getElementById('chatToast');
-            if (toast) toast.style.display = 'none';
+        // Ensure Modal Closes correctly
+        window.closeProductModal = function() {
+            document.getElementById('productModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
         };
 
-        window.toggleChatMenu = function() {
-            const menu = document.getElementById('chatMenu');
-            if (menu.style.display === 'flex') {
-                menu.style.display = 'none';
-            } else {
-                menu.style.display = 'flex';
-            }
+        // UI Language Toggle
+        let isAmharic = false;
+        window.toggleLanguage = function() {
+            isAmharic = !isAmharic;
+            document.getElementById('langText').innerText = isAmharic ? "English" : "አማርኛ";
+            // In a real app, you'd trigger a translation function here
         };
-
-        // Close chat menu if user clicks anywhere else on the screen
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('chatMenu');
-            const btn = document.querySelector('.chat-btn');
-            if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) {
-                menu.style.display = 'none';
-            }
-        });
-
-        // Check if user just posted an item (via URL params)
-        function checkPostStatus() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('posted')) {
-                const itemName = urlParams.get('item') || 'Listing';
-                document.getElementById('postedItemName').innerText = itemName;
-                document.getElementById('successModal').style.display = 'flex';
-                // Remove the param from the URL to prevent showing it again on refresh
-                window.history.replaceState({}, document.title, "index.html");
-            }
-        }
-        document.addEventListener('DOMContentLoaded', checkPostStatus);
-
-        // Fetch Admin status (Online/Offline indicator for Chat)
-        async function loadAdminStatus() {
-            if (typeof _supabase === 'undefined') return; // Fail gracefully if config.js not loaded
-
-            const { data, error } = await _supabase
-                .from('profiles')
-                .select('last_seen')
-                .eq('is_owner', true)
-                .maybeSingle();
-
-            if (error) {
-                console.error("Error fetching admin status:", error);
-                return;
-            }
-
-            if (data && data.last_seen) {
-                const lastSeenDate = new Date(data.last_seen);
-                const now = new Date();
-                const diffInMinutes = Math.floor((now - lastSeenDate) / 60000);
-
-                const dot = document.querySelector('.online-dot');
-                const label = document.querySelector('.chat-label');
-                
-                if (!dot || !label) return;
-
-                if (diffInMinutes < 5) {
-                    dot.style.background = "#2ed573"; // Green
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">Online Now</small>`;
-                } else if (diffInMinutes < 60) {
-                    dot.style.background = "#f1c40f"; // Yellow
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">Active ${diffInMinutes}m ago</small>`;
-                } else {
-                    dot.style.background = "#ccc"; // Grey
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px; opacity:0.8;">Offline</small>`;
-                }
-            }
-        }
-
-        // ==========================================
-        //  --- ADVANCED BUYER AUDIT LOG SYSTEM ---
-        // ==========================================
-        window.logBuyerAction = async (buyerEmail, actionDescription) => {
-            try {
-                if (typeof _supabase === 'undefined') return;
-
-                // 1. Identify the user (If email isn't provided, fetch it from session)
-                let userEmail = buyerEmail;
-                if (!userEmail) {
-                    const { data: { user } } = await _supabase.auth.getUser();
-                    if (user) {
-                        userEmail = user.email || user.user_metadata?.full_name || 'Logged-In User';
-                    } else {
-                        userEmail = 'Guest/Unknown';
-                    }
-                }
-
-                // 2. Insert into the database
-                await _supabase.from('audit_logs').insert([{
-                    admin_email: userEmail, 
-                    action: '[BUYER] Interaction',
-                    details: actionDescription
-                }]);
-            } catch (err) {
-                console.log("Audit log recording skipped:", err);
-            }
-        };
-
-        // TRACK UTM / MARKETING TRAFFIC ON PAGE LOAD
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const utmSource = urlParams.get('utm_source');
-            if (utmSource) {
-                const campaign = urlParams.get('utm_campaign') || 'Un-named Campaign';
-                window.logBuyerAction(null, `Arrived on site via Tracked Link (Source: ${utmSource} | Campaign: ${campaign})`);
-            }
-        });
-
-        // Check Admin status immediately, then every 2 minutes
-        loadAdminStatus();
-        setInterval(loadAdminStatus, 120000);
     </script>
 </body>
 </html>
