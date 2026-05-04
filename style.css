@@ -1,12 +1,14 @@
 /* --- 1. Base & Reset --- */
 :root {
-    --primary-color: #007bff;
-    --whatsapp-green: #25D366;
-    --telegram-blue: #0088cc;
-    --dark-text: #2d3436;
-    --light-gray: #f8f9fa;
-    --glass-bg: rgba(255, 255, 255, 0.95);
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --primary: #007bff;
+    --primary-dark: #0056b3;
+    --tg-blue: #0088cc;
+    --wa-green: #25D366;
+    --danger: #ff4757;
+    --glass: rgba(255, 255, 255, 0.95);
+    --blur: blur(10px);
+    --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+    --shadow-lg: 0 15px 40px rgba(0,0,0,0.1);
 }
 
 * {
@@ -426,11 +428,13 @@ body {
 
     /* Saved Items Summary Box */
     .saved-summary-box {
-        bottom: 80px; /* Above bottom nav */
-        border-radius: 20px;
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
+        bottom: 75px; /* Sits exactly above the bottom nav */
+        left: 10px;
+        right: 10px;
+        width: calc(100% - 20px);
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
     }
 }
 
@@ -453,20 +457,7 @@ body {
 
 
 
-        /* --- MODERN UI STYLES --- */
-        :root {
-            --primary: #1a1a1a;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --text-main: #2d3436;
-            --text-muted: #636e72;
-            --danger: #ff4757;
-            --telegram: #0088cc;
-            --whatsapp: #25D366;
-            --share: #6c5ce7;
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
+     
 
         body {
             margin: 0;
@@ -754,3 +745,24 @@ body {
                 padding-bottom: 20px;
             }
         }
+
+/* Style for the current active page link */
+.nav-item-box.active-page {
+    color: var(--primary) !important;
+}
+
+.nav-item-box.active-page i {
+    color: var(--primary) !important;
+    transform: scale(1.1);
+}
+
+.card-img-container.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
