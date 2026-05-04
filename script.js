@@ -600,22 +600,28 @@ window.updateProfileInfo = async function(e) {
     const { data: { user } } = await _supabase.auth.getUser();
     let avatarUrl = null;
 
-    // Fixed path to include user.id so users don't overwrite each other
     if (file) {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`;
+        // Overwrite the same file to save storage space
+        const fileName = `${user.id}/avatar.${fileExt}`;
 
-        const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file);
+        const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file, {
+            upsert: true // <-- THIS IS IMPORTANT: It overwrites the old image
+        });
 
         if (!uploadError) {
+            // Get public URL and append a timestamp query so the browser doesn't cache the old image
             const { data } = _supabase.storage.from('avatars').getPublicUrl(fileName);
-            avatarUrl = data.publicUrl;
+            avatarUrl = `${data.publicUrl}?t=${Date.now()}`; 
+        } else {
+            console.error("Upload error:", uploadError);
         }
     }
 
+    // Fixed 'phone' column consistency
     const updates = {
         full_name: document.getElementById('editFullName').value,
-        phone: document.getElementById('editPhone').value,
+        phone_number: document.getElementById('editPhone').value, // Make sure this matches your DB column!
     };
     if (avatarUrl) updates.avatar_url = avatarUrl;
 
@@ -623,11 +629,13 @@ window.updateProfileInfo = async function(e) {
 
     if (!error) {
         alert("Profile Updated!");
-        location.reload();
+        window.closeEditModal(); // Close modal on success
+        window.loadUserProfile(); // Refresh UI without reloading page
     } else {
         alert("Error: " + error.message);
     }
     btn.disabled = false;
+    btn.innerText = "Save Changes";
 };
 
 // --- 10. SUPPORT & MISC LOGIC ---
