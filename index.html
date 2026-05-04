@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
+    
     <meta name="google-site-verification" content="googleaee343d4e7f7a439" />
     <meta property="og:title" content="Product Name - Wanagebya">
+<!-- Replace your current OG and verification block with this cleaned version -->
+<meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
 <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
 <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
 <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
 <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
+<link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
     <meta name="geo.region" content="ET" />
     <meta name="geo.placename" content="Addis Ababa" />
     <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
@@ -429,7 +432,7 @@
     </div>
 
     <!-- 3. Product Details Modal -->
-    <div id="productModal" class="modal-overlay" style="display: none;" onclick="if(event.target == this) window.closeProductModal()">
+    <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display: none;" ...>
         <div class="modal-content">
             <button onclick="window.closeProductModal()" class="close-modal-btn">&times;</button>
             
@@ -494,6 +497,8 @@
     <script src="script.js"></script>
     
     <script>
+        imgElement.setAttribute('loading', 'lazy');
+imgElement.setAttribute('alt', 'Featured product at WanaGebya');
         // --- FLOATING CHAT LOGIC ---
         window.closeToast = function(event) {
             if (event) event.stopPropagation();
@@ -601,13 +606,15 @@
 
         // TRACK UTM / MARKETING TRAFFIC ON PAGE LOAD
         document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const utmSource = urlParams.get('utm_source');
-            if (utmSource) {
-                const campaign = urlParams.get('utm_campaign') || 'Un-named Campaign';
-                window.logBuyerAction(null, `Arrived on site via Tracked Link (Source: ${utmSource} | Campaign: ${campaign})`);
-            }
-        });
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+    // Only log if it's a new entry for this session
+    if (utmSource && !sessionStorage.getItem('utm_logged')) {
+        const campaign = urlParams.get('utm_campaign') || 'General';
+        window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${campaign}`);
+        sessionStorage.setItem('utm_logged', 'true');
+    }
+});
 
         // Check Admin status immediately, then every 2 minutes
         loadAdminStatus();
