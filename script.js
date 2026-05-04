@@ -2,6 +2,17 @@
 let currentProduct = null;
 window.currentCategory = 'All'; // Global variable
 
+// Helper function for safe localStorage parsing
+function getSavedItems() {
+    try {
+        return JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    } catch (e) {
+        console.warn("Cleared corrupted local storage.");
+        localStorage.removeItem('golem_saved');
+        return[];
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Golem System Initializing...");
     
@@ -22,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setTimeout(() => {
         const toast = document.getElementById('chatToast');
-        if (toast && !document.getElementById('chatMenu').classList.contains('active')) {
+        if (toast && !document.getElementById('chatMenu')?.classList.contains('active')) {
             toast.style.display = 'block';
         }
     }, 5000);
@@ -35,11 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = window.currentCategory || 'All') => {
-    // 1. Declare 'grid' once at the top
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
-    // Capture both Sort and Location values
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
@@ -55,52 +64,36 @@ window.fetchProducts = async (category = window.currentCategory || 'All') => {
         `)
         .eq('status', 'approved');
 
-    // Category Filter
-    if (category !== 'All') {
-        query = query.eq('category', category);
-    }
+    if (category !== 'All') query = query.eq('category', category);
+    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
 
-    // Location Filter
-    if (locationFilter !== 'all') {
-        query = query.ilike('location', `%${locationFilter}%`);
-    }
+    if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
+    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+    else query = query.order('created_at', { ascending: false });
 
-    // Sorting Logic
-    if (sortOrder === 'price_low') {
-        query = query.order('price', { ascending: true });
-    } else if (sortOrder === 'price_high') {
-        query = query.order('price', { ascending: false });
-    } else {
-        query = query.order('created_at', { ascending: false });
-    }
-
-    // Execute the query
     const { data, error } = await query;
     
-    // Check for errors
     if (!error) {
         renderProducts(data);
     } else {
         console.error("Fetch error:", error.message);
-        // Display the database error on the screen
         if (grid) {
             grid.innerHTML = `
                 <div style="text-align:center; grid-column:1/-1; padding:50px; color:#ff4757; background:#fff; border-radius:12px; border:1px solid #ff4757;">
                     <i class="fas fa-exclamation-triangle" style="font-size:30px; margin-bottom:10px;"></i>
                     <h3>Database Error</h3>
                     <p>${error.message}</p>
-                    <p style="font-size:0.8rem; color:#666; margin-top:10px;">Check your Supabase RLS policies or Table relationships.</p>
                 </div>`;
         }
     }
 };
+
 window.filterSponsored = async () => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
-    // Highlight the correct button
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('.sponsor-filter').classList.add('active');
+    document.querySelector('.sponsor-filter')?.classList.add('active');
 
     const { data, error } = await _supabase
         .from('products')
@@ -109,45 +102,38 @@ window.filterSponsored = async () => {
         .or('is_sponsored.eq.true,is_featured.eq.true')
         .order('created_at', { ascending: false });
 
-    if (!error) {
-        renderProducts(data);
-    } else {
-        console.error("Fetch error:", error.message);
-    }
+    if (!error) renderProducts(data);
+    else console.error("Fetch error:", error.message);
 };
 
 // --- 3. WISHLIST LOGIC ---
 window.toggleWishlist = function(id, btnElement) {
-    try {
-        let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
-        const icon = btnElement.querySelector('i');
+    let saved = getSavedItems();
+    const icon = btnElement.querySelector('i');
 
-        if (saved.includes(id)) {
-            saved = saved.filter(itemId => itemId !== id);
-            btnElement.classList.remove('active');
-            if (icon) {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-            }
-        } else {
-            saved.push(id);
-            btnElement.classList.add('active');
-            if (icon) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-            }
+    if (saved.includes(id)) {
+        saved = saved.filter(itemId => itemId !== id);
+        btnElement.classList.remove('active');
+        if (icon) {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
         }
-
-        localStorage.setItem('golem_saved', JSON.stringify(saved));
-        window.updateCartBadge();
-    } catch (e) {
-        console.error("Wishlist error:", e);
+    } else {
+        saved.push(id);
+        btnElement.classList.add('active');
+        if (icon) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+        }
     }
+
+    localStorage.setItem('golem_saved', JSON.stringify(saved));
+    window.updateCartBadge();
 };
 
 window.addToCartFromModal = function() {
     if (!currentProduct) return;
-    let saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    let saved = getSavedItems();
     if (!saved.includes(currentProduct.id)) {
         saved.push(currentProduct.id);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
@@ -159,7 +145,7 @@ window.addToCartFromModal = function() {
 };
 
 window.updateCartBadge = function() {
-    const saved = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const saved = getSavedItems();
     const badge = document.getElementById('cartBadge');
     if (badge) {
         badge.innerText = saved.length;
@@ -177,7 +163,7 @@ function renderProducts(products) {
         return;
     }
 
-    const savedItems = JSON.parse(localStorage.getItem('golem_saved') || '[]');
+    const savedItems = getSavedItems();
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
@@ -272,7 +258,6 @@ window.loadSponsor = async () => {
             document.getElementById('sponsorImg').src = product.image;
             document.getElementById('sponsorTitle').innerText = product.name;
             document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
-            // Removed checkout.html logic since this is a classifieds marketplace
             document.getElementById('sponsorLink').onclick = (e) => {
                 e.preventDefault();
                 window.openProductModal(product);
@@ -308,32 +293,27 @@ window.openProductDetailsSafe = (encodedData) => {
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
-    const badgeContainer = document.getElementById('sellerBadgeContainer');
-    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
-    const sellerNameElem = document.getElementById('modalSellerName');
-    
     if (!modal) return;
 
-    // DATA PREPARATION
     const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
     const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
     const tgUser = (product.telegram_username || "").replace('@', '');
 
-    // UI INJECTION
     document.getElementById('modalProductImg').src = product.image;
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = product.price.toLocaleString() + " ETB";
     document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
 
-    // SELLER DETAILS
     const profile = product.profiles || {}; 
     const isVerified = profile.is_verified === true;
-    const sellerName = profile.full_name || product.seller_name || "Community Member";
-    const avatarUrl = profile.avatar_url || 'https://via.placeholder.com/150';
     
-    if (sellerNameElem) sellerNameElem.innerText = `Seller: ${sellerName}`;
-    if (sellerAvatarElem) sellerAvatarElem.src = avatarUrl;
+    const sellerNameElem = document.getElementById('modalSellerName');
+    if (sellerNameElem) sellerNameElem.innerText = `Seller: ${profile.full_name || product.seller_name || "Community Member"}`;
+    
+    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
+    if (sellerAvatarElem) sellerAvatarElem.src = profile.avatar_url || 'https://via.placeholder.com/150';
 
+    const badgeContainer = document.getElementById('sellerBadgeContainer');
     if (badgeContainer) {
         badgeContainer.innerHTML = isVerified 
             ? `<div style="color: #2ed573; font-weight: bold; margin-top: 5px;"><i class="fas fa-check-circle"></i> Verified Seller</div>`
@@ -442,9 +422,8 @@ window.updateUIForUser = async function() {
     }
 };
 
-// Add 'event' inside the parentheses here!
 window.checkAuthToSell = async function(event) { 
-    event.preventDefault(); // Now this works properly
+    event.preventDefault(); 
     const { data: { user } } = await _supabase.auth.getUser();
     if (user) {
         window.location.href = "sell.html"; 
@@ -520,17 +499,17 @@ window.loadUsers = async function() {
 };
 
 window.deleteUser = async function(userId, identifier) {
-    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`);
+    const isConfirmed = confirm(`⚠️ DANGER: Are you sure you want to permanently delete profile for ${identifier}? (Note: Auth user deletion requires Edge Functions)`);
     if (!isConfirmed) return;
 
     try {
         const { error } = await _supabase.from('profiles').delete().eq('id', userId);
         if (error) throw error;
-        alert("User deleted successfully.");
+        alert("User profile deleted successfully.");
         await window.loadUsers(); 
     } catch (err) {
         console.error("Delete Error:", err.message);
-        alert("Failed to delete user: " + err.message);
+        alert("Failed to delete user profile: " + err.message);
     }
 };
 
@@ -550,13 +529,6 @@ window.toggleVerification = async (userId, currentStatus) => {
     }
 
     alert(`Seller successfully ${currentStatus ? 'unverified' : 'verified'}!`);
-    
-    // Trigger the auto-post logic if they were just verified
-    if (!currentStatus) {
-        console.log("New verified seller alert triggered.");
-        // Optional: postToSocialMedia(someUserData);
-    }
-    
     window.loadUsers();
 };
 
@@ -576,14 +548,22 @@ window.loadUserProfile = async function() {
         const emailElem = document.getElementById('profileEmail');
         const avatarElem = document.getElementById('profileAvatar');
         const badgeElem = document.getElementById('verificationBadge');
+        
+        // Populate inputs if edit modal is opened
+        const editFullName = document.getElementById('editFullName');
+        const editPhone = document.getElementById('editPhone');
 
         if (nameElem) nameElem.innerText = profile.full_name || "Member";
         if (emailElem) emailElem.innerText = user.email;
         if (avatarElem) avatarElem.src = profile.avatar_url || 'https://via.placeholder.com/150';
         
+        if (editFullName) editFullName.value = profile.full_name || "";
+        if (editPhone) editPhone.value = profile.phone_number || "";
+
         if (badgeElem) {
             badgeElem.innerText = profile.is_verified ? "Verified Seller" : "Community Seller";
-            badgeElem.style.background = profile.is_verified ? "#2ed573" : "#888";
+            badgeElem.style.background = profile.is_verified ? "#2ed573" : "#eee";
+            badgeElem.style.color = profile.is_verified ? "#fff" : "#555";
         }
     }
 };
@@ -602,15 +582,15 @@ window.updateProfileInfo = async function(e) {
 
     if (file) {
         const fileExt = file.name.split('.').pop();
-        // Overwrite the same file to save storage space
+        // Overwrite the exact same file to save storage limit size
         const fileName = `${user.id}/avatar.${fileExt}`;
 
         const { error: uploadError } = await _supabase.storage.from('avatars').upload(fileName, file, {
-            upsert: true // <-- THIS IS IMPORTANT: It overwrites the old image
+            upsert: true
         });
 
         if (!uploadError) {
-            // Get public URL and append a timestamp query so the browser doesn't cache the old image
+            // Append timestamp so browser ignores cache and shows newly uploaded image
             const { data } = _supabase.storage.from('avatars').getPublicUrl(fileName);
             avatarUrl = `${data.publicUrl}?t=${Date.now()}`; 
         } else {
@@ -618,10 +598,9 @@ window.updateProfileInfo = async function(e) {
         }
     }
 
-    // Fixed 'phone' column consistency
     const updates = {
         full_name: document.getElementById('editFullName').value,
-        phone_number: document.getElementById('editPhone').value, // Make sure this matches your DB column!
+        phone_number: document.getElementById('editPhone').value, // Standardized property
     };
     if (avatarUrl) updates.avatar_url = avatarUrl;
 
@@ -629,11 +608,12 @@ window.updateProfileInfo = async function(e) {
 
     if (!error) {
         alert("Profile Updated!");
-        window.closeEditModal(); // Close modal on success
-        window.loadUserProfile(); // Refresh UI without reloading page
+        window.closeEditModal(); // Custom function in your HTML to close modal
+        window.loadUserProfile(); // Re-render without full page reload
     } else {
         alert("Error: " + error.message);
     }
+    
     btn.disabled = false;
     btn.innerText = "Save Changes";
 };
@@ -679,6 +659,7 @@ window.shareToTelegramMain = function() {
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
 };
+
 window.shareToWhatsApp = function() {
     const text = encodeURIComponent("Check out Golem Marketplace - The best place to buy & sell in Ethiopia! " + window.location.href);
     window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -687,39 +668,25 @@ window.shareToWhatsApp = function() {
 let isAmharic = false;
 window.toggleLanguage = function() {
     isAmharic = !isAmharic;
-    document.getElementById('langText').innerText = isAmharic ? "English" : "አማርኛ";
+    const langBtn = document.getElementById('langText');
+    if(langBtn) langBtn.innerText = isAmharic ? "English" : "አማርኛ";
     
-    // Example localization - grab elements with data-am attribute
     document.querySelectorAll('[data-am]').forEach(el => {
         const currentText = el.innerText;
         el.innerText = el.getAttribute('data-am');
-        el.setAttribute('data-am', currentText); // Swap them back and forth
+        el.setAttribute('data-am', currentText); 
     });
 };
 
-
+/* 
+ * 🔒 SECURITY FIX: 
+ * Do NOT put Telegram Bot Tokens on the frontend. Malicious users can steal it.
+ * You should use a Supabase Database Webhook or an Edge Function to trigger this securely.
+ */
 async function postToSocialMedia(product) {
-    const botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
-    const chatId = '@your_public_channel_username'; // Your public channel
-    const message = `
-🌟 *New Item Approved!*
-📦 *Product:* ${product.name}
-💰 *Price:* ${product.price} ETB
-📍 *Location:* ${product.location}
-
-🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
-    `;
-
-    // Send to Telegram
-    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'Markdown'
-        })
-    });
+    console.warn("Security Notice: Moving social media auto-posts to the backend.");
+    // NOTE: Replace this with an invocation to your Supabase Edge Function:
+    // await _supabase.functions.invoke('telegram-bot', { body: { product: product } });
 }
 
 window.shareToFacebook = function() {
@@ -729,6 +696,6 @@ window.shareToFacebook = function() {
 
 window.shareToTelegram = function() {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("Check out this awesome find on WanaGebya!");
+    const text = encodeURIComponent("Check out this awesome find on Golem Marketplace!");
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
 };
