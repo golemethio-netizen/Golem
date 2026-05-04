@@ -33,7 +33,8 @@
     <main class="container" style="max-width: 600px; padding: 20px; margin-top: 40px;">
         <section class="profile-header" style="background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
             
-            <img id="profileAvatar" src="https://via.placeholder.com/150" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:15px; border: 4px solid #6c5ce7;">
+            <!-- FIXED: Changed via.placeholder.com to ui-avatars.com to prevent connection errors -->
+            <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=6c5ce7&color=fff&size=150" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:15px; border: 4px solid #6c5ce7;">
             
             <h1 id="profileName" style="margin-bottom: 5px;">Loading...</h1>
             <p id="profileEmail" style="color: #666; margin-bottom: 15px;"></p>
@@ -60,7 +61,6 @@
             <button type="button" class="close-modal-btn" onclick="window.closeEditModal()">&times;</button>
             <h2 style="margin-bottom: 20px;">Edit Profile</h2>
             
-            <!-- FIXED: Form now wraps ALL inputs and the submit button -->
             <form onsubmit="window.updateProfileInfo(event)">
                 
                 <div class="input-group">
@@ -123,8 +123,6 @@
                 window.loadUserProfile();
             }
         });
-
-
 
         // === INSTANT IMAGE PREVIEW LOGIC ===
         document.getElementById('editAvatar').addEventListener('change', function(event) {
