@@ -131,7 +131,24 @@ function renderSaved(items) {
         </div>
     `).join('');
 }
-
+         
+window.shareWhitelist = function() {
+    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+    
+    // Create a URL like: saved.html?items=102,105,200
+    const shareUrl = window.location.origin + window.location.pathname + "?items=" + savedIds.join(',');
+    
+    if (navigator.share) {
+        navigator.share({
+            title: "My WanaGebya Wishlist",
+            text: "Check out these items I found!",
+            url: shareUrl
+        });
+    } else {
+        navigator.clipboard.writeText(shareUrl);
+        alert("Shareable link copied!");
+    }
+};
 // --- 3. Calculations ---
 function calculateTotal(items) {
     const total = items.reduce((sum, item) => sum + parseInt(item.price), 0);
