@@ -311,8 +311,13 @@ window.openProductModal = async (product) => {
     if (sellerNameElem) sellerNameElem.innerText = `Seller: ${profile.full_name || product.seller_name || "Community Member"}`;
     
     const sellerAvatarElem = document.getElementById('modalSellerAvatar');
-    if (sellerAvatarElem) sellerAvatarElem.src = profile.avatar_url || 'https://via.placeholder.com/150';
-
+if (sellerAvatarElem) {
+    const sellerName = profile.full_name || product.seller_name || "Community";
+    // Generates an image with the user's initials!
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=random&size=150`;
+    sellerAvatarElem.src = profile.avatar_url || defaultAvatar;
+}
+    
     const badgeContainer = document.getElementById('sellerBadgeContainer');
     if (badgeContainer) {
         badgeContainer.innerHTML = isVerified 
@@ -555,7 +560,10 @@ window.loadUserProfile = async function() {
 
         if (nameElem) nameElem.innerText = profile.full_name || "Member";
         if (emailElem) emailElem.innerText = user.email;
-        if (avatarElem) avatarElem.src = profile.avatar_url || 'https://via.placeholder.com/150';
+       if (avatarElem) {
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || "Member")}&background=6c5ce7&color=fff&size=150`;
+    avatarElem.src = profile.avatar_url || defaultAvatar;
+}
         
         if (editFullName) editFullName.value = profile.full_name || "";
         if (editPhone) editPhone.value = profile.phone_number || "";
