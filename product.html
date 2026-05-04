@@ -7,23 +7,41 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .product-page-container { max-width: 800px; margin: 100px auto; padding: 20px; }
-        .product-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .product-page-container { max-width: 1000px; margin: 50px auto; padding: 20px; }
+        .product-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
         .product-display img { width: 100%; border-radius: 10px; object-fit: cover; max-height: 500px; }
-        .details-side { display: flex; flex-direction: column; gap: 15px; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: 600; }
-        .price-tag { font-size: 1.5rem; color: #2ed573; font-weight: bold; }
-        .order-buttons { display: grid; gap: 10px; margin-top: 20px; }
+        
+        /* Seller Profile Card Style */
+        .seller-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid #eee;
+        }
+        .seller-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7; }
+        .seller-info h4 { margin: 0; font-size: 1rem; color: #333; }
+        .seller-info p { margin: 0; font-size: 0.8rem; color: #777; }
+
+        .details-side { display: flex; flex-direction: column; gap: 10px; }
+        .price-tag { font-size: 1.8rem; color: #2ed573; font-weight: bold; }
+        .order-buttons { display: grid; gap: 10px; margin-top: 10px; }
         .order-buttons a { text-align: center; padding: 15px; border-radius: 8px; text-decoration: none; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .tg-btn { background: #0088cc; }
         .wa-btn { background: #25d366; }
         .call-btn { background: #333; }
+        .verified-badge { color: #0088cc; font-size: 0.9rem; font-weight: bold; }
     </style>
 </head>
-<body style="background: #f8f9fa;">
+<body style="background: #f4f7f6;">
 
     <div class="product-page-container">
-        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Catalog</a>
+        <a href="index.html" style="text-decoration: none; color: #666; font-weight: 600; display: inline-block; margin-bottom: 20px;">
+            <i class="fas fa-arrow-left"></i> Back to Catalog
+        </a>
         
         <div id="productContent" class="product-display">
             <p>Loading furniture details...</p>
@@ -34,85 +52,81 @@
     <script src="config.js"></script>
     <script>
        async function loadSingleProduct() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
 
-    if (!productId) {
-        window.location.href = 'index.html';
-        return;
-    }
+            if (!productId) {
+                window.location.href = 'index.html';
+                return;
+            }
 
-    // FIXED: Added .eq() to find specific product and .single() to get one object
-    const { data: p, error } = await _supabase
-        .from('products')
-        .select('*, profiles(is_verified)') 
-        .eq('id', productId)
-        .single();
-    
-    if (error || !p) {
-        document.getElementById('productContent').innerHTML = `
-            <div style="text-align:center; padding: 50px;">
-                <h3>Item Not Found</h3>
-                <p>This item may have been sold or removed.</p>
-                <a href="index.html" class="back-link">Return Home</a>
-            </div>`;
-        return;
-    }
-
-    // Set Page Title
-    document.title = `${p.name} | Golem Furniture`;
-
-    // Clean Phone for Links
-    const rawPhone = (p.seller_phone || "").replace(/\D/g, '');
-    const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
-    const tgUser = (p.telegram_username || "").replace('@', '');
-
-    document.getElementById('productContent').innerHTML = `
-        <div class="image-side">
-            <img src="${p.image}" alt="${p.name}">
-        </div>
-        <div class="details-side">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="category-badge" style="background:#eee; padding:5px 10px; border-radius:5px;">${p.category || 'Furniture'}</span>
-                ${p.profiles?.is_verified ? '<span style="color:#2ed573; font-size:0.8rem;"><i class="fas fa-check-circle"></i> Verified Seller</span>' : ''}
-            </div>
-            <h1>${p.name}</h1>
-            <p class="price-tag">${p.price.toLocaleString()} ETB</p>
-            <p style="color:#666; line-height:1.6;">${p.description || 'No description provided.'}</p>
+            // JOIN LOGIC: We select '*' from products and the matching 'profiles' 
+            // Note: This assumes your products table has a 'user_id' column linked to 'profiles'
+            const { data: p, error } = await _supabase
+                .from('products')
+                .select(`
+                    *,
+                    profiles (
+                        full_name,
+                        avatar_url,
+                        is_verified,
+                        phone
+                    )
+                `) 
+                .eq('id', productId)
+                .single();
             
-            <div class="order-buttons">
-                <a href="tel:+${cleanPhone}" class="call-btn" onclick="logBuyerAction(null, 'Called Seller for ${p.name}')">
-                    <i class="fas fa-phone"></i> Call Seller
-                </a>
-                <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="tg-btn" onclick="logBuyerAction(null, 'Telegram Inquiry for ${p.name}')">
-                    <i class="fab fa-telegram-plane"></i> Order via Telegram
-                </a>
-                <a href="https://wa.me/${cleanPhone}?text=I'm interested in ${p.name}" target="_blank" class="wa-btn" onclick="logBuyerAction(null, 'WhatsApp Inquiry for ${p.name}')">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-            </div>
-        </div>
-    `;
-}
+            if (error || !p) {
+                document.getElementById('productContent').innerHTML = `<h3>Item Not Found</h3>`;
+                return;
+            }
 
-// Optimized Audit Log
-const logBuyerAction = async (buyerEmail, actionDescription) => {
-    try {
-        await _supabase.from('audit_logs').insert([{
-            admin_email: buyerEmail || 'Guest/Unknown', 
-            action: '[BUYER] Action Taken',
-            details: actionDescription
-        }]);
-    } catch (e) {
-        console.error("Audit log failed", e);
-    }
-};
+            // Fallback for Seller Info
+            const sellerName = p.profiles?.full_name || "Private Seller";
+            const sellerAvatar = p.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${sellerName}`;
+            const isVerified = p.profiles?.is_verified;
 
-window.onload = loadSingleProduct;
+            // Clean Phone for Links
+            const rawPhone = (p.profiles?.phone || p.seller_phone || "").replace(/\D/g, '');
+            const cleanPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+            const tgUser = (p.telegram_username || "").replace('@', '');
 
+            document.getElementById('productContent').innerHTML = `
+                <div class="image-side">
+                    <img src="${p.image}" alt="${p.name}">
+                </div>
+                <div class="details-side">
+                    <span style="color:#888; text-transform:uppercase; font-size:0.8rem; font-weight:bold;">${p.category || 'General'}</span>
+                    <h1 style="margin:5px 0;">${p.name}</h1>
+                    <p class="price-tag">${p.price.toLocaleString()} ETB</p>
+                    
+                    <!-- MATCHED PROFILE SECTION -->
+                    <div class="seller-card">
+                        <img src="${sellerAvatar}" class="seller-avatar">
+                        <div class="seller-info">
+                            <h4>${sellerName} ${isVerified ? '<i class="fas fa-check-circle" style="color:#0088cc;"></i>' : ''}</h4>
+                            <p>${isVerified ? 'Verified Merchant' : 'Member'}</p>
+                        </div>
+                    </div>
 
+                    <p style="color:#555; line-height:1.6; min-height:100px;">${p.description || 'No description provided.'}</p>
+                    
+                    <div class="order-buttons">
+                        <a href="tel:+${cleanPhone}" class="call-btn">
+                            <i class="fas fa-phone"></i> Call Seller
+                        </a>
+                        <a href="https://t.me/${tgUser || '+'+cleanPhone}" target="_blank" class="tg-btn">
+                            <i class="fab fa-telegram-plane"></i> Telegram
+                        </a>
+                        <a href="https://wa.me/${cleanPhone}?text=Interested in ${p.name}" target="_blank" class="wa-btn">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
 
-        
+        window.onload = loadSingleProduct;
     </script>
 </body>
 </html>
