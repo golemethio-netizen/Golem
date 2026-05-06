@@ -1,322 +1,824 @@
-// ================================================
-// WanaGebya | ዋና ገበያ - Main JavaScript
-// Consolidated & Improved Version
-// ================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-// Global Variables
-let _supabase = null;
-let currentProduct = null;
-let currentCategory = 'All';
-let isAmharic = false;
-let searchTimeout = null;
+    <!-- FIX: Single google-site-verification (removed duplicate older tag) -->
+    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
 
-// ====================== INITIALIZATION ======================
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("🚀 WanaGebya Initializing...");
+    <!-- FIX: Single og:title (removed "Product Name - Wanagebya" duplicate) -->
+    <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
+    <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    <!-- FIX: og:url and canonical should match. Update both when you get a custom domain. -->
+    <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
+    <!-- FIX: Added missing og:type and twitter:card -->
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
 
-    initSupabase();
+    <meta name="geo.region" content="ET" />
+    <meta name="geo.placename" content="Addis Ababa" />
+    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
 
-    await updateUIForUser();
-    updateCartBadge();
-    fetchProducts();
-    loadSponsor();
+    <!-- FIX: Self-host your favicon so it doesn't break if flaticon changes the URL -->
+    <link rel="icon" href="/favicon.png">
 
-    // Debounced Search
-    const searchInput = document.getElementById('headerSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                fetchProducts(currentCategory, e.target.value.trim());
-            }, 350);
-        });
-    }
+    <!-- FIX: preconnect tags moved ABOVE the stylesheets that use them -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- FIX: Added required crossorigin for Google Fonts gstatic domain -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
-    // Online dot (business hours)
-    const now = new Date();
-    const hour = now.getHours();
-    const dot = document.querySelector('.online-dot');
-    if (dot) {
-        dot.style.display = (hour >= 8 && hour < 20) ? 'block' : 'none';
-    }
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    // Welcome toast
-    setTimeout(() => {
-        const toast = document.getElementById('chatToast');
-        if (toast) toast.style.display = 'block';
-    }, 5000);
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
 
-    console.log("✅ WanaGebya Ready!");
-});
+    <!-- ================= MOBILE OPTIMIZATION & HEADER CSS ================= -->
+    <style>
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
 
-// Safe Supabase Init
-function initSupabase() {
-    if (_supabase) return;
-    if (typeof supabase === 'undefined') {
-        console.error("Supabase JS library not loaded!");
-        return;
-    }
-    if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-        _supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    } else {
-        console.warn("Supabase credentials missing in config.js");
-    }
-}
-
-// ====================== FETCH PRODUCTS ======================
-window.fetchProducts = async (category = currentCategory, searchTerm = '') => {
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
-
-    grid.innerHTML = `<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>`;
-
-    const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
-    const locationFilter = document.getElementById('locationSelect')?.value || 'all';
-
-    let query = _supabase
-        .from('products')
-        .select(`
-            *,
-            profiles:user_id (full_name, avatar_url, is_verified)
-        `)
-        .eq('status', 'approved');
-
-    if (category !== 'All') query = query.eq('category', category);
-    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
-    if (searchTerm) query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-
-    // Sorting
-    if (sortOrder === 'price_low') query = query.order('price', { ascending: true });
-    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
-    else query = query.order('created_at', { ascending: false });
-
-    const { data, error } = await query;
-
-    if (error) {
-        console.error("Fetch error:", error);
-        grid.innerHTML = `
-            <div style="text-align:center; padding:60px; color:#ff4757; grid-column:1/-1;">
-                <i class="fas fa-exclamation-triangle" style="font-size:40px;"></i>
-                <h3>Database Error</h3>
-                <p>${error.message}</p>
-            </div>`;
-        return;
-    }
-
-    renderProducts(data || []);
-};
-
-// ====================== RENDER PRODUCTS ======================
-function renderProducts(products) {
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
-
-    if (!products || products.length === 0) {
-        grid.innerHTML = `<div style="text-align:center; padding:80px 20px; color:#666; grid-column:1/-1;">
-            <i class="fas fa-box-open" style="font-size:50px; opacity:0.6;"></i>
-            <h3>No items found</h3>
-            <p>Try different filters</p>
-        </div>`;
-        return;
-    }
-
-    const savedItems = JSON.parse(localStorage.getItem('wana_saved') || '[]');
-
-    grid.innerHTML = products.map(p => {
-        const isSaved = savedItems.includes(p.id);
-        const isVerified = p.profiles?.is_verified === true;
-        const isSponsored = p.is_sponsored && new Date(p.sponsored_until) > new Date();
-
-        const cleanPhone = (p.seller_phone || '').replace(/\D/g, '').replace(/^0/, '251');
-        const tgUser = (p.telegram_username || '').replace('@', '');
-
-        return `
-        <div class="product-card">
-            <div class="card-img-container">
-                ${isSponsored ? `<div class="badge sponsor-badge"><i class="fas fa-ad"></i> Sponsored</div>` : ''}
-                <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="toggleWishlist('${p.id}', this)">
-                    <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
-                </button>
-                <img src="${p.image}" alt="${p.name}" loading="lazy">
-                <div class="image-overlay">
-                    <button class="view-btn" onclick="openProductModalById('${p.id}')">Quick View</button>
-                </div>
-            </div>
-            <div class="product-info">
-                <span class="category-badge">${p.category || 'General'}</span>
-                <h3 class="product-title">
-                    ${p.name}
-                    ${isVerified ? `<i class="fas fa-check-circle" style="color:#2ed573; margin-left:6px;"></i>` : ''}
-                </h3>
-                <div class="product-price">${Number(p.price).toLocaleString()} ETB</div>
-                <div class="product-location">
-                    <i class="fas fa-map-marker-alt"></i> ${p.location || 'Addis Ababa'}
-                </div>
-                <div class="quick-contact-bar">
-                    <a href="tel:+${cleanPhone}" class="contact-icon call"><i class="fas fa-phone-alt"></i></a>
-                    <a href="https://t.me/${tgUser || cleanPhone}" target="_blank" class="contact-icon telegram"><i class="fab fa-telegram-plane"></i></a>
-                </div>
-                <button class="buy-btn" onclick="openProductModalById('${p.id}')">View Details</button>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-// ====================== PRODUCT MODAL ======================
-window.openProductModalById = async (id) => {
-    if (!_supabase) return;
-    const { data: product } = await _supabase
-        .from('products')
-        .select('*, profiles:user_id(*)')
-        .eq('id', id)
-        .single();
-
-    if (product) openProductModal(product);
-};
-
-window.openProductModal = (product) => {
-    currentProduct = product;
-
-    const intPhone = (product.seller_phone || '').replace(/\D/g, '').replace(/^0/, '251');
-    const tgUser = (product.telegram_username || '').replace('@', '');
-
-    document.getElementById('modalProductImg').src = product.image;
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductPrice').innerText = Number(product.price).toLocaleString() + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
-
-    const profile = product.profiles || {};
-    document.getElementById('modalSellerName').innerText = `Seller: ${profile.full_name || 'Community Member'}`;
-
-    document.getElementById('callContact').href = `tel:+${intPhone}`;
-    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name)}`;
-    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
-
-    document.getElementById('productModal').style.display = 'flex';
-    document.body.style.overflow = "hidden";
-};
-
-window.closeProductModal = () => {
-    document.getElementById('productModal').style.display = 'none';
-    document.body.style.overflow = "auto";
-};
-
-// ====================== WISHLIST ======================
-window.toggleWishlist = function(id, btnElement) {
-    let saved = JSON.parse(localStorage.getItem('wana_saved') || '[]');
-    if (saved.includes(id)) {
-        saved = saved.filter(itemId => itemId !== id);
-        btnElement.classList.remove('active');
-    } else {
-        saved.push(id);
-        btnElement.classList.add('active');
-    }
-    localStorage.setItem('wana_saved', JSON.stringify(saved));
-    updateCartBadge();
-};
-
-window.addToCartFromModal = function() {
-    if (!currentProduct) return;
-    let saved = JSON.parse(localStorage.getItem('wana_saved') || '[]');
-    if (!saved.includes(currentProduct.id)) {
-        saved.push(currentProduct.id);
-        localStorage.setItem('wana_saved', JSON.stringify(saved));
-        updateCartBadge();
-        alert("❤️ Added to your Wishlist!");
-    } else {
-        alert("Already in Wishlist!");
-    }
-};
-
-window.updateCartBadge = function() {
-    const saved = JSON.parse(localStorage.getItem('wana_saved') || '[]');
-    const badge = document.getElementById('cartBadge');
-    if (badge) {
-        badge.innerText = saved.length;
-        badge.style.display = saved.length > 0 ? 'flex' : 'none';
-    }
-};
-
-// ====================== FILTERS & SPONSOR ======================
-window.filterCategory = (category, button) => {
-    currentCategory = category;
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    fetchProducts(category);
-};
-
-window.filterSponsored = async () => {
-    const grid = document.getElementById('productGrid');
-    grid.innerHTML = `<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>`;
-
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('featuredFilterBtn').classList.add('active');
-
-    const { data } = await _supabase
-        .from('products')
-        .select(`*, profiles:user_id(*)`)
-        .eq('status', 'approved')
-        .or('is_sponsored.eq.true,is_featured.eq.true')
-        .order('created_at', { ascending: false });
-
-    renderProducts(data || []);
-};
-
-window.loadSponsor = async () => {
-    if (!_supabase) return;
-    try {
-        const now = new Date().toISOString();
-        const { data: product } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('is_sponsored', true)
-            .gt('sponsored_until', now)
-            .limit(1)
-            .maybeSingle();
-
-        if (product) {
-            document.getElementById('sponsorImg').src = product.image;
-            document.getElementById('sponsorTitle').innerText = product.name;
-            document.getElementById('sponsorDesc').innerText = (product.description || '').substring(0, 100) + "...";
-            document.getElementById('mainSponsor').style.display = 'block';
-
-            document.getElementById('sponsorLink').onclick = (e) => {
-                e.preventDefault();
-                openProductModal(product);
-            };
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-    } catch (err) {
-        console.error("Sponsor error:", err);
-    }
-};
 
-// ====================== AUTH & USER ======================
-let isSignUpMode = false;
+        .help-link {
+            color: #555;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
 
-window.toggleAuthMode = function() { /* Your existing toggleAuthMode */ };
-window.handleAuth = async function(e) { /* Your existing handleAuth */ };
-window.updateUIForUser = async function() { /* Your existing updateUIForUser */ };
-window.checkAuthToSell = async function(event) { /* Your existing checkAuthToSell */ };
-window.handleSignOut = async function() { /* Your existing handleSignOut */ };
-window.toggleModal = function() { /* Your existing toggleModal */ };
+        .help-link:hover { color: #007bff; }
 
-// ====================== ADMIN & OTHER FUNCTIONS ======================
-// (Keep all your admin functions: loadUsers, toggleVerification, etc.)
-// ... Paste your original admin, profile, support, and share functions here if needed ...
+        /* ===== INVITE / SHARE SECTION ===== */
+        /* style.css has no .invite-container or .tg-btn rules at all,
+           so we define them fully here. The body bg is #f0f2f5 and the
+           footer is #1a1a1a — this section needs its own solid background
+           so the buttons are never rendered on a dark surface. */
+        .invite-container {
+            text-align: center;
+            padding: 40px 20px;
+            margin: 30px 0;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
 
-window.toggleLanguage = function() {
-    isAmharic = !isAmharic;
-    document.getElementById('langText').innerText = isAmharic ? "English" : "አማርኛ";
-    // Simple toggle for data-am attributes
-    document.querySelectorAll('[data-am]').forEach(el => {
-        const temp = el.innerText;
-        el.innerText = el.getAttribute('data-am');
-        el.setAttribute('data-am', temp);
-    });
-};
+        .invite-container i.fas.fa-users {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
 
-// Close modals on background click
-document.addEventListener('click', (e) => {
-    if (e.target.id === 'productModal') closeProductModal();
-    if (e.target.id === 'authModal') toggleModal();
-});
+        .invite-container h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+
+        .invite-container p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .invite-btns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .tg-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            /* White text — hardcoded, not inherited */
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .tg-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+        }
+
+        .tg-btn i {
+            font-size: 1.1rem;
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+        }
+
+        /* Brand colours — these were inline before; now in CSS for maintainability */
+        #shareTelegramBtn { background-color: #0088cc; }
+        #shareWhatsAppBtn { background-color: #25d366; }
+        #shareFacebookBtn { background-color: #1877F2; }
+
+        @media (max-width: 480px) {
+            .invite-btns { flex-direction: column; align-items: center; }
+            .tg-btn { width: 100%; max-width: 280px; justify-content: center; }
+        }
+
+        /* FIX: Promoted repeated modal inline styles to reusable classes */
+        .modal-flex-actions {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .modal-flex-actions .contact-btn { flex: 1; }
+
+        /* FIX: Unified success modal inner layout — no more all-inline styles */
+        .success-modal-inner {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+        .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
+        .success-back-btn {
+            margin-top: 25px;
+            width: 100%;
+            padding: 15px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .golem-header { padding: 15px 10px; }
+            .header-top-row { flex-wrap: nowrap; }
+            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+            .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
+
+            .hide-text-mobile { display: none !important; }
+            .header-actions { gap: 10px; }
+            .help-link i { font-size: 1.3rem !important; }
+
+            .sign-in-btn {
+                padding: 8px !important;
+                border-radius: 50% !important;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
+
+            body { padding-bottom: 70px; }
+            .nav-container-horizontal {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+                display: flex;
+                justify-content: space-around;
+                padding: 10px 5px;
+                z-index: 1000;
+                margin: 0;
+                border-top: 1px solid #eee;
+            }
+            .nav-item-box {
+                flex-direction: column;
+                gap: 4px;
+                background: transparent !important;
+                color: #555 !important;
+                box-shadow: none;
+                padding: 5px;
+                min-width: 60px;
+            }
+            .nav-item-box i { font-size: 1.3rem; color: #3498db; }
+            .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
+
+            #adminNavLink i { color: #e74c3c; }
+
+            .filter-bar {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 5px;
+                gap: 8px;
+            }
+            .filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
+
+            .masonry-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
+            .modal-footer-actions { flex-direction: column; }
+            .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
+
+            .floating-chat { bottom: 85px; right: 15px; }
+            #chatMenu { bottom: 70px; right: 0; }
+
+            .sponsor-content { flex-direction: column; text-align: center; }
+            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
+            .sponsor-actions { flex-direction: column; gap: 10px; }
+            .sponsor-actions a { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ======================= HEADER ======================= -->
+    <header class="golem-header">
+
+        <div class="header-top-row">
+            <div class="logo">WanaGebya | ዋና ገበያ</div>
+
+            <div class="header-actions">
+
+                <!-- FIX: onclick removed — wired via addEventListener below -->
+                <a href="#" id="helpBtn" class="help-link">
+                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
+                    <span class="hide-text-mobile">Help</span>
+                </a>
+
+                <div class="lang-toggle-wrapper">
+                    <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
+                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                    </button>
+                </div>
+
+                <div class="nav-auth-controls">
+                    <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
+                    </button>
+
+                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
+                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;">
+                            <strong id="userName"></strong>
+                        </span>
+                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+        </div>
+
+        <div class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box bg-home">
+                <i class="fas fa-home"></i>
+                <p>Home</p>
+            </a>
+
+            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box">
+                <i class="fas fa-plus-circle" style="color: #2ed573;"></i>
+                <p>Sell Item</p>
+            </a>
+
+            <a href="my-items.html" class="nav-item-box bg-items">
+                <i class="fas fa-box-open"></i>
+                <p>My Items</p>
+            </a>
+
+            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;">
+                <i class="fas fa-heart"></i>
+                <p>Saved</p>
+                <span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span>
+            </a>
+
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;">
+                <i class="fas fa-user-shield"></i>
+                <p>Admin</p>
+            </a>
+        </div>
+    </header>
+
+    <!-- ======================= SPONSORED SECTION ======================= -->
+    <section class="sponsored-section container" id="mainSponsor" style="display: none; margin-top: 20px;">
+        <div class="sponsor-card">
+            <div class="sponsor-badge">Featured Partner</div>
+            <div class="sponsor-content">
+                <div class="sponsor-image">
+                    <!-- FIX: Added lazy loading and descriptive alt text -->
+                    <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
+                </div>
+                <div class="sponsor-details">
+                    <h2 id="sponsorTitle">Loading Sponsor...</h2>
+                    <p id="sponsorDesc"></p>
+                    <div class="sponsor-actions">
+                        <a href="#" id="sponsorLink" class="buy-btn">View Item</a>
+                        <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= FILTER & SORT CONTROLS ======================= -->
+    <section class="filter-controls">
+        <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+            <div class="sort-container" style="flex: 1; min-width: 140px;">
+                <select id="sortSelect" style="width: 100%;">
+                    <option value="newest">🆕 Newest First</option>
+                    <option value="price_low">💰 Price: Low to High</option>
+                    <option value="price_high">💎 Price: High to Low</option>
+                </select>
+            </div>
+            <div class="location-filter-container" style="flex: 1; min-width: 140px;">
+                <select id="locationSelect" style="width: 100%;">
+                    <option value="all">🌍 All Regions</option>
+                    <option value="Addis Ababa">Addis Ababa</option>
+                    <option value="Oromia">Oromia</option>
+                    <option value="Amhara">Amhara</option>
+                    <option value="Tigray">Tigray</option>
+                    <option value="Sidama">Sidama</option>
+                    <option value="Somali">Somali</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- FIX: All onclick removed — wired via data-category in JS -->
+        <div class="filter-bar">
+            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
+            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
+                <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
+            </button>
+            <button class="filter-btn" data-category="Electronics" data-am="ኤሌክትሮኒክስ">Electronics</button>
+            <button class="filter-btn" data-category="Furniture" data-am="የቤት ዕቃዎች">Furniture</button>
+            <button class="filter-btn" data-category="Fashion" data-am="አልባሳት">Fashion</button>
+            <button class="filter-btn" data-category="Vehicles" data-am="ተሽከርካሪዎች">Vehicles</button>
+            <button class="filter-btn" data-category="Property" data-am="ንብረት">Property</button>
+            <button class="filter-btn" data-category="Home Supplies" data-am="የቤት ቁሳቁሶች">Home Supplies</button>
+        </div>
+    </section>
+
+    <!-- ======================= MAIN GRID ======================= -->
+    <main class="container">
+        <div id="productGrid" class="masonry-wrapper">
+            <div class="loading-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading items...
+            </div>
+        </div>
+
+        <div class="invite-container">
+            <i class="fas fa-users"></i>
+            <h3>Help WanaGebya Grow By Sharing!</h3>
+            <p>Know someone selling something? Invite them to WanaGebya.</p>
+            <div class="invite-btns">
+                <button id="shareTelegramBtn" class="tg-btn">
+                    <i class="fab fa-telegram-plane"></i> Telegram
+                </button>
+                <button id="shareWhatsAppBtn" class="tg-btn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button id="shareFacebookBtn" class="tg-btn">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="golem-footer" style="padding-bottom: 80px;">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h2 class="footer-logo">WanaGebya</h2>
+                <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <p><i class="fas fa-phone"></i> +251707022845</p>
+                <div class="social-links">
+                    <a href="https://t.me/allInOneEthiopia1" target="_blank" aria-label="Join our Telegram Channel"><i class="fab fa-telegram"></i></a>
+                    <a href="https://wa.me/251707022845" target="_blank" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Language / ቋንቋ</h4>
+                <button id="footerLangBtn" class="lang-btn-footer">English / አማርኛ</button>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- ======================= FLOATING CHAT WIDGET ======================= -->
+    <div class="floating-chat">
+        <div id="chatToast" class="chat-toast" style="display: none;">
+            <span id="closeToastBtn" class="close-toast">&times;</span>
+            <p>👋 Hello! Welcome! Need help with buying or selling?</p>
+            <div class="toast-arrow"></div>
+        </div>
+
+        <div id="chatMenu" class="chat-menu" style="display: none;">
+            <a href="tel:+251707022845" class="menu-item call">
+                <i class="fas fa-phone"></i> <span>Call Now</span>
+            </a>
+            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram">
+                <i class="fab fa-telegram-plane"></i> <span>Telegram</span>
+            </a>
+            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp">
+                <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
+            </a>
+        </div>
+
+        <button id="chatToggleBtn" class="chat-btn">
+            <div class="status-dot-container">
+                <i class="fas fa-comment-dots"></i>
+                <span class="online-dot"></span>
+            </div>
+            <span class="chat-label" data-am="ያግኙን">Contact Us</span>
+        </button>
+    </div>
+
+    <!-- ======================= MODALS ======================= -->
+
+    <!-- 1. Support Modal -->
+    <div id="supportModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <button id="closeSupportModal" class="close-modal-btn">&times;</button>
+            <h2>Contact WanaGebya Support</h2>
+            <form id="supportForm">
+                <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
+                <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
+                <textarea id="supportMessage" placeholder="How can we help?" required class="modal-input" style="height:100px;"></textarea>
+                <button type="submit" class="auth-submit" style="width: 100%;">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Auth/Login Modal -->
+    <div id="authModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button type="button" id="closeAuthModal" class="close-modal-btn">&times;</button>
+            <h2 id="modalTitle">Welcome Back</h2>
+
+            <form id="authForm">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="authEmail" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="authPassword" placeholder="Password" required>
+                </div>
+
+                <div id="registerFields" style="display: none;">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regName" placeholder="Full Name">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="text" id="regPhone" placeholder="Phone Number">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="regLocation" placeholder="Location (e.g. Bole)">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-info-circle"></i>
+                        <textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit; border-radius: 8px; background: #f9f9f9;"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
+            </form>
+
+            <div class="modal-footer">
+                <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Product Details Modal -->
+    <!-- FIX: Removed stray "..." invalid attribute from the original -->
+    <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display: none;">
+        <div class="modal-content">
+            <button id="closeProductModal" class="close-modal-btn">&times;</button>
+
+            <div class="modal-img-wrapper">
+                <img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;">
+            </div>
+
+            <div class="modal-body">
+                <h2 id="modalProductTitle" style="font-size: 1.2rem; margin-bottom: 5px;"></h2>
+
+                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
+                    <!-- FIX: Replaced unreliable via.placeholder.com with inline SVG data URI -->
+                    <img id="modalSellerAvatar"
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
+                        alt="Seller avatar"
+                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
+
+                    <div style="flex: 1;">
+                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4>
+                        <div id="sellerBadgeContainer"></div>
+                    </div>
+                </div>
+
+                <div id="modalProductPrice" class="modal-price" style="font-size: 1.3rem;"></div>
+                <p id="modalProductDesc" class="modal-description" style="font-size: 0.9rem; line-height: 1.5;"></p>
+
+                <!-- FIX: Uses .modal-flex-actions class instead of inline styles; onclick removed -->
+                <div class="modal-flex-actions">
+                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width: 100%;">
+                        <i class="fas fa-heart"></i> Save to Wishlist
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Sending your order to WanaGebya ...</p>
+    </div>
+
+    <!-- 5. Success Post Modal -->
+    <!-- FIX: Now uses shared .modal-overlay + .modal-content + named classes, no wall of inline styles -->
+    <div id="successModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content success-modal-inner">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 style="margin-bottom:10px;">Listing Received!</h2>
+            <p style="color:#666; line-height:1.5;">Your item <strong id="postedItemName" style="color:#333;"></strong> has been sent to our team for review.</p>
+            <p style="font-size:0.85rem; color:#999; margin-top:10px;">It usually takes less than 2 hours to go live.</p>
+            <button id="closeSuccessModal" class="success-back-btn">Back to Marketplace</button>
+        </div>
+    </div>
+
+    <!-- ======================= SCRIPTS ======================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        // =====================================================================
+        //  CENTRALISED EVENT LISTENERS
+        //  FIX: All onclick="window.fn()" removed from HTML and wired here.
+        //  Cleaner, maintainable, and CSP-compatible.
+        // =====================================================================
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Header
+            document.getElementById('helpBtn')
+                .addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
+            document.getElementById('langToggleBtn')
+                .addEventListener('click', window.toggleLanguage);
+            document.getElementById('footerLangBtn')
+                .addEventListener('click', window.toggleLanguage);
+            document.getElementById('signInBtn')
+                .addEventListener('click', window.toggleModal);
+            document.getElementById('signOutBtn')
+                .addEventListener('click', window.handleSignOut);
+            document.getElementById('userNameLink')
+                .addEventListener('click', function () { location.href = 'profile.html'; });
+
+            // Sell button
+            document.getElementById('sellBtn')
+                .addEventListener('click', function (e) { window.checkAuthToSell(e); });
+
+            // Sort & location selects
+            document.getElementById('sortSelect')
+                .addEventListener('change', window.fetchProducts);
+            document.getElementById('locationSelect')
+                .addEventListener('change', window.fetchProducts);
+
+            // Category filter buttons
+            document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    window.filterCategory(this.dataset.category, this);
+                });
+            });
+            document.getElementById('featuredFilterBtn')
+                .addEventListener('click', window.filterSponsored);
+
+            // Share buttons
+            document.getElementById('shareTelegramBtn')
+                .addEventListener('click', window.shareToTelegram);
+            document.getElementById('shareWhatsAppBtn')
+                .addEventListener('click', window.shareToWhatsApp);
+            document.getElementById('shareFacebookBtn')
+                .addEventListener('click', window.shareToFacebook);
+
+            // Support modal
+            document.getElementById('closeSupportModal')
+                .addEventListener('click', window.toggleSupportModal);
+            document.getElementById('supportModal')
+                .addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
+            document.getElementById('supportForm')
+                .addEventListener('submit', window.handleSupportSubmit);
+
+            // Auth modal
+            document.getElementById('closeAuthModal')
+                .addEventListener('click', window.toggleModal);
+            document.getElementById('authModal')
+                .addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
+            document.getElementById('authForm')
+                .addEventListener('submit', window.handleAuth);
+            document.getElementById('toggleAuthModeLink')
+                .addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
+
+            // Product modal
+            document.getElementById('closeProductModal')
+                .addEventListener('click', window.closeProductModal);
+            document.getElementById('productModal')
+                .addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
+
+            // Product modal contact buttons — with audit logging
+            document.getElementById('callContact').addEventListener('click', function () {
+                window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText);
+            });
+            document.getElementById('telegramOrder').addEventListener('click', function () {
+                window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText);
+            });
+            document.getElementById('whatsappOrder').addEventListener('click', function () {
+                window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText);
+            });
+            document.getElementById('saveToWishlistBtn').addEventListener('click', function () {
+                window.addToCartFromModal();
+                window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);
+            });
+
+            // Sponsor link audit log
+            document.getElementById('sponsorLink').addEventListener('click', function () {
+                window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText);
+            });
+
+            // Success modal
+            document.getElementById('closeSuccessModal')
+                .addEventListener('click', function () {
+                    document.getElementById('successModal').style.display = 'none';
+                });
+
+            // Floating chat
+            document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
+            document.getElementById('closeToastBtn').addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeToast();
+            });
+
+            // Close chat menu on outside click
+            document.addEventListener('click', function (event) {
+                const menu = document.getElementById('chatMenu');
+                const btn  = document.getElementById('chatToggleBtn');
+                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) {
+                    menu.style.display = 'none';
+                }
+            });
+
+            // Check if redirected here after posting an item
+            checkPostStatus();
+
+            // FIX: UTM tracking — deduplicated per session so it only fires once
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmSource = urlParams.get('utm_source');
+            if (utmSource && !sessionStorage.getItem('utm_logged')) {
+                const campaign = urlParams.get('utm_campaign') || 'General';
+                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${campaign}`);
+                sessionStorage.setItem('utm_logged', 'true');
+            }
+
+            // FIX: Admin status polling deferred to DOMContentLoaded — no wasted reads on page load
+            loadAdminStatus();
+            setInterval(loadAdminStatus, 120000);
+
+        }); // end DOMContentLoaded
+
+        // =====================================================================
+        //  FLOATING CHAT
+        // =====================================================================
+        function closeToast() {
+            const toast = document.getElementById('chatToast');
+            if (toast) toast.style.display = 'none';
+        }
+
+        function toggleChatMenu() {
+            const menu = document.getElementById('chatMenu');
+            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // =====================================================================
+        //  POST SUCCESS CHECK
+        // =====================================================================
+        function checkPostStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('posted')) {
+                const itemName = urlParams.get('item') || 'Listing';
+                document.getElementById('postedItemName').innerText = itemName;
+                document.getElementById('successModal').style.display = 'flex';
+                window.history.replaceState({}, document.title, 'index.html');
+            }
+        }
+
+        // =====================================================================
+        //  ADMIN ONLINE STATUS
+        // =====================================================================
+        async function loadAdminStatus() {
+            if (typeof _supabase === 'undefined') return;
+
+            const { data, error } = await _supabase
+                .from('profiles')
+                .select('last_seen')
+                .eq('is_owner', true)
+                .maybeSingle();
+
+            if (error) { console.error('Error fetching admin status:', error); return; }
+
+            if (data && data.last_seen) {
+                const diffInMinutes = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
+                const dot   = document.querySelector('.online-dot');
+                const label = document.querySelector('.chat-label');
+                if (!dot || !label) return;
+
+                if (diffInMinutes < 5) {
+                    dot.style.background = '#2ed573';
+                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`;
+                } else if (diffInMinutes < 60) {
+                    dot.style.background = '#f1c40f';
+                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diffInMinutes}m ago</small>`;
+                } else {
+                    dot.style.background = '#ccc';
+                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`;
+                }
+            }
+        }
+
+        // =====================================================================
+        //  BUYER AUDIT LOG
+        //  FIX: Column renamed from misleading 'admin_email' to 'actor'.
+        //  ⚠️  Also rename the column in your Supabase table to 'actor'.
+        // =====================================================================
+        window.logBuyerAction = async function (buyerEmail, actionDescription) {
+            try {
+                if (typeof _supabase === 'undefined') return;
+
+                let userEmail = buyerEmail;
+                if (!userEmail) {
+                    const { data: { user } } = await _supabase.auth.getUser();
+                    userEmail = user
+                        ? (user.email || user.user_metadata?.full_name || 'Logged-In User')
+                        : 'Guest/Unknown';
+                }
+
+                await _supabase.from('audit_logs').insert([{
+                    actor: userEmail,           // FIX: was 'admin_email' — rename column in Supabase to 'actor'
+                    action: '[BUYER] Interaction',
+                    details: actionDescription
+                }]);
+            } catch (err) {
+                console.log('Audit log recording skipped:', err);
+            }
+        };
+    </script>
+</body>
+</html>
