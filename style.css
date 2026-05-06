@@ -1,824 +1,756 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+/* --- 1. Base & Reset --- */
+:root {
+    --primary-color: #007bff;
+    --whatsapp-green: #25D366;
+    --telegram-blue: #0088cc;
+    --dark-text: #2d3436;
+    --light-gray: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
 
-    <!-- FIX: Single google-site-verification (removed duplicate older tag) -->
-    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight on mobile */
+}
 
-    <!-- FIX: Single og:title (removed "Product Name - Wanagebya" duplicate) -->
-    <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
-    <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    <!-- FIX: og:url and canonical should match. Update both when you get a custom domain. -->
-    <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
-    <!-- FIX: Added missing og:type and twitter:card -->
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
+    color: var(--dark-text);
+    line-height: 1.6;
+}
 
-    <meta name="geo.region" content="ET" />
-    <meta name="geo.placename" content="Addis Ababa" />
-    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
-    <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
+/* --- 2. Header & Navigation --- */
+.golem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap; /* Allows search bar to drop down on mobile */
+}
 
-    <!-- FIX: Self-host your favicon so it doesn't break if flaticon changes the URL -->
-    <link rel="icon" href="/favicon.png">
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--primary-color);
+}
 
-    <!-- FIX: preconnect tags moved ABOVE the stylesheets that use them -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <!-- FIX: Added required crossorigin for Google Fonts gstatic domain -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+.search-wrapper {
+    position: relative;
+    flex-grow: 2;
+    margin: 0 20px;
+    max-width: 500px;
+}
 
-    <!-- Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+#headerSearch {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 0.95rem;
+    background: #f8f9fa;
+    transition: 0.3s;
+}
 
-    <!-- ================= MOBILE OPTIMIZATION & HEADER CSS ================= -->
-    <style>
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
+#headerSearch:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
 
-        .header-actions {
+.nav-container-horizontal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.nav-item-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s, background 0.2s;
+    position: relative;
+}
+
+.nav-item-box i { font-size: 1.2rem; margin-bottom: 4px; }
+.nav-item-box p { font-size: 0.75rem; font-weight: 600; margin: 0; }
+.nav-item-box:hover { transform: translateY(-3px); }
+
+.bg-home { background-color: #FFF4A3; }
+.bg-sell { background-color: #FFC0C7; }
+.bg-items { background-color: #D9EEE1; }
+
+#cartBadge {
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.nav-auth-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#userWelcome {
+    display: flex;
+    align-items: center;
+    background: #f1f2f6;
+    padding: 8px 15px;
+    border-radius: 50px;
+    border: 1px solid #dfe4ea;
+    font-size: 0.85rem;
+    color: #2f3542;
+}
+
+#userName { color: var(--primary-color); margin-left: 5px; }
+
+.signout-btn {
+    background: #ff4757 !important;
+    color: white !important;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.signout-btn:hover { background: #ff6b81 !important; transform: translateY(-2px); }
+
+/* Header Toggles */
+.lang-btn {
+    background: #f0f2f5;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- 3. Main Product Grid --- */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+.masonry-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Desktop: 4 columns */
+    gap: 20px;
+    padding: 10px 0;
+}
+
+/* --- 4. Product Cards --- */
+.product-card {
+    background: var(--glass-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    border: 1px solid #eee;
+}
+
+.product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+.card-img-container {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover img { transform: scale(1.08); }
+
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.wishlist-btn i { color: #888; font-size: 1rem; }
+.wishlist-btn.active i { color: #ff4757; }
+
+.product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+
+.product-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #222;
+}
+
+.product-price { color: var(--primary-color); font-size: 1.2rem; font-weight: 800; margin-top: auto; }
+
+/* --- 5. Filtering & Horizontal Scroll --- */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0 20px 0;
+    overflow-x: auto; /* Mobile swiping */
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+}
+
+.filter-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+.filter-btn {
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    flex-shrink: 0;
+}
+
+.filter-btn:hover, .filter-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+/* --- 6. Badges & Sponsored Elements --- */
+.grid-sponsor-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(241, 196, 15, 0.95);
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.product-card.is-sponsored { border: 2px solid #f1c40f; }
+
+.sponsor-card {
+    background: linear-gradient(135deg, #fff9ea 0%, #ffffff 100%);
+    border: 2px solid #f1c40f;
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(241, 196, 15, 0.15);
+}
+
+.sponsor-content { display: flex; gap: 30px; align-items: center; }
+.sponsor-image { flex: 1; max-width: 300px; height: 200px; border-radius: 15px; overflow: hidden; }
+.sponsor-image img { width: 100%; height: 100%; object-fit: cover; }
+.sponsor-details { flex: 2; }
+.sponsor-details h2 { font-size: 1.8rem; margin-bottom: 10px; }
+
+/* --- 7. Modals --- */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px); z-index: 3000;
+    align-items: center; justify-content: center;
+}
+
+.modal-content {
+    background: white; width: 95%; max-width: 900px; max-height: 90vh;
+    border-radius: 20px; display: flex; flex-direction: column;
+    overflow: hidden; position: relative; animation: slideUp 0.3s ease-out;
+}
+
+.close-modal-btn {
+    position: absolute; top: 15px; right: 15px;
+    background: rgba(0,0,0,0.1); border: none; width: 35px; height: 35px;
+    border-radius: 50%; font-size: 1.5rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;
+}
+
+.modal-img-wrapper { width: 100%; height: 350px; background: #f8f9fa; display: flex; justify-content: center; }
+#modalProductImg { max-width: 100%; max-height: 100%; object-fit: contain; }
+.modal-body { padding: 25px; overflow-y: auto; }
+
+.modal-footer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.contact-btn { padding: 14px; text-align: center; border-radius: 12px; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; }
+#callContact { background: var(--primary-color); }
+#telegramOrder { background: var(--telegram-blue); }
+#whatsappOrder { background: var(--whatsapp-green); }
+.save-btn { background: #ff4757; color: white; border: none; cursor: pointer; }
+
+/* Desktop Modal Side-by-Side */
+@media (min-width: 1024px) {
+    .modal-content { flex-direction: row; }
+    .modal-img-wrapper { flex: 1.2; height: auto; }
+    .modal-body { flex: 1; }
+}
+
+/* --- 8. Floating Chat Widget --- */
+.floating-chat { position: fixed; bottom: 30px; right: 30px; z-index: 2000; display: flex; flex-direction: column; align-items: flex-end; }
+.chat-btn { background: var(--primary-color); color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(0,123,255,0.4); }
+.chat-menu { display: none; flex-direction: column; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 220px; margin-bottom: 15px; overflow: hidden; }
+.chat-menu.active { display: flex; animation: slideUp 0.3s ease; }
+.menu-item { padding: 15px; text-decoration: none; color: #333; display: flex; align-items: center; gap: 15px; font-weight: 600; border-bottom: 1px solid #eee; }
+.menu-item.call i { color: #2ed573; }
+.menu-item.telegram i { color: #0088cc; }
+.menu-item.whatsapp i { color: #25d366; }
+
+/* --- 9. APP-LIKE MOBILE RESPONSIVENESS (Magic Happens Here) --- */
+@media (max-width: 768px) {
+    body { padding-bottom: 80px; } /* Stops footer from hiding behind bottom nav */
+    
+    /* Header Reorganization */
+    .golem-header { padding: 12px; }
+    .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .logo { font-size: 1.2rem; }
+    .search-wrapper { width: 100%; margin: 15px 0 0 0; }
+    .nav-auth-controls button { padding: 8px 12px; font-size: 0.8rem; }
+    #userWelcome { padding: 5px 10px; font-size: 0.75rem; }
+    #userWelcome span:first-child { display: none; } /* Hide 'Hello' text on phone */
+
+    /* App-like Bottom Navigation */
+    .nav-container-horizontal {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #ffffff;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 15px;
+        z-index: 2500;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .nav-item-box {
+        background: transparent !important; /* Removes default colored backgrounds */
+        padding: 5px;
+        min-width: 60px;
+        color: #7f8fa6 !important; /* Gray out non-active icons */
+    }
+    
+    .nav-item-box i { font-size: 1.4rem; color: #7f8fa6; margin-bottom: 4px; }
+    .nav-item-box p { font-size: 0.65rem; }
+    
+    /* Highlight effect for Bottom Nav */
+    .nav-item-box:active i, .nav-item-box:active p { color: var(--primary-color) !important; }
+
+    /* 2-Column Grid for Phones */
+    .masonry-wrapper {
+        grid-template-columns: repeat(2, 1fr) !important; /* Force 2 columns */
+        gap: 10px;
+        padding: 5px;
+    }
+
+    .card-img-container { height: 160px; } /* Adjust image height for 2 cols */
+    .product-info { padding: 10px; }
+    .product-title { font-size: 0.85rem; -webkit-line-clamp: 2; line-height: 1.3; }
+    .product-price { font-size: 1rem; }
+
+    /* Sponsor Block Mobile Fix */
+    .sponsor-content { flex-direction: column; text-align: center; }
+    .sponsor-image { max-width: 100%; height: 180px; }
+    .sponsor-details h2 { font-size: 1.4rem; }
+
+    /* Modal Adjustments */
+    .modal-content { margin: auto; max-height: 85vh; width: 92%; }
+    .modal-img-wrapper { height: 250px; }
+    .modal-footer-actions { grid-template-columns: 1fr; } /* Stack buttons */
+    #whatsappOrder { grid-column: span 1; }
+
+    /* Floating Chat reposition (above Bottom Nav) */
+    .floating-chat { bottom: 95px; right: 15px; }
+    .chat-btn { padding: 12px; border-radius: 50%; } /* Make it a circle */
+    .chat-label { display: none; } /* Hide text, just show icon */
+
+    /* Saved Items Summary Box */
+    .saved-summary-box {
+        bottom: 80px; /* Above bottom nav */
+        border-radius: 20px;
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+}
+
+/* Animations */
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes pulse-star { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+
+/* Footer */
+.golem-footer { background: #1a1a1a; color: #fff; padding: 50px 0 20px; margin-top: 40px; }
+.footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; padding: 0 20px; }
+.footer-logo { font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; color: white; }
+.footer-col ul { list-style: none; }
+.footer-col ul li a { color: #bbb; text-decoration: none; transition: 0.3s; display: block; padding: 5px 0; }
+.footer-col ul li a:hover { color: #fff; padding-left: 5px; }
+.social-links { display: flex; gap: 15px; margin-top: 15px; }
+.social-links a { width: 40px; height: 40px; background: #333; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; text-decoration: none; transition: 0.3s; }
+.social-links a:hover { background: var(--primary-color); transform: translateY(-3px); }
+.footer-bottom { text-align: center; padding-top: 30px; margin-top: 30px; border-top: 1px solid #333; color: #666; font-size: 0.85rem; }
+
+
+
+
+        /* --- MODERN UI STYLES --- */
+        :root {
+            --primary: #1a1a1a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --danger: #ff4757;
+            --telegram: #0088cc;
+            --whatsapp: #25D366;
+            --share: #6c5ce7;
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 120px; /* Extra space for the summary box */
+        }
+
+        /* HEADER */
+        .golem-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            padding: 15px 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            cursor: pointer;
+        }
+
+        .nav-item-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            background: #f1f2f6;
+            padding: 8px 18px;
+            border-radius: 50px;
+            transition: var(--transition);
+        }
+
+        .nav-item-box:hover {
+            background: #e2e4e9;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        /* WISHLIST HEADER */
+        .wishlist-header {
+            margin: 40px 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
-        .help-link {
-            color: #555;
-            font-size: 0.85rem;
+        .wishlist-header h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0 0 5px 0;
+        }
+
+        .wishlist-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .clear-btn {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
             font-weight: 600;
-            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
+            gap: 8px;
+            transition: var(--transition);
         }
 
-        .help-link:hover { color: #007bff; }
-
-        /* ===== INVITE / SHARE SECTION ===== */
-        /* style.css has no .invite-container or .tg-btn rules at all,
-           so we define them fully here. The body bg is #f0f2f5 and the
-           footer is #1a1a1a — this section needs its own solid background
-           so the buttons are never rendered on a dark surface. */
-        .invite-container {
-            text-align: center;
-            padding: 40px 20px;
-            margin: 30px 0;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        .clear-btn:hover {
+            background: var(--danger);
+            color: #fff;
         }
 
-        .invite-container i.fas.fa-users {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 12px;
+        /* GRID LAYOUT */
+        .masonry-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
         }
 
-        .invite-container h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #1a1a2e;
-        }
-
-        .invite-container p {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-
-        .invite-btns {
+        /* PRODUCT CARDS */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img-container {
+            width: 100%;
+            height: 240px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .card-img-container img {
+            transform: scale(1.05);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--danger);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .remove-btn:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: var(--text-main);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        /* SUMMARY BOX */
+        .saved-summary-box {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .summary-details h3 {
+            font-size: 1.3rem;
+            margin: 0 0 5px;
+        }
+
+        .summary-details p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .summary-actions {
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 12px;
         }
 
-        .tg-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            /* White text — hardcoded, not inherited */
-            color: #ffffff;
-            -webkit-text-fill-color: #ffffff;
-            font-size: 0.9rem;
+        .order-btn {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
             font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            line-height: 1;
-            opacity: 1;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .tg-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-            color: #ffffff;
-            -webkit-text-fill-color: #ffffff;
-        }
-
-        .tg-btn i {
-            font-size: 1.1rem;
-            color: #ffffff;
-            -webkit-text-fill-color: #ffffff;
-        }
-
-        /* Brand colours — these were inline before; now in CSS for maintainability */
-        #shareTelegramBtn { background-color: #0088cc; }
-        #shareWhatsAppBtn { background-color: #25d366; }
-        #shareFacebookBtn { background-color: #1877F2; }
-
-        @media (max-width: 480px) {
-            .invite-btns { flex-direction: column; align-items: center; }
-            .tg-btn { width: 100%; max-width: 280px; justify-content: center; }
-        }
-
-        /* FIX: Promoted repeated modal inline styles to reusable classes */
-        .modal-flex-actions {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .modal-flex-actions .contact-btn { flex: 1; }
-
-        /* FIX: Unified success modal inner layout — no more all-inline styles */
-        .success-modal-inner {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-        }
-        .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
-        .success-back-btn {
-            margin-top: 25px;
-            width: 100%;
-            padding: 15px;
-            background: #333;
-            color: white;
             border: none;
-            border-radius: 10px;
-            font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
         }
 
-        @media (max-width: 768px) {
-            .golem-header { padding: 15px 10px; }
-            .header-top-row { flex-wrap: nowrap; }
-            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
-            .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
+        .order-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            opacity: 0.9;
+        }
 
-            .hide-text-mobile { display: none !important; }
-            .header-actions { gap: 10px; }
-            .help-link i { font-size: 1.3rem !important; }
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            grid-column: 1 / -1;
+        }
 
-            .sign-in-btn {
-                padding: 8px !important;
-                border-radius: 50% !important;
-                width: 36px;
-                height: 36px;
-                display: flex;
+        .shop-btn {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+            transition: var(--transition);
+        }
+
+        .shop-btn:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* RESPONSIVE DESIGN FOR DESKTOP */
+        @media (min-width: 768px) {
+            .saved-summary-box {
+                position: relative;
+                flex-direction: row;
                 align-items: center;
-                justify-content: center;
+                justify-content: space-between;
+                margin-top: 40px;
+                margin-bottom: 40px;
+                border-radius: var(--radius);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+                border: none;
             }
-            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
-
-            body { padding-bottom: 70px; }
-            .nav-container-horizontal {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: white;
-                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-                display: flex;
-                justify-content: space-around;
-                padding: 10px 5px;
-                z-index: 1000;
-                margin: 0;
-                border-top: 1px solid #eee;
+            .summary-actions {
+                grid-template-columns: repeat(3, auto);
             }
-            .nav-item-box {
-                flex-direction: column;
-                gap: 4px;
-                background: transparent !important;
-                color: #555 !important;
-                box-shadow: none;
-                padding: 5px;
-                min-width: 60px;
-            }
-            .nav-item-box i { font-size: 1.3rem; color: #3498db; }
-            .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
-
-            #adminNavLink i { color: #e74c3c; }
-
-            .filter-bar {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 5px;
-                gap: 8px;
-            }
-            .filter-bar::-webkit-scrollbar { display: none; }
-            .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
-
-            .masonry-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 12px;
-            }
-
-            .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
-            .modal-footer-actions { flex-direction: column; }
-            .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
-
-            .floating-chat { bottom: 85px; right: 15px; }
-            #chatMenu { bottom: 70px; right: 0; }
-
-            .sponsor-content { flex-direction: column; text-align: center; }
-            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
-            .sponsor-actions { flex-direction: column; gap: 10px; }
-            .sponsor-actions a { margin-left: 0 !important; }
-        }
-    </style>
-</head>
-
-<body>
-    <!-- ======================= HEADER ======================= -->
-    <header class="golem-header">
-
-        <div class="header-top-row">
-            <div class="logo">WanaGebya | ዋና ገበያ</div>
-
-            <div class="header-actions">
-
-                <!-- FIX: onclick removed — wired via addEventListener below -->
-                <a href="#" id="helpBtn" class="help-link">
-                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
-                    <span class="hide-text-mobile">Help</span>
-                </a>
-
-                <div class="lang-toggle-wrapper">
-                    <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
-                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
-                    </button>
-                </div>
-
-                <div class="nav-auth-controls">
-                    <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
-                    </button>
-
-                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
-                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;">
-                            <strong id="userName"></strong>
-                        </span>
-                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
-        </div>
-
-        <div class="nav-container-horizontal">
-            <a href="index.html" class="nav-item-box bg-home">
-                <i class="fas fa-home"></i>
-                <p>Home</p>
-            </a>
-
-            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box">
-                <i class="fas fa-plus-circle" style="color: #2ed573;"></i>
-                <p>Sell Item</p>
-            </a>
-
-            <a href="my-items.html" class="nav-item-box bg-items">
-                <i class="fas fa-box-open"></i>
-                <p>My Items</p>
-            </a>
-
-            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;">
-                <i class="fas fa-heart"></i>
-                <p>Saved</p>
-                <span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span>
-            </a>
-
-            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;">
-                <i class="fas fa-user-shield"></i>
-                <p>Admin</p>
-            </a>
-        </div>
-    </header>
-
-    <!-- ======================= SPONSORED SECTION ======================= -->
-    <section class="sponsored-section container" id="mainSponsor" style="display: none; margin-top: 20px;">
-        <div class="sponsor-card">
-            <div class="sponsor-badge">Featured Partner</div>
-            <div class="sponsor-content">
-                <div class="sponsor-image">
-                    <!-- FIX: Added lazy loading and descriptive alt text -->
-                    <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
-                </div>
-                <div class="sponsor-details">
-                    <h2 id="sponsorTitle">Loading Sponsor...</h2>
-                    <p id="sponsorDesc"></p>
-                    <div class="sponsor-actions">
-                        <a href="#" id="sponsorLink" class="buy-btn">View Item</a>
-                        <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor →</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ======================= FILTER & SORT CONTROLS ======================= -->
-    <section class="filter-controls">
-        <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-            <div class="sort-container" style="flex: 1; min-width: 140px;">
-                <select id="sortSelect" style="width: 100%;">
-                    <option value="newest">🆕 Newest First</option>
-                    <option value="price_low">💰 Price: Low to High</option>
-                    <option value="price_high">💎 Price: High to Low</option>
-                </select>
-            </div>
-            <div class="location-filter-container" style="flex: 1; min-width: 140px;">
-                <select id="locationSelect" style="width: 100%;">
-                    <option value="all">🌍 All Regions</option>
-                    <option value="Addis Ababa">Addis Ababa</option>
-                    <option value="Oromia">Oromia</option>
-                    <option value="Amhara">Amhara</option>
-                    <option value="Tigray">Tigray</option>
-                    <option value="Sidama">Sidama</option>
-                    <option value="Somali">Somali</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- FIX: All onclick removed — wired via data-category in JS -->
-        <div class="filter-bar">
-            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
-            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
-                <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
-            </button>
-            <button class="filter-btn" data-category="Electronics" data-am="ኤሌክትሮኒክስ">Electronics</button>
-            <button class="filter-btn" data-category="Furniture" data-am="የቤት ዕቃዎች">Furniture</button>
-            <button class="filter-btn" data-category="Fashion" data-am="አልባሳት">Fashion</button>
-            <button class="filter-btn" data-category="Vehicles" data-am="ተሽከርካሪዎች">Vehicles</button>
-            <button class="filter-btn" data-category="Property" data-am="ንብረት">Property</button>
-            <button class="filter-btn" data-category="Home Supplies" data-am="የቤት ቁሳቁሶች">Home Supplies</button>
-        </div>
-    </section>
-
-    <!-- ======================= MAIN GRID ======================= -->
-    <main class="container">
-        <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner">
-                <i class="fas fa-circle-notch fa-spin"></i> Loading items...
-            </div>
-        </div>
-
-        <div class="invite-container">
-            <i class="fas fa-users"></i>
-            <h3>Help WanaGebya Grow By Sharing!</h3>
-            <p>Know someone selling something? Invite them to WanaGebya.</p>
-            <div class="invite-btns">
-                <button id="shareTelegramBtn" class="tg-btn">
-                    <i class="fab fa-telegram-plane"></i> Telegram
-                </button>
-                <button id="shareWhatsAppBtn" class="tg-btn">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </button>
-                <button id="shareFacebookBtn" class="tg-btn">
-                    <i class="fab fa-facebook-f"></i> Facebook
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- ======================= FOOTER ======================= -->
-    <footer class="golem-footer" style="padding-bottom: 80px;">
-        <div class="footer-container">
-            <div class="footer-col">
-                <h2 class="footer-logo">WanaGebya</h2>
-                <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
-            </div>
-
-            <div class="footer-col">
-                <h4>Contact Us</h4>
-                <p><i class="fas fa-phone"></i> +251707022845</p>
-                <div class="social-links">
-                    <a href="https://t.me/allInOneEthiopia1" target="_blank" aria-label="Join our Telegram Channel"><i class="fab fa-telegram"></i></a>
-                    <a href="https://wa.me/251707022845" target="_blank" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-col">
-                <h4>Language / ቋንቋ</h4>
-                <button id="footerLangBtn" class="lang-btn-footer">English / አማርኛ</button>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-
-    <!-- ======================= FLOATING CHAT WIDGET ======================= -->
-    <div class="floating-chat">
-        <div id="chatToast" class="chat-toast" style="display: none;">
-            <span id="closeToastBtn" class="close-toast">&times;</span>
-            <p>👋 Hello! Welcome! Need help with buying or selling?</p>
-            <div class="toast-arrow"></div>
-        </div>
-
-        <div id="chatMenu" class="chat-menu" style="display: none;">
-            <a href="tel:+251707022845" class="menu-item call">
-                <i class="fas fa-phone"></i> <span>Call Now</span>
-            </a>
-            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram">
-                <i class="fab fa-telegram-plane"></i> <span>Telegram</span>
-            </a>
-            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp">
-                <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
-            </a>
-        </div>
-
-        <button id="chatToggleBtn" class="chat-btn">
-            <div class="status-dot-container">
-                <i class="fas fa-comment-dots"></i>
-                <span class="online-dot"></span>
-            </div>
-            <span class="chat-label" data-am="ያግኙን">Contact Us</span>
-        </button>
-    </div>
-
-    <!-- ======================= MODALS ======================= -->
-
-    <!-- 1. Support Modal -->
-    <div id="supportModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 400px;">
-            <button id="closeSupportModal" class="close-modal-btn">&times;</button>
-            <h2>Contact WanaGebya Support</h2>
-            <form id="supportForm">
-                <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
-                <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
-                <textarea id="supportMessage" placeholder="How can we help?" required class="modal-input" style="height:100px;"></textarea>
-                <button type="submit" class="auth-submit" style="width: 100%;">Send Message</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. Auth/Login Modal -->
-    <div id="authModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <button type="button" id="closeAuthModal" class="close-modal-btn">&times;</button>
-            <h2 id="modalTitle">Welcome Back</h2>
-
-            <form id="authForm">
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="authEmail" placeholder="Email Address" required>
-                </div>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="authPassword" placeholder="Password" required>
-                </div>
-
-                <div id="registerFields" style="display: none;">
-                    <div class="input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="regName" placeholder="Full Name">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-phone"></i>
-                        <input type="text" id="regPhone" placeholder="Phone Number">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" id="regLocation" placeholder="Location (e.g. Bole)">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-info-circle"></i>
-                        <textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit; border-radius: 8px; background: #f9f9f9;"></textarea>
-                    </div>
-                </div>
-
-                <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
-            </form>
-
-            <div class="modal-footer">
-                <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. Product Details Modal -->
-    <!-- FIX: Removed stray "..." invalid attribute from the original -->
-    <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display: none;">
-        <div class="modal-content">
-            <button id="closeProductModal" class="close-modal-btn">&times;</button>
-
-            <div class="modal-img-wrapper">
-                <img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;">
-            </div>
-
-            <div class="modal-body">
-                <h2 id="modalProductTitle" style="font-size: 1.2rem; margin-bottom: 5px;"></h2>
-
-                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <!-- FIX: Replaced unreliable via.placeholder.com with inline SVG data URI -->
-                    <img id="modalSellerAvatar"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
-                        alt="Seller avatar"
-                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
-
-                    <div style="flex: 1;">
-                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4>
-                        <div id="sellerBadgeContainer"></div>
-                    </div>
-                </div>
-
-                <div id="modalProductPrice" class="modal-price" style="font-size: 1.3rem;"></div>
-                <p id="modalProductDesc" class="modal-description" style="font-size: 0.9rem; line-height: 1.5;"></p>
-
-                <!-- FIX: Uses .modal-flex-actions class instead of inline styles; onclick removed -->
-                <div class="modal-flex-actions">
-                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width: 100%;">
-                        <i class="fas fa-heart"></i> Save to Wishlist
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <p>Sending your order to WanaGebya ...</p>
-    </div>
-
-    <!-- 5. Success Post Modal -->
-    <!-- FIX: Now uses shared .modal-overlay + .modal-content + named classes, no wall of inline styles -->
-    <div id="successModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content success-modal-inner">
-            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-            <h2 style="margin-bottom:10px;">Listing Received!</h2>
-            <p style="color:#666; line-height:1.5;">Your item <strong id="postedItemName" style="color:#333;"></strong> has been sent to our team for review.</p>
-            <p style="font-size:0.85rem; color:#999; margin-top:10px;">It usually takes less than 2 hours to go live.</p>
-            <button id="closeSuccessModal" class="success-back-btn">Back to Marketplace</button>
-        </div>
-    </div>
-
-    <!-- ======================= SCRIPTS ======================= -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
-
-    <script>
-        // =====================================================================
-        //  CENTRALISED EVENT LISTENERS
-        //  FIX: All onclick="window.fn()" removed from HTML and wired here.
-        //  Cleaner, maintainable, and CSP-compatible.
-        // =====================================================================
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // Header
-            document.getElementById('helpBtn')
-                .addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
-            document.getElementById('langToggleBtn')
-                .addEventListener('click', window.toggleLanguage);
-            document.getElementById('footerLangBtn')
-                .addEventListener('click', window.toggleLanguage);
-            document.getElementById('signInBtn')
-                .addEventListener('click', window.toggleModal);
-            document.getElementById('signOutBtn')
-                .addEventListener('click', window.handleSignOut);
-            document.getElementById('userNameLink')
-                .addEventListener('click', function () { location.href = 'profile.html'; });
-
-            // Sell button
-            document.getElementById('sellBtn')
-                .addEventListener('click', function (e) { window.checkAuthToSell(e); });
-
-            // Sort & location selects
-            document.getElementById('sortSelect')
-                .addEventListener('change', window.fetchProducts);
-            document.getElementById('locationSelect')
-                .addEventListener('change', window.fetchProducts);
-
-            // Category filter buttons
-            document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    window.filterCategory(this.dataset.category, this);
-                });
-            });
-            document.getElementById('featuredFilterBtn')
-                .addEventListener('click', window.filterSponsored);
-
-            // Share buttons
-            document.getElementById('shareTelegramBtn')
-                .addEventListener('click', window.shareToTelegram);
-            document.getElementById('shareWhatsAppBtn')
-                .addEventListener('click', window.shareToWhatsApp);
-            document.getElementById('shareFacebookBtn')
-                .addEventListener('click', window.shareToFacebook);
-
-            // Support modal
-            document.getElementById('closeSupportModal')
-                .addEventListener('click', window.toggleSupportModal);
-            document.getElementById('supportModal')
-                .addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
-            document.getElementById('supportForm')
-                .addEventListener('submit', window.handleSupportSubmit);
-
-            // Auth modal
-            document.getElementById('closeAuthModal')
-                .addEventListener('click', window.toggleModal);
-            document.getElementById('authModal')
-                .addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
-            document.getElementById('authForm')
-                .addEventListener('submit', window.handleAuth);
-            document.getElementById('toggleAuthModeLink')
-                .addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
-
-            // Product modal
-            document.getElementById('closeProductModal')
-                .addEventListener('click', window.closeProductModal);
-            document.getElementById('productModal')
-                .addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
-
-            // Product modal contact buttons — with audit logging
-            document.getElementById('callContact').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-            document.getElementById('telegramOrder').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-            document.getElementById('whatsappOrder').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-            document.getElementById('saveToWishlistBtn').addEventListener('click', function () {
-                window.addToCartFromModal();
-                window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);
-            });
-
-            // Sponsor link audit log
-            document.getElementById('sponsorLink').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText);
-            });
-
-            // Success modal
-            document.getElementById('closeSuccessModal')
-                .addEventListener('click', function () {
-                    document.getElementById('successModal').style.display = 'none';
-                });
-
-            // Floating chat
-            document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
-            document.getElementById('closeToastBtn').addEventListener('click', function (e) {
-                e.stopPropagation();
-                closeToast();
-            });
-
-            // Close chat menu on outside click
-            document.addEventListener('click', function (event) {
-                const menu = document.getElementById('chatMenu');
-                const btn  = document.getElementById('chatToggleBtn');
-                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) {
-                    menu.style.display = 'none';
-                }
-            });
-
-            // Check if redirected here after posting an item
-            checkPostStatus();
-
-            // FIX: UTM tracking — deduplicated per session so it only fires once
-            const urlParams = new URLSearchParams(window.location.search);
-            const utmSource = urlParams.get('utm_source');
-            if (utmSource && !sessionStorage.getItem('utm_logged')) {
-                const campaign = urlParams.get('utm_campaign') || 'General';
-                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${campaign}`);
-                sessionStorage.setItem('utm_logged', 'true');
-            }
-
-            // FIX: Admin status polling deferred to DOMContentLoaded — no wasted reads on page load
-            loadAdminStatus();
-            setInterval(loadAdminStatus, 120000);
-
-        }); // end DOMContentLoaded
-
-        // =====================================================================
-        //  FLOATING CHAT
-        // =====================================================================
-        function closeToast() {
-            const toast = document.getElementById('chatToast');
-            if (toast) toast.style.display = 'none';
-        }
-
-        function toggleChatMenu() {
-            const menu = document.getElementById('chatMenu');
-            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        // =====================================================================
-        //  POST SUCCESS CHECK
-        // =====================================================================
-        function checkPostStatus() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('posted')) {
-                const itemName = urlParams.get('item') || 'Listing';
-                document.getElementById('postedItemName').innerText = itemName;
-                document.getElementById('successModal').style.display = 'flex';
-                window.history.replaceState({}, document.title, 'index.html');
+            body {
+                padding-bottom: 20px;
             }
         }
-
-        // =====================================================================
-        //  ADMIN ONLINE STATUS
-        // =====================================================================
-        async function loadAdminStatus() {
-            if (typeof _supabase === 'undefined') return;
-
-            const { data, error } = await _supabase
-                .from('profiles')
-                .select('last_seen')
-                .eq('is_owner', true)
-                .maybeSingle();
-
-            if (error) { console.error('Error fetching admin status:', error); return; }
-
-            if (data && data.last_seen) {
-                const diffInMinutes = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
-                const dot   = document.querySelector('.online-dot');
-                const label = document.querySelector('.chat-label');
-                if (!dot || !label) return;
-
-                if (diffInMinutes < 5) {
-                    dot.style.background = '#2ed573';
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`;
-                } else if (diffInMinutes < 60) {
-                    dot.style.background = '#f1c40f';
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diffInMinutes}m ago</small>`;
-                } else {
-                    dot.style.background = '#ccc';
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`;
-                }
-            }
-        }
-
-        // =====================================================================
-        //  BUYER AUDIT LOG
-        //  FIX: Column renamed from misleading 'admin_email' to 'actor'.
-        //  ⚠️  Also rename the column in your Supabase table to 'actor'.
-        // =====================================================================
-        window.logBuyerAction = async function (buyerEmail, actionDescription) {
-            try {
-                if (typeof _supabase === 'undefined') return;
-
-                let userEmail = buyerEmail;
-                if (!userEmail) {
-                    const { data: { user } } = await _supabase.auth.getUser();
-                    userEmail = user
-                        ? (user.email || user.user_metadata?.full_name || 'Logged-In User')
-                        : 'Guest/Unknown';
-                }
-
-                await _supabase.from('audit_logs').insert([{
-                    actor: userEmail,           // FIX: was 'admin_email' — rename column in Supabase to 'actor'
-                    action: '[BUYER] Interaction',
-                    details: actionDescription
-                }]);
-            } catch (err) {
-                console.log('Audit log recording skipped:', err);
-            }
-        };
-    </script>
-</body>
-</html>
