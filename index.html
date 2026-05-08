@@ -144,14 +144,18 @@
 
             #adminNavLink i { color: #e74c3c; }
 
-            .filter-bar {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 5px;
-                gap: 8px;
-            }
+        .filter-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 5px;
+    gap: 8px;
+    
+    /* ADD THESE TWO LINES */
+    justify-content: center; 
+    width: 100%;
+}
             .filter-bar::-webkit-scrollbar { display: none; }
             .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
 
