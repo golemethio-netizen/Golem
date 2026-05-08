@@ -754,3 +754,21 @@ body {
                 padding-bottom: 20px;
             }
         }
+
+
+/* Social button transitions */
+.quick-contact-bar a,
+.quick-contact-bar button,
+.inv-btn,
+.share-btn {
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.quick-contact-bar a:hover,
+.quick-contact-bar button:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+}
+.quick-contact-bar a:active,
+.quick-contact-bar button:active {
+    transform: scale(0.97);
+}
