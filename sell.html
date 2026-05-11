@@ -14,9 +14,10 @@
         .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem;
         }
-        .auth-submit { background: #333; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .auth-submit { background: #333; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; margin-top: 20px;}
         .auth-submit:hover { background: #000; }
         .auth-submit:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
+        #dynamicFields { margin-top: 15px; padding: 15px; background: #fdf2f0; border-radius: 8px; display: none; border: 1px solid #f9731633; }
     </style>
 </head>
 <body style="background: #f8f9fa; display: none;" id="sellPageBody">
@@ -32,7 +33,6 @@
             <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
 
             <form id="sellForm">
-                <!-- Image Upload -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-camera"></i> Product Photo (Max 5MB)</label>
                     <div style="text-align: center;">
@@ -41,10 +41,9 @@
                     <input type="file" id="prodFile" accept="image/*" required style="border: 2px dashed #ddd; padding: 20px; text-align: center; width: 100%; cursor: pointer;">
                 </div>
 
-                <!-- Name & Price -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-tag"></i> Item Name</label>
-                    <input type="text" id="prodName" placeholder="e.g., iPhone 15 Pro Max" required>
+                    <input type="text" id="prodName" placeholder="e.g., Luxury Wardrobe" required>
                 </div>
 
                 <div style="display: flex; gap: 15px;">
@@ -64,10 +63,9 @@
                     </div>
                 </div>
 
-                <!-- Category & Description -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-list"></i> Category</label>
-                    <select id="prodCategory" required>
+                    <select id="prodCategory" onchange="handleCategoryChange(this.value)" required>
                         <option value="" disabled selected>Select Category</option>
                         <option value="Electronics">Electronics</option>
                         <option value="Furniture">Furniture</option>
@@ -76,23 +74,26 @@
                         <option value="Property">Property</option>
                         <option value="Home Supplies">Home Supplies</option>
                         <option value="Services">Services</option>
-        <option value="Jobs">Jobs</option>
+                        <option value="Jobs">Jobs</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>
 
-                <div class="input-group-sell">
-                    <label><i class="fas fa-align-left"></i> Description</label>
-                    <textarea id="prodDesc" rows="4" placeholder="Describe the item condition, specs, etc..." required></textarea>
+                <div id="dynamicFields">
+                    <h4 style="font-size: 11px; text-transform: uppercase; margin-bottom: 10px; color: #e8321a; letter-spacing: 1px;">Specific Specifications</h4>
+                    <div id="dynamicInputsGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
                 </div>
 
-                <!-- Contact Info -->
+                <div class="input-group-sell">
+                    <label><i class="fas fa-align-left"></i> General Description</label>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item general details..." required></textarea>
+                </div>
+
                 <div class="input-group-sell">
                     <label><i class="fas fa-phone"></i> Contact Phone</label>
                     <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
-                
-                <!-- Location -->
+
                 <div class="input-group-sell">
                     <label><i class="fas fa-map-marker-alt"></i> Region</label>
                     <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
@@ -116,10 +117,8 @@
                         <option value="Nifas Silk">Nifas Silk</option>
                     </select>
                 </div>
-                
-                <button type="submit" id="submitBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
-                    Publish Listing
-                </button>
+
+                <button type="submit" id="submitBtn" class="auth-submit">Publish Listing</button>
             </form>
         </div>
     </main>
@@ -129,24 +128,55 @@
     <script>
         let currentUserName = "Unknown Seller";
 
+        // Configuration for dynamic fields
+        const categoryConfigs = {
+            "Services": [
+                { id: "exp", label: "Experience", placeholder: "e.g. 5+ Years" },
+                { id: "resp", label: "Response", placeholder: "e.g. Under 2hrs" }
+            ],
+            "Furniture": [
+                { id: "subCat", label: "Type", type: "select", options: ["Main Gate", "Kitchen Cabinet", "Cupboard", "Sofa", "Other"] },
+                { id: "material", label: "Material", placeholder: "e.g. MDF / Wood" },
+                { id: "dim", label: "Dimensions", placeholder: "e.g. 200x180cm" }
+            ]
+        };
+
+        function handleCategoryChange(val) {
+            const container = document.getElementById('dynamicFields');
+            const grid = document.getElementById('dynamicInputsGrid');
+            grid.innerHTML = ''; 
+            
+            if (categoryConfigs[val]) {
+                container.style.display = 'block';
+                categoryConfigs[val].forEach(field => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<label style="font-size:11px; margin-bottom:2px; display:block; color:#777;">${field.label}</label>`;
+                    
+                    if (field.type === 'select') {
+                        const sel = document.createElement('select');
+                        sel.className = "extra-field-input";
+                        sel.setAttribute('data-label', field.label);
+                        field.options.forEach(opt => sel.innerHTML += `<option value="${opt}">${opt}</option>`);
+                        div.appendChild(sel);
+                    } else {
+                        const inp = document.createElement('input');
+                        inp.className = "extra-field-input";
+                        inp.setAttribute('data-label', field.label);
+                        inp.placeholder = field.placeholder;
+                        div.appendChild(inp);
+                    }
+                    grid.appendChild(div);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { user } } = await _supabase.auth.getUser();
-            
-            if (!user) {
-                alert("Please log in to sell items.");
-                window.location.href = 'index.html';
-                return;
-            }
-
+            if (!user) { window.location.href = 'index.html'; return; }
             document.getElementById('sellPageBody').style.display = 'block';
-
-            // PRE-FILL FROM PROFILE TABLE (Consistency for Matching)
-            const { data: profile } = await _supabase
-                .from('profiles')
-                .select('full_name, phone')
-                .eq('id', user.id)
-                .single();
-
+            const { data: profile } = await _supabase.from('profiles').select('full_name, phone').eq('id', user.id).single();
             if (profile) {
                 currentUserName = profile.full_name || user.email.split('@')[0];
                 if (profile.phone) document.getElementById('prodPhone').value = profile.phone;
@@ -158,12 +188,6 @@
             const file = e.target.files[0];
             const preview = document.getElementById('imagePreview');
             if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File too large (Max 5MB)');
-                    this.value = '';
-                    preview.style.display = 'none';
-                    return;
-                }
                 const reader = new FileReader();
                 reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
                 reader.readAsDataURL(file);
@@ -175,80 +199,47 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const fileInput = document.getElementById('prodFile');
-            
             const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) return alert("Session expired.");
 
-            btn.innerText = "Uploading Listing...";
+            btn.innerText = "Processing...";
             btn.disabled = true;
 
             try {
-                // 1. Upload Image
+                // 1. Collect Extra Specs
+                let extraSpecsText = "";
+                const extras = document.querySelectorAll('.extra-field-input');
+                extras.forEach(el => {
+                    extraSpecsText += `\n- ${el.getAttribute('data-label')}: ${el.value}`;
+                });
+
+                const finalDescription = document.getElementById('prodDesc').value + (extraSpecsText ? "\n\n--- Specs ---" + extraSpecsText : "");
+
+                // 2. Upload Image
                 const file = fileInput.files[0];
                 const fileName = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-                
-                const { error: uploadError } = await _supabase.storage
-                    .from('product-images')
-                    .upload(fileName, file);
-
+                const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
                 if (uploadError) throw uploadError;
+                const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
 
-                const { data: { publicUrl } } = _supabase.storage
-                    .from('product-images')
-                    .getPublicUrl(fileName);
-
-                // 2. Data Prep
-                const itemName = document.getElementById('prodName').value;
-                const itemPrice = document.getElementById('prodPrice').value;
+                // 3. Database Insert
                 const region = document.getElementById('prodRegion').value;
                 const district = document.getElementById('prodDistrict').value;
-                const location = (region === 'Addis Ababa' && district) ? `${district}, ${region}` : region;
+                const locationStr = (region === 'Addis Ababa' && district) ? `${district}, ${region}` : region;
 
-                // 3. Database Insert (Linked via user_id)
-                const { error: dbError } = await _supabase
-                    .from('products')
-                    .insert([{
-                        user_id: user.id, // THE IMPORTANT MATCHING KEY
-                        name: itemName,
-                        price: parseFloat(itemPrice),
-                        status_condition: document.getElementById('status_condition').value,
-                        category: document.getElementById('prodCategory').value,
-                        description: document.getElementById('prodDesc').value,
-                        location: location,
-                        image: publicUrl,
-                        seller_phone: document.getElementById('prodPhone').value,
-                        status: 'pending' 
-                    }]);
-
-                if (dbError) throw dbError;
-
-                // 4. Audit Log
-                await _supabase.from('audit_logs').insert([{
-                    admin_email: user.email,
-                    action: 'Post Product',
-                    details: `Posted: ${itemName} (${itemPrice} ETB)`
+                const { error: dbError } = await _supabase.from('products').insert([{
+                    user_id: user.id,
+                    name: document.getElementById('prodName').value,
+                    price: parseFloat(document.getElementById('prodPrice').value),
+                    status_condition: document.getElementById('status_condition').value,
+                    category: document.getElementById('prodCategory').value,
+                    description: finalDescription,
+                    location: locationStr,
+                    image: publicUrl,
+                    seller_phone: document.getElementById('prodPhone').value,
+                    status: 'pending' 
                 }]);
 
-                // 5. Telegram Notification
-                if (typeof GolemConfig !== 'undefined' && GolemConfig.botToken) {
-                    const message = `🔔 *NEW LISTING PENDING*\n\n` +
-                                    `👤 *Seller:* ${currentUserName}\n` +
-                                    `📦 *Item:* ${itemName}\n` +
-                                    `💰 *Price:* ${itemPrice} ETB\n` +
-                                    `📍 *Loc:* ${location}\n` +
-                                    `📞 *Phone:* ${document.getElementById('prodPhone').value}\n\n` +
-                                    `👉 _Approve in Supabase Dashboard_`;
-
-                    await fetch(`https://api.telegram.org/bot${GolemConfig.botToken}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: GolemConfig.chatId,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        })
-                    });
-                }
+                if (dbError) throw dbError;
 
                 alert("🎉 Success! Your listing is pending review.");
                 window.location.href = "my-items.html";
@@ -261,8 +252,7 @@
         });
 
         window.toggleDistricts = (region) => {
-            const wrapper = document.getElementById('districtWrapper');
-            wrapper.style.display = (region === 'Addis Ababa') ? 'block' : 'none';
+            document.getElementById('districtWrapper').style.display = (region === 'Addis Ababa') ? 'block' : 'none';
         };
     </script>
 </body>
