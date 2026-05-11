@@ -93,107 +93,7 @@
             font-weight: bold;
             cursor: pointer;
         }
-/* Full Detail Card Enhancements */
-.full-detail-card {
-    max-width: 550px !important;
-    padding: 0 !important;
-    overflow: hidden;
-    border-radius: 24px !important;
-}
 
-.modal-img-wrapper {
-    position: relative;
-    height: 300px;
-}
-
-.category-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    backdrop-filter: blur(4px);
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.title-price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-
-.modal-price-tag {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #2ed573;
-    background: #f0fff4;
-    padding: 4px 12px;
-    border-radius: 8px;
-}
-
-.item-meta {
-    display: flex;
-    gap: 15px;
-    color: #777;
-    font-size: 0.85rem;
-    margin-bottom: 15px;
-}
-
-.seller-card-mini {
-    display: flex;
-    align-items: center;
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-}
-
-.seller-info h4 { margin: 0; font-size: 0.95rem; }
-.verified-badge { color: #3498db; font-size: 0.7rem; font-weight: 600; }
-
-.action-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.btn-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: 0.3s;
-}
-
-.call { background: #333; color: white; }
-.telegram { background: #0088cc; color: white; }
-.whatsapp { background: #25d366; color: white; }
-.save { background: #f0f0f0; color: #333; border: none; }
-
-.safety-tip {
-    font-size: 0.75rem;
-    color: #e67e22;
-    text-align: center;
-    margin-top: 15px;
-}
-
-@media (max-width: 768px) {
-    .modal-img-wrapper { height: 220px; }
-    .action-grid { grid-template-columns: 1fr; }
-}
         @media (max-width: 768px) {
             .golem-header { padding: 15px 10px; }
             .header-top-row { flex-wrap: nowrap; }
@@ -632,56 +532,45 @@
 
     <!-- 3. Product Details Modal -->
     <!-- FIX: Removed stray "..." invalid attribute from the original -->
-   <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
-    <div class="modal-content full-detail-card">
-        <button id="closeProductModal" class="close-modal-btn">&times;</button>
+    <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display: none;">
+        <div class="modal-content">
+            <button id="closeProductModal" class="close-modal-btn">&times;</button>
 
-        <div class="modal-img-wrapper">
-            <div class="category-badge" id="modalCategoryBadge">Electronics</div>
-            <img id="modalProductImg" src="" alt="Product Detail">
-        </div>
-
-        <div class="modal-body">
-            <div class="title-price-row">
-                <h2 id="modalProductTitle">Product Name</h2>
-                <div id="modalProductPrice" class="modal-price-tag"></div>
+            <div class="modal-img-wrapper">
+                <img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;">
             </div>
 
-            <div class="item-meta">
-                <span><i class="fas fa-map-marker-alt"></i> <span id="modalLocation">Addis Ababa</span></span>
-                <span><i class="fas fa-clock"></i> <span id="modalTime">Just now</span></span>
-                <span><i class="fas fa-eye"></i> 124 views</span>
-            </div>
+            <div class="modal-body">
+                <h2 id="modalProductTitle" style="font-size: 1.2rem; margin-bottom: 5px;"></h2>
 
-            <hr class="divider">
+                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
+                    <!-- FIX: Replaced unreliable via.placeholder.com with inline SVG data URI -->
+                    <img id="modalSellerAvatar"
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
+                        alt="Seller avatar"
+                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
 
-            <div class="seller-card-mini">
-                <img id="modalSellerAvatar" src="data:image/svg+xml..." alt="Seller">
-                <div class="seller-info">
-                    <h4 id="modalSellerName">Seller Name</h4>
-                    <div class="trust-badges">
-                        <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified Seller</span>
+                    <div style="flex: 1;">
+                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4>
+                        <div id="sellerBadgeContainer"></div>
                     </div>
                 </div>
-                <a href="#" class="view-profile-link">View Store</a>
-            </div>
 
-            <div class="description-section">
-                <h3>Description</h3>
-                <p id="modalProductDesc"></p>
-            </div>
+                <div id="modalProductPrice" class="modal-price" style="font-size: 1.3rem;"></div>
+                <p id="modalProductDesc" class="modal-description" style="font-size: 0.9rem; line-height: 1.5;"></p>
 
-            <div class="action-grid">
-                <a id="callContact" href="#" class="btn-action call"><i class="fas fa-phone-alt"></i> Call</a>
-                <a id="telegramOrder" href="#" target="_blank" class="btn-action telegram"><i class="fab fa-telegram-plane"></i> Telegram</a>
-                <a id="whatsappOrder" href="#" target="_blank" class="btn-action whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button id="saveToWishlistBtn" class="btn-action save"><i class="far fa-heart"></i> Save</button>
+                <!-- FIX: Uses .modal-flex-actions class instead of inline styles; onclick removed -->
+                <div class="modal-flex-actions">
+                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width: 100%;">
+                        <i class="fas fa-heart"></i> Save to Wishlist
+                    </button>
+                </div>
             </div>
-            
-            <p class="safety-tip"><i class="fas fa-shield-alt"></i> Safety Tip: Always meet in public places for transactions.</p>
         </div>
     </div>
-</div>
 
     <!-- 4. Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay" style="display: none;">
