@@ -682,7 +682,8 @@
            JOB CARD HTML
         ══════════════════════════════ */
         function buildJobCard(item) {
-            const safeData = encodeURIComponent(JSON.stringify(item));
+               const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+
             const sp = parseSpecs(item.description);
             const desc = cleanDesc(item.description);
             const ph = phone(item.seller_phone);
@@ -762,7 +763,7 @@
            SERVICE CARD HTML
         ══════════════════════════════ */
         function buildServiceCard(item) {
-            const safeData = encodeURIComponent(JSON.stringify(item));
+             const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
             const sp = parseSpecs(item.description);
             const desc = cleanDesc(item.description);
             const ph = phone(item.seller_phone);
