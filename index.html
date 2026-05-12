@@ -15,7 +15,8 @@
     <meta name="geo.placename" content="Addis Ababa" />
     <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
     <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
-    <link rel="icon" href="/favicon.png">
+    <!-- Kept the working favicon, removed the broken local one -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -681,6 +682,7 @@
            JOB CARD HTML
         ══════════════════════════════ */
         function buildJobCard(item) {
+            const safeData = encodeURIComponent(JSON.stringify(item));
             const sp = parseSpecs(item.description);
             const desc = cleanDesc(item.description);
             const ph = phone(item.seller_phone);
@@ -713,7 +715,7 @@
                 ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
 
             return `
-            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductModal && window.openProductModal(${esc(JSON.stringify(item).replace(/'/g,"&#39;")})" >
+            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe && window.openProductDetailsSafe('${safeData}')" >
 
                 <div class="job-card-header">
                     <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
@@ -760,6 +762,7 @@
            SERVICE CARD HTML
         ══════════════════════════════ */
         function buildServiceCard(item) {
+            const safeData = encodeURIComponent(JSON.stringify(item));
             const sp = parseSpecs(item.description);
             const desc = cleanDesc(item.description);
             const ph = phone(item.seller_phone);
@@ -791,7 +794,7 @@
             const icon = svcIcon(svcCat);
 
             return `
-            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductModal && window.openProductModal(${esc(JSON.stringify(item).replace(/'/g,"&#39;"))})">
+            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe && window.openProductDetailsSafe('${safeData}')">
 
                 <div class="service-card-header">
                     <div class="service-banner">
