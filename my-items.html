@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Items | Golem Marketplace</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    <title>My Items | WanaGebya</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -55,10 +56,10 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: var(--transition);
+            transition: 0.2s;
         }
 
-        .edit-btn { background: #f1f2f6; color: var(--text-main); }
+        .edit-btn { background: #f1f2f6; color: #2d3436; }
         .edit-btn:hover { background: #e2e4e9; transform: translateY(-2px); }
 
         .delete-btn { background: #ffeaa7; color: #d63031; }
@@ -66,11 +67,24 @@
 
         .why-btn { background: #6c5ce7; color: white; }
         .why-btn:hover { background: #5a4bcf; transform: translateY(-2px); }
+
+        /* Modal specific styling for large forms */
+        .modal-content-scrollable {
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        
+        .input-group-sell { margin-bottom: 15px; width: 100%; }
+        .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
+        .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem; box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
 
-    <!-- HEADER (Matches index and profile) -->
+    <!-- HEADER -->
     <header class="golem-header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">WanaGebya</div>
         <div class="nav-container-horizontal">
@@ -92,7 +106,7 @@
         <div class="dashboard-header">
             <div>
                 <h3>Your Posted Items</h3>
-                <p style="color: var(--text-muted); margin: 5px 0 0 0;">Manage your listings and track their status.</p>
+                <p style="color: #666; margin: 5px 0 0 0;">Manage your listings and track their status.</p>
             </div>
             <button onclick="location.href='sell.html'" class="auth-submit" style="padding: 10px 20px;">
                 <i class="fas fa-plus"></i> Post New Item
@@ -100,38 +114,117 @@
         </div>
 
         <div id="myItemsGrid" class="masonry-wrapper">
-            <div class="loading-spinner" style="text-align: center; padding: 50px; grid-column: 1 / -1; color: var(--primary-color);">
+            <div class="loading-spinner" style="text-align: center; padding: 50px; grid-column: 1 / -1; color: #6c5ce7;">
                 <i class="fas fa-circle-notch fa-spin fa-2x"></i> 
                 <p style="margin-top: 10px; font-weight: 600;">Loading your items...</p>
             </div>
         </div>
 
-        <!-- EDIT MODAL (Matches Modern Style) -->
+        <!-- FULL EDIT MODAL -->
         <div id="editModal" class="modal-overlay" onclick="if(event.target == this) window.closeEditModal()">
-            <div class="modal-content" style="max-width: 500px; padding: 30px;">
+            <div class="modal-content modal-content-scrollable" style="max-width: 600px;">
                 <button type="button" class="close-modal-btn" onclick="window.closeEditModal()">&times;</button>
-                <h2 style="margin-bottom: 20px;"><i class="fas fa-edit" style="color: var(--primary-color);"></i> Edit Listing</h2>
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-edit" style="color: #6c5ce7;"></i> Edit Listing</h2>
                 
-                <input type="hidden" id="editId">
-                
-                <div class="input-group">
-                    <i class="fas fa-tag"></i>
-                    <input type="text" id="editName" placeholder="Item Name" required>
-                </div>
+                <form id="editForm" onsubmit="window.saveChanges(event)">
+                    <input type="hidden" id="editId">
+                    
+                    <div class="input-group-sell">
+                        <label><i class="fas fa-camera"></i> Update Product Photo (Optional)</label>
+                        <div style="text-align: center;">
+                            <img id="editImagePreview" src="" alt="Current Image" style="width:100%; max-height: 250px; object-fit: cover; border-radius:10px; margin: 10px 0; border: 1px solid #ddd;">
+                        </div>
+                        <input type="file" id="editFile" accept="image/*" style="border: 2px dashed #ddd; padding: 10px; text-align: center; width: 100%; cursor: pointer;">
+                    </div>
 
-                <div class="input-group">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <input type="number" id="editPrice" placeholder="Price (ETB)" required>
-                </div>
+                    <div class="input-group-sell">
+                        <label><i class="fas fa-tag"></i> Item Name</label>
+                        <input type="text" id="editName" required>
+                    </div>
 
-                <div class="input-group" style="align-items: flex-start;">
-                    <i class="fas fa-align-left" style="margin-top: 5px;"></i>
-                    <textarea id="editDesc" placeholder="Item Description" required style="height: 100px; resize: none;"></textarea>
-                </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="input-group-sell" style="flex: 1;">
+                            <label><i class="fas fa-star"></i> Condition</label>
+                            <select id="editCondition" required>
+                                <option value="New">New</option>
+                                <option value="Used">Used</option>
+                                <option value="Refurbished">Refurbished</option>
+                                <option value="Damage">Damage / For Parts</option>
+                                <option value="We work on order">We work on order (Custom)</option>
+                            </select>
+                        </div>
+                        <div class="input-group-sell" style="flex: 1;">
+                            <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
+                            <input type="number" id="editPrice" required>
+                        </div>
+                    </div>
 
-                <button onclick="saveChanges()" class="auth-submit" style="width: 100%; margin-top: 15px;">
-                    Update & Resubmit
-                </button>
+                    <div class="input-group-sell">
+                        <label><i class="fas fa-list"></i> Category</label>
+                        <select id="editCategory" required>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Vehicles">Vehicles</option>
+                            <option value="Property">Property</option>
+                            <option value="Home Supplies">Home Supplies</option>
+                            <option value="Services">Services</option>
+                            <option value="Jobs">Jobs</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group-sell">
+                        <label><i class="fas fa-align-left"></i> Description</label>
+                        <textarea id="editDesc" rows="4" required></textarea>
+                    </div>
+
+                    <div class="input-group-sell">
+                        <label><i class="fas fa-phone"></i> Contact Phone</label>
+                        <input type="text" id="editPhone" required>
+                    </div>
+
+                    <div class="input-group-sell">
+                        <label><i class="fas fa-map-marker-alt"></i> Region</label>
+                        <select id="editRegion" onchange="window.toggleEditDistricts(this.value)" required>
+                            <option value="Addis Ababa">Addis Ababa</option>
+                            <option value="Afar">Afar</option>
+                            <option value="Amhara">Amhara</option>
+                            <option value="Benishangul-Gumuz">Benishangul-Gumuz</option>
+                            <option value="Central Ethiopia">Central Ethiopia</option>
+                            <option value="Gambela">Gambela</option>
+                            <option value="Harari">Harari</option>
+                            <option value="Oromia">Oromia</option>
+                            <option value="Sidama">Sidama</option>
+                            <option value="Somali">Somali</option>
+                            <option value="South Ethiopia">South Ethiopia</option>
+                            <option value="South West Ethiopia">South West Ethiopia</option>
+                            <option value="Tigray">Tigray</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group-sell" id="editDistrictWrapper" style="display: none;">
+                        <label><i class="fas fa-city"></i> Sub-City / District</label>
+                        <select id="editDistrict">
+                            <option value="" disabled selected>Select Sub-City</option>
+                            <option value="Addis Ketema">Addis Ketema</option>
+                            <option value="Akaki Kality">Akaki Kality</option>
+                            <option value="Arada">Arada</option>
+                            <option value="Bole">Bole</option>
+                            <option value="Gullele">Gullele</option>
+                            <option value="Kirkos">Kirkos</option>
+                            <option value="Kolfe Keranio">Kolfe Keranio</option>
+                            <option value="Lideta">Lideta</option>
+                            <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
+                            <option value="Lemi Kura">Lemi Kura</option>
+                            <option value="Yeka">Yeka</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submitEditBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
+                        Update & Resubmit
+                    </button>
+                </form>
             </div>
         </div>
     </main>
@@ -159,17 +252,17 @@
 
             if (error || !items || items.length === 0) {
                 grid.innerHTML = `
-                <div class="empty-state">
+                <div class="empty-state" style="text-align:center; padding: 50px; grid-column: 1/-1;">
                     <i class="fas fa-box-open fa-3x" style="color: #ccc; margin-bottom: 15px;"></i>
                     <h3 style="margin:0;">No items found</h3>
                     <p style="color: #888;">You haven't posted any items yet.</p>
-                    <a href="sell.html" class="shop-btn">Sell an Item</a>
+                    <a href="sell.html" class="contact-btn" style="display:inline-block; margin-top:15px; background:#333; color:white; padding:10px 20px; border-radius:8px; text-decoration:none;">Sell an Item</a>
                 </div>`;
                 return;
             }
 
             grid.innerHTML = items.map(item => {
-                const reasonNote = item.rejection_reason ? 
+                const reasonNote = item.rejection_reason && item.status === 'rejected' ? 
                     `<div style="background: #fff0f0; border-left: 3px solid #ff4757; padding: 8px; margin-top: 10px; border-radius: 4px;">
                         <span style="color: #ff4757; font-size: 0.8rem; font-weight: bold;">REASON FOR REJECTION:</span>
                         <p style="color: #d63031; font-size: 0.85rem; margin: 2px 0 0 0;">${item.rejection_reason}</p>
@@ -186,7 +279,7 @@
                         
                         <div class="product-info">
                             <h3 class="product-title">${item.name}</h3>
-                            <p class="product-price">${item.price.toLocaleString()} ETB</p>
+                            <p class="product-price">${item.price ? item.price.toLocaleString() + ' ETB' : 'Negotiable'}</p>
                             ${reasonNote}
                             
                             <div class="action-buttons">
@@ -206,12 +299,42 @@
 
         function getStatusColor(status) {
             switch(status) {
-                case 'approved': return '#25D366'; // WhatsApp Green
-                case 'rejected': return '#ff4757'; // Danger Red
-                case 'sold': return '#636e72'; // Muted Grey
-                default: return '#f1c40f'; // Pending Yellow
+                case 'approved': return '#25D366'; // Green
+                case 'rejected': return '#ff4757'; // Red
+                case 'sold': return '#636e72'; // Grey
+                default: return '#f1c40f'; // Yellow
             }
         }
+
+        // Handle Edit Image Preview
+        document.getElementById('editFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('editImagePreview');
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image is too large! Please select an image smaller than 5MB.');
+                    this.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) { preview.src = e.target.result; }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Toggle Districts
+        window.toggleEditDistricts = function(region) {
+            const wrapper = document.getElementById('editDistrictWrapper');
+            const districtSelect = document.getElementById('editDistrict');
+            if (region === 'Addis Ababa') {
+                wrapper.style.display = 'block';
+                districtSelect.required = true;
+            } else {
+                wrapper.style.display = 'none';
+                districtSelect.required = false;
+                districtSelect.value = ""; 
+            }
+        };
 
         window.openEditModal = async function(id) {
             const { data: item } = await _supabase.from('products').select('*').eq('id', id).single();
@@ -221,6 +344,24 @@
             document.getElementById('editName').value = item.name;
             document.getElementById('editPrice').value = item.price;
             document.getElementById('editDesc').value = item.description;
+            document.getElementById('editCondition').value = item.status_condition || "Used";
+            document.getElementById('editCategory').value = item.category || "Other";
+            document.getElementById('editPhone').value = item.seller_phone || "";
+            document.getElementById('editImagePreview').src = item.image; // Set current image
+            document.getElementById('editFile').value = ''; // Reset file input
+
+            // Parse Location
+            if (item.location) {
+                const locParts = item.location.split(', ');
+                if (locParts.length > 1) {
+                    document.getElementById('editRegion').value = locParts[1];
+                    toggleEditDistricts(locParts[1]);
+                    document.getElementById('editDistrict').value = locParts[0];
+                } else {
+                    document.getElementById('editRegion').value = locParts[0];
+                    toggleEditDistricts(locParts[0]);
+                }
+            }
             
             const modal = document.getElementById('editModal');
             modal.style.display = 'flex';
@@ -232,29 +373,63 @@
             document.body.style.overflow = 'auto';
         };
 
-        window.saveChanges = async function() {
+        window.saveChanges = async function(e) {
+            e.preventDefault();
             const id = document.getElementById('editId').value;
-            const btn = event.target;
-            btn.innerText = "Updating...";
+            const btn = document.getElementById('submitEditBtn');
+            const fileInput = document.getElementById('editFile');
+            
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return alert("Session expired.");
+
+            btn.innerText = "Uploading & Updating...";
             btn.disabled = true;
 
-            const updatedData = {
-                name: document.getElementById('editName').value,
-                price: parseFloat(document.getElementById('editPrice').value),
-                description: document.getElementById('editDesc').value,
-                status: 'pending', // Resets to pending for admin re-approval
-                rejection_reason: null // Clears old rejection reason
-            };
+            try {
+                let imageUrl = document.getElementById('editImagePreview').src;
 
-            const { error } = await _supabase.from('products').update(updatedData).eq('id', id);
-            
-            if (error) {
-                alert(error.message);
-                btn.innerText = "Update & Resubmit";
-                btn.disabled = false;
-            } else {
+                // 1. Upload new image if selected
+                const file = fileInput.files[0];
+                if (file) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+                    const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
+                    if (uploadError) throw uploadError;
+                    const { data } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+                    imageUrl = data.publicUrl;
+                }
+
+                // 2. Build final location
+                const region = document.getElementById('editRegion').value;
+                const districtSelect = document.getElementById('editDistrict');
+                const district = districtSelect ? districtSelect.value : "";
+                const finalLocation = district && region === 'Addis Ababa' ? `${district}, ${region}` : region;
+
+                // 3. Update database
+                const updatedData = {
+                    name: document.getElementById('editName').value,
+                    price: parseFloat(document.getElementById('editPrice').value),
+                    description: document.getElementById('editDesc').value,
+                    status_condition: document.getElementById('editCondition').value,
+                    category: document.getElementById('editCategory').value,
+                    seller_phone: document.getElementById('editPhone').value,
+                    location: finalLocation,
+                    image: imageUrl,
+                    status: 'pending', // Resets to pending for admin re-approval
+                    rejection_reason: null // Clears old rejection reason
+                };
+
+                const { error } = await _supabase.from('products').update(updatedData).eq('id', id);
+                
+                if (error) throw error;
+
                 alert("Successfully Updated! Your item is back in review.");
                 location.reload();
+
+            } catch (err) {
+                alert("Error updating item: " + err.message);
+                btn.innerText = "Update & Resubmit";
+                btn.disabled = false;
             }
         };
 
@@ -273,8 +448,13 @@
 
         window.contactAdmin = function(itemName) {
             const adminTelegram = "allInOneEthiopia1"; 
-            const message = encodeURIComponent(`Hello Admin, I have a question about my rejected item on Golem Marketplace: "${itemName}"`);
+            const message = encodeURIComponent(`Hello Admin, I have a question about my rejected item on WanaGebya: "${itemName}"`);
             window.open(`https://t.me/${adminTelegram}?text=${message}`, '_blank');
+        };
+
+        window.handleSignOut = async function() {
+            await _supabase.auth.signOut();
+            window.location.href = 'index.html';
         };
     </script>
 </body>
