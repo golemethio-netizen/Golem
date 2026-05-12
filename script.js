@@ -211,7 +211,10 @@ function renderProducts(products) {
                 <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
                     <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                 </button>
-                <img src="${p.image}" alt="${p.name}" loading="lazy">
+               <img src="${p.image}" alt="${p.name}" loading="lazy"
+  style="cursor:pointer; width:100%; display:block;"
+  onclick="window.openProductDetailsSafe('${safeData}')">
+  
                 <div class="image-overlay">
                     <button class="view-btn" onclick="window.openProductDetailsSafe('${safeData}')">Quick View</button>
                 </div>
