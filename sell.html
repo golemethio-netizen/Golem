@@ -11,13 +11,134 @@
     <style>
         .input-group-sell { margin-bottom: 15px; }
         .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
-        .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem;
+        .input-group-sell input,
+        .input-group-sell select,
+        .input-group-sell textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; font-family: inherit; font-size: 1rem;
         }
-        .auth-submit { background: #333; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; margin-top: 20px;}
+        .auth-submit {
+            background: #333; color: white; border: none; padding: 15px;
+            border-radius: 8px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; width: 100%; margin-top: 20px;
+        }
         .auth-submit:hover { background: #000; }
         .auth-submit:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
-        #dynamicFields { margin-top: 15px; padding: 15px; background: #fdf2f0; border-radius: 8px; display: none; border: 1px solid #f9731633; }
+
+        /* ── Dynamic fields container ── */
+        #dynamicFields {
+            margin-top: 15px; padding: 0;
+            background: transparent; border-radius: 8px;
+            display: none;
+        }
+
+        /* ── Section header inside dynamic block ── */
+        .dyn-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 700;
+            color: #e8321a;
+            padding: 10px 14px;
+            background: #fff4f2;
+            border: 1px solid #f9731633;
+            border-radius: 10px 10px 0 0;
+            border-bottom: none;
+        }
+
+        .dyn-section-header i { font-size: 13px; }
+
+        /* ── Dynamic inputs grid ── */
+        #dynamicInputsGrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 16px;
+            background: #fdf8f7;
+            border: 1px solid #f9731633;
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* Full-width field inside grid */
+        .dyn-full { grid-column: 1 / -1; }
+
+        /* Generic field label inside dynamic grid */
+        .dyn-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            color: #555;
+        }
+
+        .dyn-input, .extra-field-input {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 13px;
+            background: white;
+            color: #222;
+            transition: border-color 0.15s;
+        }
+
+        .dyn-input:focus, .extra-field-input:focus {
+            border-color: #e8321a;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232,50,26,0.08);
+        }
+
+        /* ── Tag-style pill selector ── */
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 2px;
+        }
+
+        .pill {
+            padding: 5px 13px;
+            border-radius: 20px;
+            border: 1.5px solid #ddd;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            color: #555;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .pill:hover { border-color: #e8321a; color: #e8321a; }
+        .pill.selected { background: #e8321a; color: white; border-color: #e8321a; }
+
+        /* ── Icon badge for category ── */
+        .cat-icon-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #fff4f2; border: 1px solid #f9731633;
+            border-radius: 20px; padding: 4px 12px;
+            font-size: 12px; font-weight: 600; color: #e8321a;
+            margin-bottom: 10px;
+        }
+
+        /* salary range row */
+        .salary-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .salary-row input { flex: 1; }
+        .salary-row span { font-size: 13px; color: #888; white-space: nowrap; }
+
+        /* tag hint text */
+        .dyn-hint {
+            font-size: 11px; color: #aaa; margin-top: 4px;
+        }
     </style>
 </head>
 <body style="background: #f8f9fa; display: none;" id="sellPageBody">
@@ -33,21 +154,27 @@
             <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
 
             <form id="sellForm">
+
+                <!-- Photo -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-camera"></i> Product Photo (Max 5MB)</label>
                     <div style="text-align: center;">
-                        <img id="imagePreview" src="#" alt="Preview" style="display:none; width:100%; max-height: 300px; object-fit: cover; border-radius:10px; margin: 10px 0; border: 1px solid #eee;">
+                        <img id="imagePreview" src="#" alt="Preview"
+                             style="display:none; width:100%; max-height:300px; object-fit:cover; border-radius:10px; margin:10px 0; border:1px solid #eee;">
                     </div>
-                    <input type="file" id="prodFile" accept="image/*" required style="border: 2px dashed #ddd; padding: 20px; text-align: center; width: 100%; cursor: pointer;">
+                    <input type="file" id="prodFile" accept="image/*" required
+                           style="border:2px dashed #ddd; padding:20px; text-align:center; width:100%; cursor:pointer;">
                 </div>
 
+                <!-- Name -->
                 <div class="input-group-sell">
-                    <label><i class="fas fa-tag"></i> Item Name</label>
-                    <input type="text" id="prodName" placeholder="e.g., Luxury Wardrobe" required>
+                    <label><i class="fas fa-tag"></i> Item / Listing Title</label>
+                    <input type="text" id="prodName" placeholder="e.g., Senior Accountant Needed" required>
                 </div>
 
-                <div style="display: flex; gap: 15px;">
-                    <div class="input-group-sell" style="flex: 1;">
+                <!-- Condition + Price -->
+                <div style="display:flex; gap:15px;">
+                    <div class="input-group-sell" style="flex:1;">
                         <label><i class="fas fa-star"></i> Condition</label>
                         <select id="status_condition" required>
                             <option value="New">New</option>
@@ -57,12 +184,13 @@
                             <option value="Custom Order">We work on order</option>
                         </select>
                     </div>
-                    <div class="input-group-sell" style="flex: 1;">
-                        <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
+                    <div class="input-group-sell" style="flex:1;">
+                        <label><i class="fas fa-money-bill-wave"></i> Price / Salary (ETB)</label>
                         <input type="number" id="prodPrice" placeholder="0.00" required>
                     </div>
                 </div>
 
+                <!-- Category -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-list"></i> Category</label>
                     <select id="prodCategory" onchange="handleCategoryChange(this.value)" required>
@@ -79,21 +207,28 @@
                     </select>
                 </div>
 
+                <!-- ── Dynamic Spec Fields ── -->
                 <div id="dynamicFields">
-                    <h4 style="font-size: 11px; text-transform: uppercase; margin-bottom: 10px; color: #e8321a; letter-spacing: 1px;">Specific Specifications</h4>
-                    <div id="dynamicInputsGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
+                    <div class="dyn-section-header" id="dynSectionHeader">
+                        <i class="fas fa-sliders-h"></i>
+                        <span id="dynSectionLabel">Specific Specifications</span>
+                    </div>
+                    <div id="dynamicInputsGrid"></div>
                 </div>
 
+                <!-- Description -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-align-left"></i> General Description</label>
-                    <textarea id="prodDesc" rows="4" placeholder="Describe the item general details..." required></textarea>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item or listing in detail..." required></textarea>
                 </div>
 
+                <!-- Phone -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-phone"></i> Contact Phone</label>
                     <input type="text" id="prodPhone" placeholder="0911..." required>
                 </div>
 
+                <!-- Region -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-map-marker-alt"></i> Region</label>
                     <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
@@ -106,7 +241,8 @@
                     </select>
                 </div>
 
-                <div class="input-group-sell" id="districtWrapper" style="display: none;">
+                <!-- Sub-City -->
+                <div class="input-group-sell" id="districtWrapper" style="display:none;">
                     <label><i class="fas fa-city"></i> Sub-City</label>
                     <select id="prodDistrict">
                         <option value="" disabled selected>Select Sub-City</option>
@@ -126,134 +262,492 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
-        let currentUserName = "Unknown Seller";
+    let currentUserName = "Unknown Seller";
 
-        // Configuration for dynamic fields
-        const categoryConfigs = {
-            "Services": [
-                { id: "exp", label: "Experience", placeholder: "e.g. 5+ Years" },
-                { id: "resp", label: "Response", placeholder: "e.g. Under 2hrs" }
-            ],
-            "Furniture": [
-                { id: "subCat", label: "Type", type: "select", options: ["Main Gate", "Kitchen Cabinet", "Cupboard", "Sofa", "Other"] },
-                { id: "material", label: "Material", placeholder: "e.g. MDF / Wood" },
-                { id: "dim", label: "Dimensions", placeholder: "e.g. 200x180cm" }
-            ]
+    /* ══════════════════════════════════════════════
+       CATEGORY CONFIG — HTML builders per category
+    ══════════════════════════════════════════════ */
+    const categoryRenderers = {
+
+        /* ── JOBS ── */
+        Jobs: () => `
+            <div class="dyn-full">
+                <span class="cat-icon-badge"><i class="fas fa-briefcase"></i> Job / Vacancy Details</span>
+            </div>
+
+            <div>
+                <label class="dyn-label">Job Title</label>
+                <input class="dyn-input extra-field-input" data-label="Job Title" placeholder="e.g. Senior Accountant">
+            </div>
+
+            <div>
+                <label class="dyn-label">Company / Organization</label>
+                <input class="dyn-input extra-field-input" data-label="Company" placeholder="e.g. ABC Trading PLC">
+            </div>
+
+            <div>
+                <label class="dyn-label">Job Type</label>
+                <select class="dyn-input extra-field-input" data-label="Job Type">
+                    <option value="">Select type</option>
+                    <option>Full-Time</option>
+                    <option>Part-Time</option>
+                    <option>Contract</option>
+                    <option>Internship</option>
+                    <option>Freelance</option>
+                    <option>Volunteer</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Work Location</label>
+                <select class="dyn-input extra-field-input" data-label="Work Location">
+                    <option value="">Select</option>
+                    <option>On-site</option>
+                    <option>Remote</option>
+                    <option>Hybrid</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Industry / Sector</label>
+                <select class="dyn-input extra-field-input" data-label="Industry">
+                    <option value="">Select industry</option>
+                    <option>Accounting & Finance</option>
+                    <option>IT & Software</option>
+                    <option>Engineering</option>
+                    <option>Healthcare</option>
+                    <option>Education & Teaching</option>
+                    <option>Sales & Marketing</option>
+                    <option>Construction</option>
+                    <option>Logistics & Transport</option>
+                    <option>Hotel & Tourism</option>
+                    <option>NGO / Development</option>
+                    <option>Government</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Experience Required</label>
+                <select class="dyn-input extra-field-input" data-label="Experience Required">
+                    <option value="">Select</option>
+                    <option>No Experience (Fresh)</option>
+                    <option>1 Year</option>
+                    <option>2 Years</option>
+                    <option>3 Years</option>
+                    <option>4 Years</option>
+                    <option>5+ Years</option>
+                    <option>10+ Years</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Education Level</label>
+                <select class="dyn-input extra-field-input" data-label="Education Level">
+                    <option value="">Select</option>
+                    <option>10th / 12th Grade</option>
+                    <option>TVET / Diploma</option>
+                    <option>Bachelor's Degree</option>
+                    <option>Master's Degree</option>
+                    <option>PhD</option>
+                    <option>Not Required</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Gender Preference</label>
+                <select class="dyn-input extra-field-input" data-label="Gender Preference">
+                    <option value="Any">Any / No Preference</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Number of Positions</label>
+                <input class="dyn-input extra-field-input" data-label="Positions Available" type="number" min="1" placeholder="e.g. 3">
+            </div>
+
+            <div>
+                <label class="dyn-label">Application Deadline</label>
+                <input class="dyn-input extra-field-input" data-label="Deadline" type="date">
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Salary Range (ETB / month)</label>
+                <div class="salary-row">
+                    <input class="dyn-input extra-field-input" data-label="Salary Min" type="number" placeholder="Min e.g. 8,000">
+                    <span>—</span>
+                    <input class="dyn-input extra-field-input" data-label="Salary Max" type="number" placeholder="Max e.g. 20,000">
+                </div>
+                <div class="dyn-hint">Leave blank if salary is negotiable</div>
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Key Skills / Requirements</label>
+                <div class="pill-group" id="skillPills">
+                    ${['MS Office','Excel','Accounting Software','English','Amharic','Driving License','Customer Service','Communication','Leadership','Teamwork','Research'].map(s =>
+                        `<span class="pill" onclick="togglePill(this,'skills')">${s}</span>`
+                    ).join('')}
+                </div>
+                <input type="hidden" id="skillsValue" data-label="Key Skills">
+                <div class="dyn-hint">Tap to select. You can add more in the description.</div>
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Benefits / Perks</label>
+                <div class="pill-group" id="benefitPills">
+                    ${['Transportation','Lunch Allowance','Health Insurance','Annual Leave','Pension','Bonus','Training','Housing Allowance'].map(b =>
+                        `<span class="pill" onclick="togglePill(this,'benefits')">${b}</span>`
+                    ).join('')}
+                </div>
+                <input type="hidden" id="benefitsValue" data-label="Benefits">
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">How to Apply</label>
+                <select class="dyn-input extra-field-input" data-label="How to Apply">
+                    <option value="">Select method</option>
+                    <option>Call / WhatsApp</option>
+                    <option>Email CV</option>
+                    <option>Walk-in Interview</option>
+                    <option>Online Application</option>
+                    <option>Telegram</option>
+                </select>
+            </div>
+        `,
+
+        /* ── SERVICES ── */
+        Services: () => `
+            <div class="dyn-full">
+                <span class="cat-icon-badge"><i class="fas fa-tools"></i> Service Details</span>
+            </div>
+
+            <div>
+                <label class="dyn-label">Service Category</label>
+                <select class="dyn-input extra-field-input" data-label="Service Category">
+                    <option value="">Select type</option>
+                    <optgroup label="Home & Construction">
+                        <option>Plumbing</option>
+                        <option>Electrical Work</option>
+                        <option>Painting</option>
+                        <option>Tiling & Flooring</option>
+                        <option>Carpentry & Woodwork</option>
+                        <option>Cleaning Service</option>
+                        <option>Moving & Packing</option>
+                        <option>Air Conditioning</option>
+                        <option>Welding & Metal Work</option>
+                    </optgroup>
+                    <optgroup label="IT & Digital">
+                        <option>Web Design</option>
+                        <option>Graphic Design</option>
+                        <option>Computer Repair</option>
+                        <option>Phone Repair</option>
+                        <option>Network Setup</option>
+                        <option>CCTV Installation</option>
+                        <option>Software Development</option>
+                    </optgroup>
+                    <optgroup label="Education & Training">
+                        <option>Private Tutoring</option>
+                        <option>Language Classes</option>
+                        <option>Music Lessons</option>
+                        <option>Driving Instruction</option>
+                        <option>Skills Training</option>
+                    </optgroup>
+                    <optgroup label="Business & Professional">
+                        <option>Accounting / Bookkeeping</option>
+                        <option>Legal Consultation</option>
+                        <option>Translation</option>
+                        <option>Photography / Videography</option>
+                        <option>Event Planning</option>
+                        <option>Security Service</option>
+                    </optgroup>
+                    <optgroup label="Personal & Beauty">
+                        <option>Hair Salon / Barbershop</option>
+                        <option>Makeup & Styling</option>
+                        <option>Massage / Spa</option>
+                        <option>Laundry Service</option>
+                        <option>Childcare / Babysitting</option>
+                        <option>Elder Care</option>
+                    </optgroup>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Provider / Business Name</label>
+                <input class="dyn-input extra-field-input" data-label="Provider Name" placeholder="e.g. Kebede Fix-It Services">
+            </div>
+
+            <div>
+                <label class="dyn-label">Years of Experience</label>
+                <select class="dyn-input extra-field-input" data-label="Experience">
+                    <option value="">Select</option>
+                    <option>Less than 1 Year</option>
+                    <option>1–2 Years</option>
+                    <option>3–5 Years</option>
+                    <option>5–10 Years</option>
+                    <option>10+ Years</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Response Time</label>
+                <select class="dyn-input extra-field-input" data-label="Response Time">
+                    <option value="">Select</option>
+                    <option>Within 1 Hour</option>
+                    <option>Same Day</option>
+                    <option>Within 24 Hours</option>
+                    <option>2–3 Days</option>
+                    <option>On Appointment</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Pricing Model</label>
+                <select class="dyn-input extra-field-input" data-label="Pricing Model">
+                    <option value="">Select</option>
+                    <option>Fixed Price</option>
+                    <option>Per Hour</option>
+                    <option>Per Day</option>
+                    <option>Per Project</option>
+                    <option>Negotiable</option>
+                    <option>Free Consultation</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Service Area</label>
+                <select class="dyn-input extra-field-input" data-label="Service Area">
+                    <option value="">Select</option>
+                    <option>Home Visit / On-site</option>
+                    <option>At Our Workshop / Office</option>
+                    <option>Remote / Online</option>
+                    <option>Both On-site & Remote</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Availability</label>
+                <select class="dyn-input extra-field-input" data-label="Availability">
+                    <option value="">Select</option>
+                    <option>Weekdays Only</option>
+                    <option>Weekends Only</option>
+                    <option>Every Day</option>
+                    <option>Flexible / By Appointment</option>
+                    <option>24/7 Emergency</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Team Size</label>
+                <select class="dyn-input extra-field-input" data-label="Team Size">
+                    <option value="">Select</option>
+                    <option>Individual (Freelancer)</option>
+                    <option>2–5 People</option>
+                    <option>6–20 People</option>
+                    <option>Company (20+)</option>
+                </select>
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Skills / Tools Used</label>
+                <div class="pill-group" id="skillPills">
+                    ${['Licensed','Insured','Certified','Free Estimate','Warranty Given','Materials Included','Equipment Provided','Portfolio Available','References Available'].map(s =>
+                        `<span class="pill" onclick="togglePill(this,'skills')">${s}</span>`
+                    ).join('')}
+                </div>
+                <input type="hidden" id="skillsValue" data-label="Service Highlights">
+                <div class="dyn-hint">Tap badges that apply to your service</div>
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Payment Methods Accepted</label>
+                <div class="pill-group" id="paymentPills">
+                    ${['Cash','Telebirr','CBE Birr','Amole','Bank Transfer','Credit Card'].map(p =>
+                        `<span class="pill" onclick="togglePill(this,'payment')">${p}</span>`
+                    ).join('')}
+                </div>
+                <input type="hidden" id="paymentValue" data-label="Payment Methods">
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Portfolio / Social Link (optional)</label>
+                <input class="dyn-input extra-field-input" data-label="Portfolio Link" placeholder="e.g. t.me/myservice or instagram.com/...">
+            </div>
+        `,
+
+        /* ── FURNITURE ── */
+        Furniture: () => `
+            <div class="dyn-full">
+                <span class="cat-icon-badge"><i class="fas fa-couch"></i> Furniture Details</span>
+            </div>
+            <div>
+                <label class="dyn-label">Type</label>
+                <select class="dyn-input extra-field-input" data-label="Type">
+                    <option>Main Gate</option>
+                    <option>Kitchen Cabinet</option>
+                    <option>Cupboard</option>
+                    <option>Sofa</option>
+                    <option>Bed Frame</option>
+                    <option>Dining Table</option>
+                    <option>Office Desk</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Material</label>
+                <input class="dyn-input extra-field-input" data-label="Material" placeholder="e.g. MDF / Solid Wood">
+            </div>
+            <div>
+                <label class="dyn-label">Dimensions</label>
+                <input class="dyn-input extra-field-input" data-label="Dimensions" placeholder="e.g. 200 x 180 cm">
+            </div>
+            <div>
+                <label class="dyn-label">Color / Finish</label>
+                <input class="dyn-input extra-field-input" data-label="Color" placeholder="e.g. Dark Oak">
+            </div>
+        `
+    };
+
+    /* ══════════════════════════════
+       PILL TOGGLE (multi-select tags)
+    ══════════════════════════════ */
+    function togglePill(el, groupId) {
+        el.classList.toggle('selected');
+        const group = document.getElementById(groupId + 'Pills');
+        const hiddenInput = document.getElementById(groupId + 'Value');
+        if (!group || !hiddenInput) return;
+        const selected = [...group.querySelectorAll('.pill.selected')].map(p => p.textContent);
+        hiddenInput.value = selected.join(', ');
+    }
+
+    /* ══════════════════════════════
+       CATEGORY CHANGE HANDLER
+    ══════════════════════════════ */
+    function handleCategoryChange(val) {
+        const container = document.getElementById('dynamicFields');
+        const grid = document.getElementById('dynamicInputsGrid');
+        const label = document.getElementById('dynSectionLabel');
+
+        grid.innerHTML = '';
+
+        const labelMap = {
+            Jobs: 'Job / Vacancy Specifications',
+            Services: 'Service Specifications',
+            Furniture: 'Furniture Specifications',
         };
 
-        function handleCategoryChange(val) {
-            const container = document.getElementById('dynamicFields');
-            const grid = document.getElementById('dynamicInputsGrid');
-            grid.innerHTML = ''; 
-            
-            if (categoryConfigs[val]) {
-                container.style.display = 'block';
-                categoryConfigs[val].forEach(field => {
-                    const div = document.createElement('div');
-                    div.innerHTML = `<label style="font-size:11px; margin-bottom:2px; display:block; color:#777;">${field.label}</label>`;
-                    
-                    if (field.type === 'select') {
-                        const sel = document.createElement('select');
-                        sel.className = "extra-field-input";
-                        sel.setAttribute('data-label', field.label);
-                        field.options.forEach(opt => sel.innerHTML += `<option value="${opt}">${opt}</option>`);
-                        div.appendChild(sel);
-                    } else {
-                        const inp = document.createElement('input');
-                        inp.className = "extra-field-input";
-                        inp.setAttribute('data-label', field.label);
-                        inp.placeholder = field.placeholder;
-                        div.appendChild(inp);
-                    }
-                    grid.appendChild(div);
-                });
-            } else {
-                container.style.display = 'none';
-            }
+        if (categoryRenderers[val]) {
+            container.style.display = 'block';
+            label.textContent = labelMap[val] || 'Specific Specifications';
+            grid.innerHTML = categoryRenderers[val]();
+        } else {
+            container.style.display = 'none';
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) { window.location.href = 'index.html'; return; }
-            document.getElementById('sellPageBody').style.display = 'block';
-            const { data: profile } = await _supabase.from('profiles').select('full_name, phone').eq('id', user.id).single();
-            if (profile) {
-                currentUserName = profile.full_name || user.email.split('@')[0];
-                if (profile.phone) document.getElementById('prodPhone').value = profile.phone;
-            }
+    /* ══════════════════════════════
+       COLLECT ALL EXTRA SPECS
+    ══════════════════════════════ */
+    function collectExtraSpecs() {
+        let text = "";
+        const extras = document.querySelectorAll('.extra-field-input');
+        extras.forEach(el => {
+            const val = el.value ? el.value.trim() : '';
+            if (val) text += `\n- ${el.getAttribute('data-label')}: ${val}`;
         });
-
-        // Image Preview
-        document.getElementById('prodFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('imagePreview');
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
-                reader.readAsDataURL(file);
-            }
+        // pill hidden inputs
+        ['skillsValue','benefitsValue','paymentValue'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.value) text += `\n- ${el.getAttribute('data-label')}: ${el.value}`;
         });
+        return text;
+    }
 
-        // FORM SUBMISSION
-        document.getElementById('sellForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const fileInput = document.getElementById('prodFile');
-            const { data: { user } } = await _supabase.auth.getUser();
+    /* ══════════════════════════════
+       PAGE INIT
+    ══════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', async () => {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) { window.location.href = 'index.html'; return; }
+        document.getElementById('sellPageBody').style.display = 'block';
+        const { data: profile } = await _supabase.from('profiles').select('full_name, phone').eq('id', user.id).single();
+        if (profile) {
+            currentUserName = profile.full_name || user.email.split('@')[0];
+            if (profile.phone) document.getElementById('prodPhone').value = profile.phone;
+        }
+    });
 
-            btn.innerText = "Processing...";
-            btn.disabled = true;
+    /* Image Preview */
+    document.getElementById('prodFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('imagePreview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
+            reader.readAsDataURL(file);
+        }
+    });
 
-            try {
-                // 1. Collect Extra Specs
-                let extraSpecsText = "";
-                const extras = document.querySelectorAll('.extra-field-input');
-                extras.forEach(el => {
-                    extraSpecsText += `\n- ${el.getAttribute('data-label')}: ${el.value}`;
-                });
+    /* ══════════════════════════════
+       FORM SUBMISSION
+    ══════════════════════════════ */
+    document.getElementById('sellForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const fileInput = document.getElementById('prodFile');
+        const { data: { user } } = await _supabase.auth.getUser();
 
-                const finalDescription = document.getElementById('prodDesc').value + (extraSpecsText ? "\n\n--- Specs ---" + extraSpecsText : "");
+        btn.innerText = "Processing...";
+        btn.disabled = true;
 
-                // 2. Upload Image
-                const file = fileInput.files[0];
-                const fileName = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-                const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
-                if (uploadError) throw uploadError;
-                const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+        try {
+            const extraSpecsText = collectExtraSpecs();
+            const finalDescription = document.getElementById('prodDesc').value +
+                (extraSpecsText ? "\n\n--- Specs ---" + extraSpecsText : "");
 
-                // 3. Database Insert
-                const region = document.getElementById('prodRegion').value;
-                const district = document.getElementById('prodDistrict').value;
-                const locationStr = (region === 'Addis Ababa' && district) ? `${district}, ${region}` : region;
+            // Upload image
+            const file = fileInput.files[0];
+            const fileName = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
+            if (uploadError) throw uploadError;
+            const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
 
-                const { error: dbError } = await _supabase.from('products').insert([{
-                    user_id: user.id,
-                    name: document.getElementById('prodName').value,
-                    price: parseFloat(document.getElementById('prodPrice').value),
-                    status_condition: document.getElementById('status_condition').value,
-                    category: document.getElementById('prodCategory').value,
-                    description: finalDescription,
-                    location: locationStr,
-                    image: publicUrl,
-                    seller_phone: document.getElementById('prodPhone').value,
-                    status: 'pending' 
-                }]);
+            // Location
+            const region = document.getElementById('prodRegion').value;
+            const district = document.getElementById('prodDistrict').value;
+            const locationStr = (region === 'Addis Ababa' && district) ? `${district}, ${region}` : region;
 
-                if (dbError) throw dbError;
+            const { error: dbError } = await _supabase.from('products').insert([{
+                user_id: user.id,
+                name: document.getElementById('prodName').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                status_condition: document.getElementById('status_condition').value,
+                category: document.getElementById('prodCategory').value,
+                description: finalDescription,
+                location: locationStr,
+                image: publicUrl,
+                seller_phone: document.getElementById('prodPhone').value,
+                status: 'pending'
+            }]);
 
-                alert("🎉 Success! Your listing is pending review.");
-                window.location.href = "my-items.html";
+            if (dbError) throw dbError;
 
-            } catch (err) {
-                alert("Error: " + err.message);
-                btn.disabled = false;
-                btn.innerText = "Publish Listing";
-            }
-        });
+            alert("🎉 Success! Your listing is pending review.");
+            window.location.href = "my-items.html";
 
-        window.toggleDistricts = (region) => {
-            document.getElementById('districtWrapper').style.display = (region === 'Addis Ababa') ? 'block' : 'none';
-        };
+        } catch (err) {
+            alert("Error: " + err.message);
+            btn.disabled = false;
+            btn.innerText = "Publish Listing";
+        }
+    });
+
+    window.toggleDistricts = (region) => {
+        document.getElementById('districtWrapper').style.display =
+            (region === 'Addis Ababa') ? 'block' : 'none';
+    };
     </script>
 </body>
 </html>
