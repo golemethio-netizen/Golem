@@ -383,6 +383,7 @@ function filterSearch(term) {
 }
 
 // --- 6. MODAL & VIEW LOGIC ---
+// --- 6. MODAL & VIEW LOGIC ---
 window.openProductDetailsSafe = (encodedData) => {
     try {
         const product = JSON.parse(decodeURIComponent(encodedData));
@@ -393,38 +394,202 @@ window.openProductDetailsSafe = (encodedData) => {
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
-    const badgeContainer = document.getElementById('sellerBadgeContainer');
-    const sellerAvatarElem = document.getElementById('modalSellerAvatar');
-    const sellerNameElem = document.getElementById('modalSellerName');
-
     if (!modal) return;
 
+    // 1. Inject CSS for the Custom Job/Service Card dynamically
+    if (!document.getElementById('jc-custom-styles')) {
+        const style = document.createElement('style');
+        style.id = 'jc-custom-styles';
+        style.innerHTML = `
+        :root { --jc-accent: #e8321a; --jc-accent2: #f97316; --jc-accent-light: #fff4f2; --jc-dark-header: #1a1612; --jc-border: #e2e8f0; --jc-green: #22c55e; }
+        .jc-card { width: 100%; background: #fff; border-radius: 18px; overflow: hidden; position: relative; text-align: left; font-family: 'Poppins', sans-serif;}
+        .jc-watermark { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 10; overflow: hidden; transform: rotate(-25deg); }
+        .jc-watermark-text { font-weight: 800; white-space: nowrap; font-size: 62px; color: rgba(232, 50, 26, 0.05); }
+        .jc-photo-wrap { background: #1a1612; border-bottom: 1px solid #2a2420; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; }
+        .jc-photo-wrap.has-photo { min-height: 200px; }
+        .jc-card-photo { width: 100%; max-height: 250px; object-fit: cover; display: block; }
+        .jc-no-photo-msg { font-size: 10px; color: #3a3530; padding: 16px; text-transform: uppercase; font-weight: 600; }
+        .jc-card-header { background: var(--jc-dark-header); padding: 18px 22px 20px; position: relative; }
+        .jc-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+        .jc-badge-stock { color: #4ade80; border: 1px solid rgba(74,222,128,0.4); background: rgba(74,222,128,0.08); font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; }
+        .jc-price-block { text-align: right; }
+        .jc-price-old { font-size: 12px; color: #555; font-weight: 500; text-decoration: line-through; }
+        .jc-price-new { font-size: 24px; font-weight: 800; color: var(--jc-accent); line-height: 1; }
+        .jc-price-currency { font-size: 10px; color: #666; font-weight: 600; margin-top: 2px; }
+        .jc-product-name { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 5px; }
+        .jc-product-sub { font-size: 12px; color: #8899aa; font-weight: 400; }
+        .jc-highlight-bar { background: linear-gradient(90deg, var(--jc-accent) 0%, var(--jc-accent2) 100%); padding: 10px 22px; display: flex; align-items: center; justify-content: space-between; }
+        .jc-highlight-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .jc-highlight-item + .jc-highlight-item { border-left: 1px solid rgba(255,255,255,0.2); }
+        .jc-highlight-value { font-size: 14px; font-weight: 800; color: white; text-align: center; }
+        .jc-highlight-label { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.75); text-transform: uppercase; margin-top: 2px; }
+        .jc-specs-grid { display: grid; grid-template-columns: 1fr 1fr; background: white; }
+        .jc-spec-cell { padding: 13px 20px; border-bottom: 1px solid var(--jc-border); display: flex; flex-direction: column; gap: 2px; }
+        .jc-spec-cell:nth-child(odd) { border-right: 1px solid var(--jc-border); }
+        .jc-spec-cell:nth-last-child(-n+2) { border-bottom: none; }
+        .jc-spec-icon-wrap { width: 26px; height: 26px; border-radius: 6px; background: var(--jc-accent-light); display: flex; align-items: center; justify-content: center; margin-bottom: 7px; color: var(--jc-accent); font-size:12px; }
+        .jc-spec-label { font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .jc-spec-value { font-size: 13.5px; font-weight: 700; color: #12100e; }
+        .jc-desc-area { padding: 15px 20px; font-size: 13px; color: #444; background: #fff; border-bottom: 1px solid var(--jc-border); line-height: 1.5; white-space: pre-wrap;}
+        .jc-card-footer { padding: 13px 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--jc-border); background: white; flex-wrap: wrap; gap:10px;}
+        .jc-availability { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #64748b; font-weight: 500; }
+        .jc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--jc-green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+        .jc-cta-btn { background: var(--jc-accent); color: white; font-size: 13px; font-weight: 700; padding: 10px 15px; border-radius: 9px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; flex: 1; justify-content: center;}
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 2. Data Preparation
     const rawPhone = (product.seller_phone || "").replace(/\D/g, '');
     const intPhone = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
     const tgUser = (product.telegram_username || "").replace('@', '');
 
-    document.getElementById('modalProductImg').src = product.image || '';
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductPrice').innerText = (product.price ? product.price.toLocaleString() : 'Negotiable') + " ETB";
-    document.getElementById('modalProductDesc').innerText = product.description || "No description available.";
-
     const profile = product.profiles || {};
     const isVerified = profile.is_verified === true;
     const sellerName = profile.full_name || product.seller_name || "Community Member";
-    const avatarUrl = profile.avatar_url || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'%3E%3Ccircle cx=\'25\' cy=\'25\' r=\'25\' fill=\'%23e0e0e0\'/%3E%3Ccircle cx=\'25\' cy=\'20\' r=\'10\' fill=\'%23bdbdbd\'/%3E%3Cellipse cx=\'25\' cy=\'45\' rx=\'16\' ry=\'12\' fill=\'%23bdbdbd\'/%3E%3C/svg%3E';
+    const avatarUrl = profile.avatar_url || "https://via.placeholder.com/50";
+    const modalContent = modal.querySelector('.modal-content');
 
-    if (sellerNameElem) sellerNameElem.innerText = `Seller: ${sellerName}`;
-    if (sellerAvatarElem) sellerAvatarElem.src = avatarUrl;
+    // 3. Conditional Layout Rendering
+    if (product.category === 'Jobs' || product.category === 'Services') {
+        const isJob = product.category === 'Jobs';
+        
+        // Parse specs from description
+        const specs = {};
+        const descParts = (product.description || '').split('--- Specs ---');
+        const cleanDesc = descParts[0].trim();
+        if (descParts[1]) {
+            descParts[1].split('\n').forEach(line => {
+                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+            });
+        }
 
-    if (badgeContainer) {
-        badgeContainer.innerHTML = isVerified
-            ? `<div style="color:#2ed573; font-weight:bold; margin-top:5px;"><i class="fas fa-check-circle"></i> Verified Seller</div>`
-            : `<div style="color:#888; margin-top:5px;"><i class="fas fa-shield-alt"></i> Community Seller</div>`;
+        const type = specs['job type'] || specs['service category'] || (isJob ? 'Full-Time' : 'Service');
+        const exp = specs['experience required'] || specs['experience'] || '-';
+        const h3Label = isJob ? 'Gender' : 'Response';
+        const h3Val = isJob ? (specs['gender'] || 'Both') : (specs['response time'] || 'Fast');
+
+        const company = specs['company'] || specs['provider name'] || sellerName;
+
+        let priceOld = 'Fixed Rate';
+        let priceNew = product.price ? product.price.toLocaleString() : 'Open';
+        if (specs['salary min'] && specs['salary max']) {
+            priceOld = specs['salary min'];
+            priceNew = specs['salary max'];
+        } else if (!product.price) {
+            priceOld = ''; priceNew = 'Negotiable';
+        }
+
+        // Wipe standard padding to fit custom card seamlessly
+        modalContent.style.padding = '0';
+        modalContent.style.background = 'transparent';
+        
+        modalContent.innerHTML = `
+            <button class="close-modal-btn" onclick="window.closeProductModal()" style="z-index: 50; position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.2); color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer;">&times;</button>
+            <div class="jc-card">
+                <div class="jc-watermark"><span class="jc-watermark-text amharic">ዋና ገበያ</span></div>
+                <div class="jc-photo-wrap ${product.image ? 'has-photo' : ''}">
+                    ${product.image ? `<img src="${product.image}" class="jc-card-photo">` : `<span class="jc-no-photo-msg">No Image Attached</span>`}
+                </div>
+                <div class="jc-card-header">
+                    <div class="jc-header-top">
+                        <div class="jc-badges"><span class="jc-badge-stock">${isJob ? 'OPEN VACANCY' : 'AVAILABLE NOW'}</span></div>
+                        <div class="jc-price-block">
+                            <div class="jc-price-old">${priceOld}</div>
+                            <div class="jc-price-new">${priceNew}</div>
+                            <div class="jc-price-currency">${isJob ? 'Monthly (ETB)' : 'ETB'}</div>
+                        </div>
+                    </div>
+                    <div class="jc-product-name">${product.name}</div>
+                    <div class="jc-product-sub">${company}</div>
+                </div>
+
+                <div class="jc-highlight-bar">
+                    <div class="jc-highlight-item"><div class="jc-highlight-value">${type}</div><div class="jc-highlight-label">${isJob ? 'Type' : 'Category'}</div></div>
+                    <div class="jc-highlight-item"><div class="jc-highlight-value">${exp}</div><div class="jc-highlight-label">Experience</div></div>
+                    <div class="jc-highlight-item"><div class="jc-highlight-value" style="font-size:11px; display:flex; align-items:center; height:100%;">${h3Val}</div><div class="jc-highlight-label">${h3Label}</div></div>
+                </div>
+
+                <div class="jc-specs-grid">
+                    <div class="jc-spec-cell">
+                        <div class="jc-spec-icon-wrap"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="jc-spec-label">${isJob ? 'Education' : 'Service Area'}</div>
+                        <div class="jc-spec-value">${specs['education level'] || specs['service area'] || '-'}</div>
+                    </div>
+                    <div class="jc-spec-cell">
+                        <div class="jc-spec-icon-wrap"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="jc-spec-label">${isJob ? 'Deadline' : 'Availability'}</div>
+                        <div class="jc-spec-value">${specs['deadline'] || specs['availability'] || 'Open'}</div>
+                    </div>
+                    <div class="jc-spec-cell">
+                        <div class="jc-spec-icon-wrap"><i class="fas fa-tools"></i></div>
+                        <div class="jc-spec-label">${isJob ? 'Required Skills' : 'Highlights'}</div>
+                        <div class="jc-spec-value" style="font-size:11px;">${specs['key skills'] || specs['service highlights'] || '-'}</div>
+                    </div>
+                    <div class="jc-spec-cell">
+                        <div class="jc-spec-icon-wrap"><i class="fas fa-users"></i></div>
+                        <div class="jc-spec-label">${isJob ? 'Vacancy Qty' : 'Payment'}</div>
+                        <div class="jc-spec-value">${specs['positions available'] || specs['payment methods'] || '-'}</div>
+                    </div>
+                </div>
+
+                ${cleanDesc ? `<div class="jc-desc-area">${cleanDesc.replace(/\n/g, '<br>')}</div>` : ''}
+
+                <div class="jc-card-footer">
+                    <div class="jc-availability"><span class="jc-dot"></span> ${isJob ? 'Hiring Now' : 'Active'}</div>
+                    <div style="display:flex; gap:8px;">
+                        <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="jc-cta-btn" style="background:#0088cc;"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm inquiring about: " + product.name)}" target="_blank" class="jc-cta-btn" style="background:#25d366;"><i class="fab fa-whatsapp"></i></a>
+                        <a href="tel:+${intPhone}" class="jc-cta-btn"><i class="fas fa-phone"></i> ${isJob ? 'Apply' : 'Call'}</a>
+                    </div>
+                </div>
+                <div style="background: #1a1612; padding: 9px 22px; display: flex; align-items: center; justify-content: center; border-top: 1px solid #2a2420; border-radius: 0 0 18px 18px;">
+                    <span style="font-size: 11px; color: #555570; letter-spacing: 0.06em;">wanagebya.com</span>
+                </div>
+            </div>`;
+
+    } else {
+        // Restore standard modal layout & styles
+        modalContent.style.padding = ''; 
+        modalContent.style.background = '#fff';
+
+        modalContent.innerHTML = `
+            <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
+            <div class="modal-img-wrapper">
+                <img src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
+            </div>
+            <div class="modal-body" style="padding: 20px 0 0;">
+                <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
+                
+                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
+                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: ${sellerName}</h4>
+                        <div style="margin-top:5px; font-size:0.8rem;">
+                            ${isVerified 
+                                ? `<span style="color:#2ed573; font-weight:bold;"><i class="fas fa-check-circle"></i> Verified Seller</span>` 
+                                : `<span style="color:#888;"><i class="fas fa-shield-alt"></i> Community Seller</span>`}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-price" style="font-size: 1.3rem; color: #2ed573; font-weight:bold; margin-bottom:15px;">
+                    ${product.price ? product.price.toLocaleString() : 'Negotiable'} ETB
+                </div>
+                
+                <p class="modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555;">
+                    ${product.description || "No description available."}
+                </p>
+
+                <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+                    <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
+                    <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
+                    <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#6c5ce7; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-heart"></i> Save to Wishlist</button>
+                </div>
+            </div>`;
     }
-
-    document.getElementById('whatsappOrder').href = `https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}`;
-    document.getElementById('telegramOrder').href = tgUser ? `https://t.me/${tgUser}` : `https://t.me/+${intPhone}`;
-    document.getElementById('callContact').href = `tel:+${intPhone}`;
 
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
@@ -435,7 +600,6 @@ window.closeProductModal = () => {
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = "auto";
 };
-
 // --- 7. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
 
