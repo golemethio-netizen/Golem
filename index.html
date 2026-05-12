@@ -620,11 +620,8 @@
     <script src="config.js"></script>
     <script src="script.js"></script>
 
-    <!-- ══════════════════════════════════════════════════════════
+   <!-- ══════════════════════════════════════════════════════════
          JOBS & SERVICES CARD RENDERER
-         Drop this AFTER script.js. It patches window.renderProduct
-         so Jobs and Services get special cards; everything else
-         falls through to the original renderer.
     ══════════════════════════════════════════════════════════════ -->
     <script>
     (function () {
@@ -637,7 +634,6 @@
 
         function phone(p) { return String(p || '').replace(/\s/g,''); }
 
-        /* ── parse specs stored in description ── */
         function parseSpecs(desc) {
             const specs = {};
             if (!desc) return specs;
@@ -654,7 +650,6 @@
             return desc.split('--- Specs ---')[0].trim();
         }
 
-        /* ── emoji map for service categories ── */
         const svcEmoji = {
             'plumbing':'🔧','electrical work':'⚡','painting':'🎨',
             'tiling & flooring':'🪵','carpentry & woodwork':'🪚',
@@ -682,8 +677,9 @@
            JOB CARD HTML
         ══════════════════════════════ */
         function buildJobCard(item) {
-               const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
-
+            // FIX: Securely encode the JSON object so quotes don't break the HTML
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
             const sp = parseSpecs(item.description);
             const desc = cleanDesc(item.description);
             const ph = phone(item.seller_phone);
@@ -715,13 +711,18 @@
             const deadlineBadge = deadline
                 ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
 
+            // Check if saved
+            let saved =[];
+            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+            const isSaved = saved.includes(item.id);
+
             return `
-            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe && window.openProductDetailsSafe('${safeData}')" >
+            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
 
                 <div class="job-card-header">
                     <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
-                    <button class="job-wishlist-btn" onclick="event.stopPropagation(); window.addToCartById && window.addToCartById('${esc(item.id)}')">
-                        <i class="fas fa-heart"></i>
+                    <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                     </button>
                     <div class="job-title">${esc(item.name)}</div>
                     ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
@@ -763,7 +764,9 @@
            SERVICE CARD HTML
         ══════════════════════════════ */
         function buildServiceCard(item) {
-             const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            // FIX: Securely encode the JSON object
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
             const sp = parseSpecs(item.description);
             const desc = cleanDesc(item.description);
             const ph = phone(item.seller_phone);
@@ -794,8 +797,13 @@
 
             const icon = svcIcon(svcCat);
 
+            // Check if saved
+            let saved =[];
+            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+            const isSaved = saved.includes(item.id);
+
             return `
-            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe && window.openProductDetailsSafe('${safeData}')">
+            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
 
                 <div class="service-card-header">
                     <div class="service-banner">
@@ -804,8 +812,8 @@
                             : `<span class="service-banner-fallback">${icon}</span>`}
                         <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
                         ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
-                        <button class="service-wishlist-btn" onclick="event.stopPropagation(); window.addToCartById && window.addToCartById('${esc(item.id)}')">
-                            <i class="fas fa-heart"></i>
+                        <button class="service-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                            <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                         </button>
                     </div>
                 </div>
@@ -864,36 +872,24 @@
         };
 
         /* ══════════════════════════════════════════════════════
-           FALLBACK: if script.js renders products by directly
-           building innerHTML (not calling renderProduct),
-           we also intercept fetchProducts / the grid population.
-
-           This version scans the grid after it is populated and
-           replaces any plain cards whose data-id matches a
-           Jobs/Services item.  Safe no-op if renderProduct patch
-           already handled everything.
+           FALLBACK
         ══════════════════════════════════════════════════════ */
         let _itemCache = {};
 
-        // Intercept supabase responses to cache items by id
         const _origFetch = window.fetchProducts;
         window.fetchProducts = async function () {
             const result = typeof _origFetch === 'function' ? await _origFetch.apply(this, arguments) : undefined;
-            // re-scan grid 300ms after fetch completes
             setTimeout(reRenderSpecialCards, 300);
             return result;
         };
 
-        // Store items when openProductModal is called (it already has item data)
         const _origOpen = window.openProductModal;
         window.openProductModal = function (item) {
             if (item && item.id) _itemCache[item.id] = item;
             if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
         };
 
-        function reRenderSpecialCards() {
-            // nothing to do if renderProduct patch handled it already
-        }
+        function reRenderSpecialCards() { }
 
     })();
     </script>
