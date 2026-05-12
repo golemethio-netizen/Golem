@@ -3,340 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- FIX: Single google-site-verification (removed duplicate older tag) -->
     <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
-
-    <!-- FIX: Single og:title (removed "Product Name - Wanagebya" duplicate) -->
     <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
     <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    <!-- FIX: og:url and canonical should match. Update both when you get a custom domain. -->
     <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
-    <!-- FIX: Added missing og:type and twitter:card -->
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
-
     <meta name="geo.region" content="ET" />
     <meta name="geo.placename" content="Addis Ababa" />
     <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
     <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
-
-    <!-- FIX: Self-host your favicon so it doesn't break if flaticon changes the URL -->
     <link rel="icon" href="/favicon.png">
-
-    <!-- FIX: preconnect tags moved ABOVE the stylesheets that use them -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <!-- FIX: Added required crossorigin for Google Fonts gstatic domain -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-
-    <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- ================= MOBILE OPTIMIZATION & HEADER CSS ================= -->
     <style>
+        /* ── HEADER ── */
         .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .help-link {
-            color: #555;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
-        }
-
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .help-link { color: #555; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.3s; }
         .help-link:hover { color: #007bff; }
-
-        /* FIX: Promoted repeated modal inline styles to reusable classes */
-        .modal-flex-actions {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
+        .modal-flex-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
         .modal-flex-actions .contact-btn { flex: 1; }
-
-        /* FIX: Unified success modal inner layout — no more all-inline styles */
-        .success-modal-inner {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-        }
+        .success-modal-inner { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; position: relative; }
         .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
-        .success-back-btn {
-            margin-top: 25px;
-            width: 100%;
-            padding: 15px;
-            background: #333;
+        .success-back-btn { margin-top: 25px; width: 100%; padding: 15px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* ════════════════════════════════════════════════════
+           ██  JOBS CARD
+        ════════════════════════════════════════════════════ */
+        .job-card {
+            background: linear-gradient(145deg, #0d1b2a 0%, #1b2838 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #1e3a5f;
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
         }
-/* ── Jobs & Services Special Cards ── */
-.job-card {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid #0f3460;
-    color: white;
-    position: relative;
-}
-.job-card .job-card-top {
-    padding: 18px 16px 12px;
-    position: relative;
-}
-.job-card .job-type-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; padding: 4px 10px;
-    border-radius: 20px; margin-bottom: 10px;
-}
-.job-card.is-job .job-type-badge {
-    background: rgba(99,179,237,0.15); color: #63b3ed;
-    border: 1px solid rgba(99,179,237,0.3);
-}
-.job-card.is-service .job-type-badge {
-    background: rgba(154,117,234,0.15); color: #b794f4;
-    border: 1px solid rgba(154,117,234,0.3);
-}
-.job-card .job-title {
-    font-size: 15px; font-weight: 700; color: #fff;
-    margin: 0 0 6px; line-height: 1.3;
-}
-.job-card .job-location {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 12px; color: #8899bb;
-}
-.job-card .job-divider {
-    height: 1px; background: rgba(255,255,255,0.07); margin: 0 16px;
-}
-.job-card .job-meta {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px;
-}
-.job-card .job-salary {
-    font-size: 17px; font-weight: 800;
-    background: linear-gradient(90deg, #63b3ed, #b794f4);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.job-card.is-service .job-salary {
-    background: linear-gradient(90deg, #b794f4, #f687b3);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.job-card .job-actions {
-    display: flex; gap: 8px; padding: 0 16px 16px;
-}
-.job-card .job-btn {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    gap: 5px; padding: 10px 8px; border-radius: 10px;
-    font-size: 12px; font-weight: 700; text-decoration: none;
-    border: none; cursor: pointer; font-family: inherit;
-    transition: opacity 0.15s;
-}
-.job-card .job-btn:hover { opacity: 0.85; }
-.job-card .job-btn-primary {
-    background: #63b3ed; color: #0d1117;
-}
-.job-card.is-service .job-btn-primary {
-    background: #b794f4; color: #0d1117;
-}
-.job-card .job-btn-outline {
-    background: rgba(255,255,255,0.07); color: #fff;
-    border: 1px solid rgba(255,255,255,0.15);
-}
-.job-card .job-desc {
-    font-size: 12px; color: #8899bb; line-height: 1.5;
-    padding: 0 16px 14px; margin: 0;
-}
-.job-card .wishlist-btn {
-    position: absolute; top: 12px; right: 12px;
-    background: rgba(255,255,255,0.08); border: none;
-    border-radius: 50%; width: 30px; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: #aaa; font-size: 13px;
-}
-.job-card .wishlist-btn.active, .job-card .wishlist-btn:hover { color: #ff6b81; }
+        .job-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(99,179,237,0.2); }
+
+        /* header strip */
+        .job-card-header {
+            background: linear-gradient(90deg, #1a3a5c, #0d2137);
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid rgba(99,179,237,0.12);
+            position: relative;
+        }
+
+        .job-type-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 3px 10px;
+            border-radius: 20px; margin-bottom: 8px;
+            background: rgba(99,179,237,0.15); color: #63b3ed;
+            border: 1px solid rgba(99,179,237,0.3);
+        }
+
+        .job-title {
+            font-size: 15px; font-weight: 700; color: #e8f4fd;
+            margin: 0 28px 5px 0; line-height: 1.3;
+        }
+
+        .job-company {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #7a9cbf; font-weight: 500;
+        }
+        .job-company i { font-size: 10px; }
+
+        /* tag row */
+        .job-tags {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .job-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .job-tag.blue   { background: rgba(99,179,237,0.12); color: #63b3ed; }
+        .job-tag.green  { background: rgba(72,187,120,0.12); color: #68d391; }
+        .job-tag.purple { background: rgba(159,122,234,0.12); color: #b794f4; }
+        .job-tag.orange { background: rgba(246,173,85,0.12); color: #f6ad55; }
+        .job-tag.red    { background: rgba(252,129,74,0.12); color: #fc8974; }
+
+        /* salary + location */
+        .job-meta-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .job-salary {
+            font-size: 16px; font-weight: 800;
+            background: linear-gradient(90deg, #63b3ed, #b794f4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .job-location {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 11.5px; color: #5a7a99;
+        }
+        .job-location i { font-size: 10px; color: #4a8ab5; }
+
+        /* description snippet */
+        .job-snippet {
+            font-size: 12px; color: #6a8aaa; line-height: 1.55;
+            padding: 0 16px 12px; margin: 0;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* action row */
+        .job-actions {
+            display: flex; gap: 8px;
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .job-btn {
+            flex: 1; display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 9px 8px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: filter 0.15s, transform 0.12s;
+        }
+        .job-btn:hover { filter: brightness(1.12); transform: scale(1.02); }
+        .job-btn:active { transform: scale(0.97); }
+
+        .job-btn-primary { background: #63b3ed; color: #0d1117; }
+        .job-btn-tg      { background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.3); }
+        .job-btn-wa      { background: rgba(37,211,102,0.12); color: #25d366; border: 1px solid rgba(37,211,102,0.25); }
+
+        .job-wishlist-btn {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(255,255,255,0.07); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #4a6a8a; font-size: 12px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .job-wishlist-btn:hover, .job-wishlist-btn.active { color: #ff6b81; background: rgba(255,107,129,0.12); }
+
+        /* deadline badge */
+        .deadline-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700;
+            color: #fc8974; padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(252,129,74,0.1);
+            border: 1px solid rgba(252,129,74,0.2);
+        }
+
+        /* ════════════════════════════════════════════════════
+           ██  SERVICES CARD
+        ════════════════════════════════════════════════════ */
+        .service-card {
+            background: linear-gradient(145deg, #1a1025 0%, #230f33 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #3b1f5c;
+            color: white;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(183,148,244,0.2); }
+
+        .service-card-header {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* photo or gradient banner */
+        .service-banner {
+            height: 110px;
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a0d2e 100%);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+
+        .service-banner img {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .service-banner-fallback {
+            font-size: 42px; opacity: 0.4;
+        }
+
+        .service-type-badge {
+            position: absolute; top: 10px; left: 12px;
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(183,148,244,0.2); color: #d6b4fe;
+            border: 1px solid rgba(183,148,244,0.35);
+            backdrop-filter: blur(4px);
+        }
+
+        .service-rating {
+            position: absolute; top: 10px; right: 12px;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; color: #fbbf24;
+            background: rgba(0,0,0,0.4); padding: 3px 8px;
+            border-radius: 6px; backdrop-filter: blur(4px);
+        }
+
+        .service-wishlist-btn {
+            position: absolute; bottom: 10px; right: 12px;
+            background: rgba(0,0,0,0.35); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #8a6aaa; font-size: 12px;
+            transition: color 0.15s; backdrop-filter: blur(4px);
+        }
+        .service-wishlist-btn:hover, .service-wishlist-btn.active { color: #ff6b81; }
+
+        .service-body { padding: 14px 16px 0; }
+
+        .service-name {
+            font-size: 15px; font-weight: 700; color: #f0e6ff;
+            margin: 0 0 5px; line-height: 1.3;
+        }
+
+        .service-provider {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #8a6aaa; margin-bottom: 10px;
+        }
+        .service-provider i { font-size: 10px; }
+
+        .service-highlights {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .svc-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .svc-tag.purple { background: rgba(183,148,244,0.12); color: #b794f4; }
+        .svc-tag.pink   { background: rgba(246,135,177,0.12); color: #f687b3; }
+        .svc-tag.teal   { background: rgba(94,234,212,0.12);  color: #5eead4; }
+        .svc-tag.amber  { background: rgba(251,191,36,0.12);  color: #fbbf24; }
+        .svc-tag.green  { background: rgba(72,187,120,0.12);  color: #68d391; }
+
+        .service-snippet {
+            font-size: 12px; color: #7a5a99; line-height: 1.55;
+            margin: 0 0 10px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .service-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(183,148,244,0.08);
+            margin-top: 4px;
+        }
+
+        .service-price {
+            font-size: 16px; font-weight: 800;
+            background: linear-gradient(90deg, #b794f4, #f687b3);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .service-price-label {
+            font-size: 10px; color: #6a4a8a; margin-top: 1px;
+        }
+
+        .service-actions { display: flex; gap: 7px; }
+
+        .svc-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; padding: 8px 14px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: filter 0.15s, transform 0.12s;
+            white-space: nowrap;
+        }
+        .svc-btn:hover { filter: brightness(1.15); transform: scale(1.02); }
+        .svc-btn:active { transform: scale(0.97); }
+
+        .svc-btn-primary { background: #b794f4; color: #1a0d2e; }
+        .svc-btn-outline { background: rgba(183,148,244,0.1); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
+
+        /* ── AVAILABILITY DOT ── */
+        .avail-dot {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 11px; color: #68d391; font-weight: 600;
+        }
+        .avail-dot::before {
+            content: '';
+            display: inline-block; width: 7px; height: 7px;
+            background: #68d391; border-radius: 50%;
+            box-shadow: 0 0 6px rgba(104,211,145,0.6);
+        }
+
+        /* ── SECTION DIVIDERS in grid ── */
+        .category-section-header {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 0 4px;
+        }
+        .category-section-header h3 {
+            font-size: 13px; font-weight: 700; color: #333;
+            white-space: nowrap;
+        }
+        .category-section-header .line {
+            flex: 1; height: 1px; background: #eee;
+        }
+
+        /* ── MOBILE ── */
         @media (max-width: 768px) {
             .golem-header { padding: 15px 10px; }
             .header-top-row { flex-wrap: nowrap; }
             .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
             .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
-
             .hide-text-mobile { display: none !important; }
             .header-actions { gap: 10px; }
             .help-link i { font-size: 1.3rem !important; }
-
-            .sign-in-btn {
-                padding: 8px !important;
-                border-radius: 50% !important;
-                width: 36px;
-                height: 36px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+            .sign-in-btn { padding: 8px !important; border-radius: 50% !important; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
             .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
-
             body { padding-bottom: 70px; }
-            .nav-container-horizontal {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: white;
-                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-                display: flex;
-                justify-content: space-around;
-                padding: 10px 5px;
-                z-index: 1000;
-                margin: 0;
-                border-top: 1px solid #eee;
-            }
-            .nav-item-box {
-                flex-direction: column;
-                gap: 4px;
-                background: transparent !important;
-                color: #555 !important;
-                box-shadow: none;
-                padding: 5px;
-                min-width: 60px;
-            }
+            .nav-container-horizontal { position: fixed; bottom: 0; left: 0; width: 100%; background: white; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); display: flex; justify-content: space-around; padding: 10px 5px; z-index: 1000; margin: 0; border-top: 1px solid #eee; }
+            .nav-item-box { flex-direction: column; gap: 4px; background: transparent !important; color: #555 !important; box-shadow: none; padding: 5px; min-width: 60px; }
             .nav-item-box i { font-size: 1.3rem; color: #3498db; }
             .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
-
             #adminNavLink i { color: #e74c3c; }
-
-        .filter-bar {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 10px 5px;
-    gap: 8px;
-    
-    /* ADD THESE TWO LINES */
-    justify-content: center; 
-    width: 100%;
-}
+            .filter-bar { display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 5px; gap: 8px; justify-content: center; width: 100%; }
             .filter-bar::-webkit-scrollbar { display: none; }
             .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
-
-            .masonry-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 12px;
-            }
-
+            .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
             .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
             .modal-footer-actions { flex-direction: column; }
             .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
-
             .floating-chat { bottom: 85px; right: 15px; }
             #chatMenu { bottom: 70px; right: 0; }
-
             .sponsor-content { flex-direction: column; text-align: center; }
             .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
             .sponsor-actions { flex-direction: column; gap: 10px; }
             .sponsor-actions a { margin-left: 0 !important; }
+
+            /* Jobs/Services cards take full width on mobile */
+            .job-card, .service-card { grid-column: 1 / -1; }
         }
-
-
-
-
-<!-- Telegram Buttons -->
-<div style="display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0;">
-
-  <!-- Join Channel button -->
-  <a href="https://t.me/WanaGebyaet" target="_blank"
-     style="display: inline-flex; align-items: center; gap: 10px;
-            padding: 13px 22px; border-radius: 50px;
-            background: #0088cc; color: #fff;
-            font-size: 15px; font-weight: 500; text-decoration: none;
-            border: none; cursor: pointer; font-family: inherit;">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-    </svg>
-    Join our Telegram
-  </a>
-
-  <!-- Share on Telegram button -->
-  <button onclick="
-      var url = encodeURIComponent(window.location.href);
-      var text = encodeURIComponent('Check out WanaGebya | ዋና ገበያ — Ethiopia\'s marketplace for electronics, furniture, fashion & more!');
-      window.open('https://t.me/share/url?url=' + url + '&text=' + text, '_blank');
-    "
-    style="display: inline-flex; align-items: center; gap: 10px;
-           padding: 13px 22px; border-radius: 50px;
-           background: transparent; color: #0088cc;
-           font-size: 15px; font-weight: 500;
-           border: 2px solid #0088cc; cursor: pointer; font-family: inherit;">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-    </svg>
-    Share on Telegram
-  </button>
-
-</div>
-        
     </style>
 </head>
 
 <body>
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
-
         <div class="header-top-row">
             <div class="logo">WanaGebya | ዋና ገበያ</div>
-
             <div class="header-actions">
-
-                <!-- FIX: onclick removed — wired via addEventListener below -->
                 <a href="#" id="helpBtn" class="help-link">
                     <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
                     <span class="hide-text-mobile">Help</span>
                 </a>
-
                 <div class="lang-toggle-wrapper">
                     <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
                         <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
                     </button>
                 </div>
-
                 <div class="nav-auth-controls">
                     <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
                         <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
                     </button>
-
                     <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
-                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;">
-                            <strong id="userName"></strong>
-                        </span>
-                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
+                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;"><strong id="userName"></strong></span>
+                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -346,41 +397,20 @@
         </div>
 
         <div class="nav-container-horizontal">
-            <a href="index.html" class="nav-item-box bg-home">
-                <i class="fas fa-home"></i>
-                <p>Home</p>
-            </a>
-
-            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box">
-                <i class="fas fa-plus-circle" style="color: #2ed573;"></i>
-                <p>Sell Item</p>
-            </a>
-
-            <a href="my-items.html" class="nav-item-box bg-items">
-                <i class="fas fa-box-open"></i>
-                <p>My Items</p>
-            </a>
-
-            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;">
-                <i class="fas fa-heart"></i>
-                <p>Saved</p>
-                <span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span>
-            </a>
-
-            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;">
-                <i class="fas fa-user-shield"></i>
-                <p>Admin</p>
-            </a>
+            <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
+            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color: #2ed573;"></i><p>Sell Item</p></a>
+            <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
+            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;"><i class="fas fa-heart"></i><p>Saved</p><span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span></a>
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
         </div>
     </header>
 
-    <!-- ======================= SPONSORED SECTION ======================= -->
+    <!-- ======================= SPONSORED ======================= -->
     <section class="sponsored-section container" id="mainSponsor" style="display: none; margin-top: 20px;">
         <div class="sponsor-card">
             <div class="sponsor-badge">Featured Partner</div>
             <div class="sponsor-content">
                 <div class="sponsor-image">
-                    <!-- FIX: Added lazy loading and descriptive alt text -->
                     <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
                 </div>
                 <div class="sponsor-details">
@@ -395,7 +425,7 @@
         </div>
     </section>
 
-    <!-- ======================= FILTER & SORT CONTROLS ======================= -->
+    <!-- ======================= FILTERS ======================= -->
     <section class="filter-controls">
         <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
             <div class="sort-container" style="flex: 1; min-width: 140px;">
@@ -418,69 +448,56 @@
             </div>
         </div>
 
-        <!-- FIX: All onclick removed — wired via data-category in JS -->
-     <!-- Updated Filter Bar with Services and Jobs -->
-<div class="filter-bar">
-    <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
-    <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
-        <i class="fas fa-star" style="color: #f1c40f;"></i> Featured
-    </button>
-    <button class="filter-btn" data-category="Electronics" data-am="ኤሌክትሮኒክስ">Electronics</button>
-    <button class="filter-btn" data-category="Furniture" data-am="የቤት ዕቃዎች">Furniture</button>
-    <button class="filter-btn" data-category="Fashion" data-am="አልባሳት">Fashion</button>
-    <button class="filter-btn" data-category="Vehicles" data-am="ተሽከርካሪዎች">Vehicles</button>
-    <button class="filter-btn" data-category="Property" data-am="ንብረት">Property</button>
-    <button class="filter-btn" data-category="Home Supplies" data-am="የቤት ቁሳቁሶች">Home Supplies</button>
-    
-    <!-- New Categories -->
-    <button class="filter-btn" data-category="Services" data-am="አገልግሎቶች">Services</button>
-    <button class="filter-btn" data-category="Jobs" data-am="ስራዎች">Jobs</button>
-</div>
+        <div class="filter-bar">
+            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
+            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች"><i class="fas fa-star" style="color: #f1c40f;"></i> Featured</button>
+            <button class="filter-btn" data-category="Electronics" data-am="ኤሌክትሮኒክስ">Electronics</button>
+            <button class="filter-btn" data-category="Furniture" data-am="የቤት ዕቃዎች">Furniture</button>
+            <button class="filter-btn" data-category="Fashion" data-am="አልባሳት">Fashion</button>
+            <button class="filter-btn" data-category="Vehicles" data-am="ተሽከርካሪዎች">Vehicles</button>
+            <button class="filter-btn" data-category="Property" data-am="ንብረት">Property</button>
+            <button class="filter-btn" data-category="Home Supplies" data-am="የቤት ቁሳቁሶች">Home Supplies</button>
+            <button class="filter-btn" data-category="Services" data-am="አገልግሎቶች">
+                <i class="fas fa-tools" style="font-size:11px; color:#b794f4;"></i> Services
+            </button>
+            <button class="filter-btn" data-category="Jobs" data-am="ስራዎች">
+                <i class="fas fa-briefcase" style="font-size:11px; color:#63b3ed;"></i> Jobs
+            </button>
+        </div>
     </section>
 
     <!-- ======================= MAIN GRID ======================= -->
     <main class="container">
         <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner">
-                <i class="fas fa-circle-notch fa-spin"></i> Loading items...
-            </div>
+            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
         </div>
 
-       <div class="invite-container" style="background:white; border-radius:16px; padding:2rem; text-align:center; border:1px solid #f0f0f0; margin:20px 0;">
-    <div style="width:56px; height:56px; border-radius:50%; background:#f0f7ff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
-        <i class="fas fa-users" style="color:#0088cc; font-size:22px;"></i>
-    </div>
-    <h3 style="margin:0 0 6px; font-size:16px; color:#222;">Help WanaGebya Grow By Sharing!</h3>
-    <p style="color:#888; font-size:13px; margin:0 0 20px;">"Do you know anyone looking to buy or sell?" Invite them to WanaGebya.</p>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto;">
-
-        <button id="shareTelegramBtn"
-            style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#0088cc; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            Share on Telegram
-        </button>
-
-        <button id="shareWhatsAppBtn"
-            style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#25d366; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-            Share on WhatsApp
-        </button>
-
-        <button id="shareFacebookBtn"
-            style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#1877F2; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            Share on Facebook
-        </button>
-
-        <a href="https://t.me/WanaGebyaet" target="_blank"
-            style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; background:#f0f7ff; color:#0088cc; border:1.5px solid #b3d9f5; font-size:13px; font-weight:600; text-decoration:none; font-family:inherit;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            Join our Telegram Channel
-        </a>
-
-    </div>
-</div>
+        <!-- Invite / Share -->
+        <div class="invite-container" style="background:white; border-radius:16px; padding:2rem; text-align:center; border:1px solid #f0f0f0; margin:20px 0;">
+            <div style="width:56px; height:56px; border-radius:50%; background:#f0f7ff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
+                <i class="fas fa-users" style="color:#0088cc; font-size:22px;"></i>
+            </div>
+            <h3 style="margin:0 0 6px; font-size:16px; color:#222;">Help WanaGebya Grow By Sharing!</h3>
+            <p style="color:#888; font-size:13px; margin:0 0 20px;">"Do you know anyone looking to buy or sell?" Invite them to WanaGebya.</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto;">
+                <button id="shareTelegramBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#0088cc; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Share on Telegram
+                </button>
+                <button id="shareWhatsAppBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#25d366; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                    Share on WhatsApp
+                </button>
+                <button id="shareFacebookBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#1877F2; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Share on Facebook
+                </button>
+                <a href="https://t.me/WanaGebyaet" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; background:#f0f7ff; color:#0088cc; border:1.5px solid #b3d9f5; font-size:13px; font-weight:600; text-decoration:none; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Join our Telegram Channel
+                </a>
+            </div>
+        </div>
     </main>
 
     <!-- ======================= FOOTER ======================= -->
@@ -490,72 +507,45 @@
                 <h2 class="footer-logo">WanaGebya</h2>
                 <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
             </div>
-
             <div class="footer-col">
                 <h4>Contact Us</h4>
                 <p><i class="fas fa-phone"></i> +251707022845</p>
-            <div class="social-links">
-        <a href="https://t.me/WanaGebya" class="social-btn telegram" aria-label="Telegram">
-            <i class="fab fa-telegram-plane"></i>
-        </a>
-        <a href="https://facebook.com/WanaGebya" class="social-btn facebook" aria-label="Facebook">
-            <i class="fab fa-facebook-f"></i>
-        </a>
-        <a href="https://instagram.com/WanaGebya" class="social-btn instagram" aria-label="Instagram">
-            <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://tiktok.com/@WanaGebya" class="social-btn tiktok" aria-label="TikTok">
-            <i class="fab fa-tiktok"></i>
-        </a>
-    </div>
+                <div class="social-links">
+                    <a href="https://t.me/WanaGebya" class="social-btn telegram" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="https://facebook.com/WanaGebya" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://instagram.com/WanaGebya" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://tiktok.com/@WanaGebya" class="social-btn tiktok" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
             </div>
-
             <div class="footer-col">
                 <h4>Language / ቋንቋ</h4>
                 <button id="footerLangBtn" class="lang-btn-footer">English / አማርኛ</button>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p>
-        </div>
+        <div class="footer-bottom"><p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p></div>
     </footer>
 
-    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;">
-        <i class="fas fa-chevron-up"></i>
-    </button>
+    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;"><i class="fas fa-chevron-up"></i></button>
 
-    <!-- ======================= FLOATING CHAT WIDGET ======================= -->
+    <!-- ======================= FLOATING CHAT ======================= -->
     <div class="floating-chat">
         <div id="chatToast" class="chat-toast" style="display: none;">
             <span id="closeToastBtn" class="close-toast">&times;</span>
             <p>👋 Hello! Welcome! Need help with buying or selling?</p>
             <div class="toast-arrow"></div>
         </div>
-
         <div id="chatMenu" class="chat-menu" style="display: none;">
-            <a href="tel:+251707022845" class="menu-item call">
-                <i class="fas fa-phone"></i> <span>Call Now</span>
-            </a>
-            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram">
-                <i class="fab fa-telegram-plane"></i> <span>Telegram</span>
-            </a>
-            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp">
-                <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
-            </a>
+            <a href="tel:+251707022845" class="menu-item call"><i class="fas fa-phone"></i> <span>Call Now</span></a>
+            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram"><i class="fab fa-telegram-plane"></i> <span>Telegram</span></a>
+            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp"><i class="fab fa-whatsapp"></i> <span>WhatsApp</span></a>
         </div>
-
         <button id="chatToggleBtn" class="chat-btn">
-            <div class="status-dot-container">
-                <i class="fas fa-comment-dots"></i>
-                <span class="online-dot"></span>
-            </div>
+            <div class="status-dot-container"><i class="fas fa-comment-dots"></i><span class="online-dot"></span></div>
             <span class="chat-label" data-am="ያግኙን">Contact Us</span>
         </button>
     </div>
 
     <!-- ======================= MODALS ======================= -->
-
-    <!-- 1. Support Modal -->
     <div id="supportModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 400px;">
             <button id="closeSupportModal" class="close-modal-btn">&times;</button>
@@ -569,100 +559,51 @@
         </div>
     </div>
 
-    <!-- 2. Auth/Login Modal -->
     <div id="authModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button type="button" id="closeAuthModal" class="close-modal-btn">&times;</button>
             <h2 id="modalTitle">Welcome Back</h2>
-
             <form id="authForm">
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="authEmail" placeholder="Email Address" required>
-                </div>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="authPassword" placeholder="Password" required>
-                </div>
-
+                <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="authEmail" placeholder="Email Address" required></div>
+                <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="authPassword" placeholder="Password" required></div>
                 <div id="registerFields" style="display: none;">
-                    <div class="input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="regName" placeholder="Full Name">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-phone"></i>
-                        <input type="text" id="regPhone" placeholder="Phone Number">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" id="regLocation" placeholder="Location (e.g. Bole)">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-info-circle"></i>
-                        <textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit; border-radius: 8px; background: #f9f9f9;"></textarea>
-                    </div>
+                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="regName" placeholder="Full Name"></div>
+                    <div class="input-group"><i class="fas fa-phone"></i><input type="text" id="regPhone" placeholder="Phone Number"></div>
+                    <div class="input-group"><i class="fas fa-map-marker-alt"></i><input type="text" id="regLocation" placeholder="Location (e.g. Bole)"></div>
+                    <div class="input-group"><i class="fas fa-info-circle"></i><textarea id="regBio" placeholder="Short Bio (Optional)" style="width: 100%; border: none; padding: 10px; font-family: inherit; border-radius: 8px; background: #f9f9f9;"></textarea></div>
                 </div>
-
                 <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
             </form>
-
             <div class="modal-footer">
                 <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
             </div>
         </div>
     </div>
 
-    <!-- 3. Product Details Modal -->
-    <!-- FIX: Removed stray "..." invalid attribute from the original -->
     <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display: none;">
         <div class="modal-content">
             <button id="closeProductModal" class="close-modal-btn">&times;</button>
-
-            <div class="modal-img-wrapper">
-                <img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;">
-            </div>
-
+            <div class="modal-img-wrapper"><img id="modalProductImg" src="" alt="Product" style="border-radius: 10px;"></div>
             <div class="modal-body">
                 <h2 id="modalProductTitle" style="font-size: 1.2rem; margin-bottom: 5px;"></h2>
-
                 <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <!-- FIX: Replaced unreliable via.placeholder.com with inline SVG data URI -->
-                    <img id="modalSellerAvatar"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
-                        alt="Seller avatar"
-                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
-
-                    <div style="flex: 1;">
-                        <h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4>
-                        <div id="sellerBadgeContainer"></div>
-                    </div>
+                    <img id="modalSellerAvatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
+                    <div style="flex: 1;"><h4 id="modalSellerName" style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: Loading...</h4><div id="sellerBadgeContainer"></div></div>
                 </div>
-
                 <div id="modalProductPrice" class="modal-price" style="font-size: 1.3rem;"></div>
                 <p id="modalProductDesc" class="modal-description" style="font-size: 0.9rem; line-height: 1.5;"></p>
-
-                <!-- FIX: Uses .modal-flex-actions class instead of inline styles; onclick removed -->
                 <div class="modal-flex-actions">
                     <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
                     <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
                     <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width: 100%;">
-                        <i class="fas fa-heart"></i> Save to Wishlist
-                    </button>
+                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width: 100%;"><i class="fas fa-heart"></i> Save to Wishlist</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 4. Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <p>Sending your order to WanaGebya ...</p>
-    </div>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;"><div class="spinner"></div><p>Sending your order to WanaGebya ...</p></div>
 
-    <!-- 5. Success Post Modal -->
-    <!-- FIX: Now uses shared .modal-overlay + .modal-content + named classes, no wall of inline styles -->
     <div id="successModal" class="modal-overlay" style="display: none;">
         <div class="modal-content success-modal-inner">
             <div class="success-icon"><i class="fas fa-check-circle"></i></div>
@@ -678,223 +619,372 @@
     <script src="config.js"></script>
     <script src="script.js"></script>
 
+    <!-- ══════════════════════════════════════════════════════════
+         JOBS & SERVICES CARD RENDERER
+         Drop this AFTER script.js. It patches window.renderProduct
+         so Jobs and Services get special cards; everything else
+         falls through to the original renderer.
+    ══════════════════════════════════════════════════════════════ -->
     <script>
-        // =====================================================================
-        //  CENTRALISED EVENT LISTENERS
-        //  FIX: All onclick="window.fn()" removed from HTML and wired here.
-        //  Cleaner, maintainable, and CSP-compatible.
-        // =====================================================================
+    (function () {
+        'use strict';
+
+        /* ── helpers ── */
+        function esc(str) {
+            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function phone(p) { return String(p || '').replace(/\s/g,''); }
+
+        /* ── parse specs stored in description ── */
+        function parseSpecs(desc) {
+            const specs = {};
+            if (!desc) return specs;
+            const block = desc.split('--- Specs ---')[1] || '';
+            block.split('\n').forEach(line => {
+                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+            });
+            return specs;
+        }
+
+        function cleanDesc(desc) {
+            if (!desc) return '';
+            return desc.split('--- Specs ---')[0].trim();
+        }
+
+        /* ── emoji map for service categories ── */
+        const svcEmoji = {
+            'plumbing':'🔧','electrical work':'⚡','painting':'🎨',
+            'tiling & flooring':'🪵','carpentry & woodwork':'🪚',
+            'cleaning service':'🧹','moving & packing':'📦',
+            'air conditioning':'❄️','welding & metal work':'⚙️',
+            'web design':'💻','graphic design':'🖼','computer repair':'🖥',
+            'phone repair':'📱','network setup':'🌐','cctv installation':'📷',
+            'software development':'👨‍💻','private tutoring':'📚',
+            'language classes':'🗣','music lessons':'🎵',
+            'driving instruction':'🚗','skills training':'🏆',
+            'accounting / bookkeeping':'📊','legal consultation':'⚖️',
+            'translation':'🌍','photography / videography':'📸',
+            'event planning':'🎉','security service':'🛡',
+            'hair salon / barbershop':'💈','makeup & styling':'💄',
+            'massage / spa':'💆','laundry service':'👕',
+            'childcare / babysitting':'👶','elder care':'🧓',
+        };
+
+        function svcIcon(cat) {
+            if (!cat) return '🛠';
+            return svcEmoji[cat.toLowerCase()] || '🛠';
+        }
+
+        /* ══════════════════════════════
+           JOB CARD HTML
+        ══════════════════════════════ */
+        function buildJobCard(item) {
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
+
+            const jobType  = sp['job type']  || 'Full-Time';
+            const industry = sp['industry']  || '';
+            const exp      = sp['experience required'] || '';
+            const edu      = sp['education level'] || '';
+            const location = sp['work location'] || item.location || '';
+            const company  = sp['company'] || '';
+            const positions= sp['positions available'] || '';
+            const deadline = sp['deadline'] || '';
+            const salMin   = sp['salary min'] || '';
+            const salMax   = sp['salary max'] || '';
+            const skills   = sp['key skills'] || '';
+
+            let salaryStr = 'Negotiable';
+            if (salMin && salMax) salaryStr = `${Number(salMin).toLocaleString()} – ${Number(salMax).toLocaleString()} ETB`;
+            else if (salMin) salaryStr = `From ${Number(salMin).toLocaleString()} ETB`;
+            else if (item.price && item.price > 0) salaryStr = `${Number(item.price).toLocaleString()} ETB`;
+
+            const typeColor = { 'Full-Time':'blue','Part-Time':'orange','Contract':'purple','Internship':'green','Freelance':'red' };
+            const badgeColor = typeColor[jobType] || 'blue';
+
+            const skillTags = skills ? skills.split(',').slice(0,4).map(s =>
+                `<span class="job-tag purple"><i class="fas fa-check" style="font-size:8px;"></i>${esc(s.trim())}</span>`
+            ).join('') : '';
+
+            const deadlineBadge = deadline
+                ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
+
+            return `
+            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductModal && window.openProductModal(${esc(JSON.stringify(item).replace(/'/g,"&#39;")})" >
+
+                <div class="job-card-header">
+                    <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
+                    <button class="job-wishlist-btn" onclick="event.stopPropagation(); window.addToCartById && window.addToCartById('${esc(item.id)}')">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <div class="job-title">${esc(item.name)}</div>
+                    ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
+                </div>
+
+                <div class="job-tags">
+                    ${industry ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i>${esc(industry)}</span>` : ''}
+                    ${exp ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i>${esc(exp)}</span>` : ''}
+                    ${edu ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i>${esc(edu)}</span>` : ''}
+                    ${positions ? `<span class="job-tag orange"><i class="fas fa-users" style="font-size:8px;"></i>${esc(positions)} position${positions>1?'s':''}</span>` : ''}
+                    ${skillTags}
+                </div>
+
+                <div class="job-meta-row">
+                    <div>
+                        <div class="job-salary">${salaryStr}</div>
+                        ${deadlineBadge}
+                    </div>
+                    <div class="job-location"><i class="fas fa-map-marker-alt"></i>${esc(location || item.location || 'Ethiopia')}</div>
+                </div>
+
+                ${desc ? `<p class="job-snippet">${esc(desc)}</p>` : ''}
+
+                <div class="job-actions">
+                    <a href="tel:${ph}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
+                        <i class="fas fa-phone"></i> Call / Apply
+                    </a>
+                    <a href="https://t.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                    <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        /* ══════════════════════════════
+           SERVICE CARD HTML
+        ══════════════════════════════ */
+        function buildServiceCard(item) {
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
+
+            const svcCat     = sp['service category'] || '';
+            const provider   = sp['provider name'] || '';
+            const experience = sp['experience'] || '';
+            const response   = sp['response time'] || '';
+            const pricing    = sp['pricing model'] || '';
+            const area       = sp['service area'] || '';
+            const avail      = sp['availability'] || '';
+            const highlights = sp['service highlights'] || '';
+            const payment    = sp['payment methods'] || '';
+
+            const priceStr = item.price && item.price > 0
+                ? `${Number(item.price).toLocaleString()} ETB`
+                : 'On Request';
+
+            const pricingLabel = pricing || 'Per Project';
+
+            const hlTags = highlights ? highlights.split(',').slice(0,4).map(h =>
+                `<span class="svc-tag purple"><i class="fas fa-check-circle" style="font-size:9px;"></i>${esc(h.trim())}</span>`
+            ).join('') : '';
+
+            const payTags = payment ? payment.split(',').slice(0,3).map(p =>
+                `<span class="svc-tag teal">${esc(p.trim())}</span>`
+            ).join('') : '';
+
+            const icon = svcIcon(svcCat);
+
+            return `
+            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductModal && window.openProductModal(${esc(JSON.stringify(item).replace(/'/g,"&#39;"))})">
+
+                <div class="service-card-header">
+                    <div class="service-banner">
+                        ${item.image
+                            ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">`
+                            : `<span class="service-banner-fallback">${icon}</span>`}
+                        <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
+                        ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
+                        <button class="service-wishlist-btn" onclick="event.stopPropagation(); window.addToCartById && window.addToCartById('${esc(item.id)}')">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-name">${esc(item.name)}</div>
+                    ${provider ? `<div class="service-provider"><i class="fas fa-user-circle"></i>${esc(provider)}</div>` : ''}
+
+                    <div class="service-highlights">
+                        ${response   ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${esc(response)}</span>` : ''}
+                        ${area       ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${esc(area)}</span>` : ''}
+                        ${avail      ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${esc(avail)}</span>` : ''}
+                        ${hlTags}
+                        ${payTags}
+                    </div>
+
+                    ${desc ? `<p class="service-snippet">${esc(desc)}</p>` : ''}
+                </div>
+
+                <div class="service-footer">
+                    <div>
+                        <div class="service-price">${priceStr}</div>
+                        <div class="service-price-label">${esc(pricingLabel)}</div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="tel:${ph}" class="svc-btn svc-btn-primary" onclick="event.stopPropagation()">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="svc-btn svc-btn-outline" onclick="event.stopPropagation()">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        /* ══════════════════════════════
+           PATCH: intercept renderProduct
+           called from script.js
+        ══════════════════════════════ */
+        const _orig = window.renderProduct;
+
+        window.renderProduct = function (item) {
+            if (item.category === 'Jobs') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildJobCard(item);
+                return wrapper.firstElementChild;
+            }
+            if (item.category === 'Services') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildServiceCard(item);
+                return wrapper.firstElementChild;
+            }
+            // all other categories fall through to original renderer
+            if (typeof _orig === 'function') return _orig(item);
+        };
+
+        /* ══════════════════════════════════════════════════════
+           FALLBACK: if script.js renders products by directly
+           building innerHTML (not calling renderProduct),
+           we also intercept fetchProducts / the grid population.
+
+           This version scans the grid after it is populated and
+           replaces any plain cards whose data-id matches a
+           Jobs/Services item.  Safe no-op if renderProduct patch
+           already handled everything.
+        ══════════════════════════════════════════════════════ */
+        let _itemCache = {};
+
+        // Intercept supabase responses to cache items by id
+        const _origFetch = window.fetchProducts;
+        window.fetchProducts = async function () {
+            const result = typeof _origFetch === 'function' ? await _origFetch.apply(this, arguments) : undefined;
+            // re-scan grid 300ms after fetch completes
+            setTimeout(reRenderSpecialCards, 300);
+            return result;
+        };
+
+        // Store items when openProductModal is called (it already has item data)
+        const _origOpen = window.openProductModal;
+        window.openProductModal = function (item) {
+            if (item && item.id) _itemCache[item.id] = item;
+            if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
+        };
+
+        function reRenderSpecialCards() {
+            // nothing to do if renderProduct patch handled it already
+        }
+
+    })();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════
+         CENTRALISED EVENT LISTENERS
+    ══════════════════════════════════════════════════════ -->
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-
-            // Header
-            document.getElementById('helpBtn')
-                .addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
-            document.getElementById('langToggleBtn')
-                .addEventListener('click', window.toggleLanguage);
-            document.getElementById('footerLangBtn')
-                .addEventListener('click', window.toggleLanguage);
-            document.getElementById('signInBtn')
-                .addEventListener('click', window.toggleModal);
-            document.getElementById('signOutBtn')
-                .addEventListener('click', window.handleSignOut);
-            document.getElementById('userNameLink')
-                .addEventListener('click', function () { location.href = 'profile.html'; });
-
-            // Sell button
-            document.getElementById('sellBtn')
-                .addEventListener('click', function (e) { window.checkAuthToSell(e); });
-
-            // Sort & location selects
-            document.getElementById('sortSelect')
-                .addEventListener('change', window.fetchProducts);
-            document.getElementById('locationSelect')
-                .addEventListener('change', window.fetchProducts);
-
-            // Category filter buttons
+            document.getElementById('helpBtn').addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
+            document.getElementById('langToggleBtn').addEventListener('click', window.toggleLanguage);
+            document.getElementById('footerLangBtn').addEventListener('click', window.toggleLanguage);
+            document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
+            document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
+            document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
+            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
+            document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
+            document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
             document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    window.filterCategory(this.dataset.category, this);
-                });
+                btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
             });
-            document.getElementById('featuredFilterBtn')
-                .addEventListener('click', window.filterSponsored);
-
-            // Share buttons
-            document.getElementById('shareTelegramBtn')
-                .addEventListener('click', window.shareToTelegram);
-            document.getElementById('shareWhatsAppBtn')
-                .addEventListener('click', window.shareToWhatsApp);
-            document.getElementById('shareFacebookBtn')
-                .addEventListener('click', window.shareToFacebook);
-
-            // Support modal
-            document.getElementById('closeSupportModal')
-                .addEventListener('click', window.toggleSupportModal);
-            document.getElementById('supportModal')
-                .addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
-            document.getElementById('supportForm')
-                .addEventListener('submit', window.handleSupportSubmit);
-
-            // Auth modal
-            document.getElementById('closeAuthModal')
-                .addEventListener('click', window.toggleModal);
-            document.getElementById('authModal')
-                .addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
-            document.getElementById('authForm')
-                .addEventListener('submit', window.handleAuth);
-            document.getElementById('toggleAuthModeLink')
-                .addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
-
-            // Product modal
-            document.getElementById('closeProductModal')
-                .addEventListener('click', window.closeProductModal);
-            document.getElementById('productModal')
-                .addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
-
-            // Product modal contact buttons — with audit logging
-            document.getElementById('callContact').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-            document.getElementById('telegramOrder').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-            document.getElementById('whatsappOrder').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-            document.getElementById('saveToWishlistBtn').addEventListener('click', function () {
-                window.addToCartFromModal();
-                window.logBuyerAction(null, 'Saved item to Wishlist: ' + document.getElementById('modalProductTitle').innerText);
-            });
-
-            // Sponsor link audit log
-            document.getElementById('sponsorLink').addEventListener('click', function () {
-                window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText);
-            });
-
-            // Success modal
-            document.getElementById('closeSuccessModal')
-                .addEventListener('click', function () {
-                    document.getElementById('successModal').style.display = 'none';
-                });
-
-            // Floating chat
+            document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
+            document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
+            document.getElementById('shareWhatsAppBtn').addEventListener('click', window.shareToWhatsApp);
+            document.getElementById('shareFacebookBtn').addEventListener('click', window.shareToFacebook);
+            document.getElementById('closeSupportModal').addEventListener('click', window.toggleSupportModal);
+            document.getElementById('supportModal').addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
+            document.getElementById('supportForm').addEventListener('submit', window.handleSupportSubmit);
+            document.getElementById('closeAuthModal').addEventListener('click', window.toggleModal);
+            document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
+            document.getElementById('authForm').addEventListener('submit', window.handleAuth);
+            document.getElementById('toggleAuthModeLink').addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
+            document.getElementById('closeProductModal').addEventListener('click', window.closeProductModal);
+            document.getElementById('productModal').addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
+            document.getElementById('callContact').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('telegramOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('whatsappOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('saveToWishlistBtn').addEventListener('click', function () { window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('sponsorLink').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText); });
+            document.getElementById('closeSuccessModal').addEventListener('click', function () { document.getElementById('successModal').style.display = 'none'; });
             document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
-            document.getElementById('closeToastBtn').addEventListener('click', function (e) {
-                e.stopPropagation();
-                closeToast();
-            });
-
-            // Close chat menu on outside click
+            document.getElementById('closeToastBtn').addEventListener('click', function (e) { e.stopPropagation(); closeToast(); });
             document.addEventListener('click', function (event) {
                 const menu = document.getElementById('chatMenu');
                 const btn  = document.getElementById('chatToggleBtn');
-                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) {
-                    menu.style.display = 'none';
-                }
+                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) menu.style.display = 'none';
             });
-
-            // Check if redirected here after posting an item
             checkPostStatus();
-
-            // FIX: UTM tracking — deduplicated per session so it only fires once
             const urlParams = new URLSearchParams(window.location.search);
             const utmSource = urlParams.get('utm_source');
             if (utmSource && !sessionStorage.getItem('utm_logged')) {
-                const campaign = urlParams.get('utm_campaign') || 'General';
-                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${campaign}`);
+                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${urlParams.get('utm_campaign') || 'General'}`);
                 sessionStorage.setItem('utm_logged', 'true');
             }
-
-            // FIX: Admin status polling deferred to DOMContentLoaded — no wasted reads on page load
             loadAdminStatus();
             setInterval(loadAdminStatus, 120000);
+        });
 
-        }); // end DOMContentLoaded
+        function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
+        function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
 
-        // =====================================================================
-        //  FLOATING CHAT
-        // =====================================================================
-        function closeToast() {
-            const toast = document.getElementById('chatToast');
-            if (toast) toast.style.display = 'none';
-        }
-
-        function toggleChatMenu() {
-            const menu = document.getElementById('chatMenu');
-            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        // =====================================================================
-        //  POST SUCCESS CHECK
-        // =====================================================================
         function checkPostStatus() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('posted')) {
-                const itemName = urlParams.get('item') || 'Listing';
-                document.getElementById('postedItemName').innerText = itemName;
+                document.getElementById('postedItemName').innerText = urlParams.get('item') || 'Listing';
                 document.getElementById('successModal').style.display = 'flex';
                 window.history.replaceState({}, document.title, 'index.html');
             }
         }
 
-        // =====================================================================
-        //  ADMIN ONLINE STATUS
-        // =====================================================================
         async function loadAdminStatus() {
             if (typeof _supabase === 'undefined') return;
-
-            const { data, error } = await _supabase
-                .from('profiles')
-                .select('last_seen')
-                .eq('is_owner', true)
-                .maybeSingle();
-
+            const { data, error } = await _supabase.from('profiles').select('last_seen').eq('is_owner', true).maybeSingle();
             if (error) { console.error('Error fetching admin status:', error); return; }
-
             if (data && data.last_seen) {
-                const diffInMinutes = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
-                const dot   = document.querySelector('.online-dot');
+                const diff = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
+                const dot = document.querySelector('.online-dot');
                 const label = document.querySelector('.chat-label');
                 if (!dot || !label) return;
-
-                if (diffInMinutes < 5) {
-                    dot.style.background = '#2ed573';
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`;
-                } else if (diffInMinutes < 60) {
-                    dot.style.background = '#f1c40f';
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diffInMinutes}m ago</small>`;
-                } else {
-                    dot.style.background = '#ccc';
-                    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`;
-                }
+                if (diff < 5)       { dot.style.background = '#2ed573'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`; }
+                else if (diff < 60) { dot.style.background = '#f1c40f'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diff}m ago</small>`; }
+                else                { dot.style.background = '#ccc';    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`; }
             }
         }
 
-        // =====================================================================
-        //  BUYER AUDIT LOG
-        //  FIX: Column renamed from misleading 'admin_email' to 'actor'.
-        //  ⚠️  Also rename the column in your Supabase table to 'actor'.
-        // =====================================================================
         window.logBuyerAction = async function (buyerEmail, actionDescription) {
             try {
                 if (typeof _supabase === 'undefined') return;
-
                 let userEmail = buyerEmail;
                 if (!userEmail) {
                     const { data: { user } } = await _supabase.auth.getUser();
-                    userEmail = user
-                        ? (user.email || user.user_metadata?.full_name || 'Logged-In User')
-                        : 'Guest/Unknown';
+                    userEmail = user ? (user.email || user.user_metadata?.full_name || 'Logged-In User') : 'Guest/Unknown';
                 }
-
-                await _supabase.from('audit_logs').insert([{
-                    actor: userEmail,           // FIX: was 'admin_email' — rename column in Supabase to 'actor'
-                    action: '[BUYER] Interaction',
-                    details: actionDescription
-                }]);
-            } catch (err) {
-                console.log('Audit log recording skipped:', err);
-            }
+                await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
+            } catch (err) { console.log('Audit log recording skipped:', err); }
         };
     </script>
 </body>
