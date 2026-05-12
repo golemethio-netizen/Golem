@@ -3,7 +3,7 @@ let currentProduct = null;
 window.currentCategory = 'All';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("🚀 Golem System Initializing...");
+    console.log("🚀 WanaGebya System Initializing...");
     await window.updateUIForUser();
     window.updateCartBadge();
     window.fetchProducts();
@@ -144,7 +144,9 @@ function renderProducts(products) {
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
-        const safeData = encodeURIComponent(JSON.stringify(p));
+        // FIX: Replaced single quotes with URL encoding to prevent HTML breaking
+        const safeData = encodeURIComponent(JSON.stringify(p)).replace(/'/g, "%27");
+        
         const isVerified = p.profiles?.is_verified === true;
         const isSold = p.status === 'sold';
         const isSaved = savedItems.includes(p.id);
@@ -256,7 +258,7 @@ function renderProducts(products) {
         // END SPECIAL CARD
         // ═══════════════════════════════════════════════════════
 
-        // Regular product card (unchanged)
+        // Regular product card
         let statusBadge = '';
         if (isSponsored) {
             statusBadge = `<div class="badge sponsor-badge"><i class="fas fa-ad"></i> Sponsored</div>`;
@@ -264,7 +266,7 @@ function renderProducts(products) {
             statusBadge = `<div class="badge feature-badge"><i class="fas fa-star"></i> Featured</div>`;
         }
 
-        const shareText = encodeURIComponent(`Check out this ${p.name} on Golem Marketplace!`);
+        const shareText = encodeURIComponent(`Check out this ${p.name} on WanaGebya Marketplace!`);
         const baseUrl = window.location.href.split('?')[0].split('#')[0].replace('index.html', '');
         const shareUrl = encodeURIComponent(`${baseUrl}product.html?id=${p.id}`);
 
@@ -321,7 +323,7 @@ function renderProducts(products) {
                     </a>
                     <button onclick="window.open('https://t.me/share/url?url=${shareUrl}&text=${shareText}','_blank')"
                         style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#6c5ce7; color:#fff; border:none; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
                         Share
                     </button>
                 </div>
@@ -520,7 +522,7 @@ window.updateUIForUser = async function() {
 };
 
 window.checkAuthToSell = async function(event) {
-    event.preventDefault();
+    if(event) event.preventDefault();
     const { data: { user } } = await _supabase.auth.getUser();
     if (user) { window.location.href = "sell.html"; }
     else { window.toggleModal(); }
@@ -712,8 +714,10 @@ window.toggleLanguage = function() {
 };
 
 async function postToSocialMedia(product) {
-    const botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
-    const chatId = '@your_public_channel_username';
+    // Falls back to a specific token if GolemConfig isn't defined, keeping your data secure
+    const botToken = typeof GolemConfig !== 'undefined' ? GolemConfig.botToken : 'YOUR_TELEGRAM_BOT_TOKEN';
+    const chatId = typeof GolemConfig !== 'undefined' ? (GolemConfig.channelId || GolemConfig.chatId) : '@your_public_channel_username';
+    
     const message = `
 🌟 *New Item Approved!*
 📦 *Product:* ${product.name}
@@ -726,5 +730,5 @@ async function postToSocialMedia(product) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
-    });
+    }).catch(err => console.log("Telegram notification silently failed", err));
 }
