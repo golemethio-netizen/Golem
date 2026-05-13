@@ -879,21 +879,49 @@ window.toggleLanguage = function() {
 };
 
 async function postToSocialMedia(product) {
-    // Falls back to a specific token if GolemConfig isn't defined, keeping your data secure
+    // 1. Config Handling
     const botToken = typeof GolemConfig !== 'undefined' ? GolemConfig.botToken : 'YOUR_TELEGRAM_BOT_TOKEN';
     const chatId = typeof GolemConfig !== 'undefined' ? (GolemConfig.channelId || GolemConfig.chatId) : '@your_public_channel_username';
-    
 
-const message = item.category === 'Jobs' 
-    ? `💼 *NEW JOB OPENING*\n\n📌 *Role:* ${item.name}\n📍 *Location:* ${item.location}\n💰 *Salary:* ${item.price} ETB\n\n🔗 Apply here: https://wanagebya.com/product?id=${item.id}`
-    : `🌟 *New Item Approved!*\n📦 *Product:* ${item.name}\n💰 *Price:* ${item.price} ETB\n📍 *Location:* ${item.location}\n\n🔗 View Details: https://wanagebya.com/product?id=${item.id}`;
-🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
-    `;
-    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
-    }).catch(err => console.log("Telegram notification silently failed", err));
+    // 2. Build the message based on category (using 'product' to match your argument)
+    // We use a relative URL or your custom domain for cleaner links
+    const baseUrl = "https://wanagebya.com"; // or "https://grand-sawine-a63bc3.netlify.app"
+    
+    let message = "";
+
+    if (product.category === 'Jobs') {
+        message = `💼 *NEW JOB OPENING*\n\n` +
+                  `📌 *Role:* ${product.name}\n` +
+                  `📍 *Location:* ${product.location || 'Addis Ababa'}\n` +
+                  `💰 *Salary:* ${product.price} ETB\n\n` +
+                  `🔗 *Apply here:* ${baseUrl}/product.html?id=${product.id}`;
+    } else {
+        message = `🌟 *New Item Approved!*\n\n` +
+                  `📦 *Product:* ${product.name}\n` +
+                  `💰 *Price:* ${product.price} ETB\n` +
+                  `📍 *Location:* ${product.location || 'Addis Ababa'}\n\n` +
+                  `🔗 *View Details:* ${baseUrl}/product.html?id=${product.id}`;
+    }
+
+    // 3. Send to Telegram
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                chat_id: chatId, 
+                text: message, 
+                parse_mode: 'Markdown' 
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Telegram API Error:", errorData);
+        }
+    } catch (err) {
+        console.log("Telegram notification silently failed", err);
+    }
 }
 
 window.showProductModal = (item) => {
