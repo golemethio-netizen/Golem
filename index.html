@@ -8,35 +8,385 @@
     <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
-    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia.">
-    
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
+    <meta name="geo.region" content="ET" />
+    <meta name="geo.placename" content="Addis Ababa" />
+    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
     <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
-    
+    <!-- Kept the working favicon, removed the broken local one -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ── HEADER ── */
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .help-link { color: #555; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.3s; }
+        .help-link:hover { color: #007bff; }
+        .modal-flex-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-flex-actions .contact-btn { flex: 1; }
+        .success-modal-inner { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; position: relative; }
+        .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
+        .success-back-btn { margin-top: 25px; width: 100%; padding: 15px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* ════════════════════════════════════════════════════
+           ██  JOBS CARD
+        ════════════════════════════════════════════════════ */
+        .job-card {
+            background: linear-gradient(145deg, #0d1b2a 0%, #1b2838 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #1e3a5f;
+            color: white;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .job-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(99,179,237,0.2); }
+
+        /* header strip */
+        .job-card-header {
+            background: linear-gradient(90deg, #1a3a5c, #0d2137);
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid rgba(99,179,237,0.12);
+            position: relative;
+        }
+
+        .job-type-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 3px 10px;
+            border-radius: 20px; margin-bottom: 8px;
+            background: rgba(99,179,237,0.15); color: #63b3ed;
+            border: 1px solid rgba(99,179,237,0.3);
+        }
+
+        .job-title {
+            font-size: 15px; font-weight: 700; color: #e8f4fd;
+            margin: 0 28px 5px 0; line-height: 1.3;
+        }
+
+        .job-company {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #7a9cbf; font-weight: 500;
+        }
+        .job-company i { font-size: 10px; }
+
+        /* tag row */
+        .job-tags {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .job-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .job-tag.blue   { background: rgba(99,179,237,0.12); color: #63b3ed; }
+        .job-tag.green  { background: rgba(72,187,120,0.12); color: #68d391; }
+        .job-tag.purple { background: rgba(159,122,234,0.12); color: #b794f4; }
+        .job-tag.orange { background: rgba(246,173,85,0.12); color: #f6ad55; }
+        .job-tag.red    { background: rgba(252,129,74,0.12); color: #fc8974; }
+
+        /* salary + location */
+        .job-meta-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .job-salary {
+            font-size: 16px; font-weight: 800;
+            background: linear-gradient(90deg, #63b3ed, #b794f4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .job-location {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 11.5px; color: #5a7a99;
+        }
+        .job-location i { font-size: 10px; color: #4a8ab5; }
+
+        /* description snippet */
+        .job-snippet {
+            font-size: 12px; color: #6a8aaa; line-height: 1.55;
+            padding: 0 16px 12px; margin: 0;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* action row */
+        .job-actions {
+            display: flex; gap: 8px;
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .job-btn {
+            flex: 1; display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 9px 8px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: filter 0.15s, transform 0.12s;
+        }
+        .job-btn:hover { filter: brightness(1.12); transform: scale(1.02); }
+        .job-btn:active { transform: scale(0.97); }
+
+        .job-btn-primary { background: #63b3ed; color: #0d1117; }
+        .job-btn-tg      { background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.3); }
+        .job-btn-wa      { background: rgba(37,211,102,0.12); color: #25d366; border: 1px solid rgba(37,211,102,0.25); }
+
+        .job-wishlist-btn {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(255,255,255,0.07); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #4a6a8a; font-size: 12px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .job-wishlist-btn:hover, .job-wishlist-btn.active { color: #ff6b81; background: rgba(255,107,129,0.12); }
+
+        /* deadline badge */
+        .deadline-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700;
+            color: #fc8974; padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(252,129,74,0.1);
+            border: 1px solid rgba(252,129,74,0.2);
+        }
+
+        /* ════════════════════════════════════════════════════
+           ██  SERVICES CARD
+        ════════════════════════════════════════════════════ */
+        .service-card {
+            background: linear-gradient(145deg, #1a1025 0%, #230f33 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #3b1f5c;
+            color: white;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(183,148,244,0.2); }
+
+        .service-card-header {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* photo or gradient banner */
+        .service-banner {
+            height: 110px;
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a0d2e 100%);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+
+        .service-banner img {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .service-banner-fallback {
+            font-size: 42px; opacity: 0.4;
+        }
+
+        .service-type-badge {
+            position: absolute; top: 10px; left: 12px;
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(183,148,244,0.2); color: #d6b4fe;
+            border: 1px solid rgba(183,148,244,0.35);
+            backdrop-filter: blur(4px);
+        }
+
+        .service-rating {
+            position: absolute; top: 10px; right: 12px;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; color: #fbbf24;
+            background: rgba(0,0,0,0.4); padding: 3px 8px;
+            border-radius: 6px; backdrop-filter: blur(4px);
+        }
+
+        .service-wishlist-btn {
+            position: absolute; bottom: 10px; right: 12px;
+            background: rgba(0,0,0,0.35); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #8a6aaa; font-size: 12px;
+            transition: color 0.15s; backdrop-filter: blur(4px);
+        }
+        .service-wishlist-btn:hover, .service-wishlist-btn.active { color: #ff6b81; }
+
+        .service-body { padding: 14px 16px 0; }
+
+        .service-name {
+            font-size: 15px; font-weight: 700; color: #f0e6ff;
+            margin: 0 0 5px; line-height: 1.3;
+        }
+
+        .service-provider {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #8a6aaa; margin-bottom: 10px;
+        }
+        .service-provider i { font-size: 10px; }
+
+        .service-highlights {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .svc-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .svc-tag.purple { background: rgba(183,148,244,0.12); color: #b794f4; }
+        .svc-tag.pink   { background: rgba(246,135,177,0.12); color: #f687b3; }
+        .svc-tag.teal   { background: rgba(94,234,212,0.12);  color: #5eead4; }
+        .svc-tag.amber  { background: rgba(251,191,36,0.12);  color: #fbbf24; }
+        .svc-tag.green  { background: rgba(72,187,120,0.12);  color: #68d391; }
+
+        .service-snippet {
+            font-size: 12px; color: #7a5a99; line-height: 1.55;
+            margin: 0 0 10px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .service-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(183,148,244,0.08);
+            margin-top: 4px;
+        }
+
+        .service-price {
+            font-size: 16px; font-weight: 800;
+            background: linear-gradient(90deg, #b794f4, #f687b3);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .service-price-label {
+            font-size: 10px; color: #6a4a8a; margin-top: 1px;
+        }
+
+        .service-actions { display: flex; gap: 7px; }
+
+        .svc-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; padding: 8px 14px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: filter 0.15s, transform 0.12s;
+            white-space: nowrap;
+        }
+        .svc-btn:hover { filter: brightness(1.15); transform: scale(1.02); }
+        .svc-btn:active { transform: scale(0.97); }
+
+        .svc-btn-primary { background: #b794f4; color: #1a0d2e; }
+        .svc-btn-outline { background: rgba(183,148,244,0.1); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
+
+        /* ── AVAILABILITY DOT ── */
+        .avail-dot {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 11px; color: #68d391; font-weight: 600;
+        }
+        .avail-dot::before {
+            content: '';
+            display: inline-block; width: 7px; height: 7px;
+            background: #68d391; border-radius: 50%;
+            box-shadow: 0 0 6px rgba(104,211,145,0.6);
+        }
+
+        /* ── SECTION DIVIDERS in grid ── */
+        .category-section-header {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 0 4px;
+        }
+        .category-section-header h3 {
+            font-size: 13px; font-weight: 700; color: #333;
+            white-space: nowrap;
+        }
+        .category-section-header .line {
+            flex: 1; height: 1px; background: #eee;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            .golem-header { padding: 15px 10px; }
+            .header-top-row { flex-wrap: nowrap; }
+            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+            .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
+            .hide-text-mobile { display: none !important; }
+            .header-actions { gap: 10px; }
+            .help-link i { font-size: 1.3rem !important; }
+            .sign-in-btn { padding: 8px !important; border-radius: 50% !important; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
+            body { padding-bottom: 70px; }
+            .nav-container-horizontal { position: fixed; bottom: 0; left: 0; width: 100%; background: white; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); display: flex; justify-content: space-around; padding: 10px 5px; z-index: 1000; margin: 0; border-top: 1px solid #eee; }
+            .nav-item-box { flex-direction: column; gap: 4px; background: transparent !important; color: #555 !important; box-shadow: none; padding: 5px; min-width: 60px; }
+            .nav-item-box i { font-size: 1.3rem; color: #3498db; }
+            .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
+            #adminNavLink i { color: #e74c3c; }
+            .filter-bar { display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 5px; gap: 8px; justify-content: center; width: 100%; }
+            .filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
+            .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+            .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
+            .modal-footer-actions { flex-direction: column; }
+            .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
+            .floating-chat { bottom: 85px; right: 15px; }
+            #chatMenu { bottom: 70px; right: 0; }
+            .sponsor-content { flex-direction: column; text-align: center; }
+            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
+            .sponsor-actions { flex-direction: column; gap: 10px; }
+            .sponsor-actions a { margin-left: 0 !important; }
+
+            /* Jobs/Services cards take full width on mobile */
+            .job-card, .service-card { grid-column: 1 / -1; }
+        }
+    </style>
 </head>
 
 <body>
-
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
         <div class="header-top-row">
             <div class="logo">WanaGebya | ዋና ገበያ</div>
-            
             <div class="header-actions">
                 <a href="#" id="helpBtn" class="help-link">
-                    <i class="fas fa-question-circle"></i> <span>Help</span>
+                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
+                    <span class="hide-text-mobile">Help</span>
                 </a>
-                <button id="langToggleBtn" class="lang-btn">
-                    <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
-                </button>
+                <div class="lang-toggle-wrapper">
+                    <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
+                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                    </button>
+                </div>
                 <div class="nav-auth-controls">
-                    <button id="signInBtn" class="btn-primary">Sign In</button>
-                    <div id="userWelcome" style="display:none;">
-                        <span id="userNameLink"><strong id="userName"></strong></span>
-                        <button id="signOutBtn" class="signout-btn">Sign Out</button>
+                    <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
+                    </button>
+                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
+                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;"><strong id="userName"></strong></span>
+                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
                     </div>
                 </div>
             </div>
@@ -47,13 +397,13 @@
             <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
         </div>
 
-        <nav class="nav-container-horizontal">
+        <div class="nav-container-horizontal">
             <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
-            <a href="sell.html" id="sellBtn" class="nav-item-box"><i class="fas fa-plus-circle"></i><p>Sell</p></a>
+            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color: #2ed573;"></i><p>Sell Item</p></a>
             <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
-            <a href="saved.html" class="nav-item-box bg-items"><i class="fas fa-heart"></i><p>Saved</p><span id="cartBadge" style="display:none;">0</span></a>
+            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;"><i class="fas fa-heart"></i><p>Saved</p><span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span></a>
             <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
-        </nav>
+        </div>
     </header>
 
     <!-- ======================= SPONSORED ======================= -->
@@ -270,6 +620,372 @@
     <script src="config.js"></script>
     <script src="script.js"></script>
 
- 
+   <!-- ══════════════════════════════════════════════════════════
+         JOBS & SERVICES CARD RENDERER
+    ══════════════════════════════════════════════════════════════ -->
+    <script>
+    (function () {
+        'use strict';
+
+        /* ── helpers ── */
+        function esc(str) {
+            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function phone(p) { return String(p || '').replace(/\s/g,''); }
+
+        function parseSpecs(desc) {
+            const specs = {};
+            if (!desc) return specs;
+            const block = desc.split('--- Specs ---')[1] || '';
+            block.split('\n').forEach(line => {
+                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+            });
+            return specs;
+        }
+
+        function cleanDesc(desc) {
+            if (!desc) return '';
+            return desc.split('--- Specs ---')[0].trim();
+        }
+
+        const svcEmoji = {
+            'plumbing':'🔧','electrical work':'⚡','painting':'🎨',
+            'tiling & flooring':'🪵','carpentry & woodwork':'🪚',
+            'cleaning service':'🧹','moving & packing':'📦',
+            'air conditioning':'❄️','welding & metal work':'⚙️',
+            'web design':'💻','graphic design':'🖼','computer repair':'🖥',
+            'phone repair':'📱','network setup':'🌐','cctv installation':'📷',
+            'software development':'👨‍💻','private tutoring':'📚',
+            'language classes':'🗣','music lessons':'🎵',
+            'driving instruction':'🚗','skills training':'🏆',
+            'accounting / bookkeeping':'📊','legal consultation':'⚖️',
+            'translation':'🌍','photography / videography':'📸',
+            'event planning':'🎉','security service':'🛡',
+            'hair salon / barbershop':'💈','makeup & styling':'💄',
+            'massage / spa':'💆','laundry service':'👕',
+            'childcare / babysitting':'👶','elder care':'🧓',
+        };
+
+        function svcIcon(cat) {
+            if (!cat) return '🛠';
+            return svcEmoji[cat.toLowerCase()] || '🛠';
+        }
+
+        /* ══════════════════════════════
+           JOB CARD HTML
+        ══════════════════════════════ */
+        function buildJobCard(item) {
+            // FIX: Securely encode the JSON object so quotes don't break the HTML
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
+
+            const jobType  = sp['job type']  || 'Full-Time';
+            const industry = sp['industry']  || '';
+            const exp      = sp['experience required'] || '';
+            const edu      = sp['education level'] || '';
+            const location = sp['work location'] || item.location || '';
+            const company  = sp['company'] || '';
+            const positions= sp['positions available'] || '';
+            const deadline = sp['deadline'] || '';
+            const salMin   = sp['salary min'] || '';
+            const salMax   = sp['salary max'] || '';
+            const skills   = sp['key skills'] || '';
+
+            let salaryStr = 'Negotiable';
+            if (salMin && salMax) salaryStr = `${Number(salMin).toLocaleString()} – ${Number(salMax).toLocaleString()} ETB`;
+            else if (salMin) salaryStr = `From ${Number(salMin).toLocaleString()} ETB`;
+            else if (item.price && item.price > 0) salaryStr = `${Number(item.price).toLocaleString()} ETB`;
+
+            const typeColor = { 'Full-Time':'blue','Part-Time':'orange','Contract':'purple','Internship':'green','Freelance':'red' };
+            const badgeColor = typeColor[jobType] || 'blue';
+
+            const skillTags = skills ? skills.split(',').slice(0,4).map(s =>
+                `<span class="job-tag purple"><i class="fas fa-check" style="font-size:8px;"></i>${esc(s.trim())}</span>`
+            ).join('') : '';
+
+            const deadlineBadge = deadline
+                ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
+
+            // Check if saved
+            let saved =[];
+            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+            const isSaved = saved.includes(item.id);
+
+            return `
+            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
+
+                <div class="job-card-header">
+                    <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
+                    <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                    <div class="job-title">${esc(item.name)}</div>
+                    ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
+                </div>
+
+                <div class="job-tags">
+                    ${industry ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i>${esc(industry)}</span>` : ''}
+                    ${exp ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i>${esc(exp)}</span>` : ''}
+                    ${edu ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i>${esc(edu)}</span>` : ''}
+                    ${positions ? `<span class="job-tag orange"><i class="fas fa-users" style="font-size:8px;"></i>${esc(positions)} position${positions>1?'s':''}</span>` : ''}
+                    ${skillTags}
+                </div>
+
+                <div class="job-meta-row">
+                    <div>
+                        <div class="job-salary">${salaryStr}</div>
+                        ${deadlineBadge}
+                    </div>
+                    <div class="job-location"><i class="fas fa-map-marker-alt"></i>${esc(location || item.location || 'Ethiopia')}</div>
+                </div>
+
+                ${desc ? `<p class="job-snippet">${esc(desc)}</p>` : ''}
+
+                <div class="job-actions">
+                    <a href="tel:${ph}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
+                        <i class="fas fa-phone"></i> Call / Apply
+                    </a>
+                    <a href="https://t.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                    <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        /* ══════════════════════════════
+           SERVICE CARD HTML
+        ══════════════════════════════ */
+        function buildServiceCard(item) {
+            // FIX: Securely encode the JSON object
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
+
+            const svcCat     = sp['service category'] || '';
+            const provider   = sp['provider name'] || '';
+            const experience = sp['experience'] || '';
+            const response   = sp['response time'] || '';
+            const pricing    = sp['pricing model'] || '';
+            const area       = sp['service area'] || '';
+            const avail      = sp['availability'] || '';
+            const highlights = sp['service highlights'] || '';
+            const payment    = sp['payment methods'] || '';
+
+            const priceStr = item.price && item.price > 0
+                ? `${Number(item.price).toLocaleString()} ETB`
+                : 'On Request';
+
+            const pricingLabel = pricing || 'Per Project';
+
+            const hlTags = highlights ? highlights.split(',').slice(0,4).map(h =>
+                `<span class="svc-tag purple"><i class="fas fa-check-circle" style="font-size:9px;"></i>${esc(h.trim())}</span>`
+            ).join('') : '';
+
+            const payTags = payment ? payment.split(',').slice(0,3).map(p =>
+                `<span class="svc-tag teal">${esc(p.trim())}</span>`
+            ).join('') : '';
+
+            const icon = svcIcon(svcCat);
+
+            // Check if saved
+            let saved =[];
+            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+            const isSaved = saved.includes(item.id);
+
+            return `
+            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
+
+                <div class="service-card-header">
+                    <div class="service-banner">
+                        ${item.image
+                            ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">`
+                            : `<span class="service-banner-fallback">${icon}</span>`}
+                        <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
+                        ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
+                        <button class="service-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                            <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-name">${esc(item.name)}</div>
+                    ${provider ? `<div class="service-provider"><i class="fas fa-user-circle"></i>${esc(provider)}</div>` : ''}
+
+                    <div class="service-highlights">
+                        ${response   ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${esc(response)}</span>` : ''}
+                        ${area       ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${esc(area)}</span>` : ''}
+                        ${avail      ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${esc(avail)}</span>` : ''}
+                        ${hlTags}
+                        ${payTags}
+                    </div>
+
+                    ${desc ? `<p class="service-snippet">${esc(desc)}</p>` : ''}
+                </div>
+
+                <div class="service-footer">
+                    <div>
+                        <div class="service-price">${priceStr}</div>
+                        <div class="service-price-label">${esc(pricingLabel)}</div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="tel:${ph}" class="svc-btn svc-btn-primary" onclick="event.stopPropagation()">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="svc-btn svc-btn-outline" onclick="event.stopPropagation()">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        /* ══════════════════════════════
+           PATCH: intercept renderProduct
+           called from script.js
+        ══════════════════════════════ */
+        const _orig = window.renderProduct;
+
+        window.renderProduct = function (item) {
+            if (item.category === 'Jobs') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildJobCard(item);
+                return wrapper.firstElementChild;
+            }
+            if (item.category === 'Services') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildServiceCard(item);
+                return wrapper.firstElementChild;
+            }
+            // all other categories fall through to original renderer
+            if (typeof _orig === 'function') return _orig(item);
+        };
+
+        /* ══════════════════════════════════════════════════════
+           FALLBACK
+        ══════════════════════════════════════════════════════ */
+        let _itemCache = {};
+
+        const _origFetch = window.fetchProducts;
+        window.fetchProducts = async function () {
+            const result = typeof _origFetch === 'function' ? await _origFetch.apply(this, arguments) : undefined;
+            setTimeout(reRenderSpecialCards, 300);
+            return result;
+        };
+
+        const _origOpen = window.openProductModal;
+        window.openProductModal = function (item) {
+            if (item && item.id) _itemCache[item.id] = item;
+            if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
+        };
+
+        function reRenderSpecialCards() { }
+
+    })();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════
+         CENTRALISED EVENT LISTENERS
+    ══════════════════════════════════════════════════════ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('helpBtn').addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
+            document.getElementById('langToggleBtn').addEventListener('click', window.toggleLanguage);
+            document.getElementById('footerLangBtn').addEventListener('click', window.toggleLanguage);
+            document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
+            document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
+            document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
+            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
+            document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
+            document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
+            document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
+                btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
+            });
+            document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
+            document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
+            document.getElementById('shareWhatsAppBtn').addEventListener('click', window.shareToWhatsApp);
+            document.getElementById('shareFacebookBtn').addEventListener('click', window.shareToFacebook);
+            document.getElementById('closeSupportModal').addEventListener('click', window.toggleSupportModal);
+            document.getElementById('supportModal').addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
+            document.getElementById('supportForm').addEventListener('submit', window.handleSupportSubmit);
+            document.getElementById('closeAuthModal').addEventListener('click', window.toggleModal);
+            document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
+            document.getElementById('authForm').addEventListener('submit', window.handleAuth);
+            document.getElementById('toggleAuthModeLink').addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
+            document.getElementById('closeProductModal').addEventListener('click', window.closeProductModal);
+            document.getElementById('productModal').addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
+            document.getElementById('callContact').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('telegramOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('whatsappOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('saveToWishlistBtn').addEventListener('click', function () { window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('sponsorLink').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText); });
+            document.getElementById('closeSuccessModal').addEventListener('click', function () { document.getElementById('successModal').style.display = 'none'; });
+            document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
+            document.getElementById('closeToastBtn').addEventListener('click', function (e) { e.stopPropagation(); closeToast(); });
+            document.addEventListener('click', function (event) {
+                const menu = document.getElementById('chatMenu');
+                const btn  = document.getElementById('chatToggleBtn');
+                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) menu.style.display = 'none';
+            });
+            checkPostStatus();
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmSource = urlParams.get('utm_source');
+            if (utmSource && !sessionStorage.getItem('utm_logged')) {
+                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${urlParams.get('utm_campaign') || 'General'}`);
+                sessionStorage.setItem('utm_logged', 'true');
+            }
+            loadAdminStatus();
+            setInterval(loadAdminStatus, 120000);
+        });
+
+        function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
+        function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
+
+        function checkPostStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('posted')) {
+                document.getElementById('postedItemName').innerText = urlParams.get('item') || 'Listing';
+                document.getElementById('successModal').style.display = 'flex';
+                window.history.replaceState({}, document.title, 'index.html');
+            }
+        }
+
+        async function loadAdminStatus() {
+            if (typeof _supabase === 'undefined') return;
+            const { data, error } = await _supabase.from('profiles').select('last_seen').eq('is_owner', true).maybeSingle();
+            if (error) { console.error('Error fetching admin status:', error); return; }
+            if (data && data.last_seen) {
+                const diff = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
+                const dot = document.querySelector('.online-dot');
+                const label = document.querySelector('.chat-label');
+                if (!dot || !label) return;
+                if (diff < 5)       { dot.style.background = '#2ed573'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`; }
+                else if (diff < 60) { dot.style.background = '#f1c40f'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diff}m ago</small>`; }
+                else                { dot.style.background = '#ccc';    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`; }
+            }
+        }
+
+        window.logBuyerAction = async function (buyerEmail, actionDescription) {
+            try {
+                if (typeof _supabase === 'undefined') return;
+                let userEmail = buyerEmail;
+                if (!userEmail) {
+                    const { data: { user } } = await _supabase.auth.getUser();
+                    userEmail = user ? (user.email || user.user_metadata?.full_name || 'Logged-In User') : 'Guest/Unknown';
+                }
+                await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
+            } catch (err) { console.log('Audit log recording skipped:', err); }
+        };
+    </script>
 </body>
 </html>
