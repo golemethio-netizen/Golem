@@ -896,3 +896,31 @@ async function postToSocialMedia(product) {
         body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
     }).catch(err => console.log("Telegram notification silently failed", err));
 }
+
+window.showProductModal = (item) => {
+    const modal = document.getElementById('productModal');
+    
+    // Set Title & Image
+    document.getElementById('modalProductTitle').innerText = item.name;
+    document.getElementById('modalProductImg').src = item.image || 'https://cdn-icons-png.flaticon.com/512/9422/9422566.png';
+    
+    // Format Description (Cleaning out the --- Specs --- block for the modal)
+    const displayDesc = item.description.split('--- Specs ---')[0];
+    document.getElementById('modalProductDesc').innerText = displayDesc;
+
+    // Contact Links
+    const cleanPhone = item.seller_phone.replace(/\s/g, '');
+    document.getElementById('callContact').href = `tel:${cleanPhone}`;
+    document.getElementById('telegramOrder').href = `https://t.me/${cleanPhone.replace('+', '')}`;
+    document.getElementById('whatsappOrder').href = `https://wa.me/${cleanPhone.replace('+', '')}`;
+
+    // Price/Salary Label
+    const priceEl = document.getElementById('modalProductPrice');
+    if (item.category === 'Jobs') {
+        priceEl.innerText = item.price > 0 ? `${item.price.toLocaleString()} ETB / Month` : "Salary Negotiable";
+    } else {
+        priceEl.innerText = item.price > 0 ? `${item.price.toLocaleString()} ETB` : "Price on Request";
+    }
+
+    modal.style.display = 'flex';
+};
