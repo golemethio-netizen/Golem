@@ -3,100 +3,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace</title>
-    
+    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
+    <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
+    <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
+    <meta name="geo.region" content="ET" />
+    <meta name="geo.placename" content="Addis Ababa" />
+    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
+    <!-- Kept the working favicon, removed the broken local one -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ── HEADER ── */
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .help-link { color: #555; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.3s; }
+        .help-link:hover { color: #007bff; }
+        .modal-flex-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-flex-actions .contact-btn { flex: 1; }
+        .success-modal-inner { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; position: relative; }
+        .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
+        .success-back-btn { margin-top: 25px; width: 100%; padding: 15px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* ════════════════════════════════════════════════════
+           ██  JOBS CARD
+        ════════════════════════════════════════════════════ */
+        .job-card {
+            background: linear-gradient(145deg, #0d1b2a 0%, #1b2838 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #1e3a5f;
+            color: white;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .job-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(99,179,237,0.2); }
+
+        /* header strip */
+        .job-card-header {
+            background: linear-gradient(90deg, #1a3a5c, #0d2137);
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid rgba(99,179,237,0.12);
+            position: relative;
+        }
+
+        .job-type-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 3px 10px;
+            border-radius: 20px; margin-bottom: 8px;
+            background: rgba(99,179,237,0.15); color: #63b3ed;
+            border: 1px solid rgba(99,179,237,0.3);
+        }
+
+        .job-title {
+            font-size: 15px; font-weight: 700; color: #e8f4fd;
+            margin: 0 28px 5px 0; line-height: 1.3;
+        }
+
+        .job-company {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #7a9cbf; font-weight: 500;
+        }
+        .job-company i { font-size: 10px; }
+
+        /* tag row */
+        .job-tags {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .job-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .job-tag.blue   { background: rgba(99,179,237,0.12); color: #63b3ed; }
+        .job-tag.green  { background: rgba(72,187,120,0.12); color: #68d391; }
+        .job-tag.purple { background: rgba(159,122,234,0.12); color: #b794f4; }
+        .job-tag.orange { background: rgba(246,173,85,0.12); color: #f6ad55; }
+        .job-tag.red    { background: rgba(252,129,74,0.12); color: #fc8974; }
+
+        /* salary + location */
+        .job-meta-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .job-salary {
+            font-size: 16px; font-weight: 800;
+            background: linear-gradient(90deg, #63b3ed, #b794f4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .job-location {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 11.5px; color: #5a7a99;
+        }
+        .job-location i { font-size: 10px; color: #4a8ab5; }
+
+        /* description snippet */
+        .job-snippet {
+            font-size: 12px; color: #6a8aaa; line-height: 1.55;
+            padding: 0 16px 12px; margin: 0;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* action row */
+        .job-actions {
+            display: flex; gap: 8px;
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .job-btn {
+            flex: 1; display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 9px 8px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: filter 0.15s, transform 0.12s;
+        }
+        .job-btn:hover { filter: brightness(1.12); transform: scale(1.02); }
+        .job-btn:active { transform: scale(0.97); }
+
+        .job-btn-primary { background: #63b3ed; color: #0d1117; }
+        .job-btn-tg      { background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.3); }
+        .job-btn-wa      { background: rgba(37,211,102,0.12); color: #25d366; border: 1px solid rgba(37,211,102,0.25); }
+
+        .job-wishlist-btn {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(255,255,255,0.07); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #4a6a8a; font-size: 12px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .job-wishlist-btn:hover, .job-wishlist-btn.active { color: #ff6b81; background: rgba(255,107,129,0.12); }
+
+        /* deadline badge */
+        .deadline-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700;
+            color: #fc8974; padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(252,129,74,0.1);
+            border: 1px solid rgba(252,129,74,0.2);
+        }
+
+        /* ════════════════════════════════════════════════════
+           ██  SERVICES CARD
+        ════════════════════════════════════════════════════ */
+        .service-card {
+            background: linear-gradient(145deg, #1a1025 0%, #230f33 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #3b1f5c;
+            color: white;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(183,148,244,0.2); }
+
+        .service-card-header {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* photo or gradient banner */
+        .service-banner {
+            height: 110px;
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a0d2e 100%);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+
+        .service-banner img {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .service-banner-fallback {
+            font-size: 42px; opacity: 0.4;
+        }
+
+        .service-type-badge {
+            position: absolute; top: 10px; left: 12px;
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(183,148,244,0.2); color: #d6b4fe;
+            border: 1px solid rgba(183,148,244,0.35);
+            backdrop-filter: blur(4px);
+        }
+
+        .service-rating {
+            position: absolute; top: 10px; right: 12px;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; color: #fbbf24;
+            background: rgba(0,0,0,0.4); padding: 3px 8px;
+            border-radius: 6px; backdrop-filter: blur(4px);
+        }
+
+        .service-wishlist-btn {
+            position: absolute; bottom: 10px; right: 12px;
+            background: rgba(0,0,0,0.35); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #8a6aaa; font-size: 12px;
+            transition: color 0.15s; backdrop-filter: blur(4px);
+        }
+        .service-wishlist-btn:hover, .service-wishlist-btn.active { color: #ff6b81; }
+
+        .service-body { padding: 14px 16px 0; }
+
+        .service-name {
+            font-size: 15px; font-weight: 700; color: #f0e6ff;
+            margin: 0 0 5px; line-height: 1.3;
+        }
+
+        .service-provider {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #8a6aaa; margin-bottom: 10px;
+        }
+        .service-provider i { font-size: 10px; }
+
+        .service-highlights {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .svc-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .svc-tag.purple { background: rgba(183,148,244,0.12); color: #b794f4; }
+        .svc-tag.pink   { background: rgba(246,135,177,0.12); color: #f687b3; }
+        .svc-tag.teal   { background: rgba(94,234,212,0.12);  color: #5eead4; }
+        .svc-tag.amber  { background: rgba(251,191,36,0.12);  color: #fbbf24; }
+        .svc-tag.green  { background: rgba(72,187,120,0.12);  color: #68d391; }
+
+        .service-snippet {
+            font-size: 12px; color: #7a5a99; line-height: 1.55;
+            margin: 0 0 10px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .service-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(183,148,244,0.08);
+            margin-top: 4px;
+        }
+
+        .service-price {
+            font-size: 16px; font-weight: 800;
+            background: linear-gradient(90deg, #b794f4, #f687b3);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .service-price-label {
+            font-size: 10px; color: #6a4a8a; margin-top: 1px;
+        }
+
+        .service-actions { display: flex; gap: 7px; }
+
+        .svc-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; padding: 8px 14px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: filter 0.15s, transform 0.12s;
+            white-space: nowrap;
+        }
+        .svc-btn:hover { filter: brightness(1.15); transform: scale(1.02); }
+        .svc-btn:active { transform: scale(0.97); }
+
+        .svc-btn-primary { background: #b794f4; color: #1a0d2e; }
+        .svc-btn-outline { background: rgba(183,148,244,0.1); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
+
+        /* ── AVAILABILITY DOT ── */
+        .avail-dot {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 11px; color: #68d391; font-weight: 600;
+        }
+        .avail-dot::before {
+            content: '';
+            display: inline-block; width: 7px; height: 7px;
+            background: #68d391; border-radius: 50%;
+            box-shadow: 0 0 6px rgba(104,211,145,0.6);
+        }
+
+        /* ── SECTION DIVIDERS in grid ── */
+        .category-section-header {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 0 4px;
+        }
+        .category-section-header h3 {
+            font-size: 13px; font-weight: 700; color: #333;
+            white-space: nowrap;
+        }
+        .category-section-header .line {
+            flex: 1; height: 1px; background: #eee;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            .golem-header { padding: 15px 10px; }
+            .header-top-row { flex-wrap: nowrap; }
+            .logo { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+            .search-wrapper { width: 100%; margin-top: 10px; order: 3; }
+            .hide-text-mobile { display: none !important; }
+            .header-actions { gap: 10px; }
+            .help-link i { font-size: 1.3rem !important; }
+            .sign-in-btn { padding: 8px !important; border-radius: 50% !important; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
+            body { padding-bottom: 70px; }
+            .nav-container-horizontal { position: fixed; bottom: 0; left: 0; width: 100%; background: white; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); display: flex; justify-content: space-around; padding: 10px 5px; z-index: 1000; margin: 0; border-top: 1px solid #eee; }
+            .nav-item-box { flex-direction: column; gap: 4px; background: transparent !important; color: #555 !important; box-shadow: none; padding: 5px; min-width: 60px; }
+            .nav-item-box i { font-size: 1.3rem; color: #3498db; }
+            .nav-item-box p { display: block; margin: 0; font-size: 0.65rem; font-weight: 600; }
+            #adminNavLink i { color: #e74c3c; }
+            .filter-bar { display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 5px; gap: 8px; justify-content: center; width: 100%; }
+            .filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { flex: 0 0 auto; font-size: 0.85rem; padding: 8px 15px; }
+            .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+            .modal-content { width: 95%; margin: 5% auto; max-height: 90vh; overflow-y: auto; }
+            .modal-footer-actions { flex-direction: column; }
+            .modal-footer-actions .contact-btn { grid-column: span 1 !important; width: 100%; margin-bottom: 5px; }
+            .floating-chat { bottom: 85px; right: 15px; }
+            #chatMenu { bottom: 70px; right: 0; }
+            .sponsor-content { flex-direction: column; text-align: center; }
+            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
+            .sponsor-actions { flex-direction: column; gap: 10px; }
+            .sponsor-actions a { margin-left: 0 !important; }
+
+            /* Jobs/Services cards take full width on mobile */
+            .job-card, .service-card { grid-column: 1 / -1; }
+        }
+    </style>
 </head>
 
 <body>
-    <!-- HEADER -->
+    <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
-        <div class="logo">WanaGebya | ዋና ገበያ</div>
-        
+        <div class="header-top-row">
+            <div class="logo">WanaGebya | ዋና ገበያ</div>
+            <div class="header-actions">
+                <a href="#" id="helpBtn" class="help-link">
+                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
+                    <span class="hide-text-mobile">Help</span>
+                </a>
+                <div class="lang-toggle-wrapper">
+                    <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
+                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                    </button>
+                </div>
+                <div class="nav-auth-controls">
+                    <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
+                    </button>
+                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
+                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;"><strong id="userName"></strong></span>
+                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
         </div>
 
-        <div class="header-actions">
-            <a href="#" id="helpBtn" class="help-link"><i class="fas fa-question-circle"></i> <span class="hide-text-mobile">Help</span></a>
-            <button id="langToggleBtn" class="lang-btn"><i class="fas fa-globe"></i> <span id="langText">አማርኛ</span></button>
-            <button id="signInBtn" class="btn-primary"><i class="fas fa-user"></i> Sign In</button>
-            <div id="userWelcome" style="display:none;">
-                <span id="userNameLink"><strong id="userName"></strong></span>
-                <button id="signOutBtn" class="signout-btn"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
+        <div class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
+            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color: #2ed573;"></i><p>Sell Item</p></a>
+            <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
+            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;"><i class="fas fa-heart"></i><p>Saved</p><span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span></a>
+            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
         </div>
     </header>
 
-    <!-- NAVIGATION (Bottom for Mobile) -->
-    <nav class="nav-container-horizontal">
-        <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
-        <a href="sell.html" id="sellBtn" class="nav-item-box"><i class="fas fa-plus-circle"></i><p>Sell</p></a>
-        <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>My Items</p></a>
-        <a href="saved.html" class="nav-item-box"><i class="fas fa-heart"></i><p>Saved</p><span id="cartBadge" style="display:none;">0</span></a>
-    </nav>
-
-    <!-- CONTENT -->
-    <main class="container">
-        <!-- Sponsored Section -->
-        <section id="mainSponsor" class="sponsored-section" style="display: none;">
-            <div class="sponsor-card">
-                <div class="sponsor-content">
-                    <img id="sponsorImg" src="" alt="Featured">
-                    <div class="sponsor-details">
-                        <h2 id="sponsorTitle"></h2>
-                        <p id="sponsorDesc"></p>
-                        <a href="#" id="sponsorLink" class="btn-primary">View Item</a>
+    <!-- ======================= SPONSORED ======================= -->
+    <section class="sponsored-section container" id="mainSponsor" style="display: none; margin-top: 20px;">
+        <div class="sponsor-card">
+            <div class="sponsor-badge">Featured Partner</div>
+            <div class="sponsor-content">
+                <div class="sponsor-image">
+                    <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
+                </div>
+                <div class="sponsor-details">
+                    <h2 id="sponsorTitle">Loading Sponsor...</h2>
+                    <p id="sponsorDesc"></p>
+                    <div class="sponsor-actions">
+                        <a href="#" id="sponsorLink" class="buy-btn">View Item</a>
+                        <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor →</a>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Filters -->
-        <section class="filter-controls">
-            <div class="filter-bar">
-                <button class="filter-btn active" data-category="All">All</button>
-                <button class="filter-btn" data-category="Electronics">Electronics</button>
-                <button class="filter-btn" data-category="Jobs">Jobs</button>
-                <button class="filter-btn" data-category="Services">Services</button>
+    <!-- ======================= FILTERS ======================= -->
+    <section class="filter-controls">
+        <div class="controls-row" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+            <div class="sort-container" style="flex: 1; min-width: 140px;">
+                <select id="sortSelect" style="width: 100%;">
+                    <option value="newest">🆕 Newest First</option>
+                    <option value="price_low">💰 Price: Low to High</option>
+                    <option value="price_high">💎 Price: High to Low</option>
+                </select>
             </div>
-        </section>
+            <div class="location-filter-container" style="flex: 1; min-width: 140px;">
+                <select id="locationSelect" style="width: 100%;">
+                    <option value="all">🌍 All Regions</option>
+                    <option value="Addis Ababa">Addis Ababa</option>
+                    <option value="Oromia">Oromia</option>
+                    <option value="Amhara">Amhara</option>
+                    <option value="Tigray">Tigray</option>
+                    <option value="Sidama">Sidama</option>
+                    <option value="Somali">Somali</option>
+                </select>
+            </div>
+        </div>
 
-        <!-- Product Grid -->
+        <div class="filter-bar">
+            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
+            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች"><i class="fas fa-star" style="color: #f1c40f;"></i> Featured</button>
+            <button class="filter-btn" data-category="Electronics" data-am="ኤሌክትሮኒክስ">Electronics</button>
+            <button class="filter-btn" data-category="Furniture" data-am="የቤት ዕቃዎች">Furniture</button>
+            <button class="filter-btn" data-category="Fashion" data-am="አልባሳት">Fashion</button>
+            <button class="filter-btn" data-category="Vehicles" data-am="ተሽከርካሪዎች">Vehicles</button>
+            <button class="filter-btn" data-category="Property" data-am="ንብረት">Property</button>
+            <button class="filter-btn" data-category="Home Supplies" data-am="የቤት ቁሳቁሶች">Home Supplies</button>
+            <button class="filter-btn" data-category="Services" data-am="አገልግሎቶች">
+                <i class="fas fa-tools" style="font-size:11px; color:#b794f4;"></i> Services
+            </button>
+            <button class="filter-btn" data-category="Jobs" data-am="ስራዎች">
+                <i class="fas fa-briefcase" style="font-size:11px; color:#63b3ed;"></i> Jobs
+            </button>
+        </div>
+    </section>
+
+    <!-- ======================= MAIN GRID ======================= -->
+    <main class="container">
         <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner">Loading items...</div>
+            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
+        </div>
+
+        <!-- Invite / Share -->
+        <div class="invite-container" style="background:white; border-radius:16px; padding:2rem; text-align:center; border:1px solid #f0f0f0; margin:20px 0;">
+            <div style="width:56px; height:56px; border-radius:50%; background:#f0f7ff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
+                <i class="fas fa-users" style="color:#0088cc; font-size:22px;"></i>
+            </div>
+            <h3 style="margin:0 0 6px; font-size:16px; color:#222;">Help WanaGebya Grow By Sharing!</h3>
+            <p style="color:#888; font-size:13px; margin:0 0 20px;">"Do you know anyone looking to buy or sell?" Invite them to WanaGebya.</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto;">
+                <button id="shareTelegramBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#0088cc; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Share on Telegram
+                </button>
+                <button id="shareWhatsAppBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#25d366; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                    Share on WhatsApp
+                </button>
+                <button id="shareFacebookBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#1877F2; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Share on Facebook
+                </button>
+                <a href="https://t.me/WanaGebyaet" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; background:#f0f7ff; color:#0088cc; border:1.5px solid #b3d9f5; font-size:13px; font-weight:600; text-decoration:none; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Join our Telegram Channel
+                </a>
+            </div>
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="golem-footer">
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="golem-footer" style="padding-bottom: 80px;">
         <div class="footer-container">
-            <div>
+            <div class="footer-col">
                 <h2 class="footer-logo">WanaGebya</h2>
-                <p>The premium marketplace for Ethiopia.</p>
+                <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
             </div>
-            <div>
+            <div class="footer-col">
                 <h4>Contact Us</h4>
                 <p><i class="fas fa-phone"></i> +251707022845</p>
                 <div class="social-links">
-                    <a href="#" class="social-btn"><i class="fab fa-telegram-plane"></i></a>
-                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://t.me/WanaGebya" class="social-btn telegram" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="https://facebook.com/WanaGebya" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://instagram.com/WanaGebya" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://tiktok.com/@WanaGebya" class="social-btn tiktok" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
+            <div class="footer-col">
+                <h4>Language / ቋንቋ</h4>
+                <button id="footerLangBtn" class="lang-btn-footer">English / አማርኛ</button>
+            </div>
         </div>
-        <div class="footer-bottom">&copy; 2026 WanaGebya Marketplace. All rights reserved.</div>
+        <div class="footer-bottom"><p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p></div>
     </footer>
 
-    <!-- Scripts remain the same -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom: 85px;"><i class="fas fa-chevron-up"></i></button>
 
     <!-- ======================= FLOATING CHAT ======================= -->
     <div class="floating-chat">
