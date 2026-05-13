@@ -882,33 +882,28 @@
             } catch (err) { console.log('Audit log recording skipped:', err); }
         };
 
-        window.renderProducts = (items) => {
+        // Inside script (5).js
+window.renderProducts = (items) => {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
     grid.innerHTML = '';
 
-    if (items.length === 0) {
-        grid.innerHTML = '<div class="no-results">No items found in this category.</div>';
-        return;
-    }
-
     items.forEach(item => {
         let cardHtml = '';
-        
-        // Use the specialized renderers from your index.html
-        if (item.category === 'Jobs') {
-            cardHtml = buildJobCard(item);
-        } else if (item.category === 'Services') {
-            cardHtml = buildServiceCard(item);
+
+        // Check if the global builders exist before calling them
+        if (item.category === 'Jobs' && typeof window.buildJobCard === 'function') {
+            cardHtml = window.buildJobCard(item);
+        } else if (item.category === 'Services' && typeof window.buildServiceCard === 'function') {
+            cardHtml = window.buildServiceCard(item);
         } else {
-            // Default Standard Product Card
-            cardHtml = buildStandardCard(item);
+            // Fallback to standard product card
+            cardHtml = buildStandardCard(item); 
         }
-        
+
         grid.insertAdjacentHTML('beforeend', cardHtml);
     });
 };
-
 
 // Add this logic to your main product fetching loop
 function updateDisplayGrid(items) {
