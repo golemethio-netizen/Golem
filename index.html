@@ -24,36 +24,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 
-    <style>
-    
-    </style>
+ 
 </head>
 
 <body>
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
-        <div class="header-top-row">
-            <div class="logo">WanaGebya | ዋና ገበያ</div>
-            <div class="header-actions">
-                <a href="#" id="helpBtn" class="help-link">
-                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
-                    <span class="hide-text-mobile">Help</span>
-                </a>
-                <div class="lang-toggle-wrapper">
-                    <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
-                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
-                    </button>
-                </div>
-                <div class="nav-auth-controls">
-                    <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
-                    </button>
-                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
-                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;"><strong id="userName"></strong></span>
-                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
-                    </div>
-                </div>
+      <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="golem-header">
+        <div class="logo">WanaGebya | ዋና ገበያ</div>
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+        </div>
+        <div class="header-actions">
+            <button id="langToggleBtn" class="lang-btn"><i class="fas fa-globe"></i> አማርኛ</button>
+            <button id="signInBtn" class="btn-primary">Sign In</button>
+            <div id="userWelcome" style="display:none;">
+                <span id="userName"></span>
+                <button id="signOutBtn" class="signout-btn">Sign Out</button>
             </div>
+        </div>
+    </header>
+
         </div>
 
         <div class="search-wrapper">
