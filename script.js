@@ -8,9 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.updateCartBadge();
     window.fetchProducts();
     window.loadSponsor();
-// Expose card builders globally
-window.buildJobCard     = buildJobCard;
-window.buildServiceCard = buildServiceCard;
+
+
     const now = new Date();
     const hour = now.getHours();
     const dot = document.querySelector('.online-dot');
@@ -148,7 +147,7 @@ function renderProducts(products) {
     grid.innerHTML = products.map(p => {
      
         // Ensure no backticks or quotes are nested incorrectly
-const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+const safeData = encodeURIComponent(JSON.stringify(p)).replace(/'/g, "%27");
         
         const isVerified = p.profiles?.is_verified === true;
         const isSold = p.status === 'sold';
@@ -926,11 +925,3 @@ window.showProductModal = (item) => {
 };
 
 
-// Example: Watch the admin's profile for status changes
-const adminChannel = supabase
-  .channel('admin-status')
-  .on('presence', { event: 'sync' }, () => {
-    const state = adminChannel.presenceState();
-    // Logic to toggle the .online-dot class
-  })
-  .subscribe();
