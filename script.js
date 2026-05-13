@@ -144,8 +144,9 @@ function renderProducts(products) {
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
-        // FIX: Replaced single quotes with URL encoding to prevent HTML breaking
-        const safeData = encodeURIComponent(JSON.stringify(p)).replace(/'/g, "%27");
+     
+        // Ensure no backticks or quotes are nested incorrectly
+const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
         
         const isVerified = p.profiles?.is_verified === true;
         const isSold = p.status === 'sold';
