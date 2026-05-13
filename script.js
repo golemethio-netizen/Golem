@@ -924,4 +924,17 @@ window.showProductModal = (item) => {
     modal.style.display = 'flex';
 };
 
+// Use the variable defined in config.js
+if (typeof _supabase !== 'undefined' && _supabase.channel) {
+    const adminChannel = _supabase.channel('admin-status');
+
+    adminChannel
+        .on('presence', { event: 'sync' }, () => {
+            const state = adminChannel.presenceState();
+            console.log("Admin Presence:", state);
+        })
+        .subscribe();
+} else {
+    console.error("Supabase Realtime (channel) is not available. Check library version.");
+}
 
