@@ -881,6 +881,33 @@
                 await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
             } catch (err) { console.log('Audit log recording skipped:', err); }
         };
+
+        window.renderProducts = (items) => {
+    const grid = document.getElementById('productGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (items.length === 0) {
+        grid.innerHTML = '<div class="no-results">No items found in this category.</div>';
+        return;
+    }
+
+    items.forEach(item => {
+        let cardHtml = '';
+        
+        // Use the specialized renderers from your index.html
+        if (item.category === 'Jobs') {
+            cardHtml = buildJobCard(item);
+        } else if (item.category === 'Services') {
+            cardHtml = buildServiceCard(item);
+        } else {
+            // Default Standard Product Card
+            cardHtml = buildStandardCard(item);
+        }
+        
+        grid.insertAdjacentHTML('beforeend', cardHtml);
+    });
+};
     </script>
 </body>
 </html>
