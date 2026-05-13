@@ -928,3 +928,13 @@ window.showProductModal = (item) => {
 
     modal.style.display = 'flex';
 };
+
+
+// Example: Watch the admin's profile for status changes
+const adminChannel = supabase
+  .channel('admin-status')
+  .on('presence', { event: 'sync' }, () => {
+    const state = adminChannel.presenceState();
+    // Logic to toggle the .online-dot class
+  })
+  .subscribe();
