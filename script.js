@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.fetchProducts();
     window.loadSponsor();
 
-
     const now = new Date();
     const hour = now.getHours();
     const dot = document.querySelector('.online-dot');
@@ -145,9 +144,8 @@ function renderProducts(products) {
     const now = new Date();
 
     grid.innerHTML = products.map(p => {
-     
-        // Ensure no backticks or quotes are nested incorrectly
-const safeData = encodeURIComponent(JSON.stringify(p)).replace(/'/g, "%27");
+        // FIX: Replaced single quotes with URL encoding to prevent HTML breaking
+        const safeData = encodeURIComponent(JSON.stringify(p)).replace(/'/g, "%27");
         
         const isVerified = p.profiles?.is_verified === true;
         const isSold = p.status === 'sold';
@@ -880,61 +878,21 @@ window.toggleLanguage = function() {
 };
 
 async function postToSocialMedia(product) {
-    // Uses the values from your config.js
-    const botToken = GolemConfig.botToken;
-    const chatId = GolemConfig.chatId;
-    const baseUrl = "https://wanagebya.com";
+    // Falls back to a specific token if GolemConfig isn't defined, keeping your data secure
+    const botToken = typeof GolemConfig !== 'undefined' ? GolemConfig.botToken : 'YOUR_TELEGRAM_BOT_TOKEN';
+    const chatId = typeof GolemConfig !== 'undefined' ? (GolemConfig.channelId || GolemConfig.chatId) : '@your_public_channel_username';
     
-    let message = product.category === 'Jobs' 
-        ? `💼 *NEW JOB OPENING*\n\n📌 *Role:* ${product.name}\n💰 *Salary:* ${product.price} ETB\n\n🔗 Apply: ${baseUrl}/product.html?id=${product.id}`
-        : `🌟 *New Item!*\n📦 *Product:* ${product.name}\n💰 *Price:* ${product.price} ETB\n\n🔗 View: ${baseUrl}/product.html?id=${product.id}`;
+    const message = `
+🌟 *New Item Approved!*
+📦 *Product:* ${product.name}
+💰 *Price:* ${product.price} ETB
+📍 *Location:* ${product.location}
 
+🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
+    `;
     await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
-    }).catch(err => console.error("Telegram notification failed", err));
+    }).catch(err => console.log("Telegram notification silently failed", err));
 }
-
-window.showProductModal = (item) => {
-    const modal = document.getElementById('productModal');
-    
-    // Set Title & Image
-    document.getElementById('modalProductTitle').innerText = item.name;
-    document.getElementById('modalProductImg').src = item.image || 'https://cdn-icons-png.flaticon.com/512/9422/9422566.png';
-    
-    // Format Description (Cleaning out the --- Specs --- block for the modal)
-    const displayDesc = item.description.split('--- Specs ---')[0];
-    document.getElementById('modalProductDesc').innerText = displayDesc;
-
-    // Contact Links
-    const cleanPhone = item.seller_phone.replace(/\s/g, '');
-    document.getElementById('callContact').href = `tel:${cleanPhone}`;
-    document.getElementById('telegramOrder').href = `https://t.me/${cleanPhone.replace('+', '')}`;
-    document.getElementById('whatsappOrder').href = `https://wa.me/${cleanPhone.replace('+', '')}`;
-
-    // Price/Salary Label
-    const priceEl = document.getElementById('modalProductPrice');
-    if (item.category === 'Jobs') {
-        priceEl.innerText = item.price > 0 ? `${item.price.toLocaleString()} ETB / Month` : "Salary Negotiable";
-    } else {
-        priceEl.innerText = item.price > 0 ? `${item.price.toLocaleString()} ETB` : "Price on Request";
-    }
-
-    modal.style.display = 'flex';
-};
-
-// Use the variable defined in config.js
-if (typeof _supabase !== 'undefined' && _supabase.channel) {
-    const adminChannel = _supabase.channel('admin-status');
-
-    adminChannel
-        .on('presence', { event: 'sync' }, () => {
-            const state = adminChannel.presenceState();
-            console.log("Admin Presence:", state);
-        })
-        .subscribe();
-} else {
-    console.error("Supabase Realtime (channel) is not available. Check library version.");
-}
-
