@@ -1,9 +1,11 @@
-// --- 1. INITIALIZATION & GLOBAL STATE ---
+/* --- 1. INITIALIZATION --- */
 let currentProduct = null;
 window.currentCategory = 'All';
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 WanaGebya System Initializing...");
+    
+  // UI Helpers
     await window.updateUIForUser();
     window.updateCartBadge();
     window.fetchProducts();
