@@ -36,283 +36,178 @@
         .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
         .success-back-btn { margin-top: 25px; width: 100%; padding: 15px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        /* ════════════════════════════════════════════════════
-           ██  JOBS CARD
-        ════════════════════════════════════════════════════ */
-        .job-card {
-            background: linear-gradient(145deg, #0d1b2a 0%, #1b2838 100%);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #1e3a5f;
-            color: white;
-            position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        .job-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(99,179,237,0.2); }
+       /* ══════════════════════════════════════════════════════════
+   JOBS & SERVICES CARD STYLING
+   ══════════════════════════════════════════════════════════ */
 
-        /* header strip */
-        .job-card-header {
-            background: linear-gradient(90deg, #1a3a5c, #0d2137);
-            padding: 14px 16px 10px;
-            border-bottom: 1px solid rgba(99,179,237,0.12);
-            position: relative;
-        }
+/* --- Job Cards --- */
+.job-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-        .job-type-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-            text-transform: uppercase; padding: 3px 10px;
-            border-radius: 20px; margin-bottom: 8px;
-            background: rgba(99,179,237,0.15); color: #63b3ed;
-            border: 1px solid rgba(99,179,237,0.3);
-        }
+.job-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
 
-        .job-title {
-            font-size: 15px; font-weight: 700; color: #e8f4fd;
-            margin: 0 28px 5px 0; line-height: 1.3;
-        }
+.job-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f0f7ff;
+    color: #007bff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
 
-        .job-company {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 12px; color: #7a9cbf; font-weight: 500;
-        }
-        .job-company i { font-size: 10px; }
+.job-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+    margin-top: 5px;
+}
 
-        /* tag row */
-        .job-tags {
-            display: flex; flex-wrap: wrap; gap: 6px;
-            padding: 10px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
+.job-company {
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
-        .job-tag {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
-            border-radius: 6px; white-space: nowrap;
-        }
-        .job-tag.blue   { background: rgba(99,179,237,0.12); color: #63b3ed; }
-        .job-tag.green  { background: rgba(72,187,120,0.12); color: #68d391; }
-        .job-tag.purple { background: rgba(159,122,234,0.12); color: #b794f4; }
-        .job-tag.orange { background: rgba(246,173,85,0.12); color: #f6ad55; }
-        .job-tag.red    { background: rgba(252,129,74,0.12); color: #fc8974; }
+.job-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+}
 
-        /* salary + location */
-        .job-meta-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 16px;
-        }
+.job-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
 
-        .job-salary {
-            font-size: 16px; font-weight: 800;
-            background: linear-gradient(90deg, #63b3ed, #b794f4);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+.job-tag.blue { background: #eef2ff; color: #4f46e5; }
+.job-tag.green { background: #ecfdf5; color: #059669; }
+.job-tag.purple { background: #faf5ff; color: #7c3aed; }
+.job-tag.orange { background: #fff7ed; color: #ea580c; }
 
-        .job-location {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 11.5px; color: #5a7a99;
-        }
-        .job-location i { font-size: 10px; color: #4a8ab5; }
+.job-salary {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2ed573;
+}
 
-        /* description snippet */
-        .job-snippet {
-            font-size: 12px; color: #6a8aaa; line-height: 1.55;
-            padding: 0 16px 12px; margin: 0;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
+.deadline-badge {
+    font-size: 11px;
+    color: #e74c3c;
+    margin-top: 4px;
+}
 
-        /* action row */
-        .job-actions {
-            display: flex; gap: 8px;
-            padding: 10px 16px 14px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
+/* --- Service Cards --- */
+.service-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    transition: 0.3s ease;
+}
 
-        .job-btn {
-            flex: 1; display: inline-flex; align-items: center; justify-content: center;
-            gap: 6px; padding: 9px 8px; border-radius: 10px;
-            font-size: 12px; font-weight: 700; text-decoration: none;
-            border: none; cursor: pointer; font-family: inherit;
-            transition: filter 0.15s, transform 0.12s;
-        }
-        .job-btn:hover { filter: brightness(1.12); transform: scale(1.02); }
-        .job-btn:active { transform: scale(0.97); }
+.service-banner {
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    position: relative;
+    background: #f8f9fa;
+}
 
-        .job-btn-primary { background: #63b3ed; color: #0d1117; }
-        .job-btn-tg      { background: rgba(0,136,204,0.15); color: #0088cc; border: 1px solid rgba(0,136,204,0.3); }
-        .job-btn-wa      { background: rgba(37,211,102,0.12); color: #25d366; border: 1px solid rgba(37,211,102,0.25); }
+.service-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-        .job-wishlist-btn {
-            position: absolute; top: 12px; right: 12px;
-            background: rgba(255,255,255,0.07); border: none;
-            border-radius: 50%; width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #4a6a8a; font-size: 12px;
-            transition: color 0.15s, background 0.15s;
-        }
-        .job-wishlist-btn:hover, .job-wishlist-btn.active { color: #ff6b81; background: rgba(255,107,129,0.12); }
+.service-icon-overlay {
+    position: absolute;
+    bottom: -15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 2;
+}
 
-        /* deadline badge */
-        .deadline-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 10px; font-weight: 700;
-            color: #fc8974; padding: 3px 8px;
-            border-radius: 6px;
-            background: rgba(252,129,74,0.1);
-            border: 1px solid rgba(252,129,74,0.2);
-        }
+.service-content {
+    padding: 20px 15px 15px;
+}
 
-        /* ════════════════════════════════════════════════════
-           ██  SERVICES CARD
-        ════════════════════════════════════════════════════ */
-        .service-card {
-            background: linear-gradient(145deg, #1a1025 0%, #230f33 100%);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #3b1f5c;
-            color: white;
-            position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        .service-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(183,148,244,0.2); }
+.svc-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
 
-        .service-card-header {
-            position: relative;
-            padding: 0;
-            overflow: hidden;
-        }
+.svc-tag.teal { background: #e6fffa; color: #008080; }
 
-        /* photo or gradient banner */
-        .service-banner {
-            height: 110px;
-            background: linear-gradient(135deg, #2d1b4e 0%, #1a0d2e 100%);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; position: relative;
-        }
+/* --- Shared Actions --- */
+.job-actions, .service-actions {
+    display: grid;
+    grid-template-columns: 1fr 45px 45px;
+    gap: 8px;
+    margin-top: 15px;
+}
 
-        .service-banner img {
-            width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.7;
-        }
+.job-btn {
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
 
-        .service-banner-fallback {
-            font-size: 42px; opacity: 0.4;
-        }
+.job-btn-primary { background: #333; color: white; }
+.job-btn-tg { background: #0088cc; color: white; }
+.job-btn-wa { background: #25d366; color: white; }
 
-        .service-type-badge {
-            position: absolute; top: 10px; left: 12px;
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-            text-transform: uppercase; padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(183,148,244,0.2); color: #d6b4fe;
-            border: 1px solid rgba(183,148,244,0.35);
-            backdrop-filter: blur(4px);
-        }
+.job-wishlist-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    background: none;
+    font-size: 18px;
+    color: #ccc;
+    cursor: pointer;
+}
 
-        .service-rating {
-            position: absolute; top: 10px; right: 12px;
-            display: flex; align-items: center; gap: 4px;
-            font-size: 11px; font-weight: 700; color: #fbbf24;
-            background: rgba(0,0,0,0.4); padding: 3px 8px;
-            border-radius: 6px; backdrop-filter: blur(4px);
-        }
-
-        .service-wishlist-btn {
-            position: absolute; bottom: 10px; right: 12px;
-            background: rgba(0,0,0,0.35); border: none;
-            border-radius: 50%; width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #8a6aaa; font-size: 12px;
-            transition: color 0.15s; backdrop-filter: blur(4px);
-        }
-        .service-wishlist-btn:hover, .service-wishlist-btn.active { color: #ff6b81; }
-
-        .service-body { padding: 14px 16px 0; }
-
-        .service-name {
-            font-size: 15px; font-weight: 700; color: #f0e6ff;
-            margin: 0 0 5px; line-height: 1.3;
-        }
-
-        .service-provider {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 12px; color: #8a6aaa; margin-bottom: 10px;
-        }
-        .service-provider i { font-size: 10px; }
-
-        .service-highlights {
-            display: flex; flex-wrap: wrap; gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .svc-tag {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 10.5px; font-weight: 600; padding: 4px 9px;
-            border-radius: 6px; white-space: nowrap;
-        }
-        .svc-tag.purple { background: rgba(183,148,244,0.12); color: #b794f4; }
-        .svc-tag.pink   { background: rgba(246,135,177,0.12); color: #f687b3; }
-        .svc-tag.teal   { background: rgba(94,234,212,0.12);  color: #5eead4; }
-        .svc-tag.amber  { background: rgba(251,191,36,0.12);  color: #fbbf24; }
-        .svc-tag.green  { background: rgba(72,187,120,0.12);  color: #68d391; }
-
-        .service-snippet {
-            font-size: 12px; color: #7a5a99; line-height: 1.55;
-            margin: 0 0 10px;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
-
-        .service-footer {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 16px 14px;
-            border-top: 1px solid rgba(183,148,244,0.08);
-            margin-top: 4px;
-        }
-
-        .service-price {
-            font-size: 16px; font-weight: 800;
-            background: linear-gradient(90deg, #b794f4, #f687b3);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .service-price-label {
-            font-size: 10px; color: #6a4a8a; margin-top: 1px;
-        }
-
-        .service-actions { display: flex; gap: 7px; }
-
-        .svc-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 5px; padding: 8px 14px; border-radius: 10px;
-            font-size: 12px; font-weight: 700; text-decoration: none;
-            border: none; cursor: pointer; font-family: inherit;
-            transition: filter 0.15s, transform 0.12s;
-            white-space: nowrap;
-        }
-        .svc-btn:hover { filter: brightness(1.15); transform: scale(1.02); }
-        .svc-btn:active { transform: scale(0.97); }
-
-        .svc-btn-primary { background: #b794f4; color: #1a0d2e; }
-        .svc-btn-outline { background: rgba(183,148,244,0.1); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
-
-        /* ── AVAILABILITY DOT ── */
-        .avail-dot {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 11px; color: #68d391; font-weight: 600;
-        }
-        .avail-dot::before {
-            content: '';
-            display: inline-block; width: 7px; height: 7px;
-            background: #68d391; border-radius: 50%;
-            box-shadow: 0 0 6px rgba(104,211,145,0.6);
-        }
+.job-wishlist-btn.active { color: #ff4757; }
 
         /* ── SECTION DIVIDERS in grid ── */
         .category-section-header {
