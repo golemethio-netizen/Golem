@@ -883,12 +883,6 @@ async function postToSocialMedia(product) {
     const botToken = typeof GolemConfig !== 'undefined' ? GolemConfig.botToken : 'YOUR_TELEGRAM_BOT_TOKEN';
     const chatId = typeof GolemConfig !== 'undefined' ? (GolemConfig.channelId || GolemConfig.chatId) : '@your_public_channel_username';
     
-    const message = `
-🌟 *New Item Approved!*
-📦 *Product:* ${product.name}
-💰 *Price:* ${product.price} ETB
-📍 *Location:* ${product.location}
-
 
 const message = item.category === 'Jobs' 
     ? `💼 *NEW JOB OPENING*\n\n📌 *Role:* ${item.name}\n📍 *Location:* ${item.location}\n💰 *Salary:* ${item.price} ETB\n\n🔗 Apply here: https://wanagebya.com/product?id=${item.id}`
