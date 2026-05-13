@@ -896,3 +896,15 @@ async function postToSocialMedia(product) {
         body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
     }).catch(err => console.log("Telegram notification silently failed", err));
 }
+
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('.golem-header');
+    let currentScroll = window.pageYOffset;
+    if (currentScroll > lastScroll && currentScroll > 100) {
+        header.style.transform = 'translateY(-100%)';
+    } else {
+        header.style.transform = 'translateY(0)';
+    }
+    lastScroll = currentScroll;
+});
