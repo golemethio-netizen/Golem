@@ -511,7 +511,8 @@
     </div>
 
     <!-- ======================= SCRIPTS ======================= -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+
     <script src="config.js"></script>
     <script src="script.js"></script>
 
@@ -527,7 +528,13 @@
             return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        function phone(p) { return String(p || '').replace(/\s/g,''); }
+function phone(p) { return String(p || '').replace(/\s/g,''); }
+
+function cleanDesc(desc) {
+    if (!desc) return '';
+    // Strip the "--- Specs ---" block, return only the human-readable intro
+    return desc.split('--- Specs ---')[0].trim();
+}
 
      function parseSpecs(desc) {
     const specs = {};
@@ -889,19 +896,22 @@ window.renderProducts = (items) => {
     grid.innerHTML = '';
 
     items.forEach(item => {
-        let cardHtml = '';
+        let el = null;
 
-        // Check if the global builders exist before calling them
         if (item.category === 'Jobs' && typeof window.buildJobCard === 'function') {
-            cardHtml = window.buildJobCard(item);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = window.buildJobCard(item);
+            el = wrapper.firstElementChild;
         } else if (item.category === 'Services' && typeof window.buildServiceCard === 'function') {
-            cardHtml = window.buildServiceCard(item);
-        } else {
-            // Fallback to standard product card
-            cardHtml = buildStandardCard(item); 
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = window.buildServiceCard(item);
+            el = wrapper.firstElementChild;
+        } else if (typeof window.renderProduct === 'function') {
+            // script.js defines renderProduct(item) → returns a DOM element
+            el = window.renderProduct(item);
         }
 
-        grid.insertAdjacentHTML('beforeend', cardHtml);
+        if (el) grid.appendChild(el);
     });
 };
 
