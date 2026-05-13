@@ -1,4 +1,4 @@
-/* --- 1. Root Variables (Centralized) --- */
+/* --- 1. Root Variables & Reset --- */
 :root {
     --primary: #1a1a1a;
     --accent: #007bff;
@@ -14,7 +14,6 @@
     --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* --- 2. Base & Layout --- */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 body {
@@ -22,103 +21,69 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     line-height: 1.6;
-    padding-bottom: 100px;
+    padding-bottom: 80px;
 }
 
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-/* --- 3. Header & Navigation --- */
+/* --- 2. Header --- */
 .golem-header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding: 15px 5%;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    position: sticky; top: 0; z-index: 1000;
     border-bottom: 1px solid rgba(0,0,0,0.05);
-    flex-wrap: wrap;
 }
 
-.logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+.header-top-row { display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.search-wrapper { margin-top: 10px; width: 100%; position: relative; }
+#headerSearch { width: 100%; padding: 12px 40px; border-radius: 25px; border: 1px solid #ddd; outline: none; }
 
-.search-wrapper { position: relative; flex-grow: 1; max-width: 400px; margin: 0 20px; }
-#headerSearch { width: 100%; padding: 10px 15px; border-radius: 25px; border: 1px solid #ddd; outline: none; }
-
-/* --- 4. Filter Bar --- */
-.filter-bar {
-    display: flex; gap: 10px; padding: 20px 0; overflow-x: auto;
-    scrollbar-width: none;
-}
-.filter-btn {
-    padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd;
-    background: white; cursor: pointer; white-space: nowrap; transition: var(--transition);
-}
-.filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-/* --- 5. Grid System & Cards --- */
+/* --- 3. Grid & Cards --- */
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 .masonry-wrapper {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
-    padding: 10px 0;
 }
 
-.product-card {
+/* Base Card Style */
+.product-card, .job-card, .service-card {
     background: var(--card-bg);
     border-radius: var(--radius);
-    overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    border: 1px solid rgba(0,0,0,0.03);
+    overflow: hidden;
 }
 
-.product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-.card-img-container { height: 220px; overflow: hidden; cursor: pointer; }
-.card-img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s ease; }
-.product-info { padding: 15px; }
-.product-title { font-weight: 600; font-size: 1rem; margin-bottom: 5px; }
-.product-price { font-weight: 800; color: var(--accent); font-size: 1.1rem; }
-
-/* --- 6. Modals --- */
-.modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center;
-}
-.modal-content {
-    background: white; width: 90%; max-width: 500px; padding: 20px; border-radius: var(--radius);
-    position: relative; animation: slideUp 0.3s ease-out;
+.product-card:hover, .job-card:hover, .service-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
 }
 
-/* --- 7. Floating Chat Widget --- */
+/* --- 4. Special Cards (Jobs & Services) --- */
+.job-card { background: linear-gradient(145deg, #0d1b2a 0%, #1b2838 100%); color: white; }
+.service-card { background: linear-gradient(145deg, #1a1025 0%, #230f33 100%); color: white; }
+
+/* --- 5. Navigation & Floating Elements --- */
+.nav-container-horizontal {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: white; padding: 10px 5px;
+    display: flex; justify-content: space-around;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+    z-index: 2000;
+}
+
+.nav-item-box { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 0.65rem; }
+.nav-item-box i { font-size: 1.3rem; display: block; margin-bottom: 4px; }
+
 .floating-chat { position: fixed; bottom: 90px; right: 20px; z-index: 2000; }
-.chat-btn {
-    background: var(--primary); color: white; padding: 15px 20px;
-    border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 8px;
-    box-shadow: var(--shadow); border: none;
-}
+.chat-btn { background: var(--primary); color: white; padding: 12px 20px; border-radius: 50px; border: none; cursor: pointer; }
 
-/* --- 8. Mobile Optimization --- */
+/* --- 6. Responsive Mobile Fixes --- */
 @media (max-width: 768px) {
-    .masonry-wrapper { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    
-    .nav-container-horizontal {
-        position: fixed; bottom: 0; left: 0; width: 100%;
-        background: white; padding: 10px 5px;
-        display: flex; justify-content: space-around;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-        z-index: 2000;
-    }
-    
-    .nav-item-box { flex-direction: column; padding: 5px; gap: 2px; text-decoration: none; color: var(--text-muted); }
-    .nav-item-box i { font-size: 1.2rem; }
-    .nav-item-box p { font-size: 0.65rem; }
-    
-    .search-wrapper { margin: 15px 0 0 0; width: 100%; }
+    .masonry-wrapper { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .hide-text-mobile { display: none; }
+    .golem-header { padding: 10px; }
+    .job-card, .service-card { grid-column: 1 / -1; }
+    .modal-content { width: 95%; margin: 5% auto; }
 }
-
-@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
