@@ -888,6 +888,10 @@ async function postToSocialMedia(product) {
 💰 *Price:* ${product.price} ETB
 📍 *Location:* ${product.location}
 
+
+const message = item.category === 'Jobs' 
+    ? `💼 *NEW JOB OPENING*\n\n📌 *Role:* ${item.name}\n📍 *Location:* ${item.location}\n💰 *Salary:* ${item.price} ETB\n\n🔗 Apply here: https://wanagebya.com/product?id=${item.id}`
+    : `🌟 *New Item Approved!*\n📦 *Product:* ${item.name}\n💰 *Price:* ${item.price} ETB\n📍 *Location:* ${item.location}\n\n🔗 View Details: https://wanagebya.com/product?id=${item.id}`;
 🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
     `;
     await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
