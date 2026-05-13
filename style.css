@@ -799,3 +799,17 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     border-color: transparent;
 }
+.online-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 5px;
+    border: 2px solid white;
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* Add a glowing effect when online */
+.online-dot[style*="background: rgb(46, 213, 115)"] {
+    box-shadow: 0 0 8px rgba(46, 213, 115, 0.6);
+}
