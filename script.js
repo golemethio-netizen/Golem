@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.updateCartBadge();
     window.fetchProducts();
     window.loadSponsor();
-
+// Expose card builders globally
+window.buildJobCard     = buildJobCard;
+window.buildServiceCard = buildServiceCard;
     const now = new Date();
     const hour = now.getHours();
     const dot = document.querySelector('.online-dot');
