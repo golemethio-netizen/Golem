@@ -529,21 +529,21 @@
 
         function phone(p) { return String(p || '').replace(/\s/g,''); }
 
-        function parseSpecs(desc) {
-            const specs = {};
-            if (!desc) return specs;
-            const block = desc.split('--- Specs ---')[1] || '';
-            block.split('\n').forEach(line => {
-                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
-                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
-            });
-            return specs;
-        }
+     function parseSpecs(desc) {
+    const specs = {};
+    if (!desc || !desc.includes('--- Specs ---')) return specs;
+    
+    const block = desc.split('--- Specs ---')[1];
+    if (!block) return specs;
 
-        function cleanDesc(desc) {
-            if (!desc) return '';
-            return desc.split('--- Specs ---')[0].trim();
+    block.split('\n').forEach(line => {
+        const [key, ...valueParts] = line.split(':');
+        if (key && valueParts.length > 0) {
+            specs[key.trim().toLowerCase()] = valueParts.join(':').trim();
         }
+    });
+    return specs;
+}
 
         const svcEmoji = {
             'plumbing':'🔧','electrical work':'⚡','painting':'🎨',
@@ -908,6 +908,31 @@
         grid.insertAdjacentHTML('beforeend', cardHtml);
     });
 };
+
+
+// Add this logic to your main product fetching loop
+function updateDisplayGrid(items) {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '';
+
+    items.forEach(item => {
+        let cardHTML = '';
+        
+        // Dynamic card selection based on category
+        if (item.category === 'Jobs') {
+            cardHTML = buildJobCard(item);
+        } else if (item.category === 'Services') {
+            cardHTML = buildServiceCard(item);
+        } else {
+            // Your existing function for standard products
+            cardHTML = buildStandardProductCard(item);
+        }
+        
+        grid.insertAdjacentHTML('beforeend', cardHTML);
+    });
+}
+
+        
     </script>
 </body>
 </html>
