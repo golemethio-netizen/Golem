@@ -19,3 +19,11 @@ const GolemConfig = {
     botToken: "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o",
     chatId: "6792892909"
 };
+
+// Use window.supabase to ensure it's available everywhere
+window.supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+    storage: window.localStorage 
+  }
+});
