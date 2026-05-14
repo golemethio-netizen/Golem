@@ -945,7 +945,7 @@
             document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
             document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
             document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
-            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
+            document.getElementById('mobileSellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
             document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
             document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
             document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
