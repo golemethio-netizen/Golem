@@ -410,41 +410,34 @@
 <body>
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
-        <div class="header-top-row">
+   <div class="header-top-row">
             <div class="logo">WanaGebya | ዋና ገበያ</div>
             <div class="header-actions">
-                <a href="#" id="helpBtn" class="help-link">
-                    <i class="fas fa-question-circle" style="font-size: 1.1rem;"></i>
-                    <span class="hide-text-mobile">Help</span>
-                </a>
-                <div class="lang-toggle-wrapper">
-                    <button id="langToggleBtn" class="lang-btn" style="padding: 6px 12px; border-radius: 20px;">
-                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
-                    </button>
-                </div>
-                <div class="nav-auth-controls">
-                    <button id="signInBtn" class="filter-btn sign-in-btn" style="padding: 6px 15px; background: #333; color: white; border: none; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-user"></i> <span class="hide-text-mobile">Sign In</span>
-                    </button>
-                    <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
-                        <span id="userNameLink" style="cursor:pointer; font-size: 0.85rem;"><strong id="userName"></strong></span>
-                        <button id="signOutBtn" class="signout-btn" style="padding: 5px 10px; font-size: 0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
-                    </div>
-                </div>
+                <a href="#" id="helpBtn" class="help-link"><i class="fas fa-question-circle"></i><span class="hide-text-mobile">Help</span></a>
+                <button id="langToggleBtn" class="lang-btn"><i class="fas fa-globe"></i> <span id="langText">አማርኛ</span></button>
+                <button id="signInBtn" class="filter-btn sign-in-btn" style="background: #333; color: white;"><i class="fas fa-user"></i></button>
             </div>
         </div>
 
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+            <input type="text" id="headerSearch" placeholder="Search in Ethiopia...">
         </div>
 
         <div class="nav-container-horizontal">
-            <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
-            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color: #2ed573;"></i><p>Sell Item</p></a>
-            <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
-            <a href="saved.html" class="nav-item-box bg-items" style="position: relative;"><i class="fas fa-heart"></i><p>Saved</p><span id="cartBadge" style="display: none; position: absolute; top: -5px; right: 5px;">0</span></a>
-            <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display: none;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
+            <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
+            <a href="sell.html" id="sellBtn" class="nav-item-box"><i class="fas fa-plus-circle" style="color: #2ed573;"></i><p>Sell</p></a>
+            <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>Items</p></a>
+            <a href="saved.html" class="nav-item-box"><i class="fas fa-heart"></i><p>Saved</p></a>
+        </div>
+
+     
+
+      <div class="nav-container-horizontal">
+            <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
+            <a href="sell.html" id="sellBtn" class="nav-item-box"><i class="fas fa-plus-circle" style="color: #2ed573;"></i><p>Sell</p></a>
+            <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>Items</p></a>
+            <a href="saved.html" class="nav-item-box"><i class="fas fa-heart"></i><p>Saved</p></a>
         </div>
     </header>
 
