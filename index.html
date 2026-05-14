@@ -516,6 +516,24 @@
 .badge-service { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; }
 .service-price { font-size: 1.4rem; font-weight: bold; color: #2ecc71; margin: 10px 0; }
 .service-features { display: flex; gap: 15px; margin-top: 15px; font-size: 0.85rem; color: #555; }
+
+
+
+
+
+/* Styling for the new Professional Views */
+.job-detail-view, .service-detail-view { padding: 5px; }
+.badge-job { background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
+.badge-service { background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 4px; font-weight: 600; font-size: 0.85rem; }
+.job-stats-grid { 
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
+    margin: 15px 0; background: #f9f9f9; padding: 12px; border-radius: 8px; 
+}
+.stat-item { font-size: 0.85rem; color: #555; }
+.service-main-img { width: 100%; border-radius: 12px; height: 220px; object-fit: cover; }
+.service-price { font-size: 1.6rem; color: #2ecc71; font-weight: bold; margin: 10px 0; }
+
+
         
     </style>
 </head>
@@ -1286,24 +1304,32 @@ function createProfessionalCard(item) {
         </div>`;
 }
 window.showProductDetails = async function(id) {
+    const modal = document.getElementById('detailsModal');
+    const modalContent = document.getElementById('modalDetailsContent');
+    
+    // Show loading state
+    modalContent.innerHTML = '<div style="padding:20px; text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    modal.classList.add('active');
+
     const { data: item, error } = await _supabase
         .from('products')
         .select('*')
         .eq('id', id)
         .single();
 
-    if (error || !item) return;
+    if (error || !item) {
+        modalContent.innerHTML = '<p style="padding:20px;">Error loading details.</p>';
+        return;
+    }
 
-    const modalContent = document.getElementById('modalDetailsContent');
-    
-    // Check Category and switch view
+    // --- CATEGORY-BASED RENDERING ---
     if (item.category === 'Jobs') {
         modalContent.innerHTML = `
             <div class="job-detail-view">
                 <div class="job-header">
                     <span class="badge-job">${item.job_type || 'Full-Time'}</span>
-                    <h2>${item.title}</h2>
-                    <p class="company-name"><i class="fas fa-building"></i> ${item.company || 'Private Company'}</p>
+                    <h2 style="margin-top:10px;">${item.title}</h2>
+                    <p class="company-name"><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</p>
                 </div>
                 <div class="job-stats-grid">
                     <div class="stat-item"><i class="fas fa-money-bill-wave"></i> <strong>Salary:</strong> ${item.price} ETB</div>
@@ -1311,34 +1337,45 @@ window.showProductDetails = async function(id) {
                     <div class="stat-item"><i class="fas fa-calendar-check"></i> <strong>Deadline:</strong> ${item.deadline || 'Open'}</div>
                 </div>
                 <div class="job-description">
-                    <h3>Description</h3>
-                    <p>${item.description}</p>
+                    <h3 style="border-bottom:1px solid #eee; padding-bottom:5px;">Description</h3>
+                    <p style="white-space: pre-wrap;">${item.description}</p>
                 </div>
             </div>`;
-    } else if (item.category === 'Services') {
+    } 
+    else if (item.category === 'Services') {
         modalContent.innerHTML = `
             <div class="service-detail-view">
-                <img src="${item.image_url}" class="service-main-img">
-                <div class="service-header">
-                    <span class="badge-service">Verified Provider</span>
-                    <h2>${item.title}</h2>
-                    <p class="service-price">Starting from ${item.price} ETB</p>
+                <img src="${item.image_url}" class="service-main-img" onerror="this.src='https://via.placeholder.com/400x250?text=Service'">
+                <div class="service-header" style="padding-top:15px;">
+                    <span class="badge-service"><i class="fas fa-check-circle"></i> Verified Provider</span>
+                    <h2 style="margin-top:5px;">${item.title}</h2>
+                    <p class="service-price">${item.price} ETB <small>(Starting)</small></p>
                 </div>
                 <div class="service-body">
-                    <h3>Service Details</h3>
-                    <p>${item.description}</p>
-                    <div class="service-features">
-                        <span><i class="fas fa-check-circle"></i> Quick Response</span>
-                        <span><i class="fas fa-check-circle"></i> Best Price</span>
-                    </div>
+                    <p style="white-space: pre-wrap;">${item.description}</p>
                 </div>
             </div>`;
-    } else {
-        // KEEP YOUR EXISTING PRODUCT DETAIL HTML HERE
-        modalContent.innerHTML = `... your current product detail code ...`;
+    } 
+    else {
+        // DEFAULT VIEW (For Electronics, Furniture, etc.)
+        modalContent.innerHTML = `
+            <div class="product-detail-standard">
+                <div class="modal-img-wrapper">
+                    <img src="${item.image_url}" alt="${item.title}" style="width:100%; border-radius:8px;">
+                </div>
+                <div class="product-info-header" style="padding:15px 0;">
+                    <h2 style="font-size:1.4rem;">${item.title}</h2>
+                    <p class="price-tag" style="color:#2ecc71; font-size:1.5rem; font-weight:bold;">${item.price} ETB</p>
+                    <p style="color:#666;"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+                </div>
+                <p style="white-space: pre-wrap; color:#444;">${item.description}</p>
+            </div>`;
     }
 
-    document.getElementById('detailsModal').classList.add('active');
+    // Ensure the contact buttons (Call, TG, etc.) are updated with the correct info
+    if (window.setupActionButtons) {
+        window.setupActionButtons(item);
+    }
 };
         
     </script>
