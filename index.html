@@ -1,25 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
     <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
     <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta property="og:url" content="https://grand-sawine-a63bc3.netlify.app/">
     <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="canonical" href="https://grand-sawine-a63bc3.netlify.app/">
-    <meta name="geo.region" content="ET" />
-    <meta name="geo.placename" content="Addis Ababa" />
-    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia.">
     <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
-    <!-- Kept the working favicon, removed the broken local one -->
+    
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -163,6 +156,55 @@
             border-radius: 6px;
             background: rgba(252,129,74,0.1);
             border: 1px solid rgba(252,129,74,0.2);
+        }
+        /* ── MOBILE OPTIMIZATIONS ── */
+        @media (max-width: 768px) {
+            body { padding-bottom: 75px; } /* Space for bottom nav */
+
+            .golem-header { padding: 10px; }
+            
+            /* Logo & Action Row */
+            .header-top-row { flex-wrap: nowrap; justify-content: space-between; }
+            .logo { font-size: 1.1rem; max-width: 50%; }
+            .header-actions { gap: 8px; }
+            .hide-text-mobile { display: none !important; }
+
+            /* Bottom Navigation */
+            .nav-container-horizontal { 
+                position: fixed; bottom: 0; left: 0; width: 100%; 
+                background: white; border-top: 1px solid #eee;
+                display: flex; justify-content: space-around; 
+                padding: 10px 0; z-index: 1000; margin: 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item-box { 
+                flex-direction: column; gap: 4px; background: transparent !important; 
+                color: #555 !important; padding: 5px; min-width: 60px; box-shadow: none;
+            }
+            .nav-item-box i { font-size: 1.2rem; color: #3498db; }
+            .nav-item-box p { font-size: 0.65rem; font-weight: 600; margin: 0; }
+
+            /* Grid & Cards */
+            .masonry-wrapper { 
+                grid-template-columns: 1fr; /* Full width for better readability */
+                gap: 15px; 
+                padding: 10px;
+            }
+            .job-card, .service-card { width: 100%; }
+
+            /* Filter Bar Scroll */
+            .filter-bar { 
+                display: flex; overflow-x: auto; white-space: nowrap; 
+                padding: 10px 5px; gap: 8px; -webkit-overflow-scrolling: touch;
+            }
+            .filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { padding: 8px 16px; font-size: 0.85rem; flex: 0 0 auto; }
+
+            /* Search Bar */
+            .search-wrapper { margin-top: 10px; width: 100%; }
+            
+            /* Floating Elements */
+            .floating-chat { bottom: 85px; right: 15px; }
         }
 
         /* ════════════════════════════════════════════════════
