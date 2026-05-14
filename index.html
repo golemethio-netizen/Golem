@@ -66,6 +66,62 @@
             background: #333; color: white; border: none;
             border-radius: 10px; font-weight: bold; cursor: pointer;
         }
+
+
+
+
+/* --- Professional Card Styling --- */
+.job-card, .service-card {
+    grid-column: 1 / -1; /* Spans full width for prominence */
+    background: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: transform 0.2s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.job-card:hover, .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.job-title, .service-name {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.job-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.job-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.job-tag.blue { background: #e1f5fe; color: #0288d1; }
+.job-tag.green { background: #e8f5e9; color: #2e7d32; }
+
+.deadline-badge {
+    font-size: 0.85rem;
+    color: #e74c3c;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+
+
+        
 /* Job & Service Specific Layout */
 .job-card, .service-card {
     grid-column: 1 / -1; /* Makes them span full width if in a masonry grid */
@@ -904,6 +960,59 @@
                 </div>
             </div>`;
         }
+
+
+
+
+// Replace your card creation logic with this:
+function generateItemHTML(item) {
+    if (item.category === 'Jobs') {
+        return `
+            <div class="job-card" onclick="showProductDetails('${item.id}')">
+                <div class="job-tags">
+                    <span class="job-tag blue"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full-Time'}</span>
+                </div>
+                <h3 class="job-title">${item.title}</h3>
+                <div style="color: #666;"><i class="fas fa-building"></i> ${item.company || 'Confidential'}</div>
+                <div class="job-tags">
+                    <span class="job-tag green">${item.price} ETB / month</span>
+                    <span class="job-tag" style="background:#f5f5f5;"><i class="fas fa-map-marker-alt"></i> ${item.location}</span>
+                </div>
+                <div class="deadline-badge"><i class="fas fa-calendar-alt"></i> Deadline: ${item.deadline || 'ASAP'}</div>
+            </div>`;
+    } 
+    
+    if (item.category === 'Services') {
+        return `
+            <div class="service-card" onclick="showProductDetails('${item.id}')">
+                <div style="display: flex; gap: 15px; align-items: start;">
+                    <img src="${item.image_url}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
+                    <div>
+                        <h3 class="service-name">${item.title}</h3>
+                        <p style="margin: 5px 0; color: #555; font-size: 0.9rem;">${item.description.substring(0, 100)}...</p>
+                        <div style="font-weight: bold; color: #2ecc71;">Starting from ${item.price} ETB</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Default for Products (Electronics, Furniture, etc.)
+    return `
+        <div class="product-card" onclick="showProductDetails('${item.id}')">
+            <div class="product-image-container">
+                <img src="${item.image_url}" alt="${item.title}" loading="lazy">
+            </div>
+            <div class="product-info">
+                <h3>${item.title}</h3>
+                <p class="price">${item.price} ETB</p>
+                <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+            </div>
+        </div>`;
+}
+
+
+
+        
 
         /* ══════════════════════════════
            PATCH: intercept renderProduct
