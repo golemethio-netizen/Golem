@@ -663,7 +663,7 @@
     <!-- ══════════════════════════════════════════════════════════
          JOBS & SERVICES CARD RENDERER
     ══════════════════════════════════════════════════════════════ -->
-    <script>
+     <script>
     (function () {
         'use strict';
 
@@ -715,8 +715,7 @@
            JOB CARD
         ───────────────────────── */
         function buildJobCard(item) {
-            const safeData = encodeURIComponent(JSON.stringify(p)).replace(/'/g, "%27");
-
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, '%27');
             const sp      = parseSpecs(item.description);
             const desc    = cleanDesc(item.description);
             const ph      = phone(item.seller_phone);
@@ -1077,5 +1076,6 @@
             } catch (err) { console.log('Audit log skipped:', err); }
         };
     </script>
+ 
 </body>
 </html>
