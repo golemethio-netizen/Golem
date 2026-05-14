@@ -831,3 +831,35 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     border-color: transparent;
 }
+/* 1. Force the main container to the edges */
+.container, 
+main, 
+#productGrid {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 10px !important;   /* Small 10px gap so it doesn't touch the glass */
+    padding-right: 10px !important;
+    margin: 0 !important;
+}
+
+/* 2. Expand the Header to the edges */
+.golem-header {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 10px 15px !important;
+}
+
+/* 3. Ensure the contact buttons in the details modal use the new space */
+.product-actions {
+    display: flex !important;
+    width: 100% !important;
+    padding: 10px 0 !important;
+    gap: 8px !important;
+}
+
+.product-actions a, 
+.product-actions button {
+    flex: 1 !important; /* Forces buttons to grow into the wide space */
+    min-width: 0 !important;
+    white-space: nowrap !important; /* Prevents text from breaking into two lines */
+}
