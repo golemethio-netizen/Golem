@@ -34,10 +34,7 @@ window.fetchProducts = async (category = window.currentCategory || 'All') => {
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
-// Inside your fetchProducts loop:
-products.forEach(item => {
-    grid.innerHTML += window.generateItemHTML(item);
-});
+
     
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
