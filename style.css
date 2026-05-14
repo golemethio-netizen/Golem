@@ -1159,3 +1159,68 @@ body {
     .quick-contact-bar a,
     .quick-contact-bar button { min-width: 44px; flex: 0 0 44px; }
 }
+
+
+/* --- Widen Layout to Edges --- */
+.container, 
+main {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 12px !important;  /* Minimal space so content doesn't hit the screen edge */
+    padding-right: 12px !important;
+    margin: 0 auto !important;
+}
+
+.golem-header {
+    max-width: 100% !important;
+    padding: 10px 12px !important;
+}
+
+/* Tighten the grid gap to fit more items across the new width */
+.masonry-wrapper {
+    gap: 10px !important; 
+}
+/* --- Fix Contact Buttons (Call, TG, WA, Share) --- */
+.product-actions, 
+.modal-footer-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 15px 0 !important;
+}
+
+.product-actions a, 
+.product-actions button,
+.modal-footer-actions a,
+.modal-footer-actions button {
+    flex: 1 !important; /* Forces all 4 buttons to be exactly the same width */
+    min-width: 0 !important; /* Essential: prevents buttons from 'pushing' out of the modal */
+    display: flex !important;
+    flex-direction: column !important; /* Icon on top, text below - saves horizontal space */
+    align-items: center !important;
+    padding: 10px 2px !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+}
+
+.product-actions i,
+.modal-footer-actions i {
+    font-size: 1.2rem !important;
+    margin-bottom: 4px !important;
+}
+
+@media (max-width: 380px) {
+    /* Hide button text on tiny screens to keep icons large and clickable */
+    .product-actions a span, 
+    .product-actions button span {
+        display: none !important;
+    }
+    
+    .product-actions a, 
+    .product-actions button {
+        padding: 12px 5px !important;
+    }
+}
