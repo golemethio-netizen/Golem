@@ -165,20 +165,20 @@ body {
     gap: 8px;
 }
 
-/* --- 3. Main Product Grid --- */
+/* Change this in your .container or main section */
 .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 15px;
+    max-width: 1400px; /* Optional: keep a max width for ultra-wide screens */
+    margin: 0 auto;
+    padding: 10px 2%; /* Reduced from 5% to 2% to fill the width */
 }
 
 .masonry-wrapper {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Desktop: 4 columns */
-    gap: 20px;
+    /* Adjust 'gap' to control space between items */
+    gap: 10px; /* Reduced from 20px or 30px */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     padding: 10px 0;
 }
-
 /* --- 4. Product Cards --- */
 .product-card {
     background: var(--glass-bg);
@@ -356,7 +356,7 @@ body {
 .menu-item.whatsapp i { color: #25d366; }
 
 /* --- 9. APP-LIKE MOBILE RESPONSIVENESS (Magic Happens Here) --- */
-@media (max-width: 768px) {
+@media (max-width: 758px) {
     body { padding-bottom: 80px; } /* Stops footer from hiding behind bottom nav */
     
     /* Header Reorganization */
@@ -399,7 +399,7 @@ body {
     /* 2-Column Grid for Phones */
     .masonry-wrapper {
         grid-template-columns: repeat(2, 1fr) !important; /* Force 2 columns */
-        gap: 10px;
+        gap: 8px;
         padding: 5px;
     }
 
