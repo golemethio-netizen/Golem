@@ -451,10 +451,50 @@
         }
 
         /* ── Very small phones ── */
-        @media (max-width: 360px) {
-            .masonry-wrapper { grid-template-columns: 1fr; }
-            .logo { font-size: 0.95rem; }
-        }
+    @media (max-width: 360px) {
+    .product-actions span, 
+    .modal-footer-actions span {
+        display: none !important; /* Only shows icons on very small phones */
+    }
+    .product-actions a, 
+    .product-actions button {
+        padding: 12px 5px !important;
+    }
+}
+        /* Target the action button container */
+.product-actions, 
+.modal-footer-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    width: 100% !important;
+    padding: 10px 0 !important;
+}
+
+/* Optimize individual buttons */
+.product-actions a, 
+.product-actions button,
+.modal-footer-actions a,
+.modal-footer-actions button {
+    flex: 1 !important; /* Force all 4 buttons to be the exact same width */
+    min-width: 0 !important; /* Prevents overflow/cutting off */
+    display: flex !important;
+    flex-direction: column !important; /* Icon on top, Text on bottom */
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 2px !important;
+    font-size: 10px !important; /* Smaller text ensures long words like 'Telegram' fit */
+    border-radius: 8px !important;
+    text-decoration: none !important;
+}
+
+/* Ensure icons are clear */
+.product-actions i,
+.modal-footer-actions i {
+    font-size: 1.2rem !important;
+    margin-bottom: 3px !important;
+}
     </style>
 </head>
 
