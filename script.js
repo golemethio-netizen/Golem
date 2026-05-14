@@ -896,3 +896,52 @@ async function postToSocialMedia(product) {
         body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
     }).catch(err => console.log("Telegram notification silently failed", err));
 }
+
+
+// --- UPDATE THIS IN script.js ---
+window.generateItemHTML = function(item) {
+    // 1. PROFESSIONAL JOB LISTING VIEW
+    if (item.category === 'Jobs') {
+        return `
+            <div class="job-card" onclick="showProductDetails('${item.id}')">
+                <div class="job-badge"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full-Time'}</div>
+                <h3 class="job-title">${item.title}</h3>
+                <div class="job-meta">
+                    <span><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${item.location}</span>
+                </div>
+                <div class="job-footer">
+                    <span class="job-salary">${item.price} ETB / Month</span>
+                    <button class="job-apply-btn">Details</button>
+                </div>
+            </div>`;
+    } 
+    
+    // 2. PROFESSIONAL SERVICE PROVIDER VIEW
+    if (item.category === 'Services') {
+        return `
+            <div class="service-card" onclick="showProductDetails('${item.id}')">
+                <div class="service-image-container">
+                    <img src="${item.image_url}" onerror="this.src='https://via.placeholder.com/300x150?text=Service'">
+                    <div class="service-status">Verified</div>
+                </div>
+                <div class="service-info">
+                    <h3 class="service-title">${item.title}</h3>
+                    <p class="service-price">Starting: <strong>${item.price} ETB</strong></p>
+                </div>
+            </div>`;
+    }
+
+    // 3. STANDARD PRODUCT VIEW (Electronics, Furniture, etc.)
+    return `
+        <div class="product-card" onclick="showProductDetails('${item.id}')">
+            <div class="product-image-container">
+                <img src="${item.image_url}" alt="${item.title}">
+            </div>
+            <div class="product-info">
+                <h3>${item.title}</h3>
+                <p class="price">${item.price} ETB</p>
+                <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+            </div>
+        </div>`;
+};
