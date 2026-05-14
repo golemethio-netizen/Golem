@@ -479,7 +479,7 @@
         <!-- ── Desktop inline nav (hidden on mobile) ── -->
         <nav class="nav-container-horizontal desktop-nav">
             <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
-            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color:#2ed573;"></i><p>Sell Item</p></a>
+            <a href="sell.html" id="sellBtn" class="sell-trigger">Sell</a>
             <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
             <a href="saved.html" class="nav-item-box bg-items" style="position:relative;">
                 <i class="fas fa-heart"></i><p>Saved</p>
@@ -1072,8 +1072,13 @@ function generateItemHTML(item) {
             document.getElementById('mobileSellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
             document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
             document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
-            document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
+           document.querySelectorAll('.sell-trigger').forEach(button => {
+    button.addEventListener('click', function (e) {
+
+                
                 btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
+        if (window.checkAuthToSell) {
+            window.checkAuthToSell(e);
             });
             document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
             document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
