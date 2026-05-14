@@ -1162,20 +1162,20 @@ body {
 
 
 /* --- Widen Layout to Edges --- */
+/* Removes side margins to use the full screen width */
 .container, 
 main {
     max-width: 100% !important;
     width: 100% !important;
-    padding-left: 12px !important;  /* Minimal space so content doesn't hit the screen edge */
-    padding-right: 12px !important;
-    margin: 0 auto !important;
+    padding-left: 8px !important;  /* Minimal padding so content doesn't hit the screen glass */
+    padding-right: 8px !important;
+    margin: 0 !important;
 }
 
 .golem-header {
     max-width: 100% !important;
-    padding: 10px 12px !important;
+    padding: 10px 8px !important;
 }
-
 /* Tighten the grid gap to fit more items across the new width */
 .masonry-wrapper {
     gap: 10px !important; 
@@ -1205,7 +1205,11 @@ main {
     font-size: 11px !important;
     text-align: center !important;
 }
-
+/* Ensure icons are prominent */
+.product-actions i {
+    font-size: 1.2rem !important;
+    margin-bottom: 4px !important;
+}
 .product-actions i,
 .modal-footer-actions i {
     font-size: 1.2rem !important;
@@ -1219,8 +1223,28 @@ main {
         display: none !important;
     }
     
-    .product-actions a, 
-    .product-actions button {
-        padding: 12px 5px !important;
-    }
+/* Optimize individual action buttons */
+.product-actions a, 
+.product-actions button {
+    flex: 1 !important; /* Forces all buttons to share space equally */
+    min-width: 0 !important; /* Prevents them from pushing out of bounds */
+    display: flex !important;
+    flex-direction: column !important; /* Icon on top, Text on bottom */
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 2px !important;
+    font-size: 10px !important; /* Small font ensures long names like 'Telegram' fit */
+    border-radius: 8px !important;
+    text-decoration: none !important;
+}
+}
+
+/* Target the button container (likely .product-actions or .modal-footer-actions) */
+.product-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 5px !important;
+    width: 100% !important;
+    padding: 10px 0 !important;
 }
