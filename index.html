@@ -495,6 +495,28 @@
     font-size: 1.2rem !important;
     margin-bottom: 3px !important;
 }
+
+/* Job Detail Styling */
+.job-detail-view { padding: 10px; }
+.badge-job { background: #e3f2fd; color: #1976d2; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; }
+.company-name { color: #666; font-size: 1.1rem; margin-top: 5px; }
+.job-stats-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+    margin: 20px 0; 
+    background: #f8f9fa; 
+    padding: 15px; 
+    border-radius: 8px; 
+}
+.stat-item { font-size: 0.9rem; color: #444; }
+
+/* Service Detail Styling */
+.service-main-img { width: 100%; border-radius: 12px; height: 250px; object-fit: cover; }
+.badge-service { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; }
+.service-price { font-size: 1.4rem; font-weight: bold; color: #2ecc71; margin: 10px 0; }
+.service-features { display: flex; gap: 15px; margin-top: 15px; font-size: 0.85rem; color: #555; }
+        
     </style>
 </head>
 
@@ -1263,6 +1285,61 @@ function createProfessionalCard(item) {
             </div>
         </div>`;
 }
+window.showProductDetails = async function(id) {
+    const { data: item, error } = await _supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error || !item) return;
+
+    const modalContent = document.getElementById('modalDetailsContent');
+    
+    // Check Category and switch view
+    if (item.category === 'Jobs') {
+        modalContent.innerHTML = `
+            <div class="job-detail-view">
+                <div class="job-header">
+                    <span class="badge-job">${item.job_type || 'Full-Time'}</span>
+                    <h2>${item.title}</h2>
+                    <p class="company-name"><i class="fas fa-building"></i> ${item.company || 'Private Company'}</p>
+                </div>
+                <div class="job-stats-grid">
+                    <div class="stat-item"><i class="fas fa-money-bill-wave"></i> <strong>Salary:</strong> ${item.price} ETB</div>
+                    <div class="stat-item"><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> ${item.location}</div>
+                    <div class="stat-item"><i class="fas fa-calendar-check"></i> <strong>Deadline:</strong> ${item.deadline || 'Open'}</div>
+                </div>
+                <div class="job-description">
+                    <h3>Description</h3>
+                    <p>${item.description}</p>
+                </div>
+            </div>`;
+    } else if (item.category === 'Services') {
+        modalContent.innerHTML = `
+            <div class="service-detail-view">
+                <img src="${item.image_url}" class="service-main-img">
+                <div class="service-header">
+                    <span class="badge-service">Verified Provider</span>
+                    <h2>${item.title}</h2>
+                    <p class="service-price">Starting from ${item.price} ETB</p>
+                </div>
+                <div class="service-body">
+                    <h3>Service Details</h3>
+                    <p>${item.description}</p>
+                    <div class="service-features">
+                        <span><i class="fas fa-check-circle"></i> Quick Response</span>
+                        <span><i class="fas fa-check-circle"></i> Best Price</span>
+                    </div>
+                </div>
+            </div>`;
+    } else {
+        // KEEP YOUR EXISTING PRODUCT DETAIL HTML HERE
+        modalContent.innerHTML = `... your current product detail code ...`;
+    }
+
+    document.getElementById('detailsModal').classList.add('active');
+};
         
     </script>
  
