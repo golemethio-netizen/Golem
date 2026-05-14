@@ -134,8 +134,18 @@
 
 /* Mobile full detail override */
 @media (max-width: 768px) {
-    .job-card, .service-card {
-        padding: 15px;
+    .container {
+        padding: 5px 5px; /* Minimal 5px gap from the phone edge */
+    }
+
+    .masonry-wrapper {
+        gap: 6px; /* Very tight spacing for a modern app feel */
+        /* Forces exactly 2 columns to keep it organized */
+        grid-template-columns: repeat(2, 1fr); 
+    }
+
+    .product-card {
+        border-radius: 8px; /* Slightly smaller radius looks better in tight grids */
     }
 }
         /* ═══════════════════════════════════════════════════════
@@ -339,10 +349,13 @@
             .nav-item-box p { font-size: 0.85rem; font-weight: 600; }
 
             /* desktop grid: 3-4 columns */
-            .masonry-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-                gap: 18px;
-            }
+        .masonry-wrapper {
+    display: grid;
+    /* Adjust 'gap' from 20px to 8px or 10px */
+    gap: 10px; 
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    padding: 5px 0;
+}
 
             /* job/service cards span 1 col on desktop */
             .job-card, .service-card { grid-column: span 1; }
@@ -405,11 +418,13 @@
             .filter-btn { flex: 0 0 auto; font-size: 0.82rem; padding: 7px 14px; }
 
             /* ── Product grid ── */
-            .masonry-wrapper {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 11px;
-            }
-
+        .masonry-wrapper {
+    display: grid;
+    /* Adjust 'gap' from 20px to 8px or 10px */
+    gap: 10px; 
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    padding: 5px 0;
+}
             /* Jobs / Services span full width on mobile */
             .job-card, .service-card { grid-column: 1 / -1; }
 
