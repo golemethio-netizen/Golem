@@ -66,7 +66,22 @@
             background: #333; color: white; border: none;
             border-radius: 10px; font-weight: bold; cursor: pointer;
         }
+/* Job & Service Specific Layout */
+.job-card, .service-card {
+    grid-column: 1 / -1; /* Makes them span full width if in a masonry grid */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+}
 
+/* Mobile full detail override */
+@media (max-width: 768px) {
+    .job-card, .service-card {
+        padding: 15px;
+    }
+}
         /* ═══════════════════════════════════════════════════════
            JOB CARD — Dark blue theme
         ═══════════════════════════════════════════════════════ */
@@ -1026,6 +1041,65 @@
                 await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
             } catch (err) { console.log('Audit log recording skipped:', err); }
         };
+
+
+function createProfessionalCard(item) {
+    const isJob = item.category === 'Jobs';
+    const isService = item.category === 'Services';
+
+    // 1. JOBS CARD TEMPLATE
+    if (isJob) {
+        return `
+            <div class="job-card" onclick="showJobDetails('${item.id}')">
+                <div class="job-type-badge"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full Time'}</div>
+                <h3 class="job-title">${item.title}</h3>
+                <div class="job-company"><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</div>
+                <div class="job-tags">
+                    <span class="job-tag blue"><i class="fas fa-clock"></i> ${item.experience || 'Entry Level'}</span>
+                    <span class="job-tag green"><i class="fas fa-money-bill-wave"></i> ${item.price} ETB</span>
+                </div>
+                <div class="job-meta-row">
+                    <div class="job-location"><i class="fas fa-map-marker-alt"></i> ${item.location}</div>
+                </div>
+                <div class="deadline-badge"><i class="fas fa-hourglass-half"></i> Deadline: ${item.deadline || 'Ongoing'}</div>
+            </div>`;
+    }
+
+    // 2. SERVICES CARD TEMPLATE
+    if (isService) {
+        return `
+            <div class="service-card" onclick="showServiceDetails('${item.id}')">
+                <div class="service-banner">
+                    <img src="${item.image_url}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/150?text=Service'">
+                    <div class="service-type-badge">${item.sub_category || 'Service'}</div>
+                    <div class="service-rating"><i class="fas fa-star"></i> 5.0</div>
+                </div>
+                <div class="service-body">
+                    <h3 class="service-name">${item.title}</h3>
+                    <div class="service-provider"><i class="fas fa-user-check"></i> Verified Provider</div>
+                    <p class="service-snippet">${item.description.substring(0, 80)}...</p>
+                </div>
+                <div class="service-footer">
+                    <div class="service-price">${item.price} <span class="service-price-label">ETB/Starting</span></div>
+                    <div class="service-actions">
+                        <button class="svc-btn svc-btn-primary">View</button>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // 3. DEFAULT PRODUCT CARD (For Electronics, Furniture, etc.)
+    return `
+        <div class="product-card" onclick="showProductDetails('${item.id}')">
+            <img src="${item.image_url}" alt="${item.title}">
+            <div class="product-info">
+                <h4>${item.title}</h4>
+                <p class="price">${item.price} ETB</p>
+                <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+            </div>
+        </div>`;
+}
+        
     </script>
  
 </body>
