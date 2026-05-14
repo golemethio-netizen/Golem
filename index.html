@@ -663,33 +663,31 @@
     <!-- ══════════════════════════════════════════════════════════
          JOBS & SERVICES CARD RENDERER
     ══════════════════════════════════════════════════════════════ -->
-     <script>
+   <script>
     (function () {
         'use strict';
 
         /* ── helpers ── */
         function esc(str) {
-            return String(str || '')
-                .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-                .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
+
         function phone(p) { return String(p || '').replace(/\s/g,''); }
+
+        function parseSpecs(desc) {
+            const specs = {};
+            if (!desc) return specs;
+            const block = desc.split('--- Specs ---')[1] || '';
+            block.split('\n').forEach(line => {
+                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+            });
+            return specs;
+        }
 
         function cleanDesc(desc) {
             if (!desc) return '';
             return desc.split('--- Specs ---')[0].trim();
-        }
-
-        function parseSpecs(desc) {
-            const specs = {};
-            if (!desc || !desc.includes('--- Specs ---')) return specs;
-            const block = desc.split('--- Specs ---')[1];
-            if (!block) return specs;
-            block.split('\n').forEach(line => {
-                const [key, ...parts] = line.split(':');
-                if (key && parts.length) specs[key.trim().toLowerCase()] = parts.join(':').trim();
-            });
-            return specs;
         }
 
         const svcEmoji = {
@@ -709,16 +707,22 @@
             'massage / spa':'💆','laundry service':'👕',
             'childcare / babysitting':'👶','elder care':'🧓',
         };
-        function svcIcon(cat) { return cat ? (svcEmoji[cat.toLowerCase()] || '🛠') : '🛠'; }
 
-        /* ─────────────────────────
-           JOB CARD
-        ───────────────────────── */
+        function svcIcon(cat) {
+            if (!cat) return '🛠';
+            return svcEmoji[cat.toLowerCase()] || '🛠';
+        }
+
+        /* ══════════════════════════════
+           JOB CARD HTML
+        ══════════════════════════════ */
         function buildJobCard(item) {
-            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, '%27');
-            const sp      = parseSpecs(item.description);
-            const desc    = cleanDesc(item.description);
-            const ph      = phone(item.seller_phone);
+            // FIX: Securely encode the JSON object so quotes don't break the HTML
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
 
             const jobType  = sp['job type']  || 'Full-Time';
             const industry = sp['industry']  || '';
@@ -734,8 +738,11 @@
 
             let salaryStr = 'Negotiable';
             if (salMin && salMax) salaryStr = `${Number(salMin).toLocaleString()} – ${Number(salMax).toLocaleString()} ETB`;
-            else if (salMin)     salaryStr = `From ${Number(salMin).toLocaleString()} ETB`;
+            else if (salMin) salaryStr = `From ${Number(salMin).toLocaleString()} ETB`;
             else if (item.price && item.price > 0) salaryStr = `${Number(item.price).toLocaleString()} ETB`;
+
+            const typeColor = { 'Full-Time':'blue','Part-Time':'orange','Contract':'purple','Internship':'green','Freelance':'red' };
+            const badgeColor = typeColor[jobType] || 'blue';
 
             const skillTags = skills ? skills.split(',').slice(0,4).map(s =>
                 `<span class="job-tag purple"><i class="fas fa-check" style="font-size:8px;"></i>${esc(s.trim())}</span>`
@@ -744,36 +751,41 @@
             const deadlineBadge = deadline
                 ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
 
-            let saved = [];
+            // Check if saved
+            let saved =[];
             try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
             const isSaved = saved.includes(item.id);
 
             return `
             <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
-                <button class="job-wishlist-btn ${isSaved ? 'active' : ''}"
-                    onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
-                    <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
-                </button>
-                <div>
+
+                <div class="job-card-header">
                     <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
+                    <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                    <div class="job-title">${esc(item.name)}</div>
+                    ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
                 </div>
-                <div class="job-title">${esc(item.name)}</div>
-                ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
+
                 <div class="job-tags">
-                    ${industry  ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i>${esc(industry)}</span>` : ''}
-                    ${exp       ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i>${esc(exp)}</span>` : ''}
-                    ${edu       ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i>${esc(edu)}</span>` : ''}
-                    ${positions ? `<span class="job-tag orange"><i class="fas fa-users" style="font-size:8px;"></i>${esc(positions)} pos.</span>` : ''}
+                    ${industry ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i>${esc(industry)}</span>` : ''}
+                    ${exp ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i>${esc(exp)}</span>` : ''}
+                    ${edu ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i>${esc(edu)}</span>` : ''}
+                    ${positions ? `<span class="job-tag orange"><i class="fas fa-users" style="font-size:8px;"></i>${esc(positions)} position${positions>1?'s':''}</span>` : ''}
                     ${skillTags}
                 </div>
+
                 <div class="job-meta-row">
                     <div>
                         <div class="job-salary">${salaryStr}</div>
                         ${deadlineBadge}
                     </div>
-                    ${location ? `<div class="job-location"><i class="fas fa-map-marker-alt"></i>${esc(location)}</div>` : ''}
+                    <div class="job-location"><i class="fas fa-map-marker-alt"></i>${esc(location || item.location || 'Ethiopia')}</div>
                 </div>
+
                 ${desc ? `<p class="job-snippet">${esc(desc)}</p>` : ''}
+
                 <div class="job-actions">
                     <a href="tel:${ph}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
                         <i class="fas fa-phone"></i> Call / Apply
@@ -788,14 +800,16 @@
             </div>`;
         }
 
-        /* ─────────────────────────
-           SERVICE CARD
-        ───────────────────────── */
+        /* ══════════════════════════════
+           SERVICE CARD HTML
+        ══════════════════════════════ */
         function buildServiceCard(item) {
-            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, '%27');
-            const sp      = parseSpecs(item.description);
-            const desc    = cleanDesc(item.description);
-            const ph      = phone(item.seller_phone);
+            // FIX: Securely encode the JSON object
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
 
             const svcCat     = sp['service category'] || '';
             const provider   = sp['provider name'] || '';
@@ -808,7 +822,9 @@
             const payment    = sp['payment methods'] || '';
 
             const priceStr = item.price && item.price > 0
-                ? `${Number(item.price).toLocaleString()} ETB` : 'On Request';
+                ? `${Number(item.price).toLocaleString()} ETB`
+                : 'On Request';
+
             const pricingLabel = pricing || 'Per Project';
 
             const hlTags = highlights ? highlights.split(',').slice(0,4).map(h =>
@@ -821,38 +837,42 @@
 
             const icon = svcIcon(svcCat);
 
-            let saved = [];
+            // Check if saved
+            let saved =[];
             try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
             const isSaved = saved.includes(item.id);
 
             return `
             <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
+
                 <div class="service-card-header">
                     <div class="service-banner">
                         ${item.image
                             ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">`
                             : `<span class="service-banner-fallback">${icon}</span>`}
-                        <span class="service-type-badge">
-                            <i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}
-                        </span>
+                        <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
                         ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
-                        <button class="service-wishlist-btn ${isSaved ? 'active' : ''}"
-                            onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                        <button class="service-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
                             <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                         </button>
                     </div>
                 </div>
+
                 <div class="service-body">
                     <div class="service-name">${esc(item.name)}</div>
                     ${provider ? `<div class="service-provider"><i class="fas fa-user-circle"></i>${esc(provider)}</div>` : ''}
+
                     <div class="service-highlights">
-                        ${response ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${esc(response)}</span>` : ''}
-                        ${area    ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${esc(area)}</span>` : ''}
-                        ${avail   ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${esc(avail)}</span>` : ''}
-                        ${hlTags}${payTags}
+                        ${response   ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${esc(response)}</span>` : ''}
+                        ${area       ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${esc(area)}</span>` : ''}
+                        ${avail      ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${esc(avail)}</span>` : ''}
+                        ${hlTags}
+                        ${payTags}
                     </div>
+
                     ${desc ? `<p class="service-snippet">${esc(desc)}</p>` : ''}
                 </div>
+
                 <div class="service-footer">
                     <div>
                         <div class="service-price">${priceStr}</div>
@@ -870,61 +890,46 @@
             </div>`;
         }
 
-        /* ─────────────────────────────────────────────────────
-           PATCH window.renderProduct  (called by script.js)
-           Intercepts Jobs & Services; passes rest to original
-        ───────────────────────────────────────────────────── */
-        const _origRenderProduct = window.renderProduct;
+        /* ══════════════════════════════
+           PATCH: intercept renderProduct
+           called from script.js
+        ══════════════════════════════ */
+        const _orig = window.renderProduct;
 
         window.renderProduct = function (item) {
             if (item.category === 'Jobs') {
-                const w = document.createElement('div');
-                w.innerHTML = buildJobCard(item);
-                return w.firstElementChild;
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildJobCard(item);
+                return wrapper.firstElementChild;
             }
             if (item.category === 'Services') {
-                const w = document.createElement('div');
-                w.innerHTML = buildServiceCard(item);
-                return w.firstElementChild;
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildServiceCard(item);
+                return wrapper.firstElementChild;
             }
-            if (typeof _origRenderProduct === 'function') return _origRenderProduct(item);
+            // all other categories fall through to original renderer
+            if (typeof _orig === 'function') return _orig(item);
         };
 
-        /* ─────────────────────────────────────────────────────
-           FIXED window.renderProducts
-           Replaces the broken version in the inline script below.
-           Uses window.renderProduct so Jobs/Services are handled
-           automatically via the patch above.
-        ───────────────────────────────────────────────────── */
-        window.renderProducts = function (items) {
-            const grid = document.getElementById('productGrid');
-            if (!grid) return;
-            grid.innerHTML = '';
+        /* ══════════════════════════════════════════════════════
+           FALLBACK
+        ══════════════════════════════════════════════════════ */
+        let _itemCache = {};
 
-            if (!items || items.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:60px; color:#888;">No items found in this category.</div>`;
-                return;
-            }
-
-            items.forEach(function (item) {
-                let el = null;
-                try {
-                    // renderProduct is patched above — handles all categories
-                    if (typeof window.renderProduct === 'function') {
-                        el = window.renderProduct(item);
-                    }
-                } catch (err) {
-                    console.error('Card render error for item', item.id, err);
-                }
-                if (el) grid.appendChild(el);
-            });
+        const _origFetch = window.fetchProducts;
+        window.fetchProducts = async function () {
+            const result = typeof _origFetch === 'function' ? await _origFetch.apply(this, arguments) : undefined;
+            setTimeout(reRenderSpecialCards, 300);
+            return result;
         };
 
-        /* ─────────────────────────────────────────────────────
-           Expose builders globally (for any external callers)
-        ───────────────────────────────────────────────────── */
-        window.buildJobCard     = buildJobCard;
-        window.buildServiceCard = buildServiceCard;
+        const _origOpen = window.openProductModal;
+        window.openProductModal = function (item) {
+            if (item && item.id) _itemCache[item.id] = item;
+            if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
+        };
+
+        function reRenderSpecialCards() { }
 
     })();
     </script>
@@ -934,96 +939,44 @@
     ══════════════════════════════════════════════════════ -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            /* ── Nav ── */
             document.getElementById('helpBtn').addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
             document.getElementById('langToggleBtn').addEventListener('click', window.toggleLanguage);
             document.getElementById('footerLangBtn').addEventListener('click', window.toggleLanguage);
             document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
             document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
             document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
-
-            /* sellBtn & mobileSellBtn both gate-check auth */
-            ['sellBtn', 'mobileSellBtn'].forEach(function (id) {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('click', function (e) { window.checkAuthToSell(e); });
-            });
-
-            /* Sync mobile cart badge count from desktop badge */
-            function syncMobileBadge() {
-                const desktopBadge = document.getElementById('cartBadge');
-                const mobileBadge  = document.getElementById('mobileCartBadge');
-                if (!desktopBadge || !mobileBadge) return;
-                const count = desktopBadge.innerText || '0';
-                mobileBadge.innerText = count;
-                mobileBadge.style.display = parseInt(count) > 0 ? 'flex' : 'none';
-            }
-            // Run once + observe desktop badge changes
-            syncMobileBadge();
-            const cartObserver = new MutationObserver(syncMobileBadge);
-            const desktopBadge = document.getElementById('cartBadge');
-            if (desktopBadge) cartObserver.observe(desktopBadge, { childList: true, characterData: true, subtree: true });
-
-            /* Sync Admin link visibility to mobile nav */
-            const adminLink       = document.getElementById('adminNavLink');
-            const mobileAdminLink = document.getElementById('mobileAdminLink');
-            if (adminLink && mobileAdminLink) {
-                const adminObserver = new MutationObserver(function () {
-                    mobileAdminLink.style.display = adminLink.style.display;
-                });
-                adminObserver.observe(adminLink, { attributes: true, attributeFilter: ['style'] });
-            }
-
-            /* ── Filters ── */
+            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
             document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
             document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
             document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
                 btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
             });
             document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
-
-            /* ── Share ── */
             document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
             document.getElementById('shareWhatsAppBtn').addEventListener('click', window.shareToWhatsApp);
             document.getElementById('shareFacebookBtn').addEventListener('click', window.shareToFacebook);
-
-            /* ── Support Modal ── */
             document.getElementById('closeSupportModal').addEventListener('click', window.toggleSupportModal);
             document.getElementById('supportModal').addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
             document.getElementById('supportForm').addEventListener('submit', window.handleSupportSubmit);
-
-            /* ── Auth Modal ── */
             document.getElementById('closeAuthModal').addEventListener('click', window.toggleModal);
             document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
             document.getElementById('authForm').addEventListener('submit', window.handleAuth);
             document.getElementById('toggleAuthModeLink').addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
-
-            /* ── Product Modal ── */
             document.getElementById('closeProductModal').addEventListener('click', window.closeProductModal);
             document.getElementById('productModal').addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
             document.getElementById('callContact').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText); });
             document.getElementById('telegramOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText); });
             document.getElementById('whatsappOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText); });
-            document.getElementById('saveToWishlistBtn').addEventListener('click', function () {
-                window.addToCartFromModal();
-                window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText);
-            });
-
-            /* ── Misc ── */
+            document.getElementById('saveToWishlistBtn').addEventListener('click', function () { window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText); });
             document.getElementById('sponsorLink').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText); });
             document.getElementById('closeSuccessModal').addEventListener('click', function () { document.getElementById('successModal').style.display = 'none'; });
-
-            /* ── Chat toggle ── */
             document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
             document.getElementById('closeToastBtn').addEventListener('click', function (e) { e.stopPropagation(); closeToast(); });
             document.addEventListener('click', function (event) {
                 const menu = document.getElementById('chatMenu');
                 const btn  = document.getElementById('chatToggleBtn');
-                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) {
-                    menu.style.display = 'none';
-                }
+                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) menu.style.display = 'none';
             });
-
-            /* ── UTM / Post status ── */
             checkPostStatus();
             const urlParams = new URLSearchParams(window.location.search);
             const utmSource = urlParams.get('utm_source');
@@ -1031,8 +984,6 @@
                 window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${urlParams.get('utm_campaign') || 'General'}`);
                 sessionStorage.setItem('utm_logged', 'true');
             }
-
-            /* ── Admin online status ── */
             loadAdminStatus();
             setInterval(loadAdminStatus, 120000);
         });
@@ -1051,17 +1002,17 @@
 
         async function loadAdminStatus() {
             if (typeof _supabase === 'undefined') return;
-            try {
-                const { data, error } = await _supabase.from('profiles').select('last_seen').eq('is_owner', true).maybeSingle();
-                if (error || !data || !data.last_seen) return;
-                const diff  = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
-                const dot   = document.querySelector('.online-dot');
+            const { data, error } = await _supabase.from('profiles').select('last_seen').eq('is_owner', true).maybeSingle();
+            if (error) { console.error('Error fetching admin status:', error); return; }
+            if (data && data.last_seen) {
+                const diff = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
+                const dot = document.querySelector('.online-dot');
                 const label = document.querySelector('.chat-label');
                 if (!dot || !label) return;
-                if      (diff < 5)  { dot.style.background = '#2ed573'; label.innerHTML = `Contact Us<br><small style="font-size:10px;opacity:0.8;">Online Now</small>`; }
-                else if (diff < 60) { dot.style.background = '#f1c40f'; label.innerHTML = `Contact Us<br><small style="font-size:10px;opacity:0.8;">Active ${diff}m ago</small>`; }
-                else                { dot.style.background = '#ccc';    label.innerHTML = `Contact Us<br><small style="font-size:10px;opacity:0.8;">Offline</small>`; }
-            } catch (err) { /* silently skip */ }
+                if (diff < 5)       { dot.style.background = '#2ed573'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`; }
+                else if (diff < 60) { dot.style.background = '#f1c40f'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diff}m ago</small>`; }
+                else                { dot.style.background = '#ccc';    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`; }
+            }
         }
 
         window.logBuyerAction = async function (buyerEmail, actionDescription) {
@@ -1073,7 +1024,7 @@
                     userEmail = user ? (user.email || user.user_metadata?.full_name || 'Logged-In User') : 'Guest/Unknown';
                 }
                 await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
-            } catch (err) { console.log('Audit log skipped:', err); }
+            } catch (err) { console.log('Audit log recording skipped:', err); }
         };
     </script>
  
