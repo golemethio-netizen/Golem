@@ -23,167 +23,353 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 
-  <style>
-    /* ═══════════════════════════════════════════════════════
-       1. LAYOUT & FOUNDATION
-    ═══════════════════════════════════════════════════════ */
-    :root {
-        --primary-blue: #007bff;
-        --job-navy: #1a1a2e;
-        --svc-purple: #7c3aed;
-        --success-green: #2ed573;
-        --danger-red: #e74c3c;
-        --bg-light: #f0f2f5;
-        --card-border: #e8f0fe;
-    }
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           LAYOUT FOUNDATION
+        ═══════════════════════════════════════════════════════ */
 
-    body { padding-bottom: 0; background-color: var(--bg-light); line-height: 1.6; }
+        /* Desktop nav is visible; mobile bottom nav is hidden by default */
+        .mobile-bottom-nav { display: none; }
+        .desktop-nav { display: flex; }
 
-    .desktop-nav { display: flex; align-items: center; gap: 6px; }
-    .mobile-bottom-nav { display: none; }
+        /* ── HEADER ── */
+        .header-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .help-link {
+            color: #555; font-size: 0.85rem; font-weight: 600;
+            text-decoration: none; display: flex; align-items: center;
+            gap: 5px; transition: color 0.3s;
+        }
+        .help-link:hover { color: #007bff; }
 
-    .masonry-wrapper {
-        display: grid;
-        gap: 12px;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        padding: 10px 0;
-    }
-
-    /* ═══════════════════════════════════════════════════════
-       2. JOB CARD — Professional Navy Theme
-    ═══════════════════════════════════════════════════════ */
-    .job-card {
-        grid-column: 1 / -1; /* Default full width */
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        border: 1px solid var(--card-border);
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .job-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-
-    .job-type-badge {
-        display: inline-flex; align-items: center; gap: 5px;
-        background: #f0f7ff; color: var(--primary-blue);
-        padding: 4px 10px; border-radius: 20px;
-        font-size: 11px; font-weight: 600; text-transform: uppercase;
-    }
-
-    .job-title { font-size: 1.1rem; font-weight: 700; color: var(--job-navy); margin: 0; }
-    .job-salary { font-size: 1rem; font-weight: 700; color: var(--success-green); }
-
-    .job-tag {
-        font-size: 11px; padding: 3px 9px; border-radius: 6px;
-        font-weight: 600; display: inline-flex; gap: 4px;
-    }
-    .job-tag.blue   { background: #eef2ff; color: #4f46e5; }
-    .job-tag.green  { background: #ecfdf5; color: #059669; }
-
-    /* ═══════════════════════════════════════════════════════
-       3. SERVICE CARD — Creative Purple Theme
-    ═══════════════════════════════════════════════════════ */
-    .service-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid #f0ebff;
-        transition: transform 0.2s ease;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .service-banner {
-        width: 100%; height: 130px;
-        position: relative;
-        background: linear-gradient(135deg, #f5f0ff 0%, #ede9fe 100%);
-    }
-
-    .service-banner img { width: 100%; height: 100%; object-fit: cover; }
-
-    .service-type-badge {
-        position: absolute; top: 10px; left: 12px;
-        font-size: 10px; font-weight: 700;
-        padding: 3px 9px; border-radius: 20px;
-        background: rgba(124,58,237,0.12); color: var(--svc-purple);
-        backdrop-filter: blur(4px);
-    }
-
-    .service-price { font-size: 1.1rem; font-weight: 800; color: var(--svc-purple); }
-
-    /* ═══════════════════════════════════════════════════════
-       4. ACTION BUTTONS (The 4-Column Grid)
-    ═══════════════════════════════════════════════════════ */
-    .product-actions, .modal-footer-actions {
-        display: flex !important;
-        justify-content: space-between !important;
-        gap: 6px !important;
-        width: 100% !important;
-        padding: 10px 0 !important;
-    }
-
-    .product-actions a, .product-actions button,
-    .modal-footer-actions a, .modal-footer-actions button {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        padding: 8px 2px !important;
-        font-size: 10px !important;
-        border-radius: 10px !important;
-        border: none;
-        text-decoration: none;
-    }
-
-    .product-actions i { font-size: 1.2rem !important; margin-bottom: 3px !important; }
-
-    /* ═══════════════════════════════════════════════════════
-       5. MOBILE OPTIMIZATIONS (≤ 768px)
-    ═══════════════════════════════════════════════════════ */
-    @media (max-width: 768px) {
-        body { padding-bottom: 75px; }
-
-        .container { padding: 5px 8px; }
-
-        .masonry-wrapper {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+        /* ── MODAL ── */
+        .modal-flex-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-flex-actions .contact-btn { flex: 1; min-width: 120px; }
+        .success-modal-inner {
+            background: white; padding: 40px; border-radius: 20px;
+            text-align: center; max-width: 400px; width: 90%; position: relative;
+        }
+        .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
+        .success-back-btn {
+            margin-top: 25px; width: 100%; padding: 15px;
+            background: #333; color: white; border: none;
+            border-radius: 10px; font-weight: bold; cursor: pointer;
         }
 
-        .desktop-nav { display: none !important; }
+        /* ═══════════════════════════════════════════════════════
+           JOB CARD — Dark blue theme
+        ═══════════════════════════════════════════════════════ */
+        .job-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e8f0fe;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .job-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
-        .mobile-bottom-nav {
-            display: flex !important;
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: white; border-top: 1px solid #eee;
-            padding: 8px 0 10px; z-index: 1000;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+        .job-type-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #f0f7ff; color: #007bff;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+        }
+        .job-title { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 4px 28px 2px 0; line-height: 1.3; }
+        .job-company { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; }
+        .job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .job-tag {
+            font-size: 11px; padding: 3px 9px; border-radius: 6px;
+            display: inline-flex; align-items: center; gap: 4px; font-weight: 600;
+        }
+        .job-tag.blue   { background: #eef2ff; color: #4f46e5; }
+        .job-tag.green  { background: #ecfdf5; color: #059669; }
+        .job-tag.purple { background: #faf5ff; color: #7c3aed; }
+        .job-tag.orange { background: #fff7ed; color: #ea580c; }
+        .job-tag.red    { background: #fff1f2; color: #e11d48; }
+
+        .job-meta-row {
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 8px;
+        }
+        .job-salary { font-size: 1rem; font-weight: 700; color: #059669; }
+        .job-location {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11.5px; color: #888;
+        }
+        .deadline-badge {
+            font-size: 11px; color: #e74c3c;
+            display: inline-flex; align-items: center; gap: 4px; margin-top: 2px;
+        }
+        .job-snippet {
+            font-size: 12px; color: #888; line-height: 1.55; margin: 0;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .job-actions {
+            display: grid;
+            grid-template-columns: 1fr 42px 42px;
+            gap: 8px; margin-top: 4px;
+        }
+        .job-btn {
+            height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; text-decoration: none; font-size: 13px;
+            font-weight: 600; transition: opacity 0.2s, transform 0.1s;
+            border: none; cursor: pointer; font-family: inherit;
+        }
+        .job-btn:hover { opacity: 0.88; transform: scale(1.01); }
+        .job-btn-primary { background: #1a1a2e; color: white; }
+        .job-btn-tg      { background: #0088cc; color: white; }
+        .job-btn-wa      { background: #25d366; color: white; }
+        .job-wishlist-btn {
+            position: absolute; top: 14px; right: 14px;
+            border: none; background: none; font-size: 17px;
+            color: #ccc; cursor: pointer; transition: color 0.15s;
+            padding: 4px;
+        }
+        .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #ff4757; }
+
+        /* ═══════════════════════════════════════════════════════
+           SERVICE CARD — Purple theme
+        ═══════════════════════════════════════════════════════ */
+        .service-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #f0ebff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
+
+        .service-banner {
+            width: 100%; height: 130px;
+            overflow: hidden; position: relative;
+            background: linear-gradient(135deg, #f5f0ff 0%, #ede9fe 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .service-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .service-banner-fallback { font-size: 44px; opacity: 0.45; }
+        .service-type-badge {
+            position: absolute; top: 10px; left: 12px;
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            padding: 3px 9px; border-radius: 20px; letter-spacing: 0.07em;
+            background: rgba(124,58,237,0.12); color: #7c3aed;
+            border: 1px solid rgba(124,58,237,0.2);
+            backdrop-filter: blur(4px);
+        }
+        .service-rating {
+            position: absolute; top: 10px; right: 12px;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; color: #f59e0b;
+            background: rgba(255,255,255,0.85); padding: 3px 7px;
+            border-radius: 6px;
+        }
+        .service-wishlist-btn {
+            position: absolute; bottom: 10px; right: 12px;
+            background: rgba(255,255,255,0.85); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #aaa; font-size: 12px; transition: color 0.15s;
+        }
+        .service-wishlist-btn.active, .service-wishlist-btn:hover { color: #ff4757; }
+
+        .service-body { padding: 14px 15px 0; }
+        .service-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; line-height: 1.3; }
+        .service-provider {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #888; margin-bottom: 10px;
+        }
+        .service-highlights { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+        .svc-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 3px 8px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .svc-tag.purple { background: #faf5ff; color: #7c3aed; }
+        .svc-tag.pink   { background: #fff0f6; color: #d6336c; }
+        .svc-tag.teal   { background: #e6fffb; color: #0d9488; }
+        .svc-tag.amber  { background: #fffbeb; color: #d97706; }
+        .svc-tag.green  { background: #ecfdf5; color: #059669; }
+        .service-snippet {
+            font-size: 12px; color: #888; line-height: 1.55; margin: 0 0 10px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .service-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 15px 14px;
+            border-top: 1px solid #f5f0ff;
+            margin-top: 4px;
+        }
+        .service-price { font-size: 16px; font-weight: 800; color: #7c3aed; }
+        .service-price-label { font-size: 10px; color: #aaa; margin-top: 1px; }
+        .service-actions { display: flex; gap: 7px; }
+        .svc-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; padding: 8px 14px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+        }
+        .svc-btn:hover { opacity: 0.85; transform: scale(1.02); }
+        .svc-btn-primary { background: #7c3aed; color: white; }
+        .svc-btn-outline {
+            background: #faf5ff; color: #7c3aed;
+            border: 1px solid rgba(124,58,237,0.3);
         }
 
-        .mobile-bottom-nav a {
-            flex: 1; text-align: center; font-size: 0.65rem;
-            color: #666; text-decoration: none;
-            display: flex; flex-direction: column; align-items: center;
+        /* ═══════════════════════════════════════════════════════
+           CATEGORY SECTION DIVIDERS
+        ═══════════════════════════════════════════════════════ */
+        .category-section-header {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 0 4px;
+        }
+        .category-section-header h3 { font-size: 13px; font-weight: 700; color: #333; white-space: nowrap; }
+        .category-section-header .line { flex: 1; height: 1px; background: #eee; }
+
+        /* ═══════════════════════════════════════════════════════
+           DESKTOP  (≥ 769px)
+        ═══════════════════════════════════════════════════════ */
+        @media (min-width: 769px) {
+            .mobile-bottom-nav { display: none !important; }
+            .desktop-nav { display: flex !important; }
+
+            /* header nav stays inline */
+            .nav-container-horizontal {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 6px;
+                align-items: center;
+            }
+            .nav-item-box {
+                flex-direction: row;
+                gap: 6px;
+                padding: 8px 14px;
+            }
+            .nav-item-box p { font-size: 0.85rem; font-weight: 600; }
+
+            /* desktop grid: 3-4 columns */
+            .masonry-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 18px;
+            }
+
+            /* job/service cards span 1 col on desktop */
+            .job-card, .service-card { grid-column: span 1; }
         }
 
-        .mobile-bottom-nav i { font-size: 1.3rem; margin-bottom: 2px; color: var(--primary-blue); }
+        /* ═══════════════════════════════════════════════════════
+           MOBILE  (≤ 768px)
+        ═══════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            /* Give bottom nav breathing room */
+            body { padding-bottom: 72px; }
 
-        .job-card, .service-card { grid-column: 1 / -1; }
-    }
+            /* ── Header ── */
+            .golem-header { padding: 12px 14px 10px; }
+            .header-top-row { flex-wrap: nowrap; }
+            .logo { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+            .header-actions { gap: 8px; }
+            .hide-text-mobile { display: none !important; }
+            .help-link i { font-size: 1.25rem !important; }
+            .sign-in-btn {
+                padding: 0 !important; border-radius: 50% !important;
+                width: 36px; height: 36px;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
+            .sign-in-btn span { display: none; }
 
-    /* ═══════════════════════════════════════════════════════
-       6. DESKTOP TWEAKS (≥ 769px)
-    ═══════════════════════════════════════════════════════ */
-    @media (min-width: 769px) {
-        .job-card, .service-card { grid-column: span 1; }
-        .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-    }
-</style>
+            /* Search stays full-width below logo row */
+            .search-wrapper { width: 100%; margin-top: 10px; }
+
+            /* ── Desktop nav hidden on mobile ── */
+            .desktop-nav { display: none !important; }
+
+            /* ── Mobile bottom tab bar ── */
+            .mobile-bottom-nav {
+                display: flex !important;
+                position: fixed; bottom: 0; left: 0; width: 100%;
+                background: white; border-top: 1px solid #eee;
+                justify-content: space-around; align-items: center;
+                padding: 8px 0 10px; z-index: 1000;
+                box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+            }
+            .mobile-bottom-nav a {
+                display: flex; flex-direction: column; align-items: center; gap: 3px;
+                text-decoration: none; color: #666; flex: 1;
+                font-size: 0.6rem; font-weight: 600; position: relative;
+            }
+            .mobile-bottom-nav a i { font-size: 1.25rem; color: #3498db; }
+            .mobile-bottom-nav a.sell-tab i { color: #2ed573; }
+            .mobile-bottom-nav a.admin-tab i { color: #e74c3c; }
+            .mobile-bottom-nav a#mobileCartBadge { /* handled below */ }
+
+            /* ── Filter bar ── */
+            .filter-bar {
+                display: flex; flex-wrap: nowrap; overflow-x: auto;
+                -webkit-overflow-scrolling: touch; padding: 10px 6px;
+                gap: 8px; width: 100%;
+            }
+            .filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { flex: 0 0 auto; font-size: 0.82rem; padding: 7px 14px; }
+
+            /* ── Product grid ── */
+            .masonry-wrapper {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 11px;
+            }
+
+            /* Jobs / Services span full width on mobile */
+            .job-card, .service-card { grid-column: 1 / -1; }
+
+            /* ── Modal ── */
+            .modal-content { width: 96%; margin: 4% auto; max-height: 92vh; overflow-y: auto; }
+            .modal-footer-actions { flex-direction: column; }
+            .modal-flex-actions .contact-btn { flex: 1 1 100%; }
+
+            /* ── Floating chat ── */
+            .floating-chat { bottom: 82px; right: 14px; }
+            #chatMenu { bottom: 68px; right: 0; }
+
+            /* ── Sponsor ── */
+            .sponsor-content { flex-direction: column; text-align: center; }
+            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
+            .sponsor-actions { flex-direction: column; gap: 10px; }
+            .sponsor-actions a { margin-left: 0 !important; }
+
+            /* ── Back-to-top stays above bottom nav ── */
+            #backToTop { bottom: 82px !important; }
+
+            /* ── Controls row ── */
+            .controls-row { flex-direction: row; }
+        }
+
+        /* ── Very small phones ── */
+        @media (max-width: 360px) {
+            .masonry-wrapper { grid-template-columns: 1fr; }
+            .logo { font-size: 0.95rem; }
+        }
+    </style>
 </head>
 
 <body>
@@ -222,7 +408,7 @@
         <!-- ── Desktop inline nav (hidden on mobile) ── -->
         <nav class="nav-container-horizontal desktop-nav">
             <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
-           <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color:#2ed573;"></i><p>Sell Item</p></a>
+            <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color:#2ed573;"></i><p>Sell Item</p></a>
             <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
             <a href="saved.html" class="nav-item-box bg-items" style="position:relative;">
                 <i class="fas fa-heart"></i><p>Saved</p>
@@ -704,59 +890,6 @@
             </div>`;
         }
 
-
-
-
-// Replace your card creation logic with this:
-function generateItemHTML(item) {
-    if (item.category === 'Jobs') {
-        return `
-            <div class="job-card" onclick="showProductDetails('${item.id}')">
-                <div class="job-tags">
-                    <span class="job-tag blue"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full-Time'}</span>
-                </div>
-                <h3 class="job-title">${item.title}</h3>
-                <div style="color: #666;"><i class="fas fa-building"></i> ${item.company || 'Confidential'}</div>
-                <div class="job-tags">
-                    <span class="job-tag green">${item.price} ETB / month</span>
-                    <span class="job-tag" style="background:#f5f5f5;"><i class="fas fa-map-marker-alt"></i> ${item.location}</span>
-                </div>
-                <div class="deadline-badge"><i class="fas fa-calendar-alt"></i> Deadline: ${item.deadline || 'ASAP'}</div>
-            </div>`;
-    } 
-    
-    if (item.category === 'Services') {
-        return `
-            <div class="service-card" onclick="showProductDetails('${item.id}')">
-                <div style="display: flex; gap: 15px; align-items: start;">
-                    <img src="${item.image_url}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
-                    <div>
-                        <h3 class="service-name">${item.title}</h3>
-                        <p style="margin: 5px 0; color: #555; font-size: 0.9rem;">${item.description.substring(0, 100)}...</p>
-                        <div style="font-weight: bold; color: #2ecc71;">Starting from ${item.price} ETB</div>
-                    </div>
-                </div>
-            </div>`;
-    }
-
-    // Default for Products (Electronics, Furniture, etc.)
-    return `
-        <div class="product-card" onclick="showProductDetails('${item.id}')">
-            <div class="product-image-container">
-                <img src="${item.image_url}" alt="${item.title}" loading="lazy">
-            </div>
-            <div class="product-info">
-                <h3>${item.title}</h3>
-                <p class="price">${item.price} ETB</p>
-                <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
-            </div>
-        </div>`;
-}
-
-
-
-        
-
         /* ══════════════════════════════
            PATCH: intercept renderProduct
            called from script.js
@@ -796,42 +929,7 @@ function generateItemHTML(item) {
             if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
         };
 
-        // The "Rerender Engine" - Fixes the 'products is not defined' error
-async function reRenderSpecialCards() {
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
-
-    // Fetch the raw data directly to ensure 'products' exists
-    const { data: products, error } = await _supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error("Supabase Error:", error);
-        return;
-    }
-
-    if (!products || products.length === 0) {
-        grid.innerHTML = '<p style="padding:20px; text-align:center;">No items found.</p>';
-        return;
-    }
-
-    // Clear and rebuild the grid using our specialized logic
-    grid.innerHTML = products.map(item => window.generateItemHTML(item)).join('');
-}
-
-// Intercept the original fetch to trigger our custom view
-const originalFetch = window.fetchProducts;
-window.fetchProducts = async function() {
-    // Call the original script.js function first
-    if (typeof originalFetch === 'function') {
-        await originalFetch.apply(this, arguments);
-    }
-    
-    // Wait a tiny bit for Supabase to finish, then run our professional view
-    setTimeout(reRenderSpecialCards, 200);
-};
+        function reRenderSpecialCards() { }
 
     })();
     </script>
@@ -847,7 +945,7 @@ window.fetchProducts = async function() {
             document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
             document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
             document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
-            document.getElementById('mobileSellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
+            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
             document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
             document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
             document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
@@ -928,185 +1026,6 @@ window.fetchProducts = async function() {
                 await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
             } catch (err) { console.log('Audit log recording skipped:', err); }
         };
-
-
-function createProfessionalCard(item) {
-    const isJob = item.category === 'Jobs';
-    const isService = item.category === 'Services';
-
-    // 1. JOBS CARD TEMPLATE
-    if (isJob) {
-        return `
-            <div class="job-card" onclick="showJobDetails('${item.id}')">
-                <div class="job-type-badge"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full Time'}</div>
-                <h3 class="job-title">${item.title}</h3>
-                <div class="job-company"><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</div>
-                <div class="job-tags">
-                    <span class="job-tag blue"><i class="fas fa-clock"></i> ${item.experience || 'Entry Level'}</span>
-                    <span class="job-tag green"><i class="fas fa-money-bill-wave"></i> ${item.price} ETB</span>
-                </div>
-                <div class="job-meta-row">
-                    <div class="job-location"><i class="fas fa-map-marker-alt"></i> ${item.location}</div>
-                </div>
-                <div class="deadline-badge"><i class="fas fa-hourglass-half"></i> Deadline: ${item.deadline || 'Ongoing'}</div>
-            </div>`;
-    }
-
-    // 2. SERVICES CARD TEMPLATE
-    if (isService) {
-        return `
-            <div class="service-card" onclick="showServiceDetails('${item.id}')">
-                <div class="service-banner">
-                    <img src="${item.image_url}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/150?text=Service'">
-                    <div class="service-type-badge">${item.sub_category || 'Service'}</div>
-                    <div class="service-rating"><i class="fas fa-star"></i> 5.0</div>
-                </div>
-                <div class="service-body">
-                    <h3 class="service-name">${item.title}</h3>
-                    <div class="service-provider"><i class="fas fa-user-check"></i> Verified Provider</div>
-                    <p class="service-snippet">${item.description.substring(0, 80)}...</p>
-                </div>
-                <div class="service-footer">
-                    <div class="service-price">${item.price} <span class="service-price-label">ETB/Starting</span></div>
-                    <div class="service-actions">
-                        <button class="svc-btn svc-btn-primary">View</button>
-                    </div>
-                </div>
-            </div>`;
-    }
-
-    // 3. DEFAULT PRODUCT CARD (For Electronics, Furniture, etc.)
-    return `
-        <div class="product-card" onclick="showProductDetails('${item.id}')">
-            <img src="${item.image_url}" alt="${item.title}">
-            <div class="product-info">
-                <h4>${item.title}</h4>
-                <p class="price">${item.price} ETB</p>
-                <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
-            </div>
-        </div>`;
-}
-
-
-window.generateItemHTML = function(item) {
-    if (item.category === 'Jobs') {
-        return `
-            <div class="job-card" onclick="showProductDetails('${item.id}')">
-                <div class="job-type-badge"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full-Time'}</div>
-                <h3 class="job-title">${item.title}</h3>
-                <div class="job-company"><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</div>
-                <div class="job-meta-row">
-                    <span class="job-salary">${item.price} ETB</span>
-                    <span class="job-location"><i class="fas fa-map-marker-alt"></i> ${item.location}</span>
-                </div>
-            </div>`;
-    } 
-    
-    if (item.category === 'Services') {
-        return `
-            <div class="service-card" onclick="showProductDetails('${item.id}')">
-                <div class="service-banner">
-                    <img src="${item.image_url}" onerror="this.src='https://via.placeholder.com/300x150?text=Service'">
-                    <div class="service-type-badge">Verified Service</div>
-                </div>
-                <div class="service-body">
-                    <h3 class="service-name">${item.title}</h3>
-                    <div class="service-footer">
-                        <span class="service-price">${item.price} ETB</span>
-                    </div>
-                </div>
-            </div>`;
-    }
-
-    // Default view for products
-    return `
-        <div class="product-card" onclick="showProductDetails('${item.id}')">
-            <div class="product-image-container">
-                <img src="${item.image_url}" alt="${item.title}">
-            </div>
-            <div class="product-info">
-                <h3>${item.title}</h3>
-                <p class="price">${item.price} ETB</p>
-                <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
-            </div>
-        </div>`;
-};
-        
-window.showProductDetails = async function(id) {
-    const modal = document.getElementById('detailsModal');
-    const modalContent = document.getElementById('modalDetailsContent');
-    
-    // Show loading state
-    modalContent.innerHTML = '<div style="padding:20px; text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-    modal.classList.add('active');
-
-    const { data: item, error } = await _supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    if (error || !item) {
-        modalContent.innerHTML = '<p style="padding:20px;">Error loading details.</p>';
-        return;
-    }
-
-    // --- CATEGORY-BASED RENDERING ---
-    if (item.category === 'Jobs') {
-        modalContent.innerHTML = `
-            <div class="job-detail-view">
-                <div class="job-header">
-                    <span class="badge-job">${item.job_type || 'Full-Time'}</span>
-                    <h2 style="margin-top:10px;">${item.title}</h2>
-                    <p class="company-name"><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</p>
-                </div>
-                <div class="job-stats-grid">
-                    <div class="stat-item"><i class="fas fa-money-bill-wave"></i> <strong>Salary:</strong> ${item.price} ETB</div>
-                    <div class="stat-item"><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> ${item.location}</div>
-                    <div class="stat-item"><i class="fas fa-calendar-check"></i> <strong>Deadline:</strong> ${item.deadline || 'Open'}</div>
-                </div>
-                <div class="job-description">
-                    <h3 style="border-bottom:1px solid #eee; padding-bottom:5px;">Description</h3>
-                    <p style="white-space: pre-wrap;">${item.description}</p>
-                </div>
-            </div>`;
-    } 
-    else if (item.category === 'Services') {
-        modalContent.innerHTML = `
-            <div class="service-detail-view">
-                <img src="${item.image_url}" class="service-main-img" onerror="this.src='https://via.placeholder.com/400x250?text=Service'">
-                <div class="service-header" style="padding-top:15px;">
-                    <span class="badge-service"><i class="fas fa-check-circle"></i> Verified Provider</span>
-                    <h2 style="margin-top:5px;">${item.title}</h2>
-                    <p class="service-price">${item.price} ETB <small>(Starting)</small></p>
-                </div>
-                <div class="service-body">
-                    <p style="white-space: pre-wrap;">${item.description}</p>
-                </div>
-            </div>`;
-    } 
-    else {
-        // DEFAULT VIEW (For Electronics, Furniture, etc.)
-        modalContent.innerHTML = `
-            <div class="product-detail-standard">
-                <div class="modal-img-wrapper">
-                    <img src="${item.image_url}" alt="${item.title}" style="width:100%; border-radius:8px;">
-                </div>
-                <div class="product-info-header" style="padding:15px 0;">
-                    <h2 style="font-size:1.4rem;">${item.title}</h2>
-                    <p class="price-tag" style="color:#2ecc71; font-size:1.5rem; font-weight:bold;">${item.price} ETB</p>
-                    <p style="color:#666;"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
-                </div>
-                <p style="white-space: pre-wrap; color:#444;">${item.description}</p>
-            </div>`;
-    }
-
-    // Ensure the contact buttons (Call, TG, etc.) are updated with the correct info
-    if (window.setupActionButtons) {
-        window.setupActionButtons(item);
-    }
-};
-        
     </script>
  
 </body>
