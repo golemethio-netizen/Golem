@@ -754,7 +754,20 @@ body {
                 padding-bottom: 20px;
             }
         }
-
+/* 3. Mobile Specific Fix (Icon-Only View if space is tight) */
+@media (max-width: 480px) {
+    .quick-contact-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Forces 4 equal columns */
+        gap: 5px;
+        padding: 5px;
+    }
+    
+    /* Hide text labels on very small screens to keep icons large */
+    .quick-contact-bar span {
+        display: none; 
+    }
+}
 
 /* Social button transitions */
 .quick-contact-bar a,
@@ -771,6 +784,25 @@ body {
 .quick-contact-bar a:active,
 .quick-contact-bar button:active {
     transform: scale(0.97);
+}
+.quick-contact-bar button {
+    flex: 1 1 auto; /* Allows buttons to grow but also stay side-by-side */
+    min-width: 45px; /* Ensures the icon is always visible */
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    text-decoration: none;
+}
+/* 1. Ensure the Quick Contact Bar doesn't clip its children */
+.quick-contact-bar {
+    display: flex;
+    flex-wrap: wrap; /* Allows buttons to move to a second row if they don't fit */
+    gap: 8px;
+    padding: 10px;
+    justify-content: center; /* Centers buttons on the screen */
+    width: 100%;
 }
 
 /* Specific Marketplace Brand Colors */
