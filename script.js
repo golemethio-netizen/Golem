@@ -975,7 +975,7 @@ function showTGPopupAuto() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
             document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 3000); 
+        }, 20000); 
     }
 }
 
