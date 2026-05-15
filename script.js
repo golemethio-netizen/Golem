@@ -160,104 +160,143 @@ function renderProducts(products) {
         const tgUser = (p.telegram_username || "").replace('@', '');
 
         // ═══════════════════════════════════════════════════════
-        // SPECIAL CARD — Jobs & Services
+        // JOB CARD — uses .job-card CSS classes from index.html
         // ═══════════════════════════════════════════════════════
-        if (p.category === 'Jobs' || p.category === 'Services') {
-            const isJob = p.category === 'Jobs';
-            const icon      = isJob ? 'fa-briefcase' : 'fa-handshake';
-            const label     = isJob ? 'Job Opportunity' : 'Service';
-            const priceLabel = isJob ? 'Salary' : 'Starting From';
-            const accentColor  = isJob ? '#63b3ed' : '#b794f4';
-            const accentColor2 = isJob ? '#4299e1' : '#9f7aea';
-            const bgGrad    = isJob
-                ? 'linear-gradient(135deg,#0d1b2a 0%,#1a2d45 100%)'
-                : 'linear-gradient(135deg,#1a0d2e 0%,#2d1a45 100%)';
-            const borderColor = isJob ? '#1e3a5f' : '#3d1a5f';
-            const shortDesc = (p.description || '').substring(0, 100) + (p.description?.length > 100 ? '…' : '');
+        if (p.category === 'Jobs') {
+            // Parse structured spec block from description
+            const desc = p.description || '';
+            const specs = {};
+            const block = desc.split('--- Job Details ---')[1] || desc.split('--- Specs ---')[1] || '';
+            block.split('\n').forEach(l => { const m = l.match(/^[-\s]*([^:]+):\s*(.+)$/); if (m) specs[m[1].trim().toLowerCase()] = m[2].trim(); });
+            const mainDesc = desc.split('\n\n--- Job Details ---')[0].split('\n\n--- Specs ---')[0];
+
+            const jobType = specs['job type'] || '';
+            const industry = specs['industry'] || '';
+            const exp = specs['experience required'] || '';
+            const edu = specs['education level'] || '';
+            const deadline = specs['application deadline'] || specs['deadline'] || '';
+            const salary = specs['salary'] || (p.price ? p.price.toLocaleString() + ' ETB' : 'Negotiable');
 
             return `
-            <div style="
-                background:${bgGrad};
-                border-radius:16px;
-                overflow:hidden;
-                border:1px solid ${borderColor};
-                color:white;
-                position:relative;
-                display:flex;
-                flex-direction:column;
-            ">
-                <!-- Top accent line -->
-                <div style="height:3px; background:linear-gradient(90deg,${accentColor},${accentColor2});"></div>
+            <div class="job-card" onclick="window.openProductDetailsSafe('${safeData}')">
+                <button class="job-wishlist-btn ${isSaved ? 'active' : ''}"
+                    onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
+                    <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                </button>
 
-                <!-- Header -->
-                <div style="padding:16px 16px 12px; position:relative;">
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                    ${jobType  ? `<span class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i>${jobType}</span>` : ''}
+                    ${industry ? `<span class="job-tag blue">${industry}</span>` : ''}
+                    <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#059669' : '#aaa'}; display:flex; align-items:center; gap:3px;">
+                        <i class="fas fa-check-circle"></i>${isVerified ? 'Verified' : 'Community'}
+                    </span>
+                </div>
 
-                    <!-- Wishlist -->
-                    <button class="wishlist-btn ${isSaved ? 'active' : ''}"
-                        onclick="window.toggleWishlist('${p.id}', this)"
-                        style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.08); border:none; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:${isSaved ? '#ff6b81' : '#888'}; font-size:13px;">
+                <div class="job-title">${p.name}</div>
+                <div class="job-company">
+                    <i class="fas fa-map-marker-alt" style="color:#ff4757; font-size:11px;"></i>
+                    ${p.location || 'Addis Ababa'}
+                </div>
+
+                <p class="job-snippet">${mainDesc || desc.substring(0, 120)}</p>
+
+                <div class="job-tags">
+                    ${exp      ? `<span class="job-tag green"><i class="fas fa-clock" style="font-size:9px;"></i>${exp}</span>` : ''}
+                    ${edu      ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:9px;"></i>${edu}</span>` : ''}
+                    ${deadline ? `<span class="job-tag red"><i class="fas fa-calendar-times" style="font-size:9px;"></i>Deadline: ${deadline}</span>` : ''}
+                </div>
+
+                <div class="job-meta-row">
+                    <div>
+                        <div style="font-size:10px; color:#aaa; text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px;">Salary</div>
+                        <div class="job-salary">${salary}</div>
+                    </div>
+                </div>
+
+                <div class="job-actions">
+                    <a href="tel:+${cleanPhone}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
+                        <i class="fas fa-phone"></i> Call / Apply
+                    </a>
+                    <a href="https://t.me/${tgUser || '+' + cleanPhone}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                    <a href="https://wa.me/${cleanPhone}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SERVICE CARD — uses .service-card CSS classes from index.html
+        // ═══════════════════════════════════════════════════════
+        if (p.category === 'Services') {
+            const desc = p.description || '';
+            const specs = {};
+            const block = desc.split('--- Service Details ---')[1] || desc.split('--- Specs ---')[1] || '';
+            block.split('\n').forEach(l => { const m = l.match(/^[-\s]*([^:]+):\s*(.+)$/); if (m) specs[m[1].trim().toLowerCase()] = m[2].trim(); });
+            const mainDesc = desc.split('\n\n--- Service Details ---')[0].split('\n\n--- Specs ---')[0];
+
+            const svcType = specs['service type'] || specs['service category'] || 'Service';
+            const exp      = specs['experience'] || '';
+            const avail    = specs['availability'] || '';
+            const response = specs['response time'] || '';
+            const pricing  = specs['pricing model'] || '';
+            const area     = specs['service area'] || '';
+            const priceStr = p.price && p.price > 0 ? p.price.toLocaleString() + ' ETB' : 'Negotiable';
+
+            return `
+            <div class="service-card" onclick="window.openProductDetailsSafe('${safeData}')">
+                <div class="service-banner">
+                    ${p.image
+                        ? `<img src="${p.image}" alt="${p.name}" loading="lazy">`
+                        : `<span class="service-banner-fallback">🛠</span>`}
+                    <span class="service-type-badge">
+                        <i class="fas fa-tools" style="font-size:9px;"></i>${svcType}
+                    </span>
+                    ${exp ? `<span class="service-rating"><i class="fas fa-star"></i>${exp}</span>` : ''}
+                    <button class="service-wishlist-btn ${isSaved ? 'active' : ''}"
+                        onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
                         <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                     </button>
+                </div>
 
-                    <!-- Category badge -->
-                    <div style="display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:4px 11px; border-radius:20px; margin-bottom:11px; background:rgba(255,255,255,0.07); color:${accentColor}; border:1px solid ${borderColor};">
-                        <i class="fas ${icon}" style="font-size:10px;"></i> ${label}
-                    </div>
-
-                    <!-- Title -->
-                    <h3 onclick="window.openProductDetailsSafe('${safeData}')"
-                        style="margin:0 0 8px; font-size:15px; font-weight:700; color:#fff; line-height:1.3; cursor:pointer;">
-                        ${p.name}
-                    </h3>
-
-                    <!-- Location -->
-                    <div style="display:flex; align-items:center; gap:5px; font-size:12px; color:#8899bb;">
-                        <i class="fas fa-map-marker-alt" style="color:#ff6b81; font-size:11px;"></i>
+                <div class="service-body">
+                    <div class="service-name">${p.name}</div>
+                    <div class="service-provider">
+                        <i class="fas fa-map-marker-alt" style="color:#ff4757; font-size:11px;"></i>
                         ${p.location || 'Addis Ababa'}
+                        <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#059669' : '#aaa'};">
+                            <i class="fas fa-check-circle"></i> ${isVerified ? 'Verified' : 'Community'}
+                        </span>
                     </div>
+                    <div class="service-highlights">
+                        ${response ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${response}</span>` : ''}
+                        ${avail    ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${avail}</span>` : ''}
+                        ${area     ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${area}</span>` : ''}
+                        ${pricing  ? `<span class="svc-tag purple">${pricing}</span>` : ''}
+                    </div>
+                    ${mainDesc ? `<p class="service-snippet">${mainDesc}</p>` : ''}
                 </div>
 
-                <!-- Description -->
-                <p style="margin:0; padding:0 16px 14px; font-size:12px; color:#8899bb; line-height:1.55;">
-                    ${shortDesc || 'No description provided.'}
-                </p>
-
-                <!-- Divider -->
-                <div style="height:1px; background:rgba(255,255,255,0.07); margin:0 16px;"></div>
-
-                <!-- Price & Verification row -->
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px;">
+                <div class="service-footer">
                     <div>
-                        <div style="font-size:9px; color:#556; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:3px;">${priceLabel}</div>
-                        <div style="font-size:17px; font-weight:800; background:linear-gradient(90deg,${accentColor},${accentColor2}); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
-                            ${p.price ? p.price.toLocaleString() + ' ETB' : 'Negotiable'}
-                        </div>
+                        <div class="service-price">${priceStr}</div>
+                        <div class="service-price-label">${pricing || 'Per Project'}</div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:5px; font-size:11px; color:#8899bb;">
-                        <i class="fas fa-check-circle" style="color:${isVerified ? '#2ed573' : '#444'};"></i>
-                        ${isVerified ? 'Verified' : 'Community'}
+                    <div class="service-actions">
+                        <a href="tel:+${cleanPhone}" class="svc-btn svc-btn-primary" onclick="event.stopPropagation()">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a href="https://wa.me/${cleanPhone}" target="_blank" class="svc-btn svc-btn-outline" onclick="event.stopPropagation()">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
                     </div>
-                </div>
-
-                <!-- Action buttons -->
-                <div style="display:flex; gap:8px; padding:0 16px 16px;">
-                    <a href="tel:+${cleanPhone}"
-                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:${accentColor}; color:#0d1117; text-decoration:none; font-size:12px; font-weight:700; border:none;">
-                        <i class="fas fa-phone" style="font-size:11px;"></i> Call
-                    </a>
-                    <a href="https://t.me/${tgUser || '+' + cleanPhone}" target="_blank"
-                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:rgba(255,255,255,0.07); color:#fff; text-decoration:none; font-size:12px; font-weight:700; border:1px solid rgba(255,255,255,0.14);">
-                        <i class="fab fa-telegram-plane" style="font-size:11px;"></i> Telegram
-                    </a>
-                    <button onclick="window.openProductDetailsSafe('${safeData}')"
-                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:rgba(255,255,255,0.07); color:#fff; font-size:12px; font-weight:700; border:1px solid rgba(255,255,255,0.14); cursor:pointer; font-family:inherit;">
-                        <i class="fas fa-info-circle" style="font-size:11px;"></i> Details
-                    </button>
                 </div>
             </div>`;
         }
         // ═══════════════════════════════════════════════════════
-        // END SPECIAL CARD
+        // END SPECIAL CARDS
         // ═══════════════════════════════════════════════════════
 
         // Regular product card
