@@ -50,26 +50,30 @@ window.fetchProducts = async (category = window.currentCategory || 'All') => {
 
         if (error) throw error;
 
-        grid.innerHTML = ''; // Clear loading
-        data.forEach(item => {
-            // Apply the "Second Image Format" (Clean Cards)
-            const card = document.createElement('div');
-            card.className = (category === 'Services' || category === 'Jobs') ? 'service-card' : 'product-card';
-            
-            card.innerHTML = `
-                <div class="card-image-container">
-                    <img src="${item.image_url || 'placeholder.jpg'}" alt="${item.title}">
-                </div>
-                <div class="card-content">
-                    <small class="category-label">${item.category}</small>
-                    <h3 class="title">${item.title}</h3>
-                    <p class="price-tag">${item.price ? item.price + ' ETB' : 'Contact for Price'}</p>
-                    <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
-                    <button onclick="openProductModal('${item.id}')" class="view-btn">View Details</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
+       // Replace the template literal part with this logic:
+grid.innerHTML = ''; 
+data.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    
+    // Using || 'No Name' ensures it never says 'undefined'
+    const productName = item.name || item.title || 'Market Item';
+    const productPrice = item.price ? `${item.price} ETB` : 'Contact for Price';
+    const productImage = item.image_url || 'https://via.placeholder.com/300?text=WanaGebya';
+
+    card.innerHTML = `
+        <div class="card-image-container">
+            <img src="${productImage}" alt="${productName}">
+        </div>
+        <div class="card-content">
+            <h3 class="title">${productName}</h3>
+            <p class="price-tag">${productPrice}</p>
+            <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location || 'Addis Ababa'}</p>
+            <button onclick="openProductModal('${item.id}')" class="view-btn">View Details</button>
+        </div>
+    `;
+    grid.appendChild(card);
+});
     } catch (err) {
         grid.innerHTML = '<p>Error loading items. Please refresh.</p>';
         console.error(err);
