@@ -947,3 +947,22 @@ window.generateItemHTML = function(item) {
             </div>
         </div>`;
 };
+
+
+function showTGPopup() {
+    // Check if user has seen it today
+    if (!localStorage.getItem('tg_popup_seen')) {
+        setTimeout(() => {
+            document.getElementById('tg-popup').classList.add('tg-popup-show');
+        }, 3000); // 3-second delay
+    }
+}
+
+function closeTGPopup() {
+    document.getElementById('tg-popup').classList.remove('tg-popup-show');
+    // Set a flag so it doesn't show again for 24 hours
+    localStorage.setItem('tg_popup_seen', 'true');
+}
+
+// Run the function on page load
+window.onload = showTGPopup;
