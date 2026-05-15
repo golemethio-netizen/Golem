@@ -32,44 +32,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category = window.currentCategory || 'All') => {
     const grid = document.getElementById('productGrid');
-    if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
-
-
+    if (!grid) return;
     
-    const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
-    const locationFilter = document.getElementById('locationSelect')?.value || 'all';
+    grid.innerHTML = '<div class="loading">Loading Latest Listings...</div>';
 
-    let query = _supabase
-        .from('products')
-        .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
-        .eq('status', 'approved');
+    try {
+        let query = _supabase
+            .from('products')
+            .select('*')
+            .order('created_at', { ascending: false }); // LATEST AT THE TOP
 
-    if (category !== 'All') query = query.eq('category', category);
-    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
-
-    if (sortOrder === 'price_low') {
-        query = query.order('price', { ascending: true });
-    } else if (sortOrder === 'price_high') {
-        query = query.order('price', { ascending: false });
-    } else {
-        query = query.order('created_at', { ascending: false });
-    }
-
-    const { data, error } = await query;
-
-    if (!error) {
-        renderProducts(data);
-    } else {
-        console.error("Fetch error:", error.message);
-        if (grid) {
-            grid.innerHTML = `
-                <div style="text-align:center; grid-column:1/-1; padding:50px; color:#ff4757; background:#fff; border-radius:12px; border:1px solid #ff4757;">
-                    <i class="fas fa-exclamation-triangle" style="font-size:30px; margin-bottom:10px;"></i>
-                    <h3>Database Error</h3>
-                    <p>${error.message}</p>
-                    <p style="font-size:0.8rem; color:#666; margin-top:10px;">Check your Supabase RLS policies or Table relationships.</p>
-                </div>`;
+        if (category !== 'All') {
+            query = query.eq('category', category);
         }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        grid.innerHTML = ''; // Clear loading
+        data.forEach(item => {
+            // Apply the "Second Image Format" (Clean Cards)
+            const card = document.createElement('div');
+            card.className = (category === 'Services' || category === 'Jobs') ? 'service-card' : 'product-card';
+            
+            card.innerHTML = `
+                <div class="card-image-container">
+                    <img src="${item.image_url || 'placeholder.jpg'}" alt="${item.title}">
+                </div>
+                <div class="card-content">
+                    <small class="category-label">${item.category}</small>
+                    <h3 class="title">${item.title}</h3>
+                    <p class="price-tag">${item.price ? item.price + ' ETB' : 'Contact for Price'}</p>
+                    <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+                    <button onclick="openProductModal('${item.id}')" class="view-btn">View Details</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        grid.innerHTML = '<p>Error loading items. Please refresh.</p>';
+        console.error(err);
     }
 };
 
