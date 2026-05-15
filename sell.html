@@ -230,29 +230,25 @@
 
                 <!-- Region -->
                 <div class="input-group-sell">
-                    <label><i class="fas fa-map-marker-alt"></i> Region</label>
-                    <select id="prodRegion" onchange="window.toggleDistricts(this.value)" required>
-                        <option value="" disabled selected>Select Region</option>
-                        <option value="Addis Ababa">Addis Ababa</option>
-                        <option value="Oromia">Oromia</option>
-                        <option value="Amhara">Amhara</option>
-                        <option value="Tigray">Tigray</option>
-                        <option value="Other">Other Region</option>
-                    </select>
-                </div>
+                 <label><i class="fas fa-map-marker-alt"></i> Region</label>
+    <select id="prodRegion" onchange="handleRegionChange(this.value)" required>
+        <option value="" disabled selected>Select Region</option>
+        <option value="Addis Ababa">Addis Ababa</option>
+        <option value="Oromia">Oromia</option>
+        <option value="Amhara">Amhara</option>
+        <option value="Tigray">Tigray</option>
+        <option value="Sidama">Sidama</option>
+        <option value="South Ethiopia">South Ethiopia</option>
+        <option value="Other">Other Region</option>
+    </select>
+</div>
 
                 <!-- Sub-City -->
-                <div class="input-group-sell" id="districtWrapper" style="display:none;">
-                    <label><i class="fas fa-city"></i> Sub-City</label>
-                    <select id="prodDistrict">
-                        <option value="" disabled selected>Select Sub-City</option>
-                        <option value="Bole">Bole</option>
-                        <option value="Kirkos">Kirkos</option>
-                        <option value="Arada">Arada</option>
-                        <option value="Yeka">Yeka</option>
-                        <option value="Nifas Silk">Nifas Silk</option>
-                    </select>
-                </div>
+               <div class="input-group-sell" id="locationWrapper" style="display:none;">
+    <label id="locationLabel"><i class="fas fa-city"></i> Area / Sub-City</label>
+    <div id="locationInputContainer">
+        </div>
+</div>
 
                 <button type="submit" id="submitBtn" class="auth-submit">Publish Listing</button>
             </form>
@@ -690,10 +686,53 @@
         }
     });
 
+
+
+
+
+        /* ══════════════════════════════
+   DYNAMIC LOCATION HANDLER
+══════════════════════════════ */
+function handleRegionChange(region) {
+    const wrapper = document.getElementById('locationWrapper');
+    const container = document.getElementById('locationInputContainer');
+    const label = document.getElementById('locationLabel');
+
+    if (!region) {
+        wrapper.style.display = 'none';
+        return;
+    }
+
+    wrapper.style.display = 'block';
+
+    if (region === 'Addis Ababa') {
+        label.innerHTML = '<i class="fas fa-city"></i> Sub-City';
+        container.innerHTML = `
+            <select id="prodDistrict" required>
+                <option value="" disabled selected>Select Sub-City</option>
+                <option value="Bole">Bole</option>
+                <option value="Kirkos">Kirkos</option>
+                <option value="Arada">Arada</option>
+                <option value="Yeka">Yeka</option>
+                <option value="Nifas Silk">Nifas Silk</option>
+                <option value="Lideta">Lideta</option>
+                <option value="Gullele">Gullele</option>
+                <option value="Addis Ketema">Addis Ketema</option>
+                <option value="Akaki Kality">Akaki Kality</option>
+                <option value="Kolfe Keranio">Kolfe Keranio</option>
+                <option value="Lemi Kura">Lemi Kura</option>
+            </select>`;
+    } else {
+        label.innerHTML = '<i class="fas fa-map-pin"></i> Specific City / Area';
+        container.innerHTML = `
+            <input type="text" id="prodDistrict" placeholder="e.g. Adama, Bahir Dar, or Dessie" required>`;
+    }
+}
+
     /* ══════════════════════════════
        FORM SUBMISSION
     ══════════════════════════════ */
-    document.getElementById('sellForm').addEventListener('submit', async (e) => {
+   document.getElementById('sellForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const fileInput = document.getElementById('prodFile');
@@ -714,10 +753,9 @@
             if (uploadError) throw uploadError;
             const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
 
-            // Location
-            const region = document.getElementById('prodRegion').value;
+         const region = document.getElementById('prodRegion').value;
             const district = document.getElementById('prodDistrict').value;
-            const locationStr = (region === 'Addis Ababa' && district) ? `${district}, ${region}` : region;
+           const locationStr = district ? `${district}, ${region}` : region;
 
             const { error: dbError } = await _supabase.from('products').insert([{
                 user_id: user.id,
