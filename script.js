@@ -341,37 +341,30 @@ function renderProducts(products) {
 }
 
 // --- 5. SPONSORSHIP, FILTERING & SEARCH ---
-let sponsorInterval;
-
 window.loadSponsor = async () => {
-    const sponsorContainer = document.getElementById('sponsorSection');
-    
-    const refreshSponsor = async () => {
-        const { data } = await _supabase.from('sponsors').select('*').eq('active', true);
-        if (data && data.length > 0) {
-            // Pick a random sponsor from your list
-            const sponsor = data[Math.floor(Math.random() * data.length)];
-            
-            // Re-inject HTML to trigger the CSS animation again
-            sponsorContainer.innerHTML = `
-                <div class="sponsored-card">
-                    <img src="${sponsor.logo_url}" class="sponsor-image">
-                    <div class="sponsor-info">
-                        <span class="sponsor-label">Featured Partner</span>
-                        <h4>${sponsor.name}</h4>
-                        <p>${sponsor.tagline}</p>
-                    </div>
-                </div>
-            `;
-        }
-    };
+    try {
+        const now = new Date().toISOString();
+        const { data: product } = await _supabase
+            .from('products')
+            .select('*')
+            .eq('is_sponsored', true)
+            .gt('sponsored_until', now)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-    // Initial load
-    refreshSponsor();
-    
-    // Auto-rotate every 10 seconds
-    clearInterval(sponsorInterval);
-    sponsorInterval = setInterval(refreshSponsor, 10000);
+        const sponsorSection = document.getElementById('mainSponsor');
+        if (product && sponsorSection) {
+            document.getElementById('sponsorImg').src = product.image;
+            document.getElementById('sponsorTitle').innerText = product.name;
+            document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
+            document.getElementById('sponsorLink').onclick = (e) => {
+                e.preventDefault();
+                window.openProductModal(product);
+            };
+            sponsorSection.style.display = 'block';
+        }
+    } catch (err) { console.error("Sponsor load error", err); }
 };
 
 window.filterCategory = (category, button) => {
@@ -982,7 +975,7 @@ function showTGPopupAuto() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
             document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 20000); 
+        }, 3000); 
     }
 }
 
