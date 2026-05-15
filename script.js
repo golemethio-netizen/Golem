@@ -966,3 +966,30 @@ function closeTGPopup() {
 
 // Run the function on page load
 window.onload = showTGPopup;
+
+
+
+
+// Function for the Automatic Popup (runs once per day)
+function showTGPopupAuto() {
+    if (!localStorage.getItem('tg_popup_seen')) {
+        setTimeout(() => {
+            document.getElementById('tg-popup').classList.add('tg-popup-show');
+        }, 3000); 
+    }
+}
+
+// Function for the Manual Button (always opens when clicked)
+function openTGPopupManual() {
+    document.getElementById('tg-popup').classList.add('tg-popup-show');
+}
+
+// Function to close the popup
+function closeTGPopup() {
+    document.getElementById('tg-popup').classList.remove('tg-popup-show');
+    // We only set the 'seen' flag if it was an automatic trigger
+    localStorage.setItem('tg_popup_seen', 'true');
+}
+
+// Start the auto-checker when the page loads
+window.onload = showTGPopupAuto;
