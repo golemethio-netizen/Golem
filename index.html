@@ -613,7 +613,16 @@
             </div>
         </div>
     </div>
-
+<!-- Telegram Popup Structure -->
+<div id="tg-popup" class="tg-popup-hidden">
+    <div class="tg-popup-content">
+        <span class="tg-close" onclick="closeTGPopup()">&times;</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" width="50">
+        <h3>Join WanaGebya on Telegram</h3>
+        <p>Get instant updates on new electronics and special discounts!</p>
+        <a href="https://t.me/your_channel_username" target="_blank" class="tg-btn" onclick="closeTGPopup()">Join Now</a>
+    </div>
+</div>
     <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display:none;">
         <div class="modal-content">
             <button id="closeProductModal" class="close-modal-btn">&times;</button>
@@ -1026,6 +1035,12 @@
                 await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
             } catch (err) { console.log('Audit log recording skipped:', err); }
         };
+
+
+
+
+
+        
     </script>
  
 </body>
