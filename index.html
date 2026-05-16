@@ -1054,37 +1054,32 @@
 
         // ══════════════════════════════════════════════
         // PASSWORD RECOVERY HANDLER
-        // Intercepts Supabase reset links (type=recovery in URL hash)
-        // and shows a Set New Password modal directly on this page.
+        // Supabase v2 fires onAuthStateChange with event='PASSWORD_RECOVERY'
+        // when a user clicks a reset link. We listen for that and show the modal.
         // ══════════════════════════════════════════════
-        (async function handleRecovery() {
-            const params = new URLSearchParams(window.location.hash.replace('#', '?'));
-            if (params.get('type') !== 'recovery') return;
+        _supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                // Clean up URL
+                history.replaceState(null, '', window.location.pathname);
 
-            // Clear the hash so it looks clean
-            history.replaceState(null, '', window.location.pathname);
+                const userEmail = session?.user?.email || '';
+                const savedPwd = sessionStorage.getItem('wg_gen_pwd');
 
-            // Get the active recovery session Supabase injected via the link
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) return;
-
-            const userEmail = session.user.email;
-            const savedPwd = sessionStorage.getItem('wg_gen_pwd');
-
-            if (savedPwd) {
-                // Admin pre-generated a password — apply it automatically
-                const { error } = await _supabase.auth.updateUser({ password: savedPwd });
-                sessionStorage.removeItem('wg_gen_pwd');
-                if (!error) {
-                    showRecoverySuccessModal(userEmail, savedPwd);
+                if (savedPwd) {
+                    // Admin pre-generated a password — apply it automatically
+                    const { error } = await _supabase.auth.updateUser({ password: savedPwd });
+                    sessionStorage.removeItem('wg_gen_pwd');
+                    if (!error) {
+                        showRecoverySuccessModal(userEmail, savedPwd);
+                    } else {
+                        showSetPasswordModal(userEmail, 'Auto-apply failed. Please enter a new password manually.');
+                    }
                 } else {
-                    showSetPasswordModal(userEmail, 'Auto-apply failed. Please set a new password manually.');
+                    // Normal forgot-password flow — show manual entry form
+                    showSetPasswordModal(userEmail, '');
                 }
-            } else {
-                // No pre-generated password — show manual entry form
-                showSetPasswordModal(userEmail, '');
             }
-        })();
+        });
 
         function showSetPasswordModal(email, errorMsg) {
             const existing = document.getElementById('recoveryModal');
@@ -1189,7 +1184,7 @@
                 }
                 this.textContent = 'Sending...';
                 const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.href.split('#')[0]
+                    redirectTo: 'https://www.wanagebya.com/index.html'
                 });
                 if (error) {
                     this.textContent = 'Forgot Password?';
