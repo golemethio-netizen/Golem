@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // --- 2. DATA FETCHING ---
-window.fetchProducts = async (category = window.currentCategory || 'All') => {
+window.fetchProducts = async (category) => {
+    // Guard: if called with no/undefined arg (e.g. from sort/location change), use currentCategory
+    if (!category || category === 'undefined') category = window.currentCategory || 'All';
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
@@ -414,12 +416,14 @@ window.filterCategory = (category, button) => {
 };
 
 function filterSearch(term) {
-    const cards = document.querySelectorAll('.product-card, [data-searchable]');
+    // If search is cleared, re-fetch so sort+location filters are re-applied properly
+    if (!term || term.trim() === '') {
+        window.fetchProducts();
+        return;
+    }
     document.querySelectorAll('#productGrid > div').forEach(card => {
-        const titleEl = card.querySelector('.product-title, h3');
-        if (titleEl) {
-            card.style.display = titleEl.innerText.toLowerCase().includes(term) ? '' : 'none';
-        }
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(term) ? '' : 'none';
     });
 }
 
