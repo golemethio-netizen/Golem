@@ -936,8 +936,9 @@
         let _itemCache = {};
 
         const _origFetch = window.fetchProducts;
-        window.fetchProducts = async function () {
-            const result = typeof _origFetch === 'function' ? await _origFetch.apply(this, arguments) : undefined;
+        window.fetchProducts = async function (category) {
+            // Pass category explicitly so the default parameter in script.js works correctly
+            const result = typeof _origFetch === 'function' ? await _origFetch.call(this, category) : undefined;
             setTimeout(reRenderSpecialCards, 300);
             return result;
         };
@@ -965,8 +966,8 @@
             document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
             document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
             document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
-            document.getElementById('sortSelect').addEventListener('change', window.fetchProducts);
-            document.getElementById('locationSelect').addEventListener('change', window.fetchProducts);
+            document.getElementById('sortSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
+            document.getElementById('locationSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
             document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
                 btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
             });
