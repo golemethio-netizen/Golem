@@ -688,7 +688,7 @@ window.handleAuth = async function(e) {
             options: { data: { full_name: fullName, phone_number: phone, location, bio } }
         });
         if (error) alert("Error: " + error.message);
-        else { alert("Success! Check your email to verify your account."); window.toggleModal(); }
+        else { alert("Success! registration successful you can login now.."); window.toggleModal(); }
     } else {
         const { error } = await _supabase.auth.signInWithPassword({ email, password });
         if (error) alert("Login failed: " + error.message);
