@@ -181,6 +181,77 @@
         let currentView = 'pending';
         let currentAdminEmail = 'System'; // Added for Audit Logging
 
+        // --- PASSWORD RECOVERY INTERCEPTOR ---
+        // Supabase redirects reset links back with #access_token&type=recovery in the URL
+        // We detect this before anything else and show a Set New Password modal
+        (async () => {
+            // getSession() will exchange the token from the URL hash automatically
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                // Check if this session came from a password recovery link
+                const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+                if (params.get('type') === 'recovery') {
+                    history.replaceState(null, '', window.location.pathname);
+                    showSetPasswordModal(session.user.email);
+                    return; // Don't load the admin dashboard yet
+                }
+            }
+        })();
+
+        function showSetPasswordModal(email) {
+            document.getElementById('pwdModal')?.remove();
+            const modal = document.createElement('div');
+            modal.id = 'pwdModal';
+            modal.style.cssText = `
+                position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 99999;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background:white; border-radius:16px; padding:32px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center;">
+                    <div style="font-size:2.5rem; margin-bottom:10px;">&#128272;</div>
+                    <h2 style="margin:0 0 6px; color:#333;">Set New Password</h2>
+                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${email}</strong></p>
+                    <input type="password" id="newPwdInput" placeholder="Enter new password (min 6 chars)"
+                        style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:10px;"
+                        oninput="this.style.borderColor='#6c5ce7'"
+                    />
+                    <input type="password" id="confirmPwdInput" placeholder="Confirm new password"
+                        style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:6px;"
+                        oninput="this.style.borderColor='#6c5ce7'"
+                    />
+                    <p id="pwdError" style="color:#ff4757; font-size:0.8rem; min-height:18px; margin-bottom:14px;"></p>
+                    <button onclick="applyNewPassword()"
+                        style="width:100%; background:#6c5ce7; color:white; border:none; padding:14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
+                        Update Password
+                    </button>
+                    <p style="font-size:0.75rem; color:#aaa;">Session opened via password reset link.</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            setTimeout(() => document.getElementById('newPwdInput')?.focus(), 100);
+        }
+
+        window.applyNewPassword = async () => {
+            const pwd = document.getElementById('newPwdInput').value;
+            const conf = document.getElementById('confirmPwdInput').value;
+            const errEl = document.getElementById('pwdError');
+            if (pwd.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+            if (pwd !== conf) { errEl.textContent = 'Passwords do not match.'; return; }
+            errEl.textContent = '';
+            const btn = document.querySelector('#pwdModal button');
+            btn.textContent = 'Updating...'; btn.disabled = true;
+            const { error } = await _supabase.auth.updateUser({ password: pwd });
+            if (error) {
+                errEl.textContent = 'Error: ' + error.message;
+                btn.textContent = 'Update Password'; btn.disabled = false;
+            } else {
+                document.getElementById('pwdModal').remove();
+                alert('Password updated successfully! The user can now sign in with the new password.');
+                await _supabase.auth.signOut();
+                window.location.href = 'index.html';
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAdmin();
             updateAdminPresence();
@@ -597,7 +668,7 @@
             if (!confirm(`Send a password reset email to:\n\n${email}\n\nThe user will receive a link to set a new password.`)) return;
             try {
                 const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/index.html'
+                    redirectTo: window.location.href.split('#')[0]  // redirect back to this same page
                 });
                 if (error) throw error;
                 logAction('Password Reset Sent', `Reset email sent to: ${email}`);
@@ -623,7 +694,7 @@
                 // After admin copies it, send a reset email so the user can log in & change it
                 try {
                     const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                        redirectTo: window.location.origin + '/index.html'
+                        redirectTo: window.location.href.split('#')[0]  // redirect back to this same page
                     });
                     if (error) throw error;
                     logAction('Password Generated', `Admin generated password & sent reset email to: ${email}`);
