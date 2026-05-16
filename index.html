@@ -610,6 +610,9 @@
             </form>
             <div class="modal-footer">
                 <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
+                <p id="forgotPwdRow" style="margin-top:8px; font-size:0.85rem;">
+                    <a href="#" id="forgotPwdLink" style="color:#6c5ce7; text-decoration:none;">Forgot Password?</a>
+                </p>
             </div>
         </div>
     </div>
@@ -1047,6 +1050,156 @@
 
 
 
+
+        // ══════════════════════════════════════════════
+        // PASSWORD RECOVERY HANDLER
+        // Intercepts Supabase reset links (type=recovery in URL hash)
+        // and shows a Set New Password modal directly on this page.
+        // ══════════════════════════════════════════════
+        (async function handleRecovery() {
+            const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+            if (params.get('type') !== 'recovery') return;
+
+            // Clear the hash so it looks clean
+            history.replaceState(null, '', window.location.pathname);
+
+            // Get the active recovery session Supabase injected via the link
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) return;
+
+            const userEmail = session.user.email;
+            const savedPwd = sessionStorage.getItem('wg_gen_pwd');
+
+            if (savedPwd) {
+                // Admin pre-generated a password — apply it automatically
+                const { error } = await _supabase.auth.updateUser({ password: savedPwd });
+                sessionStorage.removeItem('wg_gen_pwd');
+                if (!error) {
+                    showRecoverySuccessModal(userEmail, savedPwd);
+                } else {
+                    showSetPasswordModal(userEmail, 'Auto-apply failed. Please set a new password manually.');
+                }
+            } else {
+                // No pre-generated password — show manual entry form
+                showSetPasswordModal(userEmail, '');
+            }
+        })();
+
+        function showSetPasswordModal(email, errorMsg) {
+            const existing = document.getElementById('recoveryModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'recoveryModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
+                    <div style="font-size:2.5rem;margin-bottom:10px;">&#128272;</div>
+                    <h2 style="margin:0 0 6px;color:#333;">Set New Password</h2>
+                    <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Account: <strong>${email}</strong></p>
+                    ${errorMsg ? `<p style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;">${errorMsg}</p>` : ''}
+                    <input type="password" id="recPwdInput" placeholder="New password (min 6 chars)"
+                        style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:10px;"
+                        oninput="this.style.borderColor='#6c5ce7'"/>
+                    <input type="password" id="recPwdConfirm" placeholder="Confirm new password"
+                        style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:8px;"
+                        oninput="this.style.borderColor='#6c5ce7'"/>
+                    <p id="recPwdError" style="color:#ff4757;font-size:0.8rem;min-height:18px;margin-bottom:14px;"></p>
+                    <button onclick="applyRecoveryPassword()"
+                        style="width:100%;background:#6c5ce7;color:white;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
+                        &#10003; Update Password
+                    </button>
+                </div>`;
+            document.body.appendChild(modal);
+            setTimeout(() => document.getElementById('recPwdInput')?.focus(), 100);
+        }
+
+        window.applyRecoveryPassword = async () => {
+            const pwd = document.getElementById('recPwdInput').value;
+            const conf = document.getElementById('recPwdConfirm').value;
+            const errEl = document.getElementById('recPwdError');
+            if (pwd.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+            if (pwd !== conf)   { errEl.textContent = 'Passwords do not match.'; return; }
+            errEl.textContent = '';
+            const btn = document.querySelector('#recoveryModal button');
+            btn.textContent = 'Updating...'; btn.disabled = true;
+            const { error } = await _supabase.auth.updateUser({ password: pwd });
+            if (error) {
+                errEl.textContent = 'Error: ' + error.message;
+                btn.textContent = '✓ Update Password'; btn.disabled = false;
+            } else {
+                document.getElementById('recoveryModal').remove();
+                await _supabase.auth.signOut();
+                showToast('Password updated! Please sign in with your new password.', 'success');
+            }
+        };
+
+        function showRecoverySuccessModal(email, password) {
+            const existing = document.getElementById('recoveryModal');
+            if (existing) existing.remove();
+            const modal = document.createElement('div');
+            modal.id = 'recoveryModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
+                    <div style="font-size:3rem;margin-bottom:10px;color:#2ed573;">&#10003;</div>
+                    <h2 style="margin:0 0 6px;color:#333;">Password Updated!</h2>
+                    <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Account: <strong>${email}</strong></p>
+                    <div style="background:#f4f7f6;border:2px dashed #2ed573;border-radius:10px;padding:18px;margin-bottom:20px;">
+                        <p style="font-size:0.8rem;color:#888;margin:0 0 6px;">Your new password:</p>
+                        <code style="font-size:1.3rem;font-weight:bold;color:#2d3436;letter-spacing:2px;">${password}</code>
+                    </div>
+                    <button onclick="navigator.clipboard.writeText('${password}').then(()=>{this.textContent='Copied!';this.style.background='#2ed573';})"
+                        style="width:100%;background:#6c5ce7;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
+                        Copy Password
+                    </button>
+                    <button onclick="document.getElementById('recoveryModal').remove(); _supabase.auth.signOut();"
+                        style="width:100%;background:#eee;color:#333;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;">
+                        Done — Sign In Now
+                    </button>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+
+        function showToast(message, type) {
+            let toast = document.getElementById('recoveryToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'recoveryToast';
+                document.body.appendChild(toast);
+            }
+            toast.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:${type==='success'?'#2ed573':'#ff4757'};color:white;padding:14px 28px;border-radius:12px;font-weight:700;font-size:1rem;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 0.4s;`;
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 4000);
+        }
+
+        // ── FORGOT PASSWORD link handler (inside Sign In modal) ──
+        document.addEventListener('DOMContentLoaded', function () {
+            const forgotLink = document.getElementById('forgotPwdLink');
+            if (!forgotLink) return;
+            forgotLink.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const email = document.getElementById('authEmail').value.trim();
+                if (!email) {
+                    alert('Please enter your email address in the field above first.');
+                    document.getElementById('authEmail').focus();
+                    return;
+                }
+                this.textContent = 'Sending...';
+                const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.href.split('#')[0]
+                });
+                if (error) {
+                    this.textContent = 'Forgot Password?';
+                    alert('Error: ' + error.message);
+                } else {
+                    this.textContent = 'Forgot Password?';
+                    if (window.toggleModal) window.toggleModal();
+                    showToast('Reset email sent! Check your inbox.', 'success');
+                }
+            });
+        });
         
     </script>
  
