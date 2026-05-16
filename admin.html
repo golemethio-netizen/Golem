@@ -543,8 +543,11 @@
                                         <button onclick="toggleVerification('${u.id}', ${u.is_verified})" class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" style="padding: 6px 12px; font-size: 0.75rem; border:none; border-radius:5px; cursor:pointer;">
                                             ${u.is_verified ? 'Revoke' : 'Verify'}
                                         </button>
-                                        <button onclick="sendPasswordReset('${u.email}')" title="Send Password Reset Email" style="border:1px solid #3498db; color:#3498db; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;" >
-                                            <i class="fas fa-key"></i>
+                                        <button onclick="sendPasswordReset('${u.email}')" title="Send password reset email" style="border:none; background:#3498db; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                            <i class="fas fa-envelope"></i> Reset
+                                        </button>
+                                        <button onclick="generateAndSetPassword('${u.id}', '${u.email}')" title="Generate a new random password" style="border:none; background:#6c5ce7; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                            <i class="fas fa-key"></i> Gen Pass
                                         </button>
                                         <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
                                             <i class="fas fa-trash"></i>
@@ -588,17 +591,49 @@
             } catch (err) { alert("Failed to delete user: " + err.message); }
         };
 
+        // --- PASSWORD RESET: Send magic reset email via Supabase Auth ---
         window.sendPasswordReset = async (email) => {
-            if (!email) { alert("No email address found for this user."); return; }
-            if (!confirm(`Send a password reset email to:\n\n${email}?`)) return;
-            const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + '/index.html'
-            });
-            if (!error) {
-                logAction('Password Reset Sent', `Reset email dispatched to: ${email}`);
+            if (!email || email === 'undefined') { alert("No email found for this user."); return; }
+            if (!confirm(`Send a password reset email to:\n\n${email}\n\nThe user will receive a link to set a new password.`)) return;
+            try {
+                const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + '/index.html'
+                });
+                if (error) throw error;
+                logAction('Password Reset Sent', `Reset email sent to: ${email}`);
                 alert(`✅ Password reset email sent to ${email}`);
-            } else {
-                alert("❌ Failed to send reset email: " + error.message);
+            } catch (err) {
+                alert("Failed to send reset email: " + err.message);
+            }
+        };
+
+        // --- GENERATE PASSWORD: Create a random password and update via Admin API ---
+        window.generateAndSetPassword = async (userId, email) => {
+            if (!userId || userId === 'undefined') { alert("Invalid user ID."); return; }
+
+            // Generate a secure random password: 12 chars, mixed
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+            let newPassword = '';
+            const arr = new Uint8Array(12);
+            window.crypto.getRandomValues(arr);
+            arr.forEach(b => { newPassword += chars[b % chars.length]; });
+
+            if (!confirm(`Generate a new random password for:\n\n${email || userId}\n\nNew Password: ${newPassword}\n\n⚠️ Copy this now — it won't be shown again!`)) return;
+
+            try {
+                // Uses Supabase Admin API (requires service_role key in config.js as _supabaseAdmin)
+                // If _supabaseAdmin is not set, falls back to updateUser for the current session user
+                const adminClient = (typeof _supabaseAdmin !== 'undefined') ? _supabaseAdmin : _supabase;
+                const { error } = await adminClient.auth.admin.updateUserById(userId, { password: newPassword });
+                if (error) throw error;
+                logAction('Password Generated', `Admin set new password for User ID: ${userId} (${email})`);
+                // Show final confirmation with copyable password
+                const msg = `✅ Password updated!\n\nUser: ${email}\nNew Password: ${newPassword}\n\nShare this securely with the user.`;
+                alert(msg);
+            } catch (err) {
+                // Fallback: if admin API not available, prompt to use reset email instead
+                console.error(err);
+                alert(`⚠️ Admin password update requires a service_role Supabase client.\n\nError: ${err.message}\n\nTip: Use the "Reset" (email) option instead, or configure _supabaseAdmin in config.js with the service_role key.`);
             }
         };
 
