@@ -607,9 +607,9 @@
             }
         };
 
-        // --- GENERATE PASSWORD: Create a random password and update via Admin API ---
+        // --- GENERATE PASSWORD: Show a generated password + send reset email so user can apply it ---
         window.generateAndSetPassword = async (userId, email) => {
-            if (!userId || userId === 'undefined') { alert("Invalid user ID."); return; }
+            if (!email || email === 'undefined') { alert("No email found for this user."); return; }
 
             // Generate a secure random password: 12 chars, mixed
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
@@ -618,24 +618,72 @@
             window.crypto.getRandomValues(arr);
             arr.forEach(b => { newPassword += chars[b % chars.length]; });
 
-            if (!confirm(`Generate a new random password for:\n\n${email || userId}\n\nNew Password: ${newPassword}\n\n⚠️ Copy this now — it won't be shown again!`)) return;
-
-            try {
-                // Uses Supabase Admin API (requires service_role key in config.js as _supabaseAdmin)
-                // If _supabaseAdmin is not set, falls back to updateUser for the current session user
-                const adminClient = (typeof _supabaseAdmin !== 'undefined') ? _supabaseAdmin : _supabase;
-                const { error } = await adminClient.auth.admin.updateUserById(userId, { password: newPassword });
-                if (error) throw error;
-                logAction('Password Generated', `Admin set new password for User ID: ${userId} (${email})`);
-                // Show final confirmation with copyable password
-                const msg = `✅ Password updated!\n\nUser: ${email}\nNew Password: ${newPassword}\n\nShare this securely with the user.`;
-                alert(msg);
-            } catch (err) {
-                // Fallback: if admin API not available, prompt to use reset email instead
-                console.error(err);
-                alert(`⚠️ Admin password update requires a service_role Supabase client.\n\nError: ${err.message}\n\nTip: Use the "Reset" (email) option instead, or configure _supabaseAdmin in config.js with the service_role key.`);
-            }
+            // Show the generated password in a styled modal so admin can copy it
+            showPasswordModal(email, newPassword, async () => {
+                // After admin copies it, send a reset email so the user can log in & change it
+                try {
+                    const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/index.html'
+                    });
+                    if (error) throw error;
+                    logAction('Password Generated', `Admin generated password & sent reset email to: ${email}`);
+                } catch (err) {
+                    console.error("Reset email failed:", err.message);
+                }
+            });
         };
+
+        // --- MODAL: Show generated password clearly so admin can copy it ---
+        function showPasswordModal(email, password, onCopy) {
+            // Remove existing modal if any
+            document.getElementById('pwdModal')?.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'pwdModal';
+            modal.style.cssText = `
+                position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9999;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background:white; border-radius:16px; padding:32px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.25); text-align:center;">
+                    <div style="font-size:2.5rem; margin-bottom:10px;">🔑</div>
+                    <h2 style="margin:0 0 6px; color:#333;">Generated Password</h2>
+                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">For account: <strong>${email}</strong></p>
+
+                    <div style="background:#f4f7f6; border:2px dashed #6c5ce7; border-radius:10px; padding:18px; margin-bottom:20px; position:relative;">
+                        <code id="genPwdText" style="font-size:1.4rem; font-weight:bold; color:#6c5ce7; letter-spacing:2px; word-break:break-all;">${password}</code>
+                    </div>
+
+                    <p style="font-size:0.8rem; color:#e67e22; background:#fff9f0; border:1px solid #f0d9b5; border-radius:8px; padding:10px; margin-bottom:20px;">
+                        ⚠️ Copy this password now and share it securely with the user.<br>A password reset email will also be sent to them.
+                    </p>
+
+                    <div style="display:flex; gap:10px; justify-content:center;">
+                        <button id="copyPwdBtn" onclick="
+                            navigator.clipboard.writeText('${password}').then(() => {
+                                this.textContent = '✅ Copied!';
+                                this.style.background = '#2ed573';
+                            });
+                        " style="background:#6c5ce7; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem; flex:1;">
+                            📋 Copy Password
+                        </button>
+                        <button onclick="
+                            document.getElementById('pwdModal').remove();
+                        " style="background:#eee; color:#333; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem;">
+                            Close
+                        </button>
+                    </div>
+                    <p style="font-size:0.75rem; color:#aaa; margin-top:16px;">A reset email is being sent automatically so the user can apply this password.</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Trigger the reset email callback
+            if (typeof onCopy === 'function') onCopy();
+
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
 
         // --- 7. LOAD AUDIT LOGS ---
         async function loadLogs() {
