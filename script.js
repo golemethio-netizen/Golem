@@ -595,45 +595,148 @@ window.openProductModal = async (product) => {
             </div>`;
 
     } else {
-        // Restore standard modal layout & styles
-        modalContent.style.padding = ''; 
+        // ── PREMIUM PRODUCT DETAIL MODAL ──
+        modalContent.style.padding = '0';
         modalContent.style.background = '#fff';
+        modalContent.style.overflow = 'hidden';
+        modalContent.style.flexDirection = 'column';
 
-        modalContent.innerHTML = `
-            <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
-            <div class="modal-img-wrapper">
-                <img src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
-            </div>
-            <div class="modal-body" style="padding: 20px 0 0;">
-                <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
-                
-                <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
-                    <div style="flex: 1;">
-                        <h4 style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: ${sellerName}</h4>
-                        <div style="margin-top:5px; font-size:0.8rem;">
-                            ${isVerified 
-                                ? `<span style="color:#2ed573; font-weight:bold;"><i class="fas fa-check-circle"></i> Verified Seller</span>` 
-                                : `<span style="color:#888;"><i class="fas fa-shield-alt"></i> Community Seller</span>`}
-                        </div>
+        // --- Parse description into spec lines + intro text ---
+        const rawDesc = (product.description || '').trim();
+        const allLines = rawDesc.split('\n').map(l => l.trim()).filter(Boolean);
+
+        // Lines starting with emoji/bullet markers = spec lines
+        const specMarkers = /^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)/u;
+        const priceMarkers = /^(price|ዋጋ|birr|etb)/i;
+
+        const specLines = [];
+        const introLines = [];
+        let priceLineText = '';
+
+        allLines.forEach(line => {
+            if (priceMarkers.test(line)) {
+                priceLineText = line;
+            } else if (specMarkers.test(line)) {
+                specLines.push(line);
+            } else {
+                introLines.push(line);
+            }
+        });
+
+        const priceDisplay = product.price
+            ? product.price.toLocaleString() + ' ETB'
+            : (priceLineText ? priceLineText.replace(/price[:\s]*/i,'').trim() : 'Negotiable');
+
+        const categoryColor = {
+            'Electronics': '#6c5ce7', 'Phones': '#0088cc', 'Fashion': '#e84393',
+            'Vehicles': '#e67e22', 'Furniture': '#27ae60', 'Books': '#e74c3c',
+        };
+        const catColor = categoryColor[product.category] || '#6c5ce7';
+
+        const specChips = specLines.map(line => {
+            // Clean up leading emoji/bullet for display
+            const clean = line.replace(/^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)\s*/u, '').trim();
+            const leadEmoji = line.match(/^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)/u)?.[0] || '✅';
+            return `
+                <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:#f8f9ff;border-radius:10px;border-left:3px solid ${catColor};">
+                    <span style="font-size:1rem;flex-shrink:0;">${leadEmoji}</span>
+                    <span style="font-size:0.88rem;color:#333;font-weight:500;line-height:1.4;">${clean}</span>
+                </div>`;
+        }).join('');
+
+        const introText = introLines.join(' ').trim();
+
+        modalContent.innerHTML = \`
+            <div style="font-family:'Poppins',sans-serif;background:#fff;overflow:hidden;border-radius:20px;display:flex;flex-direction:column;max-height:90vh;">
+
+                <!-- IMAGE HERO -->
+                <div style="position:relative;flex-shrink:0;">
+                    <img src="\${product.image || ''}" alt="\${product.name}"
+                        style="width:100%;height:260px;object-fit:cover;display:block;">
+                    <!-- Dark gradient overlay at bottom of image -->
+                    <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,0.6));"></div>
+
+                    <!-- Category badge on image -->
+                    <div style="position:absolute;top:14px;left:14px;background:\${catColor};color:white;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:0.05em;">
+                        \${product.category || 'Item'}
+                    </div>
+
+                    <!-- Close button -->
+                    <button onclick="window.closeProductModal()"
+                        style="position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.45);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">&times;</button>
+
+                    <!-- Price on image -->
+                    <div style="position:absolute;bottom:14px;right:14px;background:\${catColor};color:white;font-size:1.1rem;font-weight:800;padding:6px 16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);">
+                        \${priceDisplay}
                     </div>
                 </div>
 
-                <div class="modal-price" style="font-size: 1.3rem; color: #2ed573; font-weight:bold; margin-bottom:15px;">
-                    ${product.price ? product.price.toLocaleString() : 'Negotiable'} ETB
-                </div>
-                
-                <p class="modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555;">
-                    ${product.description || "No description available."}
-                </p>
+                <!-- SCROLLABLE BODY -->
+                <div style="overflow-y:auto;flex:1;padding:20px;">
 
-                <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
-                    <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
-                    <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
-                    <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#6c5ce7; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-heart"></i> Save to Wishlist</button>
+                    <!-- Title -->
+                    <h2 style="margin:0 0 4px;font-size:1.15rem;font-weight:800;color:#1a1a2e;line-height:1.3;">\${product.name}</h2>
+
+                    <!-- Location + Verified row -->
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                        <span style="font-size:0.8rem;color:#888;display:flex;align-items:center;gap:4px;">
+                            <i class="fas fa-map-marker-alt" style="color:#ff4757;"></i> \${product.location || 'Addis Ababa'}
+                        </span>
+                        \${isVerified
+                            ? \`<span style="font-size:0.78rem;color:#2ed573;font-weight:700;background:#e8fdf5;padding:3px 10px;border-radius:20px;border:1px solid #2ed573;"><i class="fas fa-check-circle"></i> Verified Seller</span>\`
+                            : \`<span style="font-size:0.78rem;color:#888;background:#f1f2f6;padding:3px 10px;border-radius:20px;"><i class="fas fa-shield-alt"></i> Community</span>\`}
+                    </div>
+
+                    <!-- Seller Card -->
+                    <div style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#f8f9ff,#f0f0ff);border-radius:14px;padding:12px 14px;margin-bottom:18px;border:1px solid #ebebff;">
+                        <img src="\${avatarUrl}" alt="Seller"
+                            style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid \${catColor};flex-shrink:0;"
+                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'46\' height=\'46\' viewBox=\'0 0 50 50\'%3E%3Ccircle cx=\'25\' cy=\'25\' r=\'25\' fill=\'%23e0e0e0\'/%3E%3Ccircle cx=\'25\' cy=\'20\' r=\'10\' fill=\'%23bdbdbd\'/%3E%3Cellipse cx=\'25\' cy=\'45\' rx=\'16\' ry=\'12\' fill=\'%23bdbdbd\'/%3E%3C/svg%3E'">
+                        <div>
+                            <div style="font-weight:700;color:#333;font-size:0.9rem;">\${sellerName}</div>
+                            <div style="font-size:0.75rem;color:#888;margin-top:2px;">Seller on WanaGebya</div>
+                        </div>
+                    </div>
+
+                    <!-- Intro text (if any) -->
+                    \${introText ? \`<p style="font-size:0.88rem;color:#555;line-height:1.6;margin-bottom:16px;padding:12px;background:#fffbf0;border-radius:10px;border-left:3px solid #f1c40f;">\${introText}</p>\` : ''}
+
+                    <!-- Spec Lines -->
+                    \${specChips ? \`
+                        <div style="margin-bottom:18px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">
+                                <i class="fas fa-list-check" style="color:\${catColor};"></i> Specifications
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:8px;">\${specChips}</div>
+                        </div>\` : ''}
+
+                    <!-- Contact Buttons -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+                        <a href="tel:+\${intPhone}"
+                            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#1a1a2e;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.9rem;">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a href="https://t.me/\${tgUser || '+'+intPhone}" target="_blank"
+                            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#0088cc;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.9rem;">
+                            <i class="fab fa-telegram-plane"></i> Telegram
+                        </a>
+                        <a href="https://wa.me/\${intPhone}?text=\${encodeURIComponent('Hi, I saw '+product.name+' on WanaGebya. Is it still available?')}" target="_blank"
+                            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#25d366;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.9rem;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <button onclick="window.addToCartFromModal()"
+                            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:\${catColor};color:white;border-radius:12px;border:none;cursor:pointer;font-weight:700;font-size:0.9rem;font-family:inherit;">
+                            <i class="fas fa-heart"></i> Wishlist
+                        </button>
+                    </div>
+
+                    <!-- Footer watermark -->
+                    <div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid #f0f0f0;">
+                        <span style="font-size:0.72rem;color:#bbb;letter-spacing:0.06em;">wanagebya.com &nbsp;•&nbsp; Ethiopia's Marketplace</span>
+                    </div>
+
                 </div>
-            </div>`;
+            </div>\`;
     }
 
     modal.style.display = 'flex';
