@@ -176,7 +176,33 @@
 
                     <div class="input-group-sell">
                         <label><i class="fas fa-align-left"></i> Description</label>
-                        <textarea id="editDesc" rows="4" required></textarea>
+
+                        <!-- Format tip bar -->
+                        <div style="background:#f0f0ff;border:1px solid #d0d0ff;border-radius:10px;padding:11px 14px;margin-bottom:10px;font-size:0.8rem;color:#555;line-height:1.7;">
+                            <div style="font-weight:700;color:#6c5ce7;margin-bottom:5px;"><i class="fas fa-lightbulb"></i> How to write a great description:</div>
+                            <div>• Start with a short intro sentence about the item</div>
+                            <div>• Add each spec on its own line starting with an emoji:</div>
+                            <div style="margin-left:10px;color:#6c5ce7;font-family:monospace;">
+                                ✅ Feature or spec here<br>
+                                👉 Another detail<br>
+                                💹 Value or performance<br>
+                                ☑️ Condition or warranty
+                            </div>
+                            <div>• End with <strong>Price: XXXXX</strong> if not using the price field</div>
+                        </div>
+
+                        <textarea id="editDesc" rows="10" required
+                            placeholder="Example:&#10;Brand new Lenovo ThinkPad laptop in excellent condition.&#10;✅ Core i7 8th Generation&#10;✅ 8GB RAM&#10;✅ 512GB SSD Storage&#10;👉 2GB Dedicated Graphics&#10;👉 14 inch Screen&#10;☑️ Battery life above 8hrs&#10;☑️ One year warranty&#10;💹 Slim, portable and latest model&#10;Price: 69500"
+                            oninput="updateDescPreview(this.value)"
+                            style="font-size:0.9rem;line-height:1.6;resize:vertical;"></textarea>
+
+                        <!-- Live preview -->
+                        <div id="descPreviewBox" style="display:none;margin-top:10px;border:1px solid #e0e0ff;border-radius:10px;overflow:hidden;">
+                            <div style="background:#6c5ce7;color:white;font-size:0.75rem;font-weight:700;padding:7px 12px;letter-spacing:0.05em;">
+                                <i class="fas fa-eye"></i> PREVIEW — how buyers will see it
+                            </div>
+                            <div id="descPreviewContent" style="padding:14px;background:#f8f9ff;display:flex;flex-direction:column;gap:7px;font-size:0.87rem;"></div>
+                        </div>
                     </div>
 
                     <div class="input-group-sell">
