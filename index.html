@@ -287,7 +287,7 @@
             /* ── Header ── */
             .golem-header { padding: 12px 14px 10px; }
             .header-top-row { flex-wrap: nowrap; }
-            .logo { display: flex; align-items: center; max-width: 50%; flex-shrink: 0; }
+            .logo { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
             .header-actions { gap: 8px; }
             .hide-text-mobile { display: none !important; }
             .help-link i { font-size: 1.25rem !important; }
@@ -367,7 +367,7 @@
         /* ── Very small phones ── */
         @media (max-width: 360px) {
             .masonry-wrapper { grid-template-columns: 1fr; }
-            .logo svg { width: 120px; height: auto; }
+            .logo { font-size: 0.95rem; }
         }
     </style>
 </head>
@@ -376,34 +376,7 @@
     <!-- ======================= HEADER ======================= -->
     <header class="golem-header">
         <div class="header-top-row">
-            <a href="index.html" class="logo" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0;">
-                <svg width="140" height="44" viewBox="60 55 560 170" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Icon background -->
-                    <rect x="60" y="55" width="165" height="165" rx="36" fill="#00b894"/>
-                    <rect x="68" y="63" width="149" height="149" rx="30" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.18"/>
-                    <!-- Bag handle -->
-                    <path d="M108 138 Q108 108 142 108 Q176 108 176 138" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
-                    <!-- Bag body -->
-                    <rect x="96" y="136" width="93" height="66" rx="10" fill="#ffffff"/>
-                    <!-- Gold stripe -->
-                    <rect x="96" y="158" width="93" height="7" fill="#fdcb6e" opacity="0.75"/>
-                    <!-- Big W -->
-                    <text x="142" y="195" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="40" fill="#00b894">W</text>
-                    <!-- Sparkles -->
-                    <circle cx="182" cy="74" r="5" fill="#fdcb6e"/>
-                    <circle cx="198" cy="82" r="3" fill="#ffffff" opacity="0.6"/>
-                    <!-- Brand text -->
-                    <text x="250" y="132" font-family="Arial,sans-serif" font-weight="900" font-size="58" fill="#1a1a2e">Wana</text>
-                    <text x="433" y="132" font-family="Arial,sans-serif" font-weight="900" font-size="58" fill="#00b894">Gebya</text>
-                    <!-- Amharic -->
-                    <text x="250" y="163" font-family="Arial,sans-serif" font-weight="400" font-size="20" fill="#00b894" letter-spacing="2">ዋና ገበያ</text>
-                    <!-- Tagline -->
-                    <line x1="250" y1="178" x2="615" y2="178" stroke="#e0e0e0" stroke-width="1"/>
-                    <text x="250" y="198" font-family="Arial,sans-serif" font-size="12" letter-spacing="3" fill="#636e72">ETHIOPIA'S </text>
-                    <text x="358" y="198" font-family="Arial,sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#fdcb6e">ONLINE</text>
-                    <text x="432" y="198" font-family="Arial,sans-serif" font-size="12" letter-spacing="3" fill="#636e72"> MARKETPLACE</text>
-                </svg>
-            </a>
+            <div class="logo">WanaGebya | ዋና ገበያ</div>
             <div class="header-actions">
                 <a href="#" id="helpBtn" class="help-link">
                     <i class="fas fa-question-circle" style="font-size:1.1rem;"></i>
