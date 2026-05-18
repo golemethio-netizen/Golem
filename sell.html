@@ -219,33 +219,7 @@
                 <!-- Description -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-align-left"></i> General Description</label>
-
-                    <!-- Format guide -->
-                    <div style="background:#f0f0ff;border:1px solid #d0d0ff;border-radius:10px;padding:11px 14px;margin-bottom:10px;font-size:0.8rem;color:#555;line-height:1.7;">
-                        <div style="font-weight:700;color:#6c5ce7;margin-bottom:5px;"><i class="fas fa-lightbulb"></i> How to write a great description:</div>
-                        <div>• Start with a short intro sentence about the item</div>
-                        <div>• Add each spec on its own line starting with an emoji:</div>
-                        <div style="margin-left:10px;color:#6c5ce7;font-family:monospace;">
-                            ✅ Feature or spec here<br>
-                            👉 Another detail<br>
-                            💹 Value or performance<br>
-                            ☑️ Condition or warranty
-                        </div>
-                        <div>• End with <strong>Price: XXXXX</strong> if not using the price field</div>
-                    </div>
-
-                    <textarea id="prodDesc" rows="10" required
-                        placeholder="Example:&#10;Brand new Lenovo ThinkPad laptop in excellent condition.&#10;✅ Core i7 8th Generation&#10;✅ 8GB RAM&#10;✅ 512GB SSD Storage&#10;👉 2GB Dedicated Graphics&#10;👉 14 inch Screen&#10;☑️ Battery life above 8hrs&#10;☑️ One year warranty&#10;💹 Slim, portable and latest model&#10;Price: 69500"
-                        oninput="updateDescPreview(this.value)"
-                        style="font-size:0.9rem;line-height:1.6;resize:vertical;"></textarea>
-
-                    <!-- Live preview -->
-                    <div id="descPreviewBox" style="display:none;margin-top:10px;border:1px solid #e0e0ff;border-radius:10px;overflow:hidden;">
-                        <div style="background:#6c5ce7;color:white;font-size:0.75rem;font-weight:700;padding:7px 12px;letter-spacing:0.05em;">
-                            <i class="fas fa-eye"></i> PREVIEW — how buyers will see it
-                        </div>
-                        <div id="descPreviewContent" style="padding:14px;background:#f8f9ff;display:flex;flex-direction:column;gap:7px;font-size:0.87rem;"></div>
-                    </div>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item or listing in detail..." required></textarea>
                 </div>
 
                 <!-- Phone -->
@@ -758,6 +732,72 @@ function handleRegionChange(region) {
     /* ══════════════════════════════
        FORM SUBMISSION
     ══════════════════════════════ */
+
+        // ── WATERMARK FUNCTION ──
+        // Draws the product image on a canvas, adds watermark, returns a watermarked Blob
+        async function applyWatermark(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+
+                    // Draw original image
+                    ctx.drawImage(img, 0, 0);
+
+                    // ── Watermark config ──
+                    const text     = 'wanagebya.com';
+                    const padding  = 14;
+                    const fontSize = Math.max(16, Math.round(canvas.width * 0.038));
+                    ctx.font       = `bold ${fontSize}px Arial, sans-serif`;
+                    ctx.textBaseline = 'bottom';
+
+                    // Measure text for background pill
+                    const textW = ctx.measureText(text).width;
+                    const boxH  = fontSize + padding;
+                    const boxW  = textW + padding * 2;
+                    const x     = canvas.width  - boxW - 16;
+                    const y     = canvas.height - boxH - 16;
+
+                    // Semi-transparent background pill
+                    ctx.globalAlpha = 0.62;
+                    ctx.fillStyle   = '#1a1a2e';
+                    const r = 8;
+                    ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.lineTo(x + boxW - r, y);
+                    ctx.quadraticCurveTo(x + boxW, y, x + boxW, y + r);
+                    ctx.lineTo(x + boxW, y + boxH - r);
+                    ctx.quadraticCurveTo(x + boxW, y + boxH, x + boxW - r, y + boxH);
+                    ctx.lineTo(x + r, y + boxH);
+                    ctx.quadraticCurveTo(x, y + boxH, x, y + boxH - r);
+                    ctx.lineTo(x, y + r);
+                    ctx.quadraticCurveTo(x, y, x + r, y);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Watermark text
+                    ctx.globalAlpha = 0.92;
+                    ctx.fillStyle   = '#ffffff';
+                    ctx.fillText(text, x + padding, y + boxH - padding / 2);
+
+                    // Small logo dot accent
+                    ctx.globalAlpha = 1;
+                    ctx.fillStyle   = '#6c5ce7';
+                    ctx.beginPath();
+                    ctx.arc(x + padding - 6, y + boxH / 2, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    URL.revokeObjectURL(url);
+                    canvas.toBlob(resolve, 'image/jpeg', 0.88);
+                };
+                img.src = url;
+            });
+        }
+
    document.getElementById('sellForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -772,8 +812,12 @@ function handleRegionChange(region) {
             const finalDescription = document.getElementById('prodDesc').value +
                 (extraSpecsText ? "\n\n--- Specs ---" + extraSpecsText : "");
 
-            // Upload image
-            const file = fileInput.files[0];
+            // Upload image with watermark
+            const rawFile = fileInput.files[0];
+            btn.innerText = "Adding watermark...";
+            const watermarkedBlob = await applyWatermark(rawFile);
+            const file = new File([watermarkedBlob], rawFile.name, { type: 'image/jpeg' });
+            btn.innerText = "Uploading...";
             const fileName = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
             const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
             if (uploadError) throw uploadError;
@@ -812,28 +856,6 @@ function handleRegionChange(region) {
         document.getElementById('districtWrapper').style.display =
             (region === 'Addis Ababa') ? 'block' : 'none';
     };
-
-        // ── DESCRIPTION LIVE PREVIEW ──
-        function updateDescPreview(val) {
-            const box = document.getElementById('descPreviewBox');
-            const cnt = document.getElementById('descPreviewContent');
-            if (!val || !val.trim()) { box.style.display = 'none'; return; }
-            box.style.display = 'block';
-            const specRx = /^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)/u;
-            const priceRx = /^(price|ዋጋ|birr|etb)/i;
-            cnt.innerHTML = val.split('\n').map(l => l.trim()).filter(Boolean).map(line => {
-                if (priceRx.test(line)) {
-                    return '<div style="display:inline-block;background:#6c5ce7;color:white;font-weight:800;padding:6px 16px;border-radius:10px;font-size:0.95rem;">' + line + '</div>';
-                } else if (specRx.test(line)) {
-                    const em = (line.match(/^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)/u) || ['✅'])[0];
-                    const clean = line.replace(em, '').trim();
-                    return '<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px;background:#fff;border-radius:9px;border-left:3px solid #6c5ce7;">'
-                        + '<span>' + em + '</span><span style="color:#333;font-weight:500;">' + clean + '</span></div>';
-                } else {
-                    return '<div style="color:#555;line-height:1.5;padding:2px 0;">' + line + '</div>';
-                }
-            }).join('');
-        }
     </script>
 </body>
 </html>
