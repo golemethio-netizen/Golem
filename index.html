@@ -32,42 +32,156 @@
         .mobile-bottom-nav { display: none; }
         .desktop-nav { display: flex; }
 
-        /* ── HEADER ── */
-        .header-top-row {
+       /* ═══════════════════════════════════════════════════════
+           PREMIUM HEADER LAYOUT
+        ═══════════════════════════════════════════════════════ */
+        .golem-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            padding: 10px 0;
+        }
+
+        .header-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Top Row: Logo & Quick Actions */
+        .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            width: 100%;
-            gap: 10px;
-            padding: 6px 0 4px;
-        }
-        .header-actions {
-            display: flex;
             align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
+            width: 100%;
+        }
+
+        /* Premium Scalable Logo */
+        .logo-block {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+        }
+        .logo-block svg {
+            width: 42px; height: 42px; flex-shrink: 0;
+        }
+        .logo-title {
+            font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; color: #1a1a2e; line-height: 1; display: flex; align-items: baseline;
+        }
+        .logo-title span { color: #00b894; }
+        .logo-subtitle {
+            font-family: 'Poppins', sans-serif; font-size: 0.75rem; color: #00b894; font-weight: 700; letter-spacing: 1px; margin-top: 2px;
+        }
+
+        /* Top Right Actions */
+        .header-top-right {
+            display: flex; align-items: center; gap: 12px;
         }
         .help-link {
-            color: #555; font-size: 0.85rem; font-weight: 600;
-            text-decoration: none; display: flex; align-items: center;
-            gap: 5px; transition: color 0.3s;
+            color: #64748b; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.3s;
         }
-        .help-link:hover { color: #007bff; }
+        .help-link:hover { color: #00b894; }
+        
+        .lang-btn {
+            background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .lang-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-        /* ── MODAL ── */
-        .modal-flex-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
-        .modal-flex-actions .contact-btn { flex: 1; min-width: 120px; }
-        .success-modal-inner {
-            background: white; padding: 40px; border-radius: 20px;
-            text-align: center; max-width: 400px; width: 90%; position: relative;
+        .sign-in-btn {
+            background: #1a1a2e; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 2px 8px rgba(26,26,46,0.2);
         }
-        .success-icon { font-size: 50px; color: #2ed573; margin-bottom: 20px; }
-        .success-back-btn {
-            margin-top: 25px; width: 100%; padding: 15px;
-            background: #333; color: white; border: none;
-            border-radius: 10px; font-weight: bold; cursor: pointer;
+        .sign-in-btn:hover { background: #00b894; box-shadow: 0 2px 10px rgba(0,184,148,0.3); }
+
+        /* Bottom Row: Nav & Search */
+        .header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
         }
 
+        /* Desktop Nav */
+        .desktop-main-nav {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-item-box {
+            display: flex; align-items: center; gap: 6px; text-decoration: none; color: #475569; font-weight: 600; font-size: 0.85rem; padding: 8px 14px; border-radius: 12px; transition: background 0.2s;
+        }
+        .nav-item-box:hover { background: #f1f5f9; color: #1a1a2e; }
+        .nav-item-box.bg-sell { background: #e8fdf5; color: #00b894; }
+        .nav-item-box.bg-sell:hover { background: #d1fae5; }
+        .nav-item-box i { font-size: 1.1rem; }
+
+        .cart-badge {
+            position: absolute; top: -4px; right: -4px; background: #ff4757; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.65rem; font-weight: 700; border: 2px solid #fff; display: none;
+        }
+
+        /* Search & Filters */
+        .header-search-row {
+            display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end;
+        }
+        .search-input-group {
+            display: flex; align-items: center; background: #f4f6f8; border: 1px solid #e2e8f0; border-radius: 24px; padding: 8px 16px; gap: 8px; flex: 1; max-width: 450px; transition: all 0.3s;
+        }
+        .search-input-group:focus-within {
+            border-color: #00b894; box-shadow: 0 0 0 3px rgba(0,184,148,0.1); background: #fff;
+        }
+        .search-input-group input {
+            border: none; background: transparent; outline: none; font-size: 0.85rem; width: 100%; color: #333; font-family: inherit;
+        }
+        
+        .header-filters {
+            display: flex; gap: 8px;
+        }
+        .header-select {
+            border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 14px; border-radius: 24px; font-size: 0.8rem; font-weight: 500; font-family: inherit; outline: none; cursor: pointer; color: #475569; transition: 0.2s;
+        }
+        .header-select:hover { border-color: #cbd5e1; }
+
+        /* Mobile overrides */
+        .mobile-bottom-nav { display: none; }
+        
+        @media (max-width: 991px) {
+            .header-bottom { flex-direction: column; gap: 12px; align-items: stretch; }
+            .desktop-main-nav { display: none; }
+            .header-search-row { max-width: 100%; flex-direction: column; align-items: stretch; }
+            .search-input-group { max-width: 100%; padding: 10px 16px; }
+            .header-filters { display: flex; width: 100%; gap: 8px; }
+            .header-select { flex: 1; padding: 10px 12px; }
+            
+            .hide-mobile { display: none !important; }
+            
+            .logo-title { font-size: 1.25rem; }
+            .logo-block svg { width: 36px; height: 36px; }
+            
+            .sign-in-btn { padding: 0; width: 38px; height: 38px; justify-content: center; border-radius: 50%; }
+            .sign-in-btn span { display: none; }
+
+            /* Show mobile bottom nav */
+            .mobile-bottom-nav {
+                display: flex !important;
+                position: fixed; bottom: 0; left: 0; width: 100%;
+                background: white; border-top: 1px solid #e2e8f0;
+                justify-content: space-around; align-items: center;
+                padding: 10px 0 12px; z-index: 1000;
+                box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            }
+            .mobile-bottom-nav a {
+                display: flex; flex-direction: column; align-items: center; gap: 4px;
+                text-decoration: none; color: #64748b; flex: 1;
+                font-size: 0.65rem; font-weight: 600; position: relative; transition: color 0.2s;
+            }
+            .mobile-bottom-nav a:hover { color: #1a1a2e; }
+            .mobile-bottom-nav a i { font-size: 1.3rem; color: #94a3b8; transition: color 0.2s; }
+            .mobile-bottom-nav a.active-tab i, .mobile-bottom-nav a:hover i { color: #00b894; }
+            .mobile-bottom-nav a.sell-tab i { color: #2ed573; }
+            .mobile-bottom-nav a.admin-tab i { color: #ff4757; }
+        }
         /* ═══════════════════════════════════════════════════════
            JOB CARD — Dark blue theme
         ═══════════════════════════════════════════════════════ */
