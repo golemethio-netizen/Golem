@@ -375,105 +375,92 @@
 
 <body>
     <!-- ======================= HEADER ======================= -->
-    <header class="golem-header" style="padding-bottom:8px;">
-        <div class="header-top-row" style="align-items:flex-start;display:flex;justify-content:space-between;gap:10px;">
-
-            <!-- LEFT: Icon + Brand -->
-            <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:16px;flex-shrink:0;">
-                <svg width="110" height="110" viewBox="0 0 165 165" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-                    <rect x="0" y="0" width="165" height="165" rx="36" fill="#00b894"/>
-                    <rect x="8" y="8" width="149" height="149" rx="30" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.18"/>
-                    <path d="M48 78 Q48 48 82 48 Q116 48 116 78" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
-                    <rect x="30" y="76" width="105" height="72" rx="12" fill="#fff"/>
-                    <rect x="30" y="100" width="105" height="8" fill="#fdcb6e" opacity="0.9"/>
-                    <text x="82" y="142" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="48" fill="#00b894">W</text>
-                    <circle cx="126" cy="16" r="7" fill="#fdcb6e"/>
-                    <circle cx="144" cy="28" r="4.5" fill="#fff" opacity="0.55"/>
-                </svg>
-                <div style="display:flex;flex-direction:column;gap:0;">
-                    <div style="display:flex;align-items:baseline;line-height:1;margin-bottom:2px;">
-                        <span style="font-family:'Poppins',Arial,sans-serif;font-weight:900;font-size:3.8rem;color:#1a1a2e;line-height:1;">Wana&nbsp;</span>
-                        <span style="font-family:'Poppins',Arial,sans-serif;font-weight:900;font-size:3.8rem;color:#00b894;line-height:1;">Gebya</span>
+  <!-- ======================= PREMIUM HEADER ======================= -->
+    <header class="golem-header">
+        <div class="header-container">
+            
+            <!-- TOP ROW: Logo & Quick Actions -->
+            <div class="header-top">
+                <!-- Premium Logo -->
+                <a href="index.html" class="logo-block">
+                    <svg viewBox="0 0 165 165" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="0" width="165" height="165" rx="36" fill="#00b894"/>
+                        <rect x="8" y="8" width="149" height="149" rx="30" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.18"/>
+                        <path d="M48 78 Q48 48 82 48 Q116 48 116 78" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+                        <rect x="30" y="76" width="105" height="72" rx="12" fill="#fff"/>
+                        <rect x="30" y="100" width="105" height="8" fill="#fdcb6e" opacity="0.9"/>
+                        <text x="82" y="142" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="48" fill="#00b894">W</text>
+                        <circle cx="126" cy="16" r="7" fill="#fdcb6e"/>
+                        <circle cx="144" cy="28" r="4.5" fill="#fff" opacity="0.55"/>
+                    </svg>
+                    <div class="logo-text-wrapper">
+                        <div class="logo-title">Wana<span>Gebya</span></div>
+                        <div class="logo-subtitle">ዋና ገበያ</div>
                     </div>
-                    <div style="font-family:'Poppins',Arial,sans-serif;font-size:1.05rem;color:#00b894;font-weight:600;letter-spacing:1px;font-style:italic;margin-bottom:6px;">ዋና ገበያ</div>
-                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                        <span style="font-size:0.72rem;font-weight:700;letter-spacing:2.5px;color:#888;">ETHIOPIA'S</span>
-                        <span style="font-size:0.72rem;font-weight:800;letter-spacing:2.5px;color:#e6a817;background:#fff8e1;padding:3px 10px;border-radius:5px;border:1px solid #fde68a;">ONLINE</span>
-                        <span style="font-size:0.72rem;font-weight:700;letter-spacing:2.5px;color:#888;">MARKETPLACE</span>
-                    </div>
-                    <div style="display:flex;gap:6px;margin-top:8px;">
-                        <div style="width:9px;height:9px;border-radius:50%;background:#00b894;"></div>
-                        <div style="width:9px;height:9px;border-radius:50%;background:#fdcb6e;"></div>
-                        <div style="width:9px;height:9px;border-radius:50%;background:#b2bec3;"></div>
-                        <div style="width:9px;height:9px;border-radius:50%;background:#dfe6e9;"></div>
-                    </div>
-                </div>
-            </a>
+                </a>
 
-            <!-- RIGHT: Help/Lang/Auth + Search + Sort + Location + Nav -->
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-top:4px;">
-
-                <!-- Row 1: Help, Lang, Sign In -->
-                <div class="header-actions">
-                    <a href="#" id="helpBtn" class="help-link">
-                        <i class="fas fa-question-circle" style="font-size:1.1rem;"></i>
-                        <span class="hide-text-mobile">Help</span>
+                <!-- Right Actions: Help, Lang, Auth -->
+                <div class="header-top-right">
+                    <a href="#" id="helpBtn" class="help-link hide-mobile">
+                        <i class="fas fa-question-circle"></i> Help
                     </a>
-                    <button id="langToggleBtn" class="lang-btn" style="padding:6px 12px;border-radius:20px;">
+                    
+                    <button id="langToggleBtn" class="lang-btn">
                         <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
                     </button>
+                    
                     <div class="nav-auth-controls">
-                        <button id="signInBtn" class="filter-btn sign-in-btn" style="background:#333;color:white;border:none;display:flex;align-items:center;gap:6px;">
-                            <i class="fas fa-user"></i>
-                            <span class="hide-text-mobile">Sign In</span>
+                        <button id="signInBtn" class="sign-in-btn">
+                            <i class="fas fa-user"></i> <span class="hide-mobile">Sign In</span>
                         </button>
-                        <div id="userWelcome" style="display:none;align-items:center;gap:8px;">
-                            <span id="userNameLink" style="cursor:pointer;font-size:0.85rem;"><strong id="userName"></strong></span>
-                            <button id="signOutBtn" class="signout-btn" style="padding:5px 10px;font-size:0.8rem;">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
+                        <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
+                            <span id="userNameLink" style="cursor:pointer; font-size:0.85rem; font-weight:600;"><strong id="userName"></strong></span>
+                            <button id="signOutBtn" class="signout-btn" style="padding:6px 10px; border-radius:6px;"><i class="fas fa-sign-out-alt"></i></button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Row 2: Nav links -->
-                <nav class="nav-container-horizontal desktop-nav" style="justify-content:flex-end;">
-                    <a href="index.html" class="nav-item-box bg-home"><i class="fas fa-home"></i><p>Home</p></a>
-                    <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box"><i class="fas fa-plus-circle" style="color:#2ed573;"></i><p>Sell Item</p></a>
-                    <a href="my-items.html" class="nav-item-box bg-items"><i class="fas fa-box-open"></i><p>My Items</p></a>
-                    <a href="saved.html" class="nav-item-box bg-items" style="position:relative;">
+            <!-- BOTTOM ROW: Navigation & Search Filters -->
+            <div class="header-bottom">
+                
+                <!-- Desktop Navigation (Hidden on Mobile) -->
+                <nav class="desktop-main-nav">
+                    <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
+                    <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box bg-sell"><i class="fas fa-plus-circle"></i><p>Sell Item</p></a>
+                    <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>My Items</p></a>
+                    <a href="saved.html" class="nav-item-box" style="position:relative;">
                         <i class="fas fa-heart"></i><p>Saved</p>
-                        <span id="cartBadge" style="display:none;position:absolute;top:-5px;right:5px;">0</span>
+                        <span id="cartBadge" class="cart-badge">0</span>
                     </a>
-                    <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none;">
-                        <i class="fas fa-user-shield"></i><p>Admin</p>
-                    </a>
+                    <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none; color:#ff4757;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
                 </nav>
 
-                <!-- Row 3: Search + Sort + Location -->
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap;">
-                    <!-- Search -->
-                    <div style="display:flex;align-items:center;background:#f5f5f5;border:1.5px solid #e0e0e0;border-radius:24px;padding:7px 14px;gap:7px;min-width:220px;">
-                        <i class="fas fa-search" style="color:#aaa;font-size:0.82rem;flex-shrink:0;"></i>
-                        <input type="text" id="headerSearch" placeholder="Search items..."
-                            style="border:none;background:transparent;outline:none;font-size:0.82rem;color:#333;width:100%;font-family:'Poppins',Arial,sans-serif;">
+                <!-- Search & Sort Bar -->
+                <div class="header-search-row">
+                    <!-- Search Input -->
+                    <div class="search-input-group">
+                        <i class="fas fa-search" style="color:#94a3b8;"></i>
+                        <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
                     </div>
-                    <!-- Sort -->
-                    <select id="sortSelect" style="border:1.5px solid #e0e0e0;border-radius:24px;padding:7px 12px;font-size:0.8rem;background:#f9f9f9;color:#333;outline:none;cursor:pointer;font-family:'Poppins',Arial,sans-serif;min-width:150px;">
-                        <option value="newest">🆕 Newest First</option>
-                        <option value="price_low">💰 Price: Low to High</option>
-                        <option value="price_high">💎 Price: High to Low</option>
-                    </select>
-                    <!-- Location -->
-                    <select id="locationSelect" style="border:1.5px solid #e0e0e0;border-radius:24px;padding:7px 12px;font-size:0.8rem;background:#f9f9f9;color:#333;outline:none;cursor:pointer;font-family:'Poppins',Arial,sans-serif;min-width:130px;">
-                        <option value="all">🌍 All Regions</option>
-                        <option value="Addis Ababa">Addis Ababa</option>
-                        <option value="Oromia">Oromia</option>
-                        <option value="Amhara">Amhara</option>
-                        <option value="Tigray">Tigray</option>
-                        <option value="Sidama">Sidama</option>
-                        <option value="Somali">Somali</option>
-                    </select>
+                    
+                    <!-- Filters -->
+                    <div class="header-filters">
+                        <select id="sortSelect" class="header-select">
+                            <option value="newest">🆕 Newest First</option>
+                            <option value="price_low">💰 Price: Low to High</option>
+                            <option value="price_high">💎 Price: High to Low</option>
+                        </select>
+                        <select id="locationSelect" class="header-select">
+                            <option value="all">🌍 All Regions</option>
+                            <option value="Addis Ababa">Addis Ababa</option>
+                            <option value="Oromia">Oromia</option>
+                            <option value="Amhara">Amhara</option>
+                            <option value="Tigray">Tigray</option>
+                            <option value="Sidama">Sidama</option>
+                            <option value="Somali">Somali</option>
+                        </select>
+                    </div>
                 </div>
 
             </div>
