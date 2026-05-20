@@ -36,9 +36,16 @@
         }
 
         /* UTM Form Styles */
-        .utm-input-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
-        .utm-input-group input { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 0.95rem; outline: none; }
-        .utm-input-group input:focus { border-color: #3498db; }
+        .utm-input-group label, .config-input-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
+        .utm-input-group input, .config-input-group input, .config-input-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 0.95rem; outline: none; box-sizing: border-box; }
+        .utm-input-group input:focus, .config-input-group input:focus, .config-input-group select:focus { border-color: #3498db; }
+
+        /* Configuration Layout Spec */
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 15px; }
+        @media (max-width: 768px) { .config-grid { grid-template-columns: 1fr; } }
+        .config-card { background: #f9fbfb; border: 1px solid #e3e8e8; padding: 20px; border-radius: 8px; }
+        .list-item-node { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 14px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
+        .sub-node-box { margin-left: 20px; padding-left: 10px; border-left: 2px dashed #ddd; }
     </style>
 </head>
 <body style="background: #f4f7f6;">
@@ -54,7 +61,6 @@
 
     <div class="container" style="padding: 20px;">
         
-        <!-- TABS -->
         <div class="admin-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
             <button onclick="switchTab('pending', this)" class="tab-btn active">
                 Pending Approval <span id="pendingBadge" class="admin-badge" style="background:#ff4757; color:white; padding:2px 8px; border-radius:10px; font-size:12px; display:none;">0</span>
@@ -63,6 +69,7 @@
             <button onclick="switchTab('sold', this)" class="tab-btn">Sold Items</button> 
             <button onclick="switchTab('rejected', this)" class="tab-btn">Archive/Rejected</button>
             <button onclick="switchTab('users', this)" class="tab-btn">Registered Users</button>
+            <button onclick="switchTab('categories', this)" class="tab-btn" style="background: #e8f5e9; color: #2e7d32;"><i class="fas fa-tags"></i> Categories</button>
             <button onclick="switchTab('utm', this)" class="tab-btn" style="background: #e1f5fe; color: #0288d1;"><i class="fas fa-link"></i> Marketing (UTM)</button>
             <button onclick="switchTab('logs', this)" class="tab-btn" style="background: #fff3e0; color: #e65100;"><i class="fas fa-history"></i> Audit Logs</button>
             
@@ -71,13 +78,11 @@
             </button>
         </div>
 
-        <!-- SEARCH BAR -->
         <div class="admin-search-bar" id="searchContainer" style="margin-bottom: 25px;">
             <input type="text" id="adminSearchInput" placeholder="Search by name, phone, or category..." 
                    style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #ddd; outline: none; font-size: 1rem;">
         </div>
          
-        <!-- STATS -->
         <div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
             <div class="stat-card"><i class="fas fa-boxes"></i><div><h4 id="totalItems">0</h4><p>Total Items</p></div></div>
             <div class="stat-card"><i class="fas fa-star" style="color:#f1c40f; opacity:1;"></i><div><h4 id="activeSponsors">0</h4><p>Active Sponsors</p></div></div>
@@ -101,22 +106,63 @@
             </div>
         </div>
 
-        <!-- DYNAMIC VIEWS -->
         <main>
-            <!-- Items Grid View -->
             <div id="itemsSection">
                 <h2 id="viewTitle" style="margin-bottom: 20px;">PENDING ITEMS</h2>
                 <div id="adminGrid" class="masonry-wrapper"></div>
             </div>
 
-            <!-- Users List View -->
             <section id="usersSection" style="display: none;">
                 <h2 style="margin-bottom: 20px;">REGISTERED ACCOUNTS</h2>
                 <div id="userList" style="display: grid; gap: 10px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 </div>
             </section>
 
-            <!-- Audit Logs View -->
+            <section id="categoriesSection" style="display: none; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2 style="margin-bottom: 10px; color:#2e7d32;"><i class="fas fa-tags"></i> Marketplace Category Configuration</h2>
+                <p style="color:#666; margin-bottom: 25px;">Add, review, and dynamic management options for top-level market categories and sub-categories.</p>
+                
+                <div class="config-grid">
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        
+                        <div class="config-card">
+                            <h3 style="margin-bottom: 15px; font-size: 1.1rem; color:#333;"><i class="fas fa-folder-plus"></i> Add New Top Category</h3>
+                            <div class="config-input-group" style="margin-bottom: 15px;">
+                                <label>Category Name *</label>
+                                <input type="text" id="newCategoryName" placeholder="e.g. Electronics, Vehicles, Fashion">
+                            </div>
+                            <button onclick="addCategory()" style="background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;">
+                                Save Top Category
+                            </button>
+                        </div>
+
+                        <div class="config-card">
+                            <h3 style="margin-bottom: 15px; font-size: 1.1rem; color:#333;"><i class="fas fa-folder-open"></i> Add Sub-Category Link</h3>
+                            <div class="config-input-group" style="margin-bottom: 12px;">
+                                <label>Parent Category *</label>
+                                <select id="parentCategorySelect">
+                                    <option value="">-- Choose Category Parent --</option>
+                                </select>
+                            </div>
+                            <div class="config-input-group" style="margin-bottom: 15px;">
+                                <label>Sub-Category Name *</label>
+                                <input type="text" id="newSubCategoryName" placeholder="e.g. Smart Phones, Laptops, Shoes">
+                            </div>
+                            <button onclick="addSubCategory()" style="background: #3498db; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;">
+                                Link Sub-Category
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-bottom: 15px; font-size: 1.1rem; color:#333;"><i class="fas fa-sitemap"></i> Live Taxonomy Tree</h3>
+                        <div id="categoryStructureTree" style="max-height: 500px; overflow-y: auto; background:#fafafa; border:1px solid #eee; padding:15px; border-radius:8px;">
+                            <p style="color:#999;">Loading structure tree...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section id="logsSection" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <h2 style="margin-bottom: 20px;"><i class="fas fa-history" style="color:#e65100;"></i> SYSTEM AUDIT LOGS</h2>
                 <p style="color:#666; margin-bottom:15px;">A history of all actions taken on the platform by Admins, Sellers, and Buyers.</p>
@@ -124,7 +170,6 @@
                 </div>
             </section>
 
-            <!-- UTM Builder View -->
             <section id="utmSection" style="display: none; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <h2 style="margin-bottom: 20px; color:#333;"><i class="fas fa-bullhorn" style="color:#3498db;"></i> Marketing & UTM Link Builder</h2>
                 <p style="color:#666; margin-bottom: 25px;">Generate tracking URLs to see where your traffic comes from (Facebook, Telegram, Google, etc.).</p>
@@ -166,7 +211,6 @@
             </section>
         </main>
 
-        <!-- TICKETS -->
         <section id="ticketsSection" style="margin-top: 60px; padding-top: 30px; border-top: 2px dashed #ccc;">
             <h2 style="margin-bottom: 20px;"><i class="fas fa-envelope-open-text"></i> Support Tickets</h2>
             <div id="ticketList" style="display: grid; gap: 15px;"></div>
@@ -174,7 +218,6 @@
 
     </div>
 
-    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
@@ -349,14 +392,16 @@
 
             const itemsSection = document.getElementById('itemsSection');
             const usersSection = document.getElementById('usersSection');
+            const categoriesSection = document.getElementById('categoriesSection');
             const utmSection = document.getElementById('utmSection');
             const logsSection = document.getElementById('logsSection');
             const searchContainer = document.getElementById('searchContainer');
             const viewTitle = document.getElementById('viewTitle');
 
-            // Hide all by default
+            // Hide all views by default
             itemsSection.style.display = 'none';
             usersSection.style.display = 'none';
+            categoriesSection.style.display = 'none';
             utmSection.style.display = 'none';
             logsSection.style.display = 'none';
             searchContainer.style.display = 'block';
@@ -364,6 +409,10 @@
             if (status === 'users') {
                 usersSection.style.display = 'block';
                 loadUsers();
+            } else if (status === 'categories') {
+                categoriesSection.style.display = 'block';
+                searchContainer.style.display = 'none';
+                loadCategoryConfiguration();
             } else if (status === 'utm') {
                 utmSection.style.display = 'block';
                 searchContainer.style.display = 'none'; // hide search on builder
@@ -804,7 +853,116 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        // --- 7. LOAD AUDIT LOGS ---
+        // --- 7. CATEGORIES CONFIGURATION MANAGEMENT ENGINE ---
+        async function loadCategoryConfiguration() {
+            const treeContainer = document.getElementById('categoryStructureTree');
+            const selectDropdown = document.getElementById('parentCategorySelect');
+            
+            treeContainer.innerHTML = "<p><i class='fas fa-spinner fa-spin'></i> Building layout schema map...</p>";
+            
+            // 1. Fetch categories and associated sub-categories
+            const { data: categories, error: catError } = await _supabase.from('categories').select('*').order('name');
+            const { data: subCategories, error: subError } = await _supabase.from('sub_categories').select('*').order('name');
+
+            if (catError || subError) {
+                treeContainer.innerHTML = `<p style="color:#ff4757;">⚠️ Schema retrieval failed: ${catError?.message || subError?.message}</p>`;
+                return;
+            }
+
+            // Populate parent selector dropdown
+            selectDropdown.innerHTML = '<option value="">-- Choose Category Parent --</option>' + 
+                categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            if (categories.length === 0) {
+                treeContainer.innerHTML = "<p style='color:#888; text-align:center; padding:20px;'>Taxonomy table is empty.</p>";
+                return;
+            }
+
+            // 2. Render structured parent-child list tree mapping
+            treeContainer.innerHTML = categories.map(cat => {
+                const linkedSubs = subCategories.filter(sub => sub.category_id === cat.id);
+                
+                const subTreeHTML = linkedSubs.length > 0 
+                    ? `<div class="sub-node-box">` + linkedSubs.map(sub => `
+                        <div class="list-item-node" style="background:#fafafa;">
+                            <span><i class="far fa-circle" style="font-size:0.75rem; color:#3498db;"></i> ${sub.name}</span>
+                            <button onclick="deleteSubCategory('${sub.id}', '${sub.name}')" style="border:none; color:#ff4757; background:none; cursor:pointer;" title="Unlink Sub-Category"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                      `).join('') + `</div>`
+                    : `<p style="font-size:0.8rem; color:#aaa; margin-left:25px; margin-bottom:12px;">No sub-items linked.</p>`;
+
+                return `
+                    <div style="margin-bottom:18px;">
+                        <div class="list-item-node" style="background:#e8f5e9; font-weight:bold; border-color:#c8e6c9;">
+                            <span><i class="fas fa-folder" style="color:#2e7d32;"></i> ${cat.name}</span>
+                            <button onclick="deleteCategory('${cat.id}', '${cat.name}')" style="border:none; color:#ff4757; background:none; cursor:pointer;" title="Delete Category and Sub-items"><i class="fas fa-trash"></i></button>
+                        </div>
+                        ${subTreeHTML}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addCategory = async () => {
+            const inputEl = document.getElementById('newCategoryName');
+            const name = inputEl.value.trim();
+            if (!name) { alert("Please enter a category name."); return; }
+
+            const { error } = await _supabase.from('categories').insert([{ name: name }]);
+            if (!error) {
+                await logAction('Category Configured', `Created primary level item: ${name}`);
+                inputEl.value = '';
+                loadCategoryConfiguration();
+            } else {
+                alert("Operation failed: " + error.message);
+            }
+        };
+
+        window.addSubCategory = async () => {
+            const parentId = document.getElementById('parentCategorySelect').value;
+            const inputEl = document.getElementById('newSubCategoryName');
+            const name = inputEl.value.trim();
+
+            if (!parentId || !name) {
+                alert("Parent specification and sub-category names are required fields.");
+                return;
+            }
+
+            const { error } = await _supabase.from('sub_categories').insert([{ category_id: parentId, name: name }]);
+            if (!error) {
+                await logAction('Sub-Category Linked', `Created secondary item: ${name} inside parent scope ID: ${parentId}`);
+                inputEl.value = '';
+                loadCategoryConfiguration();
+            } else {
+                alert("Operation failed: " + error.message);
+            }
+        };
+
+        window.deleteCategory = async (id, name) => {
+            if (!confirm(`Are you sure you want to delete "${name}"?\n⚠️ Warning: If database cascades are missing, sub-categories linked to this category might throw a foreign key error.`)) return;
+            
+            const { error } = await _supabase.from('categories').delete().eq('id', id);
+            if (!error) {
+                await logAction('Category Evicted', `Permanently deleted top-level cluster: ${name}`);
+                loadCategoryConfiguration();
+            } else {
+                alert("Eviction error: " + error.message);
+            }
+        };
+
+        window.deleteSubCategory = async (id, name) => {
+            if (!confirm(`Remove sub-category "${name}"?`)) return;
+            
+            const { error } = await _supabase.from('sub_categories').delete().eq('id', id);
+            if (!error) {
+                await logAction('Sub-Category Disconnected', `Removed item: ${name}`);
+                loadCategoryConfiguration();
+            } else {
+                alert("Operation failed: " + error.message);
+            }
+        };
+
+        // --- 8. LOAD AUDIT LOGS ---
         async function loadLogs() {
             const list = document.getElementById('auditLogList');
             list.innerHTML = "<p>Loading logs...</p>";
@@ -851,7 +1009,7 @@
             `;
         }
 
-        // --- 8. UTM GENERATOR LOGIC ---
+        // --- 9. UTM GENERATOR LOGIC ---
         window.openUTMBuilderForProduct = (id) => {
             // Find the UTM tab button and simulate click
             const utmBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Marketing'));
@@ -904,7 +1062,7 @@
             logAction('UTM URL Created & Copied', `Generated for Campaign: ${document.getElementById('utmCampaign').value || 'N/A'}`);
         };
 
-        // --- 9. SUPPORT TICKETS ---
+        // --- 10. SUPPORT TICKETS ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             const { data: tickets, error } = await _supabase.from('support_tickets').select('*').eq('is_resolved', false).order('created_at', { ascending: false });
@@ -937,37 +1095,38 @@
             }
         };
         
-window.approveProduct = async (productId, productDetails) => {
-    // 1. Update status in Supabase
-    const { error } = await _supabase
-        .from('products')
-        .update({ status: 'approved' })
-        .eq('id', productId);
+        window.approveProduct = async (productId, productDetails) => {
+            // 1. Update status in Supabase
+            const { error } = await _supabase
+                .from('products')
+                .update({ status: 'approved' })
+                .eq('id', productId);
 
-    if (!error) {
-        alert("Product Approved!");
-        
-        // 2. TRIGGER AUTO-POST TO TELEGRAM CHANNEL
-        const botToken = "YOUR_BOT_TOKEN";
-        const channelId = "@YourChannelName"; // Example: @WanagebyaMarket
-        
-        const text = `🚀 *New Listing on WanaGebya!*\n\n` +
-                     `📦 *Item:* ${productDetails.name}\n` +
-                     `💰 *Price:* ${productDetails.price} ETB\n` +
-                     `📍 *Location:* ${productDetails.location}\n\n` +
-                     `🔗 View on Site: https://golemethio-netizen.github.io/shope/product.html?id=${productId}`;
+            if (!error) {
+                alert("Product Approved!");
+                
+                // 2. TRIGGER AUTO-POST TO TELEGRAM CHANNEL
+                const botToken = "YOUR_BOT_TOKEN";
+                const channelId = "@YourChannelName"; // Example: @WanagebyaMarket
+                
+                const text = `🚀 *New Listing on WanaGebya!*\n\n` +
+                             `📦 *Item:* ${productDetails.name}\n` +
+                             `💰 *Price:* ${productDetails.price} ETB\n` +
+                             `📍 *Location:* ${productDetails.location}\n\n` +
+                             `🔗 View on Site: https://golemethio-netizen.github.io/shope/product.html?id=${productId}`;
 
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: channelId,
-                text: text,
-                parse_mode: 'Markdown'
-            })
-        });
-    }
-};
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: channelId,
+                        text: text,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            }
+        };
+
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
