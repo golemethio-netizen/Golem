@@ -557,9 +557,9 @@ window.openProductModal = async (product) => {
                 <div class="jc-card-header">
                     <div class="jc-header-top">
                         <div class="jc-badges">
-                            <span class="jc-badge-stock">\${isJob ? 'OPEN VACANCY' : 'AVAILABLE NOW'}</span>
-                            \${!isJob && product.stock_status === 'out_of_stock' ? '<span style="background:#ff4757;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">OUT OF STOCK</span>' : ''}
-                            \${!isJob && product.stock_status === 'limited' ? '<span style="background:#e67e22;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">LIMITED\${product.quantity ? ': ' + product.quantity + ' LEFT' : ''}</span>' : ''}
+                            <span class="jc-badge-stock">${isJob ? 'OPEN VACANCY' : 'AVAILABLE NOW'}</span>
+                            ${!isJob && product.stock_status === 'out_of_stock' ? '<span style="background:#ff4757;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">OUT OF STOCK</span>' : ''}
+                            ${!isJob && product.stock_status === 'limited' ? '<span style="background:#e67e22;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">LIMITED' + (product.quantity ? ': ' + product.quantity + ' LEFT' : '') + '</span>' : ''}
                         </div>
                         <div class="jc-price-block">
                             <div class="jc-price-old">${priceOld}</div>
