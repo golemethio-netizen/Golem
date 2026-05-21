@@ -128,65 +128,27 @@
                 
                 <form id="editForm" onsubmit="window.saveChanges(event)">
                     <input type="hidden" id="editId">
-                    
+                    <input type="hidden" id="editCategoryType"> <!-- 'job', 'service', or 'product' -->
+
+                    <!-- Photo -->
                     <div class="input-group-sell">
-                        <label><i class="fas fa-camera"></i> Update Product Photo (Optional)</label>
-                        <div style="text-align: center;">
-                            <img id="editImagePreview" src="" alt="Current Image" style="width:100%; max-height: 250px; object-fit: cover; border-radius:10px; margin: 10px 0; border: 1px solid #ddd;">
+                        <label><i class="fas fa-camera"></i> Update Photo (Optional)</label>
+                        <div style="text-align:center;">
+                            <img id="editImagePreview" src="" alt="Current Image" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin:8px 0;border:1px solid #ddd;">
                         </div>
-                        <input type="file" id="editFile" accept="image/*" style="border: 2px dashed #ddd; padding: 10px; text-align: center; width: 100%; cursor: pointer;">
+                        <input type="file" id="editFile" accept="image/*" style="border:2px dashed #ddd;padding:10px;width:100%;cursor:pointer;">
                     </div>
 
+                    <!-- Title (label changes based on category) -->
                     <div class="input-group-sell">
-                        <label><i class="fas fa-tag"></i> Item Name</label>
+                        <label id="editNameLabel"><i class="fas fa-tag"></i> Item Name</label>
                         <input type="text" id="editName" required>
                     </div>
 
-                    <div style="display: flex; gap: 15px;">
-                        <div class="input-group-sell" style="flex: 1;">
-                            <label><i class="fas fa-star"></i> Condition</label>
-                            <select id="editCondition" required>
-                                <option value="New">New</option>
-                                <option value="Used">Used</option>
-                                <option value="Refurbished">Refurbished</option>
-                                <option value="Damage">Damage / For Parts</option>
-                                <option value="We work on order">We work on order (Custom)</option>
-                            </select>
-                        </div>
-                        <div class="input-group-sell" style="flex: 1;">
-                            <label><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
-                            <input type="number" id="editPrice" required>
-                        </div>
-                    </div>
-
-                    <!-- STOCK MANAGEMENT -->
-                    <div style="background:#f8f9ff;border:1.5px solid #d0d0ff;border-radius:12px;padding:16px;margin-bottom:4px;">
-                        <div style="font-weight:700;color:#6c5ce7;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> Stock Management</div>
-                        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-                            <!-- Stock Status Toggle -->
-                            <div class="input-group-sell" style="flex:1;min-width:140px;margin:0;">
-                                <label style="font-size:0.82rem;"><i class="fas fa-toggle-on"></i> Stock Status</label>
-                                <select id="editStockStatus" onchange="toggleQtyField(this.value)"
-                                    style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;">
-                                    <option value="in_stock">✅ In Stock</option>
-                                    <option value="out_of_stock">❌ Out of Stock</option>
-                                    <option value="limited">⚠️ Limited Stock</option>
-                                </select>
-                            </div>
-                            <!-- Quantity -->
-                            <div class="input-group-sell" id="qtyWrapper" style="flex:1;min-width:120px;margin:0;">
-                                <label style="font-size:0.82rem;"><i class="fas fa-hashtag"></i> Quantity</label>
-                                <input type="number" id="editQuantity" min="0" placeholder="e.g. 5"
-                                    style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;box-sizing:border-box;">
-                            </div>
-                        </div>
-                        <!-- Stock preview badge -->
-                        <div id="stockPreview" style="margin-top:10px;"></div>
-                    </div>
-
+                    <!-- Category (triggers form reshape) -->
                     <div class="input-group-sell">
                         <label><i class="fas fa-list"></i> Category</label>
-                        <select id="editCategory" required>
+                        <select id="editCategory" required onchange="reshapeEditForm(this.value)">
                             <option value="Electronics">Electronics</option>
                             <option value="Furniture">Furniture</option>
                             <option value="Fashion">Fashion</option>
@@ -199,16 +161,136 @@
                         </select>
                     </div>
 
-                    <div class="input-group-sell">
-                        <label><i class="fas fa-align-left"></i> Description</label>
-                        <textarea id="editDesc" rows="4" required></textarea>
+                    <!-- PRODUCT FIELDS (hidden for Jobs/Services) -->
+                    <div id="editProductFields">
+                        <div style="display:flex;gap:15px;">
+                            <div class="input-group-sell" style="flex:1;">
+                                <label><i class="fas fa-star"></i> Condition</label>
+                                <select id="editCondition">
+                                    <option value="New">New</option>
+                                    <option value="Used">Used</option>
+                                    <option value="Refurbished">Refurbished</option>
+                                    <option value="Damage">Damage / For Parts</option>
+                                    <option value="We work on order">We work on order</option>
+                                </select>
+                            </div>
+                            <div class="input-group-sell" style="flex:1;">
+                                <label id="editPriceLabel"><i class="fas fa-money-bill-wave"></i> Price (ETB)</label>
+                                <input type="number" id="editPrice">
+                            </div>
+                        </div>
+
+                        <!-- STOCK MANAGEMENT (products only) -->
+                        <div style="background:#f8f9ff;border:1.5px solid #d0d0ff;border-radius:12px;padding:16px;margin-bottom:14px;">
+                            <div style="font-weight:700;color:#6c5ce7;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> Stock Management</div>
+                            <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0;">
+                                    <label style="font-size:0.82rem;"><i class="fas fa-toggle-on"></i> Stock Status</label>
+                                    <select id="editStockStatus" onchange="toggleQtyField(this.value)"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;">
+                                        <option value="in_stock">✅ In Stock</option>
+                                        <option value="out_of_stock">❌ Out of Stock</option>
+                                        <option value="limited">⚠️ Limited Stock</option>
+                                    </select>
+                                </div>
+                                <div class="input-group-sell" id="qtyWrapper" style="flex:1;min-width:120px;margin:0;">
+                                    <label style="font-size:0.82rem;"><i class="fas fa-hashtag"></i> Quantity</label>
+                                    <input type="number" id="editQuantity" min="0" placeholder="e.g. 5"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;box-sizing:border-box;">
+                                </div>
+                            </div>
+                            <div id="stockPreview" style="margin-top:10px;"></div>
+                        </div>
                     </div>
 
+                    <!-- JOB FIELDS (shown only for Jobs) -->
+                    <div id="editJobFields" style="display:none;">
+                        <div style="background:#f0f8ff;border:1.5px solid #b3d9ff;border-radius:12px;padding:16px;margin-bottom:14px;">
+                            <div style="font-weight:700;color:#0088cc;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-briefcase"></i> Job Details</div>
+                            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
+                                    <label style="font-size:0.82rem;">Job Type</label>
+                                    <select id="editJobType" style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;">
+                                        <option value="Full Time">Full Time</option>
+                                        <option value="Part Time">Part Time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Freelance">Freelance</option>
+                                    </select>
+                                </div>
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
+                                    <label style="font-size:0.82rem;">Salary / Month (ETB)</label>
+                                    <input type="number" id="editSalary" placeholder="e.g. 15000"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;box-sizing:border-box;">
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
+                                    <label style="font-size:0.82rem;">Experience Required</label>
+                                    <select id="editExperience" style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;">
+                                        <option value="No Experience">No Experience</option>
+                                        <option value="0-1 Years">0–1 Years</option>
+                                        <option value="1-3 Years">1–3 Years</option>
+                                        <option value="3-5 Years">3–5 Years</option>
+                                        <option value="5+ Years">5+ Years</option>
+                                    </select>
+                                </div>
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
+                                    <label style="font-size:0.82rem;">Positions Available</label>
+                                    <input type="number" id="editPositions" min="1" placeholder="e.g. 2"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;box-sizing:border-box;">
+                                </div>
+                            </div>
+                            <div class="input-group-sell" style="margin:0;">
+                                <label style="font-size:0.82rem;">Application Deadline</label>
+                                <input type="date" id="editDeadline"
+                                    style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;box-sizing:border-box;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SERVICE FIELDS (shown only for Services) -->
+                    <div id="editServiceFields" style="display:none;">
+                        <div style="background:#f0fff8;border:1.5px solid #a8e6cf;border-radius:12px;padding:16px;margin-bottom:14px;">
+                            <div style="font-weight:700;color:#00b894;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-concierge-bell"></i> Service Details</div>
+                            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
+                                    <label style="font-size:0.82rem;">Service Rate (ETB)</label>
+                                    <input type="number" id="editServiceRate" placeholder="per hour/project"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #a8e6cf;width:100%;outline:none;box-sizing:border-box;">
+                                </div>
+                                <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
+                                    <label style="font-size:0.82rem;">Availability</label>
+                                    <select id="editAvailability" style="border-radius:8px;padding:10px;border:1.5px solid #a8e6cf;width:100%;outline:none;">
+                                        <option value="Available Now">Available Now</option>
+                                        <option value="Weekdays">Weekdays</option>
+                                        <option value="Weekends">Weekends</option>
+                                        <option value="Flexible">Flexible</option>
+                                        <option value="By Appointment">By Appointment</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group-sell" style="margin:0;">
+                                <label style="font-size:0.82rem;">Service Area</label>
+                                <input type="text" id="editServiceArea" placeholder="e.g. Addis Ababa, Bole"
+                                    style="border-radius:8px;padding:10px;border:1.5px solid #a8e6cf;width:100%;outline:none;box-sizing:border-box;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description (always shown) -->
+                    <div class="input-group-sell">
+                        <label id="editDescLabel"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea id="editDesc" rows="5" required></textarea>
+                    </div>
+
+                    <!-- Contact -->
                     <div class="input-group-sell">
                         <label><i class="fas fa-phone"></i> Contact Phone</label>
                         <input type="text" id="editPhone" required>
                     </div>
 
+                    <!-- Region -->
                     <div class="input-group-sell">
                         <label><i class="fas fa-map-marker-alt"></i> Region</label>
                         <select id="editRegion" onchange="window.toggleEditDistricts(this.value)" required>
@@ -228,7 +310,7 @@
                         </select>
                     </div>
 
-                    <div class="input-group-sell" id="editDistrictWrapper" style="display: none;">
+                    <div class="input-group-sell" id="editDistrictWrapper" style="display:none;">
                         <label><i class="fas fa-city"></i> Sub-City / District</label>
                         <select id="editDistrict">
                             <option value="" disabled selected>Select Sub-City</option>
@@ -246,7 +328,7 @@
                         </select>
                     </div>
 
-                    <button type="submit" id="submitEditBtn" class="auth-submit" style="width: 100%; margin-top: 20px;">
+                    <button type="submit" id="submitEditBtn" class="auth-submit" style="width:100%;margin-top:20px;">
                         Update & Resubmit
                     </button>
                 </form>
@@ -400,26 +482,81 @@
             }
         };
 
+        // Helper: parse spec value from description text
+        function parseSpec(desc, key) {
+            if (!desc) return '';
+            const rx = new RegExp(key + '[:\s]+([^\n]+)', 'i');
+            const m = desc.match(rx);
+            return m ? m[1].trim() : '';
+        }
+
+        // Reshape the edit form based on category
+        window.reshapeEditForm = function(cat) {
+            const isJob = cat === 'Jobs';
+            const isService = cat === 'Services';
+            const isProduct = !isJob && !isService;
+
+            document.getElementById('editProductFields').style.display = isProduct ? 'block' : 'none';
+            document.getElementById('editJobFields').style.display = isJob ? 'block' : 'none';
+            document.getElementById('editServiceFields').style.display = isService ? 'block' : 'none';
+
+            document.getElementById('editCondition').required = isProduct;
+            document.getElementById('editPrice').required = isProduct;
+
+            document.getElementById('editNameLabel').innerHTML = isJob
+                ? '<i class="fas fa-briefcase"></i> Job Title'
+                : isService ? '<i class="fas fa-concierge-bell"></i> Service Name'
+                : '<i class="fas fa-tag"></i> Item Name';
+
+            document.getElementById('editDescLabel').innerHTML = isJob
+                ? '<i class="fas fa-align-left"></i> Job Description & Requirements'
+                : isService ? '<i class="fas fa-align-left"></i> Service Description'
+                : '<i class="fas fa-align-left"></i> Description';
+
+            document.getElementById('editCategoryType').value = isJob ? 'job' : isService ? 'service' : 'product';
+        };
+
         window.openEditModal = async function(id) {
             const { data: item } = await _supabase.from('products').select('*').eq('id', id).single();
             if (!item) return;
 
             document.getElementById('editId').value = item.id;
             document.getElementById('editName').value = item.name;
-            document.getElementById('editPrice').value = item.price;
-            document.getElementById('editDesc').value = item.description;
-            document.getElementById('editCondition').value = item.status_condition || "Used";
-            document.getElementById('editCategory').value = item.category || "Other";
-            document.getElementById('editPhone').value = item.seller_phone || "";
-            document.getElementById('editImagePreview').src = item.image;
+            document.getElementById('editDesc').value = item.description || '';
+            document.getElementById('editPhone').value = item.seller_phone || '';
+            document.getElementById('editImagePreview').src = item.image || '';
             document.getElementById('editFile').value = '';
-            // Stock fields
-            const stockStatus = item.stock_status || 'in_stock';
-            document.getElementById('editStockStatus').value = stockStatus;
-            document.getElementById('editQuantity').value = item.quantity || '';
-            toggleQtyField(stockStatus);
 
-            // Parse Location
+            // Set category first — this reshapes the form
+            document.getElementById('editCategory').value = item.category || 'Other';
+            reshapeEditForm(item.category || 'Other');
+
+            const isJob = item.category === 'Jobs';
+            const isService = item.category === 'Services';
+
+            if (!isJob && !isService) {
+                // Product fields
+                document.getElementById('editCondition').value = item.status_condition || 'Used';
+                document.getElementById('editPrice').value = item.price || '';
+                const stockStatus = item.stock_status || 'in_stock';
+                document.getElementById('editStockStatus').value = stockStatus;
+                document.getElementById('editQuantity').value = item.quantity || '';
+                toggleQtyField(stockStatus);
+            } else if (isJob) {
+                // Job fields — parse from description or direct columns
+                document.getElementById('editSalary').value = item.price || '';
+                document.getElementById('editJobType').value = parseSpec(item.description, 'job type') || 'Full Time';
+                document.getElementById('editExperience').value = parseSpec(item.description, 'experience') || 'No Experience';
+                document.getElementById('editPositions').value = parseSpec(item.description, 'positions available') || '';
+                document.getElementById('editDeadline').value = parseSpec(item.description, 'deadline') || '';
+            } else if (isService) {
+                // Service fields
+                document.getElementById('editServiceRate').value = item.price || '';
+                document.getElementById('editAvailability').value = parseSpec(item.description, 'availability') || 'Available Now';
+                document.getElementById('editServiceArea').value = parseSpec(item.description, 'service area') || '';
+            }
+
+            // Location
             if (item.location) {
                 const locParts = item.location.split(', ');
                 if (locParts.length > 1) {
@@ -431,9 +568,8 @@
                     toggleEditDistricts(locParts[0]);
                 }
             }
-            
-            const modal = document.getElementById('editModal');
-            modal.style.display = 'flex';
+
+            document.getElementById('editModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         };
 
@@ -534,23 +670,58 @@
                 const district = districtSelect ? districtSelect.value : "";
                 const finalLocation = district && region === 'Addis Ababa' ? `${district}, ${region}` : region;
 
-                // 3. Update database
-                const stockStatus = document.getElementById('editStockStatus').value;
-                const qty = document.getElementById('editQuantity').value;
-                const updatedData = {
+                // 3. Build updated data based on category type
+                const cat = document.getElementById('editCategory').value;
+                const isJob = cat === 'Jobs';
+                const isService = cat === 'Services';
+                let updatedData = {
                     name: document.getElementById('editName').value,
-                    price: parseFloat(document.getElementById('editPrice').value),
+                    category: cat,
                     description: document.getElementById('editDesc').value,
-                    status_condition: document.getElementById('editCondition').value,
-                    category: document.getElementById('editCategory').value,
                     seller_phone: document.getElementById('editPhone').value,
                     location: finalLocation,
                     image: imageUrl,
-                    stock_status: stockStatus,
-                    quantity: qty ? parseInt(qty) : null,
                     status: 'pending',
                     rejection_reason: null
                 };
+
+                if (!isJob && !isService) {
+                    // Product-specific fields
+                    const stockStatus = document.getElementById('editStockStatus').value;
+                    const qty = document.getElementById('editQuantity').value;
+                    updatedData.price = parseFloat(document.getElementById('editPrice').value);
+                    updatedData.status_condition = document.getElementById('editCondition').value;
+                    updatedData.stock_status = stockStatus;
+                    updatedData.quantity = qty ? parseInt(qty) : null;
+                } else if (isJob) {
+                    // Job-specific fields — append specs to description
+                    const jobType = document.getElementById('editJobType').value;
+                    const exp = document.getElementById('editExperience').value;
+                    const pos = document.getElementById('editPositions').value;
+                    const deadline = document.getElementById('editDeadline').value;
+                    const salary = document.getElementById('editSalary').value;
+                    updatedData.price = salary ? parseFloat(salary) : null;
+                    updatedData.status_condition = 'Full Time';
+                    const baseDesc = document.getElementById('editDesc').value.split('\n--- Job Specs ---')[0].trim();
+                    updatedData.description = baseDesc
+                        + '\n--- Job Specs ---'
+                        + '\nJob Type: ' + jobType
+                        + '\nExperience: ' + exp
+                        + (pos ? '\nPositions Available: ' + pos : '')
+                        + (deadline ? '\nDeadline: ' + deadline : '');
+                } else if (isService) {
+                    // Service-specific fields
+                    const rate = document.getElementById('editServiceRate').value;
+                    const avail = document.getElementById('editAvailability').value;
+                    const area = document.getElementById('editServiceArea').value;
+                    updatedData.price = rate ? parseFloat(rate) : null;
+                    updatedData.status_condition = 'Service';
+                    const baseDesc = document.getElementById('editDesc').value.split('\n--- Service Specs ---')[0].trim();
+                    updatedData.description = baseDesc
+                        + '\n--- Service Specs ---'
+                        + '\nAvailability: ' + avail
+                        + (area ? '\nService Area: ' + area : '');
+                }
 
                 const { error } = await _supabase.from('products').update(updatedData).eq('id', id);
                 
