@@ -159,6 +159,31 @@
                         </div>
                     </div>
 
+                    <!-- STOCK MANAGEMENT -->
+                    <div style="background:#f8f9ff;border:1.5px solid #d0d0ff;border-radius:12px;padding:16px;margin-bottom:4px;">
+                        <div style="font-weight:700;color:#6c5ce7;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> Stock Management</div>
+                        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                            <!-- Stock Status Toggle -->
+                            <div class="input-group-sell" style="flex:1;min-width:140px;margin:0;">
+                                <label style="font-size:0.82rem;"><i class="fas fa-toggle-on"></i> Stock Status</label>
+                                <select id="editStockStatus" onchange="toggleQtyField(this.value)"
+                                    style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;">
+                                    <option value="in_stock">✅ In Stock</option>
+                                    <option value="out_of_stock">❌ Out of Stock</option>
+                                    <option value="limited">⚠️ Limited Stock</option>
+                                </select>
+                            </div>
+                            <!-- Quantity -->
+                            <div class="input-group-sell" id="qtyWrapper" style="flex:1;min-width:120px;margin:0;">
+                                <label style="font-size:0.82rem;"><i class="fas fa-hashtag"></i> Quantity</label>
+                                <input type="number" id="editQuantity" min="0" placeholder="e.g. 5"
+                                    style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <!-- Stock preview badge -->
+                        <div id="stockPreview" style="margin-top:10px;"></div>
+                    </div>
+
                     <div class="input-group-sell">
                         <label><i class="fas fa-list"></i> Category</label>
                         <select id="editCategory" required>
@@ -280,6 +305,7 @@
                         <div class="product-info">
                             <h3 class="product-title">${item.name}</h3>
                             <p class="product-price">${item.price ? item.price.toLocaleString() + ' ETB' : 'Negotiable'}</p>
+                            ${getStockBadge(item.stock_status, item.quantity)}
                             ${reasonNote}
                             
                             <div class="action-buttons">
@@ -299,10 +325,48 @@
 
         function getStatusColor(status) {
             switch(status) {
-                case 'approved': return '#25D366'; // Green
-                case 'rejected': return '#ff4757'; // Red
-                case 'sold': return '#636e72'; // Grey
-                default: return '#f1c40f'; // Yellow
+                case 'approved': return '#25D366';
+                case 'rejected': return '#ff4757';
+                case 'sold': return '#636e72';
+                default: return '#f1c40f';
+            }
+        }
+
+        function getStockBadge(stockStatus, quantity) {
+            if (!stockStatus || stockStatus === 'in_stock') {
+                const qtyText = quantity ? ` · ${quantity} left` : '';
+                return `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#00b894;margin-bottom:6px;">
+                    <i class="fas fa-check-circle"></i> In Stock${qtyText}
+                </div>`;
+            } else if (stockStatus === 'out_of_stock') {
+                return `<div style="display:inline-flex;align-items:center;gap:5px;background:#fff0f0;border:1px solid #ff4757;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#ff4757;margin-bottom:6px;">
+                    <i class="fas fa-times-circle"></i> Out of Stock
+                </div>`;
+            } else if (stockStatus === 'limited') {
+                const qtyText = quantity ? ` · Only ${quantity} left` : '';
+                return `<div style="display:inline-flex;align-items:center;gap:5px;background:#fff8e1;border:1px solid #fdcb6e;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#e67e22;margin-bottom:6px;">
+                    <i class="fas fa-exclamation-triangle"></i> Limited Stock${qtyText}
+                </div>`;
+            }
+            return '';
+        }
+
+        function toggleQtyField(val) {
+            const wrapper = document.getElementById('qtyWrapper');
+            const preview = document.getElementById('stockPreview');
+            if (val === 'out_of_stock') {
+                wrapper.style.opacity = '0.4';
+                wrapper.style.pointerEvents = 'none';
+                document.getElementById('editQuantity').value = '';
+                preview.innerHTML = '<span style="font-size:0.8rem;color:#ff4757;font-weight:700;"><i class="fas fa-times-circle"></i> This item will show as Out of Stock to buyers.</span>';
+            } else if (val === 'limited') {
+                wrapper.style.opacity = '1';
+                wrapper.style.pointerEvents = 'all';
+                preview.innerHTML = '<span style="font-size:0.8rem;color:#e67e22;font-weight:700;"><i class="fas fa-exclamation-triangle"></i> Enter remaining quantity above.</span>';
+            } else {
+                wrapper.style.opacity = '1';
+                wrapper.style.pointerEvents = 'all';
+                preview.innerHTML = '<span style="font-size:0.8rem;color:#00b894;font-weight:700;"><i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.</span>';
             }
         }
 
@@ -347,8 +411,13 @@
             document.getElementById('editCondition').value = item.status_condition || "Used";
             document.getElementById('editCategory').value = item.category || "Other";
             document.getElementById('editPhone').value = item.seller_phone || "";
-            document.getElementById('editImagePreview').src = item.image; // Set current image
-            document.getElementById('editFile').value = ''; // Reset file input
+            document.getElementById('editImagePreview').src = item.image;
+            document.getElementById('editFile').value = '';
+            // Stock fields
+            const stockStatus = item.stock_status || 'in_stock';
+            document.getElementById('editStockStatus').value = stockStatus;
+            document.getElementById('editQuantity').value = item.quantity || '';
+            toggleQtyField(stockStatus);
 
             // Parse Location
             if (item.location) {
@@ -466,6 +535,8 @@
                 const finalLocation = district && region === 'Addis Ababa' ? `${district}, ${region}` : region;
 
                 // 3. Update database
+                const stockStatus = document.getElementById('editStockStatus').value;
+                const qty = document.getElementById('editQuantity').value;
                 const updatedData = {
                     name: document.getElementById('editName').value,
                     price: parseFloat(document.getElementById('editPrice').value),
@@ -475,8 +546,10 @@
                     seller_phone: document.getElementById('editPhone').value,
                     location: finalLocation,
                     image: imageUrl,
-                    status: 'pending', // Resets to pending for admin re-approval
-                    rejection_reason: null // Clears old rejection reason
+                    stock_status: stockStatus,
+                    quantity: qty ? parseInt(qty) : null,
+                    status: 'pending',
+                    rejection_reason: null
                 };
 
                 const { error } = await _supabase.from('products').update(updatedData).eq('id', id);
