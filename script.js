@@ -436,6 +436,23 @@ window.openProductDetailsSafe = (encodedData) => {
     } catch (e) { console.error("Error parsing product", e); }
 };
 
+// ── STOCK STATUS BADGE HELPER ──
+function getStockBadge(stockStatus, quantity) {
+    if (!stockStatus || stockStatus === 'in_stock') {
+        const qty = quantity ? ' &nbsp;·&nbsp; <strong>' + quantity + ' left</strong>' : '';
+        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#e8fdf5;border:1.5px solid #2ed573;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#00b894;margin-bottom:10px;">'
+             + '<i class="fas fa-check-circle"></i> In Stock' + qty + '</div>';
+    } else if (stockStatus === 'out_of_stock') {
+        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff0f0;border:1.5px solid #ff4757;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#ff4757;margin-bottom:10px;">'
+             + '<i class="fas fa-times-circle"></i> Out of Stock &nbsp;·&nbsp; <span style="font-weight:400;font-size:0.75rem;">Contact seller for availability</span></div>';
+    } else if (stockStatus === 'limited') {
+        const qty = quantity ? ' &nbsp;·&nbsp; <strong>Only ' + quantity + ' left!</strong>' : '';
+        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1.5px solid #fdcb6e;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#e67e22;margin-bottom:10px;">'
+             + '<i class="fas fa-exclamation-triangle"></i> Limited Stock' + qty + '</div>';
+    }
+    return '';
+}
+
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
@@ -539,7 +556,11 @@ window.openProductModal = async (product) => {
                 </div>
                 <div class="jc-card-header">
                     <div class="jc-header-top">
-                        <div class="jc-badges"><span class="jc-badge-stock">${isJob ? 'OPEN VACANCY' : 'AVAILABLE NOW'}</span></div>
+                        <div class="jc-badges">
+                            <span class="jc-badge-stock">\${isJob ? 'OPEN VACANCY' : 'AVAILABLE NOW'}</span>
+                            \${!isJob && product.stock_status === 'out_of_stock' ? '<span style="background:#ff4757;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">OUT OF STOCK</span>' : ''}
+                            \${!isJob && product.stock_status === 'limited' ? '<span style="background:#e67e22;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">LIMITED\${product.quantity ? ': ' + product.quantity + ' LEFT' : ''}</span>' : ''}
+                        </div>
                         <div class="jc-price-block">
                             <div class="jc-price-old">${priceOld}</div>
                             <div class="jc-price-new">${priceNew}</div>
@@ -619,9 +640,11 @@ window.openProductModal = async (product) => {
                     </div>
                 </div>
 
-                <div class="modal-price" style="font-size: 1.3rem; color: #2ed573; font-weight:bold; margin-bottom:15px;">
+                <div class="modal-price" style="font-size: 1.3rem; color: #2ed573; font-weight:bold; margin-bottom:10px;">
                     ${product.price ? product.price.toLocaleString() : 'Negotiable'} ETB
                 </div>
+
+                <div style="margin-bottom:4px;">${getStockBadge(product.stock_status, product.quantity)}</div>
                 
                 <p class="modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555;">
                     ${product.description || "No description available."}
