@@ -220,16 +220,15 @@
                 <div class="input-group-sell">
                     <label><i class="fas fa-list"></i> Category</label>
                     <select id="prodCategory" onchange="handleCategoryChange(this.value)" required>
-                        <option value="" disabled selected>Select Category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Vehicles">Vehicles</option>
-                        <option value="Property">Property</option>
-                        <option value="Home Supplies">Home Supplies</option>
-                        <option value="Services">Services</option>
-                        <option value="Jobs">Jobs</option>
-                        <option value="Other">Other</option>
+                        <option value="" disabled selected>Loading categories…</option>
+                    </select>
+                </div>
+
+                <!-- Subcategory (shown when category has subcategories) -->
+                <div class="input-group-sell" id="subCatWrapper" style="display:none;">
+                    <label><i class="fas fa-sitemap"></i> Subcategory</label>
+                    <select id="prodSubcategory">
+                        <option value="">— Select subcategory (optional) —</option>
                     </select>
                 </div>
 
@@ -667,6 +666,9 @@
         } else {
             container.style.display = 'none';
         }
+
+        // Load subcategories for this category
+        loadSubcategories(val);
     }
 
     /* ══════════════════════════════
@@ -699,7 +701,66 @@
             currentUserName = profile.full_name || user.email.split('@')[0];
             if (profile.phone) document.getElementById('prodPhone').value = profile.phone;
         }
+        // Load categories dynamically from Supabase
+        await loadSellCategories();
     });
+
+    // ── Category + Subcategory loader for sell form ────────────
+    let _sellCats = [];
+
+    async function loadSellCategories() {
+        const sel = document.getElementById('prodCategory');
+        try {
+            const { data: cats, error } = await _supabase
+                .from('categories')
+                .select('id, name, subcategories(id, name)')
+                .order('sort_order', { ascending: true });
+
+            if (error || !cats || cats.length === 0) {
+                // Fallback to hardcoded list
+                _injectDefaultSellCats(sel);
+                return;
+            }
+            _sellCats = cats;
+            sel.innerHTML = '<option value="" disabled selected>Select Category</option>';
+            cats.forEach(c => {
+                sel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+            // Always keep "Other" at end
+            sel.innerHTML += '<option value="Other">Other</option>';
+        } catch(e) {
+            _injectDefaultSellCats(sel);
+        }
+    }
+
+    function _injectDefaultSellCats(sel) {
+        sel.innerHTML = `
+            <option value="" disabled selected>Select Category</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Vehicles">Vehicles</option>
+            <option value="Property">Property</option>
+            <option value="Home Supplies">Home Supplies</option>
+            <option value="Services">Services</option>
+            <option value="Jobs">Jobs</option>
+            <option value="Other">Other</option>`;
+    }
+
+    function loadSubcategories(catName) {
+        const cat = _sellCats.find(c => c.name === catName);
+        const wrapper = document.getElementById('subCatWrapper');
+        const subSel  = document.getElementById('prodSubcategory');
+        const subs = cat?.subcategories || [];
+        if (subs.length === 0) {
+            wrapper.style.display = 'none';
+            subSel.innerHTML = '';
+            return;
+        }
+        subSel.innerHTML = '<option value="">— Select subcategory (optional) —</option>';
+        subs.forEach(s => { subSel.innerHTML += `<option value="${s.name}">${s.name}</option>`; });
+        wrapper.style.display = 'block';
+    }
 
     /* Image Preview */
     document.getElementById('prodFile').addEventListener('change', function(e) {
@@ -862,6 +923,7 @@ function handleRegionChange(region) {
                 price: parseFloat(document.getElementById('prodPrice').value),
                 status_condition: document.getElementById('status_condition').value,
                 category: document.getElementById('prodCategory').value,
+                subcategory: document.getElementById('prodSubcategory')?.value || null,
                 description: finalDescription,
                 location: locationStr,
                 image: publicUrl,
