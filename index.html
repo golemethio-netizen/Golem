@@ -615,24 +615,13 @@
 
     <!-- ======================= FILTERS ======================= -->
     <section class="filter-controls">
-
-        <div class="filter-bar">
+        <div class="filter-bar" id="filterBar">
+            <!-- Always-present buttons -->
             <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
             <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
                 <i class="fas fa-star" style="color:#f1c40f;"></i> Featured
             </button>
-            <button class="filter-btn" data-category="Electronics" data-am="ኤሌክትሮኒክስ">Electronics</button>
-            <button class="filter-btn" data-category="Furniture" data-am="የቤት ዕቃዎች">Furniture</button>
-            <button class="filter-btn" data-category="Fashion" data-am="አልባሳት">Fashion</button>
-            <button class="filter-btn" data-category="Vehicles" data-am="ተሽከርካሪዎች">Vehicles</button>
-            <button class="filter-btn" data-category="Property" data-am="ንብረት">Property</button>
-            <button class="filter-btn" data-category="Home Supplies" data-am="የቤት ቁሳቁሶች">Home Supplies</button>
-            <button class="filter-btn" data-category="Services" data-am="አገልግሎቶች">
-                <i class="fas fa-tools" style="font-size:11px; color:#7c3aed;"></i> Services
-            </button>
-            <button class="filter-btn" data-category="Jobs" data-am="ስራዎች">
-                <i class="fas fa-briefcase" style="font-size:11px; color:#007bff;"></i> Jobs
-            </button>
+            <!-- Dynamic categories injected here by loadFilterCategories() -->
         </div>
     </section>
 
@@ -1109,10 +1098,10 @@
             document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
             document.getElementById('sortSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
             document.getElementById('locationSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
-            document.querySelectorAll('.filter-btn[data-category]').forEach(function (btn) {
-                btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
-            });
+            // Static filter buttons wired after dynamic categories are loaded
             document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
+            // Load dynamic category filter buttons from Supabase
+            loadFilterCategories();
             document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
             document.getElementById('shareWhatsAppBtn').addEventListener('click', window.shareToWhatsApp);
             document.getElementById('shareFacebookBtn').addEventListener('click', window.shareToFacebook);
@@ -1151,6 +1140,73 @@
 
         function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
         function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
+
+        // ── Dynamic Filter Bar from Supabase ─────────────────────
+        async function loadFilterCategories() {
+            const bar = document.getElementById('filterBar');
+            try {
+                const { data: cats, error } = await _supabase
+                    .from('categories')
+                    .select('id, name, amharic_name, icon')
+                    .order('sort_order', { ascending: true });
+
+                if (error || !cats || cats.length === 0) {
+                    // Fallback: hardcoded defaults so page never breaks
+                    _injectDefaultFilters(bar);
+                    return;
+                }
+
+                // Remove old dynamic buttons (keep All + Featured)
+                bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
+
+                cats.forEach(cat => {
+                    const iconHtml = cat.icon
+                        ? (cat.icon.startsWith('fa')
+                            ? `<i class="${cat.icon}" style="font-size:11px;"></i> `
+                            : `${cat.icon} `)
+                        : '';
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-btn filter-btn-dynamic';
+                    btn.dataset.category = cat.name;
+                    btn.dataset.am = cat.amharic_name || cat.name;
+                    btn.innerHTML = iconHtml + cat.name;
+                    btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
+                    bar.appendChild(btn);
+                });
+
+                // Re-wire the All button too (always first)
+                bar.querySelector('[data-category="All"]').addEventListener('click', function () {
+                    window.filterCategory('All', this);
+                });
+
+            } catch (e) {
+                console.warn('Category load failed, using defaults:', e);
+                _injectDefaultFilters(bar);
+            }
+        }
+
+        function _injectDefaultFilters(bar) {
+            const defaults = [
+                { name: 'Electronics', am: 'ኤሌክትሮኒክስ' },
+                { name: 'Furniture',   am: 'የቤት ዕቃዎች' },
+                { name: 'Fashion',     am: 'አልባሳት' },
+                { name: 'Vehicles',    am: 'ተሽከርካሪዎች' },
+                { name: 'Property',    am: 'ንብረት' },
+                { name: 'Home Supplies', am: 'የቤት ቁሳቁሶች' },
+                { name: 'Services',    am: 'አገልግሎቶች' },
+                { name: 'Jobs',        am: 'ስራዎች' },
+            ];
+            bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
+            defaults.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn filter-btn-dynamic';
+                btn.dataset.category = d.name;
+                btn.dataset.am = d.am;
+                btn.textContent = d.name;
+                btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
+                bar.appendChild(btn);
+            });
+        }
 
         function checkPostStatus() {
             const urlParams = new URLSearchParams(window.location.search);
