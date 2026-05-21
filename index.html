@@ -27,12 +27,10 @@
         /* ═══════════════════════════════════════════════════════
            LAYOUT FOUNDATION
         ═══════════════════════════════════════════════════════ */
-
-        /* Desktop nav is visible; mobile bottom nav is hidden by default */
         .mobile-bottom-nav { display: none; }
         .desktop-nav { display: flex; }
 
-       /* ═══════════════════════════════════════════════════════
+        /* ═══════════════════════════════════════════════════════
            PREMIUM HEADER LAYOUT
         ═══════════════════════════════════════════════════════ */
         .golem-header {
@@ -44,7 +42,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             padding: 10px 0;
         }
-
         .header-container {
             max-width: 1300px;
             margin: 0 auto;
@@ -53,16 +50,12 @@
             flex-direction: column;
             gap: 15px;
         }
-
-        /* Top Row: Logo & Quick Actions */
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 100%;
         }
-
-        /* Premium Scalable Logo */
         .logo-block {
             display: flex; align-items: center; gap: 10px; text-decoration: none;
         }
@@ -73,11 +66,6 @@
             font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; color: #1a1a2e; line-height: 1; display: flex; align-items: baseline;
         }
         .logo-title span { color: #00b894; }
-        .logo-subtitle {
-            font-family: 'Poppins', sans-serif; font-size: 0.75rem; color: #00b894; font-weight: 700; letter-spacing: 1px; margin-top: 2px;
-        }
-
-        /* Top Right Actions */
         .header-top-right {
             display: flex; align-items: center; gap: 12px;
         }
@@ -96,7 +84,6 @@
         }
         .sign-in-btn:hover { background: #00b894; box-shadow: 0 2px 10px rgba(0,184,148,0.3); }
 
-        /* Bottom Row: Nav & Search */
         .header-bottom {
             display: flex;
             align-items: center;
@@ -104,8 +91,6 @@
             gap: 20px;
             width: 100%;
         }
-
-        /* Desktop Nav */
         .desktop-main-nav {
             display: flex; align-items: center; gap: 8px;
         }
@@ -120,8 +105,6 @@
         .cart-badge {
             position: absolute; top: -4px; right: -4px; background: #ff4757; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.65rem; font-weight: 700; border: 2px solid #fff; display: none;
         }
-
-        /* Search & Filters */
         .header-search-row {
             display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end;
         }
@@ -143,9 +126,120 @@
         }
         .header-select:hover { border-color: #cbd5e1; }
 
-        /* Mobile overrides */
-        .mobile-bottom-nav { display: none; }
+        /* ═══════════════════════════════════════════════════════
+           DYNAMIC SUBCATEGORY PILL SYSTEM
+        ═══════════════════════════════════════════════════════ */
+        .sub-filter-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 15px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            background: #ffffff;
+            border-bottom: 1px dashed #e2e8f0;
+            scroll-behavior: smooth;
+        }
+        .sub-filter-bar::-webkit-scrollbar { display: none; }
         
+        .sub-filter-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            color: #64748b;
+            font-family: inherit;
+        }
+        .sub-filter-btn:hover {
+            background: #f1f5f9;
+            color: #1a1a2e;
+        }
+        .sub-filter-btn.active {
+            background: #e8fdf5;
+            color: #00b894;
+            border-color: #a7f3d0;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           JOB CARD — Dark blue theme
+        ═══════════════════════════════════════════════════════ */
+        .job-card {
+            background: white; border-radius: 16px; padding: 20px; border: 1px solid #e8f0fe; cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease; position: relative; display: flex; flex-direction: column; gap: 10px;
+        }
+        .job-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .job-type-badge {
+            display: inline-flex; align-items: center; gap: 5px; background: #f0f7ff; color: #007bff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+        }
+        .job-title { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 4px 28px 2px 0; line-height: 1.3; }
+        .job-company { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; }
+        .job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .job-tag { font-size: 11px; padding: 3px 9px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+        .job-tag.blue   { background: #eef2ff; color: #4f46e5; }
+        .job-tag.green  { background: #ecfdf5; color: #059669; }
+        .job-tag.purple { background: #faf5ff; color: #7c3aed; }
+        .job-tag.orange { background: #fff7ed; color: #ea580c; }
+        .job-tag.red    { background: #fff1f2; color: #e11d48; }
+        .job-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .job-salary { font-size: 1rem; font-weight: 700; color: #059669; }
+        .job-location { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #888; }
+        .deadline-badge { font-size: 11px; color: #e74c3c; display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; }
+        .job-snippet { font-size: 12px; color: #888; line-height: 1.55; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .job-actions { display: grid; grid-template-columns: 1fr 42px 42px; gap: 8px; margin-top: 4px; }
+        .job-btn { height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: opacity 0.2s, transform 0.1s; border: none; cursor: pointer; font-family: inherit; }
+        .job-btn:hover { opacity: 0.88; transform: scale(1.01); }
+        .job-btn-primary { background: #1a1a2e; color: white; }
+        .job-btn-tg      { background: #0088cc; color: white; }
+        .job-btn-wa      { background: #25d366; color: white; }
+        .job-wishlist-btn { position: absolute; top: 14px; right: 14px; border: none; background: none; font-size: 17px; color: #ccc; cursor: pointer; transition: color 0.15s; padding: 4px; }
+        .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #ff4757; }
+
+        /* ═══════════════════════════════════════════════════════
+           SERVICE CARD — Purple theme
+        ═══════════════════════════════════════════════════════ */
+        .service-card { background: white; border-radius: 16px; overflow: hidden; border: 1px solid #f0ebff; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
+        .service-banner { width: 100%; height: 130px; overflow: hidden; position: relative; background: linear-gradient(135deg, #f5f0ff 0%, #ede9fe 100%); display: flex; align-items: center; justify-content: center; }
+        .service-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .service-banner-fallback { font-size: 44px; opacity: 0.45; }
+        .service-type-badge { position: absolute; top: 10px; left: 12px; display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.07em; background: rgba(124,58,237,0.12); color: #7c3aed; border: 1px solid rgba(124,58,237,0.2); backdrop-filter: blur(4px); }
+        .service-rating { position: absolute; top: 10px; right: 12px; display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #f59e0b; background: rgba(255,255,255,0.85); padding: 3px 7px; border-radius: 6px; }
+        .service-wishlist-btn { position: absolute; bottom: 10px; right: 12px; background: rgba(255,255,255,0.85); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; font-size: 12px; transition: color 0.15s; }
+        .service-wishlist-btn.active, .service-wishlist-btn:hover { color: #ff4757; }
+        .service-body { padding: 14px 15px 0; }
+        .service-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; line-height: 1.3; }
+        .service-provider { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; margin-bottom: 10px; }
+        .service-highlights { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+        .svc-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+        .svc-tag.purple { background: #faf5ff; color: #7c3aed; }
+        .svc-tag.pink   { background: #fff0f6; color: #d6336c; }
+        .svc-tag.teal   { background: #e6fffb; color: #0d9488; }
+        .svc-tag.amber  { background: #fffbeb; color: #d97706; }
+        .svc-tag.green  { background: #ecfdf5; color: #059669; }
+        .service-snippet { font-size: 12px; color: #888; line-height: 1.55; margin: 0 0 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .service-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px 14px; border-top: 1px solid #f5f0ff; margin-top: 4px; }
+        .service-price { font-size: 16px; font-weight: 800; color: #7c3aed; }
+        .service-price-label { font-size: 10px; color: #aaa; margin-top: 1px; }
+        .service-actions { display: flex; gap: 7px; }
+        .svc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; font-family: inherit; transition: opacity 0.15s, transform 0.1s; white-space: nowrap; }
+        .svc-btn:hover { opacity: 0.85; transform: scale(1.02); }
+        .svc-btn-primary { background: #7c3aed; color: white; }
+        .svc-btn-outline { background: #faf5ff; color: #7c3aed; border: 1px solid rgba(124,58,237,0.3); }
+
+        /* ═══════════════════════════════════════════════════════
+           CATEGORY SECTION DIVIDERS & MEDIA CONTROLS
+        ═══════════════════════════════════════════════════════ */
+        .category-section-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 6px 0 4px; }
+        .category-section-header h3 { font-size: 13px; font-weight: 700; color: #333; white-space: nowrap; }
+        .category-section-header .line { flex: 1; height: 1px; background: #eee; }
+
         @media (max-width: 991px) {
             .header-bottom { flex-direction: column; gap: 12px; align-items: stretch; }
             .desktop-main-nav { display: none; }
@@ -153,349 +247,58 @@
             .search-input-group { max-width: 100%; padding: 10px 16px; }
             .header-filters { display: flex; width: 100%; gap: 8px; }
             .header-select { flex: 1; padding: 10px 12px; }
-            
             .hide-mobile { display: none !important; }
-            
             .logo-title { font-size: 1.25rem; }
             .logo-block svg { width: 36px; height: 36px; }
-            
             .sign-in-btn { padding: 0; width: 38px; height: 38px; justify-content: center; border-radius: 50%; }
             .sign-in-btn span { display: none; }
 
-            /* Show mobile bottom nav */
             .mobile-bottom-nav {
-                display: flex !important;
-                position: fixed; bottom: 0; left: 0; width: 100%;
-                background: white; border-top: 1px solid #e2e8f0;
-                justify-content: space-around; align-items: center;
-                padding: 10px 0 12px; z-index: 1000;
-                box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+                display: flex !important; position: fixed; bottom: 0; left: 0; width: 100%;
+                background: white; border-top: 1px solid #e2e8f0; justify-content: space-around;
+                align-items: center; padding: 10px 0 12px; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
             }
-            .mobile-bottom-nav a {
-                display: flex; flex-direction: column; align-items: center; gap: 4px;
-                text-decoration: none; color: #64748b; flex: 1;
-                font-size: 0.65rem; font-weight: 600; position: relative; transition: color 0.2s;
-            }
+            .mobile-bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #64748b; flex: 1; font-size: 0.65rem; font-weight: 600; position: relative; transition: color 0.2s; }
             .mobile-bottom-nav a:hover { color: #1a1a2e; }
             .mobile-bottom-nav a i { font-size: 1.3rem; color: #94a3b8; transition: color 0.2s; }
             .mobile-bottom-nav a.active-tab i, .mobile-bottom-nav a:hover i { color: #00b894; }
             .mobile-bottom-nav a.sell-tab i { color: #2ed573; }
             .mobile-bottom-nav a.admin-tab i { color: #ff4757; }
         }
-        /* ═══════════════════════════════════════════════════════
-           JOB CARD — Dark blue theme
-        ═══════════════════════════════════════════════════════ */
-        .job-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid #e8f0fe;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .job-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
-        .job-type-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: #f0f7ff; color: #007bff;
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 11px; font-weight: 600; text-transform: uppercase;
-        }
-        .job-title { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 4px 28px 2px 0; line-height: 1.3; }
-        .job-company { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; }
-        .job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .job-tag {
-            font-size: 11px; padding: 3px 9px; border-radius: 6px;
-            display: inline-flex; align-items: center; gap: 4px; font-weight: 600;
-        }
-        .job-tag.blue   { background: #eef2ff; color: #4f46e5; }
-        .job-tag.green  { background: #ecfdf5; color: #059669; }
-        .job-tag.purple { background: #faf5ff; color: #7c3aed; }
-        .job-tag.orange { background: #fff7ed; color: #ea580c; }
-        .job-tag.red    { background: #fff1f2; color: #e11d48; }
-
-        .job-meta-row {
-            display: flex; align-items: center;
-            justify-content: space-between; gap: 8px;
-        }
-        .job-salary { font-size: 1rem; font-weight: 700; color: #059669; }
-        .job-location {
-            display: flex; align-items: center; gap: 4px;
-            font-size: 11.5px; color: #888;
-        }
-        .deadline-badge {
-            font-size: 11px; color: #e74c3c;
-            display: inline-flex; align-items: center; gap: 4px; margin-top: 2px;
-        }
-        .job-snippet {
-            font-size: 12px; color: #888; line-height: 1.55; margin: 0;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .job-actions {
-            display: grid;
-            grid-template-columns: 1fr 42px 42px;
-            gap: 8px; margin-top: 4px;
-        }
-        .job-btn {
-            height: 40px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            gap: 6px; text-decoration: none; font-size: 13px;
-            font-weight: 600; transition: opacity 0.2s, transform 0.1s;
-            border: none; cursor: pointer; font-family: inherit;
-        }
-        .job-btn:hover { opacity: 0.88; transform: scale(1.01); }
-        .job-btn-primary { background: #1a1a2e; color: white; }
-        .job-btn-tg      { background: #0088cc; color: white; }
-        .job-btn-wa      { background: #25d366; color: white; }
-        .job-wishlist-btn {
-            position: absolute; top: 14px; right: 14px;
-            border: none; background: none; font-size: 17px;
-            color: #ccc; cursor: pointer; transition: color 0.15s;
-            padding: 4px;
-        }
-        .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #ff4757; }
-
-        /* ═══════════════════════════════════════════════════════
-           SERVICE CARD — Purple theme
-        ═══════════════════════════════════════════════════════ */
-        .service-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #f0ebff;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .service-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
-
-        .service-banner {
-            width: 100%; height: 130px;
-            overflow: hidden; position: relative;
-            background: linear-gradient(135deg, #f5f0ff 0%, #ede9fe 100%);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .service-banner img { width: 100%; height: 100%; object-fit: cover; }
-        .service-banner-fallback { font-size: 44px; opacity: 0.45; }
-        .service-type-badge {
-            position: absolute; top: 10px; left: 12px;
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            padding: 3px 9px; border-radius: 20px; letter-spacing: 0.07em;
-            background: rgba(124,58,237,0.12); color: #7c3aed;
-            border: 1px solid rgba(124,58,237,0.2);
-            backdrop-filter: blur(4px);
-        }
-        .service-rating {
-            position: absolute; top: 10px; right: 12px;
-            display: flex; align-items: center; gap: 4px;
-            font-size: 11px; font-weight: 700; color: #f59e0b;
-            background: rgba(255,255,255,0.85); padding: 3px 7px;
-            border-radius: 6px;
-        }
-        .service-wishlist-btn {
-            position: absolute; bottom: 10px; right: 12px;
-            background: rgba(255,255,255,0.85); border: none;
-            border-radius: 50%; width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #aaa; font-size: 12px; transition: color 0.15s;
-        }
-        .service-wishlist-btn.active, .service-wishlist-btn:hover { color: #ff4757; }
-
-        .service-body { padding: 14px 15px 0; }
-        .service-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; line-height: 1.3; }
-        .service-provider {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 12px; color: #888; margin-bottom: 10px;
-        }
-        .service-highlights { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-        .svc-tag {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 10.5px; font-weight: 600; padding: 3px 8px;
-            border-radius: 6px; white-space: nowrap;
-        }
-        .svc-tag.purple { background: #faf5ff; color: #7c3aed; }
-        .svc-tag.pink   { background: #fff0f6; color: #d6336c; }
-        .svc-tag.teal   { background: #e6fffb; color: #0d9488; }
-        .svc-tag.amber  { background: #fffbeb; color: #d97706; }
-        .svc-tag.green  { background: #ecfdf5; color: #059669; }
-        .service-snippet {
-            font-size: 12px; color: #888; line-height: 1.55; margin: 0 0 10px;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .service-footer {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 15px 14px;
-            border-top: 1px solid #f5f0ff;
-            margin-top: 4px;
-        }
-        .service-price { font-size: 16px; font-weight: 800; color: #7c3aed; }
-        .service-price-label { font-size: 10px; color: #aaa; margin-top: 1px; }
-        .service-actions { display: flex; gap: 7px; }
-        .svc-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 5px; padding: 8px 14px; border-radius: 10px;
-            font-size: 12px; font-weight: 700; text-decoration: none;
-            border: none; cursor: pointer; font-family: inherit;
-            transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
-        }
-        .svc-btn:hover { opacity: 0.85; transform: scale(1.02); }
-        .svc-btn-primary { background: #7c3aed; color: white; }
-        .svc-btn-outline {
-            background: #faf5ff; color: #7c3aed;
-            border: 1px solid rgba(124,58,237,0.3);
-        }
-
-        /* ═══════════════════════════════════════════════════════
-           CATEGORY SECTION DIVIDERS
-        ═══════════════════════════════════════════════════════ */
-        .category-section-header {
-            grid-column: 1 / -1;
-            display: flex; align-items: center; gap: 10px;
-            padding: 6px 0 4px;
-        }
-        .category-section-header h3 { font-size: 13px; font-weight: 700; color: #333; white-space: nowrap; }
-        .category-section-header .line { flex: 1; height: 1px; background: #eee; }
-
-        /* ═══════════════════════════════════════════════════════
-           DESKTOP  (≥ 769px)
-        ═══════════════════════════════════════════════════════ */
         @media (min-width: 769px) {
             .mobile-bottom-nav { display: none !important; }
             .desktop-nav { display: flex !important; }
-
-            /* header nav stays inline */
-            .nav-container-horizontal {
-                display: flex;
-                flex-wrap: nowrap;
-                gap: 6px;
-                align-items: center;
-            }
-            .nav-item-box {
-                flex-direction: row;
-                gap: 6px;
-                padding: 8px 14px;
-            }
+            .nav-container-horizontal { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; }
+            .nav-item-box { flex-direction: row; gap: 6px; padding: 8px 14px; }
             .nav-item-box p { font-size: 0.85rem; font-weight: 600; }
-
-            /* desktop grid: 3-4 columns */
-            .masonry-wrapper {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-                gap: 18px;
-            }
-
-            /* job/service cards span 1 col on desktop */
+            .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
             .job-card, .service-card { grid-column: span 1; }
         }
 
-        /* ═══════════════════════════════════════════════════════
-           MOBILE  (≤ 768px)
-        ═══════════════════════════════════════════════════════ */
         @media (max-width: 768px) {
-            /* Give bottom nav breathing room */
             body { padding-bottom: 72px; }
-
-            /* ── Header ── */
             .golem-header { padding: 12px 14px 10px; }
             .header-top-row { flex-wrap: nowrap; }
-            .logo { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
-            .header-actions { gap: 8px; }
             .hide-text-mobile { display: none !important; }
-            .help-link i { font-size: 1.25rem !important; }
-            .sign-in-btn {
-                padding: 0 !important; border-radius: 50% !important;
-                width: 36px; height: 36px;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
-            .sign-in-btn span { display: none; }
-
-            /* Search stays full-width below logo row */
             .search-wrapper { width: 100%; margin-top: 10px; }
-
-            /* ── Desktop nav hidden on mobile ── */
             .desktop-nav { display: none !important; }
-
-            /* ── Mobile bottom tab bar ── */
-            .mobile-bottom-nav {
-                display: flex !important;
-                position: fixed; bottom: 0; left: 0; width: 100%;
-                background: white; border-top: 1px solid #eee;
-                justify-content: space-around; align-items: center;
-                padding: 8px 0 10px; z-index: 1000;
-                box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
-            }
-            .mobile-bottom-nav a {
-                display: flex; flex-direction: column; align-items: center; gap: 3px;
-                text-decoration: none; color: #666; flex: 1;
-                font-size: 0.6rem; font-weight: 600; position: relative;
-            }
-            .mobile-bottom-nav a i { font-size: 1.25rem; color: #3498db; }
-            .mobile-bottom-nav a.sell-tab i { color: #2ed573; }
-            .mobile-bottom-nav a.admin-tab i { color: #e74c3c; }
-            .mobile-bottom-nav a#mobileCartBadge { /* handled below */ }
-
-            /* ── Filter bar ── */
-            .filter-bar {
-                display: flex; flex-wrap: nowrap; overflow-x: auto;
-                -webkit-overflow-scrolling: touch; padding: 10px 6px;
-                gap: 8px; width: 100%;
-            }
+            .filter-bar { display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 6px; gap: 8px; width: 100%; }
             .filter-bar::-webkit-scrollbar { display: none; }
             .filter-btn { flex: 0 0 auto; font-size: 0.82rem; padding: 7px 14px; }
-
-            /* ── Product grid ── */
-            .masonry-wrapper {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 11px;
-            }
-
-            /* Jobs / Services span full width on mobile */
+            .masonry-wrapper { grid-template-columns: repeat(2, 1fr); gap: 11px; }
             .job-card, .service-card { grid-column: 1 / -1; }
-
-            /* ── Modal ── */
             .modal-content { width: 96%; margin: 4% auto; max-height: 92vh; overflow-y: auto; }
-            .modal-footer-actions { flex-direction: column; }
-            .modal-flex-actions .contact-btn { flex: 1 1 100%; }
-
-            /* ── Floating chat ── */
             .floating-chat { bottom: 82px; right: 14px; }
-            #chatMenu { bottom: 68px; right: 0; }
-
-            /* ── Sponsor ── */
-            .sponsor-content { flex-direction: column; text-align: center; }
-            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
-            .sponsor-actions { flex-direction: column; gap: 10px; }
-            .sponsor-actions a { margin-left: 0 !important; }
-
-            /* ── Back-to-top stays above bottom nav ── */
-            #backToTop { bottom: 82px !important; }
-
-            /* ── Controls row ── */
-            .controls-row { flex-direction: row; }
         }
-
-        /* ── Very small phones ── */
-        @media (max-width: 360px) {
-            .masonry-wrapper { grid-template-columns: 1fr; }
-            .logo { font-size: 0.95rem; }
-        }
+        @media (max-width: 360px) { .masonry-wrapper { grid-template-columns: 1fr; } }
     </style>
 </head>
 
 <body>
-    <!-- ======================= HEADER ======================= -->
-  <!-- ======================= PREMIUM HEADER ======================= -->
     <header class="golem-header">
         <div class="header-container">
-            
-            <!-- TOP ROW: Logo & Quick Actions -->
             <div class="header-top">
-                <!-- Premium Logo -->
                 <a href="index.html" class="logo-block">
                     <svg viewBox="0 0 165 165" xmlns="http://www.w3.org/2000/svg">
                         <rect x="0" y="0" width="165" height="165" rx="36" fill="#00b894"/>
@@ -505,95 +308,72 @@
                         <rect x="30" y="100" width="105" height="8" fill="#fdcb6e" opacity="0.9"/>
                         <text x="82" y="142" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="48" fill="#00b894">W</text>
                         <circle cx="126" cy="16" r="7" fill="#fdcb6e"/>
-                        <circle cx="144" cy="28" r="4.5" fill="#fff" opacity="0.55"/>
                     </svg>
-                    <div class="logo-text-wrapper">
+                    <div>
                         <div class="logo-title">Wana<span>Gebya</span></div>
                         <div class="logo-subtitle">ዋና ገበያ</div>
                     </div>
                 </a>
 
-                <!-- Right Actions: Help, Lang, Auth -->
                 <div class="header-top-right">
-                    <a href="#" id="helpBtn" class="help-link hide-mobile">
-                        <i class="fas fa-question-circle"></i> Help
+                    <a href="https://t.me/allInOneEthiopia1" target="_blank" class="help-link">
+                        <i class="fas fa-question-circle"></i> <span class="hide-mobile">Help</span>
                     </a>
-                    
-                    <button id="langToggleBtn" class="lang-btn">
-                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                    <button class="lang-btn" id="langToggleBtn">
+                        <i class="fas fa-globe"></i> <span>አማርኛ</span>
                     </button>
-                    
-                    <div class="nav-auth-controls">
-                        <button id="signInBtn" class="sign-in-btn">
-                            <i class="fas fa-user"></i> <span class="hide-mobile">Sign In</span>
-                        </button>
-                        <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
-                            <span id="userNameLink" style="cursor:pointer; font-size:0.85rem; font-weight:600;"><strong id="userName"></strong></span>
-                            <button id="signOutBtn" class="signout-btn" style="padding:6px 10px; border-radius:6px;"><i class="fas fa-sign-out-alt"></i></button>
-                        </div>
-                    </div>
+                    <button class="sign-in-btn" id="headerAuthBtn">
+                        <i class="fas fa-user-circle"></i> <span>Sign In</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- BOTTOM ROW: Navigation & Search Filters -->
             <div class="header-bottom">
-                
-                <!-- Desktop Navigation (Hidden on Mobile) -->
-                <nav class="desktop-main-nav">
-                    <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
-                    <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box bg-sell"><i class="fas fa-plus-circle"></i><p>Sell Item</p></a>
-                    <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>My Items</p></a>
+                <div class="desktop-main-nav">
+                    <a href="index.html" class="nav-item-box"><i class="fas fa-house"></i> Home</a>
+                    <a href="post.html" class="nav-item-box bg-sell"><i class="fas fa-circle-plus"></i> Post Item</a>
                     <a href="saved.html" class="nav-item-box" style="position:relative;">
-                        <i class="fas fa-heart"></i><p>Saved</p>
-                        <span id="cartBadge" class="cart-badge">0</span>
+                        <i class="fas fa-heart"></i> Saved
+                        <span class="cart-badge" id="desktopCartBadge">0</span>
                     </a>
-                    <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none; color:#ff4757;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
-                </nav>
+                    <a href="admin.html" class="nav-item-box" id="headerAdminLink" style="display:none;"><i class="fas fa-user-shield"></i> Control Panel</a>
+                </div>
 
-                <!-- Search & Sort Bar -->
                 <div class="header-search-row">
-                    <!-- Search Input -->
                     <div class="search-input-group">
-                        <i class="fas fa-search" style="color:#94a3b8;"></i>
-                        <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+                        <i class="fas fa-search" style="color: #94a3b8; font-size: 0.9rem;"></i>
+                        <input type="text" id="searchInput" placeholder="Search across Ethiopia...">
                     </div>
-                    
-                    <!-- Filters -->
                     <div class="header-filters">
-                        <select id="sortSelect" class="header-select">
-                            <option value="newest">🆕 Newest First</option>
-                            <option value="price_low">💰 Price: Low to High</option>
-                            <option value="price_high">💎 Price: High to Low</option>
-                        </select>
-                        <select id="locationSelect" class="header-select">
-                            <option value="all">🌍 All Regions</option>
+                        <select class="header-select" id="locationSelect">
+                            <option value="All">📍 All Locations</option>
                             <option value="Addis Ababa">Addis Ababa</option>
-                            <option value="Oromia">Oromia</option>
-                            <option value="Amhara">Amhara</option>
-                            <option value="Tigray">Tigray</option>
-                            <option value="Sidama">Sidama</option>
-                            <option value="Somali">Somali</option>
+                            <option value="Adama">Adama</option>
+                            <option value="Hawassa">Hawassa</option>
+                            <option value="Bahir Dar">Bahir Dar</option>
+                            <option value="Dire Dawa">Dire Dawa</option>
+                        </select>
+                        <select class="header-select" id="sortSelect">
+                            <option value="latest">⏱️ Newest Listings</option>
+                            <option value="low">💰 Price: Low to High</option>
+                            <option value="high">💎 Price: High to Low</option>
                         </select>
                     </div>
                 </div>
-
             </div>
         </div>
     </header>
 
-    <!-- ── Mobile bottom tab bar (only visible on mobile) ── -->
-    <nav class="mobile-bottom-nav" id="mobileBottomNav">
-        <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
-        <a href="sell.html" id="mobileSellBtn" class="sell-tab"><i class="fas fa-plus-circle"></i><span>Sell</span></a>
-        <a href="my-items.html"><i class="fas fa-box-open"></i><span>Items</span></a>
-        <a href="saved.html" style="position:relative;">
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="active-tab"><i class="fas fa-house"></i><span>Home</span></a>
+        <a href="post.html" class="sell-tab"><i class="fas fa-circle-plus"></i><span>Sell</span></a>
+        <a href="saved.html">
             <i class="fas fa-heart"></i><span>Saved</span>
             <span id="mobileCartBadge" style="display:none; position:absolute; top:0; right:10px; background:#ff4757; color:white; border-radius:50%; width:16px; height:16px; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center;"></span>
         </a>
         <a href="admin.html" id="mobileAdminLink" class="admin-tab" style="display:none;"><i class="fas fa-user-shield"></i><span>Admin</span></a>
     </nav>
 
-    <!-- ======================= SPONSORED ======================= -->
     <section class="sponsored-section container" id="mainSponsor" style="display:none; margin-top:20px;">
         <div class="sponsor-card">
             <div class="sponsor-badge">Featured Partner</div>
@@ -613,793 +393,388 @@
         </div>
     </section>
 
-    <!-- ======================= FILTERS ======================= -->
     <section class="filter-controls">
         <div class="filter-bar" id="filterBar">
-            <!-- Always-present buttons -->
-            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
+            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All Items</button>
             <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
                 <i class="fas fa-star" style="color:#f1c40f;"></i> Featured
             </button>
-            <!-- Dynamic categories injected here by loadFilterCategories() -->
         </div>
     </section>
 
-    <!-- ======================= MAIN GRID ======================= -->
-    <main class="container">
-        <div id="productGrid" class="masonry-wrapper">
-            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
-        </div>
+    <div class="container">
+        <div id="subCategoryBar" class="sub-filter-bar" style="display: none;"></div>
+    </div>
 
-        <!-- Invite / Share -->
-        <div class="invite-container" style="background:white; border-radius:16px; padding:2rem; text-align:center; border:1px solid #f0f0f0; margin:20px 0;">
-            <div style="width:56px; height:56px; border-radius:50%; background:#f0f7ff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
-                <i class="fas fa-users" style="color:#0088cc; font-size:22px;"></i>
-            </div>
-            <h3 style="margin:0 0 6px; font-size:16px; color:#222;">Help WanaGebya Grow By Sharing!</h3>
-            <p style="color:#888; font-size:13px; margin:0 0 20px;">"Do you know anyone looking to buy or sell?" Invite them to WanaGebya.</p>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto;">
-                <button id="shareTelegramBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#0088cc; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                    Share on Telegram
-                </button>
-                <button id="shareWhatsAppBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#25d366; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-                    Share on WhatsApp
-                </button>
-                <button id="shareFacebookBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#1877F2; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    Share on Facebook
-                </button>
-                <a href="https://t.me/WanaGebyaet" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; background:#f0f7ff; color:#0088cc; border:1.5px solid #b3d9f5; font-size:13px; font-weight:600; text-decoration:none; font-family:inherit;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                    Join Telegram Channel
-                </a>
-            </div>
+    <main class="container main-layout">
+        <div class="masonry-wrapper" id="productGrid">
+            <p style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">Booting catalog components...</p>
         </div>
     </main>
 
-    <!-- ======================= FOOTER ======================= -->
-    <footer class="golem-footer" style="padding-bottom:80px;">
-        <div class="footer-container">
-            <div class="footer-col">
-                <h2 class="footer-logo">WanaGebya</h2>
-                <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Contact Us</h4>
-                <p><i class="fas fa-phone"></i> +251707022845</p>
-                <div class="social-links">
-                    <a href="https://t.me/WanaGebya" class="social-btn telegram" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                    <a href="https://facebook.com/WanaGebya" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://instagram.com/WanaGebya" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://tiktok.com/@WanaGebya" class="social-btn tiktok" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4>Language / ቋንቋ</h4>
-                <button id="footerLangBtn" class="lang-btn-footer">English / አማርኛ</button>
-            </div>
-        </div>
-        <div class="footer-bottom"><p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p></div>
-    </footer>
-
-    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom:85px;">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-
-    <!-- ======================= FLOATING CHAT ======================= -->
-    <div class="floating-chat">
-        <div id="chatToast" class="chat-toast" style="display:none;">
-            <span id="closeToastBtn" class="close-toast">&times;</span>
-            <p>👋 Hello! Welcome! Need help with buying or selling?</p>
-            <div class="toast-arrow"></div>
-        </div>
-        <div id="chatMenu" class="chat-menu" style="display:none;">
-            <a href="tel:+251707022845" class="menu-item call"><i class="fas fa-phone"></i> <span>Call Now</span></a>
-            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram"><i class="fab fa-telegram-plane"></i> <span>Telegram</span></a>
-            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp"><i class="fab fa-whatsapp"></i> <span>WhatsApp</span></a>
-        </div>
-        <button id="chatToggleBtn" class="chat-btn">
-            <div class="status-dot-container">
-                <i class="fas fa-comment-dots"></i>
-                <span class="online-dot"></span>
-            </div>
-            <span class="chat-label" data-am="ያግኙን">Contact Us</span>
-        </button>
-    </div>
-
-    <!-- ======================= MODALS ======================= -->
-    <div id="supportModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content" style="max-width:400px;">
-            <button id="closeSupportModal" class="close-modal-btn">&times;</button>
-            <h2>Contact WanaGebya Support</h2>
-            <form id="supportForm">
-                <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
-                <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
-                <textarea id="supportMessage" placeholder="How can we help?" required class="modal-input" style="height:100px;"></textarea>
-                <button type="submit" class="auth-submit" style="width:100%;">Send Message</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="authModal" class="modal-overlay" style="display:none;">
+    <div class="modal" id="productModal">
         <div class="modal-content">
-            <button type="button" id="closeAuthModal" class="close-modal-btn">&times;</button>
-            <h2 id="modalTitle">Welcome Back</h2>
-            <form id="authForm">
-                <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="authEmail" placeholder="Email Address" required></div>
-                <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="authPassword" placeholder="Password" required></div>
-                <div id="registerFields" style="display:none;">
-                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="regName" placeholder="Full Name"></div>
-                    <div class="input-group"><i class="fas fa-phone"></i><input type="text" id="regPhone" placeholder="Phone Number"></div>
-                    <div class="input-group"><i class="fas fa-map-marker-alt"></i><input type="text" id="regLocation" placeholder="Location (e.g. Bole)"></div>
-                    <div class="input-group"><i class="fas fa-info-circle"></i><textarea id="regBio" placeholder="Short Bio (Optional)" style="width:100%; border:none; padding:10px; font-family:inherit; border-radius:8px; background:#f9f9f9;"></textarea></div>
+            <button class="close-btn" id="closeProductModal">&times;</button>
+            <div class="modal-body-layout">
+                <div class="modal-image-panel">
+                    <img id="modalProductImage" src="" alt="Listing Item image">
                 </div>
-                <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
-            </form>
-            <div class="modal-footer">
-                <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
-                <p id="forgotPwdRow" style="margin-top:8px; font-size:0.85rem;">
-                    <a href="#" id="forgotPwdLink" style="color:#6c5ce7; text-decoration:none;">Forgot Password?</a>
-                </p>
-            </div>
-        </div>
-    </div>
-<!-- Telegram Popup Structure -->
-<!-- The Button (Place this wherever you want on your page) -->
-<button class="tg-manual-btn" onclick="openTGPopupManual()">
-    Join Our Telegram Channel
-</button>
-
-<!-- The Popup Structure (Keep this at the bottom of your body) -->
-<div id="tg-popup" class="tg-popup-hidden">
-    <div class="tg-popup-content">
-        <span class="tg-close" onclick="closeTGPopup()">&times;</span>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" width="50">
-        <h3>WanaGebya Market</h3>
-        <p>Stay updated with our latest electronics and offers!</p>
-        <a href="https://t.me/WanaGebyaet" target="_blank" class="tg-btn">Join Now</a>
-    </div>
-</div>
-    
-    <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display:none;">
-        <div class="modal-content">
-            <button id="closeProductModal" class="close-modal-btn">&times;</button>
-            <div class="modal-img-wrapper"><img id="modalProductImg" src="" alt="Product" style="border-radius:10px;"></div>
-            <div class="modal-body">
-                <h2 id="modalProductTitle" style="font-size:1.2rem; margin-bottom:5px;"></h2>
-                <div class="seller-details-wrapper" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:12px; display:flex; align-items:center; gap:10px; border:1px solid #eee;">
-                    <img id="modalSellerAvatar"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
-                        alt="Seller avatar" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #6c5ce7;">
-                    <div style="flex:1;">
-                        <h4 id="modalSellerName" style="margin:0; color:#333; font-size:0.95rem; font-weight:600;">Seller: Loading...</h4>
-                        <div id="sellerBadgeContainer"></div>
+                <div class="modal-details-panel">
+                    <span class="modal-badge-premium" id="modalPremiumBadge" style="display:none;"><i class="fas fa-crown"></i> FEATURED</span>
+                    <h2 class="modal-title" id="modalProductTitle">Item Title</h2>
+                    <p class="modal-price" id="modalProductPrice">0 ETB</p>
+                    <div class="modal-meta-chips">
+                        <span id="modalProductLocation">📍 Addis Ababa</span>
+                        <span id="modalProductCategory">🏷️ Category</span>
+                    </div>
+                    <div class="modal-divider"></div>
+                    <p class="modal-description" id="modalProductDescription">No item description defined yet.</p>
+                    <div class="modal-divider"></div>
+                    <div class="modal-flex-actions">
+                        <a href="#" id="callContact" class="contact-btn call-btn"><i class="fas fa-phone-alt"></i> Call Seller</a>
+                        <a href="#" id="telegramOrder" class="contact-btn telegram-btn" target="_blank"><i class="fab fa-telegram-plane"></i> Order on Telegram</a>
+                        <a href="#" id="whatsappOrder" class="contact-btn whatsapp-btn" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Chat</a>
+                    </div>
+                    <div style="margin-top:15px; text-align:center;">
+                        <button id="saveToWishlistBtn" style="background:none; border:none; color:#ff4757; font-weight:600; cursor:pointer; font-family:inherit; font-size:0.9rem;">
+                            <i class="far fa-heart"></i> Add to Saved Items
+                        </button>
                     </div>
                 </div>
-                <div id="modalProductPrice" class="modal-price" style="font-size:1.3rem;"></div>
-                <p id="modalProductDesc" class="modal-description" style="font-size:0.9rem; line-height:1.5;"></p>
-                <div class="modal-flex-actions">
-                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
-                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
-                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width:100%;"><i class="fas fa-heart"></i> Save to Wishlist</button>
-                </div>
             </div>
         </div>
     </div>
 
-    <div id="loadingOverlay" class="loading-overlay" style="display:none;">
-        <div class="spinner"></div><p>Sending your order to WanaGebya ...</p>
-    </div>
-
-    <div id="successModal" class="modal-overlay" style="display:none;">
-        <div class="modal-content success-modal-inner">
-            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-            <h2 style="margin-bottom:10px;">Listing Received!</h2>
-            <p style="color:#666; line-height:1.5;">Your item <strong id="postedItemName" style="color:#333;"></strong> has been sent to our team for review.</p>
-            <p style="font-size:0.85rem; color:#999; margin-top:10px;">It usually takes less than 2 hours to go live.</p>
-            <button id="closeSuccessModal" class="success-back-btn">Back to Marketplace</button>
-        </div>
-    </div>
-
-    <!-- ======================= SCRIPTS ======================= -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
 
-    <!-- ══════════════════════════════════════════════════════════
-         JOBS & SERVICES CARD RENDERER
-    ══════════════════════════════════════════════════════════════ -->
-   <script>
-    (function () {
-        'use strict';
+    <script>
+        (function () {
+            'use strict';
 
-        /* ── helpers ── */
-        function esc(str) {
-            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        }
+            let activeCategory = 'All';
+            let activeSubCategory = 'All';
+            let currentLang = 'en';
+            let cachedSubCategories = [];
 
-        function phone(p) { return String(p || '').replace(/\s/g,''); }
-
-        function parseSpecs(desc) {
-            const specs = {};
-            if (!desc) return specs;
-            const block = desc.split('--- Specs ---')[1] || '';
-            block.split('\n').forEach(line => {
-                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
-                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+            // Core UI Listeners Hook Setup
+            document.addEventListener('DOMContentLoaded', () => {
+                hookTaxonomyInterceptors();
+                listenLanguageMatrix();
             });
-            return specs;
-        }
 
-        function cleanDesc(desc) {
-            if (!desc) return '';
-            return desc.split('--- Specs ---')[0].trim();
-        }
+            // Handle Language State Changes
+            function listenLanguageMatrix() {
+                const langBtn = document.getElementById('langToggleBtn');
+                if (!langBtn) return;
+                
+                langBtn.addEventListener('click', () => {
+                    currentLang = currentLang === 'en' ? 'am' : 'en';
+                    langBtn.querySelector('span').textContent = currentLang === 'en' ? 'አማርኛ' : 'English';
+                    
+                    // Force refresh of visible text values safely
+                    if (window.filterProducts) window.filterProducts();
+                    refreshSubCategoryLabels();
+                });
+            }
 
-        const svcEmoji = {
-            'plumbing':'🔧','electrical work':'⚡','painting':'🎨',
-            'tiling & flooring':'🪵','carpentry & woodwork':'🪚',
-            'cleaning service':'🧹','moving & packing':'📦',
-            'air conditioning':'❄️','welding & metal work':'⚙️',
-            'web design':'💻','graphic design':'🖼','computer repair':'🖥',
-            'phone repair':'📱','network setup':'🌐','cctv installation':'📷',
-            'software development':'👨‍💻','private tutoring':'📚',
-            'language classes':'🗣','music lessons':'🎵',
-            'driving instruction':'🚗','skills training':'🏆',
-            'accounting / bookkeeping':'📊','legal consultation':'⚖️',
-            'translation':'🌍','photography / videography':'📸',
-            'event planning':'🎉','security service':'🛡',
-            'hair salon / barbershop':'💈','makeup & styling':'💄',
-            'massage / spa':'💆','laundry service':'👕',
-            'childcare / babysitting':'👶','elder care':'🧓',
-        };
+            // Hook into existing filters array ecosystem
+            function hookTaxonomyInterceptors() {
+                const originalLoadCategories = window.loadFilterCategories;
+                
+                window.loadFilterCategories = async function() {
+                    if (originalLoadCategories) await originalLoadCategories();
+                    
+                    // Fetch subcategories concurrently
+                    try {
+                        const { data, error } = await _supabase.from('sub_categories').select('*').order('name');
+                        if (!error && data) {
+                            cachedSubCategories = data;
+                        }
+                    } catch(e) {
+                        console.warn("Subcategory structural fetch skipped:", e);
+                    }
 
-        function svcIcon(cat) {
-            if (!cat) return '🛠';
-            return svcEmoji[cat.toLowerCase()] || '🛠';
-        }
+                    // Attach intercept click listeners to main filter buttons
+                    const filterBar = document.getElementById('filterBar');
+                    if (filterBar) {
+                        filterBar.addEventListener('click', (e) => {
+                            const btn = e.target.closest('.filter-btn');
+                            if (!btn) return;
+                            
+                            activeCategory = btn.getAttribute('data-category') || 'All';
+                            activeSubCategory = 'All'; // Clear deep leaf state
+                            
+                            renderSubCategoriesBelt();
+                        });
+                    }
+                };
 
-        /* ══════════════════════════════
-           JOB CARD HTML
-        ══════════════════════════════ */
-        function buildJobCard(item) {
-            // FIX: Securely encode the JSON object so quotes don't break the HTML
-            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
-            
-            const sp = parseSpecs(item.description);
-            const desc = cleanDesc(item.description);
-            const ph = phone(item.seller_phone);
+                // Inject Custom Multi-Schema Matcher inside filtering iterations
+                const originalFilterProducts = window.filterProducts;
+                window.filterProducts = function() {
+                    if (!window.allProducts) {
+                        if (originalFilterProducts) originalFilterProducts();
+                        return;
+                    }
 
-            const jobType  = sp['job type']  || 'Full-Time';
-            const industry = sp['industry']  || '';
-            const exp      = sp['experience required'] || '';
-            const edu      = sp['education level'] || '';
-            const location = sp['work location'] || item.location || '';
-            const company  = sp['company'] || '';
-            const positions= sp['positions available'] || '';
-            const deadline = sp['deadline'] || '';
-            const salMin   = sp['salary min'] || '';
-            const salMax   = sp['salary max'] || '';
-            const skills   = sp['key skills'] || '';
+                    const searchKW = document.getElementById('searchInput').value.toLowerCase().trim();
+                    const loc = document.getElementById('locationSelect').value;
+                    const sort = document.getElementById('sortSelect').value;
+                    const isFeaturedTab = document.getElementById('featuredFilterBtn')?.classList.contains('active');
 
-            let salaryStr = 'Negotiable';
-            if (salMin && salMax) salaryStr = `${Number(salMin).toLocaleString()} – ${Number(salMax).toLocaleString()} ETB`;
-            else if (salMin) salaryStr = `From ${Number(salMin).toLocaleString()} ETB`;
-            else if (item.price && item.price > 0) salaryStr = `${Number(item.price).toLocaleString()} ETB`;
+                    let datasets = [...window.allProducts];
 
-            const typeColor = { 'Full-Time':'blue','Part-Time':'orange','Contract':'purple','Internship':'green','Freelance':'red' };
-            const badgeColor = typeColor[jobType] || 'blue';
+                    // filter logic fallback sync
+                    if (isFeaturedTab) {
+                        datasets = datasets.filter(p => p.is_sponsored && p.sponsored_until && new Date(p.sponsored_until) > new Date());
+                    } else if (activeCategory !== 'All') {
+                        datasets = datasets.filter(p => p.category === activeCategory || p.category_id === activeCategory);
+                    }
 
-            const skillTags = skills ? skills.split(',').slice(0,4).map(s =>
-                `<span class="job-tag purple"><i class="fas fa-check" style="font-size:8px;"></i>${esc(s.trim())}</span>`
-            ).join('') : '';
+                    // Deep Subcategory Mapping Filter Injection
+                    if (activeSubCategory !== 'All') {
+                        datasets = datasets.filter(p => p.subcategory === activeSubCategory || p.subcategory_id === activeSubCategory);
+                    }
 
-            const deadlineBadge = deadline
-                ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
+                    if (loc !== 'All') {
+                        datasets = datasets.filter(p => p.location === loc);
+                    }
 
-            // Check if saved
-            let saved =[];
-            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
-            const isSaved = saved.includes(item.id);
+                    if (searchKW) {
+                        datasets = datasets.filter(p => 
+                            (p.name && p.name.toLowerCase().includes(searchKW)) ||
+                            (p.description && p.description.toLowerCase().includes(searchKW))
+                        );
+                    }
 
-            return `
-            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
+                    // Sort Operations
+                    if (sort === 'low') {
+                        datasets.sort((a,b) => (a.price || 0) - (b.price || 0));
+                    } else if (sort === 'high') {
+                        datasets.sort((a,b) => (b.price || 0) - (a.price || 0));
+                    } else {
+                        datasets.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+                    }
 
-                <div class="job-card-header">
-                    <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
-                    <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
-                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
-                    </button>
-                    <div class="job-title">${esc(item.name)}</div>
-                    ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
-                </div>
+                    renderUnifiedDisplayGrid(datasets);
+                };
+            }
 
-                <div class="job-tags">
-                    ${industry ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i>${esc(industry)}</span>` : ''}
-                    ${exp ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i>${esc(exp)}</span>` : ''}
-                    ${edu ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i>${esc(edu)}</span>` : ''}
-                    ${positions ? `<span class="job-tag orange"><i class="fas fa-users" style="font-size:8px;"></i>${esc(positions)} position${positions>1?'s':''}</span>` : ''}
-                    ${skillTags}
-                </div>
+            // Build structural sub-tier pill chips
+            function renderSubCategoriesBelt() {
+                const subBar = document.getElementById('subCategoryBar');
+                if (!subBar) return;
 
-                <div class="job-meta-row">
-                    <div>
-                        <div class="job-salary">${salaryStr}</div>
-                        ${deadlineBadge}
+                if (activeCategory === 'All' || activeCategory === 'Featured') {
+                    subBar.style.display = 'none';
+                    subBar.innerHTML = '';
+                    return;
+                }
+
+                // Filter down children by string reference checks or database UUID links
+                const subsets = cachedSubCategories.filter(sub => 
+                    sub.category_id === activeCategory || sub.category === activeCategory
+                );
+
+                if (subsets.length === 0) {
+                    subBar.style.display = 'none';
+                    subBar.innerHTML = '';
+                    return;
+                }
+
+                subBar.style.display = 'flex';
+                
+                const fallbackLabel = currentLang === 'en' ? `All ${activeCategory}` : `ሁሉም ${activeCategory}`;
+                let html = `<button class="sub-filter-btn active" data-sub="All">${fallbackLabel}</button>`;
+
+                subsets.forEach(sub => {
+                    const displayLabel = (currentLang === 'am' && sub.amharic_name) ? sub.amharic_name : sub.name;
+                    html += `<button class="sub-filter-btn" data-sub="${sub.id}">${esc(displayLabel)}</button>`;
+                });
+
+                subBar.innerHTML = html;
+
+                // Bind operational interaction triggers
+                subBar.querySelectorAll('.sub-filter-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        subBar.querySelectorAll('.sub-filter-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        activeSubCategory = this.getAttribute('data-sub');
+                        
+                        if (window.filterProducts) window.filterProducts();
+                    });
+                });
+            }
+
+            function refreshSubCategoryLabels() {
+                const subBar = document.getElementById('subCategoryBar');
+                if (!subBar || subBar.style.display === 'none') return;
+                
+                // Active configuration re-render maps labels cleanly
+                const currentActiveSub = activeSubCategory;
+                renderSubCategoriesBelt();
+                
+                // Restore selection pointer state
+                subBar.querySelectorAll('.sub-filter-btn').forEach(btn => {
+                    if (btn.getAttribute('data-sub') === currentActiveSub) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+
+            // Route dynamic items cleanly to standard tiles, Jobs, or Services layout views
+            function renderUnifiedDisplayGrid(items) {
+                const grid = document.getElementById('productGrid');
+                if (!grid) return;
+
+                if (items.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 20px; color:#aaa;">
+                        <i class="far fa-folder-open" style="font-size:3rem; margin-bottom:15px; color:#ddd;"></i>
+                        <p>${currentLang === 'en' ? 'No items found matching your filter selection.' : 'በመረጡት ማጣሪያ የሚገኝ ዕቃ የለም።'}</p>
+                    </div>`;
+                    return;
+                }
+
+                let containerMarkup = '';
+
+                items.forEach(item => {
+                    const catString = (item.category || '').toLowerCase();
+                    
+                    if (catString === 'jobs' || item.category_id === 'jobs') {
+                        containerMarkup += renderJobMarkupCard(item);
+                    } else if (catString === 'services' || item.category_id === 'services') {
+                        containerMarkup += renderServiceMarkupCard(item);
+                    } else {
+                        // Standard marketplace card matrix view
+                        const localPrice = item.price ? `${item.price.toLocaleString()} ETB` : (currentLang === 'en' ? 'Negotiable' : 'ድርድር');
+                        const isSpon = item.is_sponsored && item.sponsored_until && new Date(item.sponsored_until) > new Date();
+                        const rawSafeData = btoa(unescape(encodeURIComponent(JSON.stringify(item))));
+
+                        containerMarkup += `
+                        <div class="product-card" onclick="window.openProductDetailsSafe('${rawSafeData}')" style="position:relative;">
+                            ${isSpon ? `<div style="position:absolute; top:10px; left:10px; background:#f1c40f; color:#000; padding:4px 9px; border-radius:12px; font-size:0.68rem; font-weight:800; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,0.15);"><i class="fas fa-crown"></i> FEATURED</div>` : ''}
+                            <div class="card-img-container">
+                                <img src="${item.image || 'https://via.placeholder.com/300'}" alt="${esc(item.name)}" loading="lazy">
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">${esc(item.name)}</h3>
+                                <p class="product-price">${localPrice}</p>
+                                <div style="display:flex; justify-content:between; align-items:center; font-size:0.75rem; color:#64748b; margin-top:auto; width:100%;">
+                                    <span>📍 ${esc(item.location || 'Addis Ababa')}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                });
+
+                grid.innerHTML = containerMarkup;
+            }
+
+            /* ── DYNAMIC RENDERING MICRO ENGINE INJECTIONS ── */
+            function renderJobMarkupCard(item) {
+                const specs = parseSpecs(item.description);
+                const jobType = specs['job type'] || 'Full-Time';
+                const company = specs['company'] || '';
+                const industry = specs['industry'] || '';
+                const exp = specs['experience'] || '';
+                const edu = specs['education'] || '';
+                const deadline = specs['deadline'] || '';
+
+                const safeData = btoa(unescape(encodeURIComponent(JSON.stringify(item))));
+                const priceStr = item.price ? `${item.price.toLocaleString()} ETB` : 'Negotiable';
+                const desc = cleanDesc(item.description);
+
+                let saved = [];
+                try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+                const isSaved = saved.includes(item.id);
+
+                return `
+                <div class="job-card" onclick="window.openProductDetailsSafe('${safeData}')">
+                    <div class="job-card-header">
+                        <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
+                        <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                            <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                        </button>
+                        <div class="job-title">${esc(item.name)}</div>
+                        ${company ? `<div class="job-company"><i class="fas fa-building"></i> ${esc(company)}</div>` : ''}
                     </div>
-                    <div class="job-location"><i class="fas fa-map-marker-alt"></i>${esc(location || item.location || 'Ethiopia')}</div>
-                </div>
+                    <div class="job-tags">
+                        ${industry ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i> ${esc(industry)}</span>` : ''}
+                        ${exp ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i> ${esc(exp)}</span>` : ''}
+                        ${edu ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i> ${esc(edu)}</span>` : ''}
+                    </div>
+                    ${desc ? `<p class="job-snippet">${esc(desc)}</p>` : ''}
+                    ${deadline ? `<div class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</div>` : ''}
+                    <div class="job-meta-row">
+                        <div class="job-salary">${priceStr}</div>
+                        <div class="job-location"><i class="fas fa-map-marker-alt"></i> ${esc(item.location || 'Addis Ababa')}</div>
+                    </div>
+                </div>`;
+            }
 
-                ${desc ? `<p class="job-snippet">${esc(desc)}</p>` : ''}
+            function renderServiceMarkupCard(item) {
+                const specs = parseSpecs(item.description);
+                const svcCat = specs['service category'] || '';
+                const provider = specs['provider'] || '';
+                const experience = specs['rating'] || specs['experience'] || '';
+                const response = specs['response time'] || '';
+                const area = specs['service area'] || '';
+                const avail = specs['availability'] || '';
 
-                <div class="job-actions">
-                    <a href="tel:${ph}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
-                        <i class="fas fa-phone"></i> Call / Apply
-                    </a>
-                    <a href="https://t.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
-                        <i class="fab fa-telegram-plane"></i>
-                    </a>
-                    <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
-                </div>
-            </div>`;
-        }
+                const safeData = btoa(unescape(encodeURIComponent(JSON.stringify(item))));
+                const priceStr = item.price ? `${item.price.toLocaleString()} ETB` : 'Contact for Quote';
+                const desc = cleanDesc(item.description);
 
-        /* ══════════════════════════════
-           SERVICE CARD HTML
-        ══════════════════════════════ */
-        function buildServiceCard(item) {
-            // FIX: Securely encode the JSON object
-            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
-            
-            const sp = parseSpecs(item.description);
-            const desc = cleanDesc(item.description);
-            const ph = phone(item.seller_phone);
+                let saved = [];
+                try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+                const isSaved = saved.includes(item.id);
 
-            const svcCat     = sp['service category'] || '';
-            const provider   = sp['provider name'] || '';
-            const experience = sp['experience'] || '';
-            const response   = sp['response time'] || '';
-            const pricing    = sp['pricing model'] || '';
-            const area       = sp['service area'] || '';
-            const avail      = sp['availability'] || '';
-            const highlights = sp['service highlights'] || '';
-            const payment    = sp['payment methods'] || '';
-
-            const priceStr = item.price && item.price > 0
-                ? `${Number(item.price).toLocaleString()} ETB`
-                : 'On Request';
-
-            const pricingLabel = pricing || 'Per Project';
-
-            const hlTags = highlights ? highlights.split(',').slice(0,4).map(h =>
-                `<span class="svc-tag purple"><i class="fas fa-check-circle" style="font-size:9px;"></i>${esc(h.trim())}</span>`
-            ).join('') : '';
-
-            const payTags = payment ? payment.split(',').slice(0,3).map(p =>
-                `<span class="svc-tag teal">${esc(p.trim())}</span>`
-            ).join('') : '';
-
-            const icon = svcIcon(svcCat);
-
-            // Check if saved
-            let saved =[];
-            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
-            const isSaved = saved.includes(item.id);
-
-            return `
-            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
-
-                <div class="service-card-header">
+                return `
+                <div class="service-card" onclick="window.openProductDetailsSafe('${safeData}')">
                     <div class="service-banner">
-                        ${item.image
-                            ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">`
-                            : `<span class="service-banner-fallback">${icon}</span>`}
-                        <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
-                        ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
+                        ${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">` : `<span class="service-banner-fallback">🛠️</span>`}
+                        <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i> ${esc(svcCat || 'Service')}</span>
+                        ${experience ? `<span class="service-rating"><i class="fas fa-star"></i> ${esc(experience)}</span>` : ''}
                         <button class="service-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
                             <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
                         </button>
                     </div>
-                </div>
-
-                <div class="service-body">
-                    <div class="service-name">${esc(item.name)}</div>
-                    ${provider ? `<div class="service-provider"><i class="fas fa-user-circle"></i>${esc(provider)}</div>` : ''}
-
-                    <div class="service-highlights">
-                        ${response   ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${esc(response)}</span>` : ''}
-                        ${area       ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${esc(area)}</span>` : ''}
-                        ${avail      ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${esc(avail)}</span>` : ''}
-                        ${hlTags}
-                        ${payTags}
+                    <div class="service-body">
+                        <div class="service-name">${esc(item.name)}</div>
+                        ${provider ? `<div class="service-provider"><i class="fas fa-user-circle"></i> ${esc(provider)}</div>` : ''}
+                        <div class="service-highlights">
+                            ${response ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i> ${esc(response)}</span>` : ''}
+                            ${area ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i> ${esc(area)}</span>` : ''}
+                            ${avail ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i> ${esc(avail)}</span>` : ''}
+                        </div>
+                        ${desc ? `<p class="service-snippet">${esc(desc)}</p>` : ''}
                     </div>
-
-                    ${desc ? `<p class="service-snippet">${esc(desc)}</p>` : ''}
-                </div>
-
-                <div class="service-footer">
-                    <div>
-                        <div class="service-price">${priceStr}</div>
-                        <div class="service-price-label">${esc(pricingLabel)}</div>
+                    <div class="service-footer">
+                        <div>
+                            <div class="service-price">${priceStr}</div>
+                        </div>
+                        <div class="service-location" style="font-size:11px; color:#888;"><i class="fas fa-map-marker-alt"></i> ${esc(item.location || 'Addis Ababa')}</div>
                     </div>
-                    <div class="service-actions">
-                        <a href="tel:${ph}" class="svc-btn svc-btn-primary" onclick="event.stopPropagation()">
-                            <i class="fas fa-phone"></i> Call
-                        </a>
-                        <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="svc-btn svc-btn-outline" onclick="event.stopPropagation()">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>`;
-        }
-
-        /* ══════════════════════════════
-           PATCH: intercept renderProduct
-           called from script.js
-        ══════════════════════════════ */
-        const _orig = window.renderProduct;
-
-        window.renderProduct = function (item) {
-            if (item.category === 'Jobs') {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = buildJobCard(item);
-                return wrapper.firstElementChild;
+                </div>`;
             }
-            if (item.category === 'Services') {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = buildServiceCard(item);
-                return wrapper.firstElementChild;
-            }
-            // all other categories fall through to original renderer
-            if (typeof _orig === 'function') return _orig(item);
-        };
 
-        /* ══════════════════════════════════════════════════════
-           FALLBACK
-        ══════════════════════════════════════════════════════ */
-        let _itemCache = {};
+            /* ── ESCAPING HELPERS ── */
+            function esc(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+            function parseSpecs(desc) { const specs = {}; if (!desc) return specs; const block = desc.split('--- Specs ---')[1] || ''; block.split('\n').forEach(line => { const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/); if (m) specs[m[1].trim().toLowerCase()] = m[2].trim(); }); return specs; }
+            function cleanDesc(desc) { if (!desc) return ''; return desc.split('--- Specs ---')[0].trim(); }
 
-        const _origFetch = window.fetchProducts;
-        window.fetchProducts = async function (category) {
-            // Pass category explicitly so the default parameter in script.js works correctly
-            const result = typeof _origFetch === 'function' ? await _origFetch.call(this, category) : undefined;
-            setTimeout(reRenderSpecialCards, 300);
-            return result;
-        };
-
-        const _origOpen = window.openProductModal;
-        window.openProductModal = function (item) {
-            if (item && item.id) _itemCache[item.id] = item;
-            if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
-        };
-
-        function reRenderSpecialCards() { }
-
-    })();
-    </script>
-
-    <!-- ══════════════════════════════════════════════════════
-         CENTRALISED EVENT LISTENERS
-    ══════════════════════════════════════════════════════ -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('helpBtn').addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
-            document.getElementById('langToggleBtn').addEventListener('click', window.toggleLanguage);
-            document.getElementById('footerLangBtn').addEventListener('click', window.toggleLanguage);
-            document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
-            document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
-            document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
-            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
-            document.getElementById('sortSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
-            document.getElementById('locationSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
-            // Static filter buttons wired after dynamic categories are loaded
-            document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
-            // Load dynamic category filter buttons from Supabase
-            loadFilterCategories();
-            document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
-            document.getElementById('shareWhatsAppBtn').addEventListener('click', window.shareToWhatsApp);
-            document.getElementById('shareFacebookBtn').addEventListener('click', window.shareToFacebook);
-            document.getElementById('closeSupportModal').addEventListener('click', window.toggleSupportModal);
-            document.getElementById('supportModal').addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
-            document.getElementById('supportForm').addEventListener('submit', window.handleSupportSubmit);
-            document.getElementById('closeAuthModal').addEventListener('click', window.toggleModal);
-            document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
-            document.getElementById('authForm').addEventListener('submit', window.handleAuth);
-            document.getElementById('toggleAuthModeLink').addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
-            document.getElementById('closeProductModal').addEventListener('click', window.closeProductModal);
-            document.getElementById('productModal').addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
-            document.getElementById('callContact').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText); });
-            document.getElementById('telegramOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText); });
-            document.getElementById('whatsappOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText); });
-            document.getElementById('saveToWishlistBtn').addEventListener('click', function () { window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText); });
-            document.getElementById('sponsorLink').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText); });
-            document.getElementById('closeSuccessModal').addEventListener('click', function () { document.getElementById('successModal').style.display = 'none'; });
-            document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
-            document.getElementById('closeToastBtn').addEventListener('click', function (e) { e.stopPropagation(); closeToast(); });
-            document.addEventListener('click', function (event) {
-                const menu = document.getElementById('chatMenu');
-                const btn  = document.getElementById('chatToggleBtn');
-                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) menu.style.display = 'none';
-            });
-            checkPostStatus();
-            const urlParams = new URLSearchParams(window.location.search);
-            const utmSource = urlParams.get('utm_source');
-            if (utmSource && !sessionStorage.getItem('utm_logged')) {
-                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${urlParams.get('utm_campaign') || 'General'}`);
-                sessionStorage.setItem('utm_logged', 'true');
-            }
-            loadAdminStatus();
-            setInterval(loadAdminStatus, 120000);
-        });
-
-        function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
-        function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
-
-        // ── Dynamic Filter Bar from Supabase ─────────────────────
-        async function loadFilterCategories() {
-            const bar = document.getElementById('filterBar');
-            try {
-                const { data: cats, error } = await _supabase
-                    .from('categories')
-                    .select('id, name, amharic_name, icon')
-                    .order('sort_order', { ascending: true });
-
-                if (error || !cats || cats.length === 0) {
-                    // Fallback: hardcoded defaults so page never breaks
-                    _injectDefaultFilters(bar);
-                    return;
-                }
-
-                // Remove old dynamic buttons (keep All + Featured)
-                bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
-
-                cats.forEach(cat => {
-                    const iconHtml = cat.icon
-                        ? (cat.icon.startsWith('fa')
-                            ? `<i class="${cat.icon}" style="font-size:11px;"></i> `
-                            : `${cat.icon} `)
-                        : '';
-                    const btn = document.createElement('button');
-                    btn.className = 'filter-btn filter-btn-dynamic';
-                    btn.dataset.category = cat.name;
-                    btn.dataset.am = cat.amharic_name || cat.name;
-                    btn.innerHTML = iconHtml + cat.name;
-                    btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
-                    bar.appendChild(btn);
-                });
-
-                // Re-wire the All button too (always first)
-                bar.querySelector('[data-category="All"]').addEventListener('click', function () {
-                    window.filterCategory('All', this);
-                });
-
-            } catch (e) {
-                console.warn('Category load failed, using defaults:', e);
-                _injectDefaultFilters(bar);
-            }
-        }
-
-        function _injectDefaultFilters(bar) {
-            const defaults = [
-                { name: 'Electronics', am: 'ኤሌክትሮኒክስ' },
-                { name: 'Furniture',   am: 'የቤት ዕቃዎች' },
-                { name: 'Fashion',     am: 'አልባሳት' },
-                { name: 'Vehicles',    am: 'ተሽከርካሪዎች' },
-                { name: 'Property',    am: 'ንብረት' },
-                { name: 'Home Supplies', am: 'የቤት ቁሳቁሶች' },
-                { name: 'Services',    am: 'አገልግሎቶች' },
-                { name: 'Jobs',        am: 'ስራዎች' },
-            ];
-            bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
-            defaults.forEach(d => {
-                const btn = document.createElement('button');
-                btn.className = 'filter-btn filter-btn-dynamic';
-                btn.dataset.category = d.name;
-                btn.dataset.am = d.am;
-                btn.textContent = d.name;
-                btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
-                bar.appendChild(btn);
-            });
-        }
-
-        function checkPostStatus() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('posted')) {
-                document.getElementById('postedItemName').innerText = urlParams.get('item') || 'Listing';
-                document.getElementById('successModal').style.display = 'flex';
-                window.history.replaceState({}, document.title, 'index.html');
-            }
-        }
-
-        async function loadAdminStatus() {
-            if (typeof _supabase === 'undefined') return;
-            const { data, error } = await _supabase.from('profiles').select('last_seen').eq('is_owner', true).maybeSingle();
-            if (error) { console.error('Error fetching admin status:', error); return; }
-            if (data && data.last_seen) {
-                const diff = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
-                const dot = document.querySelector('.online-dot');
-                const label = document.querySelector('.chat-label');
-                if (!dot || !label) return;
-                if (diff < 5)       { dot.style.background = '#2ed573'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`; }
-                else if (diff < 60) { dot.style.background = '#f1c40f'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diff}m ago</small>`; }
-                else                { dot.style.background = '#ccc';    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`; }
-            }
-        }
-
-        window.logBuyerAction = async function (buyerEmail, actionDescription) {
-            try {
-                if (typeof _supabase === 'undefined') return;
-                let userEmail = buyerEmail;
-                if (!userEmail) {
-                    const { data: { user } } = await _supabase.auth.getUser();
-                    userEmail = user ? (user.email || user.user_metadata?.full_name || 'Logged-In User') : 'Guest/Unknown';
-                }
-                await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
-            } catch (err) { console.log('Audit log recording skipped:', err); }
-        };
-
-
-
-
-
-
-        // ══════════════════════════════════════════════
-        // PASSWORD RECOVERY HANDLER
-        // Intercepts Supabase reset links (type=recovery in URL hash)
-        // and shows a Set New Password modal directly on this page.
-        // ══════════════════════════════════════════════
-        (async function handleRecovery() {
-            const params = new URLSearchParams(window.location.hash.replace('#', '?'));
-            if (params.get('type') !== 'recovery') return;
-
-            // Clear the hash so it looks clean
-            history.replaceState(null, '', window.location.pathname);
-
-            // Get the active recovery session Supabase injected via the link
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) return;
-
-            const userEmail = session.user.email;
-            const savedPwd = sessionStorage.getItem('wg_gen_pwd');
-
-            if (savedPwd) {
-                // Admin pre-generated a password — apply it automatically
-                const { error } = await _supabase.auth.updateUser({ password: savedPwd });
-                sessionStorage.removeItem('wg_gen_pwd');
-                if (!error) {
-                    showRecoverySuccessModal(userEmail, savedPwd);
-                } else {
-                    showSetPasswordModal(userEmail, 'Auto-apply failed. Please set a new password manually.');
-                }
-            } else {
-                // No pre-generated password — show manual entry form
-                showSetPasswordModal(userEmail, '');
-            }
+            // Expose globally to window object framework
+            window.openProductDetailsSafe = function(base64Str) {
+                try {
+                    const item = JSON.parse(decodeURIComponent(escape(atob(base64Str))));
+                    if (window.openProductModal) window.openProductModal(item);
+                } catch(e) { console.error("Details decoding fault:", e); }
+            };
         })();
-
-        function showSetPasswordModal(email, errorMsg) {
-            const existing = document.getElementById('recoveryModal');
-            if (existing) existing.remove();
-
-            const modal = document.createElement('div');
-            modal.id = 'recoveryModal';
-            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
-                    <div style="font-size:2.5rem;margin-bottom:10px;">&#128272;</div>
-                    <h2 style="margin:0 0 6px;color:#333;">Set New Password</h2>
-                    <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Account: <strong>${email}</strong></p>
-                    ${errorMsg ? `<p style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;">${errorMsg}</p>` : ''}
-                    <input type="password" id="recPwdInput" placeholder="New password (min 6 chars)"
-                        style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:10px;"
-                        oninput="this.style.borderColor='#6c5ce7'"/>
-                    <input type="password" id="recPwdConfirm" placeholder="Confirm new password"
-                        style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:8px;"
-                        oninput="this.style.borderColor='#6c5ce7'"/>
-                    <p id="recPwdError" style="color:#ff4757;font-size:0.8rem;min-height:18px;margin-bottom:14px;"></p>
-                    <button onclick="applyRecoveryPassword()"
-                        style="width:100%;background:#6c5ce7;color:white;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
-                        &#10003; Update Password
-                    </button>
-                </div>`;
-            document.body.appendChild(modal);
-            setTimeout(() => document.getElementById('recPwdInput')?.focus(), 100);
-        }
-
-        window.applyRecoveryPassword = async () => {
-            const pwd = document.getElementById('recPwdInput').value;
-            const conf = document.getElementById('recPwdConfirm').value;
-            const errEl = document.getElementById('recPwdError');
-            if (pwd.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
-            if (pwd !== conf)   { errEl.textContent = 'Passwords do not match.'; return; }
-            errEl.textContent = '';
-            const btn = document.querySelector('#recoveryModal button');
-            btn.textContent = 'Updating...'; btn.disabled = true;
-            const { error } = await _supabase.auth.updateUser({ password: pwd });
-            if (error) {
-                errEl.textContent = 'Error: ' + error.message;
-                btn.textContent = '✓ Update Password'; btn.disabled = false;
-            } else {
-                document.getElementById('recoveryModal').remove();
-                await _supabase.auth.signOut();
-                showToast('Password updated! Please sign in with your new password.', 'success');
-            }
-        };
-
-        function showRecoverySuccessModal(email, password) {
-            const existing = document.getElementById('recoveryModal');
-            if (existing) existing.remove();
-            const modal = document.createElement('div');
-            modal.id = 'recoveryModal';
-            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
-                    <div style="font-size:3rem;margin-bottom:10px;color:#2ed573;">&#10003;</div>
-                    <h2 style="margin:0 0 6px;color:#333;">Password Updated!</h2>
-                    <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Account: <strong>${email}</strong></p>
-                    <div style="background:#f4f7f6;border:2px dashed #2ed573;border-radius:10px;padding:18px;margin-bottom:20px;">
-                        <p style="font-size:0.8rem;color:#888;margin:0 0 6px;">Your new password:</p>
-                        <code style="font-size:1.3rem;font-weight:bold;color:#2d3436;letter-spacing:2px;">${password}</code>
-                    </div>
-                    <button onclick="navigator.clipboard.writeText('${password}').then(()=>{this.textContent='Copied!';this.style.background='#2ed573';})"
-                        style="width:100%;background:#6c5ce7;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
-                        Copy Password
-                    </button>
-                    <button onclick="document.getElementById('recoveryModal').remove(); _supabase.auth.signOut();"
-                        style="width:100%;background:#eee;color:#333;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;">
-                        Done — Sign In Now
-                    </button>
-                </div>`;
-            document.body.appendChild(modal);
-        }
-
-        function showToast(message, type) {
-            let toast = document.getElementById('recoveryToast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'recoveryToast';
-                document.body.appendChild(toast);
-            }
-            toast.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:${type==='success'?'#2ed573':'#ff4757'};color:white;padding:14px 28px;border-radius:12px;font-weight:700;font-size:1rem;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 0.4s;`;
-            toast.textContent = message;
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 4000);
-        }
-
-        // ── FORGOT PASSWORD link handler (inside Sign In modal) ──
-        document.addEventListener('DOMContentLoaded', function () {
-            const forgotLink = document.getElementById('forgotPwdLink');
-            if (!forgotLink) return;
-            forgotLink.addEventListener('click', async function (e) {
-                e.preventDefault();
-                const email = document.getElementById('authEmail').value.trim();
-                if (!email) {
-                    alert('Please enter your email address in the field above first.');
-                    document.getElementById('authEmail').focus();
-                    return;
-                }
-                this.textContent = 'Sending...';
-                const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.href.split('#')[0]
-                });
-                if (error) {
-                    this.textContent = 'Forgot Password?';
-                    alert('Error: ' + error.message);
-                } else {
-                    this.textContent = 'Forgot Password?';
-                    if (window.toggleModal) window.toggleModal();
-                    showToast('Reset email sent! Check your inbox.', 'success');
-                }
-            });
-        });
-        
     </script>
- 
 </body>
 </html>
