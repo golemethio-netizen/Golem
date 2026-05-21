@@ -369,11 +369,32 @@
             }
 
             grid.innerHTML = items.map(item => {
+                const isJob     = item.category === 'Jobs';
+                const isService = item.category === 'Services';
+
                 const reasonNote = item.rejection_reason && item.status === 'rejected' ? 
                     `<div style="background: #fff0f0; border-left: 3px solid #ff4757; padding: 8px; margin-top: 10px; border-radius: 4px;">
                         <span style="color: #ff4757; font-size: 0.8rem; font-weight: bold;">REASON FOR REJECTION:</span>
                         <p style="color: #d63031; font-size: 0.85rem; margin: 2px 0 0 0;">${item.rejection_reason}</p>
                     </div>` : '';
+
+                // Price line: salary for jobs, rate for services, price for products
+                const priceHtml = isJob
+                    ? `<p class="product-price" style="color:#0088cc;">${item.price ? item.price.toLocaleString() + ' ETB/mo' : 'Salary: Negotiable'}</p>`
+                    : isService
+                        ? `<p class="product-price" style="color:#00b894;">${item.price ? item.price.toLocaleString() + ' ETB' : 'Rate: Negotiable'}</p>`
+                        : `<p class="product-price">${item.price ? item.price.toLocaleString() + ' ETB' : 'Negotiable'}</p>`;
+
+                // Availability badge — only stock badge for products
+                const badgeHtml = isJob
+                    ? `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8f4ff;border:1px solid #0088cc;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#0088cc;margin-bottom:6px;">
+                           <i class="fas fa-briefcase"></i> OPEN VACANCY
+                       </div>`
+                    : isService
+                        ? `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #00b894;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#00b894;margin-bottom:6px;">
+                               <i class="fas fa-concierge-bell"></i> AVAILABLE NOW
+                           </div>`
+                        : getStockBadge(item.stock_status, item.quantity);
 
                 return `
                     <div class="product-card" id="item-${item.id}">
@@ -386,8 +407,8 @@
                         
                         <div class="product-info">
                             <h3 class="product-title">${item.name}</h3>
-                            <p class="product-price">${item.price ? item.price.toLocaleString() + ' ETB' : 'Negotiable'}</p>
-                            ${getStockBadge(item.stock_status, item.quantity)}
+                            ${priceHtml}
+                            ${badgeHtml}
                             ${reasonNote}
                             
                             <div class="action-buttons">
@@ -415,7 +436,9 @@
         }
 
         function getStockBadge(stockStatus, quantity) {
-            if (!stockStatus || stockStatus === 'in_stock') {
+            // Never show a stock badge if there's no stock_status (Jobs / Services)
+            if (!stockStatus) return '';
+            if (stockStatus === 'in_stock') {
                 const qtyText = quantity ? ` · ${quantity} left` : '';
                 return `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#00b894;margin-bottom:6px;">
                     <i class="fas fa-check-circle"></i> In Stock${qtyText}
