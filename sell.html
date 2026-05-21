@@ -190,6 +190,32 @@
                     </div>
                 </div>
 
+                <!-- STOCK MANAGEMENT -->
+                <div style="background:#f8f9ff;border:1.5px solid #d0d0ff;border-radius:12px;padding:16px;margin-bottom:15px;">
+                    <div style="font-weight:700;color:#6c5ce7;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> Stock Management</div>
+                    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                        <!-- Stock Status -->
+                        <div class="input-group-sell" style="flex:1;min-width:140px;margin:0;">
+                            <label style="font-size:0.82rem;"><i class="fas fa-toggle-on"></i> Stock Status</label>
+                            <select id="prodStockStatus" onchange="toggleSellQtyField(this.value)"
+                                style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;">
+                                <option value="in_stock">✅ In Stock</option>
+                                <option value="out_of_stock">❌ Out of Stock</option>
+                                <option value="limited">⚠️ Limited Stock</option>
+                            </select>
+                        </div>
+                        <!-- Quantity -->
+                        <div class="input-group-sell" id="sellQtyWrapper" style="flex:1;min-width:120px;margin:0;">
+                            <label style="font-size:0.82rem;"><i class="fas fa-hashtag"></i> Quantity Available</label>
+                            <input type="number" id="prodQuantity" min="0" placeholder="e.g. 10"
+                                style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div id="sellStockPreview" style="margin-top:10px;font-size:0.8rem;color:#00b894;font-weight:700;">
+                        <i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.
+                    </div>
+                </div>
+
                 <!-- Category -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-list"></i> Category</label>
@@ -827,6 +853,9 @@ function handleRegionChange(region) {
             const district = document.getElementById('prodDistrict').value;
            const locationStr = district ? `${district}, ${region}` : region;
 
+            const stockStatus = document.getElementById('prodStockStatus').value;
+            const qtyVal = document.getElementById('prodQuantity').value;
+
             const { error: dbError } = await _supabase.from('products').insert([{
                 user_id: user.id,
                 name: document.getElementById('prodName').value,
@@ -837,6 +866,8 @@ function handleRegionChange(region) {
                 location: locationStr,
                 image: publicUrl,
                 seller_phone: document.getElementById('prodPhone').value,
+                stock_status: stockStatus,
+                quantity: qtyVal ? parseInt(qtyVal) : null,
                 status: 'pending'
             }]);
 
@@ -856,6 +887,28 @@ function handleRegionChange(region) {
         document.getElementById('districtWrapper').style.display =
             (region === 'Addis Ababa') ? 'block' : 'none';
     };
+
+    function toggleSellQtyField(val) {
+        const wrapper = document.getElementById('sellQtyWrapper');
+        const preview = document.getElementById('sellStockPreview');
+        if (val === 'out_of_stock') {
+            wrapper.style.opacity = '0.4';
+            wrapper.style.pointerEvents = 'none';
+            document.getElementById('prodQuantity').value = '';
+            preview.style.color = '#ff4757';
+            preview.innerHTML = '<i class="fas fa-times-circle"></i> Item will show as Out of Stock to buyers.';
+        } else if (val === 'limited') {
+            wrapper.style.opacity = '1';
+            wrapper.style.pointerEvents = 'all';
+            preview.style.color = '#e67e22';
+            preview.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Enter remaining quantity above — buyers will see a urgency badge.';
+        } else {
+            wrapper.style.opacity = '1';
+            wrapper.style.pointerEvents = 'all';
+            preview.style.color = '#00b894';
+            preview.innerHTML = '<i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.';
+        }
+    }
     </script>
 </body>
 </html>
