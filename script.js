@@ -1,6 +1,7 @@
 // --- 1. INITIALIZATION & GLOBAL STATE ---
 let currentProduct = null;
-window.currentCategory = 'All';
+window.currentCategory    = 'All';
+window.currentSubcategory = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 WanaGebya System Initializing...");
@@ -33,6 +34,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.fetchProducts = async (category) => {
     // Guard: if called with no/undefined arg (e.g. from sort/location change), use currentCategory
     if (!category || category === 'undefined') category = window.currentCategory || 'All';
+
+    // If a subcategory is active, delegate to subcategory fetcher
+    if (window.currentSubcategory && category !== 'All') {
+        return window.fetchProductsBySubcat(category, window.currentSubcategory);
+    }
     const grid = document.getElementById('productGrid');
     if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
@@ -409,10 +415,39 @@ window.loadSponsor = async () => {
 };
 
 window.filterCategory = (category, button) => {
-    window.currentCategory = category;
+    window.currentCategory    = category;
+    window.currentSubcategory = null; // reset subcategory when switching category
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     window.fetchProducts(category);
+};
+
+// Filter by both category AND subcategory
+window.fetchProductsBySubcat = async (category, subcategory) => {
+    const grid = document.getElementById('productGrid');
+    if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
+
+    window.currentSubcategory = subcategory;
+
+    const sortOrder     = document.getElementById('sortSelect')?.value     || 'newest';
+    const locationFilter = document.getElementById('locationSelect')?.value || 'all';
+
+    let query = _supabase
+        .from('products')
+        .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+        .eq('status', 'approved')
+        .eq('category', category)
+        .eq('subcategory', subcategory);
+
+    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+
+    if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
+    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+    else                                 query = query.order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+    if (!error) renderProducts(data);
+    else console.error('Subcategory fetch error:', error.message);
 };
 
 function filterSearch(term) {
