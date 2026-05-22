@@ -302,7 +302,7 @@ body {
     transition: var(--transition);
 }
 .wishlist-btn i { color: #888; font-size: 1rem; }
-.wishlist-btn.active i, .wishlist-btn:hover i { color: #ff4757; }
+.wishlist-btn.active i, .wishlist-btn:hover i { color: var(--primary-color, #007bff); }
 
 .product-info {
     padding: 14px;
