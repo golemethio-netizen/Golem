@@ -260,6 +260,35 @@
         }
         .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #ff4757; }
 
+        /* ── Subcategory filter row ── */
+        #subcatBar {
+            display: none;
+            background: #f8fafc;
+            border-bottom: 1px solid #e8f0fe;
+            padding: 0 0 0 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        #subcatBar::-webkit-scrollbar { display: none; }
+        .subcat-bar-inner {
+            display: flex;
+            gap: 7px;
+            padding: 8px 16px;
+            min-width: max-content;
+        }
+        .subcat-filter-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 14px; border-radius: 20px;
+            border: 1.5px solid #d1c4e9;
+            background: white; color: #6c5ce7;
+            font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            white-space: nowrap; transition: all 0.18s;
+        }
+        .subcat-filter-btn:hover { background: #f3f0ff; border-color: #6c5ce7; }
+        .subcat-filter-btn.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
+
         /* ═══════════════════════════════════════════════════════
            SERVICE CARD — Purple theme
         ═══════════════════════════════════════════════════════ */
@@ -624,6 +653,11 @@
             <!-- Dynamic categories injected here by loadFilterCategories() -->
         </div>
     </section>
+
+    <!-- Subcategory row — shown when a category with subcategories is active -->
+    <div id="subcatBar">
+        <div class="subcat-bar-inner" id="subcatBarInner"></div>
+    </div>
 
     <!-- ======================= MAIN GRID ======================= -->
     <main class="container">
@@ -1141,48 +1175,114 @@
         function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
         function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
 
-        // ── Dynamic Filter Bar from Supabase ─────────────────────
+        // ── Dynamic Filter Bar + Subcategory Row ─────────────────
+        let _catData = []; // full category+subcategory cache
+
         async function loadFilterCategories() {
             const bar = document.getElementById('filterBar');
+
+            // Wait for _supabase to be ready (config.js might still be parsing)
+            if (typeof _supabase === 'undefined') {
+                setTimeout(loadFilterCategories, 150);
+                return;
+            }
+
             try {
                 const { data: cats, error } = await _supabase
                     .from('categories')
-                    .select('id, name, amharic_name, icon')
+                    .select('id, name, amharic_name, icon, subcategories(id, name, amharic_name)')
                     .order('sort_order', { ascending: true });
 
                 if (error || !cats || cats.length === 0) {
-                    // Fallback: hardcoded defaults so page never breaks
                     _injectDefaultFilters(bar);
                     return;
                 }
+
+                _catData = cats;
 
                 // Remove old dynamic buttons (keep All + Featured)
                 bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
 
                 cats.forEach(cat => {
+                    // Icon: emoji rendered as-is, FA class rendered as <i>
                     const iconHtml = cat.icon
-                        ? (cat.icon.startsWith('fa')
-                            ? `<i class="${cat.icon}" style="font-size:11px;"></i> `
-                            : `${cat.icon} `)
+                        ? (cat.icon.trim().startsWith('fa')
+                            ? `<i class="${cat.icon.trim()}" style="font-size:11px;"></i> `
+                            : `${cat.icon.trim()} `)
                         : '';
+
                     const btn = document.createElement('button');
                     btn.className = 'filter-btn filter-btn-dynamic';
                     btn.dataset.category = cat.name;
-                    btn.dataset.am = cat.amharic_name || cat.name;
-                    btn.innerHTML = iconHtml + cat.name;
-                    btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
+                    btn.dataset.catId    = cat.id;
+                    btn.dataset.am       = cat.amharic_name || cat.name;
+                    btn.innerHTML        = iconHtml + cat.name;
+                    btn.addEventListener('click', function () {
+                        window.filterCategory(this.dataset.category, this);
+                        showSubcatBar(cat);
+                    });
                     bar.appendChild(btn);
                 });
 
-                // Re-wire the All button too (always first)
+                // Re-wire All button — hides subcategory bar
                 bar.querySelector('[data-category="All"]').addEventListener('click', function () {
                     window.filterCategory('All', this);
+                    hideSubcatBar();
                 });
 
             } catch (e) {
                 console.warn('Category load failed, using defaults:', e);
                 _injectDefaultFilters(bar);
             }
+        }
+
+        // ── Subcategory bar ───────────────────────────────────────
+        function showSubcatBar(cat) {
+            const bar    = document.getElementById('subcatBar');
+            const inner  = document.getElementById('subcatBarInner');
+            const subs   = cat.subcategories || [];
+
+            if (subs.length === 0) {
+                bar.style.display = 'none';
+                inner.innerHTML   = '';
+                return;
+            }
+
+            inner.innerHTML = '';
+
+            // "All [CategoryName]" resets subcategory filter
+            const allBtn = document.createElement('button');
+            allBtn.className = 'subcat-filter-btn active';
+            allBtn.textContent = 'All ' + cat.name;
+            allBtn.addEventListener('click', function () {
+                document.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                window.currentSubcategory = null;
+                window.fetchProducts(window.currentCategory);
+            });
+            inner.appendChild(allBtn);
+
+            subs.forEach(sub => {
+                const btn = document.createElement('button');
+                btn.className = 'subcat-filter-btn';
+                btn.textContent = sub.name;
+                btn.dataset.subcat = sub.name;
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    window.currentSubcategory = sub.name;
+                    window.fetchProductsBySubcat(window.currentCategory, sub.name);
+                });
+                inner.appendChild(btn);
+            });
+
+            bar.style.display = 'block';
+        }
+
+        function hideSubcatBar() {
+            document.getElementById('subcatBar').style.display = 'none';
+            document.getElementById('subcatBarInner').innerHTML = '';
+            window.currentSubcategory = null;
         }
 
         function _injectDefaultFilters(bar) {
@@ -1203,7 +1303,10 @@
                 btn.dataset.category = d.name;
                 btn.dataset.am = d.am;
                 btn.textContent = d.name;
-                btn.addEventListener('click', function () { window.filterCategory(this.dataset.category, this); });
+                btn.addEventListener('click', function () {
+                    window.filterCategory(this.dataset.category, this);
+                    hideSubcatBar();
+                });
                 bar.appendChild(btn);
             });
         }
