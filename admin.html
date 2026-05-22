@@ -1233,23 +1233,36 @@ window.approveProduct = async (productId, productDetails) => {
         };
 
         // ── Add Category ───────────────────────────────────
-        window.adminAddCategory = async () => {
-            const name    = document.getElementById('newCatName').value.trim();
-            const icon    = document.getElementById('newCatIcon').value.trim();
-            const amharic = document.getElementById('newCatAmharic').value.trim();
-            if (!name) { flashField('newCatName', 'Enter a name'); return; }
-            const { error } = await _supabase.from('categories').insert({
-                name, icon: icon || null, amharic_name: amharic || null,
-                sort_order: _adminCats.length + 1
-            });
-            if (error) { alert('Error: ' + error.message); return; }
-            logAction('Category Added', `"${name}"`);
-            document.getElementById('newCatName').value = '';
-            document.getElementById('newCatIcon').value = '';
-            document.getElementById('newCatAmharic').value = '';
-            catToast('Category added!', '#2e7d32');
-            loadAdminCategories();
-        };
+   async function adminAddCategory() {
+    const name = document.getElementById('newCatName').value.trim();
+    const icon = document.getElementById('newCatIcon').value.trim();
+    const amharic = document.getElementById('newCatAmharic').value.trim();
+
+    if (!name) {
+        alert('Category Name is required.');
+        return;
+    }
+
+    // Explicitly target your supabase client context instance
+    const { data, error } = await _supabase
+        .from('categories')
+        .insert([
+            { 
+                name: name, 
+                icon: icon || null, 
+                amharic_name: amharic || null 
+            }
+        ]);
+
+    if (error) {
+        console.error(error);
+        alert('Error: ' + error.message);
+        return;
+    }
+
+    alert('Category added successfully!');
+    loadAdminCategories(); // Reload layout view
+}
 
         // ── Add Subcategory ────────────────────────────────
         window.adminAddSubcategory = async () => {
