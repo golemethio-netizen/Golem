@@ -125,9 +125,9 @@ window.addToCartFromModal = function() {
         saved.push(currentProduct.id);
         localStorage.setItem('golem_saved', JSON.stringify(saved));
         window.updateCartBadge();
-        alert("❤️ Added to your Wishlist!");
+        alert("🛒 Added to your Cart!");
     } else {
-        alert("This item is already in your Wishlist!");
+        alert("This item is already in your Cart!");
     }
 };
 
@@ -189,7 +189,7 @@ function renderProducts(products) {
             <div class="job-card" onclick="window.openProductDetailsSafe('${safeData}')">
                 <button class="job-wishlist-btn ${isSaved ? 'active' : ''}"
                     onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
-                    <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                    <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
                 </button>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
@@ -265,7 +265,7 @@ function renderProducts(products) {
                     ${exp ? `<span class="service-rating"><i class="fas fa-star"></i>${exp}</span>` : ''}
                     <button class="service-wishlist-btn ${isSaved ? 'active' : ''}"
                         onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
-                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                        <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
                     </button>
                 </div>
 
@@ -325,7 +325,7 @@ function renderProducts(products) {
                 ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                 ${statusBadge}
                 <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
-                    <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                    <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
                 </button>
                 <img src="${p.image}" alt="${p.name}" loading="lazy"
                     style="cursor:pointer; width:100%; display:block;"
@@ -689,7 +689,7 @@ window.openProductModal = async (product) => {
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
                     <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
                     <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#6c5ce7; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-heart"></i> Save to Wishlist</button>
+                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#6c5ce7; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                 </div>
             </div>`;
     }
