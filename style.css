@@ -372,6 +372,126 @@ body {
     border-color: var(--primary-color);
 }
 
+/* ── Subcategory hover dropdown (index.html) ── */
+#subcatDropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 600;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 10px 12px;
+    min-width: 200px;
+    max-width: 360px;
+}
+#subcatDropdown.visible { display: block; }
+
+#subcatDropdownInner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Arrow tip — matches filter bar border color */
+#subcatDropdown::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: var(--arrow-left, 22px);
+    width: 13px;
+    height: 13px;
+    background: white;
+    border-left: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    transform: rotate(45deg);
+}
+
+/* Subcategory chips — match .filter-btn exactly */
+.subcat-filter-btn,
+.sell-subcat-chip {
+    padding: 7px 16px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.82rem;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+/* Hover — same blue as .filter-btn */
+.subcat-filter-btn:hover,
+.sell-subcat-chip:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Active — solid blue */
+.subcat-filter-btn.active,
+.sell-subcat-chip.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Emoji inside chip */
+.subcat-filter-btn .chip-emoji,
+.sell-subcat-chip .chip-emoji {
+    font-size: 1em;
+    line-height: 1;
+}
+
+/* Category button chevron hint */
+.filter-btn-dynamic .fa-chevron-down {
+    font-size: 7px;
+    opacity: 0.5;
+    margin-left: 2px;
+    transition: transform 0.2s;
+}
+.filter-btn-dynamic:hover .fa-chevron-down,
+.filter-btn-dynamic.active .fa-chevron-down {
+    opacity: 1;
+    transform: rotate(180deg);
+}
+
+/* Mobile ≤640px: dropdown becomes inline strip */
+@media (max-width: 640px) {
+    #subcatDropdown {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        box-shadow: none;
+        padding: 6px 2%;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    #subcatDropdown::before { display: none; }
+    #subcatDropdownInner {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 7px;
+        padding-bottom: 2px;
+    }
+    #subcatDropdownInner::-webkit-scrollbar { display: none; }
+    .subcat-filter-btn { font-size: 0.78rem; padding: 6px 13px; }
+}
+
 /* Sort & Location selects */
 .sort-container select,
 .location-filter-container select {
