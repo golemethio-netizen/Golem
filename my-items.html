@@ -78,6 +78,17 @@
         .input-group-sell { margin-bottom: 15px; width: 100%; }
         .input-group-sell label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
         .input-group-sell input, .input-group-sell select, .input-group-sell textarea {
+
+        /* Subcategory chips */
+        .sell-subcat-chip {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:6px 14px; border-radius:20px;
+            border:1.5px solid #d1c4e9; background:white; color:#6c5ce7;
+            font-size:0.8rem; font-weight:600; cursor:pointer;
+            font-family:inherit; transition:all 0.15s; white-space:nowrap;
+        }
+        .sell-subcat-chip:hover  { background:#f3f0ff; border-color:#6c5ce7; }
+        .sell-subcat-chip.active { background:#6c5ce7; color:white; border-color:#6c5ce7; }
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem; box-sizing: border-box;
         }
     </style>
@@ -148,17 +159,16 @@
                     <!-- Category (triggers form reshape) -->
                     <div class="input-group-sell">
                         <label><i class="fas fa-list"></i> Category</label>
-                        <select id="editCategory" required onchange="reshapeEditForm(this.value)">
-                            <option value="Electronics">Electronics</option>
-                            <option value="Furniture">Furniture</option>
-                            <option value="Fashion">Fashion</option>
-                            <option value="Vehicles">Vehicles</option>
-                            <option value="Property">Property</option>
-                            <option value="Home Supplies">Home Supplies</option>
-                            <option value="Services">Services</option>
-                            <option value="Jobs">Jobs</option>
-                            <option value="Other">Other</option>
+                        <select id="editCategory" required onchange="reshapeEditForm(this.value); loadEditSubcategories(this.value);">
+                            <option value="" disabled>Loading…</option>
                         </select>
+                    </div>
+
+                    <!-- Subcategory chips (shown when category has subcategories) -->
+                    <div class="input-group-sell" id="editSubCatWrapper" style="display:none;">
+                        <label><i class="fas fa-sitemap"></i> Subcategory <span style="font-weight:400;color:#aaa;font-size:0.78rem;">(optional)</span></label>
+                        <input type="hidden" id="editSubcategory" value="">
+                        <div id="editSubCatChips" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;"></div>
                     </div>
 
                     <!-- PRODUCT FIELDS (hidden for Jobs/Services) -->
@@ -347,7 +357,76 @@
                 return;
             }
             loadMyItems(user.id);
+            loadEditCategories(); // load dynamic cats for edit modal
         });
+
+        // ── Dynamic categories for edit modal ─────────────────────
+        let _editCats = [];
+
+        async function loadEditCategories() {
+            const sel = document.getElementById('editCategory');
+            try {
+                const { data: cats, error } = await _supabase
+                    .from('categories')
+                    .select('id, name, subcategories(id, name)')
+                    .order('sort_order', { ascending: true });
+
+                if (error || !cats || cats.length === 0) {
+                    _injectDefaultEditCats(sel); return;
+                }
+                _editCats = cats;
+                sel.innerHTML = '';
+                cats.forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
+                sel.innerHTML += '<option value="Other">Other</option>';
+            } catch(e) {
+                _injectDefaultEditCats(sel);
+            }
+        }
+
+        function _injectDefaultEditCats(sel) {
+            sel.innerHTML = `
+                <option value="Electronics">Electronics</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Vehicles">Vehicles</option>
+                <option value="Property">Property</option>
+                <option value="Home Supplies">Home Supplies</option>
+                <option value="Services">Services</option>
+                <option value="Jobs">Jobs</option>
+                <option value="Other">Other</option>`;
+        }
+
+        function loadEditSubcategories(catName, selectedSub) {
+            const cat     = _editCats.find(c => c.name === catName);
+            const wrapper = document.getElementById('editSubCatWrapper');
+            const chips   = document.getElementById('editSubCatChips');
+            const hidden  = document.getElementById('editSubcategory');
+            const subs    = cat?.subcategories || [];
+
+            hidden.value   = selectedSub || '';
+            chips.innerHTML = '';
+
+            if (subs.length === 0) { wrapper.style.display = 'none'; return; }
+
+            subs.forEach(sub => {
+                const chip = document.createElement('button');
+                chip.type      = 'button';
+                chip.className = 'sell-subcat-chip' + (sub.name === selectedSub ? ' active' : '');
+                chip.textContent = sub.name;
+                chip.addEventListener('click', function () {
+                    chips.querySelectorAll('.sell-subcat-chip').forEach(c => c.classList.remove('active'));
+                    if (hidden.value === sub.name) {
+                        hidden.value = '';
+                    } else {
+                        this.classList.add('active');
+                        hidden.value = sub.name;
+                    }
+                });
+                chips.appendChild(chip);
+            });
+
+            wrapper.style.display = 'block';
+        }
 
         async function loadMyItems(userId) {
             const grid = document.getElementById('myItemsGrid');
@@ -407,6 +486,7 @@
                         
                         <div class="product-info">
                             <h3 class="product-title">${item.name}</h3>
+                            ${item.subcategory ? `<p style="font-size:0.75rem;color:#6c5ce7;font-weight:600;margin:2px 0 4px;"><i class="fas fa-sitemap" style="font-size:10px;"></i> ${item.subcategory}</p>` : ''}
                             ${priceHtml}
                             ${badgeHtml}
                             ${reasonNote}
@@ -553,6 +633,8 @@
             // Set category first — this reshapes the form
             document.getElementById('editCategory').value = item.category || 'Other';
             reshapeEditForm(item.category || 'Other');
+            // Load subcategory chips and pre-select saved value
+            loadEditSubcategories(item.category || 'Other', item.subcategory || '');
 
             const isJob = item.category === 'Jobs';
             const isService = item.category === 'Services';
@@ -700,6 +782,7 @@
                 let updatedData = {
                     name: document.getElementById('editName').value,
                     category: cat,
+                    subcategory: document.getElementById('editSubcategory')?.value || null,
                     description: document.getElementById('editDesc').value,
                     seller_phone: document.getElementById('editPhone').value,
                     location: finalLocation,
