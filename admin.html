@@ -1152,13 +1152,52 @@ window.approveProduct = async (productId, productDetails) => {
             return data || [];
         }
 
-        async function loadAdminCategories() {
-            document.getElementById('adminCatList').innerHTML =
-                '<p style="color:#bbb;text-align:center;padding:30px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
-            _adminCats = await fetchAdminCats();
-            populateParentSelect();
-            renderAdminCatList(_adminCats);
-        }
+  // Add this helper snippet inside your script tags if not already present
+function renderCategoryIcon(iconString) {
+    if (!iconString) return `<span class="cat-panel-icon native-emoji">📁</span>`;
+    
+    // Check if it contains 'fa-' which implies a Font Awesome class string (e.g., 'fas fa-baby')
+    if (iconString.includes('fa-')) {
+        return `<i class="${iconString} cat-panel-icon"></i>`;
+    }
+    
+    // Otherwise, treat it as a pure text character emoji element
+    return `<span class="cat-panel-icon native-emoji">${iconString}</span>`;
+}
+
+// Inside your loadAdminCategories() or list generator function:
+// Replace the old layout structure where it rendered cat.icon with this logic:
+async function loadAdminCategories() {
+    const listContainer = document.getElementById('adminCatList');
+    // ... your current database query code ...
+    const { data: categories, error } = await _supabase.from('categories').select('*').order('name');
+    
+    if (error) {
+        listContainer.innerHTML = '<p style="color:#ff4757; text-align:center;">Error loading categories.</p>';
+        return;
+    }
+    
+    listContainer.innerHTML = categories.map(cat => {
+        return `
+            <div class="cat-panel" id="cat-panel-${cat.id}">
+                <div class="cat-panel-head" onclick="toggleCatPanel('${cat.id}')">
+                    ${renderCategoryIcon(cat.icon)}
+                    
+                    <span class="cat-panel-title">
+                        ${cat.name} 
+                        ${cat.amharic_name ? `<span class="cat-panel-am">(${cat.amharic_name})</span>` : ''}
+                    </span>
+                    <i class="fas fa-chevron-down cat-panel-chevron" id="chevron-${cat.id}"></i>
+                </div>
+                <div id="sub-wrap-${cat.id}" style="display:none;">
+                    </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Update your dropdown menu elements if necessary
+    updateParentCategoryDropdown(categories);
+}
 
         function populateParentSelect() {
             const sel = document.getElementById('subCatParent');
@@ -1392,18 +1431,7 @@ window.approveProduct = async (productId, productDetails) => {
         }
 
 
-// Helper to decide if the value is an explicit CSS class names list or an emoji character string
-function renderCategoryIcon(iconString) {
-    if (!iconString) return `<span class="cat-panel-icon native-emoji">📁</span>`;
-    
-    // Check if it contains 'fa-' which implies a Font Awesome class string (e.g., 'fas fa-baby')
-    if (iconString.includes('fa-')) {
-        return `<i class="${iconString} cat-panel-icon"></i>`;
-    }
-    
-    // Otherwise, treat it as a pure emoji text character
-    return `<span class="cat-panel-icon native-emoji">${iconString}</span>`;
-}
+
         
     </script>
 </body>
