@@ -14,6 +14,19 @@
         .input-group-sell input,
         .input-group-sell select,
         .input-group-sell textarea {
+
+        /* ── Subcategory chip selector ── */
+        .sell-subcat-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1.5px solid #d1c4e9;
+            background: white; color: #6c5ce7;
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .sell-subcat-chip:hover  { background: #f3f0ff; border-color: #6c5ce7; }
+        .sell-subcat-chip.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
             width: 100%; padding: 12px; border: 1px solid #ddd;
             border-radius: 8px; font-family: inherit; font-size: 1rem;
         }
@@ -224,12 +237,11 @@
                     </select>
                 </div>
 
-                <!-- Subcategory (shown when category has subcategories) -->
+                <!-- Subcategory chips (shown when category has subcategories) -->
                 <div class="input-group-sell" id="subCatWrapper" style="display:none;">
-                    <label><i class="fas fa-sitemap"></i> Subcategory</label>
-                    <select id="prodSubcategory">
-                        <option value="">— Select subcategory (optional) —</option>
-                    </select>
+                    <label><i class="fas fa-sitemap"></i> Subcategory <span style="font-weight:400;color:#aaa;font-size:0.78rem;">(optional)</span></label>
+                    <input type="hidden" id="prodSubcategory" value="">
+                    <div id="subCatChips" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;"></div>
                 </div>
 
                 <!-- ── Dynamic Spec Fields ── -->
@@ -748,17 +760,37 @@
     }
 
     function loadSubcategories(catName) {
-        const cat = _sellCats.find(c => c.name === catName);
+        const cat     = _sellCats.find(c => c.name === catName);
         const wrapper = document.getElementById('subCatWrapper');
-        const subSel  = document.getElementById('prodSubcategory');
-        const subs = cat?.subcategories || [];
-        if (subs.length === 0) {
-            wrapper.style.display = 'none';
-            subSel.innerHTML = '';
-            return;
-        }
-        subSel.innerHTML = '<option value="">— Select subcategory (optional) —</option>';
-        subs.forEach(s => { subSel.innerHTML += `<option value="${s.name}">${s.name}</option>`; });
+        const chips   = document.getElementById('subCatChips');
+        const hidden  = document.getElementById('prodSubcategory');
+        const subs    = cat?.subcategories || [];
+
+        // Reset
+        hidden.value  = '';
+        chips.innerHTML = '';
+
+        if (subs.length === 0) { wrapper.style.display = 'none'; return; }
+
+        subs.forEach(sub => {
+            const chip = document.createElement('button');
+            chip.type      = 'button';
+            chip.className = 'sell-subcat-chip';
+            chip.textContent = sub.name;
+            chip.addEventListener('click', function () {
+                chips.querySelectorAll('.sell-subcat-chip').forEach(c => c.classList.remove('active'));
+                if (hidden.value === sub.name) {
+                    // Clicking active chip deselects it
+                    this.classList.remove('active');
+                    hidden.value = '';
+                } else {
+                    this.classList.add('active');
+                    hidden.value = sub.name;
+                }
+            });
+            chips.appendChild(chip);
+        });
+
         wrapper.style.display = 'block';
     }
 
