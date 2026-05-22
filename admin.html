@@ -877,6 +877,11 @@
             }
         };
 
+
+
+
+
+        
         // --- GENERATE PASSWORD ---
         // 1. Generates a random password
         // 2. Saves it to sessionStorage so the recovery interceptor can auto-apply it
@@ -1215,6 +1220,11 @@ window.approveProduct = async (productId, productDetails) => {
                     </div>
                 </div>
             </div>`;
+            // Before (Broken when receiving an emoji character):
+// `<i class="${cat.icon} cat-panel-icon"></i>`
+
+// After (Fixed):
+`${renderCategoryIcon(cat.icon)}`
         }
 
         window.toggleAdminPanel = (id) => {
@@ -1381,6 +1391,20 @@ window.approveProduct = async (productId, productDetails) => {
             t._t = setTimeout(() => { t.style.opacity = '0'; }, 2800);
         }
 
+
+// Helper to decide if the value is an explicit CSS class names list or an emoji character string
+function renderCategoryIcon(iconString) {
+    if (!iconString) return `<span class="cat-panel-icon native-emoji">📁</span>`;
+    
+    // Check if it contains 'fa-' which implies a Font Awesome class string (e.g., 'fas fa-baby')
+    if (iconString.includes('fa-')) {
+        return `<i class="${iconString} cat-panel-icon"></i>`;
+    }
+    
+    // Otherwise, treat it as a pure emoji text character
+    return `<span class="cat-panel-icon native-emoji">${iconString}</span>`;
+}
+        
     </script>
 </body>
 </html>
