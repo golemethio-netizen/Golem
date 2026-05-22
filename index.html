@@ -260,35 +260,6 @@
         }
         .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #ff4757; }
 
-        /* ── Subcategory filter row ── */
-        #subcatBar {
-            display: none;
-            background: #f8fafc;
-            border-bottom: 1px solid #e8f0fe;
-            padding: 0 0 0 0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-        #subcatBar::-webkit-scrollbar { display: none; }
-        .subcat-bar-inner {
-            display: flex;
-            gap: 7px;
-            padding: 8px 16px;
-            min-width: max-content;
-        }
-        .subcat-filter-btn {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 5px 14px; border-radius: 20px;
-            border: 1.5px solid #d1c4e9;
-            background: white; color: #6c5ce7;
-            font-size: 0.78rem; font-weight: 600;
-            cursor: pointer; font-family: inherit;
-            white-space: nowrap; transition: all 0.18s;
-        }
-        .subcat-filter-btn:hover { background: #f3f0ff; border-color: #6c5ce7; }
-        .subcat-filter-btn.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
-
         /* ═══════════════════════════════════════════════════════
            SERVICE CARD — Purple theme
         ═══════════════════════════════════════════════════════ */
@@ -654,10 +625,22 @@
         </div>
     </section>
 
-    <!-- Subcategory row — shown when a category with subcategories is active -->
-    <div id="subcatBar">
-        <div class="subcat-bar-inner" id="subcatBarInner"></div>
+    <!-- Subcategory strip — appears when a category with subcats is selected -->
+    <div id="subcatBar" style="display:none; background:#f8fafc; border-bottom:1px solid #e2e8f0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+        <div id="subcatBarInner" style="display:flex; gap:7px; padding:8px 16px; min-width:max-content;"></div>
     </div>
+    <style>
+        #subcatBar::-webkit-scrollbar { display:none; }
+        .subcat-filter-btn {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 14px; border-radius:20px;
+            border:1.5px solid #d1c4e9; background:white; color:#6c5ce7;
+            font-size:0.78rem; font-weight:600; cursor:pointer;
+            font-family:inherit; white-space:nowrap; transition:all 0.18s;
+        }
+        .subcat-filter-btn:hover  { background:#f3f0ff; border-color:#6c5ce7; }
+        .subcat-filter-btn.active { background:#6c5ce7; color:white; border-color:#6c5ce7; }
+    </style>
 
     <!-- ======================= MAIN GRID ======================= -->
     <main class="container">
@@ -1175,13 +1158,13 @@
         function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
         function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
 
-        // ── Dynamic Filter Bar + Subcategory Row ─────────────────
-        let _catData = []; // full category+subcategory cache
+        // ── Dynamic Filter Bar + Subcategory Strip ────────────────
+        let _catData = [];
 
         async function loadFilterCategories() {
             const bar = document.getElementById('filterBar');
 
-            // Wait for _supabase to be ready (config.js might still be parsing)
+            // Wait until _supabase is ready (config.js may still be parsing)
             if (typeof _supabase === 'undefined') {
                 setTimeout(loadFilterCategories, 150);
                 return;
@@ -1199,35 +1182,33 @@
                 }
 
                 _catData = cats;
-
-                // Remove old dynamic buttons (keep All + Featured)
                 bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
 
                 cats.forEach(cat => {
-                    // Icon: emoji rendered as-is, FA class rendered as <i>
-                    const iconHtml = cat.icon
-                        ? (cat.icon.trim().startsWith('fa')
-                            ? `<i class="${cat.icon.trim()}" style="font-size:11px;"></i> `
-                            : `${cat.icon.trim()} `)
+                    // .trim() is critical — admin may have stored " 👶" with a leading space
+                    const rawIcon = (cat.icon || '').trim();
+                    const iconHtml = rawIcon
+                        ? (rawIcon.startsWith('fa')
+                            ? `<i class="${rawIcon}" style="font-size:11px;"></i> `
+                            : `${rawIcon} `)
                         : '';
 
                     const btn = document.createElement('button');
-                    btn.className = 'filter-btn filter-btn-dynamic';
+                    btn.className    = 'filter-btn filter-btn-dynamic';
                     btn.dataset.category = cat.name;
-                    btn.dataset.catId    = cat.id;
                     btn.dataset.am       = cat.amharic_name || cat.name;
                     btn.innerHTML        = iconHtml + cat.name;
                     btn.addEventListener('click', function () {
-                        window.filterCategory(this.dataset.category, this);
-                        showSubcatBar(cat);
+                        window.filterCategory(cat.name, this);
+                        _showSubcatBar(cat);
                     });
                     bar.appendChild(btn);
                 });
 
-                // Re-wire All button — hides subcategory bar
+                // All button hides subcategory strip
                 bar.querySelector('[data-category="All"]').addEventListener('click', function () {
                     window.filterCategory('All', this);
-                    hideSubcatBar();
+                    _hideSubcatBar();
                 });
 
             } catch (e) {
@@ -1236,80 +1217,112 @@
             }
         }
 
-        // ── Subcategory bar ───────────────────────────────────────
-        function showSubcatBar(cat) {
-            const bar    = document.getElementById('subcatBar');
-            const inner  = document.getElementById('subcatBarInner');
-            const subs   = cat.subcategories || [];
+        // ── Subcategory strip ─────────────────────────────────────
+        function _showSubcatBar(cat) {
+            const bar   = document.getElementById('subcatBar');
+            const inner = document.getElementById('subcatBarInner');
+            const subs  = (cat.subcategories || []);
 
-            if (subs.length === 0) {
-                bar.style.display = 'none';
-                inner.innerHTML   = '';
-                return;
-            }
+            if (subs.length === 0) { _hideSubcatBar(); return; }
 
             inner.innerHTML = '';
 
-            // "All [CategoryName]" resets subcategory filter
-            const allBtn = document.createElement('button');
-            allBtn.className = 'subcat-filter-btn active';
-            allBtn.textContent = 'All ' + cat.name;
-            allBtn.addEventListener('click', function () {
-                document.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+            // "All [Category]" chip resets subcategory filter
+            const allChip = document.createElement('button');
+            allChip.className   = 'subcat-filter-btn active';
+            allChip.textContent = 'All ' + cat.name;
+            allChip.addEventListener('click', function () {
+                inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 window.currentSubcategory = null;
                 window.fetchProducts(window.currentCategory);
             });
-            inner.appendChild(allBtn);
+            inner.appendChild(allChip);
 
             subs.forEach(sub => {
-                const btn = document.createElement('button');
-                btn.className = 'subcat-filter-btn';
-                btn.textContent = sub.name;
-                btn.dataset.subcat = sub.name;
-                btn.addEventListener('click', function () {
-                    document.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+                const rawIcon  = (sub.icon || '').trim();
+                const iconHtml = rawIcon
+                    ? (rawIcon.startsWith('fa')
+                        ? `<i class="${rawIcon}" style="font-size:10px;"></i> `
+                        : `${rawIcon} `)
+                    : '';
+
+                const chip = document.createElement('button');
+                chip.className   = 'subcat-filter-btn';
+                chip.innerHTML   = iconHtml + sub.name;
+                chip.addEventListener('click', function () {
+                    inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     window.currentSubcategory = sub.name;
                     window.fetchProductsBySubcat(window.currentCategory, sub.name);
                 });
-                inner.appendChild(btn);
+                inner.appendChild(chip);
             });
 
             bar.style.display = 'block';
         }
 
-        function hideSubcatBar() {
-            document.getElementById('subcatBar').style.display = 'none';
-            document.getElementById('subcatBarInner').innerHTML = '';
+        function _hideSubcatBar() {
+            const bar = document.getElementById('subcatBar');
+            if (bar) bar.style.display = 'none';
+            const inner = document.getElementById('subcatBarInner');
+            if (inner) inner.innerHTML = '';
             window.currentSubcategory = null;
         }
 
         function _injectDefaultFilters(bar) {
             const defaults = [
-                { name: 'Electronics', am: 'ኤሌክትሮኒክስ' },
-                { name: 'Furniture',   am: 'የቤት ዕቃዎች' },
-                { name: 'Fashion',     am: 'አልባሳት' },
-                { name: 'Vehicles',    am: 'ተሽከርካሪዎች' },
-                { name: 'Property',    am: 'ንብረት' },
+                { name: 'Electronics',   am: 'ኤሌክትሮኒክስ' },
+                { name: 'Furniture',     am: 'የቤት ዕቃዎች' },
+                { name: 'Fashion',       am: 'አልባሳት' },
+                { name: 'Vehicles',      am: 'ተሽከርካሪዎች' },
+                { name: 'Property',      am: 'ንብረት' },
                 { name: 'Home Supplies', am: 'የቤት ቁሳቁሶች' },
-                { name: 'Services',    am: 'አገልግሎቶች' },
-                { name: 'Jobs',        am: 'ስራዎች' },
+                { name: 'Services',      am: 'አገልግሎቶች' },
+                { name: 'Jobs',          am: 'ስራዎች' },
             ];
             bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
             defaults.forEach(d => {
                 const btn = document.createElement('button');
-                btn.className = 'filter-btn filter-btn-dynamic';
+                btn.className        = 'filter-btn filter-btn-dynamic';
                 btn.dataset.category = d.name;
-                btn.dataset.am = d.am;
-                btn.textContent = d.name;
+                btn.dataset.am       = d.am;
+                btn.textContent      = d.name;
                 btn.addEventListener('click', function () {
-                    window.filterCategory(this.dataset.category, this);
-                    hideSubcatBar();
+                    window.filterCategory(d.name, this);
+                    _hideSubcatBar();
                 });
                 bar.appendChild(btn);
             });
         }
+
+        // ── Subcategory product fetch ─────────────────────────────
+        window.currentSubcategory = null;
+
+        window.fetchProductsBySubcat = async (category, subcategory) => {
+            const grid = document.getElementById('productGrid');
+            if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
+
+            window.currentSubcategory = subcategory;
+            const sortOrder      = document.getElementById('sortSelect')?.value      || 'newest';
+            const locationFilter = document.getElementById('locationSelect')?.value  || 'all';
+
+            let query = _supabase
+                .from('products')
+                .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+                .eq('status', 'approved')
+                .eq('category', category)
+                .eq('subcategory', subcategory);
+
+            if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+            if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
+            else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+            else                                 query = query.order('created_at', { ascending: false });
+
+            const { data, error } = await query;
+            if (!error) window.renderProducts(data);
+            else console.error('Subcategory fetch error:', error.message);
+        };
 
         function checkPostStatus() {
             const urlParams = new URLSearchParams(window.location.search);
