@@ -614,7 +614,7 @@
     </section>
 
     <!-- ======================= FILTERS ======================= -->
-    <section class="filter-controls">
+    <section class="filter-controls" style="position:relative;">
         <div class="filter-bar" id="filterBar">
             <!-- Always-present buttons -->
             <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
@@ -623,23 +623,81 @@
             </button>
             <!-- Dynamic categories injected here by loadFilterCategories() -->
         </div>
+
+        <!-- Hover dropdown — repositioned under the hovered button -->
+        <div id="subcatDropdown">
+            <div id="subcatDropdownInner"></div>
+        </div>
     </section>
 
-    <!-- Subcategory strip — appears when a category with subcats is selected -->
-    <div id="subcatBar" style="display:none; background:#f8fafc; border-bottom:1px solid #e2e8f0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
-        <div id="subcatBarInner" style="display:flex; gap:7px; padding:8px 16px; min-width:max-content;"></div>
-    </div>
     <style>
-        #subcatBar::-webkit-scrollbar { display:none; }
-        .subcat-filter-btn {
-            display:inline-flex; align-items:center; gap:5px;
-            padding:5px 14px; border-radius:20px;
-            border:1.5px solid #d1c4e9; background:white; color:#6c5ce7;
-            font-size:0.78rem; font-weight:600; cursor:pointer;
-            font-family:inherit; white-space:nowrap; transition:all 0.18s;
+        /* ── Category hover dropdown ── */
+        .filter-controls { position: relative; }
+
+        #subcatDropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 500;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 10px 12px;
+            min-width: 220px;
+            max-width: 340px;
         }
-        .subcat-filter-btn:hover  { background:#f3f0ff; border-color:#6c5ce7; }
-        .subcat-filter-btn.active { background:#6c5ce7; color:white; border-color:#6c5ce7; }
+        #subcatDropdown.visible { display: block; }
+
+        #subcatDropdownInner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .subcat-filter-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1.5px solid #d1c4e9;
+            background: white; color: #6c5ce7;
+            font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            white-space: nowrap; transition: all 0.15s;
+        }
+        .subcat-filter-btn:hover  { background: #f3f0ff; border-color: #6c5ce7; }
+        .subcat-filter-btn.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
+
+        /* Arrow tip pointing up */
+        #subcatDropdown::before {
+            content: '';
+            position: absolute;
+            top: -7px;
+            left: var(--arrow-left, 20px);
+            width: 13px; height: 13px;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
+            transform: rotate(45deg);
+        }
+
+        /* Mobile: full-width strip instead of floating dropdown */
+        @media (max-width: 640px) {
+            #subcatDropdown {
+                position: static;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-top: none;
+                box-shadow: none;
+                padding: 8px 12px;
+            }
+            #subcatDropdown::before { display: none; }
+            #subcatDropdownInner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+            #subcatDropdownInner::-webkit-scrollbar { display: none; }
+        }
     </style>
 
     <!-- ======================= MAIN GRID ======================= -->
@@ -1158,13 +1216,13 @@
         function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
         function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
 
-        // ── Dynamic Filter Bar + Subcategory Strip ────────────────
+        // ── Dynamic Filter Bar + Hover Subcategory Dropdown ──────
         let _catData = [];
+        let _subcatHideTimer = null;
 
         async function loadFilterCategories() {
             const bar = document.getElementById('filterBar');
 
-            // Wait until _supabase is ready (config.js may still be parsing)
             if (typeof _supabase === 'undefined') {
                 setTimeout(loadFilterCategories, 150);
                 return;
@@ -1185,8 +1243,7 @@
                 bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
 
                 cats.forEach(cat => {
-                    // .trim() is critical — admin may have stored " 👶" with a leading space
-                    const rawIcon = (cat.icon || '').trim();
+                    const rawIcon  = (cat.icon || '').trim();
                     const iconHtml = rawIcon
                         ? (rawIcon.startsWith('fa')
                             ? `<i class="${rawIcon}" style="font-size:11px;"></i> `
@@ -1194,21 +1251,49 @@
                         : '';
 
                     const btn = document.createElement('button');
-                    btn.className    = 'filter-btn filter-btn-dynamic';
-                    btn.dataset.category = cat.name;
-                    btn.dataset.am       = cat.amharic_name || cat.name;
-                    btn.innerHTML        = iconHtml + cat.name;
+                    btn.className            = 'filter-btn filter-btn-dynamic';
+                    btn.dataset.category     = cat.name;
+                    btn.dataset.am           = cat.amharic_name || cat.name;
+                    btn.innerHTML            = iconHtml + cat.name;
+
+                    const hasSubs = (cat.subcategories || []).length > 0;
+
+                    // ── Hover: show dropdown ──────────────────────
+                    if (hasSubs) {
+                        btn.addEventListener('mouseenter', function () {
+                            clearTimeout(_subcatHideTimer);
+                            _positionAndShowDropdown(cat, btn);
+                        });
+                        btn.addEventListener('mouseleave', function () {
+                            _subcatHideTimer = setTimeout(_hideSubcatDropdown, 180);
+                        });
+                        // Small chevron hint
+                        btn.innerHTML += ' <i class="fas fa-chevron-down" style="font-size:8px;opacity:0.6;margin-left:2px;"></i>';
+                    }
+
+                    // ── Click: filter products ────────────────────
                     btn.addEventListener('click', function () {
                         window.filterCategory(cat.name, this);
-                        _showSubcatBar(cat);
+                        // On mobile (touch), also show dropdown on click
+                        if (hasSubs && window.matchMedia('(max-width:640px)').matches) {
+                            _positionAndShowDropdown(cat, btn);
+                        }
                     });
+
                     bar.appendChild(btn);
                 });
 
-                // All button hides subcategory strip
+                // All button: hide dropdown, reset filter
                 bar.querySelector('[data-category="All"]').addEventListener('click', function () {
                     window.filterCategory('All', this);
-                    _hideSubcatBar();
+                    _hideSubcatDropdown();
+                });
+
+                // Keep dropdown open when mouse moves into it
+                const dropdown = document.getElementById('subcatDropdown');
+                dropdown.addEventListener('mouseenter', () => clearTimeout(_subcatHideTimer));
+                dropdown.addEventListener('mouseleave', () => {
+                    _subcatHideTimer = setTimeout(_hideSubcatDropdown, 180);
                 });
 
             } catch (e) {
@@ -1217,21 +1302,23 @@
             }
         }
 
-        // ── Subcategory strip ─────────────────────────────────────
-        function _showSubcatBar(cat) {
-            const bar   = document.getElementById('subcatBar');
-            const inner = document.getElementById('subcatBarInner');
-            const subs  = (cat.subcategories || []);
+        // ── Position dropdown under the hovered button ────────────
+        function _positionAndShowDropdown(cat, btn) {
+            const dropdown = document.getElementById('subcatDropdown');
+            const inner    = document.getElementById('subcatDropdownInner');
+            const subs     = cat.subcategories || [];
 
-            if (subs.length === 0) { _hideSubcatBar(); return; }
+            if (subs.length === 0) return;
 
+            // Build chips
             inner.innerHTML = '';
 
-            // "All [Category]" chip resets subcategory filter
+            // "All [Category]" chip
             const allChip = document.createElement('button');
             allChip.className   = 'subcat-filter-btn active';
             allChip.textContent = 'All ' + cat.name;
-            allChip.addEventListener('click', function () {
+            allChip.addEventListener('click', function (e) {
+                e.stopPropagation();
                 inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 window.currentSubcategory = null;
@@ -1248,25 +1335,42 @@
                     : '';
 
                 const chip = document.createElement('button');
-                chip.className   = 'subcat-filter-btn';
-                chip.innerHTML   = iconHtml + sub.name;
-                chip.addEventListener('click', function () {
+                chip.className = 'subcat-filter-btn';
+                chip.innerHTML = iconHtml + sub.name;
+                chip.addEventListener('click', function (e) {
+                    e.stopPropagation();
                     inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     window.currentSubcategory = sub.name;
                     window.fetchProductsBySubcat(window.currentCategory, sub.name);
+                    // Close on mobile after selecting
+                    if (window.matchMedia('(max-width:640px)').matches) {
+                        setTimeout(_hideSubcatDropdown, 300);
+                    }
                 });
                 inner.appendChild(chip);
             });
 
-            bar.style.display = 'block';
+            // Position the arrow tip under the button
+            const btnRect = btn.getBoundingClientRect();
+            const barRect = btn.closest('.filter-controls').getBoundingClientRect();
+            const leftOffset = btnRect.left - barRect.left + btnRect.width / 2 - 26;
+            dropdown.querySelector('::before'); // just reference, actual offset via style
+            dropdown.style.left = Math.max(0, leftOffset) + 'px';
+
+            // Move arrow tip to align with button center
+            const arrowLeft = Math.min(
+                Math.max(14, btnRect.left - barRect.left + btnRect.width / 2 - Math.max(0, leftOffset) - 7),
+                200
+            );
+            dropdown.style.setProperty('--arrow-left', arrowLeft + 'px');
+
+            dropdown.classList.add('visible');
         }
 
-        function _hideSubcatBar() {
-            const bar = document.getElementById('subcatBar');
-            if (bar) bar.style.display = 'none';
-            const inner = document.getElementById('subcatBarInner');
-            if (inner) inner.innerHTML = '';
+        function _hideSubcatDropdown() {
+            const dropdown = document.getElementById('subcatDropdown');
+            if (dropdown) dropdown.classList.remove('visible');
             window.currentSubcategory = null;
         }
 
@@ -1290,7 +1394,7 @@
                 btn.textContent      = d.name;
                 btn.addEventListener('click', function () {
                     window.filterCategory(d.name, this);
-                    _hideSubcatBar();
+                    _hideSubcatDropdown();
                 });
                 bar.appendChild(btn);
             });
