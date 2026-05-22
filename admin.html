@@ -1152,52 +1152,13 @@ window.approveProduct = async (productId, productDetails) => {
             return data || [];
         }
 
-  // Add this helper snippet inside your script tags if not already present
-function renderCategoryIcon(iconString) {
-    if (!iconString) return `<span class="cat-panel-icon native-emoji">📁</span>`;
-    
-    // Check if it contains 'fa-' which implies a Font Awesome class string (e.g., 'fas fa-baby')
-    if (iconString.includes('fa-')) {
-        return `<i class="${iconString} cat-panel-icon"></i>`;
-    }
-    
-    // Otherwise, treat it as a pure text character emoji element
-    return `<span class="cat-panel-icon native-emoji">${iconString}</span>`;
-}
-
-// Inside your loadAdminCategories() or list generator function:
-// Replace the old layout structure where it rendered cat.icon with this logic:
-async function loadAdminCategories() {
-    const listContainer = document.getElementById('adminCatList');
-    // ... your current database query code ...
-    const { data: categories, error } = await _supabase.from('categories').select('*').order('name');
-    
-    if (error) {
-        listContainer.innerHTML = '<p style="color:#ff4757; text-align:center;">Error loading categories.</p>';
-        return;
-    }
-    
-    listContainer.innerHTML = categories.map(cat => {
-        return `
-            <div class="cat-panel" id="cat-panel-${cat.id}">
-                <div class="cat-panel-head" onclick="toggleCatPanel('${cat.id}')">
-                    ${renderCategoryIcon(cat.icon)}
-                    
-                    <span class="cat-panel-title">
-                        ${cat.name} 
-                        ${cat.amharic_name ? `<span class="cat-panel-am">(${cat.amharic_name})</span>` : ''}
-                    </span>
-                    <i class="fas fa-chevron-down cat-panel-chevron" id="chevron-${cat.id}"></i>
-                </div>
-                <div id="sub-wrap-${cat.id}" style="display:none;">
-                    </div>
-            </div>
-        `;
-    }).join('');
-    
-    // Update your dropdown menu elements if necessary
-    updateParentCategoryDropdown(categories);
-}
+        async function loadAdminCategories() {
+            document.getElementById('adminCatList').innerHTML =
+                '<p style="color:#bbb;text-align:center;padding:30px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+            _adminCats = await fetchAdminCats();
+            populateParentSelect();
+            renderAdminCatList(_adminCats);
+        }
 
         function populateParentSelect() {
             const sel = document.getElementById('subCatParent');
@@ -1376,53 +1337,24 @@ async function loadAdminCategories() {
         };
 
         // ── Rename Category ────────────────────────────────
-      // --- RENAME/EDIT CATEGORY SAVING LOGIC ---
-async function adminRenameCategory(id) {
-    const currentNameEl = document.querySelector(`#cat-panel-${id} .cat-panel-title`);
-    
-    // Prompt the admin safely for the new parameters
-    const oldName = currentNameEl ? currentNameEl.textContent.trim().split('(')[0].trim() : '';
-    const newName = prompt("Enter new Category Name:", oldName);
-    
-    if (newName === null) return; // Admin cancelled operation
-    if (!newName.trim()) {
-        alert("Category name cannot be empty.");
-        return;
-    }
-
-    const newAmharic = prompt("Enter new Amharic Name (Optional):");
-    const newIcon = prompt("Enter new Icon (Optional - Emoji or FontAwesome class):");
-
-    // Prepare update payload fields cleanly
-    const updateData = { name: newName.trim() };
-    if (newAmharic !== null) updateData.amharic_name = newAmharic.trim() || null;
-    if (newIcon !== null) updateData.icon = newIcon.trim() || null;
-
-    // Send update statement to Supabase database client
-    const { error } = await _supabase
-        .from('categories')
-        .update(updateData)
-        .eq('id', id);
-
-    if (error) {
-        alert('Error updating category: ' + error.message);
-        return;
-    }
-
-    // Success Actions
-    if (typeof logAction === 'function') {
-        logAction('Category Renamed', `Updated ID ${id} to: "${newName.trim()}"`);
-    }
-    
-    if (typeof catToast === 'function') {
-        catToast('Category updated successfully!', '#2e7d32');
-    } else {
-        alert('Category updated successfully!');
-    }
-    
-    // Reload layout grid view to display updates instantly
-    loadAdminCategories(); 
-}
+        window.adminStartRename = (id, name, icon, amharic) => {
+            const row = document.getElementById(`acp-${id}`);
+            const head = row.querySelector('.cat-panel-head');
+            head.style.background = '#fffde7';
+            head.innerHTML = `
+                <div style="display:flex;gap:7px;align-items:center;width:100%;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                    <input id="rn-icon-${id}" value="${icon}" placeholder="Icon/emoji"
+                        style="width:100px;padding:7px 9px;border-radius:6px;border:1.5px solid #ffe082;font-size:0.83rem;outline:none;font-family:inherit;">
+                    <input id="rn-name-${id}" value="${name}" placeholder="Category name"
+                        style="flex:1;min-width:130px;padding:7px 9px;border-radius:6px;border:1.5px solid #ffe082;font-size:0.83rem;outline:none;font-family:inherit;">
+                    <input id="rn-am-${id}" value="${amharic}" placeholder="Amharic (opt)"
+                        style="width:150px;padding:7px 9px;border-radius:6px;border:1.5px solid #ffe082;font-size:0.83rem;outline:none;font-family:inherit;">
+                    <button onclick="adminSaveRename('${id}')"
+                        style="background:#f57f17;color:white;border:none;padding:8px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.82rem;">Save</button>
+                    <button onclick="loadAdminCategories()"
+                        style="background:#eee;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.82rem;">Cancel</button>
+                </div>`;
+        };
 
         window.adminSaveRename = async (id) => {
             const name    = document.getElementById(`rn-name-${id}`).value.trim();
@@ -1460,7 +1392,18 @@ async function adminRenameCategory(id) {
         }
 
 
-
+// Helper to decide if the value is an explicit CSS class names list or an emoji character string
+function renderCategoryIcon(iconString) {
+    if (!iconString) return `<span class="cat-panel-icon native-emoji">📁</span>`;
+    
+    // Check if it contains 'fa-' which implies a Font Awesome class string (e.g., 'fas fa-baby')
+    if (iconString.includes('fa-')) {
+        return `<i class="${iconString} cat-panel-icon"></i>`;
+    }
+    
+    // Otherwise, treat it as a pure emoji text character
+    return `<span class="cat-panel-icon native-emoji">${iconString}</span>`;
+}
         
     </script>
 </body>
