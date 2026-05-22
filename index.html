@@ -614,7 +614,7 @@
     </section>
 
     <!-- ======================= FILTERS ======================= -->
-    <section class="filter-controls">
+    <section class="filter-controls" style="position:relative;">
         <div class="filter-bar" id="filterBar">
             <!-- Always-present buttons -->
             <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
@@ -623,44 +623,29 @@
             </button>
             <!-- Dynamic categories injected here by loadFilterCategories() -->
         </div>
+
+        <!-- Hover dropdown — repositioned under the hovered button -->
+        <div id="subcatDropdown">
+            <div id="subcatDropdownInner"></div>
+        </div>
     </section>
 
-    <!-- Subcategory dropdown — outside filter-controls so it never clips the filter bar -->
-    <div id="subcatDropdown">
-        <div id="subcatDropdownInner"></div>
-    </div>
-
     <style>
-        /* filter-controls: never clips children */
-        .filter-controls {
-            position: relative;
-            overflow: visible;
-        }
+        /* ── Category hover dropdown ── */
+        .filter-controls { position: relative; }
 
-        /* Filter bar: always scrollable, never wraps */
-        .filter-bar {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            gap: 8px;
-            padding: 6px 0 10px;
-            width: 100%;
-        }
-        .filter-bar::-webkit-scrollbar { display: none; }
-
-        /* Dropdown: fixed so it overlays content without affecting layout at all */
         #subcatDropdown {
             display: none;
-            position: fixed;
-            z-index: 900;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 500;
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
             padding: 10px 12px;
-            min-width: 200px;
+            min-width: 220px;
             max-width: 340px;
         }
         #subcatDropdown.visible { display: block; }
@@ -668,81 +653,50 @@
         #subcatDropdownInner {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 7px;
         }
 
-        /* Arrow tip */
+        .subcat-filter-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1.5px solid #d1c4e9;
+            background: white; color: #6c5ce7;
+            font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            white-space: nowrap; transition: all 0.15s;
+        }
+        .subcat-filter-btn:hover  { background: #f3f0ff; border-color: #6c5ce7; }
+        .subcat-filter-btn.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
+
+        /* Arrow tip pointing up */
         #subcatDropdown::before {
             content: '';
             position: absolute;
             top: -7px;
-            left: var(--arrow-left, 22px);
+            left: var(--arrow-left, 20px);
             width: 13px; height: 13px;
             background: white;
-            border-left: 1px solid #ddd;
-            border-top: 1px solid #ddd;
+            border-left: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
             transform: rotate(45deg);
         }
 
-        /* Subcategory chips — match .filter-btn style */
-        .subcat-filter-btn {
-            padding: 7px 16px;
-            border-radius: 25px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.82rem;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            flex-shrink: 0;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .subcat-filter-btn:hover,
-        .subcat-filter-btn.active {
-            background: var(--primary-color, #007bff);
-            color: white;
-            border-color: var(--primary-color, #007bff);
-        }
-
-        /* Category chevron hint */
-        .filter-btn-dynamic .fa-chevron-down {
-            font-size: 7px;
-            opacity: 0.5;
-            margin-left: 2px;
-            transition: transform 0.2s;
-        }
-        .filter-btn-dynamic:hover .fa-chevron-down { opacity: 1; }
-
-        /* Mobile ≤640px: fixed dropdown becomes bottom-anchored strip */
+        /* Mobile: full-width strip instead of floating dropdown */
         @media (max-width: 640px) {
             #subcatDropdown {
-                position: fixed;
-                left: 0 !important;
-                right: 0;
-                width: 100% !important;
+                position: static;
+                width: 100%;
                 max-width: 100%;
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
-                border-top: 1px solid #eee;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border-top: none;
+                box-shadow: none;
                 padding: 8px 12px;
-                background: #f8f9fa;
             }
             #subcatDropdown::before { display: none; }
-            #subcatDropdownInner {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                gap: 7px;
-            }
+            #subcatDropdownInner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
             #subcatDropdownInner::-webkit-scrollbar { display: none; }
-            .subcat-filter-btn { font-size: 0.78rem; padding: 6px 13px; }
         }
     </style>
 
@@ -1364,12 +1318,16 @@
             allChip.className   = 'subcat-filter-btn active';
             allChip.textContent = 'All ' + cat.name;
             allChip.addEventListener('click', function (e) {
-                e.stopPropagation();
-                inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                window.currentSubcategory = null;
-                window.fetchProducts(window.currentCategory);
-            });
+                    e.stopPropagation();
+                    inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    window.currentCategory    = cat.name;
+                    window.currentSubcategory = null;
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    const parentBtn = document.querySelector(`.filter-btn[data-category="${cat.name}"]`);
+                    if (parentBtn) parentBtn.classList.add('active');
+                    window.fetchProducts(cat.name);
+                });
             inner.appendChild(allChip);
 
             subs.forEach(sub => {
@@ -1387,8 +1345,20 @@
                     e.stopPropagation();
                     inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
+
+                    // Always set currentCategory from the cat this dropdown belongs to,
+                    // not window.currentCategory which may still be 'All' on hover-only
+                    window.currentCategory    = cat.name;
                     window.currentSubcategory = sub.name;
-                    window.fetchProductsBySubcat(window.currentCategory, sub.name);
+
+                    // Highlight the parent category filter button
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    const parentBtn = document.querySelector(`.filter-btn[data-category="${cat.name}"]`);
+                    if (parentBtn) parentBtn.classList.add('active');
+
+                    window.fetchProductsBySubcat(cat.name, sub.name);
+
+                    // Close on mobile after selecting
                     if (window.matchMedia('(max-width:640px)').matches) {
                         setTimeout(_hideSubcatDropdown, 300);
                     }
@@ -1396,32 +1366,19 @@
                 inner.appendChild(chip);
             });
 
-            // Use fixed positioning — calculated from button's viewport rect
-            // so the dropdown is never clipped by any parent overflow
+            // Position the arrow tip under the button
             const btnRect = btn.getBoundingClientRect();
-            const isMobile = window.matchMedia('(max-width:640px)').matches;
+            const barRect = btn.closest('.filter-controls').getBoundingClientRect();
+            const leftOffset = btnRect.left - barRect.left + btnRect.width / 2 - 26;
+            dropdown.querySelector('::before'); // just reference, actual offset via style
+            dropdown.style.left = Math.max(0, leftOffset) + 'px';
 
-            if (!isMobile) {
-                // Desktop: float directly below the button
-                const dropLeft = Math.min(
-                    btnRect.left,
-                    window.innerWidth - 360  // don't overflow right edge
-                );
-                dropdown.style.top  = (btnRect.bottom + 6) + 'px';
-                dropdown.style.left = Math.max(8, dropLeft) + 'px';
-                dropdown.style.right = 'auto';
-                dropdown.style.width = 'auto';
-
-                // Arrow tip: align with centre of button
-                const arrowLeft = Math.max(14, btnRect.left + btnRect.width / 2 - Math.max(8, dropLeft) - 7);
-                dropdown.style.setProperty('--arrow-left', Math.min(arrowLeft, 200) + 'px');
-            } else {
-                // Mobile: full-width strip just below the filter bar
-                dropdown.style.top  = (btnRect.bottom + 2) + 'px';
-                dropdown.style.left = '0px';
-                dropdown.style.right = '0';
-                dropdown.style.width = '100%';
-            }
+            // Move arrow tip to align with button center
+            const arrowLeft = Math.min(
+                Math.max(14, btnRect.left - barRect.left + btnRect.width / 2 - Math.max(0, leftOffset) - 7),
+                200
+            );
+            dropdown.style.setProperty('--arrow-left', arrowLeft + 'px');
 
             dropdown.classList.add('visible');
         }
