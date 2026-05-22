@@ -258,7 +258,7 @@
             color: #ccc; cursor: pointer; transition: color 0.15s;
             padding: 4px;
         }
-        .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #ff4757; }
+        .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #007bff; }
 
         /* ═══════════════════════════════════════════════════════
            SERVICE CARD — Purple theme
@@ -303,7 +303,7 @@
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; color: #aaa; font-size: 12px; transition: color 0.15s;
         }
-        .service-wishlist-btn.active, .service-wishlist-btn:hover { color: #ff4757; }
+        .service-wishlist-btn.active, .service-wishlist-btn:hover { color: #007bff; }
 
         .service-body { padding: 14px 15px 0; }
         .service-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; line-height: 1.3; }
@@ -544,7 +544,7 @@
                     <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box bg-sell"><i class="fas fa-plus-circle"></i><p>Sell Item</p></a>
                     <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>My Items</p></a>
                     <a href="saved.html" class="nav-item-box" style="position:relative;">
-                        <i class="fas fa-heart"></i><p>Saved</p>
+                        <i class="fas fa-shopping-cart"></i><p>Cart</p>
                         <span id="cartBadge" class="cart-badge">0</span>
                     </a>
                     <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none; color:#ff4757;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
@@ -587,7 +587,7 @@
         <a href="sell.html" id="mobileSellBtn" class="sell-tab"><i class="fas fa-plus-circle"></i><span>Sell</span></a>
         <a href="my-items.html"><i class="fas fa-box-open"></i><span>Items</span></a>
         <a href="saved.html" style="position:relative;">
-            <i class="fas fa-heart"></i><span>Saved</span>
+            <i class="fas fa-shopping-cart"></i><span>Cart</span>
             <span id="mobileCartBadge" style="display:none; position:absolute; top:0; right:10px; background:#ff4757; color:white; border-radius:50%; width:16px; height:16px; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center;"></span>
         </a>
         <a href="admin.html" id="mobileAdminLink" class="admin-tab" style="display:none;"><i class="fas fa-user-shield"></i><span>Admin</span></a>
@@ -859,7 +859,7 @@
                     <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
                     <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
                     <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width:100%;"><i class="fas fa-heart"></i> Save to Wishlist</button>
+                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width:100%;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                 </div>
             </div>
         </div>
@@ -986,7 +986,7 @@
                 <div class="job-card-header">
                     <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
                     <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
-                        <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                        <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
                     </button>
                     <div class="job-title">${esc(item.name)}</div>
                     ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
@@ -1077,7 +1077,7 @@
                         <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
                         ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
                         <button class="service-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
-                            <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+                            <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
                         </button>
                     </div>
                 </div>
