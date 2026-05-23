@@ -630,10 +630,6 @@
             <!-- Dynamic categories injected here by loadFilterCategories() -->
         </div>
 
-        <!-- Hover dropdown — repositioned under the hovered button -->
-        <div id="subcatDropdown">
-            <div id="subcatDropdownInner"></div>
-        </div>
     </section>
 
     <style>
@@ -698,15 +694,17 @@
         /* Mobile: full-width strip instead of floating dropdown */
         @media (max-width: 640px) {
             #subcatDropdown {
-                position: static;
-                width: 100%;
-                max-width: 100%;
+                position: fixed;
+                left: 0 !important;
+                width: 100vw;
+                max-width: 100vw;
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
                 border-top: none;
-                box-shadow: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.10);
                 padding: 8px 12px;
+                z-index: 9000;
             }
             #subcatDropdown::before { display: none; }
             #subcatDropdownInner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
@@ -1657,5 +1655,10 @@
         
     </script>
  
+    <!-- Subcategory dropdown — direct child of body so transform on filter-controls doesn't trap fixed positioning -->
+    <div id="subcatDropdown">
+        <div id="subcatDropdownInner"></div>
+    </div>
+
 </body>
 </html>
