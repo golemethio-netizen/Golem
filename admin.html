@@ -1357,16 +1357,41 @@ window.approveProduct = async (productId, productDetails) => {
         };
 
         window.adminSaveRename = async (id) => {
-            const name    = document.getElementById(`rn-name-${id}`).value.trim();
-            const icon    = document.getElementById(`rn-icon-${id}`).value.trim();
-            const amharic = document.getElementById(`rn-am-${id}`).value.trim();
+            const name    = document.getElementById('rn-name-' + id)?.value.trim();
+            const icon    = document.getElementById('rn-icon-' + id)?.value.trim();
+            const amharic = document.getElementById('rn-am-'   + id)?.value.trim();
+
             if (!name) { alert('Name cannot be empty.'); return; }
-            const { error } = await _supabase.from('categories').update({
-                name, icon: icon || null, amharic_name: amharic || null
-            }).eq('id', id);
-            if (error) { alert('Error: ' + error.message); return; }
-            logAction('Category Renamed', `Updated to: "${name}"`);
-            catToast('Category updated!', '#f57f17');
+
+            // Show saving state
+            const saveBtn = document.querySelector(`#acp-${id} button`);
+            if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+
+            // Check session is active (RLS requires auth)
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) { alert('Session expired. Please sign in again.'); return; }
+
+            const { data, error } = await _supabase
+                .from('categories')
+                .update({ name, icon: icon || null, amharic_name: amharic || null })
+                .eq('id', id)
+                .select();
+
+            if (error) {
+                console.error('Rename error:', error);
+                alert('Save failed: ' + error.message + '\n\nMake sure your Supabase RLS policy allows admins to UPDATE categories.');
+                if (saveBtn) { saveBtn.textContent = 'Save'; saveBtn.disabled = false; }
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                alert('Update had no effect. Check that:\n1. Your RLS policy allows admin UPDATE on categories\n2. The category ID exists:\n' + id);
+                if (saveBtn) { saveBtn.textContent = 'Save'; saveBtn.disabled = false; }
+                return;
+            }
+
+            logAction('Category Renamed', 'Updated to: "' + name + '"');
+            catToast('Category updated! ✓', '#f57f17');
             loadAdminCategories();
         };
 
