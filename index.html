@@ -652,10 +652,8 @@
 
         #subcatDropdown {
             display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 500;
+            position: fixed;
+            z-index: 9000;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 14px;
@@ -1382,16 +1380,23 @@
                 inner.appendChild(chip);
             });
 
-            // Position the arrow tip under the button
+            // Position the dropdown using fixed coordinates (viewport-relative)
             const btnRect = btn.getBoundingClientRect();
-            const barRect = btn.closest('.filter-controls').getBoundingClientRect();
-            const leftOffset = btnRect.left - barRect.left + btnRect.width / 2 - 26;
-            dropdown.querySelector('::before'); // just reference, actual offset via style
-            dropdown.style.left = Math.max(0, leftOffset) + 'px';
 
-            // Move arrow tip to align with button center
+            // Place dropdown just below the button
+            const dropTop  = btnRect.bottom + 6;
+            // Align dropdown left edge to button center minus a small offset, clamped to viewport
+            const dropLeft = Math.max(8, Math.min(
+                btnRect.left + btnRect.width / 2 - 26,
+                window.innerWidth - 348
+            ));
+
+            dropdown.style.top  = dropTop  + 'px';
+            dropdown.style.left = dropLeft + 'px';
+
+            // Move arrow tip to align with button center relative to dropdown left
             const arrowLeft = Math.min(
-                Math.max(14, btnRect.left - barRect.left + btnRect.width / 2 - Math.max(0, leftOffset) - 7),
+                Math.max(14, btnRect.left + btnRect.width / 2 - dropLeft - 7),
                 200
             );
             dropdown.style.setProperty('--arrow-left', arrowLeft + 'px');
