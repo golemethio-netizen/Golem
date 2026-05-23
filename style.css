@@ -394,10 +394,8 @@ body {
 /* ── Subcategory hover dropdown (index.html) ── */
 #subcatDropdown {
     display: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    z-index: 600;
+    position: fixed;
+    z-index: 9000;
     background: white;
     border: 1px solid #ddd;
     border-radius: var(--radius);
