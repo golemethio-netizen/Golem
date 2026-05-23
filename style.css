@@ -481,20 +481,22 @@ body {
     transform: rotate(180deg);
 }
 
-/* Mobile ≤640px: dropdown becomes inline strip */
+/* Mobile ≤640px: dropdown becomes full-width fixed strip */
 @media (max-width: 640px) {
     #subcatDropdown {
-        position: static;
-        width: 100%;
-        max-width: 100%;
+        position: fixed;
+        left: 0 !important;
+        width: 100vw;
+        max-width: 100vw;
         border-radius: 0;
         border-left: none;
         border-right: none;
         border-top: none;
-        box-shadow: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
         padding: 6px 2%;
         background: #f8f9fa;
         border-bottom: 1px solid #eee;
+        z-index: 9000;
     }
     #subcatDropdown::before { display: none; }
     #subcatDropdownInner {
