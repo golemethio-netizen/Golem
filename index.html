@@ -440,9 +440,15 @@
             .mobile-bottom-nav a#mobileCartBadge { /* handled below */ }
 
             /* ── Filter bar ── */
+            .filter-controls {
+                width: 100% !important;
+                left: 0 !important;
+                transform: none !important;
+                padding: 0 8px !important;
+            }
             .filter-bar {
                 display: flex; flex-wrap: nowrap; overflow-x: auto;
-                -webkit-overflow-scrolling: touch; padding: 10px 6px;
+                -webkit-overflow-scrolling: touch; padding: 10px 0;
                 gap: 8px; width: 100%;
             }
             .filter-bar::-webkit-scrollbar { display: none; }
@@ -632,7 +638,17 @@
 
     <style>
         /* ── Category hover dropdown ── */
-        .filter-controls { position: relative; }
+        .filter-controls {
+            position: relative;
+            width: 100vw;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
 
         #subcatDropdown {
             display: none;
