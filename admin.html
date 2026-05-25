@@ -627,6 +627,12 @@
                         ${utmDisplay}
                         
                         <div class="admin-actions" style="margin-top:15px; border-top: 1px solid #eee; padding-top:10px;">
+                            <!-- View button — always visible -->
+                            <button onclick="adminViewProduct('${item.id}')"
+                                style="width:100%;background:#f8f9ff;color:#6c5ce7;border:1.5px solid #6c5ce7;border-radius:7px;padding:9px;font-weight:700;font-size:0.85rem;cursor:pointer;margin-bottom:8px;">
+                                <i class="fas fa-eye"></i> View Full Details
+                            </button>
+
                             ${status === 'pending' ? `
                                 <button onclick="updateStatus('${item.id}', 'approved')" class="btn-approve">Approve & Go Live</button>
                                 <button onclick="updateStatus('${item.id}', 'rejected')" class="btn-reject">Reject Item</button>
@@ -1129,6 +1135,111 @@ window.approveProduct = async (productId, productDetails) => {
         });
     }
 };
+        // ══════════════════════════════════════════════════
+        // ADMIN PRODUCT DETAIL VIEW
+        // ══════════════════════════════════════════════════
+
+        window.adminViewProduct = async (id) => {
+            const modal = document.getElementById('adminViewModal');
+            const body  = document.getElementById('adminViewBody');
+            body.innerHTML = '<div style="padding:40px;text-align:center;color:#aaa;"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top:12px;">Loading...</p></div>';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            const { data: p, error } = await _supabase.from('products').select('*, profiles(full_name, avatar_url, is_verified)').eq('id', id).single();
+            if (error || !p) { body.innerHTML = '<p style="padding:40px;color:#ff4757;">Failed to load product.</p>'; return; }
+
+            // Parse description into spec lines + intro
+            const lines = (p.description || '').split('\n').map(l => l.trim()).filter(Boolean);
+            const specRx = /^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)/u;
+            const priceRx = /^(price|ዋጋ|birr|etb)/i;
+            const specLines = [], introLines = [];
+            lines.forEach(l => {
+                if (priceRx.test(l)) return;
+                if (specRx.test(l)) specLines.push(l);
+                else introLines.push(l);
+            });
+
+            const chips = specLines.map(line => {
+                const em = (line.match(/^(✅|☑️|👉|💹|🔹|•|►|▶|→|★|🔸|💎|⚡|🛡️|🎯|✔|❗|🔑|💡|⭐)/u) || ['✅'])[0];
+                const clean = line.replace(em, '').trim();
+                return '<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px;background:#f8f9ff;border-radius:9px;border-left:3px solid #6c5ce7;">'
+                     + '<span>' + em + '</span><span style="font-size:0.88rem;color:#333;font-weight:500;">' + clean + '</span></div>';
+            }).join('');
+
+            const seller     = p.profiles || {};
+            const isVerified = seller.is_verified;
+            const avatar     = seller.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(seller.full_name || 'Seller') + '&background=6c5ce7&color=fff';
+            const statusColors = { pending:'#f39c12', approved:'#2ed573', rejected:'#ff4757', sold:'#636e72' };
+            const statusColor  = statusColors[p.status] || '#888';
+            const stockBadge   = getStockBadge(p.stock_status, p.quantity, p.category);
+
+            body.innerHTML =
+                // Image
+                '<div style="position:relative;flex-shrink:0;">'
+              + '<img src="' + (p.image||'') + '" style="width:100%;height:280px;object-fit:cover;display:block;">'
+              + '<div style="position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,0.55));"></div>'
+              + '<div style="position:absolute;top:14px;left:14px;background:' + statusColor + ';color:white;font-size:0.72rem;font-weight:800;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;">' + (p.status||'pending') + '</div>'
+              + '<div style="position:absolute;top:14px;right:14px;background:#6c5ce7;color:white;font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:20px;">' + (p.category||'') + '</div>'
+              + '<div style="position:absolute;bottom:14px;right:14px;background:#6c5ce7;color:white;font-size:1.1rem;font-weight:800;padding:6px 18px;border-radius:12px;">' + (p.price ? p.price.toLocaleString() + ' ETB' : 'Negotiable') + '</div>'
+              + '</div>'
+
+              // Body
+              + '<div style="padding:20px;">'
+
+              // Title + meta
+              + '<h2 style="margin:0 0 6px;font-size:1.15rem;font-weight:800;color:#1a1a2e;">' + p.name + '</h2>'
+              + '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">'
+              +   '<span style="font-size:0.8rem;color:#888;"><i class="fas fa-map-marker-alt" style="color:#ff4757;"></i> ' + (p.location||'—') + '</span>'
+              +   '<span style="font-size:0.8rem;color:#888;"><i class="fas fa-tag" style="color:#6c5ce7;"></i> ' + (p.status_condition||'—') + '</span>'
+              +   (p.created_at ? '<span style="font-size:0.8rem;color:#aaa;"><i class="fas fa-calendar"></i> ' + new Date(p.created_at).toLocaleDateString() + '</span>' : '')
+              + '</div>'
+
+              // Stock badge
+              + (stockBadge ? '<div style="margin-bottom:14px;">' + stockBadge + '</div>' : '')
+
+              // Seller card
+              + '<div style="display:flex;align-items:center;gap:12px;background:#f8f9ff;border:1px solid #ebebff;border-radius:12px;padding:12px 14px;margin-bottom:16px;">'
+              +   '<img src="' + avatar + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #6c5ce7;flex-shrink:0;">'
+              +   '<div><div style="font-weight:700;color:#333;font-size:0.9rem;">' + (seller.full_name||'Seller') + '</div>'
+              +   '<div style="font-size:0.75rem;color:#aaa;">📞 ' + (p.seller_phone||'—') + '</div></div>'
+              +   '<div style="margin-left:auto;">' + (isVerified
+                    ? '<span style="font-size:0.75rem;color:#2ed573;font-weight:700;background:#e8fdf5;padding:3px 10px;border-radius:20px;border:1px solid #2ed573;"><i class="fas fa-check-circle"></i> Verified</span>'
+                    : '<span style="font-size:0.75rem;color:#888;background:#f1f2f6;padding:3px 10px;border-radius:20px;"><i class="fas fa-shield-alt"></i> Community</span>') + '</div>'
+              + '</div>'
+
+              // Intro text
+              + (introLines.length ? '<p style="font-size:0.88rem;color:#555;line-height:1.6;margin-bottom:14px;padding:12px;background:#fffbf0;border-radius:10px;border-left:3px solid #f1c40f;">' + introLines.join(' ') + '</p>' : '')
+
+              // Specs
+              + (chips ? '<div style="margin-bottom:16px;"><div style="font-size:0.72rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;"><i class="fas fa-list" style="color:#6c5ce7;"></i> Specifications</div><div style="display:flex;flex-direction:column;gap:7px;">' + chips + '</div></div>' : '')
+
+              // Admin quick actions
+              + '<div style="border-top:1px solid #f0f0f0;padding-top:14px;margin-top:4px;">'
+              + '<div style="font-size:0.72rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Admin Actions</div>'
+              + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+              +   (p.status === 'pending' ? '<button onclick="updateStatus(''+p.id+'','approved');closeAdminView();" style="background:#2ed573;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;"><i class="fas fa-check"></i> Approve</button>' : '')
+              +   (p.status === 'pending' ? '<button onclick="updateStatus(''+p.id+'','rejected');closeAdminView();" style="background:#ff4757;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;"><i class="fas fa-times"></i> Reject</button>' : '')
+              +   (p.status === 'approved' ? '<button onclick="updateStatus(''+p.id+'','sold');closeAdminView();" style="background:#ffa502;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;"><i class="fas fa-check-circle"></i> Mark Sold</button>' : '')
+              +   (p.status === 'approved' ? '<button onclick="updateStatus(''+p.id+'','rejected');closeAdminView();" style="background:#ff4757;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;"><i class="fas fa-trash"></i> Move to Trash</button>' : '')
+              +   (p.status === 'rejected' ? '<button onclick="updateStatus(''+p.id+'','approved');closeAdminView();" style="background:#2ed573;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;"><i class="fas fa-undo"></i> Restore</button>' : '')
+              +   (p.status === 'sold' ? '<button onclick="updateStatus(''+p.id+'','approved');closeAdminView();" style="background:#2ed573;color:white;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;"><i class="fas fa-redo"></i> Put on Sale</button>' : '')
+              +   '<a href="tel:' + (p.seller_phone||'') + '" style="display:flex;align-items:center;justify-content:center;gap:6px;background:#1a1a2e;color:white;border-radius:10px;padding:11px;text-decoration:none;font-weight:700;font-size:0.88rem;"><i class="fas fa-phone"></i> Call Seller</a>'
+              +   '<button onclick="closeAdminView()" style="background:#f1f2f6;color:#333;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;">Close</button>'
+              + '</div></div>'
+              + '</div>'; // end body
+        };
+
+        window.closeAdminView = () => {
+            document.getElementById('adminViewModal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        // Close on backdrop click
+        document.getElementById('adminViewModal')?.addEventListener('click', e => {
+            if (e.target === document.getElementById('adminViewModal')) closeAdminView();
+        });
+
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
@@ -1431,5 +1542,22 @@ function renderCategoryIcon(iconString) {
 }
         
     </script>
+    <!-- ══════════════════════════════════════
+         ADMIN PRODUCT DETAIL MODAL
+    ══════════════════════════════════════ -->
+    <div id="adminViewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:white;border-radius:20px;max-width:700px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
+
+            <!-- Header bar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #f0f0f0;flex-shrink:0;">
+                <div style="font-weight:800;font-size:1.05rem;color:#1a1a2e;"><i class="fas fa-eye" style="color:#6c5ce7;margin-right:8px;"></i> Product Detail View</div>
+                <button onclick="closeAdminView()" style="background:#f1f2f6;border:none;width:34px;height:34px;border-radius:50%;font-size:1.2rem;cursor:pointer;color:#555;">&times;</button>
+            </div>
+
+            <!-- Scrollable content -->
+            <div id="adminViewBody" style="overflow-y:auto;flex:1;"></div>
+        </div>
+    </div>
+
 </body>
 </html>
