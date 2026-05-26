@@ -132,6 +132,9 @@
                 return;
             }
 
+            // Track this view
+            _supabase.rpc('increment_view_count', { product_id: productId });
+
             const sellerName    = p.profiles?.full_name || "Private Seller";
             const sellerAvatar  = p.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}`;
             const isVerified    = p.profiles?.is_verified;
