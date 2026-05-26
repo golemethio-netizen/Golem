@@ -1172,7 +1172,28 @@
 
         const _origOpen = window.openProductModal;
         window.openProductModal = function (item) {
-            if (item && item.id) _itemCache[item.id] = item;
+            if (item && item.id) {
+                _itemCache[item.id] = item;
+
+                // Track this view
+                (async () => {
+                    const pid = item.id;
+                    const { error: rpcErr } = await _supabase.rpc('increment_view_count', { product_id: pid });
+                    if (rpcErr) {
+                        console.warn('RPC failed, trying direct update:', rpcErr.message);
+                        const { data: row } = await _supabase
+                            .from('products').select('view_count').eq('id', pid).single();
+                        const { error: upErr } = await _supabase
+                            .from('products')
+                            .update({ view_count: (row?.view_count || 0) + 1 })
+                            .eq('id', pid);
+                        if (upErr) console.warn('View count update failed:', upErr.message);
+                        else console.log('View counted (direct):', (row?.view_count || 0) + 1);
+                    } else {
+                        console.log('View counted via RPC');
+                    }
+                })();
+            }
             if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
         };
 
