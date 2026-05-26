@@ -132,8 +132,26 @@
                 return;
             }
 
-            // Track this view
-            _supabase.rpc('increment_view_count', { product_id: productId });
+            // ── Track this view ──────────────────────────────
+            (async () => {
+                // Try RPC first
+                const { error: rpcErr } = await _supabase.rpc('increment_view_count', { product_id: productId });
+                if (rpcErr) {
+                    console.warn('RPC failed, trying direct update:', rpcErr.message);
+                    // Fallback: read current count then increment
+                    const { data: row } = await _supabase
+                        .from('products').select('view_count').eq('id', productId).single();
+                    const { error: upErr } = await _supabase
+                        .from('products')
+                        .update({ view_count: (row?.view_count || 0) + 1 })
+                        .eq('id', productId);
+                    if (upErr) console.warn('View count update also failed:', upErr.message);
+                    else console.log('View counted (direct update). New count:', (row?.view_count || 0) + 1);
+                } else {
+                    console.log('View counted via RPC ✓');
+                }
+            })();
+            // ────────────────────────────────────────────────
 
             const sellerName    = p.profiles?.full_name || "Private Seller";
             const sellerAvatar  = p.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}`;
