@@ -1316,7 +1316,7 @@
 
                     // ── Click: filter products ────────────────────
                     btn.addEventListener('click', function () {
-                        window.filterCategory(cat.name, this);
+                        if (typeof window.filterCategory === 'function') window.filterCategory(cat.name, this);
                         // On mobile (touch), also show dropdown on click
                         if (hasSubs && window.matchMedia('(max-width:640px)').matches) {
                             _positionAndShowDropdown(cat, btn);
@@ -1328,7 +1328,7 @@
 
                 // All button: hide dropdown, reset filter
                 bar.querySelector('[data-category="All"]').addEventListener('click', function () {
-                    window.filterCategory('All', this);
+                    if (typeof window.filterCategory === 'function') window.filterCategory('All', this);
                     _hideSubcatDropdown();
                 });
 
@@ -1458,7 +1458,7 @@
                 btn.dataset.am       = d.am;
                 btn.textContent      = d.name;
                 btn.addEventListener('click', function () {
-                    window.filterCategory(d.name, this);
+                    if (typeof window.filterCategory === 'function') window.filterCategory(d.name, this);
                     _hideSubcatDropdown();
                 });
                 bar.appendChild(btn);
