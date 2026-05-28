@@ -488,7 +488,7 @@ function getStockBadge(stockStatus, quantity) {
     return '';
 }
 
-// ── SPEC CARD HELPER FUNCTIONS ──
+// ── SPEC CARD HELPERS ──
 function specCell(icon, label, value) {
     return '<div style="padding:13px 16px;border-right:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">'
          + '<div style="width:24px;height:24px;border-radius:6px;background:rgba(26,143,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:6px;">'
@@ -673,11 +673,10 @@ window.openProductModal = async (product) => {
         product.subcategory === 'Mobile Phones' ||
         (product.category === 'Electronics' && product.subcategory)
     ) {
-        // ── ELECTRONICS SPEC CARD (Computer/Phone style) ──
+        // ── ELECTRONICS / COMPUTER SPEC CARD ──
         modalContent.style.padding = '0';
         modalContent.style.background = 'transparent';
 
-        // Parse specs from description
         const specs = {};
         const descLines = (product.description || '').split('\n');
         const introLines = [];
@@ -687,20 +686,19 @@ window.openProductModal = async (product) => {
             else if (line.trim() && !line.trim().startsWith('-')) introLines.push(line.trim());
         });
 
-        const brand     = specs['brand'] || '';
-        const model     = specs['model'] || product.name;
-        const cpu       = specs['processor'] || specs['cpu'] || '-';
-        const ram       = specs['ram'] || specs['memory'] || '-';
-        const storage   = specs['storage'] || '-';
-        const display   = specs['display'] || specs['screen size'] || specs['screen'] || '-';
-        const gpu       = specs['graphics'] || specs['gpu'] || '-';
-        const battery   = specs['battery life'] || specs['battery'] || '-';
-        const os        = specs['operating system'] || specs['os'] || '-';
-        const warranty  = specs['warranty'] || '-';
-        const features  = specs['features'] || '';
-        const condition = specs['condition'] || product.status_condition || '-';
-        const subtitle  = (brand ? brand + ' · ' : '') + (product.subcategory || product.category);
-        const isMobile  = product.subcategory === 'Mobile Phones';
+        const brand    = specs['brand'] || '';
+        const cpu      = specs['processor'] || specs['cpu'] || '-';
+        const ram      = specs['ram'] || specs['memory'] || '-';
+        const storage  = specs['storage'] || '-';
+        const display  = specs['display'] || specs['screen size'] || '-';
+        const gpu      = specs['graphics'] || specs['gpu'] || '-';
+        const battery  = specs['battery life'] || specs['battery'] || '-';
+        const os       = specs['operating system'] || specs['os'] || '-';
+        const warranty = specs['warranty'] || '-';
+        const features = specs['features'] || '';
+        const condition= specs['condition'] || product.status_condition || '-';
+        const subtitle = (brand ? brand + ' · ' : '') + (product.subcategory || product.category);
+        const isMobile = product.subcategory === 'Mobile Phones';
 
         const stockColor = (!product.stock_status || product.stock_status === 'in_stock') ? '#22c55e'
             : product.stock_status === 'limited' ? '#f59e0b' : '#ef4444';
@@ -708,74 +706,55 @@ window.openProductModal = async (product) => {
             : product.stock_status === 'limited' ? 'LIMITED STOCK' : 'OUT OF STOCK';
 
         modalContent.innerHTML =
-            '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">&times;</button>'
-
-          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Sora,Poppins,Arial,sans-serif;">'
-
-          // Watermark
+            '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
+          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
           + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
-          + '<div style="font-size:3.5rem;font-weight:900;color:white;letter-spacing:0.1em;">ዋና ገበያ</div>'
-          + '<div style="font-size:1.2rem;color:white;letter-spacing:0.2em;">wanagebya.com</div>'
+          + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
+          + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
           + '</div>'
-
-          // Photo
           + '<div style="position:relative;height:220px;background:#131e2e;overflow:hidden;">'
           + (product.image ? '<img src="' + product.image + '" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.92;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
           + '<div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(15,22,35,0.85));"></div>'
           + '</div>'
-
-          // Header
           + '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
           + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">'
-          + '<span style="display:inline-flex;align-items:center;gap:5px;background:' + stockColor + '22;border:1px solid ' + stockColor + ';border-radius:20px;padding:3px 10px;font-size:0.65rem;font-weight:800;color:' + stockColor + ';letter-spacing:0.08em;">'
-          + '<span style="width:6px;height:6px;border-radius:50%;background:' + stockColor + ';box-shadow:0 0 6px ' + stockColor + ';"></span>' + stockLabel + '</span>'
+          + '<span style="display:inline-flex;align-items:center;gap:5px;background:' + stockColor + '22;border:1px solid ' + stockColor + ';border-radius:20px;padding:3px 10px;font-size:0.65rem;font-weight:800;color:' + stockColor + ';">'
+          + '<span style="width:6px;height:6px;border-radius:50%;background:' + stockColor + ';"></span>' + stockLabel + '</span>'
           + '<div style="text-align:right;">'
-          + (product.price ? '<div style="font-size:1.5rem;font-weight:900;color:#1a8fff;letter-spacing:-0.5px;">' + product.price.toLocaleString() + ' <span style="font-size:0.9rem;font-weight:600;color:#4a90d9;">ETB</span></div>' : '<div style="font-size:1.1rem;color:#4a90d9;">Negotiable</div>')
+          + (product.price ? '<div style="font-size:1.5rem;font-weight:900;color:#1a8fff;">' + product.price.toLocaleString() + ' <span style="font-size:0.9rem;color:#4a90d9;">ETB</span></div>' : '<div style="font-size:1.1rem;color:#4a90d9;">Negotiable</div>')
           + '</div></div>'
           + '<div style="font-size:1.1rem;font-weight:700;color:white;margin-bottom:3px;">' + product.name + '</div>'
           + '<div style="font-size:0.8rem;color:#64748b;">' + subtitle + '</div>'
           + '</div>'
-
-          // Seller row
           + '<div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<img src="' + avatarUrl + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #1a8fff;flex-shrink:0;" onerror="this.src='https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff'">'
           + '<div><div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;">' + sellerName + '</div>'
           + '<div style="font-size:0.72rem;color:#4a90d9;">📞 +' + intPhone + '</div></div>'
           + (isVerified ? '<span style="margin-left:auto;font-size:0.68rem;color:#22c55e;background:rgba(34,197,94,0.1);border:1px solid #22c55e;border-radius:20px;padding:2px 8px;font-weight:700;"><i class="fas fa-check-circle"></i> Verified</span>' : '')
           + '</div>'
-
-          // Specs grid
-          + '<div style="display:grid;grid-template-columns:1fr 1fr' + (isMobile ? '' : ' 1fr') + ';border-bottom:1px solid rgba(255,255,255,0.06);">'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + specCell('fas fa-microchip', isMobile ? 'RAM' : 'Processor', isMobile ? ram : cpu)
           + specCell('fas fa-hdd', 'Storage', storage)
-          + specCell('fas fa-memory', isMobile ? 'Storage' : 'Memory', isMobile ? storage : ram)
+          + specCell('fas fa-memory', 'Memory', ram)
           + specCell('fas fa-desktop', 'Display', display)
           + specCell(isMobile ? 'fas fa-battery-full' : 'fas fa-th-large', isMobile ? 'Battery' : 'Graphics', isMobile ? battery : gpu)
-          + specCell('fas fa-shield-alt', isMobile ? 'Condition' : 'Warranty', isMobile ? condition : warranty)
+          + specCell('fas fa-shield-alt', 'Warranty', warranty)
           + '</div>'
-
-          // Features pills (if any)
           + (features ? '<div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;flex-wrap:wrap;gap:6px;">'
-          + features.split(',').map(f => '<span style="background:rgba(26,143,255,0.12);border:1px solid rgba(26,143,255,0.3);color:#93c5fd;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;">' + f.trim() + '</span>').join('')
+          + features.split(',').map(function(f){ return '<span style="background:rgba(26,143,255,0.12);border:1px solid rgba(26,143,255,0.3);color:#93c5fd;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;">' + f.trim() + '</span>'; }).join('')
           + '</div>' : '')
-
-          // OS + condition bar
-          + '<div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.06);">'
+          + '<div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + miniBar('OS', os)
           + miniBar('Condition', condition)
-          + (introLines.length ? miniBar('Location', product.location || '-') : '')
+          + miniBar('Location', product.location || '-')
           + '</div>'
-
-          // Contact buttons
-          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a2e;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
           + '<a href="https://wa.me/' + intPhone + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#075e54;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fab fa-whatsapp"></i> WhatsApp</a>'
           + '<a href="https://t.me/' + (tgUser || '+' + intPhone) + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#0088cc;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;"><i class="fab fa-telegram-plane"></i> Telegram</a>'
           + '</div>'
-
-          // Footer
           + '<div style="text-align:center;padding:8px;background:#0a0f1a;">'
-          + '<span style="font-size:0.65rem;color:#334155;letter-spacing:0.1em;">ዋና ገበያ · wanagebya.com · Ethiopia's Marketplace</span>'
+          + '<span style="font-size:0.65rem;color:#334155;letter-spacing:0.1em;">ዋና ገበያ · wanagebya.com</span>'
           + '</div>'
           + '</div>';
 
