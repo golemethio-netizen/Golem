@@ -658,6 +658,232 @@
     /* ══════════════════════════════
        CATEGORY CHANGE HANDLER
     ══════════════════════════════ */
+
+    /* ══════════════════════════════════════════════════
+       SUBCATEGORY RENDERERS
+       Triggered when a subcategory chip is selected
+    ══════════════════════════════════════════════════ */
+    const subcategoryRenderers = {
+
+        /* ── COMPUTERS & LAPTOPS ── */
+        'Computers & Laptops': () => `
+            <div class="dyn-full">
+                <span class="cat-icon-badge"><i class="fas fa-laptop"></i> Computer / Laptop Specifications</span>
+            </div>
+
+            <div>
+                <label class="dyn-label">Brand</label>
+                <select class="dyn-input extra-field-input" data-label="Brand">
+                    <option value="">Select Brand</option>
+                    <option>HP</option><option>Dell</option><option>Lenovo</option>
+                    <option>Apple (MacBook)</option><option>Asus</option><option>Acer</option>
+                    <option>Samsung</option><option>MSI</option><option>Toshiba</option>
+                    <option>Sony</option><option>Other</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Model</label>
+                <input class="dyn-input extra-field-input" data-label="Model" placeholder="e.g. EliteBook 840 G8">
+            </div>
+
+            <div>
+                <label class="dyn-label">Processor (CPU)</label>
+                <select class="dyn-input extra-field-input" data-label="Processor">
+                    <option value="">Select CPU</option>
+                    <optgroup label="Intel Core">
+                        <option>Intel Core i3</option><option>Intel Core i5</option>
+                        <option>Intel Core i7</option><option>Intel Core i9</option>
+                    </optgroup>
+                    <optgroup label="Intel Generation">
+                        <option>5th Gen</option><option>6th Gen</option><option>7th Gen</option>
+                        <option>8th Gen</option><option>10th Gen</option><option>11th Gen</option>
+                        <option>12th Gen</option><option>13th Gen</option>
+                    </optgroup>
+                    <optgroup label="AMD">
+                        <option>AMD Ryzen 3</option><option>AMD Ryzen 5</option>
+                        <option>AMD Ryzen 7</option><option>AMD Ryzen 9</option>
+                    </optgroup>
+                    <optgroup label="Apple">
+                        <option>Apple M1</option><option>Apple M2</option><option>Apple M3</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">RAM</label>
+                <select class="dyn-input extra-field-input" data-label="RAM">
+                    <option value="">Select RAM</option>
+                    <option>4 GB</option><option>8 GB</option><option>12 GB</option>
+                    <option>16 GB</option><option>32 GB</option><option>64 GB</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Storage</label>
+                <select class="dyn-input extra-field-input" data-label="Storage">
+                    <option value="">Select Storage</option>
+                    <option>128 GB SSD</option><option>256 GB SSD</option><option>512 GB SSD</option>
+                    <option>1 TB SSD</option><option>500 GB HDD</option>
+                    <option>1 TB HDD</option><option>2 TB HDD</option>
+                    <option>512 GB SSD + 1 TB HDD</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Display</label>
+                <select class="dyn-input extra-field-input" data-label="Display">
+                    <option value="">Select Screen Size</option>
+                    <option>11.6"</option><option>13.3"</option><option>14"</option>
+                    <option>15.6"</option><option>16"</option><option>17.3"</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Graphics (GPU)</label>
+                <select class="dyn-input extra-field-input" data-label="Graphics">
+                    <option value="">Select GPU</option>
+                    <option>Intel Integrated</option><option>Intel Iris Xe</option>
+                    <option>NVIDIA MX Series</option><option>NVIDIA GTX 1050</option>
+                    <option>NVIDIA GTX 1650</option><option>NVIDIA RTX 3050</option>
+                    <option>NVIDIA RTX 3060</option><option>NVIDIA RTX 4060</option>
+                    <option>AMD Radeon</option><option>Apple GPU</option>
+                    <option>2GB Dedicated</option><option>4GB Dedicated</option>
+                    <option>6GB Dedicated</option><option>8GB Dedicated</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Battery Life</label>
+                <select class="dyn-input extra-field-input" data-label="Battery Life">
+                    <option value="">Select</option>
+                    <option>2–4 Hours</option><option>4–6 Hours</option>
+                    <option>6–8 Hours</option><option>8–10 Hours</option>
+                    <option>10+ Hours</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Operating System</label>
+                <select class="dyn-input extra-field-input" data-label="Operating System">
+                    <option value="">Select OS</option>
+                    <option>Windows 10</option><option>Windows 11</option>
+                    <option>macOS</option><option>Ubuntu / Linux</option><option>No OS (DOS)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="dyn-label">Condition</label>
+                <select class="dyn-input extra-field-input" data-label="Condition">
+                    <option>Brand New</option><option>Like New</option>
+                    <option>Good Condition</option><option>Fair Condition</option>
+                    <option>For Parts</option>
+                </select>
+            </div>
+
+            <div class="dyn-full">
+                <label class="dyn-label">Key Features</label>
+                <div class="pill-group" id="compFeaturePills">
+                    ${['Backlit Keyboard','Touchscreen','Fingerprint Reader','Face ID','USB-C','Thunderbolt','HDMI Port','SD Card Slot','Slim & Lightweight','Gaming Laptop','Business Laptop','2-in-1 Convertible','Water Resistant'].map(f =>
+                        '<span class="pill" onclick="togglePill(this,\'compFeatures\')">' + f + '</span>'
+                    ).join('')}
+                </div>
+                <input type="hidden" id="compFeaturesValue" data-label="Features">
+                <div class="dyn-hint">Tap to select key features</div>
+            </div>
+
+            <div>
+                <label class="dyn-label">Warranty</label>
+                <select class="dyn-input extra-field-input" data-label="Warranty">
+                    <option value="No Warranty">No Warranty</option>
+                    <option>1 Month</option><option>3 Months</option>
+                    <option>6 Months</option><option>1 Year</option><option>2 Years</option>
+                </select>
+            </div>
+        `,
+
+        /* ── MOBILE PHONES ── */
+        'Mobile Phones': () => `
+            <div class="dyn-full">
+                <span class="cat-icon-badge"><i class="fas fa-mobile-alt"></i> Mobile Phone Specifications</span>
+            </div>
+            <div>
+                <label class="dyn-label">Brand</label>
+                <select class="dyn-input extra-field-input" data-label="Brand">
+                    <option value="">Select</option>
+                    <option>Samsung</option><option>Apple (iPhone)</option><option>Tecno</option>
+                    <option>Infinix</option><option>Itel</option><option>Nokia</option>
+                    <option>Huawei</option><option>Xiaomi</option><option>Oppo</option>
+                    <option>Vivo</option><option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Model</label>
+                <input class="dyn-input extra-field-input" data-label="Model" placeholder="e.g. Samsung Galaxy A54">
+            </div>
+            <div>
+                <label class="dyn-label">RAM</label>
+                <select class="dyn-input extra-field-input" data-label="RAM">
+                    <option>2 GB</option><option>3 GB</option><option>4 GB</option>
+                    <option>6 GB</option><option>8 GB</option><option>12 GB</option><option>16 GB</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Storage</label>
+                <select class="dyn-input extra-field-input" data-label="Storage">
+                    <option>32 GB</option><option>64 GB</option><option>128 GB</option>
+                    <option>256 GB</option><option>512 GB</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Screen Size</label>
+                <select class="dyn-input extra-field-input" data-label="Display">
+                    <option>5.0"</option><option>6.0"</option><option>6.5"</option>
+                    <option>6.7"</option><option>6.9"</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Battery</label>
+                <select class="dyn-input extra-field-input" data-label="Battery">
+                    <option>3000 mAh</option><option>4000 mAh</option><option>5000 mAh</option>
+                    <option>6000 mAh</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Condition</label>
+                <select class="dyn-input extra-field-input" data-label="Condition">
+                    <option>Brand New</option><option>Like New</option>
+                    <option>Good</option><option>Fair</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Warranty</label>
+                <select class="dyn-input extra-field-input" data-label="Warranty">
+                    <option>No Warranty</option><option>3 Months</option>
+                    <option>6 Months</option><option>1 Year</option>
+                </select>
+            </div>
+        `,
+    };
+
+    // Also add to pill collector
+    function handleSubcategoryChange(subName) {
+        const container = document.getElementById('dynamicFields');
+        const grid = document.getElementById('dynamicInputsGrid');
+        const label = document.getElementById('dynSectionLabel');
+        if (subcategoryRenderers[subName]) {
+            container.style.display = 'block';
+            label.textContent = subName + ' Specifications';
+            grid.innerHTML = subcategoryRenderers[subName]();
+            // Re-bind pill toggles
+            if (typeof togglePill === 'function') {
+                document.querySelectorAll('.pill').forEach(p => {
+                    p.onclick = function() { togglePill(this, this.getAttribute('onclick').match(/'([^']+)'/g)?.[1]?.replace(/'/g,'') || ''); };
+                });
+            }
+        }
+    }
+
     function handleCategoryChange(val) {
         const container = document.getElementById('dynamicFields');
         const grid = document.getElementById('dynamicInputsGrid');
@@ -694,7 +920,7 @@
             if (val) text += `\n- ${el.getAttribute('data-label')}: ${val}`;
         });
         // pill hidden inputs
-        ['skillsValue','benefitsValue','paymentValue'].forEach(id => {
+        ['skillsValue','benefitsValue','paymentValue','compFeaturesValue'].forEach(id => {
             const el = document.getElementById(id);
             if (el && el.value) text += `\n- ${el.getAttribute('data-label')}: ${el.value}`;
         });
@@ -780,12 +1006,14 @@
             chip.addEventListener('click', function () {
                 chips.querySelectorAll('.sell-subcat-chip').forEach(c => c.classList.remove('active'));
                 if (hidden.value === sub.name) {
-                    // Clicking active chip deselects it
                     this.classList.remove('active');
                     hidden.value = '';
+                    const cat = document.getElementById('prodCategory').value;
+                    handleCategoryChange(cat);
                 } else {
                     this.classList.add('active');
                     hidden.value = sub.name;
+                    handleSubcategoryChange(sub.name);
                 }
             });
             chips.appendChild(chip);
