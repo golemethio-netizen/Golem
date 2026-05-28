@@ -727,7 +727,7 @@ window.openProductModal = async (product) => {
           + '<div style="font-size:0.8rem;color:#64748b;">' + subtitle + '</div>'
           + '</div>'
           + '<div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
-          + '<img src="' + avatarUrl + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #1a8fff;flex-shrink:0;" onerror="this.src='https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff'">'
+          + '<img src="' + avatarUrl + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #1a8fff;flex-shrink:0;" onerror="this.src=&quot;https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff&quot;">'
           + '<div><div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;">' + sellerName + '</div>'
           + '<div style="font-size:0.72rem;color:#4a90d9;">📞 +' + intPhone + '</div></div>'
           + (isVerified ? '<span style="margin-left:auto;font-size:0.68rem;color:#22c55e;background:rgba(34,197,94,0.1);border:1px solid #22c55e;border-radius:20px;padding:2px 8px;font-weight:700;"><i class="fas fa-check-circle"></i> Verified</span>' : '')
