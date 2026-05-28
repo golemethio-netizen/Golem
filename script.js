@@ -710,7 +710,7 @@ window.openProductModal = async (product) => {
         modalContent.innerHTML =
             '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">&times;</button>'
 
-          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:'Sora','Poppins',Arial,sans-serif;">'
+          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Sora,Poppins,Arial,sans-serif;">'
 
           // Watermark
           + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
@@ -1223,4 +1223,3 @@ function closeTGPopup() {
 
 // Start the auto-checker when the page loads
 window.onload = showTGPopupAuto;
-
