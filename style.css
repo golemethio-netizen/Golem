@@ -13,17 +13,17 @@
 ───────────────────────────────────────────────────────────────*/
 :root {
     /* Brand */
-    --primary-color:    #0A291A;
-    --primary:          #1a1a1a;
+    --primary-color:    #F5A623;
+    --primary:          #0A291A;
     --whatsapp-green:   #25D366;
     --telegram-blue:    #0088cc;
 
     /* UI */
-    --dark-text:    #2d3436;
-    --text-main:    #2d3436;
-    --text-muted:   #636e72;
+    --dark-text:    #1a1a1a;
+    --text-main:    #1a1a1a;
+    --text-muted:   #6b7280;
     --light-gray:   #f8f9fa;
-    --bg-color:     #f0f2f5;
+    --bg-color:     #f7f8f6;
     --glass-bg:     rgba(255, 255, 255, 0.95);
     --card-bg:      #ffffff;
     --card-shadow:  0 10px 30px rgba(0, 0, 0, 0.08);
@@ -84,7 +84,7 @@ body {
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: 1px;
-    color: var(--primary-color);
+    color: #0A291A;
     cursor: pointer;
     white-space: nowrap;
 }
@@ -125,8 +125,8 @@ body {
 }
 
 #headerSearch:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: #F5A623;
+    box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
 }
 
 /* Desktop nav */
@@ -158,7 +158,7 @@ body {
 .nav-item-box:hover { transform: translateY(-2px); }
 
 .bg-home  { background-color: #FFF4A3; }
-.bg-sell  { background-color: #FFC0C7; }
+.bg-sell  { background-color: #FFF0CC; }
 .bg-items { background-color: #D9EEE1; }
 
 /* Cart badge */
@@ -214,7 +214,7 @@ body {
 .signout-btn:hover { background: #ff6b81; transform: translateY(-2px); }
 
 .lang-btn {
-    background: #f0f2f5;
+    background: #f7f8f6;
     border: 1px solid #ddd;
     padding: 7px 14px;
     border-radius: 20px;
@@ -386,9 +386,9 @@ body {
 }
 .filter-btn:hover,
 .filter-btn.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: #F5A623;
+    color: #1a1a1a;
+    border-color: #F5A623;
 }
 
 /* ── Subcategory hover dropdown (index.html) ── */
@@ -448,17 +448,17 @@ body {
 /* Hover — same blue as .filter-btn */
 .subcat-filter-btn:hover,
 .sell-subcat-chip:hover {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: #F5A623;
+    color: #1a1a1a;
+    border-color: #F5A623;
 }
 
 /* Active — solid blue */
 .subcat-filter-btn.active,
 .sell-subcat-chip.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: #F5A623;
+    color: #1a1a1a;
+    border-color: #F5A623;
 }
 
 /* Emoji inside chip */
@@ -602,8 +602,8 @@ body {
     align-items: center;
     gap: 8px;
     padding: 12px 24px;
-    background: var(--primary-color);
-    color: white;
+    background: #F5A623;
+    color: #1a1a1a;
     border-radius: 12px;
     font-weight: 700;
     text-decoration: none;
@@ -762,8 +762,8 @@ body {
 
 .auth-submit {
     padding: 13px;
-    background: var(--primary-color);
-    color: white;
+    background: #F5A623;
+    color: #1a1a1a;
     border: none;
     border-radius: 12px;
     font-size: 1rem;
@@ -791,8 +791,8 @@ body {
 }
 
 .chat-btn {
-    background: var(--primary-color);
-    color: white;
+    background: #F5A623;
+    color: #1a1a1a;
     border: none;
     padding: 14px 22px;
     border-radius: 50px;
@@ -922,14 +922,14 @@ body {
     bottom: 85px;
     width: 44px; height: 44px;
     border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
+    background: #F5A623;
+    color: #1a1a1a;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px rgba(0, 123, 255, 0.35);
+    box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
     z-index: 900;
     transition: var(--transition);
     opacity: 0;
@@ -1102,8 +1102,8 @@ body {
 
 .shop-btn {
     display: inline-block;
-    background: var(--primary-color);
-    color: white;
+    background: #F5A623;
+    color: #1a1a1a;
     text-decoration: none;
     padding: 13px 32px;
     border-radius: 50px;
@@ -1111,7 +1111,7 @@ body {
     margin-top: 20px;
     transition: var(--transition);
 }
-.shop-btn:hover { background: #0056d6; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+.shop-btn:hover { background: #e09400; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 
 /* ─────────────────────────────────────────────────────────────
    14. QUICK CONTACT BAR  (product detail pages)
