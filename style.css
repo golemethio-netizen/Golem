@@ -1254,7 +1254,7 @@ body {
     .card-img-container { height: 155px; }
     .product-info { padding: 10px; }
     .product-title { font-size: 0.82rem; }
-    .product-price { font-size: 0.95rem; }
+    .product-price { font-size: 0.95rem; color: #e53935; font-weight: 700; }
 
     /* Filter bar */
     .filter-btn { padding: 8px 14px; font-size: 0.82rem; }
