@@ -682,14 +682,14 @@
         .subcat-filter-btn {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 20px;
-            border: 1.5px solid #d1c4e9;
-            background: white; color: #6c5ce7;
+            border: 1.5px solid #b3d0ff;
+            background: white; color: #007bff;
             font-size: 0.78rem; font-weight: 600;
             cursor: pointer; font-family: inherit;
             white-space: nowrap; transition: all 0.15s;
         }
-        .subcat-filter-btn:hover  { background: #f3f0ff; border-color: #6c5ce7; }
-        .subcat-filter-btn.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
+        .subcat-filter-btn:hover  { background: #e8f0fe; border-color: #007bff; }
+        .subcat-filter-btn.active { background: #007bff; color: white; border-color: #007bff; }
 
         /* Arrow tip pointing up */
         #subcatDropdown::before {
@@ -860,7 +860,7 @@
             <div class="modal-footer">
                 <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
                 <p id="forgotPwdRow" style="margin-top:8px; font-size:0.85rem;">
-                    <a href="#" id="forgotPwdLink" style="color:#6c5ce7; text-decoration:none;">Forgot Password?</a>
+                    <a href="#" id="forgotPwdLink" style="color:#007bff; text-decoration:none;">Forgot Password?</a>
                 </p>
             </div>
         </div>
@@ -891,7 +891,7 @@
                 <div class="seller-details-wrapper" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:12px; display:flex; align-items:center; gap:10px; border:1px solid #eee;">
                     <img id="modalSellerAvatar"
                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
-                        alt="Seller avatar" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #6c5ce7;">
+                        alt="Seller avatar" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #007bff;">
                     <div style="flex:1;">
                         <h4 id="modalSellerName" style="margin:0; color:#333; font-size:0.95rem; font-weight:600;">Seller: Loading...</h4>
                         <div id="sellerBadgeContainer"></div>
@@ -1627,13 +1627,13 @@
                     ${errorMsg ? `<p style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;">${errorMsg}</p>` : ''}
                     <input type="password" id="recPwdInput" placeholder="New password (min 6 chars)"
                         style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:10px;"
-                        oninput="this.style.borderColor='#6c5ce7'"/>
+                        oninput="this.style.borderColor='#007bff'"/>
                     <input type="password" id="recPwdConfirm" placeholder="Confirm new password"
                         style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:8px;"
-                        oninput="this.style.borderColor='#6c5ce7'"/>
+                        oninput="this.style.borderColor='#007bff'"/>
                     <p id="recPwdError" style="color:#ff4757;font-size:0.8rem;min-height:18px;margin-bottom:14px;"></p>
                     <button onclick="applyRecoveryPassword()"
-                        style="width:100%;background:#6c5ce7;color:white;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
+                        style="width:100%;background:#007bff;color:white;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
                         &#10003; Update Password
                     </button>
                 </div>`;
@@ -1677,7 +1677,7 @@
                         <code style="font-size:1.3rem;font-weight:bold;color:#2d3436;letter-spacing:2px;">${password}</code>
                     </div>
                     <button onclick="navigator.clipboard.writeText('${password}').then(()=>{this.textContent='Copied!';this.style.background='#2ed573';})"
-                        style="width:100%;background:#6c5ce7;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
+                        style="width:100%;background:#007bff;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
                         Copy Password
                     </button>
                     <button onclick="document.getElementById('recoveryModal').remove(); _supabase.auth.signOut();"
