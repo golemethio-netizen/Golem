@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details | WanaGebya</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .product-page-container { max-width: 1000px; margin: 50px auto; padding: 20px; }
@@ -93,7 +94,7 @@
 
     <div class="product-page-container">
         <a href="index.html" style="text-decoration: none; color: #666; font-weight: 600; display: inline-block; margin-bottom: 20px;">
-            <i class="fas fa-arrow-left"></i> Back to Catalog
+            <i class="fas fa-arrow-left"></i> <span data-am="ወደ ዝርዝር ተመለስ">Back to Catalog</span>
         </a>
 
         <div id="productContent" class="product-display">
@@ -188,19 +189,19 @@
                     <!-- Contact Buttons -->
                     <div class="order-buttons">
                         <a href="tel:+${cleanPhone}" class="call-btn">
-                            <i class="fas fa-phone"></i> Call Seller
+                            <i class="fas fa-phone"></i> <span data-am="ሻጩን ይደውሉ">Call Seller</span>
                         </a>
                         <a href="https://t.me/${tgUser || '+' + cleanPhone}" target="_blank" class="tg-btn">
-                            <i class="fab fa-telegram-plane"></i> Message on Telegram
+                            <i class="fab fa-telegram-plane"></i> <span data-am="በቴሌግራም ይላኩ">Message on Telegram</span>
                         </a>
                         <a href="https://wa.me/${cleanPhone}?text=Interested in ${encodeURIComponent(p.name)}" target="_blank" class="wa-btn">
-                            <i class="fab fa-whatsapp"></i> Message on WhatsApp
+                            <i class="fab fa-whatsapp"></i> <span data-am="በዋትስአፕ ይላኩ">Message on WhatsApp</span>
                         </a>
                     </div>
 
                     <!-- Share Section -->
                     <div class="share-section">
-                        <div class="share-section-label">Share this item</div>
+                        <div class="share-section-label"><span data-am="ይህን እቃ አጋሩ">Share this item</span></div>
                         <div class="share-btns-grid">
 
                             <button class="share-btn share-btn-tg"
@@ -260,6 +261,23 @@
         }
 
         window.onload = loadSingleProduct;
+    </script>
+
+    <script>
+    // Language persistence from main site
+    (function() {
+        const lang = localStorage.getItem('wg_lang');
+        if (lang === 'am') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-am]').forEach(el => {
+                    const cur = el.innerText.trim();
+                    const am = el.getAttribute('data-am');
+                    if (am) { el.innerText = am; el.setAttribute('data-am', cur); }
+                });
+                document.documentElement.lang = 'am';
+            });
+        }
+    })();
     </script>
 </body>
 </html>
