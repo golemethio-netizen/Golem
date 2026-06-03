@@ -527,7 +527,7 @@ window.openProductModal = async (product) => {
         .jc-badge-stock { color: #4ade80; border: 1px solid rgba(74,222,128,0.4); background: rgba(74,222,128,0.08); font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; }
         .jc-price-block { text-align: right; }
         .jc-price-old { font-size: 12px; color: #555; font-weight: 500; text-decoration: line-through; }
-        .jc-price-new { font-size: 24px; font-weight: 800; color: var(--jc-accent); line-height: 1; }
+        .jc-price-new { font-size: 1.05rem; font-weight: 700; color: #e53935; line-height: 1; font-variant-numeric: tabular-nums; }
         .jc-price-currency { font-size: 10px; color: #666; font-weight: 600; margin-top: 2px; }
         .jc-product-name { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 5px; }
         .jc-product-sub { font-size: 12px; color: #8899aa; font-weight: 400; }
@@ -721,7 +721,7 @@ window.openProductModal = async (product) => {
           + '<span style="display:inline-flex;align-items:center;gap:5px;background:' + stockColor + '22;border:1px solid ' + stockColor + ';border-radius:20px;padding:3px 10px;font-size:0.65rem;font-weight:800;color:' + stockColor + ';">'
           + '<span style="width:6px;height:6px;border-radius:50%;background:' + stockColor + ';"></span>' + stockLabel + '</span>'
           + '<div style="text-align:right;">'
-          + (product.price ? '<div style="font-size:1.5rem;font-weight:900;color:#1a8fff;">' + product.price.toLocaleString() + ' <span style="font-size:0.9rem;color:#4a90d9;">ETB</span></div>' : '<div style="font-size:1.1rem;color:#4a90d9;">Negotiable</div>')
+          + (product.price ? '<div style="font-size:1.05rem;font-weight:700;color:#e53935;font-variant-numeric:tabular-nums;">' + product.price.toLocaleString() + ' <span style="font-size:0.9rem;color:#e53935;">ETB</span></div>' : '<div style="font-size:1.05rem;color:#e53935;font-weight:700;">Negotiable</div>')
           + '</div></div>'
           + '<div style="font-size:1.1rem;font-weight:700;color:white;margin-bottom:3px;">' + product.name + '</div>'
           + '<div style="font-size:0.8rem;color:#64748b;">' + subtitle + '</div>'
@@ -783,7 +783,7 @@ window.openProductModal = async (product) => {
                     </div>
                 </div>
 
-                <div class="modal-price" style="font-size: 1.3rem; color: #2ed573; font-weight:bold; margin-bottom:10px;">
+                <div class="modal-price" style="font-size: 1.05rem; color: #e53935; font-weight:700; margin-bottom:10px; font-variant-numeric:tabular-nums;">
                     ${product.price ? product.price.toLocaleString() : 'Negotiable'} ETB
                 </div>
 
