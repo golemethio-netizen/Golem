@@ -195,7 +195,7 @@ function renderProducts(products) {
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
                     ${jobType  ? `<span class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i>${jobType}</span>` : ''}
                     ${industry ? `<span class="job-tag blue">${industry}</span>` : ''}
-                    <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#059669' : '#aaa'}; display:flex; align-items:center; gap:3px;">
+                    <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#2ed573' : '#aaa'}; display:flex; align-items:center; gap:3px;">
                         <i class="fas fa-check-circle"></i>${isVerified ? 'Verified' : 'Community'}
                     </span>
                 </div>
@@ -274,7 +274,7 @@ function renderProducts(products) {
                     <div class="service-provider">
                         <i class="fas fa-map-marker-alt" style="color:#ff4757; font-size:11px;"></i>
                         ${p.location || 'Addis Ababa'}
-                        <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#059669' : '#aaa'};">
+                        <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#2ed573' : '#aaa'};">
                             <i class="fas fa-check-circle"></i> ${isVerified ? 'Verified' : 'Community'}
                         </span>
                     </div>
@@ -378,7 +378,7 @@ function renderProducts(products) {
                 </div>
 
                 <div class="product-actions" style="margin-top:15px;">
-                    <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; cursor:pointer; background:#ffffff; color:#111; border:1.5px solid #222; font-weight:700;">
+                    <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; cursor:pointer; background:#F5A623; color:#1a1a1a; border:none; font-weight:700;">
                         Full Details
                     </button>
                 </div>
@@ -475,14 +475,14 @@ window.openProductDetailsSafe = (encodedData) => {
 function getStockBadge(stockStatus, quantity) {
     if (!stockStatus || stockStatus === 'in_stock') {
         const qty = quantity ? ' &nbsp;·&nbsp; <strong>' + quantity + ' left</strong>' : '';
-        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#e8fdf5;border:1.5px solid #2ed573;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#00b894;margin-bottom:10px;">'
+        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#e8fdf5;border:1.5px solid #2ed573;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#F5A623;margin-bottom:10px;">'
              + '<i class="fas fa-check-circle"></i> In Stock' + qty + '</div>';
     } else if (stockStatus === 'out_of_stock') {
         return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff0f0;border:1.5px solid #ff4757;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#ff4757;margin-bottom:10px;">'
              + '<i class="fas fa-times-circle"></i> Out of Stock &nbsp;·&nbsp; <span style="font-weight:400;font-size:0.75rem;">Contact seller for availability</span></div>';
     } else if (stockStatus === 'limited') {
         const qty = quantity ? ' &nbsp;·&nbsp; <strong>Only ' + quantity + ' left!</strong>' : '';
-        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1.5px solid #fdcb6e;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#e67e22;margin-bottom:10px;">'
+        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1.5px solid #F5A623;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#F5A623;margin-bottom:10px;">'
              + '<i class="fas fa-exclamation-triangle"></i> Limited Stock' + qty + '</div>';
     }
     return '';
@@ -492,15 +492,15 @@ function getStockBadge(stockStatus, quantity) {
 function specCell(icon, label, value) {
     return '<div style="padding:13px 16px;border-right:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">'
          + '<div style="width:24px;height:24px;border-radius:6px;background:rgba(26,143,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:6px;">'
-         + '<i class="' + icon + '" style="font-size:0.7rem;color:#1a8fff;"></i></div>'
-         + '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#4a5568;text-transform:uppercase;margin-bottom:2px;">' + label + '</div>'
+         + '<i class="' + icon + '" style="font-size:0.7rem;color:#F5A623;"></i></div>'
+         + '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#6b7280;text-transform:uppercase;margin-bottom:2px;">' + label + '</div>'
          + '<div style="font-size:0.9rem;font-weight:600;color:#e2e8f0;">' + (value || '—') + '</div>'
          + '</div>';
 }
 function miniBar(label, value) {
     return '<div style="flex:1;padding:10px 16px;border-right:1px solid rgba(255,255,255,0.06);">'
-         + '<div style="font-size:0.62rem;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.08em;">' + label + '</div>'
-         + '<div style="font-size:0.82rem;font-weight:600;color:#93c5fd;margin-top:2px;">' + (value || '—') + '</div>'
+         + '<div style="font-size:0.62rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;">' + label + '</div>'
+         + '<div style="font-size:0.82rem;font-weight:600;color:#c8e6c9;margin-top:2px;">' + (value || '—') + '</div>'
          + '</div>';
 }
 
@@ -514,11 +514,11 @@ window.openProductModal = async (product) => {
         const style = document.createElement('style');
         style.id = 'jc-custom-styles';
         style.innerHTML = `
-        :root { --jc-accent: #e8321a; --jc-accent2: #f97316; --jc-accent-light: #fff4f2; --jc-dark-header: #1a1612; --jc-border: #e2e8f0; --jc-green: #22c55e; }
+        :root { --jc-accent: #e8321a; --jc-accent2: #f97316; --jc-accent-light: #fff4f2; --jc-dark-header: #1a1a1a; --jc-border: #e2e8f0; --jc-green: #2ed573; }
         .jc-card { width: 100%; background: #fff; border-radius: 18px; overflow: hidden; position: relative; text-align: left; font-family: 'Poppins', sans-serif;}
         .jc-watermark { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 10; overflow: hidden; transform: rotate(-25deg); }
         .jc-watermark-text { font-weight: 800; white-space: nowrap; font-size: 62px; color: rgba(232, 50, 26, 0.05); }
-        .jc-photo-wrap { background: #1a1612; border-bottom: 1px solid #2a2420; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; }
+        .jc-photo-wrap { background: #1a1a1a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; }
         .jc-photo-wrap.has-photo { min-height: 200px; }
         .jc-card-photo { width: 100%; max-height: 250px; object-fit: cover; display: block; }
         .jc-no-photo-msg { font-size: 10px; color: #3a3530; padding: 16px; text-transform: uppercase; font-weight: 600; }
@@ -545,7 +545,7 @@ window.openProductModal = async (product) => {
         .jc-spec-value { font-size: 13.5px; font-weight: 700; color: #12100e; }
         .jc-desc-area { padding: 15px 20px; font-size: 13px; color: #444; background: #fff; border-bottom: 1px solid var(--jc-border); line-height: 1.5; white-space: pre-wrap;}
         .jc-card-footer { padding: 13px 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--jc-border); background: white; flex-wrap: wrap; gap:10px;}
-        .jc-availability { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #64748b; font-weight: 500; }
+        .jc-availability { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6b7280; font-weight: 500; }
         .jc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--jc-green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
         .jc-cta-btn { background: var(--jc-accent); color: white; font-size: 13px; font-weight: 700; padding: 10px 15px; border-radius: 9px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; flex: 1; justify-content: center;}
         `;
@@ -610,7 +610,7 @@ window.openProductModal = async (product) => {
                         <div class="jc-badges">
                             <span class="jc-badge-stock">${isJob ? 'OPEN VACANCY' : 'AVAILABLE NOW'}</span>
                             ${!isJob && product.stock_status === 'out_of_stock' ? '<span style="background:#ff4757;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">OUT OF STOCK</span>' : ''}
-                            ${!isJob && product.stock_status === 'limited' ? '<span style="background:#e67e22;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">LIMITED' + (product.quantity ? ': ' + product.quantity + ' LEFT' : '') + '</span>' : ''}
+                            ${!isJob && product.stock_status === 'limited' ? '<span style="background:#F5A623;color:white;font-size:0.65rem;font-weight:800;padding:3px 9px;border-radius:10px;margin-left:5px;letter-spacing:0.05em;">LIMITED' + (product.quantity ? ': ' + product.quantity + ' LEFT' : '') + '</span>' : ''}
                         </div>
                         <div class="jc-price-block">
                             <div class="jc-price-old">${priceOld}</div>
@@ -661,7 +661,7 @@ window.openProductModal = async (product) => {
                         <a href="tel:+${intPhone}" class="jc-cta-btn"><i class="fas fa-phone"></i> ${isJob ? 'Apply' : 'Call'}</a>
                     </div>
                 </div>
-                <div style="background: #1a1612; padding: 9px 22px; display: flex; align-items: center; justify-content: center; border-top: 1px solid #2a2420; border-radius: 0 0 18px 18px;">
+                <div style="background: #1a1a1a; padding: 9px 22px; display: flex; align-items: center; justify-content: center; border-top: 1px solid #1a1a1a; border-radius: 0 0 18px 18px;">
                     <span style="font-size: 11px; color: #555570; letter-spacing: 0.06em;">wanagebya.com</span>
                 </div>
             </div>`;
@@ -700,8 +700,8 @@ window.openProductModal = async (product) => {
         const subtitle = (brand ? brand + ' · ' : '') + (product.subcategory || product.category);
         const isMobile = product.subcategory === 'Mobile Phones';
 
-        const stockColor = (!product.stock_status || product.stock_status === 'in_stock') ? '#22c55e'
-            : product.stock_status === 'limited' ? '#f59e0b' : '#ef4444';
+        const stockColor = (!product.stock_status || product.stock_status === 'in_stock') ? '#2ed573'
+            : product.stock_status === 'limited' ? '#F5A623' : '#ef4444';
         const stockLabel = (!product.stock_status || product.stock_status === 'in_stock') ? 'IN STOCK'
             : product.stock_status === 'limited' ? 'LIMITED STOCK' : 'OUT OF STOCK';
 
@@ -724,13 +724,13 @@ window.openProductModal = async (product) => {
           + (product.price ? '<div style="font-size:1.05rem;font-weight:700;color:#e53935;font-variant-numeric:tabular-nums;">' + product.price.toLocaleString() + ' <span style="font-size:0.9rem;color:#e53935;">ETB</span></div>' : '<div style="font-size:1.05rem;color:#e53935;font-weight:700;">Negotiable</div>')
           + '</div></div>'
           + '<div style="font-size:1.1rem;font-weight:700;color:white;margin-bottom:3px;">' + product.name + '</div>'
-          + '<div style="font-size:0.8rem;color:#64748b;">' + subtitle + '</div>'
+          + '<div style="font-size:0.8rem;color:#6b7280;">' + subtitle + '</div>'
           + '</div>'
           + '<div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
-          + '<img src="' + avatarUrl + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #1a8fff;flex-shrink:0;" onerror="this.src=&quot;https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff&quot;">'
+          + '<img src="' + avatarUrl + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #F5A623;flex-shrink:0;" onerror="this.src=&quot;https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff&quot;">'
           + '<div><div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;">' + sellerName + '</div>'
           + '<div style="font-size:0.72rem;color:#4a90d9;">📞 +' + intPhone + '</div></div>'
-          + (isVerified ? '<span style="margin-left:auto;font-size:0.68rem;color:#22c55e;background:rgba(34,197,94,0.1);border:1px solid #22c55e;border-radius:20px;padding:2px 8px;font-weight:700;"><i class="fas fa-check-circle"></i> Verified</span>' : '')
+          + (isVerified ? '<span style="margin-left:auto;font-size:0.68rem;color:#2ed573;background:rgba(34,197,94,0.1);border:1px solid #2ed573;border-radius:20px;padding:2px 8px;font-weight:700;"><i class="fas fa-check-circle"></i> Verified</span>' : '')
           + '</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + specCell('fas fa-microchip', isMobile ? 'RAM' : 'Processor', isMobile ? ram : cpu)
@@ -741,7 +741,7 @@ window.openProductModal = async (product) => {
           + specCell('fas fa-shield-alt', 'Warranty', warranty)
           + '</div>'
           + (features ? '<div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;flex-wrap:wrap;gap:6px;">'
-          + features.split(',').map(function(f){ return '<span style="background:rgba(26,143,255,0.12);border:1px solid rgba(26,143,255,0.3);color:#93c5fd;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;">' + f.trim() + '</span>'; }).join('')
+          + features.split(',').map(function(f){ return '<span style="background:rgba(26,143,255,0.12);border:1px solid rgba(26,143,255,0.3);color:#c8e6c9;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;">' + f.trim() + '</span>'; }).join('')
           + '</div>' : '')
           + '<div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + miniBar('OS', os)
@@ -749,7 +749,7 @@ window.openProductModal = async (product) => {
           + miniBar('Location', product.location || '-')
           + '</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
-          + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a2e;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
+          + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a1a;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
           + '<a href="https://wa.me/' + intPhone + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#075e54;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fab fa-whatsapp"></i> WhatsApp</a>'
           + '<a href="https://t.me/' + (tgUser || '+' + intPhone) + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#0088cc;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;"><i class="fab fa-telegram-plane"></i> Telegram</a>'
           + '</div>'
@@ -772,7 +772,7 @@ window.openProductModal = async (product) => {
                 <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
                 
                 <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
+                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #0A291A;">
                     <div style="flex: 1;">
                         <h4 style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: ${sellerName}</h4>
                         <div style="margin-top:5px; font-size:0.8rem;">
@@ -797,7 +797,7 @@ window.openProductModal = async (product) => {
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
                     <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
                     <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#6c5ce7; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#F5A623; color:#1a1a1a; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                 </div>
             </div>`;
     }
@@ -937,7 +937,7 @@ window.loadUsers = async function() {
         <div style="overflow-x:auto;">
             <table style="width:100%; border-collapse:collapse;">
                 <thead>
-                    <tr style="text-align:left; border-bottom:2px solid #f4f7f6; color:#888;">
+                    <tr style="text-align:left; border-bottom:2px solid #f7f8f6; color:#888;">
                         <th style="padding:15px;">USER INFO</th>
                         <th style="padding:15px;">LOCATION</th>
                         <th style="padding:15px;">JOINED</th>
@@ -948,14 +948,14 @@ window.loadUsers = async function() {
                 </thead>
                 <tbody>
                     ${users.map(u => `
-                        <tr style="border-bottom:1px solid #f4f7f6;">
+                        <tr style="border-bottom:1px solid #f7f8f6;">
                             <td style="padding:10px 15px;"><strong>${u.full_name || 'Member'}</strong><br><small style="color:#888;">${u.email || 'N/A'}</small></td>
                             <td style="padding:10px 15px; font-size:0.85rem;">${u.location || 'Addis Ababa'}</td>
                             <td style="padding:10px 15px; font-size:0.85rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                             <td style="padding:10px 15px;">${u.is_admin ? 'Admin 🛡️' : 'User 👤'}</td>
                             <td style="padding:10px 15px;">${u.is_verified ? '<span style="color:#2ed573; font-weight:bold;">VERIFIED</span>' : '<span style="color:#888;">GUEST</span>'}</td>
                             <td style="padding:10px 15px; text-align:right;">
-                                <button onclick="window.toggleVerification('${u.id}', ${u.is_verified})" style="padding:5px 10px; background:#6c5ce7; color:white; border:none; border-radius:4px; cursor:pointer;">Toggle Verify</button>
+                                <button onclick="window.toggleVerification('${u.id}', ${u.is_verified})" style="padding:5px 10px; background:#F5A623; color:#1a1a1a; border:none; border-radius:4px; cursor:pointer;">Toggle Verify</button>
                             </td>
                         </tr>
                     `).join('')}
