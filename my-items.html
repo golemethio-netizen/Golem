@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <title>My Items | WanaGebya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -59,13 +60,13 @@
             transition: 0.2s;
         }
 
-        .edit-btn { background: #f1f2f6; color: #2d3436; }
+        .edit-btn { background: #f1f2f6; color: #1a1a1a; }
         .edit-btn:hover { background: #e2e4e9; transform: translateY(-2px); }
 
         .delete-btn { background: #ffeaa7; color: #d63031; }
         .delete-btn:hover { background: #fab1a0; transform: translateY(-2px); }
 
-        .why-btn { background: #6c5ce7; color: white; }
+        .why-btn { background:#F5A623; color:#1a1a1a; }
         .why-btn:hover { background: #5a4bcf; transform: translateY(-2px); }
 
         /* Modal specific styling for large forms */
@@ -83,12 +84,12 @@
         .sell-subcat-chip {
             display:inline-flex; align-items:center; gap:5px;
             padding:6px 14px; border-radius:20px;
-            border:1.5px solid #d1c4e9; background:white; color:#6c5ce7;
+            border:1.5px solid #c8e6c9; background:white; color:#0A291A;
             font-size:0.8rem; font-weight:600; cursor:pointer;
             font-family:inherit; transition:all 0.15s; white-space:nowrap;
         }
-        .sell-subcat-chip:hover  { background:#f3f0ff; border-color:#6c5ce7; }
-        .sell-subcat-chip.active { background:#6c5ce7; color:white; border-color:#6c5ce7; }
+        .sell-subcat-chip:hover  { background:#f0f7f4; border-color:#0A291A; }
+        .sell-subcat-chip.active { background:#F5A623; color:#1a1a1a; border-color:#0A291A; }
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1rem; box-sizing: border-box;
         }
     </style>
@@ -117,7 +118,7 @@
         <div class="dashboard-header">
             <div>
                 <h3>Your Posted Items</h3>
-                <p style="color: #666; margin: 5px 0 0 0;">Manage your listings and track their status.</p>
+                <p style="color: #666; margin: 5px 0 0 0;"><span data-am="ዝርዝሮችዎን ያስተዳድሩ እና ሁኔታቸውን ይከታተሉ።">Manage your listings and track their status.</span></p>
             </div>
             <button onclick="location.href='sell.html'" class="auth-submit" style="padding: 10px 20px;">
                 <i class="fas fa-plus"></i> Post New Item
@@ -125,7 +126,7 @@
         </div>
 
         <div id="myItemsGrid" class="masonry-wrapper">
-            <div class="loading-spinner" style="text-align: center; padding: 50px; grid-column: 1 / -1; color: #6c5ce7;">
+            <div class="loading-spinner" style="text-align: center; padding: 50px; grid-column: 1 / -1; color: #0A291A;">
                 <i class="fas fa-circle-notch fa-spin fa-2x"></i> 
                 <p style="margin-top: 10px; font-weight: 600;">Loading your items...</p>
             </div>
@@ -135,7 +136,7 @@
         <div id="editModal" class="modal-overlay" onclick="if(event.target == this) window.closeEditModal()">
             <div class="modal-content modal-content-scrollable" style="max-width: 600px;">
                 <button type="button" class="close-modal-btn" onclick="window.closeEditModal()">&times;</button>
-                <h2 style="margin-bottom: 20px;"><i class="fas fa-edit" style="color: #6c5ce7;"></i> Edit Listing</h2>
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-edit" style="color: #0A291A;"></i> <span data-am="ማስታወቂያ አርትዕ">Edit Listing</span></h2>
                 
                 <form id="editForm" onsubmit="window.saveChanges(event)">
                     <input type="hidden" id="editId">
@@ -192,7 +193,7 @@
 
                         <!-- STOCK MANAGEMENT (products only) -->
                         <div style="background:#f8f9ff;border:1.5px solid #d0d0ff;border-radius:12px;padding:16px;margin-bottom:14px;">
-                            <div style="font-weight:700;color:#6c5ce7;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> Stock Management</div>
+                            <div style="font-weight:700;color:#0A291A;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> <span data-am="የክምችት አስተዳደር">Stock Management</span></div>
                             <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
                                 <div class="input-group-sell" style="flex:1;min-width:140px;margin:0;">
                                     <label style="font-size:0.82rem;"><i class="fas fa-toggle-on"></i> Stock Status</label>
@@ -205,7 +206,7 @@
                                 </div>
                                 <div class="input-group-sell" id="qtyWrapper" style="flex:1;min-width:120px;margin:0;">
                                     <label style="font-size:0.82rem;"><i class="fas fa-hashtag"></i> Quantity</label>
-                                    <input type="number" id="editQuantity" min="0" placeholder="e.g. 5"
+                                    <input type="number" id="editQuantity" min="0" placeholder="e.g. 5" data-am-placeholder="ለምሳሌ 5"
                                         style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;box-sizing:border-box;">
                                 </div>
                             </div>
@@ -230,7 +231,7 @@
                                 </div>
                                 <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
                                     <label style="font-size:0.82rem;">Salary / Month (ETB)</label>
-                                    <input type="number" id="editSalary" placeholder="e.g. 15000"
+                                    <input type="number" id="editSalary" placeholder="e.g. 15000" data-am-placeholder="ለምሳሌ 15000"
                                         style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;box-sizing:border-box;">
                                 </div>
                             </div>
@@ -247,7 +248,7 @@
                                 </div>
                                 <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
                                     <label style="font-size:0.82rem;">Positions Available</label>
-                                    <input type="number" id="editPositions" min="1" placeholder="e.g. 2"
+                                    <input type="number" id="editPositions" min="1" placeholder="e.g. 2" data-am-placeholder="ለምሳሌ 2"
                                         style="border-radius:8px;padding:10px;border:1.5px solid #b3d9ff;width:100%;outline:none;box-sizing:border-box;">
                                 </div>
                             </div>
@@ -262,11 +263,11 @@
                     <!-- SERVICE FIELDS (shown only for Services) -->
                     <div id="editServiceFields" style="display:none;">
                         <div style="background:#f0fff8;border:1.5px solid #a8e6cf;border-radius:12px;padding:16px;margin-bottom:14px;">
-                            <div style="font-weight:700;color:#00b894;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-concierge-bell"></i> Service Details</div>
+                            <div style="font-weight:700;color:#2ed573;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-concierge-bell"></i> Service Details</div>
                             <div style="display:flex;gap:12px;flex-wrap:wrap;">
                                 <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
                                     <label style="font-size:0.82rem;">Service Rate (ETB)</label>
-                                    <input type="number" id="editServiceRate" placeholder="per hour/project"
+                                    <input type="number" id="editServiceRate" placeholder="per hour/project" data-am-placeholder="በሰዓት/ፕሮጀክት"
                                         style="border-radius:8px;padding:10px;border:1.5px solid #a8e6cf;width:100%;outline:none;box-sizing:border-box;">
                                 </div>
                                 <div class="input-group-sell" style="flex:1;min-width:140px;margin:0 0 10px;">
@@ -282,7 +283,7 @@
                             </div>
                             <div class="input-group-sell" style="margin:0;">
                                 <label style="font-size:0.82rem;">Service Area</label>
-                                <input type="text" id="editServiceArea" placeholder="e.g. Addis Ababa, Bole"
+                                <input type="text" id="editServiceArea" placeholder="e.g. Addis Ababa, Bole" data-am-placeholder="ለምሳሌ አዲስ አበባ፣ ቦሌ"
                                     style="border-radius:8px;padding:10px;border:1.5px solid #a8e6cf;width:100%;outline:none;box-sizing:border-box;">
                             </div>
                         </div>
@@ -442,7 +443,7 @@
                     <i class="fas fa-box-open fa-3x" style="color: #ccc; margin-bottom: 15px;"></i>
                     <h3 style="margin:0;">No items found</h3>
                     <p style="color: #888;">You haven't posted any items yet.</p>
-                    <a href="sell.html" class="contact-btn" style="display:inline-block; margin-top:15px; background:#333; color:white; padding:10px 20px; border-radius:8px; text-decoration:none;">Sell an Item</a>
+                    <a href="sell.html" class="contact-btn" style="display:inline-block; margin-top:15px; background:#F5A623; color:#1a1a1a; padding:10px 20px; border-radius:8px; text-decoration:none;">Sell an Item</a>
                 </div>`;
                 return;
             }
@@ -461,7 +462,7 @@
                 const priceHtml = isJob
                     ? `<p class="product-price" style="color:#0088cc;">${item.price ? item.price.toLocaleString() + ' ETB/mo' : 'Salary: Negotiable'}</p>`
                     : isService
-                        ? `<p class="product-price" style="color:#00b894;">${item.price ? item.price.toLocaleString() + ' ETB' : 'Rate: Negotiable'}</p>`
+                        ? `<p class="product-price" style="color:#2ed573;">${item.price ? item.price.toLocaleString() + ' ETB' : 'Rate: Negotiable'}</p>`
                         : `<p class="product-price">${item.price ? item.price.toLocaleString() + ' ETB' : 'Negotiable'}</p>`;
 
                 // Availability badge — only stock badge for products
@@ -470,7 +471,7 @@
                            <i class="fas fa-briefcase"></i> OPEN VACANCY
                        </div>`
                     : isService
-                        ? `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #00b894;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#00b894;margin-bottom:6px;">
+                        ? `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#2ed573;margin-bottom:6px;">
                                <i class="fas fa-concierge-bell"></i> AVAILABLE NOW
                            </div>`
                         : getStockBadge(item.stock_status, item.quantity);
@@ -486,7 +487,7 @@
                         
                         <div class="product-info">
                             <h3 class="product-title">${item.name}</h3>
-                            ${item.subcategory ? `<p style="font-size:0.75rem;color:#6c5ce7;font-weight:600;margin:2px 0 4px;"><i class="fas fa-sitemap" style="font-size:10px;"></i> ${item.subcategory}</p>` : ''}
+                            ${item.subcategory ? `<p style="font-size:0.75rem;color:#0A291A;font-weight:600;margin:2px 0 4px;"><i class="fas fa-sitemap" style="font-size:10px;"></i> ${item.subcategory}</p>` : ''}
                             ${priceHtml}
                             ${badgeHtml}
                             ${reasonNote}
@@ -510,7 +511,7 @@
             switch(status) {
                 case 'approved': return '#25D366';
                 case 'rejected': return '#ff4757';
-                case 'sold': return '#636e72';
+                case 'sold': return '#6b7280';
                 default: return '#f1c40f';
             }
         }
@@ -520,7 +521,7 @@
             if (!stockStatus) return '';
             if (stockStatus === 'in_stock') {
                 const qtyText = quantity ? ` · ${quantity} left` : '';
-                return `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#00b894;margin-bottom:6px;">
+                return `<div style="display:inline-flex;align-items:center;gap:5px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:700;color:#2ed573;margin-bottom:6px;">
                     <i class="fas fa-check-circle"></i> In Stock${qtyText}
                 </div>`;
             } else if (stockStatus === 'out_of_stock') {
@@ -551,7 +552,7 @@
             } else {
                 wrapper.style.opacity = '1';
                 wrapper.style.pointerEvents = 'all';
-                preview.innerHTML = '<span style="font-size:0.8rem;color:#00b894;font-weight:700;"><i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.</span>';
+                preview.innerHTML = '<span style="font-size:0.8rem;color:#2ed573;font-weight:700;"><i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.</span>';
             }
         }
 
@@ -708,7 +709,7 @@
                     const y     = canvas.height - boxH - 16;
 
                     ctx.globalAlpha = 0.62;
-                    ctx.fillStyle   = '#1a1a2e';
+                    ctx.fillStyle   = '#1a1a1a';
                     const r = 8;
                     ctx.beginPath();
                     ctx.moveTo(x + r, y);
@@ -728,7 +729,7 @@
                     ctx.fillText(text, x + padding, y + boxH - padding / 2);
 
                     ctx.globalAlpha = 1;
-                    ctx.fillStyle   = '#6c5ce7';
+                    ctx.fillStyle   = '#0A291A';
                     ctx.beginPath();
                     ctx.arc(x + padding - 6, y + boxH / 2, 4, 0, Math.PI * 2);
                     ctx.fill();
@@ -866,6 +867,26 @@
             await _supabase.auth.signOut();
             window.location.href = 'index.html';
         };
+    </script>
+
+    <script>
+    (function() {
+        const lang = localStorage.getItem('wg_lang');
+        if (lang === 'am') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-am]').forEach(el => {
+                    const cur = el.innerText.trim();
+                    const am = el.getAttribute('data-am');
+                    if (am) { el.innerText = am; el.setAttribute('data-am', cur); }
+                });
+                document.querySelectorAll('[data-am-placeholder]').forEach(el => {
+                    el.setAttribute('data-en-placeholder', el.placeholder);
+                    el.placeholder = el.getAttribute('data-am-placeholder');
+                });
+                document.documentElement.lang = 'am';
+            });
+        }
+    })();
     </script>
 </body>
 </html>
