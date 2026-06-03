@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sell an Item | WanaGebya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -19,23 +20,23 @@
         .sell-subcat-chip {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 14px; border-radius: 20px;
-            border: 1.5px solid #d1c4e9;
-            background: white; color: #6c5ce7;
+            border: 1.5px solid #c8e6c9;
+            background: white; color: #0A291A;
             font-size: 0.8rem; font-weight: 600;
             cursor: pointer; font-family: inherit;
             transition: all 0.15s; white-space: nowrap;
         }
-        .sell-subcat-chip:hover  { background: #f3f0ff; border-color: #6c5ce7; }
-        .sell-subcat-chip.active { background: #6c5ce7; color: white; border-color: #6c5ce7; }
+        .sell-subcat-chip:hover  { background: #f0f7f4; border-color: #0A291A; }
+        .sell-subcat-chip.active { background:#F5A623; color:#1a1a1a; border-color: #0A291A; }
             width: 100%; padding: 12px; border: 1px solid #ddd;
             border-radius: 8px; font-family: inherit; font-size: 1rem;
         }
         .auth-submit {
-            background: #333; color: white; border: none; padding: 15px;
+            background:#F5A623; color:#1a1a1a; border: none; padding: 15px;
             border-radius: 8px; font-weight: bold; cursor: pointer;
             transition: 0.3s; width: 100%; margin-top: 20px;
         }
-        .auth-submit:hover { background: #000; }
+        .auth-submit:hover { background: #e09400; color: #1a1a1a; }
         .auth-submit:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
 
         /* ── Dynamic fields container ── */
@@ -54,7 +55,7 @@
             text-transform: uppercase;
             letter-spacing: 1.2px;
             font-weight: 700;
-            color: #e8321a;
+            color: #F5A623;
             padding: 10px 14px;
             background: #fff4f2;
             border: 1px solid #f9731633;
@@ -100,7 +101,7 @@
         }
 
         .dyn-input:focus, .extra-field-input:focus {
-            border-color: #e8321a;
+            border-color: #F5A623;
             outline: none;
             box-shadow: 0 0 0 3px rgba(232,50,26,0.08);
         }
@@ -126,15 +127,15 @@
             user-select: none;
         }
 
-        .pill:hover { border-color: #e8321a; color: #e8321a; }
-        .pill.selected { background: #e8321a; color: white; border-color: #e8321a; }
+        .pill:hover { border-color: #F5A623; color: #F5A623; }
+        .pill.selected { background: #F5A623; color: white; border-color: #F5A623; }
 
         /* ── Icon badge for category ── */
         .cat-icon-badge {
             display: inline-flex; align-items: center; gap: 6px;
             background: #fff4f2; border: 1px solid #f9731633;
             border-radius: 20px; padding: 4px 12px;
-            font-size: 12px; font-weight: 600; color: #e8321a;
+            font-size: 12px; font-weight: 600; color: #F5A623;
             margin-bottom: 10px;
         }
 
@@ -158,13 +159,13 @@
 
     <header class="golem-header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">WanaGebya</div>
-        <a href="index.html" class="signin-btn" style="text-decoration: none;">Cancel</a>
+        <a href="index.html" class="signin-btn" style="text-decoration: none;" data-am="ይቅር">Cancel</a>
     </header>
 
     <main class="container" style="max-width: 600px; padding: 20px;">
         <div class="form-card" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
             <h2 style="margin-bottom: 10px;">Post New Listing</h2>
-            <p style="color: #666; margin-bottom: 25px;">Fill in the details to reach thousands of buyers.</p>
+            <p style="color: #666; margin-bottom: 25px;"><span data-am="ዝርዝሮችን ይሙሉ ለሺዎች ገዢዎች ያቅርቡ።">Fill in the details to reach thousands of buyers.</span></p>
 
             <form id="sellForm">
 
@@ -182,7 +183,7 @@
                 <!-- Name -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-tag"></i> Item / Listing Title</label>
-                    <input type="text" id="prodName" placeholder="your product or service Name" required>
+                    <input type="text" id="prodName" placeholder="your product or service Name" data-am-placeholder="የምርትዎ ወይም አገልግሎትዎ ስም" required>
                 </div>
 
                 <!-- Condition + Price -->
@@ -199,13 +200,13 @@
                     </div>
                     <div class="input-group-sell" style="flex:1;">
                         <label><i class="fas fa-money-bill-wave"></i> Price / Salary (ETB)</label>
-                        <input type="number" id="prodPrice" placeholder="0.00" required>
+                        <input type="number" id="prodPrice" placeholder="0.00" style="color:#e53935; font-weight:700;" required>
                     </div>
                 </div>
 
                 <!-- STOCK MANAGEMENT -->
                 <div style="background:#f8f9ff;border:1.5px solid #d0d0ff;border-radius:12px;padding:16px;margin-bottom:15px;">
-                    <div style="font-weight:700;color:#6c5ce7;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> Stock Management</div>
+                    <div style="font-weight:700;color:#0A291A;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-boxes"></i> <span data-am="የክምችት አስተዳደር">Stock Management</span></div>
                     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
                         <!-- Stock Status -->
                         <div class="input-group-sell" style="flex:1;min-width:140px;margin:0;">
@@ -224,7 +225,7 @@
                                 style="border-radius:8px;padding:10px;border:1.5px solid #d0d0ff;width:100%;outline:none;box-sizing:border-box;">
                         </div>
                     </div>
-                    <div id="sellStockPreview" style="margin-top:10px;font-size:0.8rem;color:#00b894;font-weight:700;">
+                    <div id="sellStockPreview" style="margin-top:10px;font-size:0.8rem;color:#2ed573;font-weight:700;">
                         <i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.
                     </div>
                 </div>
@@ -256,13 +257,13 @@
                 <!-- Description -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-align-left"></i> General Description</label>
-                    <textarea id="prodDesc" rows="4" placeholder="Describe the item or listing in detail..." required></textarea>
+                    <textarea id="prodDesc" rows="4" placeholder="Describe the item or listing in detail..." data-am-placeholder="እቃውን ወይም ማስታወቂያውን በዝርዝር ይግለጹ..." required></textarea>
                 </div>
 
                 <!-- Phone -->
                 <div class="input-group-sell">
                     <label><i class="fas fa-phone"></i> Contact Phone</label>
-                    <input type="text" id="prodPhone" placeholder="0911..." required>
+                    <input type="text" id="prodPhone" placeholder="0911..." data-am-placeholder="0911..." required>
                 </div>
 
                 <!-- Region -->
@@ -287,7 +288,7 @@
         </div>
 </div>
 
-                <button type="submit" id="submitBtn" class="auth-submit">Publish Listing</button>
+                <button type="submit" id="submitBtn" class="auth-submit" data-am="ያትሙ">Publish Listing</button>
             </form>
         </div>
     </main>
@@ -310,12 +311,12 @@
 
             <div>
                 <label class="dyn-label">Job Title</label>
-                <input class="dyn-input extra-field-input" data-label="Job Title" placeholder="e.g. Senior Accountant">
+                <input class="dyn-input extra-field-input" data-label="Job Title" placeholder="e.g. Senior Accountant" data-am-placeholder="ለምሳሌ ከፍተኛ ሂሳብ ባለሙያ">
             </div>
 
             <div>
                 <label class="dyn-label">Company / Organization</label>
-                <input class="dyn-input extra-field-input" data-label="Company" placeholder="e.g. ABC Trading PLC">
+                <input class="dyn-input extra-field-input" data-label="Company" placeholder="e.g. ABC Trading PLC" data-am-placeholder="ለምሳሌ ABC ንግድ ሕ/ሽ/ማ">
             </div>
 
             <div>
@@ -409,9 +410,9 @@
             <div class="dyn-full">
                 <label class="dyn-label">Salary Range (ETB / month)</label>
                 <div class="salary-row">
-                    <input class="dyn-input extra-field-input" data-label="Salary Min" type="number" placeholder="Min e.g. 8,000">
+                    <input class="dyn-input extra-field-input" data-label="Salary Min" type="number" placeholder="Min e.g. 8,000" data-am-placeholder="ዝቅተኛ ለምሳሌ 8,000">
                     <span>—</span>
-                    <input class="dyn-input extra-field-input" data-label="Salary Max" type="number" placeholder="Max e.g. 20,000">
+                    <input class="dyn-input extra-field-input" data-label="Salary Max" type="number" placeholder="Max e.g. 20,000" data-am-placeholder="ከፍተኛ ለምሳሌ 20,000">
                 </div>
                 <div class="dyn-hint">Leave blank if salary is negotiable</div>
             </div>
@@ -1072,7 +1073,7 @@ function handleRegionChange(region) {
     } else {
         label.innerHTML = '<i class="fas fa-map-pin"></i> Specific City / Area';
         container.innerHTML = `
-            <input type="text" id="prodDistrict" placeholder="e.g. Adama, Bahir Dar, or Dessie" required>`;
+            <input type="text" id="prodDistrict" placeholder="e.g. Adama, Bahir Dar, or Dessie" data-am-placeholder="ለምሳሌ አዳማ፣ ባህር ዳር ወይም ደሴ" required>`;
     }
 }
 
@@ -1111,7 +1112,7 @@ function handleRegionChange(region) {
 
                     // Semi-transparent background pill
                     ctx.globalAlpha = 0.62;
-                    ctx.fillStyle   = '#1a1a2e';
+                    ctx.fillStyle   = '#1a1a1a';
                     const r = 8;
                     ctx.beginPath();
                     ctx.moveTo(x + r, y);
@@ -1133,7 +1134,7 @@ function handleRegionChange(region) {
 
                     // Small logo dot accent
                     ctx.globalAlpha = 1;
-                    ctx.fillStyle   = '#6c5ce7';
+                    ctx.fillStyle   = '#0A291A';
                     ctx.beginPath();
                     ctx.arc(x + padding - 6, y + boxH / 2, 4, 0, Math.PI * 2);
                     ctx.fill();
@@ -1227,10 +1228,31 @@ function handleRegionChange(region) {
         } else {
             wrapper.style.opacity = '1';
             wrapper.style.pointerEvents = 'all';
-            preview.style.color = '#00b894';
+            preview.style.color = '#2ed573';
             preview.innerHTML = '<i class="fas fa-check-circle"></i> Item will show as In Stock to buyers.';
         }
     }
+    </script>
+
+    <script>
+    // Language persistence
+    (function() {
+        const lang = localStorage.getItem('wg_lang');
+        if (lang === 'am') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-am]').forEach(el => {
+                    const cur = el.innerText.trim();
+                    const am = el.getAttribute('data-am');
+                    if (am) { el.innerText = am; el.setAttribute('data-am', cur); }
+                });
+                document.querySelectorAll('[data-am-placeholder]').forEach(el => {
+                    el.setAttribute('data-en-placeholder', el.placeholder);
+                    el.placeholder = el.getAttribute('data-am-placeholder');
+                });
+                document.documentElement.lang = 'am';
+            });
+        }
+    })();
     </script>
 </body>
 </html>
