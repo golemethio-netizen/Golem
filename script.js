@@ -1078,15 +1078,135 @@ window.shareToTelegram = function() {
 };
 
 let isAmharic = false;
+
+// ── Full translation map (English ↔ Amharic) ──
+const TRANSLATIONS = {
+    en: {
+        // Nav
+        'Home': 'Home', 'Sell Item': 'Sell Item', 'My Items': 'My Items',
+        'Cart': 'Cart', 'Admin': 'Admin', 'Sell': 'Sell', 'Items': 'Items',
+        // Filters
+        'All': 'All', 'Featured': 'Featured',
+        // Sort
+        '🆕 Newest First': '🆕 Newest First',
+        '💰 Price: Low to High': '💰 Price: Low to High',
+        '💎 Price: High to Low': '💎 Price: High to Low',
+        '🌍 All Regions': '🌍 All Regions',
+        // Buttons & labels
+        'Contact Us': 'Contact Us', 'Call Now': 'Call Now',
+        'Full Details': 'Full Details', 'Share': 'Share',
+        'Add to Cart': 'Add to Cart', 'Save': 'Save',
+        'Call': 'Call', 'Message': 'Message', 'WhatsApp': 'WhatsApp',
+        'Send Message': 'Send Message', 'Sign In': 'Sign In',
+        'Sign Out': 'Sign Out', 'Welcome Back': 'Welcome Back',
+        'Featured Partner': 'Featured Partner',
+        'View Details': 'View Details',
+        'Back to Catalog': 'Back to Catalog',
+        'Copy Link': 'Copy Link',
+        '✓ Link copied to clipboard!': '✓ Link copied to clipboard!',
+        'Share this item': 'Share this item',
+        'Verified Merchant': 'Verified Merchant', 'Member': 'Member',
+        'Loading...': 'Loading...',
+        '👋 Hello! Welcome! Need help with buying or selling?': '👋 Hello! Welcome! Need help with buying or selling?',
+        'Contact WanaGebya Support': 'Contact WanaGebya Support',
+        'Join Telegram Channel': 'Join Telegram Channel',
+        'Share on Telegram': 'Share on Telegram',
+        'Share on WhatsApp': 'Share on WhatsApp',
+        'Share on Facebook': 'Share on Facebook',
+        'No description provided.': 'No description provided.',
+        'Call Seller': 'Call Seller',
+        'Message on Telegram': 'Message on Telegram',
+        'Message on WhatsApp': 'Message on WhatsApp',
+    },
+    am: {
+        // Nav
+        'Home': 'መነሻ', 'Sell Item': 'ይሽጡ', 'My Items': 'እቃዎቼ',
+        'Cart': 'ጋሪ', 'Admin': 'አስተዳዳሪ', 'Sell': 'ይሽጡ', 'Items': 'እቃዎቼ',
+        // Filters
+        'All': 'ሁሉም', 'Featured': 'ልዩ',
+        // Sort
+        '🆕 Newest First': '🆕 አዲስ መጀመሪያ',
+        '💰 Price: Low to High': '💰 ዋጋ፡ ከዝቅ ወደ ከፍ',
+        '💎 Price: High to Low': '💎 ዋጋ፡ ከከፍ ወደ ዝቅ',
+        '🌍 All Regions': '🌍 ሁሉም ክልሎች',
+        // Buttons & labels
+        'Contact Us': 'ያግኙን', 'Call Now': 'አሁን ይደውሉ',
+        'Full Details': 'ሙሉ ዝርዝር', 'Share': 'አጋሩ',
+        'Add to Cart': 'ወደ ጋሪ ጨምር', 'Save': 'አስቀምጥ',
+        'Call': 'ይደውሉ', 'Message': 'መልዕክት', 'WhatsApp': 'ዋትስአፕ',
+        'Send Message': 'መልዕክት ይላኩ', 'Sign In': 'ይግቡ',
+        'Sign Out': 'ይውጡ', 'Welcome Back': 'እንኳን ደህና መጡ',
+        'Featured Partner': 'ልዩ አጋር',
+        'View Details': 'ዝርዝር ይመልከቱ',
+        'Back to Catalog': 'ወደ ዝርዝር ተመለስ',
+        'Copy Link': 'ሊንክ ቅዱ',
+        '✓ Link copied to clipboard!': '✓ ሊንክ ተቀድቷል!',
+        'Share this item': 'ይህን እቃ አጋሩ',
+        'Verified Merchant': 'የተረጋገጠ ነጋዴ', 'Member': 'አባል',
+        'Loading...': 'በመጫን ላይ...',
+        '👋 Hello! Welcome! Need help with buying or selling?': '👋 ሰላም! እንኳን ደህና መጡ! ለመግዛት ወይም ለመሸጥ እርዳታ ይፈልጋሉ?',
+        'Contact WanaGebya Support': 'የWanaGebya ድጋፍ ያግኙ',
+        'Join Telegram Channel': 'ቴሌግራም ቻናል ይቀላቀሉ',
+        'Share on Telegram': 'በቴሌግራም አጋሩ',
+        'Share on WhatsApp': 'በዋትስአፕ አጋሩ',
+        'Share on Facebook': 'በፌስቡክ አጋሩ',
+        'No description provided.': 'መግለጫ አልቀረበም።',
+        'Call Seller': 'ሻጩን ይደውሉ',
+        'Message on Telegram': 'በቴሌግራም ይላኩ',
+        'Message on WhatsApp': 'በዋትስአፕ ይላኩ',
+    }
+};
+
 window.toggleLanguage = function() {
     isAmharic = !isAmharic;
-    document.getElementById('langText').innerText = isAmharic ? "English" : "አማርኛ";
+    const lang = isAmharic ? 'am' : 'en';
+    const t = TRANSLATIONS[lang];
+
+    // Update lang toggle button label
+    const langTextEl = document.getElementById('langText');
+    if (langTextEl) langTextEl.innerText = isAmharic ? 'English' : 'አማርኛ';
+
+    // Translate all [data-am] elements (legacy support)
     document.querySelectorAll('[data-am]').forEach(el => {
-        const currentText = el.innerText;
-        el.innerText = el.getAttribute('data-am');
+        const currentText = el.innerText.trim();
+        const stored = el.getAttribute('data-am');
+        el.innerText = stored;
         el.setAttribute('data-am', currentText);
     });
+
+    // Translate text nodes using the map
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (t[key]) el.innerText = t[key];
+    });
+
+    // Translate placeholders
+    document.querySelectorAll('[data-am-placeholder]').forEach(el => {
+        const amPh = el.getAttribute('data-am-placeholder');
+        const enPh = el.getAttribute('data-en-placeholder') || el.placeholder;
+        if (!el.getAttribute('data-en-placeholder')) el.setAttribute('data-en-placeholder', el.placeholder);
+        el.placeholder = isAmharic ? amPh : el.getAttribute('data-en-placeholder');
+    });
+
+    // Translate select option text
+    document.querySelectorAll('option[data-am]').forEach(opt => {
+        const cur = opt.textContent.trim();
+        const am = opt.getAttribute('data-am');
+        opt.textContent = am;
+        opt.setAttribute('data-am', cur);
+    });
+
+    // Store preference
+    localStorage.setItem('wg_lang', lang);
+    document.documentElement.lang = isAmharic ? 'am' : 'en';
 };
+
+// Auto-apply saved language on page load
+window.applyStoredLanguage = function() {
+    const saved = localStorage.getItem('wg_lang');
+    if (saved === 'am') window.toggleLanguage();
+};
+
 
 async function postToSocialMedia(product) {
     // Falls back to a specific token if GolemConfig isn't defined, keeping your data secure
