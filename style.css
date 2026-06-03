@@ -13,7 +13,7 @@
 ───────────────────────────────────────────────────────────────*/
 :root {
     /* Brand */
-    --primary-color:    #007bff;
+    --primary-color:    #0A291A;
     --primary:          #1a1a1a;
     --whatsapp-green:   #25D366;
     --telegram-blue:    #0088cc;
@@ -32,7 +32,7 @@
     --danger:   #ff4757;
     --telegram: #0088cc;
     --whatsapp: #25D366;
-    --share:    #007bff;
+    --share:    #0A291A;
 
     /* Tokens */
     --radius:     16px;
@@ -302,7 +302,7 @@ body {
     transition: var(--transition);
 }
 .wishlist-btn i { color: #888; font-size: 1rem; }
-.wishlist-btn.active i, .wishlist-btn:hover i { color: var(--primary-color, #007bff); }
+.wishlist-btn.active i, .wishlist-btn:hover i { color: var(--primary-color, #0A291A); }
 
 .product-info {
     padding: 14px;
