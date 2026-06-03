@@ -57,13 +57,13 @@
         .cat-act-btn { border:none; border-radius:6px; padding:5px 10px; font-size:0.73rem; font-weight:700; cursor:pointer; font-family:inherit; }
 
         .subcat-wrap { padding:10px 16px 14px 46px; display:flex; flex-wrap:wrap; gap:7px; }
-        .subcat-chip { display:inline-flex; align-items:center; gap:5px; background:#f4f3ff; border:1px solid #d9d6ff; border-radius:20px; padding:4px 10px 4px 12px; font-size:0.78rem; font-weight:600; color:#444; }
+        .subcat-chip { display:inline-flex; align-items:center; gap:5px; background:#e8f4ff; border:1px solid #b3d0ff; border-radius:20px; padding:4px 10px 4px 12px; font-size:0.78rem; font-weight:600; color:#444; }
         .subcat-chip button { background:none; border:none; cursor:pointer; color:#ccc; font-size:0.85rem; padding:0 1px; line-height:1; transition:color .15s; }
         .subcat-chip button:hover { color:#ff4757; }
         .quick-sub-row { display:flex; gap:6px; padding:0 16px 12px 46px; }
         .quick-sub-row input { flex:1; padding:7px 10px; border-radius:6px; border:1px dashed #d0d0ff; font-size:0.82rem; outline:none; font-family:inherit; }
-        .quick-sub-row input:focus { border-color:#6c5ce7; }
-        .quick-sub-row button { padding:7px 14px; border-radius:6px; border:none; background:#6c5ce7; color:#fff; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:inherit; }
+        .quick-sub-row input:focus { border-color:#007bff; }
+        .quick-sub-row button { padding:7px 14px; border-radius:6px; border:none; background:#007bff; color:#fff; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:inherit; }
 
         @media(max-width:640px){ #catAddGrid { grid-template-columns:1fr !important; } }
     </style>
@@ -96,7 +96,7 @@
             
             <button onclick="switchTab('views', this)" class="tab-btn" style="background: #e8f4fd; color: #1565c0;"><i class="fas fa-chart-bar"></i> Product Views</button>
 
-            <button onclick="generateSponsorReport()" style="background: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
+            <button onclick="generateSponsorReport()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
                 <i class="fas fa-file-invoice"></i> Expiry Report (24h)
             </button>
         </div>
@@ -213,8 +213,8 @@
                     <i class="fas fa-chart-line" style="color:#f39c12;opacity:1;"></i>
                     <div><h4 id="vKpiAvg">—</h4><p>Avg Views / Product</p></div>
                 </div>
-                <div class="stat-card" style="border-left:5px solid #6c5ce7;">
-                    <i class="fas fa-box" style="color:#6c5ce7;opacity:1;"></i>
+                <div class="stat-card" style="border-left:5px solid #007bff;">
+                    <i class="fas fa-box" style="color:#007bff;opacity:1;"></i>
                     <div><h4 id="vKpiCount">—</h4><p>Products Tracked</p></div>
                 </div>
             </div>
@@ -238,7 +238,7 @@
 
                 <!-- Category Breakdown -->
                 <div style="background:white; border-radius:14px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.07);">
-                    <h3 style="margin:0 0 18px; font-size:1rem; color:#333;"><i class="fas fa-tags" style="color:#6c5ce7;"></i> Views by Category</h3>
+                    <h3 style="margin:0 0 18px; font-size:1rem; color:#333;"><i class="fas fa-tags" style="color:#007bff;"></i> Views by Category</h3>
                     <div id="vCatBreakdown" style="display:flex; flex-direction:column; gap:12px; min-height:200px;">
                         <p style="color:#bbb; text-align:center; padding:40px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
                     </div>
@@ -316,24 +316,24 @@
                 </div>
 
                 <!-- Add Subcategory -->
-                <div style="background:#f4f3ff; border:1.5px solid #d1c4e9; border-radius:12px; padding:20px;">
-                    <h3 style="font-size:0.95rem; color:#6c5ce7; margin-bottom:14px;"><i class="fas fa-sitemap"></i> New Subcategory</h3>
+                <div style="background:#e8f4ff; border:1.5px solid #b3d0ff; border-radius:12px; padding:20px;">
+                    <h3 style="font-size:0.95rem; color:#007bff; margin-bottom:14px;"><i class="fas fa-sitemap"></i> New Subcategory</h3>
                     <div style="display:flex; flex-direction:column; gap:9px;">
                         <div>
                             <label style="font-size:0.78rem; font-weight:700; color:#555; display:block; margin-bottom:3px;">Parent Category *</label>
-                            <select id="subCatParent" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #d1c4e9;font-size:0.88rem;outline:none;font-family:inherit;background:white;box-sizing:border-box;" onfocus="this.style.borderColor='#6c5ce7'" onblur="this.style.borderColor='#d1c4e9'">
+                            <select id="subCatParent" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #b3d0ff;font-size:0.88rem;outline:none;font-family:inherit;background:white;box-sizing:border-box;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#b3d0ff'">
                                 <option value="">— Select category —</option>
                             </select>
                         </div>
                         <div>
                             <label style="font-size:0.78rem; font-weight:700; color:#555; display:block; margin-bottom:3px;">Subcategory Name *</label>
-                            <input id="newSubName" type="text" placeholder="e.g. Diapers & Wipes" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #d1c4e9;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#6c5ce7'" onblur="this.style.borderColor='#d1c4e9'">
+                            <input id="newSubName" type="text" placeholder="e.g. Diapers & Wipes" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #b3d0ff;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#b3d0ff'">
                         </div>
                         <div>
                             <label style="font-size:0.78rem; font-weight:700; color:#555; display:block; margin-bottom:3px;">Amharic Name</label>
-                            <input id="newSubAmharic" type="text" placeholder="e.g. ዳይፐር" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #d1c4e9;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#6c5ce7'" onblur="this.style.borderColor='#d1c4e9'">
+                            <input id="newSubAmharic" type="text" placeholder="e.g. ዳይፐር" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #b3d0ff;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#b3d0ff'">
                         </div>
-                        <button onclick="adminAddSubcategory()" style="background:#6c5ce7;color:white;border:none;padding:10px;border-radius:7px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.88rem;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                        <button onclick="adminAddSubcategory()" style="background:#007bff;color:white;border:none;padding:10px;border-radius:7px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.88rem;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
                             <i class="fas fa-plus"></i> Add Subcategory
                         </button>
                     </div>
@@ -418,7 +418,7 @@
                         <code id="finalPwd" style="font-size:1.3rem; font-weight:bold; color:#2d3436; letter-spacing:2px;">${password}</code>
                     </div>
                     <button onclick="navigator.clipboard.writeText('${password}').then(()=>{ this.textContent='Copied!'; this.style.background='#2ed573'; })"
-                        style="width:100%; background:#6c5ce7; color:white; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
+                        style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
                         Copy Password
                     </button>
                     <button onclick="document.getElementById('pwdModal').remove(); _supabase.auth.signOut().then(()=> location.href='index.html');"
@@ -447,15 +447,15 @@
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${email}</strong></p>
                     <input type="password" id="newPwdInput" placeholder="Enter new password (min 6 chars)"
                         style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:10px;"
-                        oninput="this.style.borderColor='#6c5ce7'"
+                        oninput="this.style.borderColor='#007bff'"
                     />
                     <input type="password" id="confirmPwdInput" placeholder="Confirm new password"
                         style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:6px;"
-                        oninput="this.style.borderColor='#6c5ce7'"
+                        oninput="this.style.borderColor='#007bff'"
                     />
                     <p id="pwdError" style="color:#ff4757; font-size:0.8rem; min-height:18px; margin-bottom:14px;"></p>
                     <button onclick="applyNewPassword()"
-                        style="width:100%; background:#6c5ce7; color:white; border:none; padding:14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
+                        style="width:100%; background:#007bff; color:white; border:none; padding:14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
                         Update Password
                     </button>
                 </div>
@@ -715,7 +715,7 @@
                                     value="${item.quantity || ''}"
                                     style="width:52px;font-size:0.72rem;padding:3px 6px;border:1px solid #ddd;border-radius:6px;outline:none;">
                                 <button onclick="updateStock('${item.id}', document.getElementById('stockSel-${item.id}').value, document.getElementById('stockQty-${item.id}').value)"
-                                    style="font-size:0.7rem;padding:3px 8px;background:#6c5ce7;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
+                                    style="font-size:0.7rem;padding:3px 8px;background:#007bff;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
                                     Save
                                 </button>
                             </div>` : ''}
@@ -913,7 +913,7 @@
                                         <button onclick="sendPasswordReset('${u.email}')" title="Send password reset email" style="border:none; background:#3498db; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-envelope"></i> Reset
                                         </button>
-                                        <button onclick="generateAndSetPassword('${u.id}', '${u.email}')" title="Generate a new random password" style="border:none; background:#6c5ce7; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                        <button onclick="generateAndSetPassword('${u.id}', '${u.email}')" title="Generate a new random password" style="border:none; background:#007bff; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-key"></i> Gen Pass
                                         </button>
                                         <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
@@ -1027,8 +1027,8 @@
                     <h2 style="margin:0 0 6px; color:#333;">Generated Password</h2>
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">For account: <strong>${email}</strong></p>
 
-                    <div style="background:#f4f7f6; border:2px dashed #6c5ce7; border-radius:10px; padding:18px; margin-bottom:20px; position:relative;">
-                        <code id="genPwdText" style="font-size:1.4rem; font-weight:bold; color:#6c5ce7; letter-spacing:2px; word-break:break-all;">${password}</code>
+                    <div style="background:#f4f7f6; border:2px dashed #007bff; border-radius:10px; padding:18px; margin-bottom:20px; position:relative;">
+                        <code id="genPwdText" style="font-size:1.4rem; font-weight:bold; color:#007bff; letter-spacing:2px; word-break:break-all;">${password}</code>
                     </div>
 
                     <p style="font-size:0.8rem; color:#e67e22; background:#fff9f0; border:1px solid #f0d9b5; border-radius:8px; padding:10px; margin-bottom:20px;">
@@ -1041,7 +1041,7 @@
                                 this.textContent = '✅ Copied!';
                                 this.style.background = '#2ed573';
                             });
-                        " style="background:#6c5ce7; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem; flex:1;">
+                        " style="background:#007bff; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem; flex:1;">
                             📋 Copy Password
                         </button>
                         <button onclick="
@@ -1401,7 +1401,7 @@ window.approveProduct = async (productId, productDetails) => {
             if (error) { alert('Error: ' + error.message); return; }
             const cat = _adminCats.find(c => String(c.id) === String(categoryId));
             logAction('Subcategory Added', `"${name}" under "${cat?.name || categoryId}"`);
-            catToast('Subcategory added!', '#6c5ce7');
+            catToast('Subcategory added!', '#007bff');
             loadAdminCategories();
         }
 
@@ -1618,7 +1618,7 @@ function renderCategoryIcon(iconString) {
             const sorted = Object.entries(catMap).sort((a,b) => b[1].views - a[1].views);
             const maxV   = sorted[0]?.[1].views || 1;
 
-            const CAT_COLORS = ['#6c5ce7','#00b894','#fd79a8','#e17055','#0984e3','#fdcb6e','#a29bfe','#55efc4'];
+            const CAT_COLORS = ['#007bff','#00b894','#fd79a8','#e17055','#0984e3','#fdcb6e','#74b3ff','#55efc4'];
 
             if (sorted.length === 0) {
                 document.getElementById('vCatBreakdown').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;">No data.</p>';
