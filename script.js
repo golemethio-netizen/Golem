@@ -371,14 +371,14 @@ function renderProducts(products) {
                         WA
                     </a>
                     <<button onclick="window.open('https://t.me/share/url?url=' + encodeURIComponent('${shareUrl}') + '&text=' + encodeURIComponent('${shareText}'), '_blank')"
-    style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#0A291A; color:#fff; border:none; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">
+    style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#ffffff; color:#111; border:1.5px solid #ddd; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
                         Share
                     </button>
                 </div>
 
                 <div class="product-actions" style="margin-top:15px;">
-                    <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; cursor:pointer;">
+                    <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; cursor:pointer; background:#ffffff; color:#111; border:1.5px solid #222; font-weight:700;">
                         Full Details
                     </button>
                 </div>
@@ -772,7 +772,7 @@ window.openProductModal = async (product) => {
                 <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
                 
                 <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #0A291A;">
+                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #6c5ce7;">
                     <div style="flex: 1;">
                         <h4 style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: ${sellerName}</h4>
                         <div style="margin-top:5px; font-size:0.8rem;">
@@ -797,7 +797,7 @@ window.openProductModal = async (product) => {
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
                     <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
                     <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#0A291A; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                    <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#6c5ce7; color:white; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                 </div>
             </div>`;
     }
@@ -955,7 +955,7 @@ window.loadUsers = async function() {
                             <td style="padding:10px 15px;">${u.is_admin ? 'Admin 🛡️' : 'User 👤'}</td>
                             <td style="padding:10px 15px;">${u.is_verified ? '<span style="color:#2ed573; font-weight:bold;">VERIFIED</span>' : '<span style="color:#888;">GUEST</span>'}</td>
                             <td style="padding:10px 15px; text-align:right;">
-                                <button onclick="window.toggleVerification('${u.id}', ${u.is_verified})" style="padding:5px 10px; background:#0A291A; color:white; border:none; border-radius:4px; cursor:pointer;">Toggle Verify</button>
+                                <button onclick="window.toggleVerification('${u.id}', ${u.is_verified})" style="padding:5px 10px; background:#6c5ce7; color:white; border:none; border-radius:4px; cursor:pointer;">Toggle Verify</button>
                             </td>
                         </tr>
                     `).join('')}
