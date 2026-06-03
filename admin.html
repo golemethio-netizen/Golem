@@ -41,7 +41,7 @@
         /* UTM Form Styles */
         .utm-input-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
         .utm-input-group input { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 0.95rem; outline: none; }
-        .utm-input-group input:focus { border-color: #3498db; }
+        .utm-input-group input:focus { border-color: #0088cc; }
 
         /* ── Category Manager ── */
         .cat-panel { background:#fff; border:1px solid #e8e8e8; border-radius:12px; overflow:hidden; }
@@ -57,18 +57,18 @@
         .cat-act-btn { border:none; border-radius:6px; padding:5px 10px; font-size:0.73rem; font-weight:700; cursor:pointer; font-family:inherit; }
 
         .subcat-wrap { padding:10px 16px 14px 46px; display:flex; flex-wrap:wrap; gap:7px; }
-        .subcat-chip { display:inline-flex; align-items:center; gap:5px; background:#e8f4ff; border:1px solid #b3d0ff; border-radius:20px; padding:4px 10px 4px 12px; font-size:0.78rem; font-weight:600; color:#444; }
+        .subcat-chip { display:inline-flex; align-items:center; gap:5px; background:#f0f7f4; border:1px solid #c8e6c9; border-radius:20px; padding:4px 10px 4px 12px; font-size:0.78rem; font-weight:600; color:#444; }
         .subcat-chip button { background:none; border:none; cursor:pointer; color:#ccc; font-size:0.85rem; padding:0 1px; line-height:1; transition:color .15s; }
         .subcat-chip button:hover { color:#ff4757; }
         .quick-sub-row { display:flex; gap:6px; padding:0 16px 12px 46px; }
         .quick-sub-row input { flex:1; padding:7px 10px; border-radius:6px; border:1px dashed #d0d0ff; font-size:0.82rem; outline:none; font-family:inherit; }
-        .quick-sub-row input:focus { border-color:#007bff; }
-        .quick-sub-row button { padding:7px 14px; border-radius:6px; border:none; background:#007bff; color:#fff; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:inherit; }
+        .quick-sub-row input:focus { border-color:#0A291A; }
+        .quick-sub-row button { padding:7px 14px; border-radius:6px; border:none; background:#F5A623; color:#1a1a1a; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:inherit; }
 
         @media(max-width:640px){ #catAddGrid { grid-template-columns:1fr !important; } }
     </style>
 </head>
-<body style="background: #f4f7f6;">
+<body style="background: #f7f8f6;">
 
     <header class="golem-header">
         <div class="logo">WanaGebya ADMIN</div>
@@ -91,12 +91,12 @@
             <button onclick="switchTab('rejected', this)" class="tab-btn">Archive/Rejected</button>
             <button onclick="switchTab('users', this)" class="tab-btn">Registered Users</button>
             <button onclick="switchTab('utm', this)" class="tab-btn" style="background: #e1f5fe; color: #0288d1;"><i class="fas fa-link"></i> Marketing (UTM)</button>
-            <button onclick="switchTab('logs', this)" class="tab-btn" style="background: #fff3e0; color: #e65100;"><i class="fas fa-history"></i> Audit Logs</button>
+            <button onclick="switchTab('logs', this)" class="tab-btn" style="background: #fff3e0; color: #F5A623;"><i class="fas fa-history"></i> Audit Logs</button>
             <button onclick="switchTab('categories', this)" class="tab-btn" style="background: #e8f5e9; color: #2e7d32;"><i class="fas fa-tags"></i> Categories</button>
             
-            <button onclick="switchTab('views', this)" class="tab-btn" style="background: #e8f4fd; color: #1565c0;"><i class="fas fa-chart-bar"></i> Product Views</button>
+            <button onclick="switchTab('views', this)" class="tab-btn" style="background: #e8f4fd; color: #0A291A;"><i class="fas fa-chart-bar"></i> Product Views</button>
 
-            <button onclick="generateSponsorReport()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
+            <button onclick="generateSponsorReport()" style="background:#F5A623; color:#1a1a1a; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
                 <i class="fas fa-file-invoice"></i> Expiry Report (24h)
             </button>
         </div>
@@ -112,15 +112,15 @@
             <div class="stat-card"><i class="fas fa-boxes"></i><div><h4 id="totalItems">0</h4><p>Total Items</p></div></div>
             <div class="stat-card"><i class="fas fa-star" style="color:#f1c40f; opacity:1;"></i><div><h4 id="activeSponsors">0</h4><p>Active Sponsors</p></div></div>
             <div class="stat-card"><i class="fas fa-wallet"></i><div><h4 id="totalValue">0 ETB</h4><p>Market Value</p></div></div>
-            <div class="stat-card"><i class="fas fa-users" style="color:#3498db; opacity:1;"></i><div><h4 id="totalUsers">0</h4><p>Total Users</p></div></div>
+            <div class="stat-card"><i class="fas fa-users" style="color:#0088cc; opacity:1;"></i><div><h4 id="totalUsers">0</h4><p>Total Users</p></div></div>
 
-            <div class="stat-card" style="border-left: 5px solid #3498db;">
-                <i class="fas fa-hdd" style="opacity: 0.5; color: #3498db;"></i>
+            <div class="stat-card" style="border-left: 5px solid #0088cc;">
+                <i class="fas fa-hdd" style="opacity: 0.5; color: #0088cc;"></i>
                 <div style="width: 100%;">
                     <h4 id="storageUsage">0 MB</h4>
                     <p>Storage (of 1GB)</p>
                     <div style="width: 100%; background: #eee; height: 5px; border-radius: 5px; margin-top: 5px;">
-                        <div id="storageBar" style="width: 0%; background: #3498db; height: 100%; border-radius: 5px; transition: 0.5s;"></div>
+                        <div id="storageBar" style="width: 0%; background: #0088cc; height: 100%; border-radius: 5px; transition: 0.5s;"></div>
                     </div>
                 </div>
             </div>
@@ -148,7 +148,7 @@
 
             <!-- Audit Logs View -->
             <section id="logsSection" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h2 style="margin-bottom: 20px;"><i class="fas fa-history" style="color:#e65100;"></i> SYSTEM AUDIT LOGS</h2>
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-history" style="color:#F5A623;"></i> SYSTEM AUDIT LOGS</h2>
                 <p style="color:#666; margin-bottom:15px;">A history of all actions taken on the platform by Admins, Sellers, and Buyers.</p>
                 <div id="auditLogList" style="overflow-x: auto;">
                 </div>
@@ -156,7 +156,7 @@
 
             <!-- UTM Builder View -->
             <section id="utmSection" style="display: none; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h2 style="margin-bottom: 20px; color:#333;"><i class="fas fa-bullhorn" style="color:#3498db;"></i> Marketing & UTM Link Builder</h2>
+                <h2 style="margin-bottom: 20px; color:#333;"><i class="fas fa-bullhorn" style="color:#0088cc;"></i> Marketing & UTM Link Builder</h2>
                 <p style="color:#666; margin-bottom: 25px;">Generate tracking URLs to see where your traffic comes from (Facebook, Telegram, Google, etc.).</p>
                 
                 <div style="display: grid; gap: 20px; max-width: 600px;">
@@ -181,7 +181,7 @@
                         <input type="text" id="utmCampaign" placeholder="e.g. spring_promo, sponsored_ad_01">
                     </div>
 
-                    <button onclick="generateUTM()" style="background: #3498db; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                    <button onclick="generateUTM()" style="background: #0088cc; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s;">
                         Generate Trackable URL
                     </button>
                     
@@ -201,8 +201,8 @@
 
             <!-- Top KPI Cards -->
             <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px;">
-                <div class="stat-card" style="border-left:5px solid #1565c0;">
-                    <i class="fas fa-eye" style="color:#1565c0;opacity:1;"></i>
+                <div class="stat-card" style="border-left:5px solid #0A291A;">
+                    <i class="fas fa-eye" style="color:#0A291A;opacity:1;"></i>
                     <div><h4 id="vKpiTotal">—</h4><p>Total Views</p></div>
                 </div>
                 <div class="stat-card" style="border-left:5px solid #2ed573;">
@@ -213,8 +213,8 @@
                     <i class="fas fa-chart-line" style="color:#f39c12;opacity:1;"></i>
                     <div><h4 id="vKpiAvg">—</h4><p>Avg Views / Product</p></div>
                 </div>
-                <div class="stat-card" style="border-left:5px solid #007bff;">
-                    <i class="fas fa-box" style="color:#007bff;opacity:1;"></i>
+                <div class="stat-card" style="border-left:5px solid #0A291A;">
+                    <i class="fas fa-box" style="color:#0A291A;opacity:1;"></i>
                     <div><h4 id="vKpiCount">—</h4><p>Products Tracked</p></div>
                 </div>
             </div>
@@ -224,7 +224,7 @@
                 <!-- Bar Chart -->
                 <div style="background:white; border-radius:14px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.07);">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
-                        <h3 style="margin:0; font-size:1rem; color:#333;"><i class="fas fa-chart-bar" style="color:#1565c0;"></i> Top 10 Most Viewed Products</h3>
+                        <h3 style="margin:0; font-size:1rem; color:#333;"><i class="fas fa-chart-bar" style="color:#0A291A;"></i> Top 10 Most Viewed Products</h3>
                         <select id="vFilterStatus" onchange="loadViewsData()" style="padding:6px 10px; border-radius:6px; border:1px solid #ddd; font-size:0.8rem; outline:none;">
                             <option value="approved">Live Items</option>
                             <option value="all">All Items</option>
@@ -238,7 +238,7 @@
 
                 <!-- Category Breakdown -->
                 <div style="background:white; border-radius:14px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.07);">
-                    <h3 style="margin:0 0 18px; font-size:1rem; color:#333;"><i class="fas fa-tags" style="color:#007bff;"></i> Views by Category</h3>
+                    <h3 style="margin:0 0 18px; font-size:1rem; color:#333;"><i class="fas fa-tags" style="color:#0A291A;"></i> Views by Category</h3>
                     <div id="vCatBreakdown" style="display:flex; flex-direction:column; gap:12px; min-height:200px;">
                         <p style="color:#bbb; text-align:center; padding:40px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
                     </div>
@@ -316,24 +316,24 @@
                 </div>
 
                 <!-- Add Subcategory -->
-                <div style="background:#e8f4ff; border:1.5px solid #b3d0ff; border-radius:12px; padding:20px;">
-                    <h3 style="font-size:0.95rem; color:#007bff; margin-bottom:14px;"><i class="fas fa-sitemap"></i> New Subcategory</h3>
+                <div style="background:#f0f7f4; border:1.5px solid #c8e6c9; border-radius:12px; padding:20px;">
+                    <h3 style="font-size:0.95rem; color:#0A291A; margin-bottom:14px;"><i class="fas fa-sitemap"></i> New Subcategory</h3>
                     <div style="display:flex; flex-direction:column; gap:9px;">
                         <div>
                             <label style="font-size:0.78rem; font-weight:700; color:#555; display:block; margin-bottom:3px;">Parent Category *</label>
-                            <select id="subCatParent" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #b3d0ff;font-size:0.88rem;outline:none;font-family:inherit;background:white;box-sizing:border-box;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#b3d0ff'">
+                            <select id="subCatParent" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #c8e6c9;font-size:0.88rem;outline:none;font-family:inherit;background:white;box-sizing:border-box;" onfocus="this.style.borderColor='#0A291A'" onblur="this.style.borderColor='#c8e6c9'">
                                 <option value="">— Select category —</option>
                             </select>
                         </div>
                         <div>
                             <label style="font-size:0.78rem; font-weight:700; color:#555; display:block; margin-bottom:3px;">Subcategory Name *</label>
-                            <input id="newSubName" type="text" placeholder="e.g. Diapers & Wipes" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #b3d0ff;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#b3d0ff'">
+                            <input id="newSubName" type="text" placeholder="e.g. Diapers & Wipes" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #c8e6c9;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#0A291A'" onblur="this.style.borderColor='#c8e6c9'">
                         </div>
                         <div>
                             <label style="font-size:0.78rem; font-weight:700; color:#555; display:block; margin-bottom:3px;">Amharic Name</label>
-                            <input id="newSubAmharic" type="text" placeholder="e.g. ዳይፐር" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #b3d0ff;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#b3d0ff'">
+                            <input id="newSubAmharic" type="text" placeholder="e.g. ዳይፐር" style="width:100%;padding:9px 11px;border-radius:7px;border:1.5px solid #c8e6c9;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;" onfocus="this.style.borderColor='#0A291A'" onblur="this.style.borderColor='#c8e6c9'">
                         </div>
-                        <button onclick="adminAddSubcategory()" style="background:#007bff;color:white;border:none;padding:10px;border-radius:7px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.88rem;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                        <button onclick="adminAddSubcategory()" style="background:#F5A623; color:#1a1a1a;border:none;padding:10px;border-radius:7px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.88rem;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
                             <i class="fas fa-plus"></i> Add Subcategory
                         </button>
                     </div>
@@ -413,12 +413,12 @@
                     <div style="font-size:3rem; margin-bottom:10px;">&#10003;</div>
                     <h2 style="margin:0 0 6px; color:#2ed573;">Password Set!</h2>
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${email}</strong></p>
-                    <div style="background:#f4f7f6; border:2px dashed #2ed573; border-radius:10px; padding:18px; margin-bottom:20px;">
+                    <div style="background:#f7f8f6; border:2px dashed #2ed573; border-radius:10px; padding:18px; margin-bottom:20px;">
                         <p style="font-size:0.8rem; color:#888; margin:0 0 6px;">New Password:</p>
-                        <code id="finalPwd" style="font-size:1.3rem; font-weight:bold; color:#2d3436; letter-spacing:2px;">${password}</code>
+                        <code id="finalPwd" style="font-size:1.3rem; font-weight:bold; color:#1a1a1a; letter-spacing:2px;">${password}</code>
                     </div>
                     <button onclick="navigator.clipboard.writeText('${password}').then(()=>{ this.textContent='Copied!'; this.style.background='#2ed573'; })"
-                        style="width:100%; background:#007bff; color:white; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
+                        style="width:100%; background:#F5A623; color:#1a1a1a; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
                         Copy Password
                     </button>
                     <button onclick="document.getElementById('pwdModal').remove(); _supabase.auth.signOut().then(()=> location.href='index.html');"
@@ -447,15 +447,15 @@
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${email}</strong></p>
                     <input type="password" id="newPwdInput" placeholder="Enter new password (min 6 chars)"
                         style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:10px;"
-                        oninput="this.style.borderColor='#007bff'"
+                        oninput="this.style.borderColor='#0A291A'"
                     />
                     <input type="password" id="confirmPwdInput" placeholder="Confirm new password"
                         style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:6px;"
-                        oninput="this.style.borderColor='#007bff'"
+                        oninput="this.style.borderColor='#0A291A'"
                     />
                     <p id="pwdError" style="color:#ff4757; font-size:0.8rem; min-height:18px; margin-bottom:14px;"></p>
                     <button onclick="applyNewPassword()"
-                        style="width:100%; background:#007bff; color:white; border:none; padding:14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
+                        style="width:100%; background:#F5A623; color:#1a1a1a; border:none; padding:14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
                         Update Password
                     </button>
                 </div>
@@ -631,14 +631,14 @@
             if (category === 'Jobs' || category === 'Services') return '';
             if (!stockStatus || stockStatus === 'in_stock') {
                 const qty = quantity ? ' · <strong>' + quantity + ' left</strong>' : '';
-                return '<span style="display:inline-flex;align-items:center;gap:4px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#00b894;">'
+                return '<span style="display:inline-flex;align-items:center;gap:4px;background:#e8fdf5;border:1px solid #2ed573;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#F5A623;">'
                      + '<i class="fas fa-check-circle"></i> In Stock' + qty + '</span>';
             } else if (stockStatus === 'out_of_stock') {
                 return '<span style="display:inline-flex;align-items:center;gap:4px;background:#fff0f0;border:1px solid #ff4757;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#ff4757;">'
                      + '<i class="fas fa-times-circle"></i> Out of Stock</span>';
             } else if (stockStatus === 'limited') {
                 const qty = quantity ? ' · Only <strong>' + quantity + ' left</strong>' : '';
-                return '<span style="display:inline-flex;align-items:center;gap:4px;background:#fff8e1;border:1px solid #fdcb6e;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#e67e22;">'
+                return '<span style="display:inline-flex;align-items:center;gap:4px;background:#fff8e1;border:1px solid #F5A623;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#F5A623;">'
                      + '<i class="fas fa-exclamation-triangle"></i> Limited' + qty + '</span>';
             }
             return '';
@@ -697,7 +697,7 @@
                             <i class="fas fa-map-marker-alt" style="color:#ff4757;"></i> ${item.location || 'Addis Ababa'}
                         </p>
                         <p style="font-size:0.85rem; color:#666; margin-top:5px;">
-                            Seller: <a href="tel:${item.seller_phone}" style="color:#007bff; text-decoration:none;">${item.seller_phone}</a>
+                            Seller: <a href="tel:${item.seller_phone}" style="color:#0A291A; text-decoration:none;">${item.seller_phone}</a>
                         </p>
 
                         <!-- Stock badge + admin quick control -->
@@ -715,7 +715,7 @@
                                     value="${item.quantity || ''}"
                                     style="width:52px;font-size:0.72rem;padding:3px 6px;border:1px solid #ddd;border-radius:6px;outline:none;">
                                 <button onclick="updateStock('${item.id}', document.getElementById('stockSel-${item.id}').value, document.getElementById('stockQty-${item.id}').value)"
-                                    style="font-size:0.7rem;padding:3px 8px;background:#007bff;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
+                                    style="font-size:0.7rem;padding:3px 8px;background:#F5A623; color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
                                     Save
                                 </button>
                             </div>` : ''}
@@ -747,7 +747,7 @@
                                         </p>
                                     ` : ''}
                                 </div>
-                                <button onclick="openUTMBuilderForProduct('${item.id}')" style="margin-top:10px; background:#3498db; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
+                                <button onclick="openUTMBuilderForProduct('${item.id}')" style="margin-top:10px; background:#0088cc; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
                                     <i class="fas fa-link"></i> Create UTM Link
                                 </button>
                                 <button onclick="updateStatus('${item.id}', 'sold')" style="margin-top:10px; background:#ffa502; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
@@ -758,7 +758,7 @@
 
                             ${status === 'sold' ? `
                                 <div style="background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px solid #ffe0b2; margin-top: 10px;">
-                                    <p style="font-size: 0.8rem; color: #e65100; font-weight: bold; margin-bottom: 8px;">
+                                    <p style="font-size: 0.8rem; color: #F5A623; font-weight: bold; margin-bottom: 8px;">
                                         <i class="fas fa-check-circle"></i> THIS ITEM IS SOLD
                                     </p>
                                     <div style="display: flex; gap: 5px;">
@@ -910,10 +910,10 @@
                                         <button onclick="toggleVerification('${u.id}', ${u.is_verified})" class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" style="padding: 6px 12px; font-size: 0.75rem; border:none; border-radius:5px; cursor:pointer;">
                                             ${u.is_verified ? 'Revoke' : 'Verify'}
                                         </button>
-                                        <button onclick="sendPasswordReset('${u.email}')" title="Send password reset email" style="border:none; background:#3498db; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                        <button onclick="sendPasswordReset('${u.email}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-envelope"></i> Reset
                                         </button>
-                                        <button onclick="generateAndSetPassword('${u.id}', '${u.email}')" title="Generate a new random password" style="border:none; background:#007bff; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                        <button onclick="generateAndSetPassword('${u.id}', '${u.email}')" title="Generate a new random password" style="border:none; background:#F5A623; color:#1a1a1a; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-key"></i> Gen Pass
                                         </button>
                                         <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
@@ -1027,11 +1027,11 @@
                     <h2 style="margin:0 0 6px; color:#333;">Generated Password</h2>
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">For account: <strong>${email}</strong></p>
 
-                    <div style="background:#f4f7f6; border:2px dashed #007bff; border-radius:10px; padding:18px; margin-bottom:20px; position:relative;">
-                        <code id="genPwdText" style="font-size:1.4rem; font-weight:bold; color:#007bff; letter-spacing:2px; word-break:break-all;">${password}</code>
+                    <div style="background:#f7f8f6; border:2px dashed #0A291A; border-radius:10px; padding:18px; margin-bottom:20px; position:relative;">
+                        <code id="genPwdText" style="font-size:1.4rem; font-weight:bold; color:#0A291A; letter-spacing:2px; word-break:break-all;">${password}</code>
                     </div>
 
-                    <p style="font-size:0.8rem; color:#e67e22; background:#fff9f0; border:1px solid #f0d9b5; border-radius:8px; padding:10px; margin-bottom:20px;">
+                    <p style="font-size:0.8rem; color:#F5A623; background:#fff9f0; border:1px solid #f0d9b5; border-radius:8px; padding:10px; margin-bottom:20px;">
                         ⚠️ Copy this password now and share it securely with the user.<br>A password reset email will also be sent to them.
                     </p>
 
@@ -1041,7 +1041,7 @@
                                 this.textContent = '✅ Copied!';
                                 this.style.background = '#2ed573';
                             });
-                        " style="background:#007bff; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem; flex:1;">
+                        " style="background:#F5A623; color:#1a1a1a; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem; flex:1;">
                             📋 Copy Password
                         </button>
                         <button onclick="
@@ -1401,7 +1401,7 @@ window.approveProduct = async (productId, productDetails) => {
             if (error) { alert('Error: ' + error.message); return; }
             const cat = _adminCats.find(c => String(c.id) === String(categoryId));
             logAction('Subcategory Added', `"${name}" under "${cat?.name || categoryId}"`);
-            catToast('Subcategory added!', '#007bff');
+            catToast('Subcategory added!', '#0A291A');
             loadAdminCategories();
         }
 
@@ -1429,7 +1429,7 @@ window.approveProduct = async (productId, productDetails) => {
             const { error } = await _supabase.from('subcategories').delete().eq('id', subId);
             if (error) { alert('Error: ' + error.message); return; }
             logAction('Subcategory Deleted', `"${sub?.name}" from "${cat?.name}"`);
-            catToast('Subcategory removed.', '#e65100');
+            catToast('Subcategory removed.', '#F5A623');
             loadAdminCategories();
         };
 
@@ -1580,7 +1580,7 @@ function renderCategoryIcon(iconString) {
             const top10 = [..._viewsData].sort((a,b) => b.view_count - a.view_count).slice(0, 10);
             const max   = top10[0]?.view_count || 1;
 
-            const COLORS = ['#1565c0','#1976d2','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#f5f5f5'];
+            const COLORS = ['#0A291A','#1976d2','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#f5f5f5'];
 
             if (top10.length === 0) {
                 document.getElementById('vBarChart').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;">No view data yet.</p>';
@@ -1599,7 +1599,7 @@ function renderCategoryIcon(iconString) {
                             <div style="flex:1; background:#f0f4f8; border-radius:20px; height:10px; overflow:hidden;">
                                 <div style="width:${pct}%; background:${COLORS[i] || COLORS[4]}; height:100%; border-radius:20px; transition:width 0.6s ease;"></div>
                             </div>
-                            <span style="font-size:0.78rem; font-weight:700; color:#1565c0; flex-shrink:0; width:40px; text-align:right;">${p.view_count.toLocaleString()}</span>
+                            <span style="font-size:0.78rem; font-weight:700; color:#0A291A; flex-shrink:0; width:40px; text-align:right;">${p.view_count.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>`;
@@ -1618,7 +1618,7 @@ function renderCategoryIcon(iconString) {
             const sorted = Object.entries(catMap).sort((a,b) => b[1].views - a[1].views);
             const maxV   = sorted[0]?.[1].views || 1;
 
-            const CAT_COLORS = ['#007bff','#00b894','#fd79a8','#e17055','#0984e3','#fdcb6e','#74b3ff','#55efc4'];
+            const CAT_COLORS = ['#0A291A','#F5A623','#fd79a8','#e17055','#0984e3','#F5A623','#74b3ff','#55efc4'];
 
             if (sorted.length === 0) {
                 document.getElementById('vCatBreakdown').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;">No data.</p>';
@@ -1672,13 +1672,13 @@ function renderCategoryIcon(iconString) {
                 const perfColor = viewPct >= 70 ? '#2ed573' : viewPct >= 35 ? '#f39c12' : '#dfe6e9';
                 const perfLabel = viewPct >= 70 ? '🔥 Hot' : viewPct >= 35 ? '📈 Active' : '😴 Low';
                 const statusBadge = {
-                    approved: '<span style="background:#e8fdf5;color:#00b894;border:1px solid #2ed573;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Live</span>',
-                    sold:     '<span style="background:#fff3e0;color:#e65100;border:1px solid #ffa502;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Sold</span>',
-                    pending:  '<span style="background:#f0f4ff;color:#3498db;border:1px solid #3498db;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Pending</span>',
+                    approved: '<span style="background:#e8fdf5;color:#F5A623;border:1px solid #2ed573;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Live</span>',
+                    sold:     '<span style="background:#fff3e0;color:#F5A623;border:1px solid #ffa502;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Sold</span>',
+                    pending:  '<span style="background:#f0f4ff;color:#0088cc;border:1px solid #0088cc;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Pending</span>',
                     rejected: '<span style="background:#fff0f0;color:#ff4757;border:1px solid #ff4757;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Rejected</span>',
                 }[p.status] || '';
 
-                return `<tr style="border-bottom:1px solid #f0f0f0; ${i % 2 === 0 ? '' : 'background:#fafafa;'} transition:background 0.15s;" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='${i%2===0?'white':'#fafafa'}'">
+                return `<tr style="border-bottom:1px solid #f0f0f0; ${i % 2 === 0 ? '' : 'background:#fafafa;'} transition:background 0.15s;" onmouseover="this.style.background='#f0f7f4'" onmouseout="this.style.background='${i%2===0?'white':'#fafafa'}'">
                     <td style="padding:10px 14px; color:#aaa; font-size:0.8rem;">${i+1}</td>
                     <td style="padding:10px 14px;">
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -1689,7 +1689,7 @@ function renderCategoryIcon(iconString) {
                     <td style="padding:10px 14px; color:#666; font-size:0.82rem;">${p.category || '—'}</td>
                     <td style="padding:10px 14px; font-weight:700; color:#2ed573;">${(p.price||0).toLocaleString()}</td>
                     <td style="padding:10px 14px; text-align:right;">
-                        <span style="font-size:1rem; font-weight:800; color:#1565c0;">${p.view_count.toLocaleString()}</span>
+                        <span style="font-size:1rem; font-weight:800; color:#0A291A;">${p.view_count.toLocaleString()}</span>
                     </td>
                     <td style="padding:10px 14px; text-align:center;">${statusBadge}</td>
                     <td style="padding:10px 14px; min-width:120px;">
