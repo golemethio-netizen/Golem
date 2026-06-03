@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 
@@ -503,7 +503,15 @@
             .masonry-wrapper { grid-template-columns: 1fr; }
             .logo { font-size: 0.95rem; }
         }
-    </style>
+    
+        /* Amharic font support */
+        :lang(am), [lang="am"] * {
+            font-family: 'Noto Sans Ethiopic', 'Poppins', sans-serif;
+        }
+        .lang-am-active {
+            font-family: 'Noto Sans Ethiopic', 'Poppins', sans-serif !important;
+        }
+</style>
 </head>
 
 <body>
@@ -544,7 +552,7 @@
                     
                     <div class="nav-auth-controls">
                         <button id="signInBtn" class="sign-in-btn">
-                            <i class="fas fa-user"></i> <span class="hide-mobile">Sign In</span>
+                            <i class="fas fa-user"></i> <span class="hide-mobile" data-am="ይግቡ">Sign In</span>
                         </button>
                         <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
                             <span id="userNameLink" style="cursor:pointer; font-size:0.85rem; font-weight:600;"><strong id="userName"></strong></span>
@@ -559,14 +567,14 @@
                 
                 <!-- Desktop Navigation (Hidden on Mobile) -->
                 <nav class="desktop-main-nav">
-                    <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p>Home</p></a>
-                    <a href="sell.html" id="sellBtn" data-am="ይሽጡ" class="nav-item-box bg-sell"><i class="fas fa-plus-circle"></i><p>Sell Item</p></a>
-                    <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p>My Items</p></a>
+                    <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p data-am="መነሻ">Home</p></a>
+                    <a href="sell.html" id="sellBtn" class="nav-item-box bg-sell"><i class="fas fa-plus-circle"></i><p data-am="ይሽጡ">Sell Item</p></a>
+                    <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p data-am="እቃዎቼ">My Items</p></a>
                     <a href="saved.html" class="nav-item-box" style="position:relative;">
-                        <i class="fas fa-shopping-cart"></i><p>Cart</p>
+                        <i class="fas fa-shopping-cart"></i><p data-am="ጋሪ">Cart</p>
                         <span id="cartBadge" class="cart-badge">0</span>
                     </a>
-                    <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none; color:#ff4757;"><i class="fas fa-user-shield"></i><p>Admin</p></a>
+                    <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none; color:#ff4757;"><i class="fas fa-user-shield"></i><p data-am="አስተዳዳሪ">Admin</p></a>
                 </nav>
 
                 <!-- Search & Sort Bar -->
@@ -574,18 +582,18 @@
                     <!-- Search Input -->
                     <div class="search-input-group">
                         <i class="fas fa-search" style="color:#94a3b8;"></i>
-                        <input type="text" id="headerSearch" placeholder="Search items, categories, or regions...">
+                        <input type="text" id="headerSearch" placeholder="Search items, categories, or regions..." data-am-placeholder="እቃዎችን፣ ምድቦችን ወይም ክልሎችን ይፈልጉ...">
                     </div>
                     
                     <!-- Filters -->
                     <div class="header-filters">
                         <select id="sortSelect" class="header-select">
-                            <option value="newest">🆕 Newest First</option>
-                            <option value="price_low">💰 Price: Low to High</option>
-                            <option value="price_high">💎 Price: High to Low</option>
+                            <option value="newest" data-am="🆕 አዲስ መጀመሪያ">🆕 Newest First</option>
+                            <option value="price_low" data-am="💰 ዋጋ፡ ከዝቅ ወደ ከፍ">💰 Price: Low to High</option>
+                            <option value="price_high" data-am="💎 ዋጋ፡ ከከፍ ወደ ዝቅ">💎 Price: High to Low</option>
                         </select>
                         <select id="locationSelect" class="header-select">
-                            <option value="all">🌍 All Regions</option>
+                            <option value="all" data-am="🌍 ሁሉም ክልሎች">🌍 All Regions</option>
                             <option value="Addis Ababa">Addis Ababa</option>
                             <option value="Oromia">Oromia</option>
                             <option value="Amhara">Amhara</option>
@@ -602,11 +610,11 @@
 
     <!-- ── Mobile bottom tab bar (only visible on mobile) ── -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
-        <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
-       <a href="sell.html" id="mobileSellBtn" class="sell-tab"><i class="fas fa-plus-circle"></i><span>Sell</span></a>
-        <a href="my-items.html"><i class="fas fa-box-open"></i><span>Items</span></a>
+        <a href="index.html"><i class="fas fa-home"></i><span data-am="መነሻ">Home</span></a>
+       <a href="sell.html" id="mobileSellBtn" class="sell-tab"><i class="fas fa-plus-circle"></i><span data-am="ይሽጡ">Sell</span></a>
+        <a href="my-items.html"><i class="fas fa-box-open"></i><span data-am="እቃዎቼ">Items</span></a>
         <a href="saved.html" style="position:relative;">
-            <i class="fas fa-shopping-cart"></i><span>Cart</span>
+            <i class="fas fa-shopping-cart"></i><span data-am="ጋሪ">Cart</span>
             <span id="mobileCartBadge" style="display:none; position:absolute; top:0; right:10px; background:#ff4757; color:white; border-radius:50%; width:16px; height:16px; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center;"></span>
         </a>
         <a href="admin.html" id="mobileAdminLink" class="admin-tab" style="display:none;"><i class="fas fa-user-shield"></i><span>Admin</span></a>
@@ -615,7 +623,7 @@
     <!-- ======================= SPONSORED ======================= -->
     <section class="sponsored-section container" id="mainSponsor" style="display:none; margin-top:20px;">
         <div class="sponsor-card">
-            <div class="sponsor-badge">Featured Partner</div>
+            <div class="sponsor-badge" data-am="ልዩ አጋር">Featured Partner</div>
             <div class="sponsor-content">
                 <div class="sponsor-image">
                     <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
@@ -637,7 +645,7 @@
         <div class="filter-bar" id="filterBar">
             <!-- Always-present buttons -->
             <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
-            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
+            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች"><span data-am="ልዩ">Featured</span>
                 <i class="fas fa-star" style="color:#f1c40f;"></i> Featured
             </button>
             <!-- Dynamic categories injected here by loadFilterCategories() -->
@@ -792,11 +800,11 @@
     <div class="floating-chat">
         <div id="chatToast" class="chat-toast" style="display:none;">
             <span id="closeToastBtn" class="close-toast">&times;</span>
-            <p>👋 Hello! Welcome! Need help with buying or selling?</p>
+            <p data-am="👋 ሰላም! እንኳን ደህና መጡ! ለመግዛት ወይም ለመሸጥ እርዳታ ይፈልጋሉ?">👋 Hello! Welcome! Need help with buying or selling?</p>
             <div class="toast-arrow"></div>
         </div>
         <div id="chatMenu" class="chat-menu" style="display:none;">
-            <a href="tel:+251707022845" class="menu-item call"><i class="fas fa-phone"></i> <span>Call Now</span></a>
+            <a href="tel:+251707022845" class="menu-item call"><i class="fas fa-phone"></i> <span data-am="አሁን ይደውሉ">Call Now</span></a>
             <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram"><i class="fab fa-telegram-plane"></i> <span>Telegram</span></a>
             <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp"><i class="fab fa-whatsapp"></i> <span>WhatsApp</span></a>
         </div>
@@ -813,12 +821,12 @@
     <div id="supportModal" class="modal-overlay" style="display:none;">
         <div class="modal-content" style="max-width:400px;">
             <button id="closeSupportModal" class="close-modal-btn">&times;</button>
-            <h2>Contact WanaGebya Support</h2>
+            <h2 data-am="የWanaGebya ድጋፍ ያግኙ">Contact WanaGebya Support</h2>
             <form id="supportForm">
-                <input type="email" id="supportEmail" placeholder="Your Email" required class="modal-input">
-                <input type="text" id="supportSubject" placeholder="Subject" required class="modal-input">
-                <textarea id="supportMessage" placeholder="How can we help?" required class="modal-input" style="height:100px;"></textarea>
-                <button type="submit" class="auth-submit" style="width:100%;">Send Message</button>
+                <input type="email" id="supportEmail" placeholder="Your Email" data-am-placeholder="ኢሜይልዎ" required class="modal-input">
+                <input type="text" id="supportSubject" placeholder="Subject" data-am-placeholder="ርዕስ" required class="modal-input">
+                <textarea id="supportMessage" placeholder="How can we help?" data-am-placeholder="እንዴት ልንረዳዎ እንችላለን?" required class="modal-input" style="height:100px;"></textarea>
+                <button type="submit" class="auth-submit" style="width:100%;" data-am="መልእክት ይላኩ">Send Message</button>
             </form>
         </div>
     </div>
@@ -826,7 +834,7 @@
     <div id="authModal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
             <button type="button" id="closeAuthModal" class="close-modal-btn">&times;</button>
-            <h2 id="modalTitle">Welcome Back</h2>
+            <h2 id="modalTitle" data-am="እንኳን ደህና መጡ">Welcome Back</h2>
 
             <!-- Google Sign-In Button -->
             <button type="button" id="googleSignInBtn" onclick="window.signInWithGoogle()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; margin-bottom:16px; background:#fff; border:1.5px solid #e2e8f0; border-radius:10px; font-size:0.9rem; font-weight:600; color:#3c4043; cursor:pointer; font-family:inherit; transition:background 0.2s, box-shadow 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.07);">
@@ -855,7 +863,7 @@
                     <div class="input-group"><i class="fas fa-map-marker-alt"></i><input type="text" id="regLocation" placeholder="Location (e.g. Bole)"></div>
                     <div class="input-group"><i class="fas fa-info-circle"></i><textarea id="regBio" placeholder="Short Bio (Optional)" style="width:100%; border:none; padding:10px; font-family:inherit; border-radius:8px; background:#f9f9f9;"></textarea></div>
                 </div>
-                <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;">Sign In</button>
+                <button type="submit" id="authSubmitBtn" class="auth-submit" style="width:100%; margin-top:10px;" data-am="ይግቡ">Sign In</button>
             </form>
             <div class="modal-footer">
                 <p id="toggleText">Don't have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a></p>
@@ -1253,6 +1261,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('helpBtn').addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
             document.getElementById('langToggleBtn').addEventListener('click', window.toggleLanguage);
+            if (window.applyStoredLanguage) window.applyStoredLanguage();
             document.getElementById('footerLangBtn').addEventListener('click', window.toggleLanguage);
             document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
             document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
