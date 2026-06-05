@@ -686,13 +686,18 @@ window.openProductModal = async (product) => {
         modalContent.style.background = 'transparent';
 
         const specs = {};
-        const descLines = (product.description || '').split('\n');
-        const introLines = [];
-        descLines.forEach(line => {
-            const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+        // Split intro text from spec block — separator is '--- Specs ---'
+        const rawDesc     = product.description || '';
+        const descParts   = rawDesc.split('--- Specs ---');
+        const introPart   = descParts[0].trim();
+        const specPart    = descParts[1] || '';
+        // Parse Key: Value pairs only from the spec block
+        specPart.split('\n').forEach(line => {
+            const m = line.match(/^\s*([^:]+):\s*(.+)$/);
             if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
-            else if (line.trim() && !line.trim().startsWith('-')) introLines.push(line.trim());
         });
+        // introLines = the human-written description text only
+        const introLines = introPart.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
         const PHONE_SUBS = ['Mobile Phones','Mobile Phone','Phone','Smartphone'];
         const isMobile = PHONE_SUBS.includes(product.subcategory);
@@ -1361,4 +1366,3 @@ function closeTGPopup() {
 
 // Start the auto-checker when the page loads
 window.onload = showTGPopupAuto;
-
