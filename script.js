@@ -668,9 +668,17 @@ window.openProductModal = async (product) => {
 
     } else if (
         product.subcategory === 'Computers & Laptops' ||
+        product.subcategory === 'Computer' ||
+        product.subcategory === 'Laptop' ||
         product.subcategory === 'Laptops' ||
+        product.subcategory === 'Desktop Computer' ||
         product.subcategory === 'Desktop Computers' ||
+        product.subcategory === 'Tablet' ||
+        product.subcategory === 'Tablets' ||
         product.subcategory === 'Mobile Phones' ||
+        product.subcategory === 'Mobile Phone' ||
+        product.subcategory === 'Phone' ||
+        product.subcategory === 'Smartphone' ||
         (product.category === 'Electronics' && product.subcategory)
     ) {
         // ── ELECTRONICS / COMPUTER SPEC CARD ──
@@ -686,7 +694,11 @@ window.openProductModal = async (product) => {
             else if (line.trim() && !line.trim().startsWith('-')) introLines.push(line.trim());
         });
 
+        const PHONE_SUBS = ['Mobile Phones','Mobile Phone','Phone','Smartphone'];
+        const isMobile = PHONE_SUBS.includes(product.subcategory);
+
         const brand    = specs['brand'] || '';
+        const model    = specs['model'] || '';
         const cpu      = specs['processor'] || specs['cpu'] || '-';
         const ram      = specs['ram'] || specs['memory'] || '-';
         const storage  = specs['storage'] || '-';
@@ -697,8 +709,11 @@ window.openProductModal = async (product) => {
         const warranty = specs['warranty'] || '-';
         const features = specs['features'] || '';
         const condition= specs['condition'] || product.status_condition || '-';
-        const subtitle = (brand ? brand + ' · ' : '') + (product.subcategory || product.category);
-        const isMobile = product.subcategory === 'Mobile Phones';
+        const camera   = specs['camera'] || specs['main camera'] || '-';
+        const network  = specs['network'] || specs['connectivity'] || '-';
+        const simSlots = specs['sim slots'] || specs['sim'] || '-';
+        const color    = specs['color'] || specs['colour'] || '';
+        const subtitle = (brand ? brand + ' · ' : '') + (model ? model + ' · ' : '') + (product.subcategory || product.category);
 
         const stockColor = (!product.stock_status || product.stock_status === 'in_stock') ? '#2ed573'
             : product.stock_status === 'limited' ? '#F5A623' : '#ef4444';
@@ -707,7 +722,7 @@ window.openProductModal = async (product) => {
 
         modalContent.innerHTML =
             '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
-          + '<div style="background:#0f1623;border-radius:18px;overflow:visible;font-family:Poppins,Arial,sans-serif;">'
+          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
           + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
           + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
@@ -732,21 +747,45 @@ window.openProductModal = async (product) => {
           + '<div style="font-size:0.72rem;color:#4a90d9;">📞 +' + intPhone + '</div></div>'
           + (isVerified ? '<span style="margin-left:auto;font-size:0.68rem;color:#2ed573;background:rgba(34,197,94,0.1);border:1px solid #2ed573;border-radius:20px;padding:2px 8px;font-weight:700;"><i class="fas fa-check-circle"></i> Verified</span>' : '')
           + '</div>'
-          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
-          + specCell('fas fa-microchip', isMobile ? 'RAM' : 'Processor', isMobile ? ram : cpu)
+          + (!isMobile ? '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
+          + specCell('fas fa-microchip', 'Processor', cpu)
           + specCell('fas fa-hdd', 'Storage', storage)
-          + specCell('fas fa-memory', 'Memory', ram)
+          + specCell('fas fa-memory', 'RAM', ram)
           + specCell('fas fa-desktop', 'Display', display)
-          + specCell(isMobile ? 'fas fa-battery-full' : 'fas fa-th-large', isMobile ? 'Battery' : 'Graphics', isMobile ? battery : gpu)
+          + specCell('fas fa-th-large', 'Graphics', gpu)
           + specCell('fas fa-shield-alt', 'Warranty', warranty)
-          + '</div>'
+          + '</div>' : '')
+          + (isMobile ? '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
+          + specCell('fas fa-camera', 'Camera', camera)
+          + specCell('fas fa-hdd', 'Storage', storage)
+          + specCell('fas fa-memory', 'RAM', ram)
+          + specCell('fas fa-mobile-alt', 'Display', display)
+          + specCell('fas fa-battery-full', 'Battery', battery)
+          + specCell('fas fa-shield-alt', 'Warranty', warranty)
+          + '</div>' : '')
+          + (isMobile && (network !== '-' || simSlots !== '-') ? '<div style="display:grid;grid-template-columns:1fr 1fr;">'
+          + specCell('fas fa-wifi', 'Network', network)
+          + specCell('fas fa-sim-card', 'SIM Slots', simSlots)
+          + '</div>' : '')
           + (features ? '<div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;flex-wrap:wrap;gap:6px;">'
           + features.split(',').map(function(f){ return '<span style="background:rgba(26,143,255,0.12);border:1px solid rgba(26,143,255,0.3);color:#c8e6c9;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;">' + f.trim() + '</span>'; }).join('')
           + '</div>' : '')
           + '<div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + miniBar('OS', os)
-          + miniBar('Condition', condition)
+          + (isMobile && color ? miniBar('Color', color) : miniBar('Condition', condition))
           + miniBar('Location', product.location || '-')
+          + '</div>'
+          + (isMobile ? '<div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);">'
+          + miniBar('Condition', condition)
+          + miniBar('Warranty', warranty)
+          + miniBar('OS', os)
+          + '</div>' : '')
+          + (introLines.length ? '<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
+          + '<div style="font-size:0.68rem;font-weight:700;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Description</div>'
+          + '<p style="font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;">' + introLines.join(' ') + '</p>'
+          + '</div>' : '')
+          + '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">'
+          + '<button onclick="window.addToCartFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#F5A623;color:#1a1a1a;border:none;border-radius:12px;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:Poppins,Arial,sans-serif;"><i class="fas fa-cart-plus"></i> Add to Cart</button>'
           + '</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a1a;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
