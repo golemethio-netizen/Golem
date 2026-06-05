@@ -290,85 +290,142 @@
                     </div>
 
 
-                    <!-- ELECTRONICS SPEC FIELDS (shown for Computer/Laptop/Mobile subcategories) -->
+                    <!-- ELECTRONICS SPEC FIELDS (computer + phone) -->
                     <div id="editElectronicsFields" style="display:none;">
                         <div style="background:#f0f7f4;border:1.5px solid #c8e6c9;border-radius:12px;padding:16px;margin-bottom:14px;">
-                            <div style="font-weight:700;color:#0A291A;font-size:0.88rem;margin-bottom:12px;"><i class="fas fa-laptop"></i> <span id="editElecLabel">Device Specifications</span></div>
+                            <div style="font-weight:700;color:#0A291A;font-size:0.88rem;margin-bottom:12px;">
+                                <i id="editElecIcon" class="fas fa-laptop"></i>
+                                <span id="editElecLabel">Device Specifications</span>
+                            </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+                                <!-- Shared: Brand -->
+                                <div class="input-group-sell" style="margin:0;grid-column:1/-1;">
+                                    <label style="font-size:0.82rem;">Brand</label>
+                                    <select id="editSpecBrand" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
+                                        <option value="">Select Brand</option>
+                                        <option>Samsung</option><option>Apple</option><option>Apple (iPhone)</option>
+                                        <option>Tecno</option><option>Infinix</option><option>Itel</option>
+                                        <option>Nokia</option><option>Huawei</option><option>Xiaomi</option>
+                                        <option>Oppo</option><option>Vivo</option><option>Realme</option>
+                                        <option>HP</option><option>Dell</option><option>Lenovo</option>
+                                        <option>Asus</option><option>Acer</option><option>MSI</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+
+                                <!-- Shared: Model -->
+                                <div class="input-group-sell" style="margin:0;grid-column:1/-1;">
+                                    <label style="font-size:0.82rem;">Model</label>
+                                    <input type="text" id="editSpecModel" placeholder="e.g. MacBook Pro 2023 / Samsung Galaxy A54"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;box-sizing:border-box;">
+                                </div>
+
+                                <!-- COMPUTER ONLY fields -->
                                 <div class="input-group-sell" style="margin:0;" id="editCpuWrap">
                                     <label style="font-size:0.82rem;">Processor / CPU</label>
-                                    <input type="text" id="editSpecProcessor" placeholder="e.g. Intel Core i7" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;box-sizing:border-box;">
-                                </div>
-                                <div class="input-group-sell" style="margin:0;">
-                                    <label style="font-size:0.82rem;">RAM</label>
-                                    <select id="editSpecRam" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
-                                        <option value="">Select</option>
-                                        <option>2 GB</option><option>4 GB</option><option>6 GB</option><option>8 GB</option>
-                                        <option>12 GB</option><option>16 GB</option><option>32 GB</option><option>64 GB</option>
-                                    </select>
-                                </div>
-                                <div class="input-group-sell" style="margin:0;">
-                                    <label style="font-size:0.82rem;">Storage</label>
-                                    <select id="editSpecStorage" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
-                                        <option value="">Select</option>
-                                        <option>32 GB</option><option>64 GB</option><option>128 GB</option><option>256 GB</option>
-                                        <option>512 GB</option><option>1 TB</option><option>2 TB</option>
-                                    </select>
-                                </div>
-                                <div class="input-group-sell" style="margin:0;">
-                                    <label style="font-size:0.82rem;">Display Size</label>
-                                    <select id="editSpecDisplay" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
-                                        <option value="">Select</option>
-                                        <option>5.5"</option><option>6.1"</option><option>6.5"</option><option>6.7"</option>
-                                        <option>11"</option><option>13"</option><option>14"</option><option>15"</option><option>15.6"</option><option>16"</option><option>17"</option>
-                                    </select>
+                                    <input type="text" id="editSpecProcessor" placeholder="e.g. Intel Core i7-12th"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;box-sizing:border-box;">
                                 </div>
                                 <div class="input-group-sell" style="margin:0;" id="editGpuWrap">
                                     <label style="font-size:0.82rem;">Graphics / GPU</label>
-                                    <input type="text" id="editSpecGpu" placeholder="e.g. NVIDIA RTX 3060" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;box-sizing:border-box;">
+                                    <input type="text" id="editSpecGpu" placeholder="e.g. NVIDIA RTX 3060"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;box-sizing:border-box;">
                                 </div>
-                                <div class="input-group-sell" style="margin:0;" id="editOsWrap">
-                                    <label style="font-size:0.82rem;">Operating System</label>
-                                    <select id="editSpecOs" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
-                                        <option value="">Select</option>
-                                        <option>Windows 11</option><option>Windows 10</option><option>macOS Ventura</option>
-                                        <option>macOS Sonoma</option><option>Ubuntu Linux</option><option>Chrome OS</option>
-                                        <option>Android</option><option>iOS</option><option>No OS</option>
-                                    </select>
-                                </div>
-                                <!-- Mobile-only fields -->
+
+                                <!-- PHONE ONLY fields -->
                                 <div class="input-group-sell" style="margin:0;" id="editCameraWrap">
-                                    <label style="font-size:0.82rem;">Camera</label>
+                                    <label style="font-size:0.82rem;">Main Camera</label>
                                     <select id="editSpecCamera" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
                                         <option value="">Select</option>
-                                        <option>8 MP</option><option>12 MP</option><option>16 MP</option><option>48 MP</option>
-                                        <option>50 MP</option><option>64 MP</option><option>108 MP</option><option>200 MP</option>
-                                        <option>Triple Camera</option><option>Dual Camera</option>
+                                        <option>8 MP</option><option>12 MP</option><option>16 MP</option>
+                                        <option>48 MP</option><option>50 MP</option><option>64 MP</option>
+                                        <option>108 MP</option><option>200 MP</option>
+                                        <option>Dual Camera</option><option>Triple Camera</option><option>Quad Camera</option>
                                     </select>
                                 </div>
                                 <div class="input-group-sell" style="margin:0;" id="editNetworkWrap">
                                     <label style="font-size:0.82rem;">Network</label>
                                     <select id="editSpecNetwork" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
                                         <option value="">Select</option>
-                                        <option>2G / 3G</option><option>4G LTE</option><option>5G</option><option>4G + WiFi Calling</option>
+                                        <option>2G / 3G</option><option>4G LTE</option>
+                                        <option>5G</option><option>4G + WiFi Calling</option>
                                     </select>
                                 </div>
                                 <div class="input-group-sell" style="margin:0;" id="editSimWrap">
                                     <label style="font-size:0.82rem;">SIM Slots</label>
                                     <select id="editSpecSim" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
                                         <option value="">Select</option>
-                                        <option>Single SIM</option><option>Dual SIM</option><option>Dual SIM + eSIM</option>
+                                        <option>Single SIM</option><option>Dual SIM</option>
+                                        <option>Dual SIM + eSIM</option>
                                     </select>
                                 </div>
+                                <div class="input-group-sell" style="margin:0;" id="editColorWrap">
+                                    <label style="font-size:0.82rem;">Color</label>
+                                    <input type="text" id="editSpecColor" placeholder="e.g. Midnight Black"
+                                        style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;box-sizing:border-box;">
+                                </div>
+
+                                <!-- Shared: RAM -->
                                 <div class="input-group-sell" style="margin:0;">
-                                    <label style="font-size:0.82rem;">Battery Life</label>
+                                    <label style="font-size:0.82rem;">RAM</label>
+                                    <select id="editSpecRam" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
+                                        <option value="">Select</option>
+                                        <option>2 GB</option><option>3 GB</option><option>4 GB</option><option>6 GB</option>
+                                        <option>8 GB</option><option>12 GB</option><option>16 GB</option>
+                                        <option>32 GB</option><option>64 GB</option>
+                                    </select>
+                                </div>
+
+                                <!-- Shared: Storage -->
+                                <div class="input-group-sell" style="margin:0;">
+                                    <label style="font-size:0.82rem;">Storage</label>
+                                    <select id="editSpecStorage" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
+                                        <option value="">Select</option>
+                                        <option>32 GB</option><option>64 GB</option><option>128 GB</option>
+                                        <option>256 GB</option><option>512 GB</option><option>1 TB</option><option>2 TB</option>
+                                    </select>
+                                </div>
+
+                                <!-- Shared: Display -->
+                                <div class="input-group-sell" style="margin:0;">
+                                    <label style="font-size:0.82rem;" id="editDisplayLabel">Display Size</label>
+                                    <select id="editSpecDisplay" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
+                                        <option value="">Select</option>
+                                        <option>5.0"</option><option>5.5"</option><option>6.0"</option>
+                                        <option>6.1"</option><option>6.5"</option><option>6.7"</option><option>6.9"</option>
+                                        <option>11"</option><option>13"</option><option>14"</option>
+                                        <option>15"</option><option>15.6"</option><option>16"</option><option>17"</option>
+                                    </select>
+                                </div>
+
+                                <!-- Shared: Battery -->
+                                <div class="input-group-sell" style="margin:0;">
+                                    <label style="font-size:0.82rem;">Battery</label>
                                     <select id="editSpecBattery" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
                                         <option value="">Select</option>
-                                        <option>Up to 4 hrs</option><option>Up to 6 hrs</option><option>Up to 8 hrs</option>
+                                        <option>2500 mAh</option><option>3000 mAh</option><option>3500 mAh</option>
+                                        <option>4000 mAh</option><option>4500 mAh</option><option>5000 mAh</option>
+                                        <option>5500 mAh</option><option>6000 mAh</option>
+                                        <option>Up to 6 hrs</option><option>Up to 8 hrs</option>
                                         <option>Up to 10 hrs</option><option>Up to 12 hrs</option><option>Up to 15 hrs</option>
-                                        <option>3000 mAh</option><option>4000 mAh</option><option>5000 mAh</option><option>6000 mAh</option>
                                     </select>
                                 </div>
+
+                                <!-- Shared: OS -->
+                                <div class="input-group-sell" style="margin:0;">
+                                    <label style="font-size:0.82rem;">Operating System</label>
+                                    <select id="editSpecOs" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
+                                        <option value="">Select</option>
+                                        <option>Android 11</option><option>Android 12</option><option>Android 13</option><option>Android 14</option>
+                                        <option>iOS 15</option><option>iOS 16</option><option>iOS 17</option><option>iOS 18</option>
+                                        <option>Windows 10</option><option>Windows 11</option>
+                                        <option>macOS Ventura</option><option>macOS Sonoma</option>
+                                        <option>Ubuntu Linux</option><option>Chrome OS</option><option>No OS</option>
+                                    </select>
+                                </div>
+
+                                <!-- Shared: Warranty -->
                                 <div class="input-group-sell" style="margin:0;">
                                     <label style="font-size:0.82rem;">Warranty</label>
                                     <select id="editSpecWarranty" style="border-radius:8px;padding:10px;border:1.5px solid #c8e6c9;width:100%;outline:none;">
@@ -520,7 +577,6 @@
             });
 
             wrapper.style.display = 'block';
-            // If a subcategory is already selected, show its spec fields
             showEditElectronicsSpec(selectedSub || '');
         }
 
@@ -690,26 +746,27 @@
         }
 
         // Reshape the edit form based on category
-        // Computer/Mobile subcategory names
+        // ── Electronics subcategory name sets ──
+        const PHONE_SUBS    = ['Mobile Phones','Mobile Phone','Phone','Smartphone'];
         const COMPUTER_SUBS = ['Computers & Laptops','Computer','Laptop','Laptops','Desktop Computer','Desktop Computers','Tablet','Tablets'];
-        const MOBILE_SUBS   = ['Mobile Phones','Mobile Phone'];
-        const ELEC_SUBS     = [...COMPUTER_SUBS, ...MOBILE_SUBS];
+        const ELEC_SUBS     = [...PHONE_SUBS, ...COMPUTER_SUBS];
 
         function showEditElectronicsSpec(subName) {
             const wrap = document.getElementById('editElectronicsFields');
             if (!subName || !ELEC_SUBS.includes(subName)) { wrap.style.display = 'none'; return; }
-
-            const isMob = MOBILE_SUBS.includes(subName);
+            const isMob = PHONE_SUBS.includes(subName);
             wrap.style.display = 'block';
-            document.getElementById('editElecLabel').textContent = isMob ? 'Mobile Phone Specifications' : 'Computer / Laptop Specifications';
 
-            // Show/hide mobile-only vs laptop-only fields
-            ['editCameraWrap','editNetworkWrap','editSimWrap'].forEach(id => {
-                document.getElementById(id).style.display = isMob ? 'block' : 'none';
-            });
-            ['editCpuWrap','editGpuWrap'].forEach(id => {
-                document.getElementById(id).style.display = isMob ? 'none' : 'block';
-            });
+            // Label + icon
+            document.getElementById('editElecLabel').textContent = isMob ? ' Mobile Phone Specifications' : ' Computer / Laptop Specifications';
+            document.getElementById('editElecIcon').className = isMob ? 'fas fa-mobile-alt' : 'fas fa-laptop';
+
+            // Phone-only fields
+            ['editCameraWrap','editNetworkWrap','editSimWrap','editColorWrap'].forEach(id =>
+                document.getElementById(id).style.display = isMob ? 'block' : 'none');
+            // Computer-only fields
+            ['editCpuWrap','editGpuWrap'].forEach(id =>
+                document.getElementById(id).style.display = isMob ? 'none' : 'block');
         }
 
         window.reshapeEditForm = function(cat) {
@@ -766,30 +823,39 @@
                 document.getElementById('editQuantity').value = item.quantity || '';
                 toggleQtyField(stockStatus);
 
-                // Pre-fill Electronics spec fields if subcategory matches
+                // Pre-fill electronics spec fields
                 const sub = item.subcategory || '';
                 showEditElectronicsSpec(sub);
                 if (ELEC_SUBS.includes(sub)) {
-                    const isMob = MOBILE_SUBS.includes(sub);
-                    if (!isMob) {
-                        document.getElementById('editSpecProcessor').value = parseSpec(item.description, 'processor') || parseSpec(item.description, 'cpu') || '';
-                        document.getElementById('editSpecGpu').value = parseSpec(item.description, 'graphics') || parseSpec(item.description, 'gpu') || '';
+                    const isMob = PHONE_SUBS.includes(sub);
+                    const selOpt = (id, val) => {
+                        if (!val) return;
+                        const s = document.getElementById(id);
+                        for (let o of s.options) { if (o.value === val || o.text === val) { s.value = o.value; break; } }
+                    };
+                    // Brand + Model
+                    const brandEl = document.getElementById('editSpecBrand');
+                    const brandVal = parseSpec(item.description, 'brand');
+                    for (let o of brandEl.options) { if (o.text === brandVal) { brandEl.value = o.value; break; } }
+                    document.getElementById('editSpecModel').value = parseSpec(item.description, 'model') || '';
+
+                    // Shared
+                    selOpt('editSpecRam',     parseSpec(item.description, 'ram') || parseSpec(item.description, 'memory'));
+                    selOpt('editSpecStorage', parseSpec(item.description, 'storage'));
+                    selOpt('editSpecDisplay', parseSpec(item.description, 'display') || parseSpec(item.description, 'screen size'));
+                    selOpt('editSpecBattery', parseSpec(item.description, 'battery life') || parseSpec(item.description, 'battery'));
+                    selOpt('editSpecOs',      parseSpec(item.description, 'operating system') || parseSpec(item.description, 'os'));
+                    selOpt('editSpecWarranty',parseSpec(item.description, 'warranty'));
+
+                    if (isMob) {
+                        selOpt('editSpecCamera',  parseSpec(item.description, 'camera') || parseSpec(item.description, 'main camera'));
+                        selOpt('editSpecNetwork', parseSpec(item.description, 'network') || parseSpec(item.description, 'connectivity'));
+                        selOpt('editSpecSim',     parseSpec(item.description, 'sim slots') || parseSpec(item.description, 'sim'));
+                        document.getElementById('editSpecColor').value = parseSpec(item.description, 'color') || parseSpec(item.description, 'colour') || '';
                     } else {
-                        const camVal = parseSpec(item.description, 'camera') || parseSpec(item.description, 'main camera') || '';
-                        const netVal = parseSpec(item.description, 'network') || parseSpec(item.description, 'connectivity') || '';
-                        const simVal = parseSpec(item.description, 'sim slots') || parseSpec(item.description, 'sim') || '';
-                        const sel = (id, val) => { const s = document.getElementById(id); for(let o of s.options) if(o.value===val||o.text===val){s.value=o.value;break;} };
-                        sel('editSpecCamera', camVal);
-                        sel('editSpecNetwork', netVal);
-                        sel('editSpecSim', simVal);
+                        document.getElementById('editSpecProcessor').value = parseSpec(item.description, 'processor') || parseSpec(item.description, 'cpu') || '';
+                        document.getElementById('editSpecGpu').value       = parseSpec(item.description, 'graphics') || parseSpec(item.description, 'gpu') || '';
                     }
-                    const selMatch = (id, val) => { const s = document.getElementById(id); for(let o of s.options) if(o.value===val||o.text===val){s.value=o.value;break;} };
-                    selMatch('editSpecRam',     parseSpec(item.description, 'ram') || parseSpec(item.description, 'memory') || '');
-                    selMatch('editSpecStorage', parseSpec(item.description, 'storage') || '');
-                    selMatch('editSpecDisplay', parseSpec(item.description, 'display') || parseSpec(item.description, 'screen size') || '');
-                    selMatch('editSpecOs',      parseSpec(item.description, 'operating system') || parseSpec(item.description, 'os') || '');
-                    selMatch('editSpecBattery', parseSpec(item.description, 'battery life') || parseSpec(item.description, 'battery') || '');
-                    selMatch('editSpecWarranty',parseSpec(item.description, 'warranty') || '');
                 }
             } else if (isJob) {
                 // Job fields — parse from description or direct columns
@@ -944,38 +1010,33 @@
                     updatedData.stock_status = stockStatus;
                     updatedData.quantity = qty ? parseInt(qty) : null;
 
-                    // Electronics spec fields — rebuild description with spec block
+                    // Rebuild description with spec block for electronics
                     const editSub = document.getElementById('editSubcategory')?.value || '';
                     if (ELEC_SUBS.includes(editSub)) {
-                        const isMob = MOBILE_SUBS.includes(editSub);
+                        const isMob = PHONE_SUBS.includes(editSub);
                         const baseDesc = updatedData.description.split('\n--- Specs ---')[0].trim();
-                        let specBlock = '\n--- Specs ---';
-                        if (!isMob) {
-                            const proc = document.getElementById('editSpecProcessor').value;
-                            const gpu  = document.getElementById('editSpecGpu').value;
-                            if (proc) specBlock += '\nProcessor: ' + proc;
-                            if (gpu)  specBlock += '\nGraphics: ' + gpu;
+                        const g = id => document.getElementById(id)?.value || '';
+                        let spec = '\n--- Specs ---';
+                        const brandVal = g('editSpecBrand');
+                        const modelVal = g('editSpecModel');
+                        if (brandVal)  spec += '\nBrand: ' + brandVal;
+                        if (modelVal)  spec += '\nModel: ' + modelVal;
+                        if (isMob) {
+                            if (g('editSpecCamera'))  spec += '\nCamera: ' + g('editSpecCamera');
+                            if (g('editSpecNetwork')) spec += '\nNetwork: ' + g('editSpecNetwork');
+                            if (g('editSpecSim'))     spec += '\nSIM Slots: ' + g('editSpecSim');
+                            if (g('editSpecColor'))   spec += '\nColor: ' + g('editSpecColor');
                         } else {
-                            const cam = document.getElementById('editSpecCamera').value;
-                            const net = document.getElementById('editSpecNetwork').value;
-                            const sim = document.getElementById('editSpecSim').value;
-                            if (cam) specBlock += '\nCamera: ' + cam;
-                            if (net) specBlock += '\nNetwork: ' + net;
-                            if (sim) specBlock += '\nSIM Slots: ' + sim;
+                            if (g('editSpecProcessor')) spec += '\nProcessor: ' + g('editSpecProcessor');
+                            if (g('editSpecGpu'))       spec += '\nGraphics: ' + g('editSpecGpu');
                         }
-                        const ram     = document.getElementById('editSpecRam').value;
-                        const storage = document.getElementById('editSpecStorage').value;
-                        const display = document.getElementById('editSpecDisplay').value;
-                        const os      = document.getElementById('editSpecOs').value;
-                        const battery = document.getElementById('editSpecBattery').value;
-                        const warranty= document.getElementById('editSpecWarranty').value;
-                        if (ram)     specBlock += '\nRAM: ' + ram;
-                        if (storage) specBlock += '\nStorage: ' + storage;
-                        if (display) specBlock += '\nDisplay: ' + display;
-                        if (os)      specBlock += '\nOperating System: ' + os;
-                        if (battery) specBlock += '\nBattery Life: ' + battery;
-                        if (warranty)specBlock += '\nWarranty: ' + warranty;
-                        updatedData.description = baseDesc + specBlock;
+                        if (g('editSpecRam'))     spec += '\nRAM: ' + g('editSpecRam');
+                        if (g('editSpecStorage')) spec += '\nStorage: ' + g('editSpecStorage');
+                        if (g('editSpecDisplay')) spec += '\nDisplay: ' + g('editSpecDisplay');
+                        if (g('editSpecBattery')) spec += '\nBattery Life: ' + g('editSpecBattery');
+                        if (g('editSpecOs'))      spec += '\nOperating System: ' + g('editSpecOs');
+                        if (g('editSpecWarranty'))spec += '\nWarranty: ' + g('editSpecWarranty');
+                        updatedData.description = baseDesc + spec;
                     }
                 } else if (isJob) {
                     // Job-specific fields — append specs to description
