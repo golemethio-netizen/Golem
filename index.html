@@ -477,6 +477,28 @@
             .job-card, .service-card { grid-column: 1 / -1; }
 
             /* ── Modal ── */
+            #productModal { align-items: flex-end !important; padding: 0 !important; }
+            #productModal .modal-content {
+                width: 100% !important;
+                margin: 0 !important;
+                border-radius: 20px 20px 0 0 !important;
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+                position: relative;
+                padding-bottom: 72px; /* clear mobile bottom nav */
+            }
+            /* Electronics dark card: top corners match sheet, no overflow clip */
+            #productModal .modal-content > div {
+                border-radius: 20px 20px 0 0 !important;
+                overflow: visible !important;
+            }
+            /* Image header inside electronics card */
+            #productModal .modal-content > div > div:first-child {
+                border-radius: 20px 20px 0 0 !important;
+                overflow: hidden;
+            }
             .modal-content { width: 96%; margin: 4% auto; max-height: 92vh; overflow-y: auto; }
             .modal-footer-actions { flex-direction: column; }
             .modal-flex-actions .contact-btn { flex: 1 1 100%; }
