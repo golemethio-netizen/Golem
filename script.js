@@ -668,15 +668,9 @@ window.openProductModal = async (product) => {
 
     } else if (
         product.subcategory === 'Computers & Laptops' ||
-        product.subcategory === 'Computer' ||
-        product.subcategory === 'Laptop' ||
         product.subcategory === 'Laptops' ||
         product.subcategory === 'Desktop Computers' ||
-        product.subcategory === 'Desktop Computer' ||
-        product.subcategory === 'Tablets' ||
-        product.subcategory === 'Tablet' ||
         product.subcategory === 'Mobile Phones' ||
-        product.subcategory === 'Mobile Phone' ||
         (product.category === 'Electronics' && product.subcategory)
     ) {
         // ── ELECTRONICS / COMPUTER SPEC CARD ──
@@ -704,9 +698,7 @@ window.openProductModal = async (product) => {
         const features = specs['features'] || '';
         const condition= specs['condition'] || product.status_condition || '-';
         const subtitle = (brand ? brand + ' · ' : '') + (product.subcategory || product.category);
-        const isMobile = product.subcategory === 'Mobile Phones' || product.subcategory === 'Mobile Phone';
-        const isDesktop = product.subcategory === 'Desktop Computers' || product.subcategory === 'Desktop Computer';
-        const isComputer = isMobile ? false : true; // laptops, computers, desktops all show laptop icon
+        const isMobile = product.subcategory === 'Mobile Phones';
 
         const stockColor = (!product.stock_status || product.stock_status === 'in_stock') ? '#2ed573'
             : product.stock_status === 'limited' ? '#F5A623' : '#ef4444';
@@ -755,6 +747,13 @@ window.openProductModal = async (product) => {
           + miniBar('OS', os)
           + miniBar('Condition', condition)
           + miniBar('Location', product.location || '-')
+          + '</div>'
+          + (introLines.length ? '<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
+            + '<div style="font-size:0.68rem;font-weight:700;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Description</div>'
+            + '<p style="font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;">' + introLines.join(' ') + '</p>'
+            + '</div>' : '')
+          + '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">'
+          + '<button onclick="window.addToCartFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#F5A623;color:#1a1a1a;border:none;border-radius:12px;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:Poppins,Arial,sans-serif;"><i class="fas fa-cart-plus"></i> Add to Cart</button>'
           + '</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a1a;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
