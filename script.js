@@ -668,10 +668,15 @@ window.openProductModal = async (product) => {
 
     } else if (
         product.subcategory === 'Computers & Laptops' ||
+        product.subcategory === 'Computer' ||
+        product.subcategory === 'Laptop' ||
         product.subcategory === 'Laptops' ||
         product.subcategory === 'Desktop Computers' ||
+        product.subcategory === 'Desktop Computer' ||
         product.subcategory === 'Tablets' ||
+        product.subcategory === 'Tablet' ||
         product.subcategory === 'Mobile Phones' ||
+        product.subcategory === 'Mobile Phone' ||
         (product.category === 'Electronics' && product.subcategory)
     ) {
         // ── ELECTRONICS / COMPUTER SPEC CARD ──
@@ -698,12 +703,10 @@ window.openProductModal = async (product) => {
         const warranty = specs['warranty'] || '-';
         const features = specs['features'] || '';
         const condition= specs['condition'] || product.status_condition || '-';
-        const camera   = specs['camera'] || specs['main camera'] || '-';
-        const network  = specs['network'] || specs['connectivity'] || '-';
-        const simSlots = specs['sim slots'] || specs['sim'] || '-';
         const subtitle = (brand ? brand + ' · ' : '') + (product.subcategory || product.category);
-        const isMobile = product.subcategory === 'Mobile Phones';
-        const isDesktop = product.subcategory === 'Desktop Computers';
+        const isMobile = product.subcategory === 'Mobile Phones' || product.subcategory === 'Mobile Phone';
+        const isDesktop = product.subcategory === 'Desktop Computers' || product.subcategory === 'Desktop Computer';
+        const isComputer = isMobile ? false : true; // laptops, computers, desktops all show laptop icon
 
         const stockColor = (!product.stock_status || product.stock_status === 'in_stock') ? '#2ed573'
             : product.stock_status === 'limited' ? '#F5A623' : '#ef4444';
@@ -740,11 +743,10 @@ window.openProductModal = async (product) => {
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + specCell('fas fa-microchip', isMobile ? 'RAM' : 'Processor', isMobile ? ram : cpu)
           + specCell('fas fa-hdd', 'Storage', storage)
-          + specCell(isMobile ? 'fas fa-camera' : 'fas fa-memory', isMobile ? 'Camera' : 'Memory', isMobile ? camera : ram)
+          + specCell('fas fa-memory', 'Memory', ram)
           + specCell('fas fa-desktop', 'Display', display)
           + specCell(isMobile ? 'fas fa-battery-full' : 'fas fa-th-large', isMobile ? 'Battery' : 'Graphics', isMobile ? battery : gpu)
-          + specCell(isMobile ? 'fas fa-wifi' : 'fas fa-shield-alt', isMobile ? 'Network' : 'Warranty', isMobile ? network : warranty)
-          + (isMobile ? specCell('fas fa-sim-card', 'SIM Slots', simSlots) + specCell('fas fa-shield-alt', 'Warranty', warranty) + specCell('fas fa-mobile-alt', 'OS', os) : '')
+          + specCell('fas fa-shield-alt', 'Warranty', warranty)
           + '</div>'
           + (features ? '<div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;flex-wrap:wrap;gap:6px;">'
           + features.split(',').map(function(f){ return '<span style="background:rgba(26,143,255,0.12);border:1px solid rgba(26,143,255,0.3);color:#c8e6c9;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;">' + f.trim() + '</span>'; }).join('')
