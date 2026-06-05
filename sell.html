@@ -803,13 +803,6 @@
             </div>
         `,
 
-        /* ── ALIASES: all map to the same Computers & Laptops spec form ── */
-        'Computer':          function() { return subcategoryRenderers['Computers & Laptops'](); },
-        'Laptop':            function() { return subcategoryRenderers['Computers & Laptops'](); },
-        'Laptops':           function() { return subcategoryRenderers['Computers & Laptops'](); },
-        'Desktop Computer':  function() { return subcategoryRenderers['Computers & Laptops'](); },
-        'Desktop Computers': function() { return subcategoryRenderers['Computers & Laptops'](); },
-
         /* ── MOBILE PHONES ── */
         'Mobile Phones': () => `
             <div class="dyn-full">
@@ -822,7 +815,7 @@
                     <option>Samsung</option><option>Apple (iPhone)</option><option>Tecno</option>
                     <option>Infinix</option><option>Itel</option><option>Nokia</option>
                     <option>Huawei</option><option>Xiaomi</option><option>Oppo</option>
-                    <option>Vivo</option><option>Other</option>
+                    <option>Vivo</option><option>Realme</option><option>Other</option>
                 </select>
             </div>
             <div>
@@ -832,6 +825,7 @@
             <div>
                 <label class="dyn-label">RAM</label>
                 <select class="dyn-input extra-field-input" data-label="RAM">
+                    <option value="">Select</option>
                     <option>2 GB</option><option>3 GB</option><option>4 GB</option>
                     <option>6 GB</option><option>8 GB</option><option>12 GB</option><option>16 GB</option>
                 </select>
@@ -839,6 +833,7 @@
             <div>
                 <label class="dyn-label">Storage</label>
                 <select class="dyn-input extra-field-input" data-label="Storage">
+                    <option value="">Select</option>
                     <option>32 GB</option><option>64 GB</option><option>128 GB</option>
                     <option>256 GB</option><option>512 GB</option>
                 </select>
@@ -846,20 +841,63 @@
             <div>
                 <label class="dyn-label">Screen Size</label>
                 <select class="dyn-input extra-field-input" data-label="Display">
-                    <option>5.0"</option><option>6.0"</option><option>6.5"</option>
-                    <option>6.7"</option><option>6.9"</option>
+                    <option value="">Select</option>
+                    <option>5.0"</option><option>5.5"</option><option>6.0"</option>
+                    <option>6.1"</option><option>6.5"</option><option>6.7"</option><option>6.9"</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Main Camera</label>
+                <select class="dyn-input extra-field-input" data-label="Camera">
+                    <option value="">Select</option>
+                    <option>8 MP</option><option>12 MP</option><option>16 MP</option>
+                    <option>48 MP</option><option>50 MP</option><option>64 MP</option>
+                    <option>108 MP</option><option>200 MP</option>
+                    <option>Dual Camera</option><option>Triple Camera</option><option>Quad Camera</option>
                 </select>
             </div>
             <div>
                 <label class="dyn-label">Battery</label>
                 <select class="dyn-input extra-field-input" data-label="Battery">
-                    <option>3000 mAh</option><option>4000 mAh</option><option>5000 mAh</option>
-                    <option>6000 mAh</option>
+                    <option value="">Select</option>
+                    <option>2500 mAh</option><option>3000 mAh</option><option>3500 mAh</option>
+                    <option>4000 mAh</option><option>4500 mAh</option><option>5000 mAh</option>
+                    <option>5500 mAh</option><option>6000 mAh</option>
                 </select>
+            </div>
+            <div>
+                <label class="dyn-label">Network</label>
+                <select class="dyn-input extra-field-input" data-label="Network">
+                    <option value="">Select</option>
+                    <option>2G / 3G</option><option>4G LTE</option>
+                    <option>5G</option><option>4G + WiFi Calling</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">SIM Slots</label>
+                <select class="dyn-input extra-field-input" data-label="SIM Slots">
+                    <option value="">Select</option>
+                    <option>Single SIM</option><option>Dual SIM</option>
+                    <option>Dual SIM + eSIM</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Operating System</label>
+                <select class="dyn-input extra-field-input" data-label="Operating System">
+                    <option value="">Select</option>
+                    <option>Android 11</option><option>Android 12</option><option>Android 13</option>
+                    <option>Android 14</option><option>iOS 15</option><option>iOS 16</option>
+                    <option>iOS 17</option><option>iOS 18</option><option>KaiOS</option>
+                </select>
+            </div>
+            <div>
+                <label class="dyn-label">Color</label>
+                <input class="dyn-input extra-field-input" data-label="Color" placeholder="e.g. Midnight Black, Ivory White">
             </div>
             <div>
                 <label class="dyn-label">Condition</label>
                 <select class="dyn-input extra-field-input" data-label="Condition">
+                    <option value="">Select</option>
                     <option>Brand New</option><option>Like New</option>
                     <option>Good</option><option>Fair</option>
                 </select>
@@ -867,11 +905,24 @@
             <div>
                 <label class="dyn-label">Warranty</label>
                 <select class="dyn-input extra-field-input" data-label="Warranty">
+                    <option value="">Select</option>
                     <option>No Warranty</option><option>3 Months</option>
                     <option>6 Months</option><option>1 Year</option>
                 </select>
             </div>
         `,
+
+        /* ── ALIASES: Phone / Mobile Phone map to same form ── */
+        'Phone':        function() { return subcategoryRenderers['Mobile Phones'](); },
+        'Mobile Phone': function() { return subcategoryRenderers['Mobile Phones'](); },
+        'Smartphone':   function() { return subcategoryRenderers['Mobile Phones'](); },
+
+        /* ── COMPUTER ALIASES ── */
+        'Computer':          function() { return subcategoryRenderers['Computers & Laptops'](); },
+        'Laptop':            function() { return subcategoryRenderers['Computers & Laptops'](); },
+        'Laptops':           function() { return subcategoryRenderers['Computers & Laptops'](); },
+        'Desktop Computer':  function() { return subcategoryRenderers['Computers & Laptops'](); },
+        'Desktop Computers': function() { return subcategoryRenderers['Computers & Laptops'](); },
     };
 
     // Also add to pill collector
