@@ -707,7 +707,7 @@ window.openProductModal = async (product) => {
 
         modalContent.innerHTML =
             '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
-          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
+          + '<div style="background:#0f1623;border-radius:18px;overflow:visible;font-family:Poppins,Arial,sans-serif;">'
           + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
           + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
@@ -747,13 +747,6 @@ window.openProductModal = async (product) => {
           + miniBar('OS', os)
           + miniBar('Condition', condition)
           + miniBar('Location', product.location || '-')
-          + '</div>'
-          + (introLines.length ? '<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
-            + '<div style="font-size:0.68rem;font-weight:700;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Description</div>'
-            + '<p style="font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;">' + introLines.join(' ') + '</p>'
-            + '</div>' : '')
-          + '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">'
-          + '<button onclick="window.addToCartFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#F5A623;color:#1a1a1a;border:none;border-radius:12px;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:Poppins,Arial,sans-serif;"><i class="fas fa-cart-plus"></i> Add to Cart</button>'
           + '</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
           + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a1a;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
