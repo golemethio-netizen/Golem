@@ -726,17 +726,15 @@ window.openProductModal = async (product) => {
             : product.stock_status === 'limited' ? 'LIMITED STOCK' : 'OUT OF STOCK';
 
         modalContent.innerHTML =
-            '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
+            '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
+          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
           + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
           + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
           + '</div>'
-          + '<div style="position:relative;background:#0d1520;overflow:hidden;border-radius:20px 20px 0 0;">'
-          + (product.image
-            ? '<img src="' + product.image + '" style="width:100%;max-height:75vw;min-height:180px;object-fit:contain;display:block;">'
-            : '<div style="display:flex;align-items:center;justify-content:center;height:180px;color:#2a3a4a;font-size:3rem;">' + (isMobile ? '📱' : '💻') + '</div>')
-          + '<button onclick="window.closeProductModal()" style="position:absolute;top:12px;right:12px;z-index:99;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
-          + '<div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,rgba(13,21,32,0.95));"></div>'
+          + '<div style="position:relative;height:220px;background:#131e2e;overflow:hidden;">'
+          + (product.image ? '<img src="' + product.image + '" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.92;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
+          + '<div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(15,22,35,0.85));"></div>'
           + '</div>'
           + '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
           + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">'
