@@ -853,57 +853,85 @@ window.closeProductModal = () => {
 // --- 7. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
 
-window.toggleAuthMode = function() {
-    isSignUpMode = !isSignUpMode;
-    const title = document.getElementById('modalTitle');
-    const submitBtn = document.getElementById('authSubmitBtn');
+// Show inline toast inside the auth modal
+function authToast(msg, type) {
+    const t = document.getElementById('authToast');
+    if (!t) return;
+    t.style.display = 'block';
+    t.style.background = type === 'error' ? '#fee2e2' : '#dcfce7';
+    t.style.color     = type === 'error' ? '#991b1b' : '#166534';
+    t.textContent = msg;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+
+// Switch between Sign In / Create Account tabs
+window.switchAuthTab = function(mode) {
+    isSignUpMode = (mode === 'signup');
+    const tabLogin  = document.getElementById('authTabLogin');
+    const tabSignup = document.getElementById('authTabSignup');
     const regFields = document.getElementById('registerFields');
-    const toggleLink = document.getElementById('toggleText');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const emailLabel = document.querySelector('#authPanelLogin label');
+
+    const activeStyle   = 'flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:Poppins,sans-serif; border:none; background:transparent; color:#0A291A; border-bottom:2.5px solid #F5A623; cursor:pointer;';
+    const inactiveStyle = 'flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:Poppins,sans-serif; border:none; background:transparent; color:#9ca3af; border-bottom:2.5px solid transparent; cursor:pointer;';
 
     if (isSignUpMode) {
-        title.innerText = "Create Account";
-        submitBtn.innerText = "Sign Up";
-        regFields.style.display = "block";
-        toggleLink.innerHTML = 'Already have an account? <a href="#" id="toggleAuthModeLink">Sign In</a>';
+        if (tabLogin)  tabLogin.style.cssText  = inactiveStyle;
+        if (tabSignup) tabSignup.style.cssText = activeStyle;
+        if (regFields) regFields.style.display = 'block';
+        if (submitBtn) submitBtn.textContent   = 'Create My Account';
     } else {
-        title.innerText = "Welcome Back";
-        submitBtn.innerText = "Sign In";
-        regFields.style.display = "none";
-        toggleLink.innerHTML = 'Don\'t have an account? <a href="#" id="toggleAuthModeLink">Sign Up</a>';
+        if (tabLogin)  tabLogin.style.cssText  = activeStyle;
+        if (tabSignup) tabSignup.style.cssText = inactiveStyle;
+        if (regFields) regFields.style.display = 'none';
+        if (submitBtn) submitBtn.textContent   = 'Sign In to WanaGebya';
     }
-    document.getElementById('toggleAuthModeLink')?.addEventListener('click', function(e) {
-        e.preventDefault(); window.toggleAuthMode();
-    });
+    const toast = document.getElementById('authToast');
+    if (toast) toast.style.display = 'none';
+};
+
+// Keep old toggleAuthMode as alias for scripts that call it
+window.toggleAuthMode = function() {
+    window.switchAuthTab(isSignUpMode ? 'login' : 'signup');
 };
 
 window.handleAuth = async function(e) {
     e.preventDefault();
-    const email = document.getElementById('authEmail').value;
+    const email    = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
-    const btn = document.getElementById('authSubmitBtn');
+    const btn      = document.getElementById('authSubmitBtn');
 
-    btn.disabled = true;
-    btn.innerText = "Processing...";
+    if (!email || !password) { authToast('Please fill in all fields.', 'error'); return; }
+
+    const origText = btn.textContent;
+    btn.disabled   = true;
+    btn.textContent = 'Please wait…';
 
     if (isSignUpMode) {
-        const fullName = document.getElementById('regName').value;
-        const phone = document.getElementById('regPhone').value;
-        const location = document.getElementById('regLocation').value;
-        const bio = document.getElementById('regBio').value;
+        const fullName = document.getElementById('regName')?.value || '';
+        const phone    = document.getElementById('regPhone')?.value || '';
+        const location = document.getElementById('regLocation')?.value || '';
+        const bio      = document.getElementById('regBio')?.value || '';
 
         const { error } = await _supabase.auth.signUp({
-            email,
-            password,
+            email, password,
             options: { data: { full_name: fullName, phone_number: phone, location, bio } }
         });
-        if (error) alert("Error: " + error.message);
-        else { alert("Success! registration successful you can login now.."); window.toggleModal(); }
+        if (error) { authToast(error.message, 'error'); }
+        else {
+            authToast('✓ Account created! Check your email to confirm.', 'success');
+            setTimeout(() => window.toggleModal(), 2500);
+        }
     } else {
         const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) alert("Login failed: " + error.message);
+        if (error) { authToast(error.message, 'error'); }
         else { window.toggleModal(); await window.updateUIForUser(); }
     }
-    btn.disabled = false;
+
+    btn.disabled    = false;
+    btn.textContent = origText;
 };
 
 window.updateUIForUser = async function() {
@@ -953,6 +981,12 @@ window.toggleModal = () => {
         const isFlex = modal.style.display === 'flex';
         modal.style.display = isFlex ? 'none' : 'flex';
         document.body.style.overflow = isFlex ? 'auto' : 'hidden';
+        if (!isFlex) {
+            // Reset to Sign In tab every time modal opens
+            window.switchAuthTab('login');
+            const toast = document.getElementById('authToast');
+            if (toast) toast.style.display = 'none';
+        }
     }
 };
 
