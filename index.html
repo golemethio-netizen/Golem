@@ -858,7 +858,7 @@
         <div id="authModalInner" style="background:#fff; border-radius:20px; overflow:hidden; width:100%; max-width:430px; box-shadow:0 8px 40px rgba(0,0,0,0.18); margin:auto; position:relative; max-height:90vh; overflow-y:auto;">
 
             <!-- Close button -->
-            <button type="button" id="closeAuthModal" onclick="window.toggleModal()" style="position:absolute; top:14px; right:14px; z-index:10; background:rgba(255,255,255,0.15); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; line-height:1; backdrop-filter:blur(4px);">&times;</button>
+            <button type="button" id="closeAuthModal" style="position:absolute; top:14px; right:14px; z-index:10; background:rgba(255,255,255,0.15); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; line-height:1; backdrop-filter:blur(4px);">&times;</button>
 
             <!-- Brand header -->
             <div style="background:#0A291A; padding:28px 32px 22px; text-align:center;">
@@ -868,8 +868,8 @@
 
             <!-- Tabs -->
             <div style="display:flex; border-bottom:1px solid #eef0ed;">
-                <button id="authTabLogin" onclick="window.switchAuthTab('login')" style="flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; border:none; background:transparent; color:#0A291A; border-bottom:2.5px solid #F5A623; cursor:pointer;" data-am="ይግቡ">Sign In</button>
-                <button id="authTabSignup" onclick="window.switchAuthTab('signup')" style="flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; border:none; background:transparent; color:#9ca3af; border-bottom:2.5px solid transparent; cursor:pointer;" data-am="ይመዝገቡ">Create Account</button>
+                <button id="authTabLogin" style="flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; border:none; background:transparent; color:#0A291A; border-bottom:2.5px solid #F5A623; cursor:pointer;" data-am="ይግቡ">Sign In</button>
+                <button id="authTabSignup" style="flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; border:none; background:transparent; color:#9ca3af; border-bottom:2.5px solid transparent; cursor:pointer;" data-am="ይመዝገቡ">Create Account</button>
             </div>
 
             <!-- Body -->
@@ -895,7 +895,7 @@
 
                 <!-- SIGN IN PANEL -->
                 <div id="authPanelLogin">
-                    <form id="authForm" onsubmit="window.handleAuth(event)">
+                    <form id="authForm">
                         <div style="margin-bottom:14px;">
                             <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Email Address</label>
                             <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px; transition:border-color 0.2s;" onfocusin="this.style.borderColor='#0A291A'" onfocusout="this.style.borderColor='#e5e7eb'">
@@ -1365,7 +1365,9 @@
             document.getElementById('closeAuthModal').addEventListener('click', window.toggleModal);
             document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
             document.getElementById('authForm').addEventListener('submit', window.handleAuth);
-            document.getElementById('toggleAuthModeLink').addEventListener('click', function (e) { e.preventDefault(); window.toggleAuthMode(); });
+            document.getElementById('authTabLogin')?.addEventListener('click', function() { window.switchAuthTab('login'); });
+            document.getElementById('authTabSignup')?.addEventListener('click', function() { window.switchAuthTab('signup'); });
+            document.getElementById('switchToLoginLink')?.addEventListener('click', function(e) { e.preventDefault(); window.switchAuthTab('login'); });
             document.getElementById('closeProductModal').addEventListener('click', window.closeProductModal);
             document.getElementById('productModal').addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
             document.getElementById('callContact').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText); });
