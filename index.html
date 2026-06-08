@@ -642,6 +642,35 @@
         <a href="admin.html" id="mobileAdminLink" class="admin-tab" style="display:none;"><i class="fas fa-user-shield"></i><span>Admin</span></a>
     </nav>
 
+    <!-- ======================= MARKETPLACE LAYOUT ======================= -->
+    <div class="marketplace-layout">
+
+    <!-- LEFT SIDEBAR: Category List -->
+    <aside class="category-sidebar" id="categorySidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-th-list"></i>
+            <span data-am="ምድቦች">Categories</span>
+        </div>
+        <div class="filter-bar" id="filterBar">
+            <!-- Always-present buttons -->
+            <button class="filter-btn active" data-category="All" data-am="ሁሉም">
+                <i class="fas fa-border-all"></i> <span>All</span>
+            </button>
+            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች">
+                <i class="fas fa-star" style="color:#f1c40f;"></i> <span data-am="ልዩ">Featured</span>
+            </button>
+            <!-- Dynamic categories injected here by loadFilterCategories() -->
+        </div>
+    </aside>
+
+    <!-- RIGHT CONTENT: Products -->
+    <div class="marketplace-content">
+
+    <!-- Keep filter-controls as a hidden stub so scripts that target it still work -->
+    <section class="filter-controls filter-controls-hidden" style="position:relative; display:none;">
+        <div style="display:none;"></div>
+    </section>
+
     <!-- ======================= SPONSORED ======================= -->
     <section class="sponsored-section container" id="mainSponsor" style="display:none; margin-top:20px;">
         <div class="sponsor-card">
@@ -660,19 +689,6 @@
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- ======================= FILTERS ======================= -->
-    <section class="filter-controls" style="position:relative;">
-        <div class="filter-bar" id="filterBar">
-            <!-- Always-present buttons -->
-            <button class="filter-btn active" data-category="All" data-am="ሁሉም">All</button>
-            <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች"><span data-am="ልዩ">Featured</span>
-                <i class="fas fa-star" style="color:#f1c40f;"></i> 
-            </button>
-            <!-- Dynamic categories injected here by loadFilterCategories() -->
-        </div>
-
     </section>
 
     <style>
@@ -755,6 +771,188 @@
         }
     </style>
 
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           MARKETPLACE TWO-COLUMN LAYOUT
+        ═══════════════════════════════════════════════════════ */
+        .marketplace-layout {
+            display: flex;
+            align-items: flex-start;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 2% 0;
+            gap: 0;
+        }
+
+        /* LEFT SIDEBAR */
+        .category-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #eef0ed;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            position: sticky;
+            top: 80px; /* clear the sticky header */
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #e2e8f0 transparent;
+        }
+        .category-sidebar::-webkit-scrollbar { width: 4px; }
+        .category-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .category-sidebar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 16px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .sidebar-header i { color: #0A291A; }
+
+        /* Override filter-bar to be vertical inside sidebar */
+        .category-sidebar .filter-bar {
+            display: flex !important;
+            flex-direction: column !important;
+            overflow-x: unset !important;
+            overflow-y: unset !important;
+            padding: 8px 0 12px !important;
+            gap: 2px !important;
+            white-space: normal !important;
+        }
+
+        /* Override filter-btn for vertical sidebar style */
+        .category-sidebar .filter-btn {
+            display: flex !important;
+            align-items: center !important;
+            gap: 9px !important;
+            width: 100% !important;
+            padding: 9px 16px !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            color: #374151 !important;
+            font-size: 0.83rem !important;
+            font-weight: 500 !important;
+            text-align: left !important;
+            white-space: normal !important;
+            justify-content: flex-start !important;
+            transition: background 0.15s, color 0.15s !important;
+            box-shadow: none !important;
+        }
+        .category-sidebar .filter-btn i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            flex-shrink: 0;
+        }
+        .category-sidebar .filter-btn .chip-emoji {
+            width: 18px;
+            text-align: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .category-sidebar .filter-btn:hover {
+            background: #f0f7f4 !important;
+            color: #0A291A !important;
+        }
+        .category-sidebar .filter-btn:hover i { color: #0A291A !important; }
+        .category-sidebar .filter-btn.active {
+            background: #f0f7f4 !important;
+            color: #0A291A !important;
+            font-weight: 700 !important;
+            border-left: 3px solid #0A291A !important;
+        }
+        .category-sidebar .filter-btn.active i { color: #0A291A !important; }
+
+        /* Chevron on sidebar items (subcategory indicator) */
+        .category-sidebar .filter-btn-dynamic .fa-chevron-down {
+            margin-left: auto !important;
+            transform: none !important;
+            font-size: 0.7rem !important;
+            color: #cbd5e1 !important;
+        }
+        .category-sidebar .filter-btn-dynamic.active .fa-chevron-down,
+        .category-sidebar .filter-btn-dynamic:hover .fa-chevron-down {
+            color: #0A291A !important;
+        }
+
+        /* RIGHT CONTENT */
+        .marketplace-content {
+            flex: 1;
+            min-width: 0;
+            padding-left: 18px;
+        }
+        .marketplace-content .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* ── MOBILE: sidebar becomes top horizontal strip ── */
+        @media (max-width: 768px) {
+            .marketplace-layout {
+                flex-direction: column;
+                padding: 0;
+                gap: 0;
+            }
+            .category-sidebar {
+                width: 100%;
+                position: static;
+                max-height: none;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-top: none;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                overflow: visible;
+            }
+            .sidebar-header { display: none; }
+            .category-sidebar .filter-bar {
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                padding: 10px 12px !important;
+                gap: 8px !important;
+                white-space: nowrap !important;
+                scrollbar-width: none !important;
+            }
+            .category-sidebar .filter-bar::-webkit-scrollbar { display: none; }
+            .category-sidebar .filter-btn {
+                width: auto !important;
+                flex-shrink: 0 !important;
+                padding: 7px 14px !important;
+                border-radius: 20px !important;
+                border: 1.5px solid #e2e8f0 !important;
+                background: white !important;
+                color: #374151 !important;
+                font-size: 0.8rem !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+            }
+            .category-sidebar .filter-btn.active {
+                background: #0A291A !important;
+                color: #fff !important;
+                border-color: #0A291A !important;
+                border-left-width: 1.5px !important;
+            }
+            .category-sidebar .filter-btn:hover { background: #f0f7f4 !important; }
+            .marketplace-content {
+                padding-left: 0;
+                padding: 0 10px;
+            }
+        }
+    </style>
+
     <!-- ======================= MAIN GRID ======================= -->
     <main class="container">
         <div id="productGrid" class="masonry-wrapper">
@@ -788,6 +986,9 @@
             </div>
         </div>
     </main>
+
+    </div><!-- /.marketplace-content -->
+    </div><!-- /.marketplace-layout -->
 
     <!-- ======================= FOOTER ======================= -->
     <footer class="golem-footer" style="padding-bottom:80px;">
