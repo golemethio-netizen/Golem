@@ -797,12 +797,9 @@
             top: 80px; /* clear the sticky header */
             max-height: calc(100vh - 100px);
             overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #e2e8f0 transparent;
+            scrollbar-width: none;
         }
-        .category-sidebar::-webkit-scrollbar { width: 4px; }
-        .category-sidebar::-webkit-scrollbar-track { background: transparent; }
-        .category-sidebar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+        .category-sidebar::-webkit-scrollbar { display: none; }
 
         .sidebar-header {
             display: flex;
