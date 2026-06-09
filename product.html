@@ -210,20 +210,46 @@
 
             if (!productId) { window.location.href = 'index.html'; return; }
 
-            const { data: p, error } = await _supabase
-                .from('products')
-                .select(`*, profiles(full_name, avatar_url, is_verified, phone)`)
-                .eq('id', productId)
-                .single();
-
             const el = document.getElementById('productContent');
 
-            if (error || !p) {
+            // ── Step 1: check the ID exists at all (no joins, no filters) ──
+            const { data: bare, error: bareErr } = await _supabase
+                .from('products')
+                .select('id, name, status')
+                .eq('id', productId)
+                .maybeSingle();
+
+            if (bareErr || !bare) {
+                // ID genuinely doesn't exist in the table
                 el.innerHTML = `
                     <div style="text-align:center; padding:60px 20px; grid-column:1/-1;">
                         <i class="fas fa-box-open" style="font-size:3rem; color:#ddd;"></i>
                         <h3 style="color:#aaa; margin:16px 0 8px;">Item Not Found</h3>
                         <p style="color:#bbb; font-size:0.9rem;">This listing may have been removed or the link is incorrect.</p>
+                        <p style="color:#ddd; font-size:0.75rem; font-family:monospace; margin-top:8px;">ID: ${productId}</p>
+                        ${bareErr ? `<p style="color:#f8a; font-size:0.75rem; font-family:monospace;">${bareErr.message}</p>` : ''}
+                        <a href="index.html" style="display:inline-block; margin-top:16px; background:#0A291A; color:white; padding:10px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                            Browse All Items
+                        </a>
+                    </div>`;
+                return;
+            }
+
+            // ── Step 2: now fetch with full join ──
+            const { data: p, error } = await _supabase
+                .from('products')
+                .select(`*, profiles(full_name, avatar_url, is_verified, phone)`)
+                .eq('id', productId)
+                .maybeSingle();
+
+            if (error || !p) {
+                // ID exists but join failed — likely RLS on profiles blocking it
+                el.innerHTML = `
+                    <div style="text-align:center; padding:60px 20px; grid-column:1/-1;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#F5A623;"></i>
+                        <h3 style="color:#aaa; margin:16px 0 8px;">Could not load product</h3>
+                        <p style="color:#bbb; font-size:0.9rem;">The item exists but failed to load. This is usually an RLS (Row Level Security) issue on the <code>profiles</code> table.</p>
+                        <p style="color:#f8a; font-size:0.78rem; font-family:monospace; margin-top:8px;">${error?.message || 'Unknown error'}</p>
                         <a href="index.html" style="display:inline-block; margin-top:16px; background:#0A291A; color:white; padding:10px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
                             Browse All Items
                         </a>
