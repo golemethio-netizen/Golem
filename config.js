@@ -21,7 +21,25 @@ const _supabase = window._supabase;
 window.supabase = window._supabase;
 
 const GolemConfig = {
-    myPhone: "251707022845",
+    myPhone:    "251707022845",
     myTelegram: "@allInOneEthiopia1",
-   
 };
+
+// ── Telegram helper ──────────────────────────────────────────────────────────
+// Routes through the Supabase Edge Function — bot token never exposed in browser.
+// Usage: sendTelegram('🛒 New order from <b>Alem</b>')
+async function sendTelegram(message, parse_mode = 'Markdown') {
+    try {
+        const res = await fetch(`${supabaseUrl}/functions/v1/send-telegram`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ message, parse_mode })
+        });
+        const data = await res.json();
+        if (!data.success) console.warn('Telegram send failed:', data.error || data);
+        return data;
+    } catch (err) {
+        console.warn('sendTelegram error:', err.message);
+        return { success: false, error: err.message };
+    }
+}
