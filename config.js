@@ -23,6 +23,5 @@ window.supabase = window._supabase;
 const GolemConfig = {
     myPhone: "251707022845",
     myTelegram: "@allInOneEthiopia1",
-    botToken: "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o",
-    chatId: "6792892909"
+   
 };
