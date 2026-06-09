@@ -147,10 +147,97 @@
             </section>
 
             <!-- Audit Logs View -->
-            <section id="logsSection" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <h2 style="margin-bottom: 20px;"><i class="fas fa-history" style="color:#F5A623;"></i> SYSTEM AUDIT LOGS</h2>
-                <p style="color:#666; margin-bottom:15px;">A history of all actions taken on the platform by Admins, Sellers, and Buyers.</p>
-                <div id="auditLogList" style="overflow-x: auto;">
+            <section id="logsSection" style="display: none;">
+
+                <!-- Header -->
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+                    <div>
+                        <h2 style="margin:0 0 4px;"><i class="fas fa-shield-alt" style="color:#F5A623;"></i> SYSTEM AUDIT LOGS</h2>
+                        <p style="color:#888; margin:0; font-size:0.88rem;">Real-time activity trail for every user, admin, and system event on WanaGebya.</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button onclick="loadLogs(true)" style="background:#f0f4f8; border:1px solid #ddd; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem; color:#333;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button onclick="exportLogsCSV()" style="background:#0A291A; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem;">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Summary Cards -->
+                <div id="logKpis" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:20px;">
+                    <div class="stat-card" style="border-left:4px solid #0A291A; padding:14px 16px;">
+                        <i class="fas fa-list-alt" style="color:#0A291A; opacity:0.7;"></i>
+                        <div><h4 id="kpiTotalLogs" style="margin:0; font-size:1.3rem;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Total Events</p></div>
+                    </div>
+                    <div class="stat-card" style="border-left:4px solid #ff4757; padding:14px 16px;">
+                        <i class="fas fa-exclamation-triangle" style="color:#ff4757; opacity:0.8;"></i>
+                        <div><h4 id="kpiCritical" style="margin:0; font-size:1.3rem; color:#ff4757;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Critical / Errors</p></div>
+                    </div>
+                    <div class="stat-card" style="border-left:4px solid #f39c12; padding:14px 16px;">
+                        <i class="fas fa-user-shield" style="color:#f39c12; opacity:0.8;"></i>
+                        <div><h4 id="kpiAdminActions" style="margin:0; font-size:1.3rem; color:#f39c12;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Admin Actions</p></div>
+                    </div>
+                    <div class="stat-card" style="border-left:4px solid #0088cc; padding:14px 16px;">
+                        <i class="fas fa-users" style="color:#0088cc; opacity:0.8;"></i>
+                        <div><h4 id="kpiUniqueUsers" style="margin:0; font-size:1.3rem; color:#0088cc;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Unique Users</p></div>
+                    </div>
+                </div>
+
+                <!-- Filters Bar -->
+                <div style="background:white; border-radius:12px; padding:16px 20px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                    <input type="text" id="logSearch" placeholder="🔍 Search by user, action, description…"
+                        oninput="filterLogs()"
+                        style="flex:1; min-width:200px; padding:9px 14px; border-radius:8px; border:1px solid #ddd; outline:none; font-size:0.88rem;">
+
+                    <select id="logFilterCategory" onchange="filterLogs()"
+                        style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
+                        <option value="">All Categories</option>
+                        <option value="AUTH">🔐 Auth</option>
+                        <option value="PRODUCT">📦 Product</option>
+                        <option value="ORDER">🛒 Order</option>
+                        <option value="ADMIN">🛡️ Admin</option>
+                        <option value="PROFILE">👤 Profile</option>
+                        <option value="SYSTEM">⚙️ System</option>
+                    </select>
+
+                    <select id="logFilterSeverity" onchange="filterLogs()"
+                        style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
+                        <option value="">All Severities</option>
+                        <option value="INFO">ℹ️ Info</option>
+                        <option value="WARNING">⚠️ Warning</option>
+                        <option value="ERROR">❌ Error</option>
+                        <option value="CRITICAL">🚨 Critical</option>
+                    </select>
+
+                    <select id="logFilterUser" onchange="filterLogs()"
+                        style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
+                        <option value="">All Users</option>
+                        <option value="ADMIN_ONLY">Admin Actions Only</option>
+                        <option value="USERS_ONLY">User Actions Only</option>
+                    </select>
+
+                    <button onclick="clearLogFilters()" style="padding:9px 14px; border-radius:8px; border:1px solid #ddd; background:white; color:#888; cursor:pointer; font-size:0.82rem;">
+                        Clear Filters
+                    </button>
+
+                    <span id="logCount" style="font-size:0.8rem; color:#aaa; white-space:nowrap;"></span>
+                </div>
+
+                <!-- Logs Table -->
+                <div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden;">
+                    <div id="auditLogList" style="overflow-x:auto; min-height:200px;">
+                        <p style="padding:40px; text-align:center; color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading logs…</p>
+                    </div>
+                    <!-- Pagination -->
+                    <div id="logPagination" style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid #f0f0f0; flex-wrap:wrap; gap:8px;">
+                        <span id="logPageInfo" style="font-size:0.82rem; color:#888;"></span>
+                        <div style="display:flex; gap:6px;">
+                            <button id="logPrevBtn" onclick="changeLogPage(-1)" style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;" disabled>← Prev</button>
+                            <button id="logNextBtn" onclick="changeLogPage(1)"  style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;">Next →</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -508,6 +595,8 @@
             } else {
                 currentAdminEmail = user.email || profile.email || 'Admin';
                 document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
+                // Log admin session open
+                logAction('ADMIN_LOGIN', `Admin panel opened by ${currentAdminEmail}`, { category:'ADMIN', severity:'INFO', metadata:{ user_id: user.id } });
             }
         }
 
@@ -518,13 +607,33 @@
             }
         }
 
-        // Action Tracker Helper
-        async function logAction(actionName, details) {
+        // ── Audit Logger ──────────────────────────────────────────────
+        // Inserts a structured row into audit_logs.
+        async function logAction(actionName, details, opts = {}) {
             try {
+                const {
+                    category   = 'ADMIN',
+                    severity   = 'INFO',
+                    metadata   = {},
+                    actorEmail = null,
+                    actorName  = null,
+                    userId     = null
+                } = opts;
+
+                const { data: { user } } = await _supabase.auth.getUser();
+                const finalUserId   = userId    || user?.id    || null;
+                const finalEmail    = actorEmail || currentAdminEmail || user?.email || 'unknown';
+                const finalName     = actorName  || finalEmail.split('@')[0];
+
                 await _supabase.from('audit_logs').insert([{
-                    admin_email: currentAdminEmail,
-                    action: `[ADMIN] ${actionName}`,
-                    details: details
+                    user_id:     finalUserId,
+                    user_email:  finalEmail,
+                    user_name:   finalName,
+                    action:      actionName,
+                    category:    category,
+                    severity:    severity,
+                    description: details,
+                    metadata:    metadata
                 }]);
             } catch (err) {
                 console.error("Audit log failed:", err);
@@ -786,7 +895,7 @@
         window.updateStatus = async (id, newStatus) => {
             const { error } = await _supabase.from('products').update({ status: newStatus }).eq('id', id);
             if (!error) { 
-                logAction('Status Change', `Item ID: ${id} changed to ${newStatus.toUpperCase()}`);
+                logAction('STATUS_CHANGE', `Item ${id} → ${newStatus.toUpperCase()}`, { category:'ADMIN', severity: newStatus==='rejected'?'WARNING':'INFO', metadata:{item_id:id, new_status:newStatus} });
                 document.getElementById(`card-${id}`)?.remove(); 
                 loadStats(); 
             }
@@ -798,7 +907,7 @@
             expiry.setDate(expiry.getDate() + days);
             const { error } = await _supabase.from('products').update({ is_sponsored: true, sponsored_until: expiry.toISOString() }).eq('id', id);
             if (!error) { 
-                logAction('Feature Activated', `Item ID: ${id} featured for ${days} days`);
+                logAction('FEATURE_ACTIVATED', `Item ${id} featured for ${days} days`, { category:'ADMIN', severity:'INFO', metadata:{item_id:id, days} });
                 alert("Featured activated!"); 
                 loadItems('approved'); loadStats(); 
             }
@@ -807,7 +916,7 @@
         window.cancelSponsor = async (id) => {
             const { error } = await _supabase.from('products').update({ is_sponsored: false, sponsored_until: null }).eq('id', id);
             if (!error) {
-                logAction('Feature Canceled', `Removed feature status from Item ID: ${id}`);
+                logAction('FEATURE_CANCELED', `Removed feature from item ${id}`, { category:'ADMIN', severity:'WARNING', metadata:{item_id:id} });
                 loadItems('approved');
             }
         };
@@ -826,7 +935,7 @@
 
                 const { error } = await _supabase.from('products').delete().eq('id', id);
                 if (!error) {
-                    logAction('Item Permanently Deleted', `Deleted Item ID: ${id}`);
+                    logAction('ITEM_DELETED', `Permanently deleted item ${id}`, { category:'ADMIN', severity:'WARNING', metadata:{item_id:id} });
                     document.getElementById(`card-${id}`)?.remove();
                     checkStorageUsage();
                     loadStats();
@@ -933,7 +1042,7 @@
             if (!confirm(`Are you sure you want to ${verb} this seller?`)) return;
             const { error } = await _supabase.from('profiles').update({ is_verified: !currentStatus }).eq('id', userId);
             if (!error) {
-                logAction('User Verification Update', `Set verification status to ${!currentStatus} for User ID: ${userId}`);
+                logAction('USER_VERIFIED', `Set verification=${!currentStatus} for user ${userId}`, { category:'ADMIN', severity:'INFO', metadata:{user_id:userId, verified:!currentStatus} });
                 loadUsers(); 
             } else alert("Error: " + error.message);
         };
@@ -942,7 +1051,7 @@
             if (!confirm(`Are you sure you want to ${currentStatus ? 'remove' : 'grant'} admin rights?`)) return;
             const { error } = await _supabase.from('profiles').update({ is_admin: !currentStatus }).eq('id', userId);
             if (!error) { 
-                logAction('Admin Rights Update', `Set Admin to ${!currentStatus} for User ID: ${userId}`);
+                logAction('ADMIN_RIGHTS', `Set admin=${!currentStatus} for user ${userId}`, { category:'ADMIN', severity:'WARNING', metadata:{user_id:userId, is_admin:!currentStatus} });
                 loadUsers(); loadStats(); 
             } else alert("Error: " + error.message);
         };
@@ -952,7 +1061,7 @@
             try {
                 const { error } = await _supabase.from('profiles').delete().eq('id', userId);
                 if (error) throw error;
-                logAction('Account Deleted', `Permanently deleted user account: ${identifier} (ID: ${userId})`);
+                logAction('ACCOUNT_DELETED', `Deleted user ${identifier} (${userId})`, { category:'ADMIN', severity:'CRITICAL', metadata:{user_id:userId, identifier} });
                 alert("User deleted.");
                 loadUsers();
             } catch (err) { alert("Failed to delete user: " + err.message); }
@@ -967,7 +1076,7 @@
                     redirectTo: window.location.href.split('#')[0]  // redirect back to this same page
                 });
                 if (error) throw error;
-                logAction('Password Reset Sent', `Reset email sent to: ${email}`);
+                logAction('PASSWORD_RESET_SENT', `Reset email sent to ${email}`, { category:'ADMIN', severity:'INFO', metadata:{email} });
                 alert(`✅ Password reset email sent to ${email}`);
             } catch (err) {
                 alert("Failed to send reset email: " + err.message);
@@ -1002,7 +1111,7 @@
                         redirectTo: window.location.href.split('#')[0]
                     });
                     if (error) throw error;
-                    logAction('Password Generated', 'Admin generated password & sent reset email to: ' + email);
+                    logAction('PASSWORD_GENERATED', `Admin generated password for ${email}`, { category:'ADMIN', severity:'WARNING', metadata:{email} });
                 } catch (err) {
                     sessionStorage.removeItem('wg_gen_pwd');
                     alert('Failed to send reset email: ' + err.message);
@@ -1062,51 +1171,198 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        // --- 7. LOAD AUDIT LOGS ---
-        async function loadLogs() {
+        // --- 7. LOAD & RENDER AUDIT LOGS ---
+        let _allLogs     = [];   // full dataset from Supabase
+        let _filteredLogs = [];  // after client-side filters
+        let _logPage     = 1;
+        const LOG_PAGE_SIZE = 50;
+
+        async function loadLogs(forceRefresh = false) {
             const list = document.getElementById('auditLogList');
-            list.innerHTML = "<p>Loading logs...</p>";
-            
+            list.innerHTML = `<p style="padding:40px;text-align:center;color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading logs…</p>`;
+
+            // Fetch up to 1000 rows (plenty for most deployments)
             const { data: logs, error } = await _supabase
                 .from('audit_logs')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(100);
+                .limit(1000);
 
             if (error) {
-                list.innerHTML = `<p style="color:#ff4757;">⚠️ Error Loading Logs. Ensure you created the 'audit_logs' table.</p><p>${error.message}</p>`;
+                list.innerHTML = `<div style="padding:30px;color:#ff4757;">
+                    <i class="fas fa-exclamation-triangle"></i> Error loading logs.<br>
+                    <small style="color:#aaa;">${error.message}</small><br><br>
+                    <small style="color:#bbb;">Make sure your <code>audit_logs</code> table exists and has RLS set correctly.</small>
+                </div>`;
                 return;
             }
 
-            if (!logs || logs.length === 0) {
-                list.innerHTML = `<p style="color:#888;">No audit logs recorded yet.</p>`;
+            _allLogs  = logs || [];
+            _logPage  = 1;
+            updateLogKPIs();
+            filterLogs();
+        }
+
+        function updateLogKPIs() {
+            document.getElementById('kpiTotalLogs').innerText   = _allLogs.length.toLocaleString();
+            document.getElementById('kpiCritical').innerText    = _allLogs.filter(l => l.severity === 'CRITICAL' || l.severity === 'ERROR').length;
+            document.getElementById('kpiAdminActions').innerText = _allLogs.filter(l => l.category === 'ADMIN').length;
+            const uniqueUsers = new Set(_allLogs.map(l => l.user_email).filter(Boolean));
+            document.getElementById('kpiUniqueUsers').innerText = uniqueUsers.size;
+        }
+
+        function filterLogs() {
+            const search   = (document.getElementById('logSearch')?.value || '').toLowerCase();
+            const cat      = document.getElementById('logFilterCategory')?.value || '';
+            const sev      = document.getElementById('logFilterSeverity')?.value || '';
+            const userType = document.getElementById('logFilterUser')?.value || '';
+
+            _filteredLogs = _allLogs.filter(log => {
+                if (cat && log.category !== cat) return false;
+                if (sev && log.severity !== sev) return false;
+                if (userType === 'ADMIN_ONLY' && log.category !== 'ADMIN') return false;
+                if (userType === 'USERS_ONLY' && log.category === 'ADMIN') return false;
+                if (search) {
+                    const haystack = [log.user_email, log.user_name, log.action, log.description, log.category].join(' ').toLowerCase();
+                    if (!haystack.includes(search)) return false;
+                }
+                return true;
+            });
+
+            _logPage = 1;
+            renderLogsPage();
+        }
+
+        function clearLogFilters() {
+            document.getElementById('logSearch').value = '';
+            document.getElementById('logFilterCategory').value = '';
+            document.getElementById('logFilterSeverity').value = '';
+            document.getElementById('logFilterUser').value = '';
+            filterLogs();
+        }
+
+        function changeLogPage(dir) {
+            const maxPage = Math.ceil(_filteredLogs.length / LOG_PAGE_SIZE);
+            _logPage = Math.max(1, Math.min(_logPage + dir, maxPage));
+            renderLogsPage();
+        }
+
+        function renderLogsPage() {
+            const list    = document.getElementById('auditLogList');
+            const total   = _filteredLogs.length;
+            const maxPage = Math.max(1, Math.ceil(total / LOG_PAGE_SIZE));
+            const start   = (_logPage - 1) * LOG_PAGE_SIZE;
+            const slice   = _filteredLogs.slice(start, start + LOG_PAGE_SIZE);
+
+            // Count label
+            document.getElementById('logCount').innerText = `${total.toLocaleString()} event${total !== 1 ? 's' : ''}`;
+            document.getElementById('logPageInfo').innerText = `Page ${_logPage} of ${maxPage} · ${total.toLocaleString()} total`;
+            document.getElementById('logPrevBtn').disabled = _logPage <= 1;
+            document.getElementById('logNextBtn').disabled = _logPage >= maxPage;
+
+            if (total === 0) {
+                list.innerHTML = `<p style="padding:50px;text-align:center;color:#bbb;"><i class="fas fa-search"></i> No events match your filters.</p>`;
                 return;
             }
+
+            // Severity badge styles
+            const sevStyle = {
+                INFO:     'background:#e8f5e9; color:#2e7d32;',
+                WARNING:  'background:#fff3e0; color:#e65100;',
+                ERROR:    'background:#fce4ec; color:#c62828;',
+                CRITICAL: 'background:#ff4757; color:white;'
+            };
+            const sevIcon = { INFO: 'info-circle', WARNING: 'exclamation-triangle', ERROR: 'times-circle', CRITICAL: 'radiation' };
+
+            // Category badge styles
+            const catStyle = {
+                AUTH:    'background:#e3f2fd; color:#1565c0;',
+                PRODUCT: 'background:#e8f5e9; color:#2e7d32;',
+                ORDER:   'background:#fff8e1; color:#f57f17;',
+                ADMIN:   'background:#fce4ec; color:#880e4f;',
+                PROFILE: 'background:#f3e5f5; color:#6a1b9a;',
+                SYSTEM:  'background:#f5f5f5; color:#424242;',
+                USER:    'background:#e0f7fa; color:#00695c;'
+            };
 
             list.innerHTML = `
-                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                <table style="width:100%; border-collapse:collapse; min-width:860px; font-size:0.84rem;">
                     <thead>
-                        <tr style="border-bottom: 2px solid #ddd; text-align:left; color: #333; font-size: 0.9rem;">
-                            <th style="padding:12px;">Date & Time</th>
-                            <th>User / Admin Account</th>
-                            <th>Action Performed</th>
-                            <th>Details / Target</th>
+                        <tr style="background:#fafafa; border-bottom:2px solid #f0f0f0; text-align:left; color:#555; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;">
+                            <th style="padding:12px 16px; white-space:nowrap;">Timestamp</th>
+                            <th style="padding:12px 10px;">User</th>
+                            <th style="padding:12px 10px;">Category</th>
+                            <th style="padding:12px 10px;">Severity</th>
+                            <th style="padding:12px 10px;">Action</th>
+                            <th style="padding:12px 10px; min-width:200px;">Description</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${logs.map(log => `
-                            <tr style="border-bottom: 1px solid #eee; font-size:0.85rem;">
-                                <td style="padding:12px; color:#666; white-space:nowrap;">
-                                    ${new Date(log.created_at).toLocaleDateString()} at ${new Date(log.created_at).toLocaleTimeString()}
+                        ${slice.map((log, i) => {
+                            const sev  = log.severity || 'INFO';
+                            const cat  = log.category || 'SYSTEM';
+                            const sStyle = sevStyle[sev]  || sevStyle.INFO;
+                            const cStyle = catStyle[cat]  || catStyle.SYSTEM;
+                            const icon   = sevIcon[sev]   || 'info-circle';
+                            const dt     = new Date(log.created_at);
+                            const dateStr = dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+                            const timeStr = dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+                            const isEven  = i % 2 === 0;
+                            const rowBg   = sev === 'CRITICAL' ? '#fff5f5' : sev === 'ERROR' ? '#fff8f8' : (isEven ? 'white' : '#fafafa');
+                            const displayName = log.user_name || log.user_email?.split('@')[0] || 'Unknown';
+                            const displayEmail = log.user_email || '';
+                            const metaStr = log.metadata && Object.keys(log.metadata).length
+                                ? `<div style="margin-top:4px; font-size:0.72rem; color:#aaa; font-family:monospace;">${JSON.stringify(log.metadata)}</div>` : '';
+                            return \`<tr style="border-bottom:1px solid #f0f0f0; background:\${rowBg}; transition:background 0.15s;"
+                                onmouseover="this.style.background='#f0f7f4'"
+                                onmouseout="this.style.background='\${rowBg}'">
+                                <td style="padding:11px 16px; white-space:nowrap; color:#777;">
+                                    <div style="font-weight:600; color:#444;">\${timeStr}</div>
+                                    <div style="font-size:0.75rem; color:#aaa;">\${dateStr}</div>
                                 </td>
-                                <td><strong>${log.admin_email || 'Unknown'}</strong></td>
-                                <td><span style="background:#f1f2f6; padding:3px 8px; border-radius:12px; font-weight:600; color:#333;">${log.action}</span></td>
-                                <td style="color:#555;">${log.details || '-'}</td>
-                            </tr>
-                        `).join('')}
+                                <td style="padding:11px 10px;">
+                                    <div style="font-weight:700; color:#222;">\${displayName}</div>
+                                    <div style="font-size:0.72rem; color:#aaa;">\${displayEmail}</div>
+                                </td>
+                                <td style="padding:11px 10px;">
+                                    <span style="padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:700; \${cStyle}">\${cat}</span>
+                                </td>
+                                <td style="padding:11px 10px;">
+                                    <span style="padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:700; display:inline-flex; align-items:center; gap:4px; \${sStyle}">
+                                        <i class="fas fa-\${icon}" style="font-size:0.65rem;"></i> \${sev}
+                                    </span>
+                                </td>
+                                <td style="padding:11px 10px;">
+                                    <span style="background:#f1f2f6; padding:3px 9px; border-radius:8px; font-weight:700; color:#333; font-size:0.78rem;">\${log.action || '—'}</span>
+                                </td>
+                                <td style="padding:11px 10px; color:#555; line-height:1.4;">
+                                    \${log.description || log.details || '—'}
+                                    \${metaStr}
+                                </td>
+                            </tr>\`;
+                        }).join('')}
                     </tbody>
-                </table>
-            `;
+                </table>`;
+        }
+
+        function exportLogsCSV() {
+            if (!_filteredLogs.length) { alert('No logs to export.'); return; }
+            const headers = ['Timestamp','User Name','User Email','Category','Severity','Action','Description'];
+            const rows = _filteredLogs.map(l => [
+                new Date(l.created_at).toISOString(),
+                `"${(l.user_name||'').replace(/"/g,'""')}"`,
+                `"${(l.user_email||'').replace(/"/g,'""')}"`,
+                l.category || '',
+                l.severity || '',
+                `"${(l.action||'').replace(/"/g,'""')}"`,
+                `"${(l.description||l.details||'').replace(/"/g,'""')}"`
+            ]);
+            const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a    = document.createElement('a');
+            a.href     = URL.createObjectURL(blob);
+            a.download = `audit_logs_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
         }
 
         // --- 8. UTM GENERATOR LOGIC ---
