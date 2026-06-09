@@ -147,16 +147,16 @@
             </section>
 
             <!-- Audit Logs View -->
-            <section id="logsSection" style="display: none;">
+            <section id="logsSection" style="display:none;">
 
-                <!-- Header -->
+                <!-- Header Row -->
                 <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
                     <div>
                         <h2 style="margin:0 0 4px;"><i class="fas fa-shield-alt" style="color:#F5A623;"></i> SYSTEM AUDIT LOGS</h2>
-                        <p style="color:#888; margin:0; font-size:0.88rem;">Real-time activity trail for every user, admin, and system event on WanaGebya.</p>
+                        <p style="color:#888; margin:0; font-size:0.88rem;">Real-time activity trail for every admin action on WanaGebya.</p>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button onclick="loadLogs(true)" style="background:#f0f4f8; border:1px solid #ddd; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem; color:#333;">
+                        <button onclick="loadLogs()" style="background:#f0f4f8; border:1px solid #ddd; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem; color:#333;">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                         <button onclick="exportLogsCSV()" style="background:#0A291A; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem;">
@@ -165,77 +165,60 @@
                     </div>
                 </div>
 
-                <!-- KPI Summary Cards -->
-                <div id="logKpis" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:20px;">
+                <!-- KPI Cards -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:20px;">
                     <div class="stat-card" style="border-left:4px solid #0A291A; padding:14px 16px;">
-                        <i class="fas fa-list-alt" style="color:#0A291A; opacity:0.7;"></i>
+                        <i class="fas fa-list-alt" style="color:#0A291A; opacity:0.7; font-size:1.6rem;"></i>
                         <div><h4 id="kpiTotalLogs" style="margin:0; font-size:1.3rem;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Total Events</p></div>
                     </div>
                     <div class="stat-card" style="border-left:4px solid #ff4757; padding:14px 16px;">
-                        <i class="fas fa-exclamation-triangle" style="color:#ff4757; opacity:0.8;"></i>
-                        <div><h4 id="kpiCritical" style="margin:0; font-size:1.3rem; color:#ff4757;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Critical / Errors</p></div>
+                        <i class="fas fa-exclamation-triangle" style="color:#ff4757; font-size:1.6rem;"></i>
+                        <div><h4 id="kpiAdminActions" style="margin:0; font-size:1.3rem; color:#e65100;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Admin Actions</p></div>
                     </div>
-                    <div class="stat-card" style="border-left:4px solid #f39c12; padding:14px 16px;">
-                        <i class="fas fa-user-shield" style="color:#f39c12; opacity:0.8;"></i>
-                        <div><h4 id="kpiAdminActions" style="margin:0; font-size:1.3rem; color:#f39c12;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Admin Actions</p></div>
+                    <div class="stat-card" style="border-left:4px solid #2ed573; padding:14px 16px;">
+                        <i class="fas fa-user-check" style="color:#2ed573; font-size:1.6rem;"></i>
+                        <div><h4 id="kpiUniqueAdmins" style="margin:0; font-size:1.3rem; color:#2e7d32;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Unique Admins</p></div>
                     </div>
                     <div class="stat-card" style="border-left:4px solid #0088cc; padding:14px 16px;">
-                        <i class="fas fa-users" style="color:#0088cc; opacity:0.8;"></i>
-                        <div><h4 id="kpiUniqueUsers" style="margin:0; font-size:1.3rem; color:#0088cc;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Unique Users</p></div>
+                        <i class="fas fa-clock" style="color:#0088cc; font-size:1.6rem;"></i>
+                        <div><h4 id="kpiLatestAction" style="margin:0; font-size:0.9rem; color:#0088cc; font-weight:700;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Last Action</p></div>
                     </div>
                 </div>
 
-                <!-- Filters Bar -->
-                <div style="background:white; border-radius:12px; padding:16px 20px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-                    <input type="text" id="logSearch" placeholder="🔍 Search by user, action, description…"
+                <!-- Filter Bar -->
+                <div style="background:white; border-radius:12px; padding:14px 18px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <input type="text" id="logSearch" placeholder="🔍  Search by admin, action, details…"
                         oninput="filterLogs()"
                         style="flex:1; min-width:200px; padding:9px 14px; border-radius:8px; border:1px solid #ddd; outline:none; font-size:0.88rem;">
-
-                    <select id="logFilterCategory" onchange="filterLogs()"
+                    <select id="logFilterAction" onchange="filterLogs()"
                         style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
-                        <option value="">All Categories</option>
-                        <option value="AUTH">🔐 Auth</option>
-                        <option value="PRODUCT">📦 Product</option>
-                        <option value="ORDER">🛒 Order</option>
-                        <option value="ADMIN">🛡️ Admin</option>
-                        <option value="PROFILE">👤 Profile</option>
-                        <option value="SYSTEM">⚙️ System</option>
+                        <option value="">All Actions</option>
+                        <option value="Status Change">Status Changes</option>
+                        <option value="Feature">Featured / Ads</option>
+                        <option value="User">User Actions</option>
+                        <option value="Password">Password</option>
+                        <option value="Deleted">Deletions</option>
+                        <option value="UTM">UTM Links</option>
                     </select>
-
-                    <select id="logFilterSeverity" onchange="filterLogs()"
-                        style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
-                        <option value="">All Severities</option>
-                        <option value="INFO">ℹ️ Info</option>
-                        <option value="WARNING">⚠️ Warning</option>
-                        <option value="ERROR">❌ Error</option>
-                        <option value="CRITICAL">🚨 Critical</option>
-                    </select>
-
-                    <select id="logFilterUser" onchange="filterLogs()"
-                        style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
-                        <option value="">All Users</option>
-                        <option value="ADMIN_ONLY">Admin Actions Only</option>
-                        <option value="USERS_ONLY">User Actions Only</option>
-                    </select>
-
                     <button onclick="clearLogFilters()" style="padding:9px 14px; border-radius:8px; border:1px solid #ddd; background:white; color:#888; cursor:pointer; font-size:0.82rem;">
-                        Clear Filters
+                        Clear
                     </button>
-
-                    <span id="logCount" style="font-size:0.8rem; color:#aaa; white-space:nowrap;"></span>
+                    <span id="logCount" style="font-size:0.8rem; color:#bbb; white-space:nowrap;"></span>
                 </div>
 
-                <!-- Logs Table -->
+                <!-- Table -->
                 <div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden;">
                     <div id="auditLogList" style="overflow-x:auto; min-height:200px;">
-                        <p style="padding:40px; text-align:center; color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading logs…</p>
+                        <p style="padding:40px; text-align:center; color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
                     </div>
                     <!-- Pagination -->
-                    <div id="logPagination" style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid #f0f0f0; flex-wrap:wrap; gap:8px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-top:1px solid #f0f0f0; flex-wrap:wrap; gap:8px;">
                         <span id="logPageInfo" style="font-size:0.82rem; color:#888;"></span>
                         <div style="display:flex; gap:6px;">
-                            <button id="logPrevBtn" onclick="changeLogPage(-1)" style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;" disabled>← Prev</button>
-                            <button id="logNextBtn" onclick="changeLogPage(1)"  style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;">Next →</button>
+                            <button id="logPrevBtn" onclick="changeLogPage(-1)" disabled
+                                style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;">← Prev</button>
+                            <button id="logNextBtn" onclick="changeLogPage(1)"
+                                style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;">Next →</button>
                         </div>
                     </div>
                 </div>
@@ -574,8 +557,6 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAdmin();
-            // Log admin session only after auth is confirmed
-            logAction('ADMIN_LOGIN', `Admin panel opened by ${currentAdminEmail}`, { category:'ADMIN', severity:'INFO' });
             updateAdminPresence();
             loadStats();
             loadItems('pending');
@@ -607,36 +588,16 @@
             }
         }
 
-        // ── Audit Logger ──────────────────────────────────────────────
-        // Inserts a structured row into audit_logs.
-        // Fire-and-forget audit log — NEVER throws, NEVER blocks the UI
-        function logAction(actionName, details, opts = {}) {
+        // Action Tracker — fire-and-forget, never blocks the UI
+        function logAction(actionName, details) {
             setTimeout(async () => {
                 try {
-                    const {
-                        category  = 'ADMIN',
-                        severity  = 'INFO',
-                        metadata  = {},
-                        actorEmail = null,
-                        actorName  = null,
-                        userId     = null
-                    } = opts;
-
-                    const finalEmail = actorEmail || currentAdminEmail || 'unknown';
-                    const finalName  = actorName  || finalEmail.split('@')[0];
-
                     await _supabase.from('audit_logs').insert([{
-                        user_id:     userId     || null,
-                        user_email:  finalEmail,
-                        user_name:   finalName,
-                        action:      actionName,
-                        category:    category,
-                        severity:    severity,
-                        description: details,
-                        metadata:    metadata
+                        admin_email: currentAdminEmail,
+                        action:      `[ADMIN] ${actionName}`,
+                        details:     details
                     }]);
                 } catch (err) {
-                    // Silent fail — log errors must never break the admin UI
                     console.warn('Audit log skipped:', err.message);
                 }
             }, 0);
@@ -897,7 +858,7 @@
         window.updateStatus = async (id, newStatus) => {
             const { error } = await _supabase.from('products').update({ status: newStatus }).eq('id', id);
             if (!error) { 
-                logAction('STATUS_CHANGE', `Item ${id} → ${newStatus.toUpperCase()}`, { category:'ADMIN', severity: newStatus==='rejected'?'WARNING':'INFO', metadata:{item_id:id, new_status:newStatus} });
+                logAction('Status Change', `Item ID: ${id} changed to ${newStatus.toUpperCase()}`);
                 document.getElementById(`card-${id}`)?.remove(); 
                 loadStats(); 
             }
@@ -909,7 +870,7 @@
             expiry.setDate(expiry.getDate() + days);
             const { error } = await _supabase.from('products').update({ is_sponsored: true, sponsored_until: expiry.toISOString() }).eq('id', id);
             if (!error) { 
-                logAction('FEATURE_ACTIVATED', `Item ${id} featured for ${days} days`, { category:'ADMIN', severity:'INFO', metadata:{item_id:id, days} });
+                logAction('Feature Activated', `Item ID: ${id} featured for ${days} days`);
                 alert("Featured activated!"); 
                 loadItems('approved'); loadStats(); 
             }
@@ -918,7 +879,7 @@
         window.cancelSponsor = async (id) => {
             const { error } = await _supabase.from('products').update({ is_sponsored: false, sponsored_until: null }).eq('id', id);
             if (!error) {
-                logAction('FEATURE_CANCELED', `Removed feature from item ${id}`, { category:'ADMIN', severity:'WARNING', metadata:{item_id:id} });
+                logAction('Feature Canceled', `Removed feature status from Item ID: ${id}`);
                 loadItems('approved');
             }
         };
@@ -937,7 +898,7 @@
 
                 const { error } = await _supabase.from('products').delete().eq('id', id);
                 if (!error) {
-                    logAction('ITEM_DELETED', `Permanently deleted item ${id}`, { category:'ADMIN', severity:'WARNING', metadata:{item_id:id} });
+                    logAction('Item Permanently Deleted', `Deleted Item ID: ${id}`);
                     document.getElementById(`card-${id}`)?.remove();
                     checkStorageUsage();
                     loadStats();
@@ -1044,7 +1005,7 @@
             if (!confirm(`Are you sure you want to ${verb} this seller?`)) return;
             const { error } = await _supabase.from('profiles').update({ is_verified: !currentStatus }).eq('id', userId);
             if (!error) {
-                logAction('USER_VERIFIED', `Set verification=${!currentStatus} for user ${userId}`, { category:'ADMIN', severity:'INFO', metadata:{user_id:userId, verified:!currentStatus} });
+                logAction('User Verification Update', `Set verification status to ${!currentStatus} for User ID: ${userId}`);
                 loadUsers(); 
             } else alert("Error: " + error.message);
         };
@@ -1053,7 +1014,7 @@
             if (!confirm(`Are you sure you want to ${currentStatus ? 'remove' : 'grant'} admin rights?`)) return;
             const { error } = await _supabase.from('profiles').update({ is_admin: !currentStatus }).eq('id', userId);
             if (!error) { 
-                logAction('ADMIN_RIGHTS', `Set admin=${!currentStatus} for user ${userId}`, { category:'ADMIN', severity:'WARNING', metadata:{user_id:userId, is_admin:!currentStatus} });
+                logAction('Admin Rights Update', `Set Admin to ${!currentStatus} for User ID: ${userId}`);
                 loadUsers(); loadStats(); 
             } else alert("Error: " + error.message);
         };
@@ -1063,7 +1024,7 @@
             try {
                 const { error } = await _supabase.from('profiles').delete().eq('id', userId);
                 if (error) throw error;
-                logAction('ACCOUNT_DELETED', `Deleted user ${identifier} (${userId})`, { category:'ADMIN', severity:'CRITICAL', metadata:{user_id:userId, identifier} });
+                logAction('Account Deleted', `Permanently deleted user account: ${identifier} (ID: ${userId})`);
                 alert("User deleted.");
                 loadUsers();
             } catch (err) { alert("Failed to delete user: " + err.message); }
@@ -1078,7 +1039,7 @@
                     redirectTo: window.location.href.split('#')[0]  // redirect back to this same page
                 });
                 if (error) throw error;
-                logAction('PASSWORD_RESET_SENT', `Reset email sent to ${email}`, { category:'ADMIN', severity:'INFO', metadata:{email} });
+                logAction('Password Reset Sent', `Reset email sent to: ${email}`);
                 alert(`✅ Password reset email sent to ${email}`);
             } catch (err) {
                 alert("Failed to send reset email: " + err.message);
@@ -1113,7 +1074,7 @@
                         redirectTo: window.location.href.split('#')[0]
                     });
                     if (error) throw error;
-                    logAction('PASSWORD_GENERATED', `Admin generated password for ${email}`, { category:'ADMIN', severity:'WARNING', metadata:{email} });
+                    logAction('Password Generated', 'Admin generated password & sent reset email to: ' + email);
                 } catch (err) {
                     sessionStorage.removeItem('wg_gen_pwd');
                     alert('Failed to send reset email: ' + err.message);
@@ -1173,17 +1134,16 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        // --- 7. LOAD & RENDER AUDIT LOGS ---
-        let _allLogs     = [];   // full dataset from Supabase
-        let _filteredLogs = [];  // after client-side filters
-        let _logPage     = 1;
+        // --- 7. AUDIT LOGS — Full Feature ─────────────────────────────
+        let _allLogs      = [];
+        let _filteredLogs = [];
+        let _logPage      = 1;
         const LOG_PAGE_SIZE = 50;
 
-        async function loadLogs(forceRefresh = false) {
+        async function loadLogs() {
             const list = document.getElementById('auditLogList');
             list.innerHTML = `<p style="padding:40px;text-align:center;color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading logs…</p>`;
 
-            // Fetch up to 1000 rows (plenty for most deployments)
             const { data: logs, error } = await _supabase
                 .from('audit_logs')
                 .select('*')
@@ -1192,41 +1152,42 @@
 
             if (error) {
                 list.innerHTML = `<div style="padding:30px;color:#ff4757;">
-                    <i class="fas fa-exclamation-triangle"></i> Error loading logs.<br>
+                    <b><i class="fas fa-exclamation-triangle"></i> Could not load audit logs.</b><br>
                     <small style="color:#aaa;">${error.message}</small><br><br>
-                    <small style="color:#bbb;">Make sure your <code>audit_logs</code> table exists and has RLS set correctly.</small>
+                    <small style="color:#bbb;">Make sure the <code>audit_logs</code> table exists in Supabase and RLS allows admin reads.</small>
                 </div>`;
                 return;
             }
 
-            _allLogs  = logs || [];
-            _logPage  = 1;
+            _allLogs = logs || [];
+            _logPage = 1;
             updateLogKPIs();
             filterLogs();
         }
 
         function updateLogKPIs() {
-            document.getElementById('kpiTotalLogs').innerText   = _allLogs.length.toLocaleString();
-            document.getElementById('kpiCritical').innerText    = _allLogs.filter(l => l.severity === 'CRITICAL' || l.severity === 'ERROR').length;
-            document.getElementById('kpiAdminActions').innerText = _allLogs.filter(l => l.category === 'ADMIN').length;
-            const uniqueUsers = new Set(_allLogs.map(l => l.user_email).filter(Boolean));
-            document.getElementById('kpiUniqueUsers').innerText = uniqueUsers.size;
+            document.getElementById('kpiTotalLogs').innerText     = _allLogs.length.toLocaleString();
+            document.getElementById('kpiAdminActions').innerText  = _allLogs.filter(l => l.action?.includes('[ADMIN]')).length;
+            const uniq = new Set(_allLogs.map(l => l.admin_email).filter(Boolean));
+            document.getElementById('kpiUniqueAdmins').innerText  = uniq.size;
+            if (_allLogs.length) {
+                const last = _allLogs[0];
+                const dt   = new Date(last.created_at);
+                document.getElementById('kpiLatestAction').innerText =
+                    dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) + ' ' +
+                    dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+            }
         }
 
         function filterLogs() {
-            const search   = (document.getElementById('logSearch')?.value || '').toLowerCase();
-            const cat      = document.getElementById('logFilterCategory')?.value || '';
-            const sev      = document.getElementById('logFilterSeverity')?.value || '';
-            const userType = document.getElementById('logFilterUser')?.value || '';
+            const search    = (document.getElementById('logSearch')?.value || '').toLowerCase();
+            const actionFil = (document.getElementById('logFilterAction')?.value || '').toLowerCase();
 
             _filteredLogs = _allLogs.filter(log => {
-                if (cat && log.category !== cat) return false;
-                if (sev && log.severity !== sev) return false;
-                if (userType === 'ADMIN_ONLY' && log.category !== 'ADMIN') return false;
-                if (userType === 'USERS_ONLY' && log.category === 'ADMIN') return false;
+                if (actionFil && !log.action?.toLowerCase().includes(actionFil)) return false;
                 if (search) {
-                    const haystack = [log.user_email, log.user_name, log.action, log.description, log.category].join(' ').toLowerCase();
-                    if (!haystack.includes(search)) return false;
+                    const hay = [log.admin_email, log.action, log.details].join(' ').toLowerCase();
+                    if (!hay.includes(search)) return false;
                 }
                 return true;
             });
@@ -1237,15 +1198,13 @@
 
         function clearLogFilters() {
             document.getElementById('logSearch').value = '';
-            document.getElementById('logFilterCategory').value = '';
-            document.getElementById('logFilterSeverity').value = '';
-            document.getElementById('logFilterUser').value = '';
+            document.getElementById('logFilterAction').value = '';
             filterLogs();
         }
 
         function changeLogPage(dir) {
-            const maxPage = Math.ceil(_filteredLogs.length / LOG_PAGE_SIZE);
-            _logPage = Math.max(1, Math.min(_logPage + dir, maxPage));
+            const max = Math.max(1, Math.ceil(_filteredLogs.length / LOG_PAGE_SIZE));
+            _logPage  = Math.max(1, Math.min(_logPage + dir, max));
             renderLogsPage();
         }
 
@@ -1256,92 +1215,59 @@
             const start   = (_logPage - 1) * LOG_PAGE_SIZE;
             const slice   = _filteredLogs.slice(start, start + LOG_PAGE_SIZE);
 
-            // Count label
-            document.getElementById('logCount').innerText = `${total.toLocaleString()} event${total !== 1 ? 's' : ''}`;
-            document.getElementById('logPageInfo').innerText = `Page ${_logPage} of ${maxPage} · ${total.toLocaleString()} total`;
-            document.getElementById('logPrevBtn').disabled = _logPage <= 1;
-            document.getElementById('logNextBtn').disabled = _logPage >= maxPage;
+            document.getElementById('logCount').innerText    = `${total.toLocaleString()} event${total !== 1 ? 's' : ''}`;
+            document.getElementById('logPageInfo').innerText = total ? `Page ${_logPage} of ${maxPage} · ${total.toLocaleString()} total` : '';
+            document.getElementById('logPrevBtn').disabled   = _logPage <= 1;
+            document.getElementById('logNextBtn').disabled   = _logPage >= maxPage;
 
             if (total === 0) {
-                list.innerHTML = `<p style="padding:50px;text-align:center;color:#bbb;"><i class="fas fa-search"></i> No events match your filters.</p>`;
+                list.innerHTML = `<p style="padding:50px;text-align:center;color:#bbb;">
+                    <i class="fas fa-search"></i>&nbsp; No events match your filters.</p>`;
                 return;
             }
 
-            // Severity badge styles
-            const sevStyle = {
-                INFO:     'background:#e8f5e9; color:#2e7d32;',
-                WARNING:  'background:#fff3e0; color:#e65100;',
-                ERROR:    'background:#fce4ec; color:#c62828;',
-                CRITICAL: 'background:#ff4757; color:white;'
-            };
-            const sevIcon = { INFO: 'info-circle', WARNING: 'exclamation-triangle', ERROR: 'times-circle', CRITICAL: 'radiation' };
-
-            // Category badge styles
-            const catStyle = {
-                AUTH:    'background:#e3f2fd; color:#1565c0;',
-                PRODUCT: 'background:#e8f5e9; color:#2e7d32;',
-                ORDER:   'background:#fff8e1; color:#f57f17;',
-                ADMIN:   'background:#fce4ec; color:#880e4f;',
-                PROFILE: 'background:#f3e5f5; color:#6a1b9a;',
-                SYSTEM:  'background:#f5f5f5; color:#424242;',
-                USER:    'background:#e0f7fa; color:#00695c;'
-            };
+            // Action → colour chip
+            function actionChip(action) {
+                const a = action || '';
+                let bg = '#f1f2f6', color = '#333';
+                if (a.includes('Delete') || a.includes('Erase'))   { bg='#fff0f0'; color='#c62828'; }
+                else if (a.includes('Reject') || a.includes('Ban')){ bg='#fff3e0'; color='#e65100'; }
+                else if (a.includes('Approv') || a.includes('Verif')){ bg='#e8f5e9'; color='#2e7d32'; }
+                else if (a.includes('Feature') || a.includes('Sponsor')){ bg='#fff8e1'; color='#f57f17'; }
+                else if (a.includes('Password') || a.includes('Admin')){ bg='#fce4ec'; color='#880e4f'; }
+                else if (a.includes('UTM') || a.includes('Link'))  { bg='#e3f2fd'; color='#1565c0'; }
+                return `<span style="background:${bg};color:${color};padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;white-space:nowrap;">${a}</span>`;
+            }
 
             list.innerHTML = `
-                <table style="width:100%; border-collapse:collapse; min-width:860px; font-size:0.84rem;">
+                <table style="width:100%;border-collapse:collapse;min-width:700px;font-size:0.84rem;">
                     <thead>
-                        <tr style="background:#fafafa; border-bottom:2px solid #f0f0f0; text-align:left; color:#555; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;">
-                            <th style="padding:12px 16px; white-space:nowrap;">Timestamp</th>
-                            <th style="padding:12px 10px;">User</th>
-                            <th style="padding:12px 10px;">Category</th>
-                            <th style="padding:12px 10px;">Severity</th>
+                        <tr style="background:#fafafa;border-bottom:2px solid #f0f0f0;text-align:left;color:#555;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">
+                            <th style="padding:12px 16px;white-space:nowrap;">Timestamp</th>
+                            <th style="padding:12px 10px;">Admin Account</th>
                             <th style="padding:12px 10px;">Action</th>
-                            <th style="padding:12px 10px; min-width:200px;">Description</th>
+                            <th style="padding:12px 10px;min-width:220px;">Details</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${slice.map((log, i) => {
-                            const sev  = log.severity || 'INFO';
-                            const cat  = log.category || 'SYSTEM';
-                            const sStyle = sevStyle[sev]  || sevStyle.INFO;
-                            const cStyle = catStyle[cat]  || catStyle.SYSTEM;
-                            const icon   = sevIcon[sev]   || 'info-circle';
-                            const dt     = new Date(log.created_at);
+                            const dt      = new Date(log.created_at);
                             const dateStr = dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
                             const timeStr = dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-                            const isEven  = i % 2 === 0;
-                            const rowBg   = sev === 'CRITICAL' ? '#fff5f5' : sev === 'ERROR' ? '#fff8f8' : (isEven ? 'white' : '#fafafa');
-                            const displayName = log.user_name || log.user_email?.split('@')[0] || 'Unknown';
-                            const displayEmail = log.user_email || '';
-                            const metaStr = log.metadata && Object.keys(log.metadata).length
-                                ? `<div style="margin-top:4px; font-size:0.72rem; color:#aaa; font-family:monospace;">${JSON.stringify(log.metadata)}</div>` : '';
-                            return \`<tr style="border-bottom:1px solid #f0f0f0; background:\${rowBg}; transition:background 0.15s;"
+                            const rowBg   = i % 2 === 0 ? 'white' : '#fafafa';
+                            return `<tr style="border-bottom:1px solid #f0f0f0;background:${rowBg};transition:background 0.12s;"
                                 onmouseover="this.style.background='#f0f7f4'"
-                                onmouseout="this.style.background='\${rowBg}'">
-                                <td style="padding:11px 16px; white-space:nowrap; color:#777;">
-                                    <div style="font-weight:600; color:#444;">\${timeStr}</div>
-                                    <div style="font-size:0.75rem; color:#aaa;">\${dateStr}</div>
+                                onmouseout="this.style.background='${rowBg}'">
+                                <td style="padding:11px 16px;white-space:nowrap;">
+                                    <div style="font-weight:700;color:#333;">${timeStr}</div>
+                                    <div style="font-size:0.72rem;color:#aaa;">${dateStr}</div>
                                 </td>
                                 <td style="padding:11px 10px;">
-                                    <div style="font-weight:700; color:#222;">\${displayName}</div>
-                                    <div style="font-size:0.72rem; color:#aaa;">\${displayEmail}</div>
+                                    <div style="font-weight:700;color:#0A291A;">${log.admin_email || '—'}</div>
                                 </td>
-                                <td style="padding:11px 10px;">
-                                    <span style="padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:700; \${cStyle}">\${cat}</span>
-                                </td>
-                                <td style="padding:11px 10px;">
-                                    <span style="padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:700; display:inline-flex; align-items:center; gap:4px; \${sStyle}">
-                                        <i class="fas fa-\${icon}" style="font-size:0.65rem;"></i> \${sev}
-                                    </span>
-                                </td>
-                                <td style="padding:11px 10px;">
-                                    <span style="background:#f1f2f6; padding:3px 9px; border-radius:8px; font-weight:700; color:#333; font-size:0.78rem;">\${log.action || '—'}</span>
-                                </td>
-                                <td style="padding:11px 10px; color:#555; line-height:1.4;">
-                                    \${log.description || log.details || '—'}
-                                    \${metaStr}
-                                </td>
-                            </tr>\`;
+                                <td style="padding:11px 10px;">${actionChip(log.action)}</td>
+                                <td style="padding:11px 10px;color:#555;line-height:1.5;">${log.details || '—'}</td>
+                            </tr>`;
                         }).join('')}
                     </tbody>
                 </table>`;
@@ -1349,15 +1275,12 @@
 
         function exportLogsCSV() {
             if (!_filteredLogs.length) { alert('No logs to export.'); return; }
-            const headers = ['Timestamp','User Name','User Email','Category','Severity','Action','Description'];
+            const headers = ['Timestamp', 'Admin Email', 'Action', 'Details'];
             const rows = _filteredLogs.map(l => [
                 new Date(l.created_at).toISOString(),
-                `"${(l.user_name||'').replace(/"/g,'""')}"`,
-                `"${(l.user_email||'').replace(/"/g,'""')}"`,
-                l.category || '',
-                l.severity || '',
+                `"${(l.admin_email||'').replace(/"/g,'""')}"`,
                 `"${(l.action||'').replace(/"/g,'""')}"`,
-                `"${(l.description||l.details||'').replace(/"/g,'""')}"`
+                `"${(l.details||'').replace(/"/g,'""')}"`
             ]);
             const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
