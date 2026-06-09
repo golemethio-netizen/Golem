@@ -5,27 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Wishlist | WanaGebya</title>
 
-    <!-- Open Graph Tags for wanagebya.com -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://wanagebya.com/">
-<meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
-<meta property="og:description" content="Quality furniture and electronics delivered in Addis Ababa.">
-
-<!-- CRITICAL: The Preview Image -->
-<!-- Ensure this image file exists at this exact path on your server -->
-<meta property="og:image" content="https://wanagebya.com/assets/images/social-preview.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wanagebya.com/">
+    <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
+    <meta property="og:description" content="Quality furniture and electronics delivered in Addis Ababa.">
+    <meta property="og:image" content="https://wanagebya.com/assets/images/social-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
    
-
-    <!-- Stylesheets -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
- <header class="golem-header">
+    <header class="golem-header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">WanaGebya</div>
         <div style="flex-grow: 1;"></div>
         <a href="index.html" class="nav-item-box bg-home">
@@ -33,6 +27,11 @@
             <p>Back</p>
         </a>
     </header>
+
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
+        <i class="fas fa-circle-notch fa-spin fa-3x" style="color:#333; margin-bottom:15px;"></i>
+        <p style="font-weight:600;">Sending Order to WanaGebya...</p>
+    </div>
 
     <main class="container">
         <div class="wishlist-header" style="margin: 30px 0; display: flex; justify-content: space-between; align-items: flex-end;">
@@ -56,256 +55,234 @@
         </div>
 
         <div id="savedSummary" class="saved-summary-box" style="display: none;">
-          <div class="summary-details">
-        <h3 style="font-weight: 700; margin: 0; font-size: 1.1rem;">Order Summary</h3>
-        <p style="color: #666; margin: 5px 0;">
-            Items: <span id="totalItems" style="font-weight: 600; color: #333;">0</span> | 
-            Total: <span id="totalPrice" style="font-weight: 800; color: #000;">0</span> ETB
-        </p>
-    </div>
+            <div class="summary-details">
+                <h3 style="font-weight: 700; margin: 0; font-size: 1.1rem;">Order Summary</h3>
+                <p style="color: #666; margin: 5px 0;">
+                    Items: <span id="totalItems" style="font-weight: 600; color: #333;">0</span> | 
+                    Total: <span id="totalPrice" style="font-weight: 800; color: #000;">0</span> ETB
+                </p>
+            </div>
             
             <div class="summary-actions">
                 <button onclick="sendOrder('telegram')" class="order-btn tg-btn" style="background: #0088cc; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <i class="fab fa-telegram"></i>order on Telegram
-        </button>
-        <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn" style="background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <i class="fab fa-whatsapp"></i> WhatsApp
-        </button>
+                    <i class="fab fa-telegram"></i>order on Telegram
+                </button>
+                <button onclick="sendOrder('whatsapp')" class="order-btn wa-btn" style="background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
                 <button onclick="shareWhitelist()" class="order-btn" style="background: #6c5ce7; color: white;">
-    <i class="fas fa-share-alt"></i> Share List
-</button>
+                    <i class="fas fa-share-alt"></i> Share List
+                </button>
             </div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-     <script>
-   // --- 1. Load Data ---
-async function loadSavedItems() {
-    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
-    const grid = document.getElementById('savedGrid');
-    const empty = document.getElementById('emptyState');
-    const summary = document.getElementById('savedSummary');
+    <script>
+        // --- 1. Load Data ---
+        async function loadSavedItems() {
+            const grid = document.getElementById('savedGrid');
+            const empty = document.getElementById('emptyState');
+            const summary = document.getElementById('savedSummary');
 
-    if (savedIds.length === 0) {
-        grid.innerHTML = ""; 
-        grid.appendChild(empty);
-        empty.style.display = 'block';
-        summary.style.display = 'none';
-        return;
-    }
+            // Read URL Params (golem shared routing match)
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedItemsParam = urlParams.get('items');
+            
+            let savedIds = [];
+            
+            if (sharedItemsParam) {
+                savedIds = sharedItemsParam.split(',').filter(id => id.trim() !== "");
+            } else {
+                savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+            }
 
+            if (savedIds.length === 0) {
+                grid.innerHTML = ""; 
+                grid.appendChild(empty);
+                empty.style.display = 'block';
+                summary.style.display = 'none';
+                return;
+            }
 
+            // Database lookup
+            const { data, error } = await _supabase
+                .from('products')
+                .select('*')
+                .in('id', savedIds)
+                .order('created_at', { ascending: false });
 
-    // 3. Fetch ONLY the saved items, but maintain the Golem Sorting Order
-    const { data, error } = await _supabase
-        .from('products')
-        .select('*')
-        .in('id', savedIds)
-        .order('created_at', { ascending: false });
+            if (error) {
+                console.error("Whitelist Load Error:", error.message);
+                return;
+            }
 
-    if (error) {
-        console.error("Whitelist Load Error:", error.message);
-        return;
-    }
+            if (data && data.length > 0) {
+                empty.style.display = 'none';
+                summary.style.display = 'block';
+                renderSaved(data);
+                calculateTotal(data);
+            } else {
+                grid.innerHTML = ""; 
+                grid.appendChild(empty);
+                empty.style.display = 'block';
+                summary.style.display = 'none';
+            }
+        }
 
-    if (data) {
-        empty.style.display = 'none';
-        summary.style.display = 'block';
-        renderSaved(data);
-        calculateTotal(data);
-    }
-}
-
-// --- 2. Render Cards ---
-function renderSaved(items) {
-    const grid = document.getElementById('savedGrid');
-    grid.innerHTML = items.map(p => `
-        <div class="product-card">
-            <button class="remove-btn" onclick="removeItem('${p.id}')">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="card-img-container" onclick="location.href='checkout.html?id=${p.id}'">
-                <img src="${p.image}" alt="${p.name}">
-            </div>
-            <div class="product-info">
-                <h3 class="product-title">${p.name}</h3>
-                <p class="product-price">${p.price.toLocaleString()} ETB</p>
-            </div>
-        </div>
-    `).join('');
-}
+        // --- 2. Render Cards ---
+        function renderSaved(items) {
+            const grid = document.getElementById('savedGrid');
+            grid.innerHTML = items.map(p => `
+                <div class="product-card">
+                    <button class="remove-btn" onclick="removeItem('${p.id}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="card-img-container" onclick="location.href='product.html?id=${p.id}'">
+                        <img src="${p.image}" alt="${p.name}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${p.name}</h3>
+                        <p class="product-price">${p.price.toLocaleString()} ETB</p>
+                    </div>
+                </div>
+            `).join('');
+        }
          
-window.shareWhitelist = function() {
-    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
-    
-    // Create a URL like: saved.html?items=102,105,200
-    const shareUrl = window.location.origin + window.location.pathname + "?items=" + savedIds.join(',');
-    
-    if (navigator.share) {
-        navigator.share({
-            title: "My WanaGebya Wishlist",
-            text: "Check out these items I found!",
-            url: shareUrl
-        });
-    } else {
-        navigator.clipboard.writeText(shareUrl);
-        alert("Shareable link copied!");
-    }
-};
-// --- 3. Calculations ---
-function calculateTotal(items) {
-    const total = items.reduce((sum, item) => sum + parseInt(item.price), 0);
-    document.getElementById('totalItems').innerText = items.length;
-    document.getElementById('totalPrice').innerText = total.toLocaleString();
-}
+        // --- 3. Share Whitelist Function ---
+        window.shareWhitelist = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let savedIds = [];
 
-// --- 4. Fixed Order Logic (Separates WhatsApp and Telegram) ---
-async function sendOrder(platform) {
-    const total = document.getElementById('totalPrice').innerText;
-    const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
+            if (urlParams.get('items')) {
+                savedIds = urlParams.get('items').split(',');
+            } else {
+                savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+            }
+            
+            const shareUrl = window.location.origin + window.location.pathname + "?items=" + savedIds.join(',');
+            const shareTitle = "My WanaGebya Wishlist";
+            const shareText = "Check out these items I saved on WanaGebya!";
 
-    const customerName = prompt("Enter your Name:");
-    if (!customerName) return;
-    const customerPhone = prompt("Enter your Phone:");
-    if (!customerPhone) return;
+            if (navigator.share) {
+                navigator.share({
+                    title: shareTitle,
+                    text: shareText,
+                    url: shareUrl
+                })
+                .catch((error) => console.log('Error sharing', error));
+            } else {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    alert("Link copied to clipboard! You can now paste it in Telegram or WhatsApp.");
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+            }
+        };
 
-    const loader = document.getElementById('loadingOverlay');
-    loader.style.display = 'flex';
+        // --- 4. Calculations ---
+        function calculateTotal(items) {
+            const total = items.reduce((sum, item) => sum + parseInt(item.price), 0);
+            document.getElementById('totalItems').innerText = items.length;
+            document.getElementById('totalPrice').innerText = total.toLocaleString();
+        }
 
-    // Bot credentials — stored here until Edge Function network issue is resolved
-    const BOT_TOKEN = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o';
-    const CHAT_ID   = '6792892909';
+        // --- 5. Order Logic ---
+        async function sendOrder(platform) {
+            const total = document.getElementById('totalPrice').innerText;
+            const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
 
-    const message = `🛒 *NEW WanaGebya ORDER*
+            const customerName = prompt("Enter your Name:");
+            if (!customerName) return;
+            const customerPhone = prompt("Enter your Phone:");
+            if (!customerPhone) return;
+
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) loader.style.display = 'flex';
+
+            const BOT_TOKEN = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o';
+            const CHAT_ID   = '6792892909';
+
+            const message = `🛒 *NEW WanaGebya ORDER*
 👤 Name: ${customerName}
 📞 Phone: ${customerPhone}
 💰 Total: ${total} ETB
 📦 Items:
-${items.map(i => `• ${i}`).join('
-')}`;
+${items.map(i => `• ${i}`).join('\n')}`;
 
-    try {
-        if (platform === 'telegram') {
-            const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
-            });
-            const data = await res.json();
+            try {
+                if (platform === 'telegram') {
+                    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+                    });
+                    const data = await res.json();
 
-            if (data.ok) {
-                loader.style.display = 'none';
-                localStorage.removeItem('golem_saved');
-                document.getElementById('successMsg').innerText =
-                    `Order sent! We will contact you soon, ${customerName}.`;
-                document.getElementById('successModal').style.display = 'flex';
-            } else {
-                throw new Error(data.description || 'Telegram rejected the message');
+                    if (data.ok) {
+                        if (loader) loader.style.display = 'none';
+                        localStorage.removeItem('golem_saved');
+                        document.getElementById('successMsg').innerText = `Order sent! We will contact you soon, ${customerName}.`;
+                        document.getElementById('successModal').style.display = 'flex';
+                    } else {
+                        throw new Error(data.description || 'Telegram rejected the message');
+                    }
+
+                } else if (platform === 'whatsapp') {
+                    const waNumber = GolemConfig.myPhone || "251707022845";
+                    const waMsg    = encodeURIComponent(message.replace(/\*/g, ''));
+                    window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
+                    if (loader) loader.style.display = 'none';
+                }
+            } catch (err) {
+                console.error('sendOrder error:', err);
+                alert(`❌ Could not send order.\n${err.message}\n\nPlease try WhatsApp instead.`);
+            } finally {
+                if (loader) loader.style.display = 'none';
             }
-
-        } else if (platform === 'whatsapp') {
-            const waNumber = GolemConfig.myPhone || "251707022845";
-            const waMsg    = encodeURIComponent(message.replace(/\*/g, ''));
-            window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
-            loader.style.display = 'none';
         }
-    } catch (err) {
-        console.error('sendOrder error:', err);
-        alert(`❌ Could not send order.
-${err.message}
 
-Please try WhatsApp instead.`);
-    } finally {
-        loader.style.display = 'none';
-    }
-}
-
-         // --- SHARE WHITELIST FUNCTION ---
-window.shareWhitelist = function() {
-    // 1. Get the current page URL
-    const shareUrl = window.location.href;
-    const shareTitle = "My WanaGebya Wishlist";
-    const shareText = "Check out these items I saved on WanaGebya!";
-
-    // 2. Use the Web Share API (Mobile/Modern Browsers)
-    if (navigator.share) {
-        navigator.share({
-            title: shareTitle,
-            text: shareText,
-            url: shareUrl
-        })
-        .then(() => console.log('Successful share'))
-        .catch((error) => console.log('Error sharing', error));
-    } else {
-        // 3. Fallback: Copy to Clipboard for Desktop/Older Browsers
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            alert("Link copied to clipboard! You can now paste it in Telegram or WhatsApp.");
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
-        });
-    }
-};
-
-
-window.closeSuccessAndHome = function() {
-    // Hide modal and go back to the main furniture catalog
-    document.getElementById('successModal').style.display = 'none';
-    window.location.href = 'index.html';
-};
-
+        window.closeSuccessAndHome = function() {
+            document.getElementById('successModal').style.display = 'none';
+            window.location.href = 'index.html';
+        };
          
-         
-// --- 6. Utils ---
-function removeItem(id) {
-    const card = document.querySelector(`button[onclick="removeItem('${id}')"]`).closest('.product-card');
-    card.style.opacity = '0';
-    setTimeout(() => {
-        let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
-        saved = saved.filter(savedId => savedId !== id);
-        localStorage.setItem('golem_saved', JSON.stringify(saved));
-        loadSavedItems();
-    }, 300);
-}
+        // --- 6. Utils ---
+        function removeItem(id) {
+            const card = document.querySelector(`button[onclick="removeItem('${id}')"]`).closest('.product-card');
+            card.style.opacity = '0';
+            setTimeout(() => {
+                let saved = JSON.parse(localStorage.getItem('golem_saved')) || [];
+                saved = saved.filter(savedId => savedId !== id);
+                localStorage.setItem('golem_saved', JSON.stringify(saved));
+                loadSavedItems();
+            }, 300);
+        }
 
-window.clearAllSaved = function() {
-    if (confirm("Are you sure you want to remove all saved items?")) {
-        localStorage.removeItem('golem_saved'); 
-        const summary = document.getElementById('savedSummary');
-        if (summary) summary.style.display = 'none';
-        loadSavedItems();
-    }
-};
+        window.clearAllSaved = function() {
+            if (confirm("Are you sure you want to remove all saved items?")) {
+                localStorage.removeItem('golem_saved'); 
+                const summary = document.getElementById('savedSummary');
+                if (summary) summary.style.display = 'none';
+                loadSavedItems();
+            }
+        };
 
-document.addEventListener('DOMContentLoaded', loadSavedItems);
+        document.addEventListener('DOMContentLoaded', loadSavedItems);
     </script>
 
-
-
-
-    
-
-<div id="successModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:white; padding:40px; border-radius:20px; text-align:center; max-width:400px; width:100%; box-shadow:0 15px 30px rgba(0,0,0,0.2);">
-        <div style="width:80px; height:80px; background:#2ed573; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:40px;">
-            <i class="fas fa-check"></i>
+    <div id="successModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; padding:40px; border-radius:20px; text-align:center; max-width:400px; width:100%; box-shadow:0 15px 30px rgba(0,0,0,0.2);">
+            <div style="width:80px; height:80px; background:#2ed573; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:40px;">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 style="font-weight:700; margin-bottom:10px;">Order Sent!</h2>
+            <p id="successMsg" style="color:#666; margin-bottom:25px; line-height:1.5;">We've received your order and our team will contact you shortly via Telegram/Phone.</p>
+            <button onclick="closeSuccessAndHome()" style="background:#333; color:white; border:none; padding:15px 30px; border-radius:10px; font-weight:700; cursor:pointer; width:100%; transition:0.3s;">
+                Continue Shopping
+            </button>
         </div>
-        <h2 style="font-weight:700; margin-bottom:10px;">Order Sent!</h2>
-        <p id="successMsg" style="color:#666; margin-bottom:25px; line-height:1.5;">We've received your order and our team will contact you shortly via Telegram/Phone.</p>
-        <button onclick="closeSuccessAndHome()" style="background:#333; color:white; border:none; padding:15px 30px; border-radius:10px; font-weight:700; cursor:pointer; width:100%; transition:0.3s;">
-            Continue Shopping
-        </button>
     </div>
-</div>
-
-
-
-
-    
-    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
-    <i class="fas fa-circle-notch fa-spin fa-3x" style="color:#333; margin-bottom:15px;"></i>
-    <p style="font-weight:600;">Sending Order to WanaGebya...</p>
-</div>
 </body>
 </html>
