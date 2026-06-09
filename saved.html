@@ -82,27 +82,12 @@
     <script src="config.js"></script>
      <script>
    // --- 1. Load Data ---
-// --- 1. Load Data ---
 async function loadSavedItems() {
+    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
     const grid = document.getElementById('savedGrid');
     const empty = document.getElementById('emptyState');
     const summary = document.getElementById('savedSummary');
 
-    // 1. First, check if there are shared items in the URL string (?items=ID1,ID2)
-    const urlParams = new URLSearchParams(window.location.search);
-    const sharedItemsParam = urlParams.get('items');
-    
-    let savedIds = [];
-    
-    if (sharedItemsParam) {
-        // If shared via link, split comma separated IDs into an array
-        savedIds = sharedItemsParam.split(',').filter(id => id.trim() !== "");
-    } else {
-        // Fallback to local storage if no share parameter exists
-        savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
-    }
-
-    // 2. Render Empty State if no IDs are found anywhere
     if (savedIds.length === 0) {
         grid.innerHTML = ""; 
         grid.appendChild(empty);
@@ -111,7 +96,9 @@ async function loadSavedItems() {
         return;
     }
 
-    // 3. Fetch ONLY the saved items, but maintain the Sorting Order
+
+
+    // 3. Fetch ONLY the saved items, but maintain the Golem Sorting Order
     const { data, error } = await _supabase
         .from('products')
         .select('*')
@@ -123,17 +110,11 @@ async function loadSavedItems() {
         return;
     }
 
-    if (data && data.length > 0) {
+    if (data) {
         empty.style.display = 'none';
         summary.style.display = 'block';
         renderSaved(data);
         calculateTotal(data);
-    } else {
-        // Fallback if IDs exist in storage but were deleted or missing from the Supabase database
-        grid.innerHTML = ""; 
-        grid.appendChild(empty);
-        empty.style.display = 'block';
-        summary.style.display = 'none';
     }
 }
 
@@ -184,59 +165,51 @@ function calculateTotal(items) {
 async function sendOrder(platform) {
     const total = document.getElementById('totalPrice').innerText;
     const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
-
+    
+    // 1. Collect Info
     const customerName = prompt("Enter your Name:");
     if (!customerName) return;
     const customerPhone = prompt("Enter your Phone:");
     if (!customerPhone) return;
 
+    // 2. SHOW SPINNER
     const loader = document.getElementById('loadingOverlay');
     loader.style.display = 'flex';
 
-    // Bot credentials — stored here until Edge Function network issue is resolved
-    const BOT_TOKEN = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o';
-    const CHAT_ID   = '6792892909';
+    // 3. BOT CONFIG
+    const BOT_TOKEN = GolemConfig.botToken;
+const CHAT_ID = GolemConfig.chatId;
 
-    const message = `🛒 *NEW WanaGebya ORDER*
-👤 Name: ${customerName}
-📞 Phone: ${customerPhone}
-💰 Total: ${total} ETB
-📦 Items:
-${items.map(i => `• ${i}`).join('
-')}`;
+    let message = `🛒 *NEW WanaGebya ORDER*\n👤 Name: ${customerName}\n📞 Phone: ${customerPhone}\n💰 Total: ${total} ETB\n📦 Items: ${items.join(', ')}`;
 
     try {
         if (platform === 'telegram') {
-            const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method:  'POST',
+            const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
             });
-            const data = await res.json();
 
-            if (data.ok) {
-                loader.style.display = 'none';
-                localStorage.removeItem('golem_saved');
-                document.getElementById('successMsg').innerText =
-                    `Order sent! We will contact you soon, ${customerName}.`;
-                document.getElementById('successModal').style.display = 'flex';
-            } else {
-                throw new Error(data.description || 'Telegram rejected the message');
-            }
-
+            if (response.ok) {
+    // 1. Hide the loading overlay first
+    document.getElementById('loadingOverlay').style.display = 'none';
+    
+    // 2. Clear the local storage since the order is placed
+    localStorage.removeItem('golem_saved');
+    
+    // 3. Update the message and show the modal
+    document.getElementById('successMsg').innerText = `Success! Your order has been sent to Golem, ${customerName}. We will reach out to you soon.`;
+    document.getElementById('successModal').style.display = 'flex';
+}
         } else if (platform === 'whatsapp') {
-            const waNumber = GolemConfig.myPhone || "251707022845";
-            const waMsg    = encodeURIComponent(message.replace(/\*/g, ''));
+            const waNumber = "251707022845"; 
+            const waMsg = window.encodeURIComponent(message.replace(/\*/g, ''));
             window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
-            loader.style.display = 'none';
         }
-    } catch (err) {
-        console.error('sendOrder error:', err);
-        alert(`❌ Could not send order.
-${err.message}
-
-Please try WhatsApp instead.`);
+    } catch (error) {
+        alert("❌ Something went wrong. Check your connection.");
     } finally {
+        // 4. HIDE SPINNER (Always runs even if there is an error)
         loader.style.display = 'none';
     }
 }
