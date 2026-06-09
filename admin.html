@@ -574,6 +574,8 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAdmin();
+            // Log admin session only after auth is confirmed
+            logAction('ADMIN_LOGIN', `Admin panel opened by ${currentAdminEmail}`, { category:'ADMIN', severity:'INFO' });
             updateAdminPresence();
             loadStats();
             loadItems('pending');
@@ -595,8 +597,6 @@
             } else {
                 currentAdminEmail = user.email || profile.email || 'Admin';
                 document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
-                // Log admin session open
-                logAction('ADMIN_LOGIN', `Admin panel opened by ${currentAdminEmail}`, { category:'ADMIN', severity:'INFO', metadata:{ user_id: user.id } });
             }
         }
 
@@ -609,35 +609,37 @@
 
         // ── Audit Logger ──────────────────────────────────────────────
         // Inserts a structured row into audit_logs.
-        async function logAction(actionName, details, opts = {}) {
-            try {
-                const {
-                    category   = 'ADMIN',
-                    severity   = 'INFO',
-                    metadata   = {},
-                    actorEmail = null,
-                    actorName  = null,
-                    userId     = null
-                } = opts;
+        // Fire-and-forget audit log — NEVER throws, NEVER blocks the UI
+        function logAction(actionName, details, opts = {}) {
+            setTimeout(async () => {
+                try {
+                    const {
+                        category  = 'ADMIN',
+                        severity  = 'INFO',
+                        metadata  = {},
+                        actorEmail = null,
+                        actorName  = null,
+                        userId     = null
+                    } = opts;
 
-                const { data: { user } } = await _supabase.auth.getUser();
-                const finalUserId   = userId    || user?.id    || null;
-                const finalEmail    = actorEmail || currentAdminEmail || user?.email || 'unknown';
-                const finalName     = actorName  || finalEmail.split('@')[0];
+                    const finalEmail = actorEmail || currentAdminEmail || 'unknown';
+                    const finalName  = actorName  || finalEmail.split('@')[0];
 
-                await _supabase.from('audit_logs').insert([{
-                    user_id:     finalUserId,
-                    user_email:  finalEmail,
-                    user_name:   finalName,
-                    action:      actionName,
-                    category:    category,
-                    severity:    severity,
-                    description: details,
-                    metadata:    metadata
-                }]);
-            } catch (err) {
-                console.error("Audit log failed:", err);
-            }
+                    await _supabase.from('audit_logs').insert([{
+                        user_id:     userId     || null,
+                        user_email:  finalEmail,
+                        user_name:   finalName,
+                        action:      actionName,
+                        category:    category,
+                        severity:    severity,
+                        description: details,
+                        metadata:    metadata
+                    }]);
+                } catch (err) {
+                    // Silent fail — log errors must never break the admin UI
+                    console.warn('Audit log skipped:', err.message);
+                }
+            }, 0);
         }
 
         // --- 2. TAB SWITCHING ---
