@@ -82,12 +82,27 @@
     <script src="config.js"></script>
      <script>
    // --- 1. Load Data ---
+// --- 1. Load Data ---
 async function loadSavedItems() {
-    const savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
     const grid = document.getElementById('savedGrid');
     const empty = document.getElementById('emptyState');
     const summary = document.getElementById('savedSummary');
 
+    // 1. First, check if there are shared items in the URL string (?items=ID1,ID2)
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedItemsParam = urlParams.get('items');
+    
+    let savedIds = [];
+    
+    if (sharedItemsParam) {
+        // If shared via link, split comma separated IDs into an array
+        savedIds = sharedItemsParam.split(',').filter(id => id.trim() !== "");
+    } else {
+        // Fallback to local storage if no share parameter exists
+        savedIds = JSON.parse(localStorage.getItem('golem_saved')) || [];
+    }
+
+    // 2. Render Empty State if no IDs are found anywhere
     if (savedIds.length === 0) {
         grid.innerHTML = ""; 
         grid.appendChild(empty);
@@ -96,9 +111,7 @@ async function loadSavedItems() {
         return;
     }
 
-
-
-    // 3. Fetch ONLY the saved items, but maintain the Golem Sorting Order
+    // 3. Fetch ONLY the saved items, but maintain the Sorting Order
     const { data, error } = await _supabase
         .from('products')
         .select('*')
@@ -110,11 +123,17 @@ async function loadSavedItems() {
         return;
     }
 
-    if (data) {
+    if (data && data.length > 0) {
         empty.style.display = 'none';
         summary.style.display = 'block';
         renderSaved(data);
         calculateTotal(data);
+    } else {
+        // Fallback if IDs exist in storage but were deleted or missing from the Supabase database
+        grid.innerHTML = ""; 
+        grid.appendChild(empty);
+        empty.style.display = 'block';
+        summary.style.display = 'none';
     }
 }
 
