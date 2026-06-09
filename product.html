@@ -8,194 +8,312 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .product-page-container { max-width: 1000px; margin: 50px auto; padding: 20px; }
-        .product-display { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        .product-display img { width: 100%; border-radius: 10px; object-fit: cover; max-height: 500px; }
+        /* ── Page layout ── */
+        .product-page-container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+        .product-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .product-display img { width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
 
+        /* ── Seller card ── */
         .seller-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin: 20px 0;
+            display: flex; align-items: center; gap: 15px;
+            padding: 15px; background: #f8f9fa;
+            border-radius: 12px; margin: 16px 0;
             border: 1px solid #eee;
         }
         .seller-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #F5A623; }
         .seller-info h4 { margin: 0; font-size: 1rem; color: #333; }
-        .seller-info p { margin: 0; font-size: 0.8rem; color: #777; }
+        .seller-info p  { margin: 0; font-size: 0.8rem; color: #777; }
 
         .details-side { display: flex; flex-direction: column; gap: 10px; }
-        .price-tag { font-size: 1.05rem; color: #e53935; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .price-tag { font-size: 1.4rem; color: #e53935; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-        /* Contact buttons */
+        /* ── Status badge ── */
+        .status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        }
+        .status-pending  { background:#fff3e0; color:#e65100; }
+        .status-rejected { background:#fce4ec; color:#c62828; }
+
+        /* ── Specs table ── */
+        .specs-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 0.88rem; }
+        .specs-table tr:nth-child(even) td { background: #f7f8f6; }
+        .specs-table td { padding: 7px 10px; border-bottom: 1px solid #eee; color: #444; }
+        .specs-table td:first-child { font-weight: 600; color: #333; width: 42%; }
+
+        /* ── Contact buttons ── */
         .order-buttons { display: grid; gap: 10px; margin-top: 10px; }
         .order-buttons a {
-            text-align: center; padding: 15px; border-radius: 8px;
+            text-align: center; padding: 14px; border-radius: 8px;
             text-decoration: none; color: white; font-weight: bold;
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .tg-btn  { background: #0088cc; }
-        .wa-btn  { background: #25d366; }
+        .tg-btn   { background: #0088cc; }
+        .wa-btn   { background: #25d366; }
         .call-btn { background: #0A291A; }
-        .verified-badge { color: #0088cc; font-size: 0.9rem; font-weight: bold; }
+        .verified-badge { color: #0088cc; font-size: 0.9rem; }
 
-        /* Share section */
-        .share-section {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        .share-section-label {
-            font-size: 12px;
-            color: #aaa;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 12px;
-        }
-        .share-btns-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 10px;
-        }
+        /* ── Share section ── */
+        .share-section { margin-top: 24px; padding-top: 18px; border-top: 1px solid #eee; }
+        .share-section-label { font-size: 12px; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+        .share-btns-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
         .share-btn {
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 14px; border-radius: 50px;
+            padding: 11px 12px; border-radius: 50px;
             font-size: 13px; font-weight: 600; text-decoration: none;
-            border: none; cursor: pointer; font-family: inherit;
+            border: 1.5px solid #ddd; cursor: pointer; font-family: inherit;
+            background: white; color: #111;
             transition: opacity 0.18s, transform 0.15s;
-            color: #111;
         }
-        .share-btn:hover  { opacity: 0.85; transform: translateY(-2px); }
-        .share-btn:active { transform: scale(0.97); opacity: 1; }
-        .share-btn-tg { background: #ffffff; color: #111 !important; border: 1.5px solid #ddd; }
-        .share-btn-wa { background: #ffffff; color: #111 !important; border: 1.5px solid #ddd; }
-        .share-btn-fb { background: #ffffff; color: #111 !important; border: 1.5px solid #ddd; }
-        .share-btn-cp {
-            background: transparent; color: #555;
-            border: 1.5px solid #ddd;
-        }
-        .share-btn-cp:hover { background: #f5f5f5; opacity: 1; }
+        .share-btn:hover  { opacity: 0.82; transform: translateY(-2px); }
+        .share-btn:active { transform: scale(0.97); }
+        .copy-toast { display:none; font-size:12px; color:#2ed573; margin-top:8px; text-align:center; font-weight:600; }
 
-        /* Copy feedback */
-        .copy-toast {
-            display: none;
-            font-size: 12px;
-            color: #2ed573;
-            margin-top: 8px;
-            text-align: center;
-            font-weight: 600;
+        /* ── Related items ── */
+        .related-section { margin-top: 40px; }
+        .related-section h3 { font-size: 1.1rem; color: #333; margin-bottom: 16px; font-weight: 700; }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .related-card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            cursor: pointer; transition: transform 0.18s, box-shadow 0.18s;
+            text-decoration: none; color: inherit; display: block;
+        }
+        .related-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.10); }
+        .related-card img { width: 100%; height: 150px; object-fit: contain; background:#f7f8f6; }
+        .related-card-body { padding: 12px; }
+        .related-card-body h4 { margin: 0 0 4px; font-size: 0.9rem; color: #222; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .related-card-body p  { margin: 0; font-size: 0.85rem; color: #e53935; font-weight: 700; }
+
+        /* ── UTM toast ── */
+        #utmToast {
+            display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0A291A; color: white; padding: 10px 20px; border-radius: 50px;
+            font-size: 0.82rem; font-weight: 600; z-index: 9999;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body style="background: #f7f8f6;">
 
-    <div class="product-page-container">
-        <a href="index.html" style="text-decoration: none; color: #666; font-weight: 600; display: inline-block; margin-bottom: 20px;">
+    <!-- Navbar (pulled from style.css global nav) -->
+    <nav class="navbar" style="position:sticky;top:0;z-index:100;">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="https://cdn-icons-png.flaticon.com/512/9422/9422566.png" alt="WanaGebya" style="width:32px;height:32px;border-radius:6px;">
+            <span style="font-weight:700; font-size:1.1rem; color:#0A291A;">WanaGebya</span>
+        </a>
+        <a href="index.html" style="text-decoration:none; color:#555; font-weight:600; font-size:0.9rem; display:flex; align-items:center; gap:6px;">
             <i class="fas fa-arrow-left"></i> <span data-am="ወደ ዝርዝር ተመለስ">Back to Catalog</span>
         </a>
+    </nav>
 
+    <div class="product-page-container">
         <div id="productContent" class="product-display">
-            <p>Loading product details...</p>
+            <p style="color:#aaa; text-align:center; padding:40px 0;">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading product...
+            </p>
+        </div>
+
+        <!-- Related Items -->
+        <div class="related-section" id="relatedSection" style="display:none;">
+            <h3><i class="fas fa-th-large" style="color:#F5A623;"></i> <span data-am="ተዛማጅ እቃዎች">Related Items</span></h3>
+            <div class="related-grid" id="relatedGrid"></div>
         </div>
     </div>
+
+    <!-- UTM Source Toast -->
+    <div id="utmToast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
+
+        // ── 1. Track UTM source when buyer lands ─────────────────────────────
+        function trackUTMVisit() {
+            const params  = new URLSearchParams(window.location.search);
+            const source   = params.get('utm_source');
+            const medium   = params.get('utm_medium');
+            const campaign = params.get('utm_campaign');
+            if (!source) return;
+
+            // Save to localStorage so index.html can read it too
+            localStorage.setItem('wg_utm_source',   source);
+            localStorage.setItem('wg_utm_medium',   medium   || '');
+            localStorage.setItem('wg_utm_campaign', campaign || '');
+
+            // Show a subtle toast so admin can verify tracking works
+            const toast = document.getElementById('utmToast');
+            toast.textContent = `📊 Traffic source: ${source}${campaign ? ' · ' + campaign : ''}`;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 4000);
+
+            // Also log to Supabase audit_logs (fire-and-forget)
+            setTimeout(async () => {
+                try {
+                    await _supabase.from('audit_logs').insert([{
+                        action:      'UTM_VISIT',
+                        admin_email: 'visitor',
+                        details:     `Source: ${source} | Medium: ${medium || '-'} | Campaign: ${campaign || '-'} | Product: ${new URLSearchParams(window.location.search).get('id')}`
+                    }]);
+                } catch(e) { /* silent */ }
+            }, 0);
+        }
+
+        // ── 2. Parse specs from description ──────────────────────────────────
+        function parseDescription(raw) {
+            if (!raw) return { description: '', specsHTML: '' };
+            const sep = raw.indexOf('--- Specs ---');
+            if (sep === -1) return { description: raw, specsHTML: '' };
+
+            const description = raw.substring(0, sep).trim();
+            const specsRaw    = raw.substring(sep + 13).trim();
+            const rows = specsRaw.split('\n').map(line => line.trim()).filter(Boolean);
+
+            const tableRows = rows.map(line => {
+                const colonIdx = line.indexOf(':');
+                if (colonIdx === -1) return `<tr><td colspan="2">${line}</td></tr>`;
+                const key = line.substring(0, colonIdx).trim();
+                const val = line.substring(colonIdx + 1).trim();
+                return `<tr><td>${key}</td><td>${val}</td></tr>`;
+            }).join('');
+
+            const specsHTML = tableRows
+                ? `<div style="margin-top:10px;">
+                     <p style="font-weight:700; color:#333; font-size:0.88rem; margin:0 0 6px;">
+                       <i class="fas fa-list-ul" style="color:#F5A623;"></i> Specifications
+                     </p>
+                     <table class="specs-table">${tableRows}</table>
+                   </div>`
+                : '';
+
+            return { description, specsHTML };
+        }
+
+        // ── 3. Load main product ──────────────────────────────────────────────
         async function loadSingleProduct() {
+            trackUTMVisit();
+
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
 
-            if (!productId) {
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!productId) { window.location.href = 'index.html'; return; }
 
             const { data: p, error } = await _supabase
                 .from('products')
-                .select(`
-                    *,
-                    profiles (
-                        full_name,
-                        avatar_url,
-                        is_verified,
-                        phone
-                    )
-                `)
+                .select(`*, profiles(full_name, avatar_url, is_verified, phone)`)
                 .eq('id', productId)
                 .single();
 
+            const el = document.getElementById('productContent');
+
             if (error || !p) {
-                document.getElementById('productContent').innerHTML = `<h3>Item Not Found</h3>`;
+                el.innerHTML = `
+                    <div style="text-align:center; padding:60px 20px; grid-column:1/-1;">
+                        <i class="fas fa-box-open" style="font-size:3rem; color:#ddd;"></i>
+                        <h3 style="color:#aaa; margin:16px 0 8px;">Item Not Found</h3>
+                        <p style="color:#bbb; font-size:0.9rem;">This listing may have been removed or the link is incorrect.</p>
+                        <a href="index.html" style="display:inline-block; margin-top:16px; background:#0A291A; color:white; padding:10px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                            Browse All Items
+                        </a>
+                    </div>`;
                 return;
             }
 
-            // ── Track this view ──────────────────────────────
-            (async () => {
-                // Try RPC first
+            // ── Show a banner if item is not live ──
+            let statusBanner = '';
+            if (p.status === 'pending') {
+                statusBanner = `<div style="grid-column:1/-1; background:#fff3e0; border-radius:10px; padding:12px 18px; font-size:0.88rem; color:#e65100; font-weight:600;">
+                    <i class="fas fa-clock"></i> This item is pending approval and not yet visible to the public.
+                </div>`;
+            } else if (p.status === 'rejected') {
+                statusBanner = `<div style="grid-column:1/-1; background:#fce4ec; border-radius:10px; padding:12px 18px; font-size:0.88rem; color:#c62828; font-weight:600;">
+                    <i class="fas fa-times-circle"></i> This item has been rejected and is not publicly listed.
+                </div>`;
+            }
+
+            // ── Track view count ──
+            setTimeout(async () => {
                 const { error: rpcErr } = await _supabase.rpc('increment_view_count', { product_id: productId });
                 if (rpcErr) {
-                    console.warn('RPC failed, trying direct update:', rpcErr.message);
-                    // Fallback: read current count then increment
-                    const { data: row } = await _supabase
-                        .from('products').select('view_count').eq('id', productId).single();
-                    const { error: upErr } = await _supabase
-                        .from('products')
-                        .update({ view_count: (row?.view_count || 0) + 1 })
-                        .eq('id', productId);
-                    if (upErr) console.warn('View count update also failed:', upErr.message);
-                    else console.log('View counted (direct update). New count:', (row?.view_count || 0) + 1);
-                } else {
-                    console.log('View counted via RPC ✓');
+                    const { data: row } = await _supabase.from('products').select('view_count').eq('id', productId).single();
+                    await _supabase.from('products').update({ view_count: (row?.view_count || 0) + 1 }).eq('id', productId);
                 }
-            })();
-            // ────────────────────────────────────────────────
+            }, 0);
 
-            const sellerName    = p.profiles?.full_name || "Private Seller";
-            const sellerAvatar  = p.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}`;
-            const isVerified    = p.profiles?.is_verified;
-            const rawPhone      = (p.profiles?.phone || p.seller_phone || "").replace(/\D/g, '');
-            const cleanPhone    = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
-            const tgUser        = (p.telegram_username || "").replace('@', '');
+            const sellerName   = p.profiles?.full_name || "Private Seller";
+            const sellerAvatar = p.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=0A291A&color=fff`;
+            const isVerified   = p.profiles?.is_verified;
+            const rawPhone     = (p.profiles?.phone || p.seller_phone || "").replace(/\D/g, '');
+            const cleanPhone   = rawPhone.startsWith('0') ? '251' + rawPhone.substring(1) : rawPhone;
+            const tgUser       = (p.telegram_username || "").replace('@', '');
 
-            // Share data
+            // Page title
+            document.title = `${p.name} — WanaGebya`;
+
+            // Share URLs
             const shareUrl  = encodeURIComponent(window.location.href);
-            const shareText = encodeURIComponent(`Check out "${p.name}" on WanaGebya | ዋና ገበያ — ${p.price.toLocaleString()} ETB`);
+            const shareText = encodeURIComponent(`Check out "${p.name}" on WanaGebya — ${p.price.toLocaleString()} ETB`);
 
-            document.getElementById('productContent').innerHTML = `
+            // Parse description + specs
+            const { description, specsHTML } = parseDescription(p.description);
+
+            el.innerHTML = `
+                ${statusBanner}
+
                 <div class="image-side">
-                    <img src="${p.image}" alt="${p.name}">
+                    <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
                 </div>
 
                 <div class="details-side">
-                    <span style="color:#888; text-transform:uppercase; font-size:0.8rem; font-weight:bold;">${p.category || 'General'}</span>
-                    <h1 style="margin:5px 0;">${p.name}</h1>
-                    <p class="price-tag">${p.price.toLocaleString()} ETB</p>
+                    <span style="color:#888; text-transform:uppercase; font-size:0.78rem; font-weight:700; letter-spacing:0.04em;">
+                        ${p.category || 'General'}${p.subcategory ? ' · ' + p.subcategory : ''}
+                    </span>
+                    <h1 style="margin:5px 0; font-size:1.4rem; color:#1a1a1a;">${p.name}</h1>
+                    <p class="price-tag">${p.price.toLocaleString()} <span style="font-size:0.95rem;">ETB</span></p>
+
+                    ${p.location ? `<p style="font-size:0.85rem; color:#888; margin:0;"><i class="fas fa-map-marker-alt" style="color:#F5A623;"></i> ${p.location}</p>` : ''}
 
                     <!-- Seller Card -->
                     <div class="seller-card">
-                        <img src="${sellerAvatar}" class="seller-avatar" alt="${sellerName}">
+                        <img src="${sellerAvatar}" class="seller-avatar" alt="${sellerName}"
+                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=0A291A&color=fff'">
                         <div class="seller-info">
-                            <h4>${sellerName} ${isVerified ? '<i class="fas fa-check-circle" style="color:#0088cc;"></i>' : ''}</h4>
+                            <h4>${sellerName} ${isVerified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}</h4>
                             <p>${isVerified ? 'Verified Merchant' : 'Member'}</p>
                         </div>
                     </div>
 
-                    <p style="color:#555; line-height:1.6; min-height:100px;">${p.description || 'No description provided.'}</p>
+                    <!-- Description -->
+                    ${description ? `<p style="color:#555; line-height:1.7; margin:0;">${description}</p>` : ''}
+
+                    <!-- Specs Table -->
+                    ${specsHTML}
 
                     <!-- Contact Buttons -->
-                    <div class="order-buttons">
+                    <div class="order-buttons" style="margin-top:14px;">
                         <a href="tel:+${cleanPhone}" class="call-btn">
-                            <i class="fas fa-phone"></i> <span data-am="ሻጩን ይደውሉ">Call Seller</span>
+                            <i class="fas fa-phone"></i>
+                            <span data-am="ሻጩን ይደውሉ">Call Seller</span>
                         </a>
                         <a href="https://t.me/${tgUser || '+' + cleanPhone}" target="_blank" class="tg-btn">
-                            <i class="fab fa-telegram-plane"></i> <span data-am="በቴሌግራም ይላኩ">Message on Telegram</span>
+                            <i class="fab fa-telegram-plane"></i>
+                            <span data-am="በቴሌግራም ይላኩ">Message on Telegram</span>
                         </a>
-                        <a href="https://wa.me/${cleanPhone}?text=Interested in ${encodeURIComponent(p.name)}" target="_blank" class="wa-btn">
-                            <i class="fab fa-whatsapp"></i> <span data-am="በዋትስአፕ ይላኩ">Message on WhatsApp</span>
+                        <a href="https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hi, I am interested in: ' + p.name)}" target="_blank" class="wa-btn">
+                            <i class="fab fa-whatsapp"></i>
+                            <span data-am="በዋትስአፕ ይላኩ">Message on WhatsApp</span>
                         </a>
                     </div>
 
@@ -203,59 +321,74 @@
                     <div class="share-section">
                         <div class="share-section-label"><span data-am="ይህን እቃ አጋሩ">Share this item</span></div>
                         <div class="share-btns-grid">
-
-                            <button class="share-btn share-btn-tg"
-                                onclick="window.open('https://t.me/share/url?url=${shareUrl}&text=${shareText}','_blank')">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                                </svg>
+                            <button class="share-btn" onclick="window.open('https://t.me/share/url?url=${shareUrl}&text=${shareText}','_blank')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                                 Telegram
                             </button>
-
-                            <button class="share-btn share-btn-wa"
-                                onclick="window.open('https://wa.me/?text=${shareText}%20${shareUrl}','_blank')">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
-                                </svg>
+                            <button class="share-btn" onclick="window.open('https://wa.me/?text=${shareText}%20${shareUrl}','_blank')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
                                 WhatsApp
                             </button>
-
-                            <button class="share-btn share-btn-fb"
-                                onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${shareUrl}','_blank')">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                                </svg>
+                            <button class="share-btn" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${shareUrl}','_blank')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                                 Facebook
                             </button>
-
-                            <button class="share-btn share-btn-cp" id="copyLinkBtn"
-                                onclick="copyProductLink()">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                                </svg>
+                            <button class="share-btn" id="copyLinkBtn" onclick="copyProductLink()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                                 Copy Link
                             </button>
-
                         </div>
-                        <div class="copy-toast" id="copyToast">✓ Link copied to clipboard!</div>
+                        <div class="copy-toast" id="copyToast">✓ Link copied!</div>
                     </div>
-
                 </div>
             `;
+
+            // Load related items
+            loadRelated(p.category, productId);
         }
 
+        // ── 4. Load related items ─────────────────────────────────────────────
+        async function loadRelated(category, currentId) {
+            if (!category) return;
+            const { data: items } = await _supabase
+                .from('products')
+                .select('id, name, price, image, category')
+                .eq('status', 'approved')
+                .eq('category', category)
+                .neq('id', currentId)
+                .limit(4);
+
+            if (!items || items.length === 0) return;
+
+            const section = document.getElementById('relatedSection');
+            const grid    = document.getElementById('relatedGrid');
+            section.style.display = 'block';
+
+            grid.innerHTML = items.map(item => `
+                <a href="product.html?id=${item.id}" class="related-card">
+                    <img src="${item.image}" alt="${item.name}"
+                         onerror="this.src='https://via.placeholder.com/200x150?text=No+Image'">
+                    <div class="related-card-body">
+                        <h4>${item.name}</h4>
+                        <p>${item.price.toLocaleString()} ETB</p>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // ── 5. Copy link ──────────────────────────────────────────────────────
         function copyProductLink() {
-            navigator.clipboard.writeText(window.location.href).then(function () {
+            navigator.clipboard.writeText(window.location.href).then(() => {
                 const toast = document.getElementById('copyToast');
                 const btn   = document.getElementById('copyLinkBtn');
                 if (!toast || !btn) return;
                 toast.style.display = 'block';
                 btn.style.borderColor = '#2ed573';
                 btn.style.color = '#2ed573';
-                setTimeout(function () {
+                setTimeout(() => {
                     toast.style.display = 'none';
                     btn.style.borderColor = '#ddd';
-                    btn.style.color = '#555';
+                    btn.style.color = '#111';
                 }, 2500);
             });
         }
@@ -264,15 +397,14 @@
     </script>
 
     <script>
-    // Language persistence from main site
+    // Language persistence
     (function() {
         const lang = localStorage.getItem('wg_lang');
         if (lang === 'am') {
             document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('[data-am]').forEach(el => {
-                    const cur = el.innerText.trim();
                     const am = el.getAttribute('data-am');
-                    if (am) { el.innerText = am; el.setAttribute('data-am', cur); }
+                    if (am) { const cur = el.innerText.trim(); el.innerText = am; el.setAttribute('data-am', cur); }
                 });
                 document.documentElement.lang = 'am';
             });
