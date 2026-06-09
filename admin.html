@@ -147,80 +147,10 @@
             </section>
 
             <!-- Audit Logs View -->
-            <section id="logsSection" style="display:none;">
-
-                <!-- Header Row -->
-                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
-                    <div>
-                        <h2 style="margin:0 0 4px;"><i class="fas fa-shield-alt" style="color:#F5A623;"></i> SYSTEM AUDIT LOGS</h2>
-                        <p style="color:#888; margin:0; font-size:0.88rem;">Real-time activity trail for every admin action on WanaGebya.</p>
-                    </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button onclick="loadLogs()" style="background:#f0f4f8; border:1px solid #ddd; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem; color:#333;">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button onclick="exportLogsCSV()" style="background:#0A291A; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.82rem;">
-                            <i class="fas fa-download"></i> Export CSV
-                        </button>
-                    </div>
-                </div>
-
-                <!-- KPI Cards -->
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:20px;">
-                    <div class="stat-card" style="border-left:4px solid #0A291A; padding:14px 16px;">
-                        <i class="fas fa-list-alt" style="color:#0A291A; opacity:0.7; font-size:1.6rem;"></i>
-                        <div><h4 id="kpiTotalLogs" style="margin:0; font-size:1.3rem;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Total Events</p></div>
-                    </div>
-                    <div class="stat-card" style="border-left:4px solid #ff4757; padding:14px 16px;">
-                        <i class="fas fa-exclamation-triangle" style="color:#ff4757; font-size:1.6rem;"></i>
-                        <div><h4 id="kpiAdminActions" style="margin:0; font-size:1.3rem; color:#e65100;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Admin Actions</p></div>
-                    </div>
-                    <div class="stat-card" style="border-left:4px solid #2ed573; padding:14px 16px;">
-                        <i class="fas fa-user-check" style="color:#2ed573; font-size:1.6rem;"></i>
-                        <div><h4 id="kpiUniqueAdmins" style="margin:0; font-size:1.3rem; color:#2e7d32;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Unique Admins</p></div>
-                    </div>
-                    <div class="stat-card" style="border-left:4px solid #0088cc; padding:14px 16px;">
-                        <i class="fas fa-clock" style="color:#0088cc; font-size:1.6rem;"></i>
-                        <div><h4 id="kpiLatestAction" style="margin:0; font-size:0.9rem; color:#0088cc; font-weight:700;">—</h4><p style="margin:0; font-size:0.78rem; color:#888;">Last Action</p></div>
-                    </div>
-                </div>
-
-                <!-- Filter Bar -->
-                <div style="background:white; border-radius:12px; padding:14px 18px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                    <input type="text" id="logSearch" placeholder="🔍  Search by admin, action, details…"
-                        oninput="filterLogs()"
-                        style="flex:1; min-width:200px; padding:9px 14px; border-radius:8px; border:1px solid #ddd; outline:none; font-size:0.88rem;">
-                    <select id="logFilterAction" onchange="filterLogs()"
-                        style="padding:9px 12px; border-radius:8px; border:1px solid #ddd; font-size:0.85rem; outline:none; background:white; color:#333;">
-                        <option value="">All Actions</option>
-                        <option value="Status Change">Status Changes</option>
-                        <option value="Feature">Featured / Ads</option>
-                        <option value="User">User Actions</option>
-                        <option value="Password">Password</option>
-                        <option value="Deleted">Deletions</option>
-                        <option value="UTM">UTM Links</option>
-                    </select>
-                    <button onclick="clearLogFilters()" style="padding:9px 14px; border-radius:8px; border:1px solid #ddd; background:white; color:#888; cursor:pointer; font-size:0.82rem;">
-                        Clear
-                    </button>
-                    <span id="logCount" style="font-size:0.8rem; color:#bbb; white-space:nowrap;"></span>
-                </div>
-
-                <!-- Table -->
-                <div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden;">
-                    <div id="auditLogList" style="overflow-x:auto; min-height:200px;">
-                        <p style="padding:40px; text-align:center; color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
-                    </div>
-                    <!-- Pagination -->
-                    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-top:1px solid #f0f0f0; flex-wrap:wrap; gap:8px;">
-                        <span id="logPageInfo" style="font-size:0.82rem; color:#888;"></span>
-                        <div style="display:flex; gap:6px;">
-                            <button id="logPrevBtn" onclick="changeLogPage(-1)" disabled
-                                style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;">← Prev</button>
-                            <button id="logNextBtn" onclick="changeLogPage(1)"
-                                style="padding:7px 14px; border-radius:6px; border:1px solid #ddd; background:white; cursor:pointer; font-size:0.82rem;">Next →</button>
-                        </div>
-                    </div>
+            <section id="logsSection" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-history" style="color:#F5A623;"></i> SYSTEM AUDIT LOGS</h2>
+                <p style="color:#666; margin-bottom:15px;">A history of all actions taken on the platform by Admins, Sellers, and Buyers.</p>
+                <div id="auditLogList" style="overflow-x: auto;">
                 </div>
             </section>
 
@@ -588,19 +518,17 @@
             }
         }
 
-        // Action Tracker — fire-and-forget, never blocks the UI
-        function logAction(actionName, details) {
-            setTimeout(async () => {
-                try {
-                    await _supabase.from('audit_logs').insert([{
-                        admin_email: currentAdminEmail,
-                        action:      `[ADMIN] ${actionName}`,
-                        details:     details
-                    }]);
-                } catch (err) {
-                    console.warn('Audit log skipped:', err.message);
-                }
-            }, 0);
+        // Action Tracker Helper
+        async function logAction(actionName, details) {
+            try {
+                await _supabase.from('audit_logs').insert([{
+                    admin_email: currentAdminEmail,
+                    action: `[ADMIN] ${actionName}`,
+                    details: details
+                }]);
+            } catch (err) {
+                console.error("Audit log failed:", err);
+            }
         }
 
         // --- 2. TAB SWITCHING ---
@@ -819,9 +747,13 @@
                                         </p>
                                     ` : ''}
                                 </div>
-                                <button onclick="openUTMBuilderForProduct('${item.id}')" style="margin-top:10px; background:#0088cc; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
+                                ${item.status === 'approved' ? `
+                                <button onclick="openUTMBuilderForProduct('${item.id}')" style="margin-top:10px; background:#0088cc; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600; cursor:pointer;">
                                     <i class="fas fa-link"></i> Create UTM Link
-                                </button>
+                                </button>` : `
+                                <button disabled title="Approve this item first before creating a UTM link" style="margin-top:10px; background:#eee; color:#aaa; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600; cursor:not-allowed;">
+                                    <i class="fas fa-lock"></i> Approve First to Get UTM Link
+                                </button>`}
                                 <button onclick="updateStatus('${item.id}', 'sold')" style="margin-top:10px; background:#ffa502; color:white; border:none; width:100%; padding:10px; border-radius:5px; font-weight:600;">
                                     <i class="fas fa-check-circle"></i> Mark as Sold
                                 </button>
@@ -1134,160 +1066,51 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        // --- 7. AUDIT LOGS — Full Feature ─────────────────────────────
-        let _allLogs      = [];
-        let _filteredLogs = [];
-        let _logPage      = 1;
-        const LOG_PAGE_SIZE = 50;
-
+        // --- 7. LOAD AUDIT LOGS ---
         async function loadLogs() {
             const list = document.getElementById('auditLogList');
-            list.innerHTML = `<p style="padding:40px;text-align:center;color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading logs…</p>`;
-
+            list.innerHTML = "<p>Loading logs...</p>";
+            
             const { data: logs, error } = await _supabase
                 .from('audit_logs')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(1000);
+                .limit(100);
 
             if (error) {
-                list.innerHTML = `<div style="padding:30px;color:#ff4757;">
-                    <b><i class="fas fa-exclamation-triangle"></i> Could not load audit logs.</b><br>
-                    <small style="color:#aaa;">${error.message}</small><br><br>
-                    <small style="color:#bbb;">Make sure the <code>audit_logs</code> table exists in Supabase and RLS allows admin reads.</small>
-                </div>`;
+                list.innerHTML = `<p style="color:#ff4757;">⚠️ Error Loading Logs. Ensure you created the 'audit_logs' table.</p><p>${error.message}</p>`;
                 return;
             }
 
-            _allLogs = logs || [];
-            _logPage = 1;
-            updateLogKPIs();
-            filterLogs();
-        }
-
-        function updateLogKPIs() {
-            document.getElementById('kpiTotalLogs').innerText     = _allLogs.length.toLocaleString();
-            document.getElementById('kpiAdminActions').innerText  = _allLogs.filter(l => l.action?.includes('[ADMIN]')).length;
-            const uniq = new Set(_allLogs.map(l => l.admin_email).filter(Boolean));
-            document.getElementById('kpiUniqueAdmins').innerText  = uniq.size;
-            if (_allLogs.length) {
-                const last = _allLogs[0];
-                const dt   = new Date(last.created_at);
-                document.getElementById('kpiLatestAction').innerText =
-                    dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) + ' ' +
-                    dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
-            }
-        }
-
-        function filterLogs() {
-            const search    = (document.getElementById('logSearch')?.value || '').toLowerCase();
-            const actionFil = (document.getElementById('logFilterAction')?.value || '').toLowerCase();
-
-            _filteredLogs = _allLogs.filter(log => {
-                if (actionFil && !log.action?.toLowerCase().includes(actionFil)) return false;
-                if (search) {
-                    const hay = [log.admin_email, log.action, log.details].join(' ').toLowerCase();
-                    if (!hay.includes(search)) return false;
-                }
-                return true;
-            });
-
-            _logPage = 1;
-            renderLogsPage();
-        }
-
-        function clearLogFilters() {
-            document.getElementById('logSearch').value = '';
-            document.getElementById('logFilterAction').value = '';
-            filterLogs();
-        }
-
-        function changeLogPage(dir) {
-            const max = Math.max(1, Math.ceil(_filteredLogs.length / LOG_PAGE_SIZE));
-            _logPage  = Math.max(1, Math.min(_logPage + dir, max));
-            renderLogsPage();
-        }
-
-        function renderLogsPage() {
-            const list    = document.getElementById('auditLogList');
-            const total   = _filteredLogs.length;
-            const maxPage = Math.max(1, Math.ceil(total / LOG_PAGE_SIZE));
-            const start   = (_logPage - 1) * LOG_PAGE_SIZE;
-            const slice   = _filteredLogs.slice(start, start + LOG_PAGE_SIZE);
-
-            document.getElementById('logCount').innerText    = `${total.toLocaleString()} event${total !== 1 ? 's' : ''}`;
-            document.getElementById('logPageInfo').innerText = total ? `Page ${_logPage} of ${maxPage} · ${total.toLocaleString()} total` : '';
-            document.getElementById('logPrevBtn').disabled   = _logPage <= 1;
-            document.getElementById('logNextBtn').disabled   = _logPage >= maxPage;
-
-            if (total === 0) {
-                list.innerHTML = `<p style="padding:50px;text-align:center;color:#bbb;">
-                    <i class="fas fa-search"></i>&nbsp; No events match your filters.</p>`;
+            if (!logs || logs.length === 0) {
+                list.innerHTML = `<p style="color:#888;">No audit logs recorded yet.</p>`;
                 return;
-            }
-
-            // Action → colour chip
-            function actionChip(action) {
-                const a = action || '';
-                let bg = '#f1f2f6', color = '#333';
-                if (a.includes('Delete') || a.includes('Erase'))   { bg='#fff0f0'; color='#c62828'; }
-                else if (a.includes('Reject') || a.includes('Ban')){ bg='#fff3e0'; color='#e65100'; }
-                else if (a.includes('Approv') || a.includes('Verif')){ bg='#e8f5e9'; color='#2e7d32'; }
-                else if (a.includes('Feature') || a.includes('Sponsor')){ bg='#fff8e1'; color='#f57f17'; }
-                else if (a.includes('Password') || a.includes('Admin')){ bg='#fce4ec'; color='#880e4f'; }
-                else if (a.includes('UTM') || a.includes('Link'))  { bg='#e3f2fd'; color='#1565c0'; }
-                return `<span style="background:${bg};color:${color};padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;white-space:nowrap;">${a}</span>`;
             }
 
             list.innerHTML = `
-                <table style="width:100%;border-collapse:collapse;min-width:700px;font-size:0.84rem;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
                     <thead>
-                        <tr style="background:#fafafa;border-bottom:2px solid #f0f0f0;text-align:left;color:#555;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">
-                            <th style="padding:12px 16px;white-space:nowrap;">Timestamp</th>
-                            <th style="padding:12px 10px;">Admin Account</th>
-                            <th style="padding:12px 10px;">Action</th>
-                            <th style="padding:12px 10px;min-width:220px;">Details</th>
+                        <tr style="border-bottom: 2px solid #ddd; text-align:left; color: #333; font-size: 0.9rem;">
+                            <th style="padding:12px;">Date & Time</th>
+                            <th>User / Admin Account</th>
+                            <th>Action Performed</th>
+                            <th>Details / Target</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${slice.map((log, i) => {
-                            const dt      = new Date(log.created_at);
-                            const dateStr = dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-                            const timeStr = dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-                            const rowBg   = i % 2 === 0 ? 'white' : '#fafafa';
-                            return `<tr style="border-bottom:1px solid #f0f0f0;background:${rowBg};transition:background 0.12s;"
-                                onmouseover="this.style.background='#f0f7f4'"
-                                onmouseout="this.style.background='${rowBg}'">
-                                <td style="padding:11px 16px;white-space:nowrap;">
-                                    <div style="font-weight:700;color:#333;">${timeStr}</div>
-                                    <div style="font-size:0.72rem;color:#aaa;">${dateStr}</div>
+                        ${logs.map(log => `
+                            <tr style="border-bottom: 1px solid #eee; font-size:0.85rem;">
+                                <td style="padding:12px; color:#666; white-space:nowrap;">
+                                    ${new Date(log.created_at).toLocaleDateString()} at ${new Date(log.created_at).toLocaleTimeString()}
                                 </td>
-                                <td style="padding:11px 10px;">
-                                    <div style="font-weight:700;color:#0A291A;">${log.admin_email || '—'}</div>
-                                </td>
-                                <td style="padding:11px 10px;">${actionChip(log.action)}</td>
-                                <td style="padding:11px 10px;color:#555;line-height:1.5;">${log.details || '—'}</td>
-                            </tr>`;
-                        }).join('')}
+                                <td><strong>${log.admin_email || 'Unknown'}</strong></td>
+                                <td><span style="background:#f1f2f6; padding:3px 8px; border-radius:12px; font-weight:600; color:#333;">${log.action}</span></td>
+                                <td style="color:#555;">${log.details || '-'}</td>
+                            </tr>
+                        `).join('')}
                     </tbody>
-                </table>`;
-        }
-
-        function exportLogsCSV() {
-            if (!_filteredLogs.length) { alert('No logs to export.'); return; }
-            const headers = ['Timestamp', 'Admin Email', 'Action', 'Details'];
-            const rows = _filteredLogs.map(l => [
-                new Date(l.created_at).toISOString(),
-                `"${(l.admin_email||'').replace(/"/g,'""')}"`,
-                `"${(l.action||'').replace(/"/g,'""')}"`,
-                `"${(l.details||'').replace(/"/g,'""')}"`
-            ]);
-            const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a    = document.createElement('a');
-            a.href     = URL.createObjectURL(blob);
-            a.download = `audit_logs_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
+                </table>
+            `;
         }
 
         // --- 8. UTM GENERATOR LOGIC ---
@@ -1295,18 +1118,17 @@
             // Find the UTM tab button and simulate click
             const utmBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Marketing'));
             if(utmBtn) switchTab('utm', utmBtn);
-            
-            // Build the base domain logic (accounting for localhost/production)
-            const baseUrl = (window.location.origin.includes('127.0') || window.location.origin.includes('localhost')) 
-                ? 'https://wanagebya.com' // Switch to your actual domain if on local testing
-                : window.location.origin;
-                
+
+            // Always use wanagebya.com as the base — never localhost
+            const baseUrl = 'https://wanagebya.com';
+
+            // Use index.html with the product id param (matches your actual site structure)
             document.getElementById('utmUrl').value = `${baseUrl}/product.html?id=${id}`;
-            document.getElementById('utmSource').value = 'telegram'; // default assumption for quick sharing
+            document.getElementById('utmSource').value = 'telegram';
             document.getElementById('utmMedium').value = 'social';
             document.getElementById('utmCampaign').value = 'featured_ad';
             document.getElementById('utmResult').value = '';
-            
+
             // Pre-generate URL
             generateUTM();
         };
