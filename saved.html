@@ -165,51 +165,42 @@ function calculateTotal(items) {
 async function sendOrder(platform) {
     const total = document.getElementById('totalPrice').innerText;
     const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
-    
-    // 1. Collect Info
+
     const customerName = prompt("Enter your Name:");
     if (!customerName) return;
     const customerPhone = prompt("Enter your Phone:");
     if (!customerPhone) return;
 
-    // 2. SHOW SPINNER
     const loader = document.getElementById('loadingOverlay');
     loader.style.display = 'flex';
 
-    // 3. BOT CONFIG
-    const BOT_TOKEN = GolemConfig.botToken;
-const CHAT_ID = GolemConfig.chatId;
-
-    let message = `🛒 *NEW WanaGebya ORDER*\n👤 Name: ${customerName}\n📞 Phone: ${customerPhone}\n💰 Total: ${total} ETB\n📦 Items: ${items.join(', ')}`;
+    const message = `🛒 *NEW WanaGebya ORDER*\n👤 Name: ${customerName}\n📞 Phone: ${customerPhone}\n💰 Total: ${total} ETB\n📦 Items:\n${items.map(i => `• ${i}`).join('\n')}`;
 
     try {
         if (platform === 'telegram') {
-            const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
-            });
+            // Use Edge Function — bot token is safe on the server
+            const result = await sendTelegram(message, 'Markdown');
 
-            if (response.ok) {
-    // 1. Hide the loading overlay first
-    document.getElementById('loadingOverlay').style.display = 'none';
-    
-    // 2. Clear the local storage since the order is placed
-    localStorage.removeItem('golem_saved');
-    
-    // 3. Update the message and show the modal
-    document.getElementById('successMsg').innerText = `Success! Your order has been sent to Golem, ${customerName}. We will reach out to you soon.`;
-    document.getElementById('successModal').style.display = 'flex';
-}
+            if (result && result.success) {
+                loader.style.display = 'none';
+                localStorage.removeItem('golem_saved');
+                document.getElementById('successMsg').innerText =
+                    `Order sent! We will contact you soon, ${customerName}.`;
+                document.getElementById('successModal').style.display = 'flex';
+            } else {
+                throw new Error(result?.error || 'Telegram delivery failed');
+            }
+
         } else if (platform === 'whatsapp') {
-            const waNumber = "251707022845"; 
-            const waMsg = window.encodeURIComponent(message.replace(/\*/g, ''));
+            const waNumber = GolemConfig.myPhone || "251707022845";
+            const waMsg    = encodeURIComponent(message.replace(/\*/g, ''));
             window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
+            loader.style.display = 'none';
         }
-    } catch (error) {
-        alert("❌ Something went wrong. Check your connection.");
+    } catch (err) {
+        console.error('sendOrder error:', err);
+        alert(`❌ Could not send order: ${err.message}\n\nTry WhatsApp instead, or contact us on Telegram @${GolemConfig.myTelegram}`);
     } finally {
-        // 4. HIDE SPINNER (Always runs even if there is an error)
         loader.style.display = 'none';
     }
 }
