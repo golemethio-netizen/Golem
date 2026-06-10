@@ -782,7 +782,7 @@ window.openProductModal = async (product) => {
           + '</div>' : '')
           + (introLines.length ? '<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<div style="font-size:0.68rem;font-weight:700;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Description</div>'
-          + '<p style="font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;">' + introLines.join(' ') + '</p>'
+          + '<p style=\"font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;white-space:pre-wrap;\">' + introLines.join('\n') + '</p>'
           + '</div>' : '')
           + '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<button onclick="window.addToCartFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#F5A623;color:#1a1a1a;border:none;border-radius:12px;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:Poppins,Arial,sans-serif;"><i class="fas fa-cart-plus"></i> Add to Cart</button>'
