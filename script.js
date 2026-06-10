@@ -391,27 +391,83 @@ function renderProducts(products) {
 window.loadSponsor = async () => {
     try {
         const now = new Date().toISOString();
-        const { data: product } = await _supabase
+        // Fetch top 2 active sponsored products — soonest expiry first (most urgent = slot 1)
+        const { data: products } = await _supabase
             .from('products')
             .select('*')
             .eq('is_sponsored', true)
             .gt('sponsored_until', now)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
+            .order('sponsored_until', { ascending: true })
+            .limit(2);
 
         const sponsorSection = document.getElementById('mainSponsor');
-        if (product && sponsorSection) {
-            document.getElementById('sponsorImg').src = product.image;
-            document.getElementById('sponsorTitle').innerText = product.name;
-            document.getElementById('sponsorDesc').innerText = product.description?.substring(0, 100) + "...";
-            document.getElementById('sponsorLink').onclick = (e) => {
-                e.preventDefault();
-                window.openProductModal(product);
-            };
-            sponsorSection.style.display = 'block';
+        if (!products || products.length === 0 || !sponsorSection) return;
+
+        // Clear any previous countdown intervals
+        if (window._sponsorCountdownTimers) {
+            window._sponsorCountdownTimers.forEach(clearInterval);
         }
-    } catch (err) { console.error("Sponsor load error", err); }
+        window._sponsorCountdownTimers = [];
+
+        let anyVisible = false;
+
+        products.forEach((product, i) => {
+            const slot = i + 1;
+            const card     = document.getElementById('sponsorCard' + slot);
+            const imgEl    = document.getElementById('sponsorImg' + slot);
+            const titleEl  = document.getElementById('sponsorTitle' + slot);
+            const descEl   = document.getElementById('sponsorDesc' + slot);
+            const linkEl   = document.getElementById('sponsorLink' + slot);
+            const cntEl    = document.getElementById('sponsorCountdown' + slot);
+            if (!card) return;
+
+            imgEl.src = product.image || '';
+            titleEl.innerText = product.name;
+            descEl.innerText = (product.description || '').substring(0, 100) + '...';
+            linkEl.onclick = (e) => { e.preventDefault(); window.openProductModal(product); };
+            card.style.display = 'block';
+            anyVisible = true;
+
+            // Live countdown to sponsored_until
+            if (product.sponsored_until && cntEl) {
+                const spanEl = cntEl.querySelector('span');
+                const endTime = new Date(product.sponsored_until).getTime();
+
+                function updateCountdown() {
+                    const diff = endTime - Date.now();
+                    if (diff <= 0) {
+                        spanEl.textContent = 'Expired';
+                        cntEl.classList.add('urgent');
+                        return;
+                    }
+                    const days  = Math.floor(diff / 86400000);
+                    const hrs   = Math.floor((diff % 86400000) / 3600000);
+                    const mins  = Math.floor((diff % 3600000) / 60000);
+                    const secs  = Math.floor((diff % 60000) / 1000);
+
+                    if (days > 0) {
+                        spanEl.textContent = days + 'd ' + hrs + 'h ' + mins + 'm';
+                    } else {
+                        spanEl.textContent = hrs + 'h ' + mins + 'm ' + secs + 's';
+                    }
+                    // Turn urgent red flash when under 1 hour
+                    if (diff < 3600000) cntEl.classList.add('urgent');
+                    else cntEl.classList.remove('urgent');
+                }
+
+                updateCountdown();
+                const timer = setInterval(updateCountdown, 1000);
+                window._sponsorCountdownTimers.push(timer);
+            }
+        });
+
+        // Update the slots label
+        const slotsLabel = document.querySelector('.sponsor-slots-label');
+        if (slotsLabel) slotsLabel.textContent = products.length + ' Slot' + (products.length > 1 ? 's' : '') + ' Active';
+
+        if (anyVisible) sponsorSection.style.display = 'block';
+
+    } catch (err) { console.error('Sponsor load error', err); }
 };
 
 window.filterCategory = (category, button) => {
@@ -828,9 +884,9 @@ window.openProductModal = async (product) => {
 
                 <div style="margin-bottom:4px;">${getStockBadge(product.stock_status, product.quantity)}</div>
                 
-                <p class="modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap;">
-                    ${product.description || "No description available."}
-                </p>
+             <p class=\"modal-description\" style=\"font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap;\">
+    ${product.description || \"No description available.\"}
+</p>
 
                 <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
@@ -1356,7 +1412,7 @@ function showTGPopup() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
             document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 60000); // 60-second delay
+        }, 3000); // 3-second delay
     }
 }
 
@@ -1377,7 +1433,7 @@ function showTGPopupAuto() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
             document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 60000);
+        }, 3000); 
     }
 }
 
