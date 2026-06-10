@@ -828,9 +828,9 @@ window.openProductModal = async (product) => {
 
                 <div style="margin-bottom:4px;">${getStockBadge(product.stock_status, product.quantity)}</div>
                 
-                <p class="modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555;">
-                    ${product.description || "No description available."}
-                </p>
+             <p class=\"modal-description\" style=\"font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap;\">
+    ${product.description || \"No description available.\"}
+</p>
 
                 <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
