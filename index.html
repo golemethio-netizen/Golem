@@ -533,6 +533,132 @@
         .lang-am-active {
             font-family: 'Noto Sans Ethiopic', 'Poppins', sans-serif !important;
         }
+
+        /* ═══════════════════════════════════════════════════════
+           FEATURED PARTNER — Promotional Animations
+        ═══════════════════════════════════════════════════════ */
+
+        /* Keyframes */
+        @keyframes fp-pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); }
+            50%       { box-shadow: 0 0 0 12px rgba(245,166,35,0.18); }
+        }
+        @keyframes fp-img-breathe {
+            0%, 100% { transform: scale(1);    filter: brightness(1); }
+            50%       { transform: scale(1.04); filter: brightness(1.06); }
+        }
+        @keyframes fp-badge-spin {
+            0%   { transform: rotateY(0deg); }
+            45%  { transform: rotateY(180deg); }
+            55%  { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        @keyframes fp-shimmer {
+            0%   { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        @keyframes fp-title-pop {
+            0%, 100% { transform: scale(1);    color: #1a1a1a; }
+            50%       { transform: scale(1.03); color: #0A291A; }
+        }
+        @keyframes fp-btn-bounce {
+            0%, 100% { transform: translateY(0); }
+            40%       { transform: translateY(-4px); }
+            60%       { transform: translateY(-2px); }
+        }
+        @keyframes fp-live-dot {
+            0%, 100% { opacity: 1;   transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
+        }
+        @keyframes fp-border-rotate {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Card — animated glowing border */
+        .sponsor-card {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            animation: fp-pulse-glow 3s ease-in-out infinite;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        .sponsor-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #F5A623, #0A291A, #F5A623, #0A291A);
+            background-size: 300% 300%;
+            animation: fp-border-rotate 4s linear infinite;
+            z-index: 0;
+        }
+        .sponsor-content {
+            position: relative;
+            z-index: 1;
+            background: white;
+            border-radius: 16px;
+        }
+
+        /* Image — slow breathe zoom */
+        .sponsor-image img {
+            animation: fp-img-breathe 4s ease-in-out infinite;
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        /* Badge — flip every 5 seconds */
+        .sponsor-badge {
+            display: inline-block;
+            animation: fp-badge-spin 5s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        /* Shimmer overlay on image */
+        .sponsor-image {
+            position: relative;
+            overflow: hidden;
+        }
+        .sponsor-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                transparent 40%,
+                rgba(255,255,255,0.35) 50%,
+                transparent 60%
+            );
+            background-size: 400px 100%;
+            animation: fp-shimmer 2.8s linear infinite;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        /* Title — subtle scale pulse */
+        #sponsorTitle {
+            animation: fp-title-pop 4s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* CTA button — gentle bounce */
+        .sponsor-actions .buy-btn {
+            animation: fp-btn-bounce 2.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* LIVE indicator dot */
+        .sponsor-live-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #2ed573;
+            margin-right: 6px;
+            animation: fp-live-dot 1.2s ease-in-out infinite;
+            vertical-align: middle;
+        }
 </style>
 </head>
 
@@ -982,7 +1108,7 @@
             <!-- Sponsored Banner -->
             <section class="sponsored-section" id="mainSponsor" style="display:none;">
                 <div class="sponsor-card">
-                    <div class="sponsor-badge" data-am="ልዩ አጋር">Featured Partner</div>
+                    <div class="sponsor-badge" data-am="ልዩ አጋር"><span class="sponsor-live-dot"></span>Featured Partner</div>
                     <div class="sponsor-content">
                         <div class="sponsor-image">
                             <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
