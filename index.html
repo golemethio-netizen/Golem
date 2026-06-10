@@ -725,6 +725,120 @@
             background: #0A291A;
             color: #F5A623;
         }
+
+        /* ═══════════════════════════════════════════════════════
+           DESCRIPTION & SPEC — Scroll + Zoom Animations
+        ═══════════════════════════════════════════════════════ */
+
+        /* Scroll marquee for long description text */
+        @keyframes desc-scroll {
+            0%        { transform: translateY(0); }
+            10%       { transform: translateY(0); }
+            85%       { transform: translateY(var(--scroll-dist, -60%)); }
+            95%, 100% { transform: translateY(var(--scroll-dist, -60%)); }
+        }
+
+        /* Zoom-in entrance for spec cells */
+        @keyframes spec-zoom-in {
+            from { opacity: 0; transform: scale(0.75); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* Shimmer sweep on spec value */
+        @keyframes spec-shimmer {
+            0%   { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        /* Fade-slide-up entrance for description */
+        @keyframes desc-fade-up {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Wrapper that clips and scrolls */
+        .anim-desc-wrap {
+            overflow: hidden;
+            max-height: 90px;
+            position: relative;
+            cursor: default;
+        }
+        .anim-desc-wrap:hover { max-height: none; }
+
+        .anim-desc-inner {
+            animation: desc-fade-up 0.5s ease both,
+                       desc-scroll 9s ease-in-out 1.2s infinite;
+            --scroll-dist: -55%;
+        }
+        /* Fade mask at bottom */
+        .anim-desc-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 28px;
+            background: linear-gradient(transparent, rgba(255,255,255,0.95));
+            pointer-events: none;
+        }
+        /* Dark version for electronics modal */
+        .anim-desc-wrap.dark::after {
+            background: linear-gradient(transparent, rgba(15,22,35,0.97));
+        }
+        .anim-desc-wrap:hover::after { display: none; }
+
+        /* Spec cell zoom-in with staggered delay */
+        .anim-spec-cell {
+            animation: spec-zoom-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .anim-spec-cell:nth-child(1)  { animation-delay: 0.05s; }
+        .anim-spec-cell:nth-child(2)  { animation-delay: 0.10s; }
+        .anim-spec-cell:nth-child(3)  { animation-delay: 0.15s; }
+        .anim-spec-cell:nth-child(4)  { animation-delay: 0.20s; }
+        .anim-spec-cell:nth-child(5)  { animation-delay: 0.25s; }
+        .anim-spec-cell:nth-child(6)  { animation-delay: 0.30s; }
+        .anim-spec-cell:nth-child(7)  { animation-delay: 0.35s; }
+        .anim-spec-cell:nth-child(8)  { animation-delay: 0.40s; }
+        .anim-spec-cell:nth-child(9)  { animation-delay: 0.45s; }
+
+        /* Shimmer on spec value text */
+        .anim-spec-value {
+            background: linear-gradient(90deg, currentColor 30%, rgba(255,255,255,0.6) 50%, currentColor 70%);
+            background-size: 200px 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: spec-shimmer 2.5s linear 0.6s 2;
+            /* Falls back gracefully if clip not supported */
+        }
+
+        /* jc-spec-cell (Jobs/Services modal) gets zoom too */
+        .jc-spec-cell {
+            animation: spec-zoom-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .jc-spec-cell:nth-child(1) { animation-delay: 0.05s; }
+        .jc-spec-cell:nth-child(2) { animation-delay: 0.12s; }
+        .jc-spec-cell:nth-child(3) { animation-delay: 0.19s; }
+        .jc-spec-cell:nth-child(4) { animation-delay: 0.26s; }
+
+        /* jc-desc-area scroll */
+        .jc-desc-area {
+            overflow: hidden;
+            max-height: 80px;
+            position: relative;
+        }
+        .jc-desc-area:hover { max-height: none; overflow: visible; }
+        .jc-desc-area .anim-desc-inner {
+            animation: desc-fade-up 0.5s ease both,
+                       desc-scroll 9s ease-in-out 1.2s infinite;
+        }
+        .jc-desc-area::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 24px;
+            background: linear-gradient(transparent, rgba(255,255,255,0.95));
+            pointer-events: none;
+        }
+        .jc-desc-area:hover::after { display: none; }
 </style>
 </head>
 
