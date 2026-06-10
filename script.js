@@ -450,6 +450,10 @@ window.loadSponsor = async () => {
                     + (isSponsored ? 'Sponsored' : 'Featured Partner');
             }
 
+            // Store product reference for whole-card click
+            window._sponsorProducts = window._sponsorProducts || {};
+            window._sponsorProducts[slot] = product;
+
             imgEl.src = product.image || '';
             titleEl.innerText = product.name;
             descEl.innerText = (product.description || '').substring(0, 100) + '...';
@@ -540,6 +544,12 @@ window.loadSponsor = async () => {
         if (anyVisible) sponsorSection.style.display = 'block';
 
     } catch (err) { console.error('Sponsor load error', err); }
+};
+
+// Whole-card click handler for Featured Partner slots
+window._sponsorClick = function(slot) {
+    const product = window._sponsorProducts && window._sponsorProducts[slot];
+    if (product) window.openProductModal(product);
 };
 
 window.filterCategory = (category, button) => {
