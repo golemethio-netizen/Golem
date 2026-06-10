@@ -546,11 +546,11 @@ function getStockBadge(stockStatus, quantity) {
 
 // ── SPEC CARD HELPERS ──
 function specCell(icon, label, value) {
-    return '<div style="padding:13px 16px;border-right:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">'
+    return '<div class="anim-spec-cell" style="padding:13px 16px;border-right:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">'
          + '<div style="width:24px;height:24px;border-radius:6px;background:rgba(26,143,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:6px;">'
          + '<i class="' + icon + '" style="font-size:0.7rem;color:#F5A623;"></i></div>'
          + '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#6b7280;text-transform:uppercase;margin-bottom:2px;">' + label + '</div>'
-         + '<div style="font-size:0.9rem;font-weight:600;color:#e2e8f0;">' + (value || '—') + '</div>'
+         + '<div class="anim-spec-value" style="font-size:0.9rem;font-weight:600;color:#e2e8f0;">' + (value || '—') + '</div>'
          + '</div>';
 }
 function miniBar(label, value) {
@@ -707,7 +707,7 @@ window.openProductModal = async (product) => {
                     </div>
                 </div>
 
-                ${cleanDesc ? `<div class="jc-desc-area">${cleanDesc.replace(/\n/g, '<br>')}</div>` : ''}
+                ${cleanDesc ? `<div class="jc-desc-area"><div class="anim-desc-inner">${cleanDesc.replace(/\n/g, '<br>')}</div></div>` : ''}
 
                 <div class="jc-card-footer">
                     <div class="jc-availability"><span class="jc-dot"></span> ${isJob ? 'Hiring Now' : 'Active'}</div>
@@ -838,7 +838,7 @@ window.openProductModal = async (product) => {
           + '</div>' : '')
           + (introLines.length ? '<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<div style="font-size:0.68rem;font-weight:700;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Description</div>'
-          + '<p style=\"font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;white-space:pre-wrap;\">' + introLines.join('\n') + '</p>'
+          + '<div class="anim-desc-wrap dark"><p class="anim-desc-inner" style=\\"font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;white-space:pre-wrap;\\">' + introLines.join('\\n') + '</p></div>'
           + '</div>' : '')
           + '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<button onclick="window.addToCartFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#F5A623;color:#1a1a1a;border:none;border-radius:12px;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:Poppins,Arial,sans-serif;"><i class="fas fa-cart-plus"></i> Add to Cart</button>'
@@ -884,9 +884,7 @@ window.openProductModal = async (product) => {
 
                 <div style="margin-bottom:4px;">${getStockBadge(product.stock_status, product.quantity)}</div>
                 
-                <p class="modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap;">
-                    ${product.description || "No description available."}
-                </p>
+                <div class="anim-desc-wrap"><p class="anim-desc-inner modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap; margin:0;">${product.description || "No description available."}</p></div>
 
                 <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
