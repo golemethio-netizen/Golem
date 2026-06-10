@@ -1356,7 +1356,7 @@ function showTGPopup() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
             document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 3000); // 3-second delay
+        }, 60000); // 60-second delay
     }
 }
 
@@ -1377,7 +1377,7 @@ function showTGPopupAuto() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
             document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 3000); 
+        }, 60000);
     }
 }
 
