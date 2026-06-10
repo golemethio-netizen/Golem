@@ -800,7 +800,13 @@
 
             document.getElementById('editId').value = item.id;
             document.getElementById('editName').value = item.name;
-            document.getElementById('editDesc').value = item.description || '';
+           // Strip spec block so only the clean description shows in the textarea
+const rawDesc = item.description || '';
+const descOnly = rawDesc.split('\n--- Specs ---')[0]
+                        .split('\n--- Job Specs ---')[0]
+                        .split('\n--- Service Specs ---')[0]
+                        .trim();
+document.getElementById('editDesc').value = descOnly;
             document.getElementById('editPhone').value = item.seller_phone || '';
             document.getElementById('editImagePreview').src = item.image || '';
             document.getElementById('editFile').value = '';
