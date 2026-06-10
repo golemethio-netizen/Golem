@@ -391,17 +391,35 @@ function renderProducts(products) {
 window.loadSponsor = async () => {
     try {
         const now = new Date().toISOString();
-        // Fetch top 2 active sponsored products — soonest expiry first (most urgent = slot 1)
-        const { data: products } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('is_sponsored', true)
-            .gt('sponsored_until', now)
-            .order('sponsored_until', { ascending: true })
-            .limit(2);
+
+        // Fetch sponsored (with active until) AND featured items separately
+        const [{ data: sponsored }, { data: featured }] = await Promise.all([
+            _supabase
+                .from('products')
+                .select('*')
+                .eq('is_sponsored', true)
+                .gt('sponsored_until', now)
+                .eq('status', 'approved')
+                .order('sponsored_until', { ascending: true })  // soonest expiry first
+                .limit(2),
+            _supabase
+                .from('products')
+                .select('*')
+                .eq('is_featured', true)
+                .eq('status', 'approved')
+                .order('featured_until', { ascending: true, nullsFirst: false })
+                .limit(2)
+        ]);
+
+        // Merge: sponsored takes priority; fill remaining slot(s) with featured
+        const sponsoredList = sponsored || [];
+        const featuredList  = (featured || []).filter(f =>
+            !sponsoredList.find(s => s.id === f.id)
+        );
+        const products = [...sponsoredList, ...featuredList].slice(0, 2);
 
         const sponsorSection = document.getElementById('mainSponsor');
-        if (!products || products.length === 0 || !sponsorSection) return;
+        if (!products.length || !sponsorSection) return;
 
         // Clear any previous countdown intervals
         if (window._sponsorCountdownTimers) {
@@ -412,14 +430,25 @@ window.loadSponsor = async () => {
         let anyVisible = false;
 
         products.forEach((product, i) => {
-            const slot = i + 1;
-            const card     = document.getElementById('sponsorCard' + slot);
-            const imgEl    = document.getElementById('sponsorImg' + slot);
-            const titleEl  = document.getElementById('sponsorTitle' + slot);
-            const descEl   = document.getElementById('sponsorDesc' + slot);
-            const linkEl   = document.getElementById('sponsorLink' + slot);
-            const cntEl    = document.getElementById('sponsorCountdown' + slot);
+            const slot    = i + 1;
+            const card    = document.getElementById('sponsorCard' + slot);
+            const imgEl   = document.getElementById('sponsorImg'  + slot);
+            const titleEl = document.getElementById('sponsorTitle' + slot);
+            const descEl  = document.getElementById('sponsorDesc' + slot);
+            const linkEl  = document.getElementById('sponsorLink' + slot);
+            const cntEl   = document.getElementById('sponsorCountdown' + slot);
+            const badgeEl = card ? card.querySelector('.sponsor-badge') : null;
             if (!card) return;
+
+            // Determine type
+            const isSponsored = product.is_sponsored && product.sponsored_until;
+            const endDateRaw  = isSponsored ? product.sponsored_until : (product.featured_until || null);
+
+            // Badge label
+            if (badgeEl) {
+                badgeEl.innerHTML = '<span class="sponsor-live-dot"></span>'
+                    + (isSponsored ? 'Sponsored' : 'Featured Partner');
+            }
 
             imgEl.src = product.image || '';
             titleEl.innerText = product.name;
@@ -428,31 +457,71 @@ window.loadSponsor = async () => {
             card.style.display = 'block';
             anyVisible = true;
 
-            // Live countdown to sponsored_until
-            if (product.sponsored_until && cntEl) {
-                const spanEl = cntEl.querySelector('span');
-                const endTime = new Date(product.sponsored_until).getTime();
+            // ── Live countdown ──
+            if (cntEl) {
+                const spanEl  = cntEl.querySelector('span');
+                const iconEl  = cntEl.querySelector('i');
+
+                if (!endDateRaw) {
+                    // Featured with no end date — show "Always On"
+                    if (iconEl) iconEl.className = 'fas fa-infinity';
+                    spanEl.textContent = 'Always On';
+                    cntEl.style.color  = '#2ed573';
+                    cntEl.style.background    = 'rgba(46,213,115,0.08)';
+                    cntEl.style.borderColor   = 'rgba(46,213,115,0.3)';
+                    return;
+                }
+
+                const endTime = new Date(endDateRaw).getTime();
+
+                // Show total duration bar data
+                const startTime = product.created_at ? new Date(product.created_at).getTime() : (endTime - 86400000 * 7);
+                const totalDuration = endTime - startTime;
 
                 function updateCountdown() {
                     const diff = endTime - Date.now();
                     if (diff <= 0) {
                         spanEl.textContent = 'Expired';
                         cntEl.classList.add('urgent');
+                        clearInterval(timer);
+                        // Auto-hide the card after 3s
+                        setTimeout(() => { card.style.display = 'none'; window.loadSponsor(); }, 3000);
                         return;
                     }
-                    const days  = Math.floor(diff / 86400000);
-                    const hrs   = Math.floor((diff % 86400000) / 3600000);
-                    const mins  = Math.floor((diff % 3600000) / 60000);
-                    const secs  = Math.floor((diff % 60000) / 1000);
+
+                    const days = Math.floor(diff / 86400000);
+                    const hrs  = Math.floor((diff % 86400000) / 3600000);
+                    const mins = Math.floor((diff % 3600000)  / 60000);
+                    const secs = Math.floor((diff % 60000)    / 1000);
 
                     if (days > 0) {
                         spanEl.textContent = days + 'd ' + hrs + 'h ' + mins + 'm';
-                    } else {
+                    } else if (hrs > 0) {
                         spanEl.textContent = hrs + 'h ' + mins + 'm ' + secs + 's';
+                    } else {
+                        spanEl.textContent = mins + 'm ' + secs + 's';
                     }
-                    // Turn urgent red flash when under 1 hour
-                    if (diff < 3600000) cntEl.classList.add('urgent');
-                    else cntEl.classList.remove('urgent');
+
+                    // Urgency levels
+                    if (diff < 3600000) {          // under 1 hour — red flash
+                        cntEl.classList.add('urgent');
+                    } else if (diff < 86400000) {  // under 1 day — amber
+                        cntEl.classList.remove('urgent');
+                        cntEl.style.color       = '#F5A623';
+                        cntEl.style.background  = 'rgba(245,166,35,0.08)';
+                        cntEl.style.borderColor = 'rgba(245,166,35,0.4)';
+                    } else {
+                        cntEl.classList.remove('urgent');
+                    }
+
+                    // Progress bar fill
+                    const progressEl = document.getElementById('sponsorProgress' + slot);
+                    if (progressEl && totalDuration > 0) {
+                        const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
+                        progressEl.style.width = pct + '%';
+                        progressEl.style.background = diff < 3600000 ? '#e53935'
+                            : diff < 86400000 ? '#F5A623' : '#2ed573';
+                    }
                 }
 
                 updateCountdown();
@@ -461,9 +530,12 @@ window.loadSponsor = async () => {
             }
         });
 
-        // Update the slots label
+        // Slots label
         const slotsLabel = document.querySelector('.sponsor-slots-label');
-        if (slotsLabel) slotsLabel.textContent = products.length + ' Slot' + (products.length > 1 ? 's' : '') + ' Active';
+        if (slotsLabel) {
+            const n = products.length;
+            slotsLabel.textContent = n + ' Slot' + (n > 1 ? 's' : '') + ' Active';
+        }
 
         if (anyVisible) sponsorSection.style.display = 'block';
 
