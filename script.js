@@ -835,7 +835,7 @@ window.openProductModal = async (product) => {
                 <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
                     <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
-                    <a href="https://wa.me/${intPhone}?text=${encodeURIComponent("I'm interested in " + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a href="https://wa.me/${intPhone}?text=${encodeURIComponent('I am interested in ' + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                     <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#F5A623; color:#1a1a1a; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                 </div>
             </div>`;
