@@ -638,7 +638,7 @@
         }
 
         /* Title — subtle scale pulse */
-        #sponsorTitle {
+        #sponsorTitle1, #sponsorTitle2 {
             animation: fp-title-pop 4s ease-in-out infinite;
             display: inline-block;
         }
@@ -658,6 +658,72 @@
             margin-right: 6px;
             animation: fp-live-dot 1.2s ease-in-out infinite;
             vertical-align: middle;
+        }
+
+        /* ── Dual grid layout ── */
+        .sponsor-dual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .sponsor-dual-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Section header ── */
+        .sponsor-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #0A291A;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
+        .sponsor-slots-label {
+            margin-left: auto;
+            font-size: 0.7rem;
+            background: rgba(245,166,35,0.15);
+            color: #b87800;
+            border: 1px solid rgba(245,166,35,0.4);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-weight: 700;
+        }
+
+        /* ── Countdown timer ── */
+        .sponsor-countdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #e53935;
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 20px;
+            padding: 3px 10px;
+            margin: 6px 0 10px;
+        }
+        .sponsor-countdown.urgent {
+            background: #e53935;
+            color: white;
+            border-color: #e53935;
+            animation: fp-live-dot 0.8s ease-in-out infinite;
+        }
+
+        /* ── Slot 2 color variant (green theme) ── */
+        .sponsor-card-2::before {
+            background: linear-gradient(90deg, #0A291A, #2ed573, #0A291A, #2ed573);
+            background-size: 300% 300%;
+            animation: fp-border-rotate 4s linear infinite;
+        }
+        .sponsor-badge-2 {
+            background: #0A291A;
+            color: #F5A623;
         }
 </style>
 </head>
@@ -1107,21 +1173,58 @@
 
             <!-- Sponsored Banner -->
             <section class="sponsored-section" id="mainSponsor" style="display:none;">
-                <div class="sponsor-card">
-                    <div class="sponsor-badge" data-am="ልዩ አጋር"><span class="sponsor-live-dot"></span>Featured Partner</div>
-                    <div class="sponsor-content">
-                        <div class="sponsor-image">
-                            <img id="sponsorImg" src="" alt="Featured product at WanaGebya" loading="lazy">
-                        </div>
-                        <div class="sponsor-details">
-                            <h2 id="sponsorTitle">Loading Sponsor...</h2>
-                            <p id="sponsorDesc"></p>
-                            <div class="sponsor-actions">
-                                <a href="#" id="sponsorLink" class="buy-btn">View Item</a>
-                                <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor →</a>
+                <!-- Section header -->
+                <div class="sponsor-section-header">
+                    <span class="sponsor-live-dot"></span>
+                    <span data-am="ልዩ አጋሮች">Featured Partners</span>
+                    <span class="sponsor-slots-label">2 Slots Active</span>
+                </div>
+
+                <!-- Dual product grid -->
+                <div class="sponsor-dual-grid">
+
+                    <!-- Slot 1 -->
+                    <div class="sponsor-card" id="sponsorCard1" style="display:none;">
+                        <div class="sponsor-badge" data-am="ልዩ አጋር"><span class="sponsor-live-dot"></span>Featured Partner</div>
+                        <div class="sponsor-content">
+                            <div class="sponsor-image">
+                                <img id="sponsorImg1" src="" alt="Featured product" loading="lazy">
+                            </div>
+                            <div class="sponsor-details">
+                                <h2 id="sponsorTitle1">Loading...</h2>
+                                <p id="sponsorDesc1"></p>
+                                <div class="sponsor-countdown" id="sponsorCountdown1">
+                                    <i class="fas fa-clock"></i> <span></span>
+                                </div>
+                                <div class="sponsor-actions">
+                                    <a href="#" id="sponsorLink1" class="buy-btn">View Item</a>
+                                    <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor &rarr;</a>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Slot 2 -->
+                    <div class="sponsor-card sponsor-card-2" id="sponsorCard2" style="display:none;">
+                        <div class="sponsor-badge sponsor-badge-2" data-am="ልዩ አጋር"><span class="sponsor-live-dot"></span>Featured Partner</div>
+                        <div class="sponsor-content">
+                            <div class="sponsor-image">
+                                <img id="sponsorImg2" src="" alt="Featured product" loading="lazy">
+                            </div>
+                            <div class="sponsor-details">
+                                <h2 id="sponsorTitle2">Loading...</h2>
+                                <p id="sponsorDesc2"></p>
+                                <div class="sponsor-countdown" id="sponsorCountdown2">
+                                    <i class="fas fa-clock"></i> <span></span>
+                                </div>
+                                <div class="sponsor-actions">
+                                    <a href="#" id="sponsorLink2" class="buy-btn">View Item</a>
+                                    <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank">Become a Sponsor &rarr;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
@@ -1748,7 +1851,14 @@
             document.getElementById('telegramOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText); });
             document.getElementById('whatsappOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText); });
             document.getElementById('saveToWishlistBtn').addEventListener('click', function () { window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText); });
-            document.getElementById('sponsorLink').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Sponsored Item: ' + document.getElementById('sponsorTitle').innerText); });
+            ['sponsorLink1','sponsorLink2'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', function () {
+                    const slot = id.replace('sponsorLink','');
+                    const title = document.getElementById('sponsorTitle' + slot);
+                    window.logBuyerAction(null, 'Clicked Sponsored Item: ' + (title ? title.innerText : ''));
+                });
+            });
             document.getElementById('closeSuccessModal').addEventListener('click', function () { document.getElementById('successModal').style.display = 'none'; });
             document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
             document.getElementById('closeToastBtn').addEventListener('click', function (e) { e.stopPropagation(); closeToast(); });
