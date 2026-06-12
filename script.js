@@ -1078,25 +1078,27 @@ window.updateUIForUser = async function() {
     const signOutBtn = document.getElementById('signOutBtn');
     const adminLink = document.getElementById('adminNavLink');
 
-    if (user) {
-        if (signInBtn) signInBtn.style.display = 'none';
-        if (userWelcome) userWelcome.style.display = 'flex';
-        if (signOutBtn) signOutBtn.style.display = 'block';
+if (user) {
+    if (signInBtn) signInBtn.style.display = 'none';
+    if (userWelcome) userWelcome.style.display = 'flex';
+    if (signOutBtn) signOutBtn.style.display = 'block';
 
-        const { data: profile } = await _supabase
-            .from('profiles')
-            .select('full_name, is_admin')
-            .eq('id', user.id)
-            .maybeSingle();
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('full_name, is_admin')
+        .eq('id', user.id)
+        .maybeSingle();
 
-        if (userNameElem) userNameElem.innerText = profile?.full_name ? profile.full_name.split(' ')[0] : "Member";
-        if (adminLink && profile?.is_admin) adminLink.style.display = 'flex';
-    } else {
-        if (signInBtn) signInBtn.style.display = 'block';
-        if (userWelcome) userWelcome.style.display = 'none';
-        if (signOutBtn) signOutBtn.style.display = 'none';
-        if (adminLink) adminLink.style.display = 'none';
-    }
+    if (userNameElem) userNameElem.innerText = profile?.full_name ? profile.full_name.split(' ')[0] : "Member";
+    if (adminLink && profile?.is_admin) adminLink.style.display = 'flex';
+    if (mobileAdminLink && profile?.is_admin) mobileAdminLink.style.display = 'flex';
+} else {
+    if (signInBtn) signInBtn.style.display = 'block';
+    if (userWelcome) userWelcome.style.display = 'none';
+    if (signOutBtn) signOutBtn.style.display = 'none';
+    if (adminLink) adminLink.style.display = 'none';
+    if (mobileAdminLink) mobileAdminLink.style.display = 'none';
+}
 };
 
 window.checkAuthToSell = async function(event) {
