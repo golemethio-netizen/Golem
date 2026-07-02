@@ -144,11 +144,10 @@
 
                     <!-- Photo -->
                     <div class="input-group-sell">
-                        <label><i class="fas fa-camera"></i> Update Photo (Optional)</label>
-                        <div style="text-align:center;">
-                            <img id="editImagePreview" src="" alt="Current Image" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin:8px 0;border:1px solid #ddd;">
-                        </div>
-                        <input type="file" id="editFile" accept="image/*" style="border:2px dashed #ddd;padding:10px;width:100%;cursor:pointer;">
+                        <label><i class="fas fa-camera"></i> Photos (up to 3)</label>
+                        <div id="editPhotoPreviewGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:10px 0;"></div>
+                        <input type="file" id="editFile" accept="image/*" multiple style="border:2px dashed #ddd;padding:10px;width:100%;cursor:pointer;">
+                        <div id="editPhotoHint" style="font-size:11px; color:#aaa; margin-top:4px;">You can have up to 3 photos. The first one is the main cover photo.</div>
                     </div>
 
                     <!-- Title (label changes based on category) -->
@@ -707,20 +706,72 @@
             }
         }
 
-        // Handle Edit Image Preview
-        document.getElementById('editFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('editImagePreview');
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Image is too large! Please select an image smaller than 5MB.');
-                    this.value = '';
-                    return;
+        // Handle Edit Photos (multi, max 3)
+        const EDIT_MAX_PHOTOS = 3;
+        // Each entry: { type: 'existing', url } or { type: 'new', file }
+        let editPhotoItems = [];
+
+        function renderEditPhotoGrid() {
+            const grid = document.getElementById('editPhotoPreviewGrid');
+            grid.innerHTML = '';
+            editPhotoItems.forEach((item, idx) => {
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'position:relative; border-radius:10px; overflow:hidden; border:1px solid #eee; aspect-ratio:1/1;';
+
+                const img = document.createElement('img');
+                img.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block;';
+                if (item.type === 'existing') {
+                    img.src = item.url;
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = (e) => { img.src = e.target.result; };
+                    reader.readAsDataURL(item.file);
                 }
-                const reader = new FileReader();
-                reader.onload = function(e) { preview.src = e.target.result; }
-                reader.readAsDataURL(file);
+                wrap.appendChild(img);
+
+                if (idx === 0) {
+                    const badge = document.createElement('span');
+                    badge.textContent = 'Cover';
+                    badge.style.cssText = 'position:absolute; top:4px; left:4px; background:#F5A623; color:#1a1a1a; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px;';
+                    wrap.appendChild(badge);
+                }
+
+                const removeBtn = document.createElement('span');
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.style.cssText = 'position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer;';
+                removeBtn.onclick = () => {
+                    editPhotoItems.splice(idx, 1);
+                    renderEditPhotoGrid();
+                };
+                wrap.appendChild(removeBtn);
+
+                grid.appendChild(wrap);
+            });
+        }
+
+        document.getElementById('editFile').addEventListener('change', function(e) {
+            const incoming = Array.from(e.target.files || []);
+            const hint = document.getElementById('editPhotoHint');
+
+            for (const f of incoming) {
+                if (editPhotoItems.length >= EDIT_MAX_PHOTOS) break;
+                if (f.size > 5 * 1024 * 1024) {
+                    alert(`"${f.name}" is over 5MB and was skipped.`);
+                    continue;
+                }
+                editPhotoItems.push({ type: 'new', file: f });
             }
+
+            if (incoming.length && editPhotoItems.length >= EDIT_MAX_PHOTOS && incoming.length + editPhotoItems.length > EDIT_MAX_PHOTOS) {
+                hint.textContent = `Only ${EDIT_MAX_PHOTOS} photos max. Remove one to add another.`;
+                hint.style.color = '#e53935';
+            } else {
+                hint.textContent = 'You can have up to 3 photos. The first one is the main cover photo.';
+                hint.style.color = '#aaa';
+            }
+
+            this.value = ''; // allow re-selecting the same file later
+            renderEditPhotoGrid();
         });
 
         // Toggle Districts
@@ -808,8 +859,12 @@ const descOnly = rawDesc.split('\n--- Specs ---')[0]
                         .trim();
 document.getElementById('editDesc').value = descOnly;
             document.getElementById('editPhone').value = item.seller_phone || '';
-            document.getElementById('editImagePreview').src = item.image || '';
+            const existingPhotos = Array.isArray(item.images) && item.images.length
+                ? item.images.filter(Boolean)
+                : (item.image ? [item.image] : []);
+            editPhotoItems = existingPhotos.map(url => ({ type: 'existing', url }));
             document.getElementById('editFile').value = '';
+            renderEditPhotoGrid();
 
             // Set category first — this reshapes the form
             document.getElementById('editCategory').value = item.category || 'Other';
@@ -960,7 +1015,6 @@ document.getElementById('editDesc').value = descOnly;
             e.preventDefault();
             const id = document.getElementById('editId').value;
             const btn = document.getElementById('submitEditBtn');
-            const fileInput = document.getElementById('editFile');
             
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) return alert("Session expired.");
@@ -969,21 +1023,28 @@ document.getElementById('editDesc').value = descOnly;
             btn.disabled = true;
 
             try {
-                let imageUrl = document.getElementById('editImagePreview').src;
+                // 1. Resolve final photo list: keep existing URLs in place, upload any new files
+                if (!editPhotoItems.length) throw new Error("Please keep at least one photo.");
 
-                // 1. Upload new image with watermark if selected
-                const rawFile = fileInput.files[0];
-                if (rawFile) {
-                    btn.innerText = "Adding watermark...";
-                    const watermarkedBlob = await applyWatermark(rawFile);
-                    const file = new File([watermarkedBlob], rawFile.name, { type: 'image/jpeg' });
-                    btn.innerText = "Uploading...";
-                    const fileName = `${user.id}/${Date.now()}.jpg`;
-                    const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
-                    if (uploadError) throw uploadError;
-                    const { data } = _supabase.storage.from('product-images').getPublicUrl(fileName);
-                    imageUrl = data.publicUrl;
+                const finalUrls = [];
+                let photoIdx = 0;
+                for (const item of editPhotoItems) {
+                    photoIdx++;
+                    if (item.type === 'existing') {
+                        finalUrls.push(item.url);
+                    } else {
+                        btn.innerText = `Adding watermark (${photoIdx}/${editPhotoItems.length})...`;
+                        const watermarkedBlob = await applyWatermark(item.file);
+                        const file = new File([watermarkedBlob], item.file.name, { type: 'image/jpeg' });
+                        btn.innerText = `Uploading photo ${photoIdx}/${editPhotoItems.length}...`;
+                        const fileName = `${user.id}/${Date.now()}-${photoIdx}.jpg`;
+                        const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
+                        if (uploadError) throw uploadError;
+                        const { data } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+                        finalUrls.push(data.publicUrl);
+                    }
                 }
+                const imageUrl = finalUrls[0];
 
                 // 2. Build final location
                 const region = document.getElementById('editRegion').value;
@@ -1003,6 +1064,7 @@ document.getElementById('editDesc').value = descOnly;
                     seller_phone: document.getElementById('editPhone').value,
                     location: finalLocation,
                     image: imageUrl,
+                    images: finalUrls,
                     status: 'pending',
                     rejection_reason: null
                 };
