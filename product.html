@@ -21,6 +21,13 @@
         }
         .product-display img { width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
 
+        /* ── Hover-zoom lens on main product image ── */
+        .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; }
+        .zoom-wrap img { transition: transform 0.12s ease-out; transform-origin: center center; }
+        @media (hover: hover) and (pointer: fine) {
+            .zoom-wrap { cursor: zoom-in; }
+        }
+
         /* ── Seller card ── */
         .seller-card {
             display: flex; align-items: center; gap: 15px;
@@ -301,7 +308,7 @@
                 <div class="image-side">
                     ${(() => {
                         const gallery = Array.isArray(p.images) && p.images.length ? p.images : [p.image];
-                        const mainImg = `<img id="mainProductImg" src="${gallery[0]}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">`;
+                        const mainImg = `<div class="zoom-wrap" id="mainImgWrap"><img id="mainProductImg" src="${gallery[0]}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"></div>`;
                         if (gallery.length <= 1) return mainImg;
                         const thumbs = gallery.map((url, i) => `
                             <img src="${url}" data-idx="${i}"
@@ -381,11 +388,34 @@
                 </div>
             `;
 
+            initImageZoom();
+
             // Load related items
             loadRelated(p.category, productId);
         }
 
         // ── 4. Load related items ─────────────────────────────────────────────
+        // ── Hover-zoom lens on main product image (desktop/mouse only) ──
+        function initImageZoom() {
+            const wrap = document.getElementById('mainImgWrap');
+            const img = document.getElementById('mainProductImg');
+            if (!wrap || !img) return;
+            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return; // skip on touch devices
+
+            const ZOOM = 2.2;
+            wrap.onmousemove = (e) => {
+                const rect = wrap.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                img.style.transformOrigin = `${x}% ${y}%`;
+                img.style.transform = `scale(${ZOOM})`;
+            };
+            wrap.onmouseleave = () => {
+                img.style.transform = 'scale(1)';
+                img.style.transformOrigin = 'center center';
+            };
+        }
+
         async function loadRelated(category, currentId) {
             if (!category) return;
             const { data: items } = await _supabase
