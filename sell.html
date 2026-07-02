@@ -171,13 +171,11 @@
 
                 <!-- Photo -->
                 <div class="input-group-sell">
-                    <label><i class="fas fa-camera"></i> Product Photo (Max 5MB)</label>
-                    <div style="text-align: center;">
-                        <img id="imagePreview" src="#" alt="Preview"
-                             style="display:none; width:100%; max-height:300px; object-fit:cover; border-radius:10px; margin:10px 0; border:1px solid #eee;">
-                    </div>
-                    <input type="file" id="prodFile" accept="image/*" required
+                    <label><i class="fas fa-camera"></i> Product Photos (up to 3, Max 5MB each)</label>
+                    <div id="photoPreviewGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:10px 0;"></div>
+                    <input type="file" id="prodFile" accept="image/*" multiple required
                            style="border:2px dashed #ddd; padding:20px; text-align:center; width:100%; cursor:pointer;">
+                    <div id="photoHint" style="font-size:11px; color:#aaa; margin-top:4px;">You can select up to 3 photos. The first one will be used as the main cover photo.</div>
                 </div>
 
                 <!-- Name -->
@@ -1081,15 +1079,74 @@
         wrapper.style.display = 'block';
     }
 
-    /* Image Preview */
-    document.getElementById('prodFile').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const preview = document.getElementById('imagePreview');
-        if (file) {
+    /* Multi-Photo Preview (max 3) */
+    const MAX_PHOTOS = 3;
+    let selectedPhotoFiles = [];
+
+    function renderPhotoPreviewGrid() {
+        const grid = document.getElementById('photoPreviewGrid');
+        grid.innerHTML = '';
+        selectedPhotoFiles.forEach((file, idx) => {
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'position:relative; border-radius:10px; overflow:hidden; border:1px solid #eee; aspect-ratio:1/1;';
+
+            const img = document.createElement('img');
+            img.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block;';
             const reader = new FileReader();
-            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
+            reader.onload = (e) => { img.src = e.target.result; };
             reader.readAsDataURL(file);
+            wrap.appendChild(img);
+
+            if (idx === 0) {
+                const badge = document.createElement('span');
+                badge.textContent = 'Cover';
+                badge.style.cssText = 'position:absolute; top:4px; left:4px; background:#F5A623; color:#1a1a1a; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px;';
+                wrap.appendChild(badge);
+            }
+
+            const removeBtn = document.createElement('span');
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.style.cssText = 'position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer;';
+            removeBtn.onclick = () => {
+                selectedPhotoFiles.splice(idx, 1);
+                syncFileInput();
+                renderPhotoPreviewGrid();
+            };
+            wrap.appendChild(removeBtn);
+
+            grid.appendChild(wrap);
+        });
+    }
+
+    function syncFileInput() {
+        const dt = new DataTransfer();
+        selectedPhotoFiles.forEach(f => dt.items.add(f));
+        document.getElementById('prodFile').files = dt.files;
+    }
+
+    document.getElementById('prodFile').addEventListener('change', function(e) {
+        const incoming = Array.from(e.target.files || []);
+        const hint = document.getElementById('photoHint');
+
+        for (const f of incoming) {
+            if (selectedPhotoFiles.length >= MAX_PHOTOS) break;
+            if (f.size > 5 * 1024 * 1024) {
+                alert(`"${f.name}" is over 5MB and was skipped.`);
+                continue;
+            }
+            selectedPhotoFiles.push(f);
         }
+
+        if (incoming.length + selectedPhotoFiles.length > MAX_PHOTOS) {
+            hint.textContent = `Only the first ${MAX_PHOTOS} photos are kept. Remove one to add another.`;
+            hint.style.color = '#e53935';
+        } else {
+            hint.textContent = 'You can select up to 3 photos. The first one will be used as the main cover photo.';
+            hint.style.color = '#aaa';
+        }
+
+        syncFileInput();
+        renderPhotoPreviewGrid();
     });
 
 
@@ -1218,16 +1275,24 @@ function handleRegionChange(region) {
             const finalDescription = document.getElementById('prodDesc').value +
                 (extraSpecsText ? "\n\n--- Specs ---" + extraSpecsText : "");
 
-            // Upload image with watermark
-            const rawFile = fileInput.files[0];
-            btn.innerText = "Adding watermark...";
-            const watermarkedBlob = await applyWatermark(rawFile);
-            const file = new File([watermarkedBlob], rawFile.name, { type: 'image/jpeg' });
-            btn.innerText = "Uploading...";
-            const fileName = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
-            if (uploadError) throw uploadError;
-            const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+            // Upload photos (up to 3) with watermark
+            const rawFiles = selectedPhotoFiles.length ? selectedPhotoFiles : Array.from(fileInput.files || []);
+            if (!rawFiles.length) throw new Error("Please select at least one photo.");
+
+            const uploadedUrls = [];
+            for (let i = 0; i < rawFiles.length; i++) {
+                const rawFile = rawFiles[i];
+                btn.innerText = `Adding watermark (${i + 1}/${rawFiles.length})...`;
+                const watermarkedBlob = await applyWatermark(rawFile);
+                const file = new File([watermarkedBlob], rawFile.name, { type: 'image/jpeg' });
+                btn.innerText = `Uploading photo ${i + 1}/${rawFiles.length}...`;
+                const fileName = `${user.id}/${Date.now()}-${i}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, file);
+                if (uploadError) throw uploadError;
+                const { data: { publicUrl } } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+                uploadedUrls.push(publicUrl);
+            }
+            const publicUrl = uploadedUrls[0];
 
          const region = document.getElementById('prodRegion').value;
             const district = document.getElementById('prodDistrict').value;
@@ -1246,6 +1311,7 @@ function handleRegionChange(region) {
                 description: finalDescription,
                 location: locationStr,
                 image: publicUrl,
+                images: uploadedUrls,
                 seller_phone: document.getElementById('prodPhone').value,
                 stock_status: stockStatus,
                 quantity: qtyVal ? parseInt(qtyVal) : null,
