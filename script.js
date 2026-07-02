@@ -642,6 +642,27 @@ function miniBar(label, value) {
          + '</div>';
 }
 
+// ── MULTI-PHOTO GALLERY HELPERS ──
+function getProductGalleryImages(product) {
+    const imgs = Array.isArray(product.images) && product.images.length
+        ? product.images.filter(Boolean)
+        : (product.image ? [product.image] : []);
+    return imgs;
+}
+function buildThumbStrip(images, mainImgId, opts) {
+    opts = opts || {};
+    if (!images || images.length <= 1) return '';
+    const bg = opts.bg || 'transparent';
+    const pad = opts.padding || '8px 20px';
+    return '<div style="display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';">'
+        + images.map(function (url, i) {
+            return '<img src="' + url + '" data-gallery-thumb '
+                + 'onclick="document.getElementById(\'' + mainImgId + '\').src=this.src; this.parentElement.querySelectorAll(\'img\').forEach(function(t){t.style.borderColor=\'transparent\';}); this.style.borderColor=\'#F5A623\';" '
+                + 'style="width:46px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ' + (i === 0 ? '#F5A623' : 'transparent') + ';">';
+        }).join('')
+        + '</div>';
+}
+
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
@@ -741,8 +762,9 @@ window.openProductModal = async (product) => {
             <div class="jc-card">
                 <div class="jc-watermark"><span class="jc-watermark-text amharic">ዋና ገበያ</span></div>
                 <div class="jc-photo-wrap ${product.image ? 'has-photo' : ''}">
-                    ${product.image ? `<img src="${product.image}" class="jc-card-photo">` : `<span class="jc-no-photo-msg">No Image Attached</span>`}
+                    ${product.image ? `<img id="jcMainPhoto" src="${product.image}" class="jc-card-photo">` : `<span class="jc-no-photo-msg">No Image Attached</span>`}
                 </div>
+                ${buildThumbStrip(getProductGalleryImages(product), 'jcMainPhoto', { bg: '#1a1a1a', padding: '8px 22px' })}
                 <div class="jc-card-header">
                     <div class="jc-header-top">
                         <div class="jc-badges">
@@ -866,9 +888,10 @@ window.openProductModal = async (product) => {
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
           + '</div>'
           + '<div style="position:relative;height:220px;background:#131e2e;overflow:hidden;">'
-          + (product.image ? '<img src="' + product.image + '" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.92;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
+          + (product.image ? '<img id="elecMainPhoto" src="' + product.image + '" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.92;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
           + '<div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(15,22,35,0.85));"></div>'
           + '</div>'
+          + buildThumbStrip(getProductGalleryImages(product), 'elecMainPhoto', { bg: '#0f1623', padding: '8px 20px' })
           + '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
           + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">'
           + '<span style="display:inline-flex;align-items:center;gap:5px;background:' + stockColor + '22;border:1px solid ' + stockColor + ';border-radius:20px;padding:3px 10px;font-size:0.65rem;font-weight:800;color:' + stockColor + ';">'
@@ -943,8 +966,9 @@ window.openProductModal = async (product) => {
         modalContent.innerHTML = `
             <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
             <div class="modal-img-wrapper">
-                <img src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
+                <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
             </div>
+            ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', padding: '8px 0' })}
             <div class="modal-body" style="padding: 20px 0 0;">
                 <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
                 
