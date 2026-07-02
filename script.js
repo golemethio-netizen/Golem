@@ -663,41 +663,88 @@ function buildThumbStrip(images, mainImgId, opts) {
         + '</div>';
 }
 
-// ── MAGNIFYING-GLASS LENS (desktop/mouse only) ──
+// ── SIDE-WINDOW (SIDE-BY-SIDE) ZOOM (desktop/mouse only) ──
 function attachMagnifierLens(wrap, img) {
-    let lens = wrap.querySelector('.img-lens');
-    if (!lens) {
-        lens = document.createElement('div');
-        lens.className = 'img-lens';
-        wrap.appendChild(lens);
+    // Selection box drawn on top of the thumbnail image
+    let selector = wrap.querySelector('.zoom-selector');
+    if (!selector) {
+        selector = document.createElement('div');
+        selector.className = 'zoom-selector';
+        wrap.appendChild(selector);
     }
-    const LENS_SIZE = 150;
-    const ZOOM = 2.5;
 
-    function moveLens(e) {
+    // Larger preview box shown beside the image; lives on <body> (position:fixed)
+    // so it floats above the modal instead of being clipped by it.
+    let pane = document.body.querySelector('.zoom-pane[data-for="' + (wrap.id || '') + '"]');
+    if (!pane) {
+        pane = document.createElement('div');
+        pane.className = 'zoom-pane';
+        if (wrap.id) pane.setAttribute('data-for', wrap.id);
+        document.body.appendChild(pane);
+    }
+
+    const ZOOM = 2.2;   // magnification factor
+    const GAP  = 16;    // gap (px) between the image and the zoom pane
+
+    function hideZoom() {
+        selector.style.display = 'none';
+        pane.style.display = 'none';
+    }
+
+    function moveZoom(e) {
         const imgRect = img.getBoundingClientRect();
-        const wrapRect = wrap.getBoundingClientRect();
+
         const x = e.clientX - imgRect.left;
         const y = e.clientY - imgRect.top;
-
         if (x < 0 || y < 0 || x > imgRect.width || y > imgRect.height) {
-            lens.style.display = 'none';
+            hideZoom();
             return;
         }
 
-        lens.style.display = 'block';
-        lens.style.backgroundImage = 'url("' + (img.currentSrc || img.src) + '")';
-        lens.style.backgroundSize = (imgRect.width * ZOOM) + 'px ' + (imgRect.height * ZOOM) + 'px';
-        lens.style.backgroundPosition = (-(x * ZOOM - LENS_SIZE / 2)) + 'px ' + (-(y * ZOOM - LENS_SIZE / 2)) + 'px';
+        const paneW = Math.min(imgRect.width, 380);
+        const paneH = imgRect.height;
 
-        const offsetX = imgRect.left - wrapRect.left;
-        const offsetY = imgRect.top - wrapRect.top;
-        lens.style.left = (offsetX + x - LENS_SIZE / 2) + 'px';
-        lens.style.top = (offsetY + y - LENS_SIZE / 2) + 'px';
+        const spaceRight = window.innerWidth - imgRect.right;
+        const spaceLeft  = imgRect.left;
+        let paneLeft;
+        if (spaceRight >= paneW + GAP) {
+            paneLeft = imgRect.right + GAP;
+        } else if (spaceLeft >= paneW + GAP) {
+            paneLeft = imgRect.left - paneW - GAP;
+        } else {
+            hideZoom(); // no room on either side (e.g. narrow viewport) — bail out
+            return;
+        }
+
+        const selW = Math.min(imgRect.width, paneW / ZOOM);
+        const selH = Math.min(imgRect.height, paneH / ZOOM);
+
+        const selX = Math.max(0, Math.min(x - selW / 2, imgRect.width - selW));
+        const selY = Math.max(0, Math.min(y - selH / 2, imgRect.height - selH));
+
+        selector.style.display = 'block';
+        selector.style.width  = selW + 'px';
+        selector.style.height = selH + 'px';
+        selector.style.left   = selX + 'px';
+        selector.style.top    = selY + 'px';
+
+        let paneTop = imgRect.top;
+        if (paneTop + paneH > window.innerHeight - 10) {
+            paneTop = Math.max(10, window.innerHeight - paneH - 10);
+        }
+
+        pane.style.display = 'block';
+        pane.style.width  = paneW + 'px';
+        pane.style.height = paneH + 'px';
+        pane.style.left   = paneLeft + 'px';
+        pane.style.top    = paneTop + 'px';
+        pane.style.backgroundImage = 'url("' + (img.currentSrc || img.src) + '")';
+        pane.style.backgroundSize = (imgRect.width * ZOOM) + 'px ' + (imgRect.height * ZOOM) + 'px';
+        pane.style.backgroundPosition = (-(selX * ZOOM)) + 'px ' + (-(selY * ZOOM)) + 'px';
     }
 
-    wrap.onmousemove = moveLens;
-    wrap.onmouseleave = function () { lens.style.display = 'none'; };
+    wrap.onmousemove = moveZoom;
+    wrap.onmouseleave = hideZoom;
 }
 function initModalMagnifier() {
     if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches) return; // skip on touch devices
@@ -724,8 +771,9 @@ window.openProductModal = async (product) => {
         .jc-watermark-text { font-weight: 800; white-space: nowrap; font-size: 62px; color: rgba(232, 50, 26, 0.05); }
         .jc-photo-wrap { background: #1a1a1a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; overflow: hidden; }
         .jc-photo-wrap.has-photo { min-height: 200px; }
-        .img-lens { position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 3px solid #F5A623; box-shadow: 0 4px 18px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.6); pointer-events: none; display: none; background-repeat: no-repeat; background-color: #0e0e0e; z-index: 20; }
-        @media (any-hover: hover) and (any-pointer: fine) { .jc-photo-wrap, .elec-photo-wrap, .modal-img-wrapper { cursor: crosshair; } }
+        .zoom-selector { position: absolute; border: 2px solid #F5A623; background: rgba(245, 166, 35, 0.15); pointer-events: none; display: none; z-index: 20; }
+        .zoom-pane { position: fixed; display: none; background-color: #0e0e0e; background-repeat: no-repeat; border: 1px solid #333; border-radius: 10px; box-shadow: 0 10px 34px rgba(0,0,0,0.45); z-index: 99999; pointer-events: none; }
+        @media (any-hover: hover) and (any-pointer: fine) { .jc-photo-wrap, .elec-photo-wrap, .modal-img-wrapper { cursor: zoom-in; } }
         .jc-card-photo { width: 100%; max-height: 250px; object-fit: contain; background:#0e0e0e; display: block; }
         .jc-no-photo-msg { font-size: 10px; color: #3a3530; padding: 16px; text-transform: uppercase; font-weight: 600; }
         .jc-card-header { background: var(--jc-dark-header); padding: 18px 22px 20px; position: relative; }
