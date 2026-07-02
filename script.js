@@ -656,8 +656,8 @@ function buildThumbStrip(images, mainImgId, opts) {
     const pad = opts.padding || '8px 20px';
     return '<div style="display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';">'
         + images.map(function (url, i) {
-            return '<img src="' + url + '" data-gallery-thumb '
-                + 'onclick="document.getElementById(\'' + mainImgId + '\').src=this.src; this.parentElement.querySelectorAll(\'img\').forEach(function(t){t.style.borderColor=\'transparent\';}); this.style.borderColor=\'#F5A623\';" '
+            return '<img src="' + url + '" data-gallery-thumb data-idx="' + i + '" '
+                + 'onclick="document.getElementById(\'' + mainImgId + '\').src=this.src; document.getElementById(\'' + mainImgId + '\').dataset.idx=this.dataset.idx; this.parentElement.querySelectorAll(\'img\').forEach(function(t){t.style.borderColor=\'transparent\';}); this.style.borderColor=\'#F5A623\';" '
                 + 'style="width:46px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ' + (i === 0 ? '#F5A623' : 'transparent') + ';">';
         }).join('')
         + '</div>';
@@ -753,6 +753,188 @@ function initModalMagnifier() {
         const img = document.getElementById(pair[1]);
         if (wrap && img) attachMagnifierLens(wrap, img);
     });
+}
+
+// ── FULLSCREEN TAP-TO-ZOOM LIGHTBOX (mobile pinch/swipe + desktop click) ──
+function ensureWgLightboxStyles() {
+    if (document.getElementById('wg-lightbox-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'wg-lightbox-styles';
+    style.innerHTML = `
+    .wg-lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:999999; display:none; align-items:center; justify-content:center; touch-action:none; }
+    .wg-lightbox.open { display:flex; }
+    .wg-lightbox-imgwrap { width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .wg-lightbox-img { max-width:100%; max-height:100%; touch-action:none; user-select:none; -webkit-user-drag:none; }
+    .wg-lightbox-close { position:absolute; top:16px; right:16px; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.15); color:#fff; border:none; font-size:1.6rem; line-height:1; display:flex; align-items:center; justify-content:center; z-index:2; cursor:pointer; }
+    .wg-lightbox-counter { position:absolute; top:20px; left:50%; transform:translateX(-50%); color:#fff; font-size:0.82rem; font-weight:600; background:rgba(255,255,255,0.12); padding:5px 14px; border-radius:20px; }
+    .wg-lightbox-nav { position:absolute; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,0.15); color:#fff; border:none; font-size:1.1rem; display:flex; align-items:center; justify-content:center; z-index:2; cursor:pointer; }
+    .wg-lightbox-prev { left:10px; }
+    .wg-lightbox-next { right:10px; }
+    .wg-lightbox-hint { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.55); font-size:0.7rem; }
+    .wg-tap-badge { position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%; background:rgba(0,0,0,0.55); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.8rem; pointer-events:none; z-index:15; }
+    `;
+    document.head.appendChild(style);
+}
+
+let _wgLightboxEl = null;
+function buildWgLightbox() {
+    if (_wgLightboxEl) return _wgLightboxEl;
+    ensureWgLightboxStyles();
+    const el = document.createElement('div');
+    el.className = 'wg-lightbox';
+    el.innerHTML =
+        '<button class="wg-lightbox-close" aria-label="Close">&times;</button>' +
+        '<div class="wg-lightbox-counter"></div>' +
+        '<button class="wg-lightbox-nav wg-lightbox-prev" aria-label="Previous">&#10094;</button>' +
+        '<div class="wg-lightbox-imgwrap"><img class="wg-lightbox-img" alt=""></div>' +
+        '<button class="wg-lightbox-nav wg-lightbox-next" aria-label="Next">&#10095;</button>' +
+        '<div class="wg-lightbox-hint">Double-tap or pinch to zoom</div>';
+    document.body.appendChild(el);
+    _wgLightboxEl = el;
+    return el;
+}
+
+window.openWgLightbox = function (images, startIndex) {
+    images = (images || []).filter(Boolean);
+    if (!images.length) return;
+    const el = buildWgLightbox();
+    const imgEl = el.querySelector('.wg-lightbox-img');
+    const counterEl = el.querySelector('.wg-lightbox-counter');
+    const prevBtn = el.querySelector('.wg-lightbox-prev');
+    const nextBtn = el.querySelector('.wg-lightbox-next');
+    const closeBtn = el.querySelector('.wg-lightbox-close');
+
+    let idx = Math.max(0, Math.min(startIndex || 0, images.length - 1));
+    let scale = 1, tx = 0, ty = 0;
+    let startDist = 0, startScale = 1;
+    let lastTap = 0;
+    let dragging = false, dragStartX = 0, dragStartY = 0, dragOrigTx = 0, dragOrigTy = 0;
+    let swipeStartX = 0, swipeStartTime = 0;
+
+    function resetTransform() {
+        scale = 1; tx = 0; ty = 0;
+        imgEl.style.transform = 'translate(0px, 0px) scale(1)';
+    }
+    function applyTransform() {
+        imgEl.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
+    }
+    function render() {
+        imgEl.src = images[idx];
+        counterEl.textContent = images.length > 1 ? (idx + 1) + ' / ' + images.length : '';
+        prevBtn.style.display = images.length > 1 ? 'flex' : 'none';
+        nextBtn.style.display = images.length > 1 ? 'flex' : 'none';
+        resetTransform();
+    }
+    function go(delta) {
+        idx = (idx + delta + images.length) % images.length;
+        render();
+    }
+    function onKeydown(e) {
+        if (e.key === 'Escape') close();
+        else if (e.key === 'ArrowLeft') go(-1);
+        else if (e.key === 'ArrowRight') go(1);
+    }
+    function close() {
+        el.classList.remove('open');
+        document.body.style.overflow = document.getElementById('productModal') && document.getElementById('productModal').style.display === 'flex' ? 'hidden' : '';
+        el.removeEventListener('touchstart', onTouchStart);
+        el.removeEventListener('touchmove', onTouchMove);
+        el.removeEventListener('touchend', onTouchEnd);
+        document.removeEventListener('keydown', onKeydown);
+        el.onclick = null;
+    }
+    function dist(t1, t2) {
+        const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    function onTouchStart(e) {
+        if (e.touches.length === 2) {
+            startDist = dist(e.touches[0], e.touches[1]);
+            startScale = scale;
+            dragging = false;
+        } else if (e.touches.length === 1) {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                if (scale > 1) resetTransform(); else { scale = 2.4; applyTransform(); }
+                lastTap = 0;
+                return;
+            }
+            lastTap = now;
+            if (scale > 1) {
+                dragging = true;
+                dragStartX = e.touches[0].clientX;
+                dragStartY = e.touches[0].clientY;
+                dragOrigTx = tx; dragOrigTy = ty;
+            } else {
+                swipeStartX = e.touches[0].clientX;
+                swipeStartTime = Date.now();
+            }
+        }
+    }
+    function onTouchMove(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const d = dist(e.touches[0], e.touches[1]);
+            scale = Math.max(1, Math.min(4, startScale * (d / startDist)));
+            applyTransform();
+        } else if (e.touches.length === 1 && dragging) {
+            e.preventDefault();
+            tx = dragOrigTx + (e.touches[0].clientX - dragStartX);
+            ty = dragOrigTy + (e.touches[0].clientY - dragStartY);
+            applyTransform();
+        }
+    }
+    function onTouchEnd(e) {
+        if (scale <= 1) {
+            resetTransform();
+            if (e.changedTouches && e.changedTouches.length === 1 && !dragging) {
+                const dx = e.changedTouches[0].clientX - swipeStartX;
+                const dt = Date.now() - swipeStartTime;
+                if (Math.abs(dx) > 60 && dt < 600) {
+                    if (dx < 0) go(1); else go(-1);
+                }
+            }
+        }
+        dragging = false;
+    }
+
+    closeBtn.onclick = close;
+    prevBtn.onclick = function (e) { e.stopPropagation(); go(-1); };
+    nextBtn.onclick = function (e) { e.stopPropagation(); go(1); };
+    el.onclick = function (e) { if (e.target === el) close(); };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: false });
+    document.addEventListener('keydown', onKeydown);
+
+    render();
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+};
+
+function initModalLightbox(product) {
+    ensureWgLightboxStyles();
+    const pairs = [['jcPhotoWrap', 'jcMainPhoto'], ['elecPhotoWrap', 'elecMainPhoto'], ['stdPhotoWrap', 'stdMainPhoto']];
+    for (let i = 0; i < pairs.length; i++) {
+        const wrap = document.getElementById(pairs[i][0]);
+        const img = document.getElementById(pairs[i][1]);
+        if (wrap && img) {
+            const gallery = getProductGalleryImages(product);
+            if (!img.dataset.idx) img.dataset.idx = '0';
+            if (!wrap.querySelector('.wg-tap-badge')) {
+                const badge = document.createElement('div');
+                badge.className = 'wg-tap-badge';
+                badge.innerHTML = '<i class="fas fa-expand"></i>';
+                wrap.appendChild(badge);
+            }
+            wrap.style.cursor = 'zoom-in';
+            wrap.onclick = function () {
+                openWgLightbox(gallery, parseInt(img.dataset.idx || '0', 10));
+            };
+            break;
+        }
+    }
 }
 
 window.openProductModal = async (product) => {
@@ -1099,11 +1281,13 @@ window.openProductModal = async (product) => {
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
     initModalMagnifier();
+    initModalLightbox(product);
 };
 
 window.closeProductModal = () => {
     const modal = document.getElementById('productModal');
     if (modal) modal.style.display = 'none';
+    if (_wgLightboxEl) _wgLightboxEl.classList.remove('open');
     document.body.style.overflow = "auto";
 };
 // --- 7. AUTHENTICATION SYSTEM ---
