@@ -21,23 +21,31 @@
         }
         .product-display img { width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
 
-        /* ── Magnifying-glass lens on main product image ── */
+        /* ── Side-window (side-by-side) zoom on main product image ── */
         .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; }
         @media (any-hover: hover) and (any-pointer: fine) {
-            .zoom-wrap { cursor: crosshair; }
+            .zoom-wrap { cursor: zoom-in; }
         }
-        .img-lens {
+        /* Highlighted region on the main image showing what's being magnified */
+        .zoom-selector {
             position: absolute;
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 3px solid #F5A623;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.6);
+            border: 2px solid #F5A623;
+            background: rgba(245, 166, 35, 0.15);
             pointer-events: none;
             display: none;
-            background-repeat: no-repeat;
-            background-color: #f7f8f6;
             z-index: 5;
+        }
+        /* The larger preview box shown beside the main image */
+        .zoom-pane {
+            position: fixed;
+            display: none;
+            background-color: #fff;
+            background-repeat: no-repeat;
+            border: 1px solid #e2e2e2;
+            border-radius: 10px;
+            box-shadow: 0 10px 34px rgba(0,0,0,0.28);
+            z-index: 9999;
+            pointer-events: none;
         }
 
         /* ── Seller card ── */
@@ -406,48 +414,98 @@
             loadRelated(p.category, productId);
         }
 
-        // ── Magnifying-glass lens on main product image (desktop/mouse only) ──
+        // ── Side-window (side-by-side) zoom on main product image (desktop/mouse only) ──
         function initImageZoom() {
             const wrap = document.getElementById('mainImgWrap');
             const img = document.getElementById('mainProductImg');
             if (!wrap || !img) return;
             if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches) return; // skip on touch devices
 
-            let lens = document.getElementById('imgLens');
-            if (!lens) {
-                lens = document.createElement('div');
-                lens.id = 'imgLens';
-                lens.className = 'img-lens';
-                wrap.appendChild(lens);
+            // Selection box drawn on top of the main image
+            let selector = document.getElementById('zoomSelector');
+            if (!selector) {
+                selector = document.createElement('div');
+                selector.id = 'zoomSelector';
+                selector.className = 'zoom-selector';
+                wrap.appendChild(selector);
             }
 
-            const LENS_SIZE = 150;
-            const ZOOM = 2.5;
+            // Larger preview box shown beside the image (fixed to viewport so it
+            // can float outside the image column without being clipped)
+            let pane = document.getElementById('zoomPane');
+            if (!pane) {
+                pane = document.createElement('div');
+                pane.id = 'zoomPane';
+                pane.className = 'zoom-pane';
+                document.body.appendChild(pane);
+            }
 
-            function moveLens(e) {
+            const ZOOM = 2.2;   // magnification factor
+            const GAP  = 16;    // gap (px) between the image and the zoom pane
+
+            function hideZoom() {
+                selector.style.display = 'none';
+                pane.style.display = 'none';
+            }
+
+            function moveZoom(e) {
                 const imgRect = img.getBoundingClientRect();
-                const wrapRect = wrap.getBoundingClientRect();
+
                 const x = e.clientX - imgRect.left;
                 const y = e.clientY - imgRect.top;
-
                 if (x < 0 || y < 0 || x > imgRect.width || y > imgRect.height) {
-                    lens.style.display = 'none';
+                    hideZoom();
                     return;
                 }
 
-                lens.style.display = 'block';
-                lens.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
-                lens.style.backgroundSize = `${imgRect.width * ZOOM}px ${imgRect.height * ZOOM}px`;
-                lens.style.backgroundPosition = `${-(x * ZOOM - LENS_SIZE / 2)}px ${-(y * ZOOM - LENS_SIZE / 2)}px`;
+                // Pane keeps the image's on-screen height and a sensible max width
+                const paneW = Math.min(imgRect.width, 420);
+                const paneH = imgRect.height;
 
-                const offsetX = imgRect.left - wrapRect.left;
-                const offsetY = imgRect.top - wrapRect.top;
-                lens.style.left = (offsetX + x - LENS_SIZE / 2) + 'px';
-                lens.style.top = (offsetY + y - LENS_SIZE / 2) + 'px';
+                // Decide which side has room for the pane; bail out if neither does
+                const spaceRight = window.innerWidth - imgRect.right;
+                const spaceLeft  = imgRect.left;
+                let paneLeft;
+                if (spaceRight >= paneW + GAP) {
+                    paneLeft = imgRect.right + GAP;
+                } else if (spaceLeft >= paneW + GAP) {
+                    paneLeft = imgRect.left - paneW - GAP;
+                } else {
+                    hideZoom();
+                    return;
+                }
+
+                // Selection box sized so it maps 1:1 onto the pane at the given zoom
+                const selW = Math.min(imgRect.width, paneW / ZOOM);
+                const selH = Math.min(imgRect.height, paneH / ZOOM);
+
+                let selX = Math.max(0, Math.min(x - selW / 2, imgRect.width - selW));
+                let selY = Math.max(0, Math.min(y - selH / 2, imgRect.height - selH));
+
+                selector.style.display = 'block';
+                selector.style.width  = selW + 'px';
+                selector.style.height = selH + 'px';
+                selector.style.left   = selX + 'px';
+                selector.style.top    = selY + 'px';
+
+                let paneTop = imgRect.top;
+                if (paneTop + paneH > window.innerHeight - 10) {
+                    paneTop = Math.max(10, window.innerHeight - paneH - 10);
+                }
+
+                pane.style.display = 'block';
+                pane.style.width  = paneW + 'px';
+                pane.style.height = paneH + 'px';
+                pane.style.left   = paneLeft + 'px';
+                pane.style.top    = paneTop + 'px';
+                pane.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
+                pane.style.backgroundSize = `${imgRect.width * ZOOM}px ${imgRect.height * ZOOM}px`;
+                pane.style.backgroundPosition = `${-(selX * ZOOM)}px ${-(selY * ZOOM)}px`;
             }
 
-            wrap.onmousemove = moveLens;
-            wrap.onmouseleave = () => { lens.style.display = 'none'; };
+            wrap.onmousemove = moveZoom;
+            wrap.onmouseleave = hideZoom;
+            window.addEventListener('scroll', hideZoom, { passive: true });
         }
 
         async function loadRelated(category, currentId) {
