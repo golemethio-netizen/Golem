@@ -23,7 +23,7 @@
 
         /* ── Magnifying-glass lens on main product image ── */
         .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; }
-        @media (hover: hover) and (pointer: fine) {
+        @media (any-hover: hover) and (any-pointer: fine) {
             .zoom-wrap { cursor: crosshair; }
         }
         .img-lens {
@@ -411,7 +411,7 @@
             const wrap = document.getElementById('mainImgWrap');
             const img = document.getElementById('mainProductImg');
             if (!wrap || !img) return;
-            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return; // skip on touch devices
+            if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches) return; // skip on touch devices
 
             let lens = document.getElementById('imgLens');
             if (!lens) {
