@@ -663,6 +663,51 @@ function buildThumbStrip(images, mainImgId, opts) {
         + '</div>';
 }
 
+// ── MAGNIFYING-GLASS LENS (desktop/mouse only) ──
+function attachMagnifierLens(wrap, img) {
+    let lens = wrap.querySelector('.img-lens');
+    if (!lens) {
+        lens = document.createElement('div');
+        lens.className = 'img-lens';
+        wrap.appendChild(lens);
+    }
+    const LENS_SIZE = 150;
+    const ZOOM = 2.5;
+
+    function moveLens(e) {
+        const imgRect = img.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        const x = e.clientX - imgRect.left;
+        const y = e.clientY - imgRect.top;
+
+        if (x < 0 || y < 0 || x > imgRect.width || y > imgRect.height) {
+            lens.style.display = 'none';
+            return;
+        }
+
+        lens.style.display = 'block';
+        lens.style.backgroundImage = 'url("' + (img.currentSrc || img.src) + '")';
+        lens.style.backgroundSize = (imgRect.width * ZOOM) + 'px ' + (imgRect.height * ZOOM) + 'px';
+        lens.style.backgroundPosition = (-(x * ZOOM - LENS_SIZE / 2)) + 'px ' + (-(y * ZOOM - LENS_SIZE / 2)) + 'px';
+
+        const offsetX = imgRect.left - wrapRect.left;
+        const offsetY = imgRect.top - wrapRect.top;
+        lens.style.left = (offsetX + x - LENS_SIZE / 2) + 'px';
+        lens.style.top = (offsetY + y - LENS_SIZE / 2) + 'px';
+    }
+
+    wrap.onmousemove = moveLens;
+    wrap.onmouseleave = function () { lens.style.display = 'none'; };
+}
+function initModalMagnifier() {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return; // skip on touch devices
+    [['jcPhotoWrap', 'jcMainPhoto'], ['elecPhotoWrap', 'elecMainPhoto'], ['stdPhotoWrap', 'stdMainPhoto']].forEach(function (pair) {
+        const wrap = document.getElementById(pair[0]);
+        const img = document.getElementById(pair[1]);
+        if (wrap && img) attachMagnifierLens(wrap, img);
+    });
+}
+
 window.openProductModal = async (product) => {
     currentProduct = product;
     const modal = document.getElementById('productModal');
@@ -677,8 +722,10 @@ window.openProductModal = async (product) => {
         .jc-card { width: 100%; background: #fff; border-radius: 18px; overflow: hidden; position: relative; text-align: left; font-family: 'Poppins', sans-serif;}
         .jc-watermark { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 10; overflow: hidden; transform: rotate(-25deg); }
         .jc-watermark-text { font-weight: 800; white-space: nowrap; font-size: 62px; color: rgba(232, 50, 26, 0.05); }
-        .jc-photo-wrap { background: #1a1a1a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; }
+        .jc-photo-wrap { background: #1a1a1a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; overflow: hidden; }
         .jc-photo-wrap.has-photo { min-height: 200px; }
+        .img-lens { position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 3px solid #F5A623; box-shadow: 0 4px 18px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.6); pointer-events: none; display: none; background-repeat: no-repeat; background-color: #0e0e0e; z-index: 20; }
+        @media (hover: hover) and (pointer: fine) { .jc-photo-wrap, .elec-photo-wrap, .modal-img-wrapper { cursor: crosshair; } }
         .jc-card-photo { width: 100%; max-height: 250px; object-fit: contain; background:#0e0e0e; display: block; }
         .jc-no-photo-msg { font-size: 10px; color: #3a3530; padding: 16px; text-transform: uppercase; font-weight: 600; }
         .jc-card-header { background: var(--jc-dark-header); padding: 18px 22px 20px; position: relative; }
@@ -761,7 +808,7 @@ window.openProductModal = async (product) => {
             <button class="close-modal-btn" onclick="window.closeProductModal()" style="z-index: 50; position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.2); color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer;">&times;</button>
             <div class="jc-card">
                 <div class="jc-watermark"><span class="jc-watermark-text amharic">ዋና ገበያ</span></div>
-                <div class="jc-photo-wrap ${product.image ? 'has-photo' : ''}">
+                <div class="jc-photo-wrap ${product.image ? 'has-photo' : ''}" id="jcPhotoWrap">
                     ${product.image ? `<img id="jcMainPhoto" src="${product.image}" class="jc-card-photo">` : `<span class="jc-no-photo-msg">No Image Attached</span>`}
                 </div>
                 ${buildThumbStrip(getProductGalleryImages(product), 'jcMainPhoto', { bg: '#1a1a1a', padding: '8px 22px' })}
@@ -887,7 +934,7 @@ window.openProductModal = async (product) => {
           + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
           + '</div>'
-          + '<div style="position:relative;height:260px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
+          + '<div id="elecPhotoWrap" class="elec-photo-wrap" style="position:relative;height:260px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
           + (product.image ? '<img id="elecMainPhoto" src="' + product.image + '" style="width:100%;height:100%;object-fit:contain;display:block;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
           + '<div style="position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,rgba(15,22,35,0.85));pointer-events:none;"></div>'
           + '</div>'
@@ -965,7 +1012,7 @@ window.openProductModal = async (product) => {
 
         modalContent.innerHTML = `
             <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
-            <div class="modal-img-wrapper">
+            <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative;">
                 <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
             </div>
             ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', padding: '8px 0' })}
@@ -1003,6 +1050,7 @@ window.openProductModal = async (product) => {
 
     modal.style.display = 'flex';
     document.body.style.overflow = "hidden";
+    initModalMagnifier();
 };
 
 window.closeProductModal = () => {
