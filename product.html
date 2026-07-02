@@ -299,7 +299,19 @@
                 ${statusBanner}
 
                 <div class="image-side">
-                    <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                    ${(() => {
+                        const gallery = Array.isArray(p.images) && p.images.length ? p.images : [p.image];
+                        const mainImg = `<img id="mainProductImg" src="${gallery[0]}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">`;
+                        if (gallery.length <= 1) return mainImg;
+                        const thumbs = gallery.map((url, i) => `
+                            <img src="${url}" data-idx="${i}"
+                                 class="product-thumb${i === 0 ? ' active' : ''}"
+                                 style="width:60px; height:60px; object-fit:cover; border-radius:8px; cursor:pointer; border:2px solid ${i === 0 ? '#F5A623' : 'transparent'};"
+                                 onclick="document.getElementById('mainProductImg').src=this.src; document.querySelectorAll('.product-thumb').forEach(t=>t.style.borderColor='transparent'); this.style.borderColor='#F5A623';"
+                                 onerror="this.style.display='none'">
+                        `).join('');
+                        return `${mainImg}<div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">${thumbs}</div>`;
+                    })()}
                 </div>
 
                 <div class="details-side">
