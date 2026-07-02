@@ -700,7 +700,7 @@ function attachMagnifierLens(wrap, img) {
     wrap.onmouseleave = function () { lens.style.display = 'none'; };
 }
 function initModalMagnifier() {
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return; // skip on touch devices
+    if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches) return; // skip on touch devices
     [['jcPhotoWrap', 'jcMainPhoto'], ['elecPhotoWrap', 'elecMainPhoto'], ['stdPhotoWrap', 'stdMainPhoto']].forEach(function (pair) {
         const wrap = document.getElementById(pair[0]);
         const img = document.getElementById(pair[1]);
@@ -725,7 +725,7 @@ window.openProductModal = async (product) => {
         .jc-photo-wrap { background: #1a1a1a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; overflow: hidden; }
         .jc-photo-wrap.has-photo { min-height: 200px; }
         .img-lens { position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 3px solid #F5A623; box-shadow: 0 4px 18px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.6); pointer-events: none; display: none; background-repeat: no-repeat; background-color: #0e0e0e; z-index: 20; }
-        @media (hover: hover) and (pointer: fine) { .jc-photo-wrap, .elec-photo-wrap, .modal-img-wrapper { cursor: crosshair; } }
+        @media (any-hover: hover) and (any-pointer: fine) { .jc-photo-wrap, .elec-photo-wrap, .modal-img-wrapper { cursor: crosshair; } }
         .jc-card-photo { width: 100%; max-height: 250px; object-fit: contain; background:#0e0e0e; display: block; }
         .jc-no-photo-msg { font-size: 10px; color: #3a3530; padding: 16px; text-transform: uppercase; font-weight: 600; }
         .jc-card-header { background: var(--jc-dark-header); padding: 18px 22px 20px; position: relative; }
