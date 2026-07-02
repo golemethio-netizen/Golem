@@ -679,7 +679,7 @@ window.openProductModal = async (product) => {
         .jc-watermark-text { font-weight: 800; white-space: nowrap; font-size: 62px; color: rgba(232, 50, 26, 0.05); }
         .jc-photo-wrap { background: #1a1a1a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 56px; position: relative; }
         .jc-photo-wrap.has-photo { min-height: 200px; }
-        .jc-card-photo { width: 100%; max-height: 250px; object-fit: cover; display: block; }
+        .jc-card-photo { width: 100%; max-height: 250px; object-fit: contain; background:#0e0e0e; display: block; }
         .jc-no-photo-msg { font-size: 10px; color: #3a3530; padding: 16px; text-transform: uppercase; font-weight: 600; }
         .jc-card-header { background: var(--jc-dark-header); padding: 18px 22px 20px; position: relative; }
         .jc-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
@@ -887,9 +887,9 @@ window.openProductModal = async (product) => {
           + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
           + '</div>'
-          + '<div style="position:relative;height:220px;background:#131e2e;overflow:hidden;">'
-          + (product.image ? '<img id="elecMainPhoto" src="' + product.image + '" style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.92;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
-          + '<div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(15,22,35,0.85));"></div>'
+          + '<div style="position:relative;height:260px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
+          + (product.image ? '<img id="elecMainPhoto" src="' + product.image + '" style="width:100%;height:100%;object-fit:contain;display:block;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
+          + '<div style="position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,rgba(15,22,35,0.85));pointer-events:none;"></div>'
           + '</div>'
           + buildThumbStrip(getProductGalleryImages(product), 'elecMainPhoto', { bg: '#0f1623', padding: '8px 20px' })
           + '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
