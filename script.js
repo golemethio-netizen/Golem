@@ -753,15 +753,16 @@ function attachMagnifierLens(wrap, img, opts) {
 function initModalMagnifier() {
     if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches) return; // skip on touch devices
 
-    const jcWrap = document.getElementById('jcPhotoWrap'), jcImg = document.getElementById('jcMainPhoto');
-    if (jcWrap && jcImg) attachMagnifierLens(jcWrap, jcImg);
+    const maxSize = { maxWidth: 900, maxHeight: 720 };
 
-    // Computer & Phone (Electronics) card gets a maximized output zoom panel
+    const jcWrap = document.getElementById('jcPhotoWrap'), jcImg = document.getElementById('jcMainPhoto');
+    if (jcWrap && jcImg) attachMagnifierLens(jcWrap, jcImg, maxSize);
+
     const elecWrap = document.getElementById('elecPhotoWrap'), elecImg = document.getElementById('elecMainPhoto');
-    if (elecWrap && elecImg) attachMagnifierLens(elecWrap, elecImg, { maxWidth: 900, maxHeight: 720 });
+    if (elecWrap && elecImg) attachMagnifierLens(elecWrap, elecImg, maxSize);
 
     const stdWrap = document.getElementById('stdPhotoWrap'), stdImg = document.getElementById('stdMainPhoto');
-    if (stdWrap && stdImg) attachMagnifierLens(stdWrap, stdImg);
+    if (stdWrap && stdImg) attachMagnifierLens(stdWrap, stdImg, maxSize);
 }
 
 // ── FULLSCREEN TAP-TO-ZOOM LIGHTBOX (mobile pinch/swipe + desktop click) ──
