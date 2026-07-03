@@ -664,7 +664,8 @@ function buildThumbStrip(images, mainImgId, opts) {
 }
 
 // ── SIDE-WINDOW (SIDE-BY-SIDE) ZOOM (desktop/mouse only) ──
-function attachMagnifierLens(wrap, img) {
+function attachMagnifierLens(wrap, img, opts) {
+    opts = opts || {};
     // Selection box drawn on top of the thumbnail image
     let selector = wrap.querySelector('.zoom-selector');
     if (!selector) {
@@ -683,8 +684,10 @@ function attachMagnifierLens(wrap, img) {
         document.body.appendChild(pane);
     }
 
-    const ZOOM = 2.2;   // magnification factor
-    const GAP  = 16;    // gap (px) between the image and the zoom pane
+    const ZOOM = opts.zoom || 2.2;      // magnification factor
+    const GAP  = 16;                     // gap (px) between the image and the zoom pane
+    const MAX_W = opts.maxWidth || 380;  // cap on pane width (no longer tied to thumbnail width)
+    const MAX_H = opts.maxHeight || null; // cap on pane height; null = match thumbnail height
 
     function hideZoom() {
         selector.style.display = 'none';
@@ -701,19 +704,20 @@ function attachMagnifierLens(wrap, img) {
             return;
         }
 
-        const paneW = Math.min(imgRect.width, 380);
-        const paneH = imgRect.height;
+        const spaceRight = window.innerWidth - imgRect.right - GAP - 8;
+        const spaceLeft  = imgRect.left - GAP - 8;
+        const bestSpace  = Math.max(spaceRight, spaceLeft, 200);
 
-        const spaceRight = window.innerWidth - imgRect.right;
-        const spaceLeft  = imgRect.left;
+        const paneW = Math.min(MAX_W, bestSpace);
+        const paneH = MAX_H ? Math.min(MAX_H, window.innerHeight - 20) : imgRect.height;
+
         let paneLeft;
         if (spaceRight >= paneW + GAP) {
             paneLeft = imgRect.right + GAP;
         } else if (spaceLeft >= paneW + GAP) {
             paneLeft = imgRect.left - paneW - GAP;
         } else {
-            hideZoom(); // no room on either side (e.g. narrow viewport) — bail out
-            return;
+            paneLeft = Math.max(8, window.innerWidth - paneW - 8); // squeeze into whatever room exists
         }
 
         const selW = Math.min(imgRect.width, paneW / ZOOM);
@@ -748,11 +752,16 @@ function attachMagnifierLens(wrap, img) {
 }
 function initModalMagnifier() {
     if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches) return; // skip on touch devices
-    [['jcPhotoWrap', 'jcMainPhoto'], ['elecPhotoWrap', 'elecMainPhoto'], ['stdPhotoWrap', 'stdMainPhoto']].forEach(function (pair) {
-        const wrap = document.getElementById(pair[0]);
-        const img = document.getElementById(pair[1]);
-        if (wrap && img) attachMagnifierLens(wrap, img);
-    });
+
+    const jcWrap = document.getElementById('jcPhotoWrap'), jcImg = document.getElementById('jcMainPhoto');
+    if (jcWrap && jcImg) attachMagnifierLens(jcWrap, jcImg);
+
+    // Computer & Phone (Electronics) card gets a maximized output zoom panel
+    const elecWrap = document.getElementById('elecPhotoWrap'), elecImg = document.getElementById('elecMainPhoto');
+    if (elecWrap && elecImg) attachMagnifierLens(elecWrap, elecImg, { maxWidth: 900, maxHeight: 720 });
+
+    const stdWrap = document.getElementById('stdPhotoWrap'), stdImg = document.getElementById('stdMainPhoto');
+    if (stdWrap && stdImg) attachMagnifierLens(stdWrap, stdImg);
 }
 
 // ── FULLSCREEN TAP-TO-ZOOM LIGHTBOX (mobile pinch/swipe + desktop click) ──
