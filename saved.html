@@ -86,7 +86,6 @@
             const empty = document.getElementById('emptyState');
             const summary = document.getElementById('savedSummary');
 
-            // Read URL Params (golem shared routing match)
             const urlParams = new URLSearchParams(window.location.search);
             const sharedItemsParam = urlParams.get('items');
             
@@ -106,7 +105,6 @@
                 return;
             }
 
-            // Database lookup
             const { data, error } = await _supabase
                 .from('products')
                 .select('*')
@@ -190,9 +188,14 @@
 
         // --- 5. Order Logic ---
         async function sendOrder(platform) {
-            const total = document.getElementById('totalPrice').innerText;
             const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
+            
+            if (items.length === 0) {
+                alert("Your wishlist is empty!");
+                return;
+            }
 
+            const total = document.getElementById('totalPrice').innerText;
             const customerName = prompt("Enter your Name:");
             if (!customerName) return;
             const customerPhone = prompt("Enter your Phone:");
@@ -210,8 +213,6 @@ ${items.map(i => `• ${i}`).join('\n')}`;
 
             try {
                 if (platform === 'telegram') {
-                    // Routed through the Supabase Edge Function (config.js) —
-                    // no bot token is ever exposed in this page's source.
                     const data = await sendTelegram(message);
 
                     if (data.success) {
@@ -226,8 +227,13 @@ ${items.map(i => `• ${i}`).join('\n')}`;
                 } else if (platform === 'whatsapp') {
                     const waNumber = GolemConfig.myPhone || "251707022845";
                     const waMsg    = encodeURIComponent(message.replace(/\*/g, ''));
+                    
+                    localStorage.removeItem('golem_saved');
                     window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
+                    
                     if (loader) loader.style.display = 'none';
+                    document.getElementById('successMsg').innerText = `Order prepared for WhatsApp! Redirecting you now, ${customerName}.`;
+                    document.getElementById('successModal').style.display = 'flex';
                 }
             } catch (err) {
                 console.error('sendOrder error:', err);
@@ -272,6 +278,7 @@ ${items.map(i => `• ${i}`).join('\n')}`;
                 <i class="fas fa-check"></i>
             </div>
             <h2 style="font-weight:700; margin-bottom:10px;">Order Sent!</h2>
+            <!-- FIXED: Added id="successMsg" here to ensure target element exists in JavaScript operations -->
             <p id="successMsg" style="color:#666; margin-bottom:25px; line-height:1.5;">We've received your order and our team will contact you shortly via Telegram/Phone.</p>
             <button onclick="closeSuccessAndHome()" style="background:#333; color:white; border:none; padding:15px 30px; border-radius:10px; font-weight:700; cursor:pointer; width:100%; transition:0.3s;">
                 Continue Shopping
