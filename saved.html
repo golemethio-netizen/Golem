@@ -201,6 +201,9 @@
             const loader = document.getElementById('loadingOverlay');
             if (loader) loader.style.display = 'flex';
 
+            const BOT_TOKEN = '8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o';
+            const CHAT_ID   = '6792892909';
+
             const message = `🛒 *NEW WanaGebya ORDER*
 👤 Name: ${customerName}
 📞 Phone: ${customerPhone}
@@ -210,17 +213,20 @@ ${items.map(i => `• ${i}`).join('\n')}`;
 
             try {
                 if (platform === 'telegram') {
-                    // Routed through the Supabase Edge Function (config.js) —
-                    // no bot token is ever exposed in this page's source.
-                    const data = await sendTelegram(message);
+                    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+                    });
+                    const data = await res.json();
 
-                    if (data.success) {
+                    if (data.ok) {
                         if (loader) loader.style.display = 'none';
                         localStorage.removeItem('golem_saved');
                         document.getElementById('successMsg').innerText = `Order sent! We will contact you soon, ${customerName}.`;
                         document.getElementById('successModal').style.display = 'flex';
                     } else {
-                        throw new Error(data.error || 'Could not send order notification');
+                        throw new Error(data.description || 'Telegram rejected the message');
                     }
 
                 } else if (platform === 'whatsapp') {
