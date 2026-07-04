@@ -32,7 +32,10 @@ async function sendTelegram(message, parse_mode = 'Markdown') {
     try {
         const res = await fetch(`${supabaseUrl}/functions/v1/send-telegram`, {
             method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type':  'application/json',
+                'Authorization': `Bearer ${supabaseKey}`
+            },
             body:    JSON.stringify({ message, parse_mode })
         });
         const data = await res.json();
