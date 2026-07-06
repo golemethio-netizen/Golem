@@ -54,3 +54,4 @@ async function sendTelegram(message, parse_mode = 'Markdown') {
         return { success: false, error: err.message };
     }
 }
+
