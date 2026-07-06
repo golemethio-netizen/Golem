@@ -176,6 +176,7 @@
         }
 
         // --- 5. Fixed Order Logic (uses secure edge function) ---
+     // --- 5. Fixed Order Logic (Temporary Client-Side Direct Send) ---
         async function sendOrder(platform) {
             const total = document.getElementById('totalPrice').innerText;
             const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
@@ -188,22 +189,42 @@
             const loader = document.getElementById('loadingOverlay');
             if (loader) loader.style.display = 'flex';
 
-            const message = `🛒 *NEW WanaGebya ORDER*
-👤 Name: ${customerName}
-📞 Phone: ${customerPhone}
-💰 Total: ${total} ETB
-📦 Items:
-${items.map(i => `• ${i}`).join('\n')}`;
+            // Clean format for markdown
+            const cleanMarkdown = (text) => text.replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&');
+
+            const message = `🛒 *NEW WanaGebya ORDER*\n` +
+                            `👤 *Name:* ${customerName}\n` +
+                            `📞 *Phone:* ${customerPhone}\n` +
+                            `💰 *Total:* ${total} ETB\n` +
+                            `📦 *Items:*\n` +
+                            `${items.map(i => `• ${i}`).join('\n')}`;
 
             try {
                 if (platform === 'telegram') {
-                    const result = await sendTelegram(message, 'Markdown');
-                    if (result.success) {
+                    // Direct Browser fallback using your GolemConfig tokens
+                    const token = GolemConfig.botToken || "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
+                    const chatId = GolemConfig.chatId || "6792892909";
+                    
+                    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: message,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.ok) {
                         localStorage.removeItem('golem_saved');
                         document.getElementById('successMsg').innerText = `Order sent! We will contact you soon, ${customerName}.`;
                         document.getElementById('successModal').style.display = 'flex';
                     } else {
-                        throw new Error(result.error || 'Telegram send failed');
+                        throw new Error(result.description || 'Telegram Direct Send failed');
                     }
                 } 
                 else if (platform === 'whatsapp') {
@@ -218,7 +239,6 @@ ${items.map(i => `• ${i}`).join('\n')}`;
                 if (loader) loader.style.display = 'none';
             }
         }
-
         window.closeSuccessAndHome = function() {
             document.getElementById('successModal').style.display = 'none';
             window.location.href = 'index.html';
