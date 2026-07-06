@@ -28,13 +28,24 @@ const GolemConfig = {
 // ── Telegram helper ──────────────────────────────────────────────────────────
 // Routes through the Supabase Edge Function — bot token never exposed in browser.
 // Usage: sendTelegram('🛒 New order from <b>Alem</b>')
+// ── Updated Telegram helper in config.js ─────────────────────────────────────
 async function sendTelegram(message, parse_mode = 'Markdown') {
     try {
+        // 1. Get the current active session/token
+        const { data: { session } } = await _supabase.auth.getSession();
+        
+        // 2. Prepare headers (include Auth token if available)
+        const headers = { 'Content-Type': 'application/json' };
+        if (session && session.access_token) {
+            headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+
         const res = await fetch(`${supabaseUrl}/functions/v1/send-telegram`, {
             method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers, // 3. Inject the Authorization header here
             body:    JSON.stringify({ message, parse_mode })
         });
+        
         const data = await res.json();
         if (!data.success) console.warn('Telegram send failed:', data.error || data);
         return data;
