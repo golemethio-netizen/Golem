@@ -497,6 +497,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
+        // Escape user-supplied text before inserting into innerHTML.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        // Escape text embedded inside a single-quoted JS string within an
+        // inline onclick="..." attribute — HTML-escaping alone isn't enough
+        // there since entities decode back before the attribute is parsed as JS.
+        function escapeJsAttr(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '&quot;')
+                .replace(/\n/g, '\\n')
+                .replace(/</g, '\\x3C');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) {
@@ -605,7 +626,7 @@
                 const reasonNote = item.rejection_reason && item.status === 'rejected' ? 
                     `<div style="background: #fff0f0; border-left: 3px solid #ff4757; padding: 8px; margin-top: 10px; border-radius: 4px;">
                         <span style="color: #ff4757; font-size: 0.8rem; font-weight: bold;">REASON FOR REJECTION:</span>
-                        <p style="color: #d63031; font-size: 0.85rem; margin: 2px 0 0 0;">${item.rejection_reason}</p>
+                        <p style="color: #d63031; font-size: 0.85rem; margin: 2px 0 0 0;">${escapeHtml(item.rejection_reason)}</p>
                     </div>` : '';
 
                 // Price line: salary for jobs, rate for services, price for products
@@ -632,12 +653,12 @@
                             <span class="status-tag" style="background:${getStatusColor(item.status)};">
                                 ${item.status}
                             </span>
-                            <img src="${item.image}" alt="${item.name}">
+                            <img src="${item.image}" alt="${escapeHtml(item.name)}">
                         </div>
                         
                         <div class="product-info">
-                            <h3 class="product-title">${item.name}</h3>
-                            ${item.subcategory ? `<p style="font-size:0.75rem;color:#0A291A;font-weight:600;margin:2px 0 4px;"><i class="fas fa-sitemap" style="font-size:10px;"></i> ${item.subcategory}</p>` : ''}
+                            <h3 class="product-title">${escapeHtml(item.name)}</h3>
+                            ${item.subcategory ? `<p style="font-size:0.75rem;color:#0A291A;font-weight:600;margin:2px 0 4px;"><i class="fas fa-sitemap" style="font-size:10px;"></i> ${escapeHtml(item.subcategory)}</p>` : ''}
                             ${priceHtml}
                             ${badgeHtml}
                             ${reasonNote}
@@ -645,7 +666,7 @@
                             <div class="action-buttons">
                                 <button onclick="openEditModal('${item.id}')" class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
                                 ${item.status === 'rejected' ? `
-                                    <button onclick="contactAdmin('${item.name}')" class="why-btn">
+                                    <button onclick="contactAdmin('${escapeJsAttr(item.name)}')" class="why-btn">
                                         <i class="fas fa-headset"></i> Support
                                     </button>
                                 ` : ''}
