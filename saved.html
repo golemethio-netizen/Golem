@@ -201,31 +201,22 @@
 
             try {
                 if (platform === 'telegram') {
-                    // Direct Browser fallback using your GolemConfig tokens
-                    const token = GolemConfig.botToken || "8557174379:AAHjA_5WAIxIR8uq4mjZOhd1EfdKvgI2s7o";
-                    const chatId = GolemConfig.chatId || "6792892909";
-                    
-                    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-                    
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        })
+                    // Secure path: token lives only in Supabase Edge Function secrets,
+                    // never in client-side code.
+                    const { data, error } = await _supabase.functions.invoke('send-telegram', {
+                        body: { customerName, customerPhone, total, items }
                     });
 
-                    const result = await response.json();
-
-                    if (response.ok && result.ok) {
-                        localStorage.removeItem('golem_saved');
-                        document.getElementById('successMsg').innerText = `Order sent! We will contact you soon, ${customerName}.`;
-                        document.getElementById('successModal').style.display = 'flex';
-                    } else {
-                        throw new Error(result.description || 'Telegram Direct Send failed');
+                    if (error) {
+                        throw new Error(error.message || 'Order send failed');
                     }
+                    if (!data || data.error) {
+                        throw new Error((data && data.error) || 'Order send failed');
+                    }
+
+                    localStorage.removeItem('golem_saved');
+                    document.getElementById('successMsg').innerText = `Order sent! We will contact you soon, ${customerName}.`;
+                    document.getElementById('successModal').style.display = 'flex';
                 } 
                 else if (platform === 'whatsapp') {
                     const waNumber = GolemConfig.myPhone || "251707022845";
