@@ -1734,22 +1734,14 @@ window.applyStoredLanguage = function() {
 
 
 async function postToSocialMedia(product) {
-    // Falls back to a specific token if GolemConfig isn't defined, keeping your data secure
-    const botToken = typeof GolemConfig !== 'undefined' ? GolemConfig.botToken : 'YOUR_TELEGRAM_BOT_TOKEN';
-    const chatId = typeof GolemConfig !== 'undefined' ? (GolemConfig.channelId || GolemConfig.chatId) : '@your_public_channel_username';
-    
-    const message = `
-🌟 *New Item Approved!*
-📦 *Product:* ${product.name}
-💰 *Price:* ${product.price} ETB
-📍 *Location:* ${product.location}
-
-🔗 View Details: https://grand-sawine-a63bc3.netlify.app/product.html?id=${product.id}
-    `;
-    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
+    // Secure path: bot token lives only in Supabase Edge Function secrets.
+    await _supabase.functions.invoke('telegram-announce', {
+        body: {
+            name: product.name,
+            price: product.price,
+            location: product.location,
+            id: product.id
+        }
     }).catch(err => console.log("Telegram notification silently failed", err));
 }
 
