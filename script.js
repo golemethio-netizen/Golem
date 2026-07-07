@@ -1735,12 +1735,26 @@ window.applyStoredLanguage = function() {
 
 async function postToSocialMedia(product) {
     // Secure path: bot token lives only in Supabase Edge Function secrets.
+    // Supports a single image field or an array — adjust the field names
+    // below if your `products` table uses different column names.
+    let images = [];
+    if (Array.isArray(product.images)) {
+        images = product.images.filter(Boolean);
+    } else if (typeof product.images === 'string') {
+        try { images = JSON.parse(product.images); } catch (_) { images = [product.images]; }
+    } else if (product.image) {
+        images = [product.image];
+    }
+
     await _supabase.functions.invoke('telegram-announce', {
         body: {
             name: product.name,
             price: product.price,
             location: product.location,
-            id: product.id
+            category: product.category,
+            description: product.description,
+            id: product.id,
+            images
         }
     }).catch(err => console.log("Telegram notification silently failed", err));
 }
