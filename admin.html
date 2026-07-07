@@ -371,6 +371,30 @@
         let currentView = 'pending';
         let currentAdminEmail = 'System'; // Added for Audit Logging
 
+        // Escape user-supplied text before inserting into innerHTML —
+        // prevents stored XSS via product/user fields reviewed here.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        // Escape text that will be embedded inside a single-quoted JS string
+        // within an inline onclick="..." attribute. HTML-escaping alone is
+        // NOT enough here — entities decode back to real characters before
+        // the browser parses the attribute as JS, so a plain HTML-escaped
+        // apostrophe would still break out of the string and execute.
+        function escapeJsAttr(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '&quot;')
+                .replace(/\n/g, '\\n')
+                .replace(/</g, '\\x3C');
+        }
+
         // --- PASSWORD RECOVERY INTERCEPTOR ---
         // When a user clicks a reset link, Supabase redirects back here with a recovery session.
         // We detect it and show a manual set-password form.
@@ -638,21 +662,21 @@
 
                 // Show UTM Source visually if it exists in db
                 const utmDisplay = item.utm_source ? 
-                    `<p style="font-size:0.75rem; color:#27ae60; margin-top:5px; font-weight:600;"><i class="fas fa-satellite-dish"></i> Traffic: ${item.utm_source}</p>` : '';
+                    `<p style="font-size:0.75rem; color:#27ae60; margin-top:5px; font-weight:600;"><i class="fas fa-satellite-dish"></i> Traffic: ${escapeHtml(item.utm_source)}</p>` : '';
 
                 return `
                 <div class="product-card ${expiringClass}" id="card-${item.id}" style="background:white; border-radius:12px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom:20px;">
                     <img src="${item.image}" style="width:100%; height:200px; object-fit:cover; ${status === 'sold' ? 'filter: grayscale(100%);' : ''}">
                     
                     <div class="product-info" style="padding:15px;">
-                        <h3 style="margin-bottom:5px;">${item.name}</h3>
+                        <h3 style="margin-bottom:5px;">${escapeHtml(item.name)}</h3>
                         <p style="color:#2ed573; font-weight:bold; font-size:1.1rem;">${item.price?.toLocaleString()} ETB</p>
                         
                         <p style="font-size:0.85rem; color:#666; margin-top:5px; display: flex; align-items: center; gap: 5px;">
-                            <i class="fas fa-map-marker-alt" style="color:#ff4757;"></i> ${item.location || 'Addis Ababa'}
+                            <i class="fas fa-map-marker-alt" style="color:#ff4757;"></i> ${escapeHtml(item.location || 'Addis Ababa')}
                         </p>
                         <p style="font-size:0.85rem; color:#666; margin-top:5px;">
-                            Seller: <a href="tel:${item.seller_phone}" style="color:#0A291A; text-decoration:none;">${item.seller_phone}</a>
+                            Seller: <a href="tel:${escapeHtml(item.seller_phone)}" style="color:#0A291A; text-decoration:none;">${escapeHtml(item.seller_phone)}</a>
                         </p>
 
                         <!-- Stock badge + admin quick control -->
@@ -845,13 +869,13 @@
                             <tr style="border-bottom: 1px solid #eee; height:70px;">
                                 <td style="padding:12px;">
                                     <div style="display:flex; flex-direction:column;">
-                                        <strong>${u.full_name || 'Anonymous User'}</strong>
-                                        <span style="font-size:0.75rem; color:#888;">${u.email}</span>
+                                        <strong>${escapeHtml(u.full_name || 'Anonymous User')}</strong>
+                                        <span style="font-size:0.75rem; color:#888;">${escapeHtml(u.email)}</span>
                                     </div>
                                 </td>
-                                <td style="font-size:0.85rem; color:#555;">${u.location || 'Unknown'}</td>
+                                <td style="font-size:0.85rem; color:#555;">${escapeHtml(u.location || 'Unknown')}</td>
                                 <td style="font-size:0.85rem; color:#555;">
-                                    ${u.utm_source ? `<span style="background:#e1f5fe; color:#0288d1; padding:3px 8px; border-radius:12px; font-weight:600; font-size:0.75rem;">${u.utm_source}</span>` : 'Organic'}
+                                    ${u.utm_source ? `<span style="background:#e1f5fe; color:#0288d1; padding:3px 8px; border-radius:12px; font-weight:600; font-size:0.75rem;">${escapeHtml(u.utm_source)}</span>` : 'Organic'}
                                 </td>
                                 <td style="font-size:0.85rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
                                 <td>
@@ -869,10 +893,10 @@
                                         <button onclick="toggleVerification('${u.id}', ${u.is_verified})" class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" style="padding: 6px 12px; font-size: 0.75rem; border:none; border-radius:5px; cursor:pointer;">
                                             ${u.is_verified ? 'Revoke' : 'Verify'}
                                         </button>
-                                        <button onclick="sendPasswordReset('${u.email}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                        <button onclick="sendPasswordReset('${escapeJsAttr(u.email)}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-envelope"></i> Reset
                                         </button>
-                                        <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
+                                        <button onclick="deleteUserAccount('${u.id}', '${escapeJsAttr(u.full_name || u.email)}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -1051,9 +1075,9 @@
                 <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #ff4757; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:start;">
                         <div>
-                            <h4 style="color:#333;">${t.subject || 'No Subject'}</h4>
-                            <p style="margin: 10px 0; color:#555; line-height:1.4;">${t.message}</p>
-                            <small style="color:#888;">From: <strong>${t.user_email}</strong> • ${new Date(t.created_at).toLocaleDateString()}</small>
+                            <h4 style="color:#333;">${escapeHtml(t.subject || 'No Subject')}</h4>
+                            <p style="margin: 10px 0; color:#555; line-height:1.4;">${escapeHtml(t.message)}</p>
+                            <small style="color:#888;">From: <strong>${escapeHtml(t.user_email)}</strong> • ${new Date(t.created_at).toLocaleDateString()}</small>
                         </div>
                         <button onclick="resolveTicket('${t.id}')" style="background:#2ed573; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">
                             Mark Resolved
@@ -1070,37 +1094,6 @@
             }
         };
         
-window.approveProduct = async (productId, productDetails) => {
-    // 1. Update status in Supabase
-    const { error } = await _supabase
-        .from('products')
-        .update({ status: 'approved' })
-        .eq('id', productId);
-
-    if (!error) {
-        alert("Product Approved!");
-        
-        // 2. TRIGGER AUTO-POST TO TELEGRAM CHANNEL
-        const botToken = "YOUR_BOT_TOKEN";
-        const channelId = "@YourChannelName"; // Example: @WanagebyaMarket
-        
-        const text = `🚀 *New Listing on WanaGebya!*\n\n` +
-                     `📦 *Item:* ${productDetails.name}\n` +
-                     `💰 *Price:* ${productDetails.price} ETB\n` +
-                     `📍 *Location:* ${productDetails.location}\n\n` +
-                     `🔗 View on Site: https://golemethio-netizen.github.io/shope/product.html?id=${productId}`;
-
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: channelId,
-                text: text,
-                parse_mode: 'Markdown'
-            })
-        });
-    }
-};
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
@@ -1558,10 +1551,10 @@ function renderCategoryIcon(iconString) {
                     <td style="padding:10px 14px;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             ${p.image ? `<img src="${p.image}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : '<div style="width:38px;height:38px;border-radius:8px;background:#eee;flex-shrink:0;"></div>'}
-                            <span style="font-weight:600; color:#333; font-size:0.88rem;">${p.name || '—'}</span>
+                            <span style="font-weight:600; color:#333; font-size:0.88rem;">${escapeHtml(p.name || '—')}</span>
                         </div>
                     </td>
-                    <td style="padding:10px 14px; color:#666; font-size:0.82rem;">${p.category || '—'}</td>
+                    <td style="padding:10px 14px; color:#666; font-size:0.82rem;">${escapeHtml(p.category || '—')}</td>
                     <td style="padding:10px 14px; font-weight:700; color:#2ed573;">${(p.price||0).toLocaleString()}</td>
                     <td style="padding:10px 14px; text-align:right;">
                         <span style="font-size:1rem; font-weight:800; color:#0A291A;">${p.view_count.toLocaleString()}</span>
