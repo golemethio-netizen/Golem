@@ -372,64 +372,19 @@
         let currentAdminEmail = 'System'; // Added for Audit Logging
 
         // --- PASSWORD RECOVERY INTERCEPTOR ---
-        // When user clicks reset link, Supabase redirects back here with a recovery session.
-        // We detect it, then AUTO-APPLY the pre-generated password stored in sessionStorage.
+        // When a user clicks a reset link, Supabase redirects back here with a recovery session.
+        // We detect it and show a manual set-password form.
         (async () => {
             const params = new URLSearchParams(window.location.hash.replace('#', '?'));
             if (params.get('type') === 'recovery') {
                 history.replaceState(null, '', window.location.pathname);
                 const { data: { session } } = await _supabase.auth.getSession();
                 if (session) {
-                    const savedPwd = sessionStorage.getItem('wg_gen_pwd');
-                    if (savedPwd) {
-                        // Auto-apply the generated password silently
-                        const { error } = await _supabase.auth.updateUser({ password: savedPwd });
-                        sessionStorage.removeItem('wg_gen_pwd');
-                        if (!error) {
-                            showSuccessBanner(session.user.email, savedPwd);
-                        } else {
-                            alert('Failed to set password: ' + error.message);
-                        }
-                    } else {
-                        // No pre-generated password — show manual entry form
-                        showSetPasswordModal(session.user.email);
-                    }
+                    showSetPasswordModal(session.user.email);
                     return;
                 }
             }
         })();
-
-        // Show a clean success banner after auto-applying password
-        function showSuccessBanner(email, password) {
-            document.getElementById('pwdModal')?.remove();
-            const modal = document.createElement('div');
-            modal.id = 'pwdModal';
-            modal.style.cssText = `
-                position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 99999;
-                display: flex; align-items: center; justify-content: center;
-            `;
-            modal.innerHTML = `
-                <div style="background:white; border-radius:16px; padding:32px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center;">
-                    <div style="font-size:3rem; margin-bottom:10px;">&#10003;</div>
-                    <h2 style="margin:0 0 6px; color:#2ed573;">Password Set!</h2>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${email}</strong></p>
-                    <div style="background:#f7f8f6; border:2px dashed #2ed573; border-radius:10px; padding:18px; margin-bottom:20px;">
-                        <p style="font-size:0.8rem; color:#888; margin:0 0 6px;">New Password:</p>
-                        <code id="finalPwd" style="font-size:1.3rem; font-weight:bold; color:#1a1a1a; letter-spacing:2px;">${password}</code>
-                    </div>
-                    <button onclick="navigator.clipboard.writeText('${password}').then(()=>{ this.textContent='Copied!'; this.style.background='#2ed573'; })"
-                        style="width:100%; background:#F5A623; color:#1a1a1a; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; margin-bottom:10px;">
-                        Copy Password
-                    </button>
-                    <button onclick="document.getElementById('pwdModal').remove(); _supabase.auth.signOut().then(()=> location.href='index.html');"
-                        style="width:100%; background:#eee; color:#333; border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem;">
-                        Done — Go to Login
-                    </button>
-                    <p style="font-size:0.75rem; color:#aaa; margin-top:14px;">Share this password securely with the user.</p>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
 
         // Manual entry fallback (used when no pre-generated password is stored)
         function showSetPasswordModal(email) {
@@ -917,9 +872,6 @@
                                         <button onclick="sendPasswordReset('${u.email}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-envelope"></i> Reset
                                         </button>
-                                        <button onclick="generateAndSetPassword('${u.id}', '${u.email}')" title="Generate a new random password" style="border:none; background:#F5A623; color:#1a1a1a; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
-                                            <i class="fas fa-key"></i> Gen Pass
-                                        </button>
                                         <button onclick="deleteUserAccount('${u.id}', '${u.full_name || u.email}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -944,7 +896,10 @@
 
         window.toggleAdmin = async (userId, currentStatus) => {
             if (!confirm(`Are you sure you want to ${currentStatus ? 'remove' : 'grant'} admin rights?`)) return;
-            const { error } = await _supabase.from('profiles').update({ is_admin: !currentStatus }).eq('id', userId);
+            const { error } = await _supabase.rpc('set_admin_status', {
+                target_user_id: userId,
+                new_status: !currentStatus
+            });
             if (!error) { 
                 logAction('Admin Rights Update', `Set Admin to ${!currentStatus} for User ID: ${userId}`);
                 loadUsers(); loadStats(); 
@@ -983,89 +938,6 @@
 
 
         
-        // --- GENERATE PASSWORD ---
-        // 1. Generates a random password
-        // 2. Saves it to sessionStorage so the recovery interceptor can auto-apply it
-        // 3. Sends a reset email — when user clicks it, the password is applied automatically
-        window.generateAndSetPassword = async (userId, email) => {
-            if (!email || email === 'undefined') { alert("No email found for this user."); return; }
-
-            // Generate secure random password
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
-            let newPassword = '';
-            const arr = new Uint8Array(12);
-            window.crypto.getRandomValues(arr);
-            arr.forEach(b => { newPassword += chars[b % chars.length]; });
-
-            showPasswordModal(email, newPassword, async () => {
-                // Save the generated password so the recovery page can auto-apply it
-                sessionStorage.setItem('wg_gen_pwd', newPassword);
-
-                try {
-                    const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                        redirectTo: window.location.href.split('#')[0]
-                    });
-                    if (error) throw error;
-                    logAction('Password Generated', 'Admin generated password & sent reset email to: ' + email);
-                } catch (err) {
-                    sessionStorage.removeItem('wg_gen_pwd');
-                    alert('Failed to send reset email: ' + err.message);
-                }
-            });
-        };
-
-        // --- MODAL: Show generated password clearly so admin can copy it ---
-        function showPasswordModal(email, password, onCopy) {
-            // Remove existing modal if any
-            document.getElementById('pwdModal')?.remove();
-
-            const modal = document.createElement('div');
-            modal.id = 'pwdModal';
-            modal.style.cssText = `
-                position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9999;
-                display: flex; align-items: center; justify-content: center;
-            `;
-            modal.innerHTML = `
-                <div style="background:white; border-radius:16px; padding:32px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.25); text-align:center;">
-                    <div style="font-size:2.5rem; margin-bottom:10px;">🔑</div>
-                    <h2 style="margin:0 0 6px; color:#333;">Generated Password</h2>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">For account: <strong>${email}</strong></p>
-
-                    <div style="background:#f7f8f6; border:2px dashed #0A291A; border-radius:10px; padding:18px; margin-bottom:20px; position:relative;">
-                        <code id="genPwdText" style="font-size:1.4rem; font-weight:bold; color:#0A291A; letter-spacing:2px; word-break:break-all;">${password}</code>
-                    </div>
-
-                    <p style="font-size:0.8rem; color:#F5A623; background:#fff9f0; border:1px solid #f0d9b5; border-radius:8px; padding:10px; margin-bottom:20px;">
-                        ⚠️ Copy this password now and share it securely with the user.<br>A password reset email will also be sent to them.
-                    </p>
-
-                    <div style="display:flex; gap:10px; justify-content:center;">
-                        <button id="copyPwdBtn" onclick="
-                            navigator.clipboard.writeText('${password}').then(() => {
-                                this.textContent = '✅ Copied!';
-                                this.style.background = '#2ed573';
-                            });
-                        " style="background:#F5A623; color:#1a1a1a; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem; flex:1;">
-                            📋 Copy Password
-                        </button>
-                        <button onclick="
-                            document.getElementById('pwdModal').remove();
-                        " style="background:#eee; color:#333; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem;">
-                            Close
-                        </button>
-                    </div>
-                    <p style="font-size:0.75rem; color:#aaa; margin-top:16px;">A reset email is being sent automatically so the user can apply this password.</p>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            // Trigger the reset email callback
-            if (typeof onCopy === 'function') onCopy();
-
-            // Close on backdrop click
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-        }
-
         // --- 7. LOAD AUDIT LOGS ---
         async function loadLogs() {
             const list = document.getElementById('auditLogList');
