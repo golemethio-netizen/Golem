@@ -3,6 +3,15 @@ let currentProduct = null;
 window.currentCategory    = 'All';
 window.currentSubcategory = null;
 
+// Escape user-supplied text before inserting into innerHTML, to prevent
+// stored XSS via product name/location/description fields set by sellers.
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 WanaGebya System Initializing...");
     await window.updateUIForUser();
@@ -193,31 +202,31 @@ function renderProducts(products) {
                 </button>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
-                    ${jobType  ? `<span class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i>${jobType}</span>` : ''}
-                    ${industry ? `<span class="job-tag blue">${industry}</span>` : ''}
+                    ${jobType  ? `<span class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i>${escapeHtml(jobType)}</span>` : ''}
+                    ${industry ? `<span class="job-tag blue">${escapeHtml(industry)}</span>` : ''}
                     <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#2ed573' : '#aaa'}; display:flex; align-items:center; gap:3px;">
                         <i class="fas fa-check-circle"></i>${isVerified ? 'Verified' : 'Community'}
                     </span>
                 </div>
 
-                <div class="job-title">${p.name}</div>
+                <div class="job-title">${escapeHtml(p.name)}</div>
                 <div class="job-company">
                     <i class="fas fa-map-marker-alt" style="color:#ff4757; font-size:11px;"></i>
-                    ${p.location || 'Addis Ababa'}
+                    ${escapeHtml(p.location || 'Addis Ababa')}
                 </div>
 
-                <p class="job-snippet">${mainDesc || desc.substring(0, 120)}</p>
+                <p class="job-snippet">${escapeHtml(mainDesc || desc.substring(0, 120))}</p>
 
                 <div class="job-tags">
-                    ${exp      ? `<span class="job-tag green"><i class="fas fa-clock" style="font-size:9px;"></i>${exp}</span>` : ''}
-                    ${edu      ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:9px;"></i>${edu}</span>` : ''}
-                    ${deadline ? `<span class="job-tag red"><i class="fas fa-calendar-times" style="font-size:9px;"></i>Deadline: ${deadline}</span>` : ''}
+                    ${exp      ? `<span class="job-tag green"><i class="fas fa-clock" style="font-size:9px;"></i>${escapeHtml(exp)}</span>` : ''}
+                    ${edu      ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:9px;"></i>${escapeHtml(edu)}</span>` : ''}
+                    ${deadline ? `<span class="job-tag red"><i class="fas fa-calendar-times" style="font-size:9px;"></i>Deadline: ${escapeHtml(deadline)}</span>` : ''}
                 </div>
 
                 <div class="job-meta-row">
                     <div>
                         <div style="font-size:10px; color:#aaa; text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px;">Salary</div>
-                        <div class="job-salary">${salary}</div>
+                        <div class="job-salary">${escapeHtml(String(salary))}</div>
                     </div>
                 </div>
 
@@ -225,7 +234,7 @@ function renderProducts(products) {
                     <a href="tel:+${cleanPhone}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
                         <i class="fas fa-phone"></i> Call / Apply
                     </a>
-                    <a href="https://t.me/${tgUser || '+' + cleanPhone}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
+                    <a href="https://t.me/${escapeHtml(tgUser) || '+' + cleanPhone}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
                         <i class="fab fa-telegram-plane"></i>
                     </a>
                     <a href="https://wa.me/${cleanPhone}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
@@ -257,12 +266,12 @@ function renderProducts(products) {
             <div class="service-card" onclick="window.openProductDetailsSafe('${safeData}')">
                 <div class="service-banner">
                     ${p.image
-                        ? `<img src="${p.image}" alt="${p.name}" loading="lazy">`
+                        ? `<img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy">`
                         : `<span class="service-banner-fallback">🛠</span>`}
                     <span class="service-type-badge">
-                        <i class="fas fa-tools" style="font-size:9px;"></i>${svcType}
+                        <i class="fas fa-tools" style="font-size:9px;"></i>${escapeHtml(svcType)}
                     </span>
-                    ${exp ? `<span class="service-rating"><i class="fas fa-star"></i>${exp}</span>` : ''}
+                    ${exp ? `<span class="service-rating"><i class="fas fa-star"></i>${escapeHtml(exp)}</span>` : ''}
                     <button class="service-wishlist-btn ${isSaved ? 'active' : ''}"
                         onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
                         <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
@@ -270,27 +279,27 @@ function renderProducts(products) {
                 </div>
 
                 <div class="service-body">
-                    <div class="service-name">${p.name}</div>
+                    <div class="service-name">${escapeHtml(p.name)}</div>
                     <div class="service-provider">
                         <i class="fas fa-map-marker-alt" style="color:#ff4757; font-size:11px;"></i>
-                        ${p.location || 'Addis Ababa'}
+                        ${escapeHtml(p.location || 'Addis Ababa')}
                         <span style="margin-left:auto; font-size:11px; color:${isVerified ? '#2ed573' : '#aaa'};">
                             <i class="fas fa-check-circle"></i> ${isVerified ? 'Verified' : 'Community'}
                         </span>
                     </div>
                     <div class="service-highlights">
-                        ${response ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${response}</span>` : ''}
-                        ${avail    ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${avail}</span>` : ''}
-                        ${area     ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${area}</span>` : ''}
-                        ${pricing  ? `<span class="svc-tag purple">${pricing}</span>` : ''}
+                        ${response ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${escapeHtml(response)}</span>` : ''}
+                        ${avail    ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${escapeHtml(avail)}</span>` : ''}
+                        ${area     ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${escapeHtml(area)}</span>` : ''}
+                        ${pricing  ? `<span class="svc-tag purple">${escapeHtml(pricing)}</span>` : ''}
                     </div>
-                    ${mainDesc ? `<p class="service-snippet">${mainDesc}</p>` : ''}
+                    ${mainDesc ? `<p class="service-snippet">${escapeHtml(mainDesc)}</p>` : ''}
                 </div>
 
                 <div class="service-footer">
                     <div>
                         <div class="service-price">${priceStr}</div>
-                        <div class="service-price-label">${pricing || 'Per Project'}</div>
+                        <div class="service-price-label">${escapeHtml(pricing || 'Per Project')}</div>
                     </div>
                     <div class="service-actions">
                         <a href="tel:+${cleanPhone}" class="svc-btn svc-btn-primary" onclick="event.stopPropagation()">
@@ -327,7 +336,7 @@ function renderProducts(products) {
                 <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
                     <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
                 </button>
-                <img src="${p.image}" alt="${p.name}" loading="lazy"
+                <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy"
                     style="cursor:pointer; width:100%; display:block;"
                     onclick="window.openProductDetailsSafe('${safeData}')">
                 <div class="image-overlay">
@@ -336,9 +345,9 @@ function renderProducts(products) {
             </div>
 
             <div class="product-info">
-                <span class="category-badge">${p.category || 'General'}</span>
+                <span class="category-badge">${escapeHtml(p.category || 'General')}</span>
                 <h3 class="product-title">
-                    ${p.name}
+                    ${escapeHtml(p.name)}
                     <span class="verification-wrapper" style="display:inline-flex; align-items:center; gap:5px; font-size:0.8rem; margin-left:5px;">
                         <i class="fas fa-check-circle" style="color:${isVerified ? '#2ed573' : '#ccc'};"></i>
                         <span style="color:${isVerified ? '#2ed573' : '#888'}; font-weight:normal;">
@@ -351,7 +360,7 @@ function renderProducts(products) {
 
                 <div class="product-location" style="display:flex; align-items:center; gap:5px; font-size:0.85rem; color:#666; margin-top:5px;">
                     <i class="fas fa-map-marker-alt" style="color:#ff4757;"></i>
-                    <span>${p.location || 'Addis Ababa'}</span>
+                    <span>${escapeHtml(p.location || 'Addis Ababa')}</span>
                 </div>
 
                 <div class="quick-contact-bar" style="margin-top:12px; display:flex; gap:7px;">
@@ -360,7 +369,7 @@ function renderProducts(products) {
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
                         Call
                     </a>
-                    <a href="https://t.me/${tgUser || '+' + cleanPhone}" target="_blank"
+                    <a href="https://t.me/${escapeHtml(tgUser) || '+' + cleanPhone}" target="_blank"
     style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#0088cc; color:#fff; text-decoration:none; font-size:12px; font-weight:600;">
     <i class="fab fa-telegram-plane" style="font-size:13px;"></i>
     TG
