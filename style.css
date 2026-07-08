@@ -276,10 +276,9 @@ body {
 .card-img-container img {
     width: 100%;
     height: 100%;
-    object-fit: contain;  /* show full product, no cropping */
+    object-fit: cover;    /* fill the box consistently, crop instead of leaving gaps */
     display: block;
     transition: transform 0.5s ease;
-    padding: 6px;          /* small breathing room around the product */
 }
 
 .product-card:hover .card-img-container img { transform: scale(1.06); }
