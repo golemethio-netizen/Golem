@@ -198,7 +198,7 @@ function renderProducts(products) {
             <div class="job-card" onclick="window.openProductDetailsSafe('${safeData}')">
                 <button class="job-wishlist-btn ${isSaved ? 'active' : ''}"
                     onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
-                    <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
+                    <i class="fas fa-shopping-cart"></i>
                 </button>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
@@ -274,7 +274,7 @@ function renderProducts(products) {
                     ${exp ? `<span class="service-rating"><i class="fas fa-star"></i>${escapeHtml(exp)}</span>` : ''}
                     <button class="service-wishlist-btn ${isSaved ? 'active' : ''}"
                         onclick="event.stopPropagation(); window.toggleWishlist('${p.id}', this)">
-                        <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
+                        <i class="fas fa-shopping-cart"></i>
                     </button>
                 </div>
 
@@ -334,7 +334,7 @@ function renderProducts(products) {
                 ${isSold ? '<div class="sold-watermark">SOLD</div>' : ''}
                 ${statusBadge}
                 <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="window.toggleWishlist('${p.id}', this)">
-                    <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
+                    <i class="fas fa-shopping-cart"></i>
                 </button>
                 <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy"
                     style="cursor:pointer; width:100%; display:block;"
