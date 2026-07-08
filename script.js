@@ -345,7 +345,6 @@ function renderProducts(products) {
             </div>
 
             <div class="product-info">
-                <span class="category-badge">${escapeHtml(p.category || 'General')}</span>
                 <h3 class="product-title">
                     ${escapeHtml(p.name)}
                     <span class="verification-wrapper" style="display:inline-flex; align-items:center; gap:5px; font-size:0.8rem; margin-left:5px;">
