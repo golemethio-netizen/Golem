@@ -1393,6 +1393,37 @@ window.handleAuth = async function(e) {
     btn.textContent = origText;
 };
 
+// Ensure a `profiles` row exists for this user. Email/password sign-ups
+// send full_name/phone/location through signUp()'s `options.data`, which a
+// DB trigger normally turns into a profiles row. Google sign-ins skip that
+// path entirely, so without this, Google users never get a profiles row
+// and never show up in Admin > Registered Users. Safe to call on every
+// page load: it's a no-op once the row exists.
+window.ensureProfileExists = async function(user) {
+    if (!user) return;
+    try {
+        const { data: existing } = await _supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle();
+        if (existing) return;
+
+        const meta = user.user_metadata || {};
+        await _supabase.from('profiles').upsert({
+            id: user.id,
+            email: user.email,
+            full_name: meta.full_name || meta.name || (user.email ? user.email.split('@')[0] : 'New User'),
+            avatar_url: meta.avatar_url || meta.picture || null,
+            phone_number: meta.phone_number || meta.phone || null,
+            location: meta.location || null,
+            bio: meta.bio || null
+        }, { onConflict: 'id' });
+    } catch (err) {
+        console.warn('ensureProfileExists failed:', err);
+    }
+};
+
 window.updateUIForUser = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
     const signInBtn = document.getElementById('signInBtn');
@@ -1405,6 +1436,8 @@ if (user) {
     if (signInBtn) signInBtn.style.display = 'none';
     if (userWelcome) userWelcome.style.display = 'flex';
     if (signOutBtn) signOutBtn.style.display = 'block';
+
+    await window.ensureProfileExists(user);
 
     const { data: profile } = await _supabase
         .from('profiles')
