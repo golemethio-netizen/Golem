@@ -721,6 +721,12 @@ body {
     .modal-content { flex-direction: row; }
     .modal-img-wrapper { flex: 1.2; height: auto; min-height: 420px; }
     .modal-body { flex: 1; overflow-y: auto; }
+    .wg-thumbstrip-v {
+        flex-direction: column !important;
+        overflow-x: visible !important;
+        overflow-y: auto !important;
+        max-height: 420px;
+    }
 }
 
 /* Form inputs inside modals */
