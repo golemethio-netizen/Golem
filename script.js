@@ -1911,3 +1911,5 @@ function closeTGPopup() {
 
 // Start the auto-checker when the page loads
 window.onload = showTGPopupAuto;
+
+
