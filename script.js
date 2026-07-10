@@ -52,6 +52,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// --- SESSION SELF-HEAL ---
+// If a user's session is stuck in localStorage with a refresh token that's
+// no longer valid (expired, revoked, password changed elsewhere), Supabase
+// keeps trying to use the dead access token on every request instead of
+// falling back to the public anon key — even for visitors who aren't
+// actually logged in. This clears out a broken session once at startup so
+// it doesn't silently break every page load from then on.
+(async function healBrokenSession() {
+    try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return; // nothing stored, nothing to heal
+        const { error } = await _supabase.auth.getUser();
+        if (error) {
+            console.warn('Stale/invalid session detected — clearing it locally.', error.message);
+            await _supabase.auth.signOut({ scope: 'local' });
+        }
+    } catch (err) {
+        console.warn('Session self-heal check failed:', err);
+    }
+})();
+
+function isJwtExpiredError(error) {
+    if (!error) return false;
+    const msg = (error.message || '').toLowerCase();
+    return msg.includes('jwt expired') || msg.includes('invalid jwt') || error.code === 'PGRST301';
+}
+
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category) => {
     // Guard: if called with no/undefined arg (e.g. from sort/location change), use currentCategory
@@ -69,23 +96,35 @@ window.fetchProducts = async (category) => {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
-    let query = _supabase
-        .from('products')
-        .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
-        .eq('status', 'approved');
+    function buildQuery() {
+        let query = _supabase
+            .from('products')
+            .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+            .eq('status', 'approved');
 
-    if (category !== 'All') query = query.eq('category', category);
-    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+        if (category !== 'All') query = query.eq('category', category);
+        if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
 
-    if (sortOrder === 'price_low') {
-        query = query.order('price', { ascending: true });
-    } else if (sortOrder === 'price_high') {
-        query = query.order('price', { ascending: false });
-    } else {
-        query = query.order('created_at', { ascending: false });
+        if (sortOrder === 'price_low') {
+            query = query.order('price', { ascending: true });
+        } else if (sortOrder === 'price_high') {
+            query = query.order('price', { ascending: false });
+        } else {
+            query = query.order('created_at', { ascending: false });
+        }
+        return query;
     }
 
-    const { data, error } = await query;
+    let { data, error } = await buildQuery();
+
+    // Self-heal: a JWT-expired error here almost always means a stale session
+    // is stuck in localStorage, not a real database problem. Clear it and
+    // retry once as an anonymous request before showing any error to the user.
+    if (error && isJwtExpiredError(error)) {
+        console.warn('JWT expired on product fetch — clearing stale session and retrying.');
+        await _supabase.auth.signOut({ scope: 'local' });
+        ({ data, error } = await buildQuery());
+    }
 
     if (!error) {
         renderProducts(data);
@@ -582,20 +621,30 @@ window.fetchProductsBySubcat = async (category, subcategory) => {
     const sortOrder     = document.getElementById('sortSelect')?.value     || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
-    let query = _supabase
-        .from('products')
-        .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
-        .eq('status', 'approved')
-        .eq('category', category)
-        .eq('subcategory', subcategory);
+    function buildQuery() {
+        let query = _supabase
+            .from('products')
+            .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+            .eq('status', 'approved')
+            .eq('category', category)
+            .eq('subcategory', subcategory);
 
-    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+        if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
 
-    if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
-    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
-    else                                 query = query.order('created_at', { ascending: false });
+        if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
+        else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+        else                                 query = query.order('created_at', { ascending: false });
+        return query;
+    }
 
-    const { data, error } = await query;
+    let { data, error } = await buildQuery();
+
+    if (error && isJwtExpiredError(error)) {
+        console.warn('JWT expired on subcategory fetch — clearing stale session and retrying.');
+        await _supabase.auth.signOut({ scope: 'local' });
+        ({ data, error } = await buildQuery());
+    }
+
     if (!error) renderProducts(data);
     else console.error('Subcategory fetch error:', error.message);
 };
