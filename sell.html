@@ -1330,11 +1330,6 @@ function handleRegionChange(region) {
         }
     });
 
-    window.toggleDistricts = (region) => {
-        document.getElementById('districtWrapper').style.display =
-            (region === 'Addis Ababa') ? 'block' : 'none';
-    };
-
     function toggleSellQtyField(val) {
         const wrapper = document.getElementById('sellQtyWrapper');
         const preview = document.getElementById('sellStockPreview');
