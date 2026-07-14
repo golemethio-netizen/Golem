@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /profile.html
+Disallow: /saved.html
+Disallow: /my-items.html
+
+Sitemap: https://wanagebya.com/sitemap.xml
