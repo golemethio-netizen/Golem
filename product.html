@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details | WanaGebya</title>
-    <meta name="description" content="Buy quality items on WanaGebya — Ethiopia's trusted online marketplace.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Product Details | WanaGebya">
-    <meta property="og:description" content="Buy quality items on WanaGebya — Ethiopia's trusted online marketplace.">
-    <meta property="og:image" content="https://wanagebya.com/logo.png">
-    <meta property="og:url" content="https://wanagebya.com/product.html">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="canonical" href="https://wanagebya.com/product.html">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -213,15 +205,6 @@
     <script src="config.js"></script>
     <script>
 
-        // Escape user-supplied text before inserting into innerHTML —
-        // prevents stored XSS via product name/location/description/specs.
-        function escapeHtml(str) {
-            if (str === null || str === undefined) return '';
-            const div = document.createElement('div');
-            div.textContent = String(str);
-            return div.innerHTML;
-        }
-
         // ── 1. Track UTM source when buyer lands ─────────────────────────────
         function trackUTMVisit() {
             const params  = new URLSearchParams(window.location.search);
@@ -257,18 +240,18 @@
         function parseDescription(raw) {
             if (!raw) return { description: '', specsHTML: '' };
             const sep = raw.indexOf('--- Specs ---');
-            if (sep === -1) return { description: escapeHtml(raw), specsHTML: '' };
+            if (sep === -1) return { description: raw, specsHTML: '' };
 
-            const description = escapeHtml(raw.substring(0, sep).trim());
+            const description = raw.substring(0, sep).trim();
             const specsRaw    = raw.substring(sep + 13).trim();
             const rows = specsRaw.split('\n').map(line => line.trim()).filter(Boolean);
 
             const tableRows = rows.map(line => {
                 const colonIdx = line.indexOf(':');
-                if (colonIdx === -1) return `<tr><td colspan="2">${escapeHtml(line)}</td></tr>`;
+                if (colonIdx === -1) return `<tr><td colspan="2">${line}</td></tr>`;
                 const key = line.substring(0, colonIdx).trim();
                 const val = line.substring(colonIdx + 1).trim();
-                return `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(val)}</td></tr>`;
+                return `<tr><td>${key}</td><td>${val}</td></tr>`;
             }).join('');
 
             const specsHTML = tableRows
@@ -383,7 +366,7 @@
                 <div class="image-side">
                     ${(() => {
                         const gallery = Array.isArray(p.images) && p.images.length ? p.images : [p.image];
-                        const mainImg = `<div class="zoom-wrap" id="mainImgWrap"><img id="mainProductImg" data-idx="0" src="${gallery[0]}" alt="${escapeHtml(p.name)}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"><div class="zoom-tap-badge"><i class="fas fa-expand"></i></div></div>`;
+                        const mainImg = `<div class="zoom-wrap" id="mainImgWrap"><img id="mainProductImg" data-idx="0" src="${gallery[0]}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"><div class="zoom-tap-badge"><i class="fas fa-expand"></i></div></div>`;
                         if (gallery.length <= 1) return mainImg;
                         const thumbs = gallery.map((url, i) => `
                             <img src="${url}" data-idx="${i}"
@@ -398,19 +381,19 @@
 
                 <div class="details-side">
                     <span style="color:#888; text-transform:uppercase; font-size:0.78rem; font-weight:700; letter-spacing:0.04em;">
-                        ${escapeHtml(p.category || 'General')}${p.subcategory ? ' · ' + escapeHtml(p.subcategory) : ''}
+                        ${p.category || 'General'}${p.subcategory ? ' · ' + p.subcategory : ''}
                     </span>
-                    <h1 style="margin:5px 0; font-size:1.4rem; color:#1a1a1a;">${escapeHtml(p.name)}</h1>
+                    <h1 style="margin:5px 0; font-size:1.4rem; color:#1a1a1a;">${p.name}</h1>
                     <p class="price-tag">${p.price.toLocaleString()} <span style="font-size:0.95rem;">ETB</span></p>
 
-                    ${p.location ? `<p style="font-size:0.85rem; color:#888; margin:0;"><i class="fas fa-map-marker-alt" style="color:#F5A623;"></i> ${escapeHtml(p.location)}</p>` : ''}
+                    ${p.location ? `<p style="font-size:0.85rem; color:#888; margin:0;"><i class="fas fa-map-marker-alt" style="color:#F5A623;"></i> ${p.location}</p>` : ''}
 
                     <!-- Seller Card -->
                     <div class="seller-card">
-                        <img src="${sellerAvatar}" class="seller-avatar" alt="${escapeHtml(sellerName)}"
+                        <img src="${sellerAvatar}" class="seller-avatar" alt="${sellerName}"
                              onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=0A291A&color=fff'">
                         <div class="seller-info">
-                            <h4>${escapeHtml(sellerName)} ${isVerified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}</h4>
+                            <h4>${sellerName} ${isVerified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}</h4>
                             <p>${isVerified ? 'Verified Merchant' : 'Member'}</p>
                         </div>
                     </div>
@@ -727,10 +710,10 @@
 
             grid.innerHTML = items.map(item => `
                 <a href="product.html?id=${item.id}" class="related-card">
-                    <img src="${item.image}" alt="${escapeHtml(item.name)}"
+                    <img src="${item.image}" alt="${item.name}"
                          onerror="this.src='https://via.placeholder.com/200x150?text=No+Image'">
                     <div class="related-card-body">
-                        <h4>${escapeHtml(item.name)}</h4>
+                        <h4>${item.name}</h4>
                         <p>${item.price.toLocaleString()} ETB</p>
                     </div>
                 </a>
