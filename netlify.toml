@@ -1,1 +1,23 @@
+[build]
+  publish = "."
 
+# Serverless function that builds sitemap.xml dynamically from live product data
+[functions]
+  directory = "netlify/functions"
+
+# Route /sitemap.xml to the dynamic function.
+# force = true is required: without it, if a static sitemap.xml file also
+# exists in the published folder, Netlify serves that static file instead
+# and this redirect is silently ignored.
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/.netlify/functions/sitemap"
+  status = 200
+  force = true
+
+# Edge Function that injects real per-product meta tags for crawlers/link
+# previews. Runs before product.html is served, on every request that hits
+# that path (with or without a ?id= — the function itself checks for id).
+[[edge_functions]]
+  path = "/product.html"
+  function = "product-meta"
