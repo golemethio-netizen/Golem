@@ -52,33 +52,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// --- SESSION SELF-HEAL ---
-// If a user's session is stuck in localStorage with a refresh token that's
-// no longer valid (expired, revoked, password changed elsewhere), Supabase
-// keeps trying to use the dead access token on every request instead of
-// falling back to the public anon key — even for visitors who aren't
-// actually logged in. This clears out a broken session once at startup so
-// it doesn't silently break every page load from then on.
-(async function healBrokenSession() {
-    try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (!session) return; // nothing stored, nothing to heal
-        const { error } = await _supabase.auth.getUser();
-        if (error) {
-            console.warn('Stale/invalid session detected — clearing it locally.', error.message);
-            await _supabase.auth.signOut({ scope: 'local' });
-        }
-    } catch (err) {
-        console.warn('Session self-heal check failed:', err);
-    }
-})();
-
-function isJwtExpiredError(error) {
-    if (!error) return false;
-    const msg = (error.message || '').toLowerCase();
-    return msg.includes('jwt expired') || msg.includes('invalid jwt') || error.code === 'PGRST301';
-}
-
 // --- 2. DATA FETCHING ---
 window.fetchProducts = async (category) => {
     // Guard: if called with no/undefined arg (e.g. from sort/location change), use currentCategory
@@ -96,35 +69,23 @@ window.fetchProducts = async (category) => {
     const sortOrder = document.getElementById('sortSelect')?.value || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
-    function buildQuery() {
-        let query = _supabase
-            .from('products')
-            .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
-            .eq('status', 'approved');
+    let query = _supabase
+        .from('products')
+        .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+        .eq('status', 'approved');
 
-        if (category !== 'All') query = query.eq('category', category);
-        if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+    if (category !== 'All') query = query.eq('category', category);
+    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
 
-        if (sortOrder === 'price_low') {
-            query = query.order('price', { ascending: true });
-        } else if (sortOrder === 'price_high') {
-            query = query.order('price', { ascending: false });
-        } else {
-            query = query.order('created_at', { ascending: false });
-        }
-        return query;
+    if (sortOrder === 'price_low') {
+        query = query.order('price', { ascending: true });
+    } else if (sortOrder === 'price_high') {
+        query = query.order('price', { ascending: false });
+    } else {
+        query = query.order('created_at', { ascending: false });
     }
 
-    let { data, error } = await buildQuery();
-
-    // Self-heal: a JWT-expired error here almost always means a stale session
-    // is stuck in localStorage, not a real database problem. Clear it and
-    // retry once as an anonymous request before showing any error to the user.
-    if (error && isJwtExpiredError(error)) {
-        console.warn('JWT expired on product fetch — clearing stale session and retrying.');
-        await _supabase.auth.signOut({ scope: 'local' });
-        ({ data, error } = await buildQuery());
-    }
+    const { data, error } = await query;
 
     if (!error) {
         renderProducts(data);
@@ -286,11 +247,11 @@ function renderProducts(products) {
                     <a href="tel:+${cleanPhone}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
                         <i class="fas fa-phone"></i> Call / Apply
                     </a>
-                    <a href="https://t.me/${escapeHtml(tgUser) || '+' + cleanPhone}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
-                        <i class="fab fa-telegram-plane"></i>
-                    </a>
                     <a href="https://wa.me/${cleanPhone}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
                         <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="https://t.me/${escapeHtml(tgUser) || '+' + cleanPhone}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
+                        <i class="fab fa-telegram-plane"></i>
                     </a>
                 </div>
             </div>`;
@@ -410,25 +371,25 @@ function renderProducts(products) {
                     <span>${escapeHtml(p.location || 'Addis Ababa')}</span>
                 </div>
 
-                <div class="quick-contact-bar" style="margin-top:10px; display:flex; gap:5px;">
+                <div class="quick-contact-bar" style="margin-top:12px; display:flex; gap:7px;">
                     <a href="tel:+${cleanPhone}"
-                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:4px; padding:7px 6px; border-radius:8px; background:#333; color:#fff; text-decoration:none; font-size:11px; font-weight:600;">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#333; color:#fff; text-decoration:none; font-size:12px; font-weight:600;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
                         Call
                     </a>
-                    <a href="https://t.me/${escapeHtml(tgUser) || '+' + cleanPhone}" target="_blank"
-    style="flex:1; display:flex; align-items:center; justify-content:center; gap:4px; padding:7px 6px; border-radius:8px; background:#0088cc; color:#fff; text-decoration:none; font-size:11px; font-weight:600;">
-    <i class="fab fa-telegram-plane" style="font-size:11px;"></i>
-    TG
-</a>
                     <a href="https://wa.me/${cleanPhone}?text=${encodeURIComponent('Interested in ' + p.name + ' on WanaGebya')}" target="_blank"
-                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:4px; padding:7px 6px; border-radius:8px; background:#25d366; color:#fff; text-decoration:none; font-size:11px; font-weight:600;">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                        style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#25d366; color:#fff; text-decoration:none; font-size:12px; font-weight:600;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
                         WA
                     </a>
+                    <a href="https://t.me/${escapeHtml(tgUser) || '+' + cleanPhone}" target="_blank"
+    style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 6px; border-radius:10px; background:#0088cc; color:#fff; text-decoration:none; font-size:12px; font-weight:600;">
+    <i class="fab fa-telegram-plane" style="font-size:13px;"></i>
+    TG
+</a>
                 </div>
 
-                <div class="product-actions" style="margin-top:6px;">
+                <div class="product-actions" style="margin-top:15px;">
                     <button class="buy-btn" onclick="window.openProductDetailsSafe('${safeData}')" style="width:100%; padding:10px; border-radius:8px; cursor:pointer; background:#F5A623; color:#1a1a1a; border:none; font-weight:700;">
                         Full Details
                     </button>
@@ -621,30 +582,20 @@ window.fetchProductsBySubcat = async (category, subcategory) => {
     const sortOrder     = document.getElementById('sortSelect')?.value     || 'newest';
     const locationFilter = document.getElementById('locationSelect')?.value || 'all';
 
-    function buildQuery() {
-        let query = _supabase
-            .from('products')
-            .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
-            .eq('status', 'approved')
-            .eq('category', category)
-            .eq('subcategory', subcategory);
+    let query = _supabase
+        .from('products')
+        .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+        .eq('status', 'approved')
+        .eq('category', category)
+        .eq('subcategory', subcategory);
 
-        if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+    if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
 
-        if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
-        else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
-        else                                 query = query.order('created_at', { ascending: false });
-        return query;
-    }
+    if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
+    else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+    else                                 query = query.order('created_at', { ascending: false });
 
-    let { data, error } = await buildQuery();
-
-    if (error && isJwtExpiredError(error)) {
-        console.warn('JWT expired on subcategory fetch — clearing stale session and retrying.');
-        await _supabase.auth.signOut({ scope: 'local' });
-        ({ data, error } = await buildQuery());
-    }
-
+    const { data, error } = await query;
     if (!error) renderProducts(data);
     else console.error('Subcategory fetch error:', error.message);
 };
@@ -687,20 +638,6 @@ function getStockBadge(stockStatus, quantity) {
     return '';
 }
 
-function getConditionBadge(condition) {
-    if (!condition || condition === '-') return '';
-    const map = {
-        'New':          { color: '#2ed573', icon: 'fa-tag' },
-        'Used':         { color: '#F5A623', icon: 'fa-recycle' },
-        'Refurbished':  { color: '#1a8fff', icon: 'fa-wrench' },
-        'Damage':       { color: '#ff4757', icon: 'fa-exclamation-triangle' },
-        'Custom Order': { color: '#8854d0', icon: 'fa-hammer' }
-    };
-    const c = map[condition] || { color: '#888', icon: 'fa-info-circle' };
-    return '<div style="display:inline-flex;align-items:center;gap:6px;background:' + c.color + '14;border:1.5px solid ' + c.color + ';border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:' + c.color + ';">'
-         + '<i class="fas ' + c.icon + '"></i> ' + condition + '</div>';
-}
-
 // ── SPEC CARD HELPERS ──
 function specCell(icon, label, value) {
     return '<div class="anim-spec-cell" style="padding:13px 16px;border-right:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">'
@@ -729,13 +666,11 @@ function buildThumbStrip(images, mainImgId, opts) {
     if (!images || images.length <= 1) return '';
     const bg = opts.bg || 'transparent';
     const pad = opts.padding || '8px 20px';
-    const vertClass = opts.vertical ? ' wg-thumbstrip-v' : '';
-    const size = opts.size || 46;
-    return '<div class="wg-thumbstrip' + vertClass + '" style="display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';">'
+    return '<div style="display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';">'
         + images.map(function (url, i) {
             return '<img src="' + url + '" data-gallery-thumb data-idx="' + i + '" '
                 + 'onclick="document.getElementById(\'' + mainImgId + '\').src=this.src; document.getElementById(\'' + mainImgId + '\').dataset.idx=this.dataset.idx; this.parentElement.querySelectorAll(\'img\').forEach(function(t){t.style.borderColor=\'transparent\';}); this.style.borderColor=\'#F5A623\';" '
-                + 'style="width:' + size + 'px;height:' + size + 'px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ' + (i === 0 ? '#F5A623' : 'transparent') + ';">';
+                + 'style="width:46px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ' + (i === 0 ? '#F5A623' : 'transparent') + ';">';
         }).join('')
         + '</div>';
 }
@@ -1332,7 +1267,7 @@ window.openProductModal = async (product) => {
             <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative;">
                 <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
             </div>
-            ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', padding: '0 8px', vertical: true, size: 64 })}
+            ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', padding: '8px 0' })}
             <div class="modal-body" style="padding: 20px 0 0;">
                 <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
                 
@@ -1352,14 +1287,14 @@ window.openProductModal = async (product) => {
                     ${product.price ? product.price.toLocaleString() : 'Negotiable'} ETB
                 </div>
 
-                <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:8px;">${getStockBadge(product.stock_status, product.quantity)}${getConditionBadge(product.status_condition)}</div>
+                <div style="margin-bottom:4px;">${getStockBadge(product.stock_status, product.quantity)}</div>
                 
                 <div class="anim-desc-wrap"><p class="anim-desc-inner modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap; margin:0;">${product.description || "No description available."}</p></div>
 
                 <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
-                    <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
                     <a href="https://wa.me/${intPhone}?text=${encodeURIComponent('I am interested in ' + product.name + " on WanaGebya")}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#25d366; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a href="https://t.me/${tgUser || '+'+intPhone}" target="_blank" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#0088cc; color:white; border-radius:8px; text-decoration:none;"><i class="fab fa-telegram-plane"></i> Message</a>
                     <button onclick="window.shareProductFromModal('${product.id}', '${escapeJsAttr(product.name)}')" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#ffffff; color:#111; border:1.5px solid #ddd; border-radius:8px; cursor:pointer; font-weight:600;"><i class="fas fa-share-alt"></i> Share</button>
                     <button onclick="window.addToCartFromModal()" class="contact-btn save-btn" style="width: 100%; text-align:center; padding:10px; background:#F5A623; color:#1a1a1a; border-radius:8px; border:none; cursor:pointer; font-weight:bold; margin-top:5px;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                 </div>
