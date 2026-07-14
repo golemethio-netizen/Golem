@@ -80,6 +80,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
+        // Escape user-supplied text before inserting into innerHTML, to prevent
+        // stored XSS via product name/image fields set by sellers.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         // --- 1. Load Data ---
         async function loadSavedItems() {
             const grid = document.getElementById('savedGrid');
@@ -138,10 +147,10 @@
                         <i class="fas fa-times"></i>
                     </button>
                     <div class="card-img-container" onclick="location.href='product.html?id=${p.id}'">
-                        <img src="${p.image}" alt="${p.name}">
+                        <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.src='https://via.placeholder.com/200x150?text=No+Image'">
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title">${p.name}</h3>
+                        <h3 class="product-title">${escapeHtml(p.name)}</h3>
                         <p class="product-price">${p.price.toLocaleString()} ETB</p>
                     </div>
                 </div>
@@ -175,8 +184,9 @@
             document.getElementById('totalPrice').innerText = total.toLocaleString();
         }
 
-        // --- 5. Fixed Order Logic (uses secure edge function) ---
-     // --- 5. Fixed Order Logic (Temporary Client-Side Direct Send) ---
+        // --- 5. Order Logic (Telegram send goes through the secure
+        //         'send-telegram' Supabase Edge Function; the bot token
+        //         never touches client-side code) ---
         async function sendOrder(platform) {
             const total = document.getElementById('totalPrice').innerText;
             const items = Array.from(document.querySelectorAll('.product-title')).map(el => el.innerText);
