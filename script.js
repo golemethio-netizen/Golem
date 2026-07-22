@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.updateCartBadge();
     window.fetchProducts();
     window.loadSponsor();
+    window.initGoogleOneTap(); // fire-and-forget; no-op if user is already signed in
 
     const now = new Date();
     const hour = now.getHours();
@@ -1442,6 +1443,70 @@ window.ensureProfileExists = async function(user) {
     } catch (err) {
         console.warn('ensureProfileExists failed:', err);
     }
+};
+
+// Google One Tap — shows the native Google "Continue as [Name]" popup in the
+// top-right corner for anonymous visitors. Uses Google Identity Services
+// (loaded via the accounts.google.com/gsi/client script tag in index.html)
+// plus Supabase's signInWithIdToken flow. A nonce is generated and hashed
+// per Supabase/Google's recommended pattern so the ID token can't be replayed.
+const GOOGLE_ONE_TAP_CLIENT_ID = '272992224183-q8enj9nbbrcno23e775fiavmc5mclvl4.apps.googleusercontent.com';
+
+async function generateOneTapNonce() {
+    const raw = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+    const encoded = new TextEncoder().encode(raw);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+    const hashed = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return [raw, hashed];
+}
+
+window.handleGoogleOneTapResponse = async function(response) {
+    try {
+        const { data, error } = await _supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: response.credential,
+            nonce: window.__oneTapNonce
+        });
+        if (error) {
+            console.warn('Google One Tap sign-in failed:', error.message);
+            return;
+        }
+        if (data?.user) {
+            await window.ensureProfileExists(data.user);
+            await window.updateUIForUser();
+        }
+    } catch (err) {
+        console.warn('Google One Tap sign-in error:', err);
+    }
+};
+
+window.initGoogleOneTap = async function() {
+    // Don't prompt users who are already signed in.
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) return;
+
+    // The GSI script loads with async/defer, so it may not be ready yet
+    // when DOMContentLoaded fires — poll briefly for it.
+    let attempts = 0;
+    while (!(window.google && window.google.accounts && window.google.accounts.id) && attempts < 20) {
+        await new Promise(r => setTimeout(r, 250));
+        attempts++;
+    }
+    if (!(window.google && window.google.accounts && window.google.accounts.id)) return;
+
+    const [nonce, hashedNonce] = await generateOneTapNonce();
+    window.__oneTapNonce = nonce;
+
+    google.accounts.id.initialize({
+        client_id: GOOGLE_ONE_TAP_CLIENT_ID,
+        callback: window.handleGoogleOneTapResponse,
+        nonce: hashedNonce,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+        use_fedcm_for_prompt: true
+    });
+
+    google.accounts.id.prompt();
 };
 
 window.updateUIForUser = async function() {
