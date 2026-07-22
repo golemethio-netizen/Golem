@@ -668,14 +668,15 @@ function buildThumbStrip(images, mainImgId, opts) {
     const bg = opts.bg || 'transparent';
     const vertical = !!opts.vertical;
     const pad = opts.padding || (vertical ? '0' : '8px 20px');
+    const size = opts.size || (vertical ? 64 : 46);
     const containerStyle = vertical
-        ? 'display:flex;flex-direction:column;gap:6px;padding:' + pad + ';overflow-y:auto;background:' + bg + ';flex-shrink:0;'
+        ? 'display:flex;flex-direction:column;gap:8px;padding:' + pad + ';overflow-y:auto;background:' + bg + ';flex-shrink:0;'
         : 'display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';';
     return '<div style="' + containerStyle + '">'
         + images.map(function (url, i) {
             return '<img src="' + url + '" data-gallery-thumb data-idx="' + i + '" '
                 + 'onclick="document.getElementById(\'' + mainImgId + '\').src=this.src; document.getElementById(\'' + mainImgId + '\').dataset.idx=this.dataset.idx; this.parentElement.querySelectorAll(\'img\').forEach(function(t){t.style.borderColor=\'transparent\';}); this.style.borderColor=\'#F5A623\';" '
-                + 'style="width:46px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ' + (i === 0 ? '#F5A623' : 'transparent') + ';">';
+                + 'style="width:' + size + 'px;height:' + size + 'px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;border:2px solid ' + (i === 0 ? '#F5A623' : 'transparent') + ';">';
         }).join('')
         + '</div>';
 }
