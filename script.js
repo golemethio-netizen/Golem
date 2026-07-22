@@ -666,8 +666,12 @@ function buildThumbStrip(images, mainImgId, opts) {
     opts = opts || {};
     if (!images || images.length <= 1) return '';
     const bg = opts.bg || 'transparent';
-    const pad = opts.padding || '8px 20px';
-    return '<div style="display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';">'
+    const vertical = !!opts.vertical;
+    const pad = opts.padding || (vertical ? '0' : '8px 20px');
+    const containerStyle = vertical
+        ? 'display:flex;flex-direction:column;gap:6px;padding:' + pad + ';overflow-y:auto;background:' + bg + ';flex-shrink:0;'
+        : 'display:flex;gap:6px;padding:' + pad + ';overflow-x:auto;background:' + bg + ';';
+    return '<div style="' + containerStyle + '">'
         + images.map(function (url, i) {
             return '<img src="' + url + '" data-gallery-thumb data-idx="' + i + '" '
                 + 'onclick="document.getElementById(\'' + mainImgId + '\').src=this.src; document.getElementById(\'' + mainImgId + '\').dataset.idx=this.dataset.idx; this.parentElement.querySelectorAll(\'img\').forEach(function(t){t.style.borderColor=\'transparent\';}); this.style.borderColor=\'#F5A623\';" '
@@ -1265,10 +1269,12 @@ window.openProductModal = async (product) => {
 
         modalContent.innerHTML = `
             <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
-            <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative;">
-                <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+                ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', vertical: true })}
+                <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative; flex:1; min-width:0;">
+                    <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
+                </div>
             </div>
-            ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', padding: '8px 0' })}
             <div class="modal-body" style="padding: 20px 0 0;">
                 <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
                 
