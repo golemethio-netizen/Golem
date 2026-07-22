@@ -1506,7 +1506,15 @@ window.initGoogleOneTap = async function() {
         use_fedcm_for_prompt: true
     });
 
-    google.accounts.id.prompt();
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+            console.warn('[One Tap] not displayed — reason:', notification.getNotDisplayedReason());
+        } else if (notification.isSkippedMoment()) {
+            console.warn('[One Tap] skipped — reason:', notification.getSkippedReason());
+        } else if (notification.isDismissedMoment()) {
+            console.warn('[One Tap] dismissed — reason:', notification.getDismissedReason());
+        }
+    });
 };
 
 window.updateUIForUser = async function() {
