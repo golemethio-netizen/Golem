@@ -1271,8 +1271,8 @@ window.openProductModal = async (product) => {
             <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
             <div style="display:flex; gap:10px; align-items:flex-start;">
                 ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', vertical: true })}
-                <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative; flex:1; min-width:0;">
-                    <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%;">
+                <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative; flex:1; min-width:0; height:260px; background:#f7f8f6; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                    <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%; height: 100%; object-fit: contain;">
                 </div>
             </div>
             <div class="modal-body" style="padding: 20px 0 0;">
