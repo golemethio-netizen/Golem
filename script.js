@@ -1758,7 +1758,7 @@ const TRANSLATIONS = {
         '🆕 Newest First': '🆕 Newest First',
         '💰 Price: Low to High': '💰 Price: Low to High',
         '💎 Price: High to Low': '💎 Price: High to Low',
-        '🌍 All Regions': '🌍 All Regions',
+        '🌍 All Locations': '🌍 All Locations',
         // Buttons & labels
         'Contact Us': 'Contact Us', 'Call Now': 'Call Now',
         'Full Details': 'Full Details', 'Share': 'Share',
@@ -1795,7 +1795,7 @@ const TRANSLATIONS = {
         '🆕 Newest First': '🆕 አዲስ መጀመሪያ',
         '💰 Price: Low to High': '💰 ዋጋ፡ ከዝቅ ወደ ከፍ',
         '💎 Price: High to Low': '💎 ዋጋ፡ ከከፍ ወደ ዝቅ',
-        '🌍 All Regions': '🌍 ሁሉም ክልሎች',
+        '🌍 All Locations': '🌍 ሁሉም ቦታዎች',
         // Buttons & labels
         'Contact Us': 'ያግኙን', 'Call Now': 'አሁን ይደውሉ',
         'Full Details': 'ሙሉ ዝርዝር', 'Share': 'አጋሩ',
