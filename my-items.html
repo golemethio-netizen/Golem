@@ -448,42 +448,44 @@
                         <input type="text" id="editPhone" required>
                     </div>
 
-                    <!-- Region -->
+                    <!-- City / Location -->
                     <div class="input-group-sell">
-                        <label><i class="fas fa-map-marker-alt"></i> Region</label>
+                        <label><i class="fas fa-map-marker-alt"></i> City / Location</label>
                         <select id="editRegion" onchange="window.toggleEditDistricts(this.value)" required>
+                            <option value="" disabled>Select City / Location</option>
                             <option value="Addis Ababa">Addis Ababa</option>
-                            <option value="Afar">Afar</option>
-                            <option value="Amhara">Amhara</option>
-                            <option value="Benishangul-Gumuz">Benishangul-Gumuz</option>
-                            <option value="Central Ethiopia">Central Ethiopia</option>
-                            <option value="Gambela">Gambela</option>
-                            <option value="Harari">Harari</option>
-                            <option value="Oromia">Oromia</option>
-                            <option value="Sidama">Sidama</option>
-                            <option value="Somali">Somali</option>
-                            <option value="South Ethiopia">South Ethiopia</option>
-                            <option value="South West Ethiopia">South West Ethiopia</option>
-                            <option value="Tigray">Tigray</option>
+                            <option value="Adama">Adama (Nazret)</option>
+                            <option value="Bahir Dar">Bahir Dar</option>
+                            <option value="Dire Dawa">Dire Dawa</option>
+                            <option value="Mekele">Mekele</option>
+                            <option value="Shashamane">Shashamane</option>
+                            <option value="Hawassa">Hawassa</option>
+                            <option value="Bishoftu">Bishoftu (Debre Zeit)</option>
+                            <option value="Jigjiga">Jigjiga</option>
+                            <option value="Gondar">Gondar</option>
+                            <option value="Dilla">Dilla</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
                     <div class="input-group-sell" id="editDistrictWrapper" style="display:none;">
-                        <label><i class="fas fa-city"></i> Sub-City / District</label>
-                        <select id="editDistrict">
-                            <option value="" disabled selected>Select Sub-City</option>
-                            <option value="Addis Ketema">Addis Ketema</option>
-                            <option value="Akaki Kality">Akaki Kality</option>
-                            <option value="Arada">Arada</option>
-                            <option value="Bole">Bole</option>
-                            <option value="Gullele">Gullele</option>
-                            <option value="Kirkos">Kirkos</option>
-                            <option value="Kolfe Keranio">Kolfe Keranio</option>
-                            <option value="Lideta">Lideta</option>
-                            <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
-                            <option value="Lemi Kura">Lemi Kura</option>
-                            <option value="Yeka">Yeka</option>
-                        </select>
+                        <label id="editDistrictLabel"><i class="fas fa-city"></i> Sub-City / District</label>
+                        <div id="editDistrictContainer">
+                            <select id="editDistrict">
+                                <option value="" disabled selected>Select Sub-City</option>
+                                <option value="Addis Ketema">Addis Ketema</option>
+                                <option value="Akaki Kality">Akaki Kality</option>
+                                <option value="Arada">Arada</option>
+                                <option value="Bole">Bole</option>
+                                <option value="Gullele">Gullele</option>
+                                <option value="Kirkos">Kirkos</option>
+                                <option value="Kolfe Keranio">Kolfe Keranio</option>
+                                <option value="Lideta">Lideta</option>
+                                <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
+                                <option value="Lemi Kura">Lemi Kura</option>
+                                <option value="Yeka">Yeka</option>
+                            </select>
+                        </div>
                     </div>
 
                     <button type="submit" id="submitEditBtn" class="auth-submit" style="width:100%;margin-top:20px;">
@@ -798,14 +800,34 @@
         // Toggle Districts
         window.toggleEditDistricts = function(region) {
             const wrapper = document.getElementById('editDistrictWrapper');
-            const districtSelect = document.getElementById('editDistrict');
+            const label = document.getElementById('editDistrictLabel');
+            const container = document.getElementById('editDistrictContainer');
+
             if (region === 'Addis Ababa') {
                 wrapper.style.display = 'block';
-                districtSelect.required = true;
+                label.innerHTML = '<i class="fas fa-city"></i> Sub-City / District';
+                container.innerHTML = `
+                    <select id="editDistrict" required>
+                        <option value="" disabled selected>Select Sub-City</option>
+                        <option value="Addis Ketema">Addis Ketema</option>
+                        <option value="Akaki Kality">Akaki Kality</option>
+                        <option value="Arada">Arada</option>
+                        <option value="Bole">Bole</option>
+                        <option value="Gullele">Gullele</option>
+                        <option value="Kirkos">Kirkos</option>
+                        <option value="Kolfe Keranio">Kolfe Keranio</option>
+                        <option value="Lideta">Lideta</option>
+                        <option value="Nifas Silk-Lafto">Nifas Silk-Lafto</option>
+                        <option value="Lemi Kura">Lemi Kura</option>
+                        <option value="Yeka">Yeka</option>
+                    </select>`;
+            } else if (region === 'Other') {
+                wrapper.style.display = 'block';
+                label.innerHTML = '<i class="fas fa-map-pin"></i> Specify City / Location';
+                container.innerHTML = `<input type="text" id="editDistrict" placeholder="e.g. Debre Birhan, Nekemte, Arba Minch" required>`;
             } else {
                 wrapper.style.display = 'none';
-                districtSelect.required = false;
-                districtSelect.value = ""; 
+                container.innerHTML = `<select id="editDistrict" style="display:none;"></select>`;
             }
         };
 
@@ -955,14 +977,24 @@ document.getElementById('editDesc').value = descOnly;
 
             // Location
             if (item.location) {
-                const locParts = item.location.split(', ');
-                if (locParts.length > 1) {
-                    document.getElementById('editRegion').value = locParts[1];
-                    toggleEditDistricts(locParts[1]);
+                const KNOWN_CITIES = ['Addis Ababa','Adama','Bahir Dar','Dire Dawa','Mekele','Shashamane','Hawassa','Bishoftu','Jigjiga','Gondar','Dilla'];
+                const loc = item.location.trim();
+                const locParts = loc.split(', ');
+
+                if (locParts.length > 1 && locParts[1] === 'Addis Ababa') {
+                    // "Sub-City, Addis Ababa" format
+                    document.getElementById('editRegion').value = 'Addis Ababa';
+                    toggleEditDistricts('Addis Ababa');
                     document.getElementById('editDistrict').value = locParts[0];
+                } else if (KNOWN_CITIES.includes(loc)) {
+                    // Exact match on one of the known cities
+                    document.getElementById('editRegion').value = loc;
+                    toggleEditDistricts(loc);
                 } else {
-                    document.getElementById('editRegion').value = locParts[0];
-                    toggleEditDistricts(locParts[0]);
+                    // Legacy region name (e.g. "Oromia") or a custom city — fall back to "Other"
+                    document.getElementById('editRegion').value = 'Other';
+                    toggleEditDistricts('Other');
+                    document.getElementById('editDistrict').value = loc;
                 }
             }
 
@@ -1071,7 +1103,14 @@ document.getElementById('editDesc').value = descOnly;
                 const region = document.getElementById('editRegion').value;
                 const districtSelect = document.getElementById('editDistrict');
                 const district = districtSelect ? districtSelect.value : "";
-                const finalLocation = district && region === 'Addis Ababa' ? `${district}, ${region}` : region;
+                let finalLocation;
+                if (region === 'Addis Ababa') {
+                    finalLocation = district ? `${district}, Addis Ababa` : 'Addis Ababa';
+                } else if (region === 'Other') {
+                    finalLocation = district || 'Other';
+                } else {
+                    finalLocation = region;
+                }
 
                 // 3. Build updated data based on category type
                 const cat = document.getElementById('editCategory').value;
