@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WanaGebya — ዋና ገበያ</title>
+<meta name="description" content="WanaGebya — Ethiopia's marketplace to buy and sell. Scan or tap to visit.">
+<meta property="og:title" content="WanaGebya — ዋና ገበያ">
+<meta property="og:description" content="Ethiopia's marketplace to buy and sell. Call, message, or visit the site.">
+<meta property="og:url" content="https://wanagebya.com/card.html">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://wanagebya.com/card.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Poppins:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --forest:#0A291A;
+    --forest-deep:#071D12;
+    --gold:#F5A623;
+    --cream:#F7F0DE;
+    --rust:#B5502E;
+    --ink:#14201A;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 18px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(245,166,35,0.10), transparent 55%),
+      var(--forest-deep);
+    background-color:var(--forest-deep);
+    font-family:'Poppins', sans-serif;
+    color:var(--ink);
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* faint woven diamond texture across the page */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(45deg, rgba(245,240,222,0.035) 25%, transparent 25%, transparent 75%, rgba(245,240,222,0.035) 75%),
+      linear-gradient(45deg, rgba(245,240,222,0.035) 25%, transparent 25%, transparent 75%, rgba(245,240,222,0.035) 75%);
+    background-size:26px 26px;
+    background-position:0 0, 13px 13px;
+    pointer-events:none;
+  }
+
+  .card-stage{
+    perspective:1200px;
+    width:100%;
+    max-width:380px;
+  }
+
+  .card{
+    position:relative;
+    background:var(--cream);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.55), 0 4px 18px rgba(0,0,0,0.35);
+    transform:rotateX(0deg) rotateY(0deg);
+    transition:transform .25s ease;
+    will-change:transform;
+  }
+
+  /* Tibeb-inspired triangle border — the card's signature element */
+  .tibeb{
+    height:15px;
+    width:100%;
+    display:flex;
+  }
+  .tibeb span{
+    flex:1;
+    height:100%;
+    clip-path:polygon(50% 0, 100% 100%, 0 100%);
+  }
+  .tibeb span:nth-child(3n+1){background:var(--gold);}
+  .tibeb span:nth-child(3n+2){background:var(--rust);}
+  .tibeb span:nth-child(3n+3){background:var(--forest);}
+  .tibeb.bottom{transform:rotate(180deg);}
+
+  .card-body{
+    padding:34px 30px 30px;
+    text-align:center;
+  }
+
+  .wordmark{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:700;
+    font-size:34px;
+    letter-spacing:-0.01em;
+    color:var(--forest);
+    margin:0;
+    line-height:1.05;
+  }
+  .wordmark span{color:var(--rust);}
+
+  .amharic{
+    font-family:'Noto Sans Ethiopic', sans-serif;
+    font-size:16px;
+    font-weight:600;
+    color:var(--gold);
+    margin:6px 0 0;
+    letter-spacing:0.02em;
+    background:var(--forest);
+    display:inline-block;
+    padding:3px 14px;
+    border-radius:999px;
+  }
+
+  .tagline{
+    margin:16px 0 0;
+    font-size:13.5px;
+    color:#4b5a4f;
+    line-height:1.55;
+  }
+  .tagline em{font-style:normal; color:var(--forest); font-weight:600;}
+  .tagline .am-line{
+    display:inline-block;
+    margin-top:6px;
+    font-family:'Noto Sans Ethiopic', sans-serif;
+    font-size:12.5px;
+    color:#6b7a6f;
+  }
+
+  .qr-wrap{
+    margin:24px auto 6px;
+    width:168px;
+    height:168px;
+    background:#fff;
+    padding:10px;
+    border-radius:16px;
+    border:1px solid rgba(10,41,26,0.08);
+    box-shadow:inset 0 0 0 1px rgba(245,166,35,0.25);
+  }
+  #qrcode{width:100%; height:100%;}
+  #qrcode img{width:100% !important; height:100% !important; border-radius:6px;}
+
+  .scan-label{
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--rust);
+    font-weight:600;
+    line-height:1.6;
+    margin:12px 0 22px;
+  }
+
+  .divider{
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(10,41,26,0.15), transparent);
+    margin:0 0 22px;
+  }
+
+  .contact-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    text-align:left;
+    margin-bottom:22px;
+  }
+  .contact-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:14px;
+    font-weight:500;
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(10,41,26,0.035);
+    transition:background .15s ease;
+  }
+  .contact-row:hover{background:rgba(10,41,26,0.07);}
+  .contact-row .ico{
+    width:34px; height:34px;
+    flex-shrink:0;
+    border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--forest);
+    color:var(--gold);
+    font-size:15px;
+  }
+  .contact-row small{display:block; color:#6b7a6f; font-weight:400; font-size:11.5px; margin-top:1px;}
+
+  .cta-row{
+    display:flex;
+    gap:10px;
+  }
+  .btn{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:13px 8px;
+    border-radius:12px;
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:12px;
+    text-decoration:none;
+    border:none;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+    white-space:nowrap;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{
+    background:var(--gold);
+    color:var(--forest);
+    box-shadow:0 8px 18px -8px rgba(245,166,35,0.7);
+  }
+  .btn-secondary{
+    background:var(--forest);
+    color:var(--cream);
+  }
+
+  .save-contact{
+    display:block;
+    text-align:center;
+    margin-top:14px;
+    font-size:12px;
+    color:#7c8a80;
+    text-decoration:none;
+    font-weight:500;
+  }
+  .save-contact:hover{color:var(--forest);}
+
+  .footer-note{
+    text-align:center;
+    margin-top:22px;
+    font-size:11px;
+    color:rgba(247,240,222,0.35);
+    letter-spacing:0.04em;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:26px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--forest);
+    color:var(--cream);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:500;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (prefers-reduced-motion: reduce){
+    .card{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="card-stage" id="cardStage">
+    <div class="card" id="card">
+      <div class="tibeb top" id="tibebTop"></div>
+
+      <div class="card-body">
+        <h1 class="wordmark">Wana<span>Gebya</span></h1>
+        <p class="amharic">ዋና ገበያ</p>
+
+        <p class="tagline">Ethiopia's marketplace to <em>buy</em> and <em>sell</em> — electronics, fashion, jobs and services.<br>
+        <span class="am-line">የኢትዮጵያ የግብይት መድረክ — ኤሌክትሮኒክስ፣ ፋሽን፣ ስራና አገልግሎት ለመሸጥና ለመግዛት።</span></p>
+
+        <div class="qr-wrap"><div id="qrcode"></div></div>
+        <p class="scan-label">Scan for contact & links · ለመገናኛ ይቃኙ</p>
+
+        <div class="divider"></div>
+
+        <div class="contact-list">
+          <a class="contact-row" href="https://wanagebya.com" target="_blank" rel="noopener">
+            <span class="ico">🌐</span>
+            <span>wanagebya.com<small>Browse the marketplace · ገበያውን ይጎብኙ</small></span>
+          </a>
+          <a class="contact-row" href="tel:+251707022845">
+            <span class="ico">📞</span>
+            <span>+251 707 022 845<small>Call us · ይደውሉልን</small></span>
+          </a>
+          <a class="contact-row" href="https://t.me/WanaGebyaet" target="_blank" rel="noopener">
+            <span class="ico">✈️</span>
+            <span>t.me/WanaGebyaet<small>Join the community · ቡድኑን ይቀላቀሉ</small></span>
+          </a>
+        </div>
+
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://wanagebya.com" target="_blank" rel="noopener">Visit Site · ይጎብኙ</a>
+          <button class="btn btn-secondary" id="shareBtn">Share · አጋራ</button>
+        </div>
+
+        <a class="save-contact" id="saveContact" href="#">↓ Save as contact · አድራሻ ያስቀምጡ</a>
+      </div>
+
+      <div class="tibeb bottom" id="tibebBottom"></div>
+    </div>
+
+    <p class="footer-note">WANAGEBYA · ADDIS ABABA, ETHIOPIA</p>
+  </div>
+
+  <div class="toast" id="toast">Link copied</div>
+
+<script>
+  // The card's own live URL — this is what the QR code and Share button
+  // point to, so anyone who scans/shares lands on the full contact hub
+  // (phone, Telegram, vCard) rather than skipping straight to the homepage.
+  const CARD_URL = "https://wanagebya.com/card.html";
+
+  // Build the tibeb triangle bands
+  function fillTibeb(el, count){
+    for(let i=0;i<count;i++){ const s=document.createElement('span'); el.appendChild(s); }
+  }
+  fillTibeb(document.getElementById('tibebTop'), 18);
+  fillTibeb(document.getElementById('tibebBottom'), 18);
+
+  // QR code -> the card itself (the hub with phone, Telegram, vCard)
+  new QRCode(document.getElementById("qrcode"), {
+    text: CARD_URL,
+    width: 300,
+    height: 300,
+    colorDark: "#0A291A",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M
+  });
+
+  // Subtle tilt-on-move interaction (the card's tactile signature)
+  const stage = document.getElementById('cardStage');
+  const card = document.getElementById('card');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReduced && window.matchMedia('(hover: hover)').matches){
+    stage.addEventListener('mousemove', (e) => {
+      const r = stage.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
+    });
+    stage.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0deg) rotateX(0deg)'; });
+  }
+
+  // Share button — native share sheet, fallback to copy link
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    const shareData = { title: 'WanaGebya — ዋና ገበያ', text: "Ethiopia's marketplace to buy and sell.", url: CARD_URL };
+    if (navigator.share){
+      try { await navigator.share(shareData); } catch(e){ /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(CARD_URL);
+        showToast('Link copied');
+      } catch(e){ showToast('Visit wanagebya.com/card.html'); }
+    }
+  });
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  // Save as contact -> downloads a .vcf (organization card)
+  document.getElementById('saveContact').addEventListener('click', (e) => {
+    e.preventDefault();
+    const vcard = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      'N:;WanaGebya;;;',
+      'FN:WanaGebya',
+      'ORG:WanaGebya (ዋና ገበያ)',
+      'TITLE:Ethiopia\'s Online Marketplace',
+      'TEL;TYPE=WORK,VOICE:+251707022845',
+      'URL:https://wanagebya.com',
+      'NOTE:Buy and sell electronics, fashion, jobs and services in Ethiopia.',
+      'END:VCARD'
+    ].join('\n');
+    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'WanaGebya.vcf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>
