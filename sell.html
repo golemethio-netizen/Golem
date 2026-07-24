@@ -264,18 +264,23 @@
                     <input type="text" id="prodPhone" placeholder="0911..." data-am-placeholder="0911..." required>
                 </div>
 
-                <!-- Region -->
+                <!-- City / Location -->
                 <div class="input-group-sell">
-                 <label><i class="fas fa-map-marker-alt"></i> Region</label>
+                 <label><i class="fas fa-map-marker-alt"></i> City / Location</label>
     <select id="prodRegion" onchange="handleRegionChange(this.value)" required>
-        <option value="" disabled selected>Select Region</option>
+        <option value="" disabled selected>Select City / Location</option>
         <option value="Addis Ababa">Addis Ababa</option>
-        <option value="Oromia">Oromia</option>
-        <option value="Amhara">Amhara</option>
-        <option value="Tigray">Tigray</option>
-        <option value="Sidama">Sidama</option>
-        <option value="South Ethiopia">South Ethiopia</option>
-        <option value="Other">Other Region</option>
+        <option value="Adama">Adama (Nazret)</option>
+        <option value="Bahir Dar">Bahir Dar</option>
+        <option value="Dire Dawa">Dire Dawa</option>
+        <option value="Mekele">Mekele</option>
+        <option value="Shashamane">Shashamane</option>
+        <option value="Hawassa">Hawassa</option>
+        <option value="Bishoftu">Bishoftu (Debre Zeit)</option>
+        <option value="Jigjiga">Jigjiga</option>
+        <option value="Gondar">Gondar</option>
+        <option value="Dilla">Dilla</option>
+        <option value="Other">Other</option>
     </select>
 </div>
 
@@ -1166,9 +1171,8 @@ function handleRegionChange(region) {
         return;
     }
 
-    wrapper.style.display = 'block';
-
     if (region === 'Addis Ababa') {
+        wrapper.style.display = 'block';
         label.innerHTML = '<i class="fas fa-city"></i> Sub-City';
         container.innerHTML = `
             <select id="prodDistrict" required>
@@ -1185,10 +1189,15 @@ function handleRegionChange(region) {
                 <option value="Kolfe Keranio">Kolfe Keranio</option>
                 <option value="Lemi Kura">Lemi Kura</option>
             </select>`;
-    } else {
-        label.innerHTML = '<i class="fas fa-map-pin"></i> Specific City / Area';
+    } else if (region === 'Other') {
+        wrapper.style.display = 'block';
+        label.innerHTML = '<i class="fas fa-map-pin"></i> Specify City / Location';
         container.innerHTML = `
-            <input type="text" id="prodDistrict" placeholder="e.g. Adama, Bahir Dar, or Dessie" data-am-placeholder="ለምሳሌ አዳማ፣ ባህር ዳር ወይም ደሴ" required>`;
+            <input type="text" id="prodDistrict" placeholder="e.g. Debre Birhan, Nekemte, Arba Minch" data-am-placeholder="ለምሳሌ ደብረ ብርሃን፣ ነቀምቴ፣ አርባ ምንጭ" required>`;
+    } else {
+        // A specific city was chosen directly — no extra input needed.
+        wrapper.style.display = 'none';
+        container.innerHTML = '';
     }
 }
 
@@ -1295,8 +1304,16 @@ function handleRegionChange(region) {
             const publicUrl = uploadedUrls[0];
 
          const region = document.getElementById('prodRegion').value;
-            const district = document.getElementById('prodDistrict').value;
-           const locationStr = district ? `${district}, ${region}` : region;
+            const districtEl = document.getElementById('prodDistrict');
+            const district = districtEl ? districtEl.value : '';
+            let locationStr;
+            if (region === 'Addis Ababa') {
+                locationStr = district ? `${district}, Addis Ababa` : 'Addis Ababa';
+            } else if (region === 'Other') {
+                locationStr = district || 'Other';
+            } else {
+                locationStr = region;
+            }
 
             const stockStatus = document.getElementById('prodStockStatus').value;
             const qtyVal = document.getElementById('prodQuantity').value;
