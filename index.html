@@ -1508,21 +1508,32 @@
                 </button>
 
                 <!-- Divider -->
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                     <div style="flex:1; height:1px; background:#eef0ed;"></div>
-                    <span style="font-size:11.5px; color:#9ca3af; font-weight:600; white-space:nowrap;">or continue with email</span>
+                    <span style="font-size:11.5px; color:#9ca3af; font-weight:600; white-space:nowrap;">or continue with</span>
                     <div style="flex:1; height:1px; background:#eef0ed;"></div>
+                </div>
+
+                <!-- EMAIL / PHONE METHOD TOGGLE -->
+                <div style="display:flex; gap:8px; margin-bottom:14px; background:#f3f4f6; padding:4px; border-radius:10px;">
+                    <button type="button" id="authMethodEmail" onclick="window.switchAuthMethod('email')" style="flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; border:none; border-radius:8px; cursor:pointer; background:#fff; color:#0A291A; box-shadow:0 1px 3px rgba(0,0,0,0.08); transition:all 0.15s;">
+                        <i class="fas fa-envelope" style="margin-right:6px;"></i>Email
+                    </button>
+                    <button type="button" id="authMethodPhone" onclick="window.switchAuthMethod('phone')" style="flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; border:none; border-radius:8px; cursor:pointer; background:transparent; color:#6b7280; transition:all 0.15s;">
+                        <i class="fas fa-phone" style="margin-right:6px;"></i>Phone
+                    </button>
                 </div>
 
                 <!-- SIGN IN PANEL -->
                 <div id="authPanelLogin">
                     <form id="authForm">
                         <div style="margin-bottom:14px;">
-                            <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Email Address</label>
+                            <label id="authIdentifierLabel" style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Email Address</label>
                             <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px; transition:border-color 0.2s;" onfocusin="this.style.borderColor='#0A291A'" onfocusout="this.style.borderColor='#e5e7eb'">
-                                <i class="fas fa-envelope" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
+                                <i id="authIdentifierIcon" class="fas fa-envelope" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
                                 <input type="email" id="authEmail" placeholder="you@example.com" required style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
                             </div>
+                            <div id="authPhoneHint" style="display:none; font-size:11px; color:#9ca3af; margin-top:5px;">Enter your Ethiopian mobile number, e.g. 0912345678</div>
                         </div>
                         <div style="margin-bottom:8px;">
                             <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Password</label>
@@ -1531,9 +1542,10 @@
                                 <input type="password" id="authPassword" placeholder="••••••••" required style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
                             </div>
                         </div>
-                        <div style="text-align:right; margin-bottom:18px;">
+                        <div id="forgotPwdWrap" style="text-align:right; margin-bottom:18px;">
                             <a href="#" id="forgotPwdLink" style="font-size:12px; color:#0A291A; opacity:0.65; text-decoration:none;">Forgot Password?</a>
                         </div>
+                        <div id="phoneResetHint" style="display:none; text-align:right; margin-bottom:18px; font-size:12px; color:#9ca3af;">Forgot your password? Message us on Telegram to reset it.</div>
                     </form>
 
                     <!-- SIGN UP PANEL (hidden by default, shown inside same form area) -->
@@ -1545,7 +1557,7 @@
                                 <input type="text" id="regName" placeholder="Abebe Bekele" style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
                             </div>
                         </div>
-                        <div style="margin-bottom:14px;">
+                        <div id="regPhoneField" style="margin-bottom:14px;">
                             <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Phone Number</label>
                             <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px;">
                                 <i class="fas fa-phone" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
