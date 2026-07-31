@@ -25,8 +25,33 @@ function escapeJsAttr(str) {
         .replace(/</g, '\\x3C');
 }
 
+// Lightweight, privacy-minimal "unique visitor" tracking for the admin
+// dashboard's Site Reach number. Each browser gets a random ID stored in
+// localStorage on first visit; we log one row per page load tagged with
+// that ID. No cookies, no fingerprinting, no personal data collected.
+function logSiteVisit() {
+    try {
+        if (typeof _supabase === 'undefined') return;
+        const KEY = 'wg_visitor_id';
+        let visitorId = localStorage.getItem(KEY);
+        if (!visitorId) {
+            visitorId = (crypto.randomUUID ? crypto.randomUUID() : 'v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+            localStorage.setItem(KEY, visitorId);
+        }
+        _supabase.from('site_visits').insert([{
+            visitor_id: visitorId,
+            page: location.pathname,
+            referrer: document.referrer || null,
+            user_agent: navigator.userAgent
+        }]).then(() => {}).catch(() => {});
+    } catch (e) {
+        // Never let analytics break the page
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 WanaGebya System Initializing...");
+    logSiteVisit(); // fire-and-forget, never blocks page load
     await window.updateUIForUser();
     window.updateCartBadge();
     window.fetchProducts();
