@@ -1474,17 +1474,22 @@ window.handleAuth = async function(e) {
         const location = document.getElementById('regLocation')?.value || '';
         const bio      = document.getElementById('regBio')?.value || '';
 
-        const { error } = await _supabase.auth.signUp({
+        const { data, error } = await _supabase.auth.signUp({
             email, password,
             options: { data: { full_name: fullName, phone_number: phone, location, bio } }
         });
         if (error) { authToast(error.message, 'error'); }
-        else {
-            if (authMethod === 'phone') {
-                authToast('✓ Account created! You can sign in now.', 'success');
-            } else {
-                authToast('✓ Account created! Check your email to confirm.', 'success');
-            }
+        else if (data && data.session) {
+            // "Confirm email" is off in Supabase, so signUp already returns a live session —
+            // the account is fully created and the person is logged in right now.
+            authToast(`✓ Welcome to WanaGebya, ${fullName || 'there'}! Your account is ready.`, 'success');
+            await window.updateUIForUser();
+            setTimeout(() => window.toggleModal(), 2000);
+        } else if (authMethod === 'phone') {
+            authToast('✓ Account created! You can sign in now.', 'success');
+            setTimeout(() => window.toggleModal(), 2500);
+        } else {
+            authToast('✓ Account created! Check your email to confirm.', 'success');
             setTimeout(() => window.toggleModal(), 2500);
         }
     } else {
