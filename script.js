@@ -1349,12 +1349,12 @@ let authMethod   = 'email'; // 'email' | 'phone'
 function normalizeEthPhone(raw) {
     let p = String(raw || '').trim().replace(/[^\d+]/g, '');
     p = p.replace(/^\+/, '');
-    if (p.startsWith('0') && p.length === 10)      p = '251' + p.slice(1);
-    else if (p.length === 9 && p.startsWith('9'))  p = '251' + p;
-    return p; // expected shape: 2519XXXXXXXX
+    if (p.startsWith('0') && p.length === 10)                     p = '251' + p.slice(1);
+    else if (p.length === 9 && /^[79]/.test(p))                   p = '251' + p;
+    return p; // expected shape: 251[79]XXXXXXXX (9 = Ethio Telecom, 7 = Safaricom Ethiopia)
 }
 function isValidEthPhone(p) {
-    return /^2519\d{8}$/.test(p);
+    return /^251[79]\d{8}$/.test(p);
 }
 function phoneToPseudoEmail(p) {
     return p + '@phone.wanagebya.com';
