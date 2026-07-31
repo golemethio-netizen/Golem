@@ -933,8 +933,22 @@
         window.deleteUserAccount = async (userId, identifier) => {
             if (!confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`)) return;
             try {
-                const { error } = await _supabase.from('profiles').delete().eq('id', userId);
-                if (error) throw error;
+                const { data: sessionData } = await _supabase.auth.getSession();
+                const token = sessionData?.session?.access_token;
+                if (!token) { alert("Your session expired — please sign in again."); return; }
+
+                const res = await fetch(`${_supabase.supabaseUrl}/functions/v1/admin-delete-user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'apikey': _supabase.supabaseKey
+                    },
+                    body: JSON.stringify({ targetUserId: userId })
+                });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || 'Delete failed');
+
                 logAction('Account Deleted', `Permanently deleted user account: ${identifier} (ID: ${userId})`);
                 alert("User deleted.");
                 loadUsers();
