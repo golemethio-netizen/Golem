@@ -1339,6 +1339,65 @@ window.shareProductFromModal = (productId, productName) => {
 
 // --- 7. AUTHENTICATION SYSTEM ---
 let isSignUpMode = false;
+let authMethod   = 'email'; // 'email' | 'phone'
+
+// Supabase has no free phone/OTP auth without an SMS provider (Twilio, cost per
+// message). To let people sign in with just a phone + password, we normalize
+// the phone number and use it to build a fake internal email address, which
+// becomes the real identifier Supabase Auth stores under the hood. The user
+// never sees this email; profiles.phone_number keeps the real number.
+function normalizeEthPhone(raw) {
+    let p = String(raw || '').trim().replace(/[^\d+]/g, '');
+    p = p.replace(/^\+/, '');
+    if (p.startsWith('0') && p.length === 10)      p = '251' + p.slice(1);
+    else if (p.length === 9 && p.startsWith('9'))  p = '251' + p;
+    return p; // expected shape: 2519XXXXXXXX
+}
+function isValidEthPhone(p) {
+    return /^2519\d{8}$/.test(p);
+}
+function phoneToPseudoEmail(p) {
+    return p + '@phone.wanagebya.com';
+}
+
+// Switch between Email and Phone as the sign-in/sign-up identifier
+window.switchAuthMethod = function(method) {
+    authMethod = method;
+    const btnEmail        = document.getElementById('authMethodEmail');
+    const btnPhone        = document.getElementById('authMethodPhone');
+    const label           = document.getElementById('authIdentifierLabel');
+    const icon            = document.getElementById('authIdentifierIcon');
+    const input           = document.getElementById('authEmail');
+    const hint            = document.getElementById('authPhoneHint');
+    const regPhoneField   = document.getElementById('regPhoneField');
+    const forgotWrap      = document.getElementById('forgotPwdWrap');
+    const phoneResetHint  = document.getElementById('phoneResetHint');
+
+    const activePill   = "flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; border:none; border-radius:8px; cursor:pointer; background:#fff; color:#0A291A; box-shadow:0 1px 3px rgba(0,0,0,0.08); transition:all 0.15s;";
+    const inactivePill = "flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; border:none; border-radius:8px; cursor:pointer; background:transparent; color:#6b7280; transition:all 0.15s;";
+    if (btnEmail) btnEmail.style.cssText = (method === 'email') ? activePill : inactivePill;
+    if (btnPhone) btnPhone.style.cssText = (method === 'phone') ? activePill : inactivePill;
+
+    if (method === 'phone') {
+        if (label) label.textContent   = 'Phone Number';
+        if (icon)  icon.className      = 'fas fa-phone';
+        if (input) { input.type = 'tel'; input.placeholder = '09XX XXX XXX'; }
+        if (hint)  hint.style.display  = 'block';
+        if (regPhoneField)  regPhoneField.style.display  = 'none';
+        if (forgotWrap)     forgotWrap.style.display      = 'none';
+        if (phoneResetHint) phoneResetHint.style.display  = 'block';
+    } else {
+        if (label) label.textContent   = 'Email Address';
+        if (icon)  icon.className      = 'fas fa-envelope';
+        if (input) { input.type = 'email'; input.placeholder = 'you@example.com'; }
+        if (hint)  hint.style.display  = 'none';
+        if (regPhoneField)  regPhoneField.style.display  = 'block';
+        if (forgotWrap)     forgotWrap.style.display      = '';
+        if (phoneResetHint) phoneResetHint.style.display  = 'none';
+    }
+    const toast = document.getElementById('authToast');
+    if (toast) toast.style.display = 'none';
+};
 
 // Show inline toast inside the auth modal
 function authToast(msg, type) {
@@ -1386,11 +1445,24 @@ window.toggleAuthMode = function() {
 
 window.handleAuth = async function(e) {
     e.preventDefault();
-    const email    = document.getElementById('authEmail').value.trim();
-    const password = document.getElementById('authPassword').value;
-    const btn      = document.getElementById('authSubmitBtn');
+    const identifierRaw = document.getElementById('authEmail').value.trim();
+    const password       = document.getElementById('authPassword').value;
+    const btn            = document.getElementById('authSubmitBtn');
 
-    if (!email || !password) { authToast('Please fill in all fields.', 'error'); return; }
+    if (!identifierRaw || !password) { authToast('Please fill in all fields.', 'error'); return; }
+
+    let email      = identifierRaw;
+    let realPhone  = '';
+
+    if (authMethod === 'phone') {
+        const normalized = normalizeEthPhone(identifierRaw);
+        if (!isValidEthPhone(normalized)) {
+            authToast('Please enter a valid Ethiopian phone number, e.g. 0912345678.', 'error');
+            return;
+        }
+        realPhone = '+' + normalized;
+        email     = phoneToPseudoEmail(normalized); // internal identifier only, never shown to the user
+    }
 
     const origText = btn.textContent;
     btn.disabled   = true;
@@ -1398,7 +1470,7 @@ window.handleAuth = async function(e) {
 
     if (isSignUpMode) {
         const fullName = document.getElementById('regName')?.value || '';
-        const phone    = document.getElementById('regPhone')?.value || '';
+        const phone    = authMethod === 'phone' ? realPhone : (document.getElementById('regPhone')?.value || '');
         const location = document.getElementById('regLocation')?.value || '';
         const bio      = document.getElementById('regBio')?.value || '';
 
@@ -1408,12 +1480,24 @@ window.handleAuth = async function(e) {
         });
         if (error) { authToast(error.message, 'error'); }
         else {
-            authToast('✓ Account created! Check your email to confirm.', 'success');
+            if (authMethod === 'phone') {
+                authToast('✓ Account created! You can sign in now.', 'success');
+            } else {
+                authToast('✓ Account created! Check your email to confirm.', 'success');
+            }
             setTimeout(() => window.toggleModal(), 2500);
         }
     } else {
         const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) { authToast(error.message, 'error'); }
+        if (error) {
+            if (authMethod === 'phone' && /Invalid login credentials/i.test(error.message)) {
+                authToast('No account found with that phone number, or the password is wrong.', 'error');
+            } else if (authMethod === 'phone' && /Email not confirmed/i.test(error.message)) {
+                authToast('Sign-in blocked: turn off "Confirm email" in Supabase Auth settings for phone accounts to work.', 'error');
+            } else {
+                authToast(error.message, 'error');
+            }
+        }
         else { window.toggleModal(); await window.updateUIForUser(); }
     }
 
