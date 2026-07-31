@@ -840,6 +840,14 @@
             renderUserTable(users, filter);
         }
 
+        // Accounts created via the Phone tab get an internal placeholder email
+        // like 2519XXXXXXXX@phone.wanagebya.com — never shown to the user, but
+        // we need to recognize it here so the admin table shows their real
+        // phone number instead of that fake address.
+        function isPhoneAccount(email) {
+            return !!email && /@phone\.wanagebya\.com$/i.test(email);
+        }
+
         function renderUserTable(users, currentFilter) {
             const list = document.getElementById('userList');
             const filterHTML = `
@@ -865,12 +873,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${users.map(u => `
+                        ${users.map(u => {
+                            const phoneAcct = isPhoneAccount(u.email);
+                            return `
                             <tr style="border-bottom: 1px solid #eee; height:70px;">
                                 <td style="padding:12px;">
                                     <div style="display:flex; flex-direction:column;">
                                         <strong>${escapeHtml(u.full_name || 'Anonymous User')}</strong>
-                                        <span style="font-size:0.75rem; color:#888;">${escapeHtml(u.email)}</span>
+                                        ${phoneAcct
+                                            ? `<span style="font-size:0.75rem; color:#0A291A; font-weight:600;"><i class="fas fa-phone" style="margin-right:3px;"></i>${escapeHtml(u.phone || 'No phone on file')}</span>
+                                               <span style="font-size:0.65rem; color:#999;">Phone sign-up</span>`
+                                            : `<span style="font-size:0.75rem; color:#888;">${escapeHtml(u.email || 'No email')}</span>
+                                               ${u.phone ? `<span style="font-size:0.7rem; color:#888;"><i class="fas fa-phone" style="margin-right:3px;"></i>${escapeHtml(u.phone)}</span>` : ''}`
+                                        }
                                     </div>
                                 </td>
                                 <td style="font-size:0.85rem; color:#555;">${escapeHtml(u.location || 'Unknown')}</td>
@@ -893,16 +908,19 @@
                                         <button onclick="toggleVerification('${u.id}', ${u.is_verified})" class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" style="padding: 6px 12px; font-size: 0.75rem; border:none; border-radius:5px; cursor:pointer;">
                                             ${u.is_verified ? 'Revoke' : 'Verify'}
                                         </button>
-                                        <button onclick="sendPasswordReset('${escapeJsAttr(u.email)}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                        ${phoneAcct
+                                            ? `<span title="Phone accounts have no real inbox — reset manually via Telegram" style="padding: 5px 10px; font-size:0.75rem; color:#ccc;"><i class="fas fa-envelope"></i> N/A</span>`
+                                            : `<button onclick="sendPasswordReset('${escapeJsAttr(u.email)}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
                                             <i class="fas fa-envelope"></i> Reset
-                                        </button>
-                                        <button onclick="deleteUserAccount('${u.id}', '${escapeJsAttr(u.full_name || u.email)}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
+                                        </button>`
+                                        }
+                                        <button onclick="deleteUserAccount('${u.id}', '${escapeJsAttr(u.full_name || u.phone || u.email)}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                        `).join('')}
+                        `;}).join('')}
                     </tbody>
                 </table>
                 </div>`;
