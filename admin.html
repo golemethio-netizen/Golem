@@ -534,6 +534,9 @@
             viewsSection.style.display      = 'none';
             searchContainer.style.display   = 'block';
 
+            const searchInput = document.getElementById('adminSearchInput');
+            if (searchInput) searchInput.value = '';
+
             if (status === 'users') {
                 usersSection.style.display = 'block';
                 loadUsers();
@@ -1129,9 +1132,15 @@
         // Search Bar Event Listener
         document.getElementById('adminSearchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.product-card').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
-            });
+            if (currentView === 'users') {
+                document.querySelectorAll('#userList table tbody tr').forEach(row => {
+                    row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+                });
+            } else {
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
+                });
+            }
         });
 
         // ═══════════════════════════════════════════════════
