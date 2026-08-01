@@ -12,6 +12,30 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
+// Returns a product's specs as a { lowercasekey: value } object.
+// Prefers the structured `specs` jsonb column (new listings). Falls back to
+// parsing the old "--- Specs ---" / "--- Job Details ---" / "--- Service
+// Details ---" free-text block for listings created before that column
+// existed, so old listings keep displaying correctly without a data migration.
+function getProductSpecs(p) {
+    if (p.specs && typeof p.specs === 'object' && Object.keys(p.specs).length) {
+        const out = {};
+        Object.entries(p.specs).forEach(([k, v]) => { out[String(k).trim().toLowerCase()] = v; });
+        return out;
+    }
+    const desc = p.description || '';
+    const block = desc.split('--- Job Details ---')[1]
+               || desc.split('--- Service Details ---')[1]
+               || desc.split('--- Specs ---')[1]
+               || '';
+    const specs = {};
+    block.split('\n').forEach(l => {
+        const m = l.match(/^[-\s]*([^:]+):\s*(.+)$/);
+        if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+    });
+    return specs;
+}
+
 // Escape text embedded inside a single-quoted JS string within an inline
 // onclick="..." attribute — HTML-escaping alone isn't enough there since
 // entities decode back before the browser parses the attribute as JS.
@@ -219,11 +243,8 @@ function renderProducts(products) {
         // JOB CARD — uses .job-card CSS classes from index.html
         // ═══════════════════════════════════════════════════════
         if (p.category === 'Jobs') {
-            // Parse structured spec block from description
             const desc = p.description || '';
-            const specs = {};
-            const block = desc.split('--- Job Details ---')[1] || desc.split('--- Specs ---')[1] || '';
-            block.split('\n').forEach(l => { const m = l.match(/^[-\s]*([^:]+):\s*(.+)$/); if (m) specs[m[1].trim().toLowerCase()] = m[2].trim(); });
+            const specs = getProductSpecs(p);
             const mainDesc = desc.split('\n\n--- Job Details ---')[0].split('\n\n--- Specs ---')[0];
 
             const jobType = specs['job type'] || '';
@@ -288,9 +309,7 @@ function renderProducts(products) {
         // ═══════════════════════════════════════════════════════
         if (p.category === 'Services') {
             const desc = p.description || '';
-            const specs = {};
-            const block = desc.split('--- Service Details ---')[1] || desc.split('--- Specs ---')[1] || '';
-            block.split('\n').forEach(l => { const m = l.match(/^[-\s]*([^:]+):\s*(.+)$/); if (m) specs[m[1].trim().toLowerCase()] = m[2].trim(); });
+            const specs = getProductSpecs(p);
             const mainDesc = desc.split('\n\n--- Service Details ---')[0].split('\n\n--- Specs ---')[0];
 
             const svcType = specs['service type'] || specs['service category'] || 'Service';
@@ -1056,16 +1075,9 @@ window.openProductModal = async (product) => {
     if (product.category === 'Jobs' || product.category === 'Services') {
         const isJob = product.category === 'Jobs';
         
-        // Parse specs from description
-        const specs = {};
-        const descParts = (product.description || '').split('--- Specs ---');
-        const cleanDesc = descParts[0].trim();
-        if (descParts[1]) {
-            descParts[1].split('\n').forEach(line => {
-                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
-                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
-            });
-        }
+        // Specs: structured column first, legacy text-parsing fallback
+        const specs = getProductSpecs(product);
+        const cleanDesc = (product.description || '').split('--- Specs ---')[0].trim();
 
         const type = specs['job type'] || specs['service category'] || (isJob ? 'Full-Time' : 'Service');
         const exp = specs['experience required'] || specs['experience'] || '-';
@@ -1175,14 +1187,21 @@ window.openProductModal = async (product) => {
         modalContent.style.padding = '0';
         modalContent.style.background = 'transparent';
 
-        const specs = {};
-        const descLines = (product.description || '').split('\n');
+        const specs = getProductSpecs(product);
+        const hasStructuredSpecs = product.specs && typeof product.specs === 'object' && Object.keys(product.specs).length > 0;
         const introLines = [];
-        descLines.forEach(line => {
-            const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
-            if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
-            else if (line.trim() && !line.trim().startsWith('-')) introLines.push(line.trim());
-        });
+        if (hasStructuredSpecs) {
+            // New listings: description is pure free text, no spec lines mixed in
+            (product.description || '').split('\n').forEach(line => {
+                if (line.trim()) introLines.push(line.trim());
+            });
+        } else {
+            // Legacy listings: specs were mixed into the description as "key: value" lines
+            (product.description || '').split('\n').forEach(line => {
+                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+                if (!m && line.trim() && !line.trim().startsWith('-')) introLines.push(line.trim());
+            });
+        }
 
         const PHONE_SUBS = ['Mobile Phones','Mobile Phone','Phone','Smartphone'];
         const isMobile = PHONE_SUBS.includes(product.subcategory);
