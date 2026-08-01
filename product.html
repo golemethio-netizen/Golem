@@ -27,16 +27,22 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         }
-        .product-display img { width: 100%; height: 420px; border-radius: 10px; object-fit: contain; object-position: center; background:#f7f8f6; }
+        .product-display img { width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
+
+        /* ── Scoped fix: Electronics → Computer subcategory only ──
+           Gives the main image an explicit height (not just max-height)
+           so object-fit:contain is guaranteed to apply and nothing
+           gets clipped by .zoom-wrap's overflow:hidden. Does not
+           affect any other category/subcategory. */
+        .zoom-wrap.computer-detail-img { height: 420px; }
+        .zoom-wrap.computer-detail-img img { height: 420px; object-fit: contain; object-position: center; }
         @media (max-width: 480px) {
-            .product-display img { height: 300px; }
+            .zoom-wrap.computer-detail-img,
+            .zoom-wrap.computer-detail-img img { height: 300px; }
         }
 
         /* ── Side-window (side-by-side) zoom on main product image ── */
-        .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; height: 420px; }
-        @media (max-width: 480px) {
-            .zoom-wrap { height: 300px; }
-        }
+        .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; }
         @media (any-hover: hover) and (any-pointer: fine) {
             .zoom-wrap { cursor: zoom-in; }
         }
@@ -455,7 +461,8 @@
                 <div class="image-side">
                     ${(() => {
                         const gallery = Array.isArray(p.images) && p.images.length ? p.images : [p.image];
-                        const mainImg = `<div class="zoom-wrap" id="mainImgWrap"><img id="mainProductImg" data-idx="0" src="${gallery[0]}" alt="${escapeHtml(p.name)}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"><div class="zoom-tap-badge"><i class="fas fa-expand"></i></div></div>`;
+                        const isComputerSub = (p.subcategory || '').trim().toLowerCase() === 'computer';
+                        const mainImg = `<div class="zoom-wrap${isComputerSub ? ' computer-detail-img' : ''}" id="mainImgWrap"><img id="mainProductImg" data-idx="0" src="${gallery[0]}" alt="${escapeHtml(p.name)}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"><div class="zoom-tap-badge"><i class="fas fa-expand"></i></div></div>`;
                         if (gallery.length <= 1) return mainImg;
                         const thumbs = gallery.map((url, i) => `
                             <img src="${url}" data-idx="${i}"
