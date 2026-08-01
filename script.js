@@ -2065,48 +2065,20 @@ window.generateItemHTML = function(item) {
 };
 
 
-function showTGPopup() {
-    // Check if user has seen it today
-    if (!localStorage.getItem('tg_popup_seen')) {
-        setTimeout(() => {
-            document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 3000); // 3-second delay
-    }
-}
-
-function closeTGPopup() {
-    document.getElementById('tg-popup').classList.remove('tg-popup-show');
-    // Set a flag so it doesn't show again for 24 hours
-    localStorage.setItem('tg_popup_seen', 'true');
-}
-
-// Run the function on page load
-window.onload = showTGPopup;
-
-
-
-
-// Function for the Automatic Popup (runs once per day)
+// Auto-popup inviting people to join the Telegram channel — shows once
+// per visitor (tracked via localStorage), 3 seconds after page load.
 function showTGPopupAuto() {
     if (!localStorage.getItem('tg_popup_seen')) {
         setTimeout(() => {
-            document.getElementById('tg-popup').classList.add('tg-popup-show');
-        }, 3000); 
+            document.getElementById('tg-popup')?.classList.add('tg-popup-show');
+        }, 3000);
     }
 }
 
-// Function for the Manual Button (always opens when clicked)
-function openTGPopupManual() {
-    document.getElementById('tg-popup').classList.add('tg-popup-show');
-}
-
-// Function to close the popup
 function closeTGPopup() {
-    document.getElementById('tg-popup').classList.remove('tg-popup-show');
-    // We only set the 'seen' flag if it was an automatic trigger
+    document.getElementById('tg-popup')?.classList.remove('tg-popup-show');
     localStorage.setItem('tg_popup_seen', 'true');
 }
 
-// Start the auto-checker when the page loads
 window.onload = showTGPopupAuto;
 
