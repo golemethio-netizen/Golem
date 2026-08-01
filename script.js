@@ -1206,6 +1206,14 @@ window.openProductModal = async (product) => {
         const PHONE_SUBS = ['Mobile Phones','Mobile Phone','Phone','Smartphone'];
         const isMobile = PHONE_SUBS.includes(product.subcategory);
 
+        // Computer/Laptop/Desktop only — taller photo area + no bottom
+        // fade, since that gradient was darkening/hiding the lower part
+        // of laptop photos. Every other subcategory (phones, tablets,
+        // other electronics) keeps the original 260px + gradient look.
+        const COMPUTER_SUBS = ['Computer','Computers & Laptops','Laptop','Laptops','Desktop Computer','Desktop Computers'];
+        const isComputerSub = COMPUTER_SUBS.includes(product.subcategory);
+        const photoHeight = isComputerSub ? 320 : 260;
+
         const brand    = specs['brand'] || '';
         const model    = specs['model'] || '';
         const cpu      = specs['processor'] || specs['cpu'] || '-';
@@ -1236,9 +1244,9 @@ window.openProductModal = async (product) => {
           + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
           + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
           + '</div>'
-          + '<div id="elecPhotoWrap" class="elec-photo-wrap" style="position:relative;height:260px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
+          + '<div id="elecPhotoWrap" class="elec-photo-wrap" style="position:relative;height:' + photoHeight + 'px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
           + (product.image ? '<img id="elecMainPhoto" src="' + product.image + '" style="width:100%;height:100%;object-fit:contain;display:block;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
-          + '<div style="position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,rgba(15,22,35,0.85));pointer-events:none;"></div>'
+          + (isComputerSub ? '' : '<div style="position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,rgba(15,22,35,0.85));pointer-events:none;"></div>')
           + '</div>'
           + buildThumbStrip(getProductGalleryImages(product), 'elecMainPhoto', { bg: '#0f1623', padding: '8px 20px' })
           + '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
