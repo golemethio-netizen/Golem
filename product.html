@@ -253,6 +253,34 @@
             }, 0);
         }
 
+        // ── Stock status badge (same styling/logic as the main catalog cards) ──
+        function getStockBadge(stockStatus, quantity) {
+            if (!stockStatus || stockStatus === 'in_stock') {
+                const qty = quantity ? ' &nbsp;·&nbsp; <strong>' + quantity + ' left</strong>' : '';
+                return '<div style="display:inline-flex;align-items:center;gap:6px;background:#e8fdf5;border:1.5px solid #2ed573;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#1a9c5c;margin:8px 0;">'
+                     + '<i class="fas fa-check-circle"></i> In Stock' + qty + '</div>';
+            } else if (stockStatus === 'out_of_stock') {
+                return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff0f0;border:1.5px solid #ff4757;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#ff4757;margin:8px 0;">'
+                     + '<i class="fas fa-times-circle"></i> Out of Stock &nbsp;·&nbsp; <span style="font-weight:400;font-size:0.75rem;">Contact seller for availability</span></div>';
+            } else if (stockStatus === 'limited') {
+                const qty = quantity ? ' &nbsp;·&nbsp; <strong>Only ' + quantity + ' left!</strong>' : '';
+                return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1.5px solid #F5A623;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#F5A623;margin:8px 0;">'
+                     + '<i class="fas fa-exclamation-triangle"></i> Limited Stock' + qty + '</div>';
+            }
+            return '';
+        }
+
+        // ── Condition badge (New / Used / Refurbished, etc.) ──
+        function getConditionBadge(conditionText) {
+            if (!conditionText) return '';
+            const isNew = /new/i.test(conditionText);
+            const bg     = isNew ? '#eef2ff' : '#f3f0ff';
+            const border = isNew ? '#6366f1' : '#9333ea';
+            const color  = isNew ? '#4338ca' : '#7e22ce';
+            return `<div style="display:inline-flex;align-items:center;gap:6px;background:${bg};border:1.5px solid ${border};border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:${color};margin:8px 6px 8px 0;">`
+                 + `<i class="fas fa-tag"></i> ${escapeHtml(conditionText)}</div>`;
+        }
+
         // ── 2. Parse specs from description ──────────────────────────────────
         function parseDescription(raw) {
             if (!raw) return { description: '', specsHTML: '' };
@@ -405,6 +433,11 @@
                     </span>
                     <h1 style="margin:5px 0; font-size:1.4rem; color:#1a1a1a;">${escapeHtml(p.name)}</h1>
                     <p class="price-tag">${p.price.toLocaleString()} <span style="font-size:0.95rem;">ETB</span></p>
+
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                        ${getConditionBadge(p.status_condition)}
+                        ${getStockBadge(p.stock_status, p.quantity)}
+                    </div>
 
                     ${p.location ? `<p style="font-size:0.85rem; color:#888; margin:0;"><i class="fas fa-map-marker-alt" style="color:#F5A623;"></i> ${escapeHtml(p.location)}</p>` : ''}
 
