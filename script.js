@@ -1365,6 +1365,28 @@ window.openProductModal = async (product) => {
     document.body.style.overflow = "hidden";
     initModalMagnifier();
     initModalLightbox(product);
+
+    // Computer/Laptop/Desktop only: size the photo box to the actual
+    // image's own aspect ratio so the full picture fills the space
+    // edge-to-edge, instead of rendering small inside a taller fixed
+    // box with empty space around it. Every other subcategory keeps
+    // the original fixed-height box untouched.
+    (function fitComputerPhoto() {
+        const COMPUTER_SUBS = ['Computer','Computers & Laptops','Laptop','Laptops','Desktop Computer','Desktop Computers'];
+        if (!COMPUTER_SUBS.includes(product.subcategory)) return;
+        const wrapEl = document.getElementById('elecPhotoWrap');
+        const imgEl = document.getElementById('elecMainPhoto');
+        if (!wrapEl || !imgEl) return;
+        const fit = () => {
+            if (!imgEl.naturalWidth || !imgEl.naturalHeight) return;
+            const w = wrapEl.clientWidth;
+            if (!w) return;
+            const h = Math.max(220, Math.min(480, Math.round(w * imgEl.naturalHeight / imgEl.naturalWidth)));
+            wrapEl.style.height = h + 'px';
+        };
+        imgEl.onload = fit; // also re-fits when a thumbnail swaps the main photo
+        if (imgEl.complete && imgEl.naturalWidth) fit();
+    })();
 };
 
 window.closeProductModal = () => {
