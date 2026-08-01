@@ -651,7 +651,7 @@ window.openProductDetailsSafe = (encodedData) => {
 function getStockBadge(stockStatus, quantity) {
     if (!stockStatus || stockStatus === 'in_stock') {
         const qty = quantity ? ' &nbsp;·&nbsp; <strong>' + quantity + ' left</strong>' : '';
-        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#e8fdf5;border:1.5px solid #2ed573;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#F5A623;margin-bottom:10px;">'
+        return '<div style="display:inline-flex;align-items:center;gap:6px;background:#e8fdf5;border:1.5px solid #2ed573;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#1a9c5c;margin-bottom:10px;">'
              + '<i class="fas fa-check-circle"></i> In Stock' + qty + '</div>';
     } else if (stockStatus === 'out_of_stock') {
         return '<div style="display:inline-flex;align-items:center;gap:6px;background:#fff0f0;border:1.5px solid #ff4757;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700;color:#ff4757;margin-bottom:10px;">'
