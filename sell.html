@@ -989,6 +989,27 @@
         return text;
     }
 
+    // Same fields as collectExtraSpecs(), but as a structured object for the
+    // `specs` jsonb column instead of flattened text. This is what actually
+    // gets saved now — collectExtraSpecs() above is kept only so nothing else
+    // breaks if it's referenced elsewhere.
+    function collectExtraSpecsObject() {
+        const specs = {};
+        document.querySelectorAll('.extra-field-input').forEach(el => {
+            const val = el.value ? el.value.trim() : '';
+            const label = el.getAttribute('data-label');
+            if (val && label) specs[label] = val;
+        });
+        ['skillsValue','benefitsValue','paymentValue','compFeaturesValue'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.value) {
+                const label = el.getAttribute('data-label');
+                if (label) specs[label] = el.value;
+            }
+        });
+        return specs;
+    }
+
     /* ══════════════════════════════
        PAGE INIT
     ══════════════════════════════ */
@@ -1280,9 +1301,8 @@ function handleRegionChange(region) {
         btn.disabled = true;
 
         try {
-            const extraSpecsText = collectExtraSpecs();
-            const finalDescription = document.getElementById('prodDesc').value +
-                (extraSpecsText ? "\n\n--- Specs ---" + extraSpecsText : "");
+            const specsObject = collectExtraSpecsObject();
+            const finalDescription = document.getElementById('prodDesc').value;
 
             // Upload photos (up to 3) with watermark
             const rawFiles = selectedPhotoFiles.length ? selectedPhotoFiles : Array.from(fileInput.files || []);
@@ -1326,6 +1346,7 @@ function handleRegionChange(region) {
                 category: document.getElementById('prodCategory').value,
                 subcategory: document.getElementById('prodSubcategory')?.value || null,
                 description: finalDescription,
+                specs: specsObject,
                 location: locationStr,
                 image: publicUrl,
                 images: uploadedUrls,
