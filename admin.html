@@ -828,6 +828,16 @@
                     document.getElementById(`card-${id}`)?.remove();
                     checkStorageUsage();
                     loadStats();
+                } else {
+                    // Most common cause: an order still references this product,
+                    // and the foreign key won't allow the row to be removed.
+                    const isFkError = /foreign key|violates/i.test(error.message || '');
+                    alert(
+                        isFkError
+                            ? "Can't delete — this product has an existing order linked to it, so the database is blocking the delete. Ask Claude to update the orders foreign key so it doesn't block this."
+                            : `Delete failed: ${error.message}`
+                    );
+                    console.error('permanentlyDelete failed:', error);
                 }
             }
         };
