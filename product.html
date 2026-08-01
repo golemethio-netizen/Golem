@@ -27,10 +27,16 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         }
-        .product-display img { width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
+        .product-display img { width: 100%; height: 420px; border-radius: 10px; object-fit: contain; object-position: center; background:#f7f8f6; }
+        @media (max-width: 480px) {
+            .product-display img { height: 300px; }
+        }
 
         /* ── Side-window (side-by-side) zoom on main product image ── */
-        .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; }
+        .zoom-wrap { position: relative; overflow: hidden; border-radius: 10px; background:#f7f8f6; height: 420px; }
+        @media (max-width: 480px) {
+            .zoom-wrap { height: 300px; }
+        }
         @media (any-hover: hover) and (any-pointer: fine) {
             .zoom-wrap { cursor: zoom-in; }
         }
