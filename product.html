@@ -281,12 +281,46 @@
                  + `<i class="fas fa-tag"></i> ${escapeHtml(conditionText)}</div>`;
         }
 
-        // ── 2. Parse specs from description ──────────────────────────────────
+        // ── Relative time ("Posted 3 days ago") ──
+        function timeAgo(dateStr) {
+            if (!dateStr) return '';
+            const diffMs = Date.now() - new Date(dateStr).getTime();
+            const mins   = Math.floor(diffMs / 60000);
+            const hours  = Math.floor(diffMs / 3600000);
+            const days   = Math.floor(diffMs / 86400000);
+            if (mins < 1)   return 'Just now';
+            if (mins < 60)  return `${mins} minute${mins === 1 ? '' : 's'} ago`;
+            if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+            if (days < 30)  return `${days} day${days === 1 ? '' : 's'} ago`;
+            const months = Math.floor(days / 30);
+            if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
+            const years = Math.floor(days / 365);
+            return `${years} year${years === 1 ? '' : 's'} ago`;
+        }
+
+        // ── 2. Specs: prefer structured `specs` jsonb (new listings), fall
+        //    back to parsing "--- Specs ---" out of free-text description
+        //    (old listings created before this migration) ──────────────────
+        function buildSpecsTable(specsObj) {
+            const entries = Object.entries(specsObj || {}).filter(([, v]) => v !== null && v !== '');
+            if (!entries.length) return '';
+            const rows = entries.map(([key, val]) =>
+                `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(val)}</td></tr>`
+            ).join('');
+            return `<div style="margin-top:10px;">
+                     <p style="font-weight:700; color:#333; font-size:0.88rem; margin:0 0 6px;">
+                       <i class="fas fa-list-ul" style="color:#F5A623;"></i> Specifications
+                     </p>
+                     <table class="specs-table">${rows}</table>
+                   </div>`;
+        }
+
         function parseDescription(raw) {
             if (!raw) return { description: '', specsHTML: '' };
             const sep = raw.indexOf('--- Specs ---');
             if (sep === -1) return { description: escapeHtml(raw), specsHTML: '' };
 
+            // Legacy format only — listings saved before the specs column existed
             const description = escapeHtml(raw.substring(0, sep).trim());
             const specsRaw    = raw.substring(sep + 13).trim();
             const rows = specsRaw.split('\n').map(line => line.trim()).filter(Boolean);
@@ -331,13 +365,12 @@
 
             if (bareErr || !bare) {
                 // ID genuinely doesn't exist in the table
+                if (bareErr) console.error('Product lookup failed:', bareErr, 'id:', productId);
                 el.innerHTML = `
                     <div style="text-align:center; padding:60px 20px; grid-column:1/-1;">
                         <i class="fas fa-box-open" style="font-size:3rem; color:#ddd;"></i>
                         <h3 style="color:#aaa; margin:16px 0 8px;">Item Not Found</h3>
                         <p style="color:#bbb; font-size:0.9rem;">This listing may have been removed or the link is incorrect.</p>
-                        <p style="color:#ddd; font-size:0.75rem; font-family:monospace; margin-top:8px;">ID: ${productId}</p>
-                        ${bareErr ? `<p style="color:#f8a; font-size:0.75rem; font-family:monospace;">${bareErr.message}</p>` : ''}
                         <a href="index.html" style="display:inline-block; margin-top:16px; background:#0A291A; color:white; padding:10px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
                             Browse All Items
                         </a>
@@ -354,12 +387,12 @@
 
             if (error || !p) {
                 // ID exists but join failed — likely RLS on profiles blocking it
+                console.error('Product join failed:', error, 'id:', productId);
                 el.innerHTML = `
                     <div style="text-align:center; padding:60px 20px; grid-column:1/-1;">
                         <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#F5A623;"></i>
-                        <h3 style="color:#aaa; margin:16px 0 8px;">Could not load product</h3>
-                        <p style="color:#bbb; font-size:0.9rem;">The item exists but failed to load. This is usually an RLS (Row Level Security) issue on the <code>profiles</code> table.</p>
-                        <p style="color:#f8a; font-size:0.78rem; font-family:monospace; margin-top:8px;">${error?.message || 'Unknown error'}</p>
+                        <h3 style="color:#aaa; margin:16px 0 8px;">Couldn't Load This Item</h3>
+                        <p style="color:#bbb; font-size:0.9rem;">Something went wrong loading this listing. Please try again in a moment.</p>
                         <a href="index.html" style="display:inline-block; margin-top:16px; background:#0A291A; color:white; padding:10px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
                             Browse All Items
                         </a>
@@ -402,8 +435,13 @@
             const shareUrl  = encodeURIComponent(window.location.href);
             const shareText = encodeURIComponent(`Check out "${p.name}" on WanaGebya — ${p.price.toLocaleString()} ETB`);
 
-            // Parse description + specs
-            const { description, specsHTML } = parseDescription(p.description);
+            // Description text + specs: prefer the structured `specs` column;
+            // fall back to legacy text-parsing only for older listings that
+            // don't have it populated.
+            const hasStructuredSpecs = p.specs && typeof p.specs === 'object' && Object.keys(p.specs).length > 0;
+            const parsed = parseDescription(p.description);
+            const description = hasStructuredSpecs ? escapeHtml(p.description || '') : parsed.description;
+            const specsHTML    = hasStructuredSpecs ? buildSpecsTable(p.specs) : parsed.specsHTML;
 
             el.innerHTML = `
                 ${statusBanner}
@@ -440,6 +478,11 @@
                     </div>
 
                     ${p.location ? `<p style="font-size:0.85rem; color:#888; margin:0;"><i class="fas fa-map-marker-alt" style="color:#F5A623;"></i> ${escapeHtml(p.location)}</p>` : ''}
+
+                    <p style="font-size:0.8rem; color:#aaa; margin:0; display:flex; align-items:center; gap:14px;">
+                        <span><i class="fas fa-eye"></i> ${(p.view_count || 0).toLocaleString()} views</span>
+                        ${p.created_at ? `<span><i class="fas fa-clock"></i> Posted ${timeAgo(p.created_at)}</span>` : ''}
+                    </p>
 
                     <!-- Seller Card -->
                     <div class="seller-card">
