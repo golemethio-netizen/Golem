@@ -1237,19 +1237,17 @@ window.openProductModal = async (product) => {
         const stockLabel = (!product.stock_status || product.stock_status === 'in_stock') ? 'IN STOCK'
             : product.stock_status === 'limited' ? 'LIMITED STOCK' : 'OUT OF STOCK';
 
-        modalContent.innerHTML =
-            '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
-          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
-          + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
-          + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
-          + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
-          + '</div>'
-          + '<div id="elecPhotoWrap" class="elec-photo-wrap" style="position:relative;height:' + photoHeight + 'px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
+        // ── MEDIA COLUMN: photo + thumbnails ──
+        const elecMediaHTML =
+            '<div id="elecPhotoWrap" class="elec-photo-wrap" style="position:relative;height:' + photoHeight + 'px;background:#131e2e;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
           + (product.image ? '<img id="elecMainPhoto" src="' + product.image + '" style="width:100%;height:100%;object-fit:contain;display:block;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#334;font-size:2rem;">🖥️</div>')
           + (isComputerSub ? '' : '<div style="position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,rgba(15,22,35,0.85));pointer-events:none;"></div>')
           + '</div>'
-          + buildThumbStrip(getProductGalleryImages(product), 'elecMainPhoto', { bg: '#0f1623', padding: '8px 20px' })
-          + '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
+          + buildThumbStrip(getProductGalleryImages(product), 'elecMainPhoto', { bg: '#0f1623', padding: '8px 20px' });
+
+        // ── INFO COLUMN: header, seller, specs, description, actions ──
+        const elecInfoHTML =
+            '<div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">'
           + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">'
           + '<span style="display:inline-flex;align-items:center;gap:5px;background:' + stockColor + '22;border:1px solid ' + stockColor + ';border-radius:20px;padding:3px 10px;font-size:0.65rem;font-weight:800;color:' + stockColor + ';">'
           + '<span style="width:6px;height:6px;border-radius:50%;background:' + stockColor + ';"></span>' + stockLabel + '</span>'
@@ -1309,6 +1307,18 @@ window.openProductModal = async (product) => {
           + '<a href="tel:+' + intPhone + '" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#1a1a1a;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fas fa-phone"></i> Call</a>'
           + '<a href="https://wa.me/' + intPhone + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#075e54;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;border-right:1px solid rgba(255,255,255,0.07);"><i class="fab fa-whatsapp"></i> WhatsApp</a>'
           + '<a href="https://t.me/' + (tgUser || '+' + intPhone) + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:15px 10px;background:#0088cc;color:white;text-decoration:none;font-weight:700;font-size:0.82rem;"><i class="fab fa-telegram-plane"></i> Telegram</a>'
+          + '</div>';
+
+        modalContent.innerHTML =
+            '<button onclick="window.closeProductModal()" style="position:absolute;top:14px;right:14px;z-index:99;background:rgba(255,255,255,0.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>'
+          + '<div style="background:#0f1623;border-radius:18px;overflow:hidden;font-family:Poppins,Arial,sans-serif;">'
+          + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:0;opacity:0.04;">'
+          + '<div style="font-size:3.5rem;font-weight:900;color:white;">ዋና ገበያ</div>'
+          + '<div style="font-size:1.2rem;color:white;">wanagebya.com</div>'
+          + '</div>'
+          + '<div class="elec-flex-wrap">'
+          + '<div class="elec-info-col">' + elecInfoHTML + '</div>'
+          + '<div class="elec-media-col">' + elecMediaHTML + '</div>'
           + '</div>'
           + '<div style="text-align:center;padding:8px;background:#0a0f1a;">'
           + '<span style="font-size:0.65rem;color:#334155;letter-spacing:0.1em;">ዋና ገበያ · wanagebya.com</span>'
