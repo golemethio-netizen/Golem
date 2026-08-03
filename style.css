@@ -656,6 +656,43 @@ body {
 
 .modal-body { padding: 22px; overflow-y: auto; flex: 1; }
 
+/* Electronics/computer spec card: photo column + specs column */
+.elec-flex-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.elec-media-col {
+  order: 1;
+  flex-shrink: 0;
+}
+.elec-info-col {
+  order: 2;
+  min-width: 0;
+}
+
+@media (min-width: 769px) {
+  .elec-flex-wrap {
+    flex-direction: row;
+    align-items: stretch;
+    max-height: 82vh;
+  }
+  .elec-info-col {
+    order: 1;
+    flex: 1 1 55%;
+    min-width: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .elec-media-col {
+    order: 2;
+    flex: 0 0 42%;
+    max-width: 420px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-left: 1px solid rgba(255,255,255,0.07);
+  }
+}
+
 .modal-price {
   color: var(--primary-color);
   font-weight: 800;
