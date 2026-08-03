@@ -618,7 +618,9 @@ body {
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   position: relative;
   animation: slideUp 0.3s ease-out;
 }
