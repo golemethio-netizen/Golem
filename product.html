@@ -27,7 +27,17 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         }
-        .product-display img { width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
+        /* Grid items default to min-width:auto, which lets an oversized
+           source image (common on furniture listings) force its column
+           wider than its 1fr share — squeezing/hiding the details column
+           on desktop and breaking alignment on mobile. min-width:0 lets
+           the track actually respect the grid sizing instead of the
+           image's intrinsic pixel width. */
+        .product-display > .image-side,
+        .product-display > .details-side {
+            min-width: 0;
+        }
+        .product-display img { width: 100%; max-width: 100%; border-radius: 10px; object-fit: contain; max-height: 420px; background:#f7f8f6; }
 
         /* ── Scoped fix: Electronics → Computer subcategory only ──
            Gives the main image an explicit height (not just max-height)
@@ -39,6 +49,18 @@
         @media (max-width: 480px) {
             .zoom-wrap.computer-detail-img,
             .zoom-wrap.computer-detail-img img { height: 300px; }
+        }
+
+        /* Deterministic column count instead of relying on auto-fit's
+           width math (which is what let oversized images blow out the
+           image column on desktop). Two even columns above 768px,
+           single stacked column at/below it — matches the site's
+           existing mobile breakpoint. */
+        @media (min-width: 769px) {
+            .product-display { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .product-display { grid-template-columns: minmax(0, 1fr); }
         }
 
         /* ── Side-window (side-by-side) zoom on main product image ── */
@@ -117,7 +139,8 @@
         .seller-info h4 { margin: 0; font-size: 1rem; color: #333; }
         .seller-info p  { margin: 0; font-size: 0.8rem; color: #777; }
 
-        .details-side { display: flex; flex-direction: column; gap: 10px; }
+        .image-side { min-width: 0; overflow: hidden; }
+        .details-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
         .price-tag { font-size: 1.4rem; color: #e53935; font-weight: 700; font-variant-numeric: tabular-nums; }
 
         /* ── Status badge ── */
