@@ -1068,7 +1068,7 @@ window.openProductModal = async (product) => {
     const profile = product.profiles || {};
     const isVerified = profile.is_verified === true;
     const sellerName = profile.full_name || product.seller_name || "Community Member";
-    const avatarUrl = profile.avatar_url || "https://via.placeholder.com/50";
+    const avatarUrl = profile.avatar_url || "https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff";
     const modalContent = modal.querySelector('.modal-content');
 
     // 3. Conditional Layout Rendering
@@ -1332,17 +1332,17 @@ window.openProductModal = async (product) => {
 
         modalContent.innerHTML = `
             <button class="close-modal-btn" onclick="window.closeProductModal()">&times;</button>
-            <div style="display:flex; gap:10px; align-items:flex-start;">
+            <div class="std-modal-photo-row" style="display:flex; gap:10px; align-items:flex-start; flex:1.2; min-width:0;">
                 ${buildThumbStrip(getProductGalleryImages(product), 'stdMainPhoto', { bg: 'transparent', vertical: true })}
                 <div class="modal-img-wrapper" id="stdPhotoWrap" style="position:relative; flex:1; min-width:0; height:260px; background:#f7f8f6; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
                     <img id="stdMainPhoto" src="${product.image || ''}" alt="Product" style="border-radius: 10px; width: 100%; height: 100%; object-fit: contain;">
                 </div>
             </div>
-            <div class="modal-body" style="padding: 20px 0 0;">
+            <div class="modal-body" style="padding: 20px 0 0; min-width: 0;">
                 <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
                 
                 <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
-                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #0A291A;">
+                    <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #0A291A;" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff';">
                     <div style="flex: 1;">
                         <h4 style="margin: 0; color: #333; font-size: 0.95rem; font-weight: 600;">Seller: ${sellerName}</h4>
                         <div style="margin-top:5px; font-size:0.8rem;">
