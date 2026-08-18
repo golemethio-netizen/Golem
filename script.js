@@ -1056,10 +1056,6 @@ window.openProductModal = async (product) => {
         .jc-availability { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6b7280; font-weight: 500; }
         .jc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--jc-green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
         .jc-cta-btn { background: var(--jc-accent); color: white; font-size: 13px; font-weight: 700; padding: 10px 15px; border-radius: 9px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; flex: 1; justify-content: center;}
-        @media (min-width: 769px) {
-            .std-modal-photo-row { flex: 1.2; }
-            .modal-body { min-width: 0; }
-        }
         `;
         document.head.appendChild(style);
     }
