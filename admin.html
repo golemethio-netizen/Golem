@@ -496,6 +496,7 @@
             if (!profile?.is_admin) {
                 alert("Restricted Access: Admin Only.");
                 window.location.href = 'index.html';
+                return;
             } else {
                 currentAdminEmail = user.email || profile.email || 'Admin';
                 document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
