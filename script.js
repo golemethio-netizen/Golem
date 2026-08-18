@@ -1120,8 +1120,8 @@ window.openProductModal = async (product) => {
                             <div class="jc-price-currency">${isJob ? 'Monthly (ETB)' : 'ETB'}</div>
                         </div>
                     </div>
-                    <div class="jc-product-name">${product.name}</div>
-                    <div class="jc-product-sub">${company}</div>
+                    <div class="jc-product-name">${escapeHtml(product.name)}</div>
+                    <div class="jc-product-sub">${escapeHtml(company)}</div>
                 </div>
 
                 <div class="jc-highlight-bar">
@@ -1298,7 +1298,7 @@ window.openProductModal = async (product) => {
           + '</div>' : '')
           + (introLines.length ? '<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<div style="font-size:0.68rem;font-weight:700;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Description</div>'
-          + '<div class="anim-desc-wrap dark"><p class="anim-desc-inner" style=\\"font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;white-space:pre-wrap;\\">' + introLines.join('\\n') + '</p></div>'
+          + '<div class="anim-desc-wrap dark"><p class="anim-desc-inner" style=\\"font-size:0.82rem;color:#cbd5e1;line-height:1.6;margin:0;white-space:pre-wrap;\\">' + escapeHtml(introLines.join('\\n')) + '</p></div>'
           + '</div>' : '')
           + '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">'
           + '<button onclick="window.addToCartFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#F5A623;color:#1a1a1a;border:none;border-radius:12px;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:Poppins,Arial,sans-serif;"><i class="fas fa-cart-plus"></i> Add to Cart</button>'
@@ -1339,7 +1339,7 @@ window.openProductModal = async (product) => {
                 </div>
             </div>
             <div class="modal-body" style="padding: 20px 0 0; min-width: 0;">
-                <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${product.name}</h2>
+                <h2 style="font-size: 1.2rem; margin-bottom: 5px;">${escapeHtml(product.name)}</h2>
                 
                 <div class="seller-details-wrapper" style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #eee;">
                     <img src="${avatarUrl}" alt="Seller avatar" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #0A291A;" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Seller&background=1a8fff&color=fff';">
@@ -1359,7 +1359,7 @@ window.openProductModal = async (product) => {
 
                 <div style="margin-bottom:4px;">${getStockBadge(product.stock_status, product.quantity)}</div>
                 
-                <div class="anim-desc-wrap"><p class="anim-desc-inner modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap; margin:0;">${product.description || "No description available."}</p></div>
+                <div class="anim-desc-wrap"><p class="anim-desc-inner modal-description" style="font-size: 0.9rem; line-height: 1.5; color:#555; white-space: pre-wrap; margin:0;">${escapeHtml(product.description) || "No description available."}</p></div>
 
                 <div class="modal-flex-actions" style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
                     <a href="tel:+${intPhone}" class="contact-btn" style="flex:1; text-align:center; padding:10px; background:#333; color:white; border-radius:8px; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
@@ -2081,11 +2081,11 @@ window.generateItemHTML = function(item) {
     if (item.category === 'Jobs') {
         return `
             <div class="job-card" onclick="showProductDetails('${item.id}')">
-                <div class="job-badge"><i class="fas fa-briefcase"></i> ${item.job_type || 'Full-Time'}</div>
-                <h3 class="job-title">${item.title}</h3>
+                <div class="job-badge"><i class="fas fa-briefcase"></i> ${escapeHtml(item.job_type) || 'Full-Time'}</div>
+                <h3 class="job-title">${escapeHtml(item.title)}</h3>
                 <div class="job-meta">
-                    <span><i class="fas fa-building"></i> ${item.company || 'Private Employer'}</span>
-                    <span><i class="fas fa-map-marker-alt"></i> ${item.location}</span>
+                    <span><i class="fas fa-building"></i> ${escapeHtml(item.company) || 'Private Employer'}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(item.location)}</span>
                 </div>
                 <div class="job-footer">
                     <span class="job-salary">${item.price} ETB / Month</span>
@@ -2103,7 +2103,7 @@ window.generateItemHTML = function(item) {
                     <div class="service-status">Verified</div>
                 </div>
                 <div class="service-info">
-                    <h3 class="service-title">${item.title}</h3>
+                    <h3 class="service-title">${escapeHtml(item.title)}</h3>
                     <p class="service-price">Starting: <strong>${item.price} ETB</strong></p>
                 </div>
             </div>`;
@@ -2113,10 +2113,10 @@ window.generateItemHTML = function(item) {
     return `
         <div class="product-card" onclick="showProductDetails('${item.id}')">
             <div class="product-image-container">
-                <img src="${item.image_url}" alt="${item.title}">
+                <img src="${item.image_url}" alt="${escapeHtml(item.title)}">
             </div>
             <div class="product-info">
-                <h3>${item.title}</h3>
+                <h3>${escapeHtml(item.title)}</h3>
                 <p class="price">${item.price} ETB</p>
                 <p class="location"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
             </div>
