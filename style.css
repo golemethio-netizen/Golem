@@ -1234,6 +1234,7 @@ body {
   .modal-content { flex-direction: row; }
   .modal-img-wrapper { flex: 1.2; height: auto; min-height: 420px; }
   .modal-body { flex: 1; overflow-y: auto; }
+  .std-modal-photo-row { flex: 1.2; }
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -1281,6 +1282,7 @@ body {
   .sponsor-actions a { margin-left: 0; }
 
   .modal-content { width: 96%; margin: auto; max-height: 90vh; }
+  .std-modal-photo-row { flex: none; }
   .modal-img-wrapper { height: 240px; }
   .modal-footer-actions { grid-template-columns: 1fr; }
   #whatsappOrder { grid-column: span 1; }
