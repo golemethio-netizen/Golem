@@ -823,12 +823,18 @@
                     }
                 } catch(e) { console.log("Image URL parse skip"); }
 
-                const { error } = await _supabase.from('products').delete().eq('id', id);
-                if (!error) {
+                const { data, error } = await _supabase.from('products').delete().eq('id', id).select();
+                if (!error && data && data.length > 0) {
                     logAction('Item Permanently Deleted', `Deleted Item ID: ${id}`);
                     document.getElementById(`card-${id}`)?.remove();
                     checkStorageUsage();
                     loadStats();
+                } else if (!error && (!data || data.length === 0)) {
+                    // No exception was thrown, but nothing was actually deleted —
+                    // this is the signature of a Row Level Security policy silently
+                    // filtering the row out, not a real success.
+                    alert("Delete blocked: the database silently refused to remove this row (0 rows affected, no error). This is almost always a Row Level Security policy — ask Claude to check the products table's DELETE policy.");
+                    console.error('permanentlyDelete: 0 rows affected — likely RLS block. id:', id);
                 } else {
                     // Most common cause: an order still references this product,
                     // and the foreign key won't allow the row to be removed.
