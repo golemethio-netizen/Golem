@@ -839,6 +839,17 @@
             return m ? m[1].trim() : '';
         }
 
+        // Prefer the structured `specs` jsonb column (new listings, case-
+        // insensitive key match). Falls back to regex-parsing the old
+        // free-text spec block for listings created before that column existed.
+        function getSpec(item, key) {
+            if (item.specs && typeof item.specs === 'object') {
+                const foundKey = Object.keys(item.specs).find(k => k.toLowerCase() === key.toLowerCase());
+                if (foundKey && item.specs[foundKey]) return item.specs[foundKey];
+            }
+            return parseSpec(item.description, key);
+        }
+
         // Reshape the edit form based on category
         // ── Electronics subcategory name sets ──
         const PHONE_SUBS    = ['Mobile Phones','Mobile Phone','Phone','Smartphone'];
@@ -939,40 +950,40 @@ document.getElementById('editDesc').value = descOnly;
                     };
                     // Brand + Model
                     const brandEl = document.getElementById('editSpecBrand');
-                    const brandVal = parseSpec(item.description, 'brand');
+                    const brandVal = getSpec(item, 'brand');
                     for (let o of brandEl.options) { if (o.text === brandVal) { brandEl.value = o.value; break; } }
-                    document.getElementById('editSpecModel').value = parseSpec(item.description, 'model') || '';
+                    document.getElementById('editSpecModel').value = getSpec(item, 'model') || '';
 
                     // Shared
-                    selOpt('editSpecRam',     parseSpec(item.description, 'ram') || parseSpec(item.description, 'memory'));
-                    selOpt('editSpecStorage', parseSpec(item.description, 'storage'));
-                    selOpt('editSpecDisplay', parseSpec(item.description, 'display') || parseSpec(item.description, 'screen size'));
-                    selOpt('editSpecBattery', parseSpec(item.description, 'battery life') || parseSpec(item.description, 'battery'));
-                    selOpt('editSpecOs',      parseSpec(item.description, 'operating system') || parseSpec(item.description, 'os'));
-                    selOpt('editSpecWarranty',parseSpec(item.description, 'warranty'));
+                    selOpt('editSpecRam',     getSpec(item, 'ram') || getSpec(item, 'memory'));
+                    selOpt('editSpecStorage', getSpec(item, 'storage'));
+                    selOpt('editSpecDisplay', getSpec(item, 'display') || getSpec(item, 'screen size'));
+                    selOpt('editSpecBattery', getSpec(item, 'battery life') || getSpec(item, 'battery'));
+                    selOpt('editSpecOs',      getSpec(item, 'operating system') || getSpec(item, 'os'));
+                    selOpt('editSpecWarranty',getSpec(item, 'warranty'));
 
                     if (isMob) {
-                        selOpt('editSpecCamera',  parseSpec(item.description, 'camera') || parseSpec(item.description, 'main camera'));
-                        selOpt('editSpecNetwork', parseSpec(item.description, 'network') || parseSpec(item.description, 'connectivity'));
-                        selOpt('editSpecSim',     parseSpec(item.description, 'sim slots') || parseSpec(item.description, 'sim'));
-                        document.getElementById('editSpecColor').value = parseSpec(item.description, 'color') || parseSpec(item.description, 'colour') || '';
+                        selOpt('editSpecCamera',  getSpec(item, 'camera') || getSpec(item, 'main camera'));
+                        selOpt('editSpecNetwork', getSpec(item, 'network') || getSpec(item, 'connectivity'));
+                        selOpt('editSpecSim',     getSpec(item, 'sim slots') || getSpec(item, 'sim'));
+                        document.getElementById('editSpecColor').value = getSpec(item, 'color') || getSpec(item, 'colour') || '';
                     } else {
-                        document.getElementById('editSpecProcessor').value = parseSpec(item.description, 'processor') || parseSpec(item.description, 'cpu') || '';
-                        document.getElementById('editSpecGpu').value       = parseSpec(item.description, 'graphics') || parseSpec(item.description, 'gpu') || '';
+                        document.getElementById('editSpecProcessor').value = getSpec(item, 'processor') || getSpec(item, 'cpu') || '';
+                        document.getElementById('editSpecGpu').value       = getSpec(item, 'graphics') || getSpec(item, 'gpu') || '';
                     }
                 }
             } else if (isJob) {
                 // Job fields — parse from description or direct columns
                 document.getElementById('editSalary').value = item.price || '';
-                document.getElementById('editJobType').value = parseSpec(item.description, 'job type') || 'Full Time';
-                document.getElementById('editExperience').value = parseSpec(item.description, 'experience') || 'No Experience';
-                document.getElementById('editPositions').value = parseSpec(item.description, 'positions available') || '';
-                document.getElementById('editDeadline').value = parseSpec(item.description, 'deadline') || '';
+                document.getElementById('editJobType').value = getSpec(item, 'job type') || 'Full Time';
+                document.getElementById('editExperience').value = getSpec(item, 'experience') || 'No Experience';
+                document.getElementById('editPositions').value = getSpec(item, 'positions available') || '';
+                document.getElementById('editDeadline').value = getSpec(item, 'deadline') || '';
             } else if (isService) {
                 // Service fields
                 document.getElementById('editServiceRate').value = item.price || '';
-                document.getElementById('editAvailability').value = parseSpec(item.description, 'availability') || 'Available Now';
-                document.getElementById('editServiceArea').value = parseSpec(item.description, 'service area') || '';
+                document.getElementById('editAvailability').value = getSpec(item, 'availability') || 'Available Now';
+                document.getElementById('editServiceArea').value = getSpec(item, 'service area') || '';
             }
 
             // Location
@@ -1138,36 +1149,35 @@ document.getElementById('editDesc').value = descOnly;
                     updatedData.stock_status = stockStatus;
                     updatedData.quantity = qty ? parseInt(qty) : null;
 
-                    // Rebuild description with spec block for electronics
+                    // Structured specs for electronics — saved to the `specs`
+                    // jsonb column directly. Description above is left as
+                    // pure free text; no more spec lines mixed into it.
                     const editSub = document.getElementById('editSubcategory')?.value || '';
                     if (ELEC_SUBS.includes(editSub)) {
                         const isMob = PHONE_SUBS.includes(editSub);
-                        const baseDesc = updatedData.description.split('\n--- Specs ---')[0].trim();
                         const g = id => document.getElementById(id)?.value || '';
-                        let spec = '\n--- Specs ---';
-                        const brandVal = g('editSpecBrand');
-                        const modelVal = g('editSpecModel');
-                        if (brandVal)  spec += '\nBrand: ' + brandVal;
-                        if (modelVal)  spec += '\nModel: ' + modelVal;
+                        const specs = {};
+                        if (g('editSpecBrand'))  specs['Brand'] = g('editSpecBrand');
+                        if (g('editSpecModel'))  specs['Model'] = g('editSpecModel');
                         if (isMob) {
-                            if (g('editSpecCamera'))  spec += '\nCamera: ' + g('editSpecCamera');
-                            if (g('editSpecNetwork')) spec += '\nNetwork: ' + g('editSpecNetwork');
-                            if (g('editSpecSim'))     spec += '\nSIM Slots: ' + g('editSpecSim');
-                            if (g('editSpecColor'))   spec += '\nColor: ' + g('editSpecColor');
+                            if (g('editSpecCamera'))  specs['Camera'] = g('editSpecCamera');
+                            if (g('editSpecNetwork')) specs['Network'] = g('editSpecNetwork');
+                            if (g('editSpecSim'))     specs['SIM Slots'] = g('editSpecSim');
+                            if (g('editSpecColor'))   specs['Color'] = g('editSpecColor');
                         } else {
-                            if (g('editSpecProcessor')) spec += '\nProcessor: ' + g('editSpecProcessor');
-                            if (g('editSpecGpu'))       spec += '\nGraphics: ' + g('editSpecGpu');
+                            if (g('editSpecProcessor')) specs['Processor'] = g('editSpecProcessor');
+                            if (g('editSpecGpu'))       specs['Graphics'] = g('editSpecGpu');
                         }
-                        if (g('editSpecRam'))     spec += '\nRAM: ' + g('editSpecRam');
-                        if (g('editSpecStorage')) spec += '\nStorage: ' + g('editSpecStorage');
-                        if (g('editSpecDisplay')) spec += '\nDisplay: ' + g('editSpecDisplay');
-                        if (g('editSpecBattery')) spec += '\nBattery Life: ' + g('editSpecBattery');
-                        if (g('editSpecOs'))      spec += '\nOperating System: ' + g('editSpecOs');
-                        if (g('editSpecWarranty'))spec += '\nWarranty: ' + g('editSpecWarranty');
-                        updatedData.description = baseDesc + spec;
+                        if (g('editSpecRam'))      specs['RAM'] = g('editSpecRam');
+                        if (g('editSpecStorage'))  specs['Storage'] = g('editSpecStorage');
+                        if (g('editSpecDisplay'))  specs['Display'] = g('editSpecDisplay');
+                        if (g('editSpecBattery'))  specs['Battery Life'] = g('editSpecBattery');
+                        if (g('editSpecOs'))       specs['Operating System'] = g('editSpecOs');
+                        if (g('editSpecWarranty')) specs['Warranty'] = g('editSpecWarranty');
+                        updatedData.specs = specs;
                     }
                 } else if (isJob) {
-                    // Job-specific fields — append specs to description
+                    // Job-specific fields — structured specs, not text
                     const jobType = document.getElementById('editJobType').value;
                     const exp = document.getElementById('editExperience').value;
                     const pos = document.getElementById('editPositions').value;
@@ -1175,25 +1185,23 @@ document.getElementById('editDesc').value = descOnly;
                     const salary = document.getElementById('editSalary').value;
                     updatedData.price = salary ? parseFloat(salary) : null;
                     updatedData.status_condition = 'Full Time';
-                    const baseDesc = document.getElementById('editDesc').value.split('\n--- Job Specs ---')[0].trim();
-                    updatedData.description = baseDesc
-                        + '\n--- Job Specs ---'
-                        + '\nJob Type: ' + jobType
-                        + '\nExperience: ' + exp
-                        + (pos ? '\nPositions Available: ' + pos : '')
-                        + (deadline ? '\nDeadline: ' + deadline : '');
+                    updatedData.specs = {
+                        'Job Type': jobType,
+                        'Experience': exp,
+                        ...(pos ? { 'Positions Available': pos } : {}),
+                        ...(deadline ? { 'Deadline': deadline } : {})
+                    };
                 } else if (isService) {
-                    // Service-specific fields
+                    // Service-specific fields — structured specs, not text
                     const rate = document.getElementById('editServiceRate').value;
                     const avail = document.getElementById('editAvailability').value;
                     const area = document.getElementById('editServiceArea').value;
                     updatedData.price = rate ? parseFloat(rate) : null;
                     updatedData.status_condition = 'Service';
-                    const baseDesc = document.getElementById('editDesc').value.split('\n--- Service Specs ---')[0].trim();
-                    updatedData.description = baseDesc
-                        + '\n--- Service Specs ---'
-                        + '\nAvailability: ' + avail
-                        + (area ? '\nService Area: ' + area : '');
+                    updatedData.specs = {
+                        'Availability': avail,
+                        ...(area ? { 'Service Area': area } : {})
+                    };
                 }
 
                 const { error } = await _supabase.from('products').update(updatedData).eq('id', id);
