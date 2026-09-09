@@ -575,6 +575,13 @@
                         </div>
                         <div class="copy-toast" id="copyToast">✓ Link copied!</div>
                     </div>
+
+                    <!-- Report Listing -->
+                    <div style="text-align:center; margin-top:6px;">
+                        <button onclick="window.openReportModal('${p.id}')" style="background:none; border:none; color:#aaa; font-size:0.8rem; cursor:pointer; text-decoration:underline; padding:6px;">
+                            <i class="fas fa-flag"></i> Report this listing
+                        </button>
+                    </div>
                 </div>
             `;
 
@@ -870,6 +877,90 @@
         }
 
         window.onload = loadSingleProduct;
+    </script>
+
+    <!-- Report Listing Modal -->
+    <div id="reportModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#fff; border-radius:14px; max-width:400px; width:100%; padding:24px; position:relative;">
+            <button onclick="window.closeReportModal()" style="position:absolute; top:12px; right:14px; background:none; border:none; font-size:1.4rem; color:#999; cursor:pointer;">&times;</button>
+            <h3 style="margin:0 0 4px; color:#1a1a1a; font-size:1.1rem;"><i class="fas fa-flag" style="color:#ff4757;"></i> Report this listing</h3>
+            <p style="color:#888; font-size:0.85rem; margin:0 0 16px;">Let us know what's wrong — our team will review it.</p>
+
+            <label style="display:block; font-size:0.78rem; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:6px;">Reason</label>
+            <select id="reportReason" style="width:100%; padding:10px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:0.9rem; margin-bottom:14px; font-family:inherit;">
+                <option value="Scam or Fraud">Scam or Fraud</option>
+                <option value="Prohibited Item">Prohibited Item</option>
+                <option value="Wrong Category">Wrong Category</option>
+                <option value="Duplicate Listing">Duplicate Listing</option>
+                <option value="Offensive Content">Offensive Content</option>
+                <option value="Already Sold">Already Sold</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label style="display:block; font-size:0.78rem; font-weight:700; color:#6b7280; text-transform:uppercase; margin-bottom:6px;">Details (optional)</label>
+            <textarea id="reportDetails" rows="3" placeholder="Anything else we should know?" style="width:100%; padding:10px; border:1.5px solid #e5e7eb; border-radius:8px; font-size:0.9rem; font-family:inherit; resize:vertical; margin-bottom:16px;"></textarea>
+
+            <button id="reportSubmitBtn" onclick="window.submitReport()" style="width:100%; background:#0A291A; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; font-size:0.9rem; cursor:pointer;">
+                Submit Report
+            </button>
+            <p id="reportStatusMsg" style="text-align:center; font-size:0.82rem; margin:10px 0 0; display:none;"></p>
+        </div>
+    </div>
+
+    <script>
+    let reportTargetProductId = null;
+
+    window.openReportModal = async function(productId) {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) {
+            alert("Please sign in first to report a listing.");
+            window.location.href = 'index.html';
+            return;
+        }
+        reportTargetProductId = productId;
+        document.getElementById('reportReason').value = 'Scam or Fraud';
+        document.getElementById('reportDetails').value = '';
+        document.getElementById('reportStatusMsg').style.display = 'none';
+        document.getElementById('reportModal').style.display = 'flex';
+    };
+
+    window.closeReportModal = function() {
+        document.getElementById('reportModal').style.display = 'none';
+    };
+
+    window.submitReport = async function() {
+        const btn = document.getElementById('reportSubmitBtn');
+        const msg = document.getElementById('reportStatusMsg');
+        const reason  = document.getElementById('reportReason').value;
+        const details = document.getElementById('reportDetails').value.trim();
+
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) { alert("Please sign in first."); return; }
+
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        const { error } = await _supabase.from('product_reports').insert([{
+            product_id: reportTargetProductId,
+            reporter_id: user.id,
+            reason: reason,
+            details: details || null
+        }]);
+
+        btn.disabled = false;
+        btn.textContent = 'Submit Report';
+
+        msg.style.display = 'block';
+        if (error) {
+            msg.style.color = '#ff4757';
+            msg.textContent = 'Something went wrong — please try again.';
+            console.error('Report submission failed:', error);
+        } else {
+            msg.style.color = '#1a9c5c';
+            msg.textContent = '✓ Thank you — our team will review this shortly.';
+            setTimeout(() => window.closeReportModal(), 2000);
+        }
+    };
     </script>
 
     <script>
