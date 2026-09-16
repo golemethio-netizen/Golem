@@ -15,6 +15,14 @@
         .input-group-sell input,
         .input-group-sell select,
         .input-group-sell textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
 
         /* ── Subcategory chip selector ── */
         .sell-subcat-chip {
@@ -28,9 +36,6 @@
         }
         .sell-subcat-chip:hover  { background: #f0f7f4; border-color: #0A291A; }
         .sell-subcat-chip.active { background:#F5A623; color:#1a1a1a; border-color: #0A291A; }
-            width: 100%; padding: 12px; border: 1px solid #ddd;
-            border-radius: 8px; font-family: inherit; font-size: 1rem;
-        }
         .auth-submit {
             background:#F5A623; color:#1a1a1a; border: none; padding: 15px;
             border-radius: 8px; font-weight: bold; cursor: pointer;
@@ -1296,6 +1301,11 @@ function handleRegionChange(region) {
         const btn = document.getElementById('submitBtn');
         const fileInput = document.getElementById('prodFile');
         const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) {
+            alert("Please sign in before posting a listing.");
+            window.location.href = "index.html";
+            return;
+        }
 
         btn.innerText = "Processing...";
         btn.disabled = true;
