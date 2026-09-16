@@ -3,67 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Item | Golem</title>
+    <title>Edit / Post Item | WanaGebya</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script type="text/javascript">
-   (function(){
-      emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your Public Key from EmailJS
-   })();
-</script>
-
-    
 </head>
 <body>
     <nav>
-        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">GOLEM</div>
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">WanaGebya</div>
     </nav>
 
-    <div class="container" style="padding: 20px; max-width: 500px; margin: auto;">
-        <h2 style="text-align: center;">Sell Your Item</h2>
+    <main class="container" style="padding:20px; max-width:500px; margin:auto;">
+        <h2 style="text-align:center;">Listing Details</h2>
+
         <form id="uploadForm">
             <input type="text" id="pName" placeholder="Product Name (e.g. iPhone 13)" required>
-            <input type="number" id="pPrice" placeholder="Price in ETB" required>
-           <div style="margin-top: 15px;">
-    <label style="font-size: 0.85rem; font-weight: bold;">Product Image</label>
-    <input type="file" id="pImageFile" accept="image/*" required style="margin-top: 5px;">
-    <img id="imagePreview" style="display:none; width:100%; margin-top:10px; border-radius:8px;">
-<div class="form-group">
-    <label>Condition</label>
-    <select id="itemCondition" class="input-field" required>
-        <option value="used">Used</option>
-        <option value="new">New / Boxed</option>
-        <option value="refurbished">Refurbished</option>
-    </select>
-</div>
+            <input type="number" id="pPrice" min="0" step="0.01" placeholder="Price in ETB" required>
 
-<div class="form-group">
-    <label>Description</label>
-    <textarea id="itemDescription" class="input-field" placeholder="Describe the item's features or flaws..." rows="4" required></textarea>
-</div>
-            <select id="pCat">
-                <option value="Electronics">Electronics</option>
-                <option value="Computer & Phone">Computer & Phone</option>
-                <option value="Fashion">Fashion</option>
-             <option value="home & Furniture">home & Furniture</option>
-                   <option value="Vehicls">Vehicls</option>
-                   <option value="Jobes">Jobes</option>
-                   <option value="Services">Services</option>
-                <option value="Other">Other</option>
-            </select>
+            <div style="margin-top:15px;">
+                <label style="font-size:0.85rem; font-weight:bold;">Product Image</label>
+                <input type="file" id="pImageFile" accept="image/*" required style="margin-top:5px;">
+                <img id="imagePreview" alt="Product image preview"
+                     style="display:none; width:100%; margin-top:10px; border-radius:8px;">
+            </div>
 
-           <div style="margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-    <p style="font-size: 0.85rem; font-weight: bold; color: #333; margin-bottom: 5px;">Contact Information</p>
-    <label style="font-size: 0.75rem; color: #666;">Phone Number (For Calls & WhatsApp)</label>
-    <input type="tel" id="pPhone" placeholder="e.g. 0911223344" required>
-</div>
+            <div class="form-group">
+                <label for="itemCondition">Condition</label>
+                <select id="itemCondition" class="input-field" required>
+                    <option value="Used">Used</option>
+                    <option value="New">New / Boxed</option>
+                    <option value="Refurbished">Refurbished</option>
+                    <option value="Damage">Damage / For Parts</option>
+                    <option value="Custom Order">We work on order</option>
+                </select>
+            </div>
 
-            <button type="submit" class="main-btn" style="margin-top: 20px;">Post for Approval</button>
+            <div class="form-group">
+                <label for="itemDescription">Description</label>
+                <textarea id="itemDescription" class="input-field"
+                          placeholder="Describe the item's features or flaws..."
+                          rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="pCat">Category</label>
+                <select id="pCat" required>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Computer & Phone">Computer & Phone</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Home & Furniture">Home & Furniture</option>
+                    <option value="Vehicles">Vehicles</option>
+                    <option value="Jobs">Jobs</option>
+                    <option value="Services">Services</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div style="margin-top:15px; padding:15px; background:#f9f9f9; border-radius:8px; border:1px solid #ddd;">
+                <p style="font-size:0.85rem; font-weight:bold; color:#333; margin-bottom:5px;">Contact Information</p>
+                <label for="pPhone" style="font-size:0.75rem; color:#666;">Phone Number (For Calls & WhatsApp)</label>
+                <input type="tel" id="pPhone" placeholder="e.g. 0911223344" required>
+            </div>
+
+            <button type="submit" class="main-btn" style="margin-top:20px;">Post for Approval</button>
         </form>
-    </div>
+    </main>
 
     <script src="config.js"></script>
     <script src="submit.js"></script>
