@@ -248,15 +248,13 @@
 <div id="modalRoot"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script>
 // ============================================================
-// CONFIG — fill in before deploying
+// Uses the shared _supabase client from config.js (same client
+// your other pages already use — no separate key/config here).
 // ============================================================
-const SUPABASE_URL = "https://ryeylhawdmykbbmnfrrh.supabase.co";
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5ZXlsaGF3ZG15a2JibW5mcnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MzU4NjcsImV4cCI6MjA4NjIxMTg2N30.6FpidGEaunpf8AwBIpjKwcC3a53iWmvaRxctj2ZYrSY';
 const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existing bucket name
-
-const supabase = window.supabase.createClient(SUPABASE_URL, supabaseKey);
 
 let currentUser = null;
 let currentLang = "en";
@@ -264,7 +262,7 @@ let currentLang = "en";
 // ---------- Auth gate ----------
 async function initAuth(){
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await _supabase.auth.getUser();
     currentUser = user;
   } catch (err) {
     console.error("Auth check failed:", err);
@@ -280,15 +278,15 @@ async function initAuth(){
 }
 
 async function signInWithGoogle(){
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { error } = await _supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: window.location.href }
+    options: { redirectTo: window.location.origin + "/dating.html" }
   });
   if (error) alert("Sign-in failed: " + error.message);
 }
 
 async function signOut(){
-  await supabase.auth.signOut();
+  await _supabase.auth.signOut();
 }
 
 function updateHeaderAuthUI(){
@@ -304,7 +302,7 @@ function updateHeaderAuthUI(){
 }
 
 // Re-check auth state after OAuth redirect completes, or if session changes
-supabase.auth.onAuthStateChange((_event, session) => {
+_supabase.auth.onAuthStateChange((_event, session) => {
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
   document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
@@ -440,7 +438,7 @@ async function sendMessage(productId, recipientId){
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
-  const { error } = await supabase.from("dating_messages").insert({
+  const { error } = await _supabase.from("dating_messages").insert({
     product_id: productId,
     sender_id: currentUser.id,
     recipient_id: recipientId,
@@ -496,7 +494,7 @@ async function loadThreads(){
 async function openThread(thread){
   thread.messages
     .filter(m => m.recipient_id === currentUser.id && !m.read)
-    .forEach(m => supabase.from("dating_messages").update({ read: true }).eq("id", m.id).then(()=>{}));
+    .forEach(m => _supabase.from("dating_messages").update({ read: true }).eq("id", m.id).then(()=>{}));
 
   const ordered = [...thread.messages].reverse();
   const root = document.getElementById("modalRoot");
@@ -556,7 +554,7 @@ async function loadMyProfile(){
 
   document.getElementById("editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const { error: updErr } = await supabase.from("products").update({
+    const { error: updErr } = await _supabase.from("products").update({
       specs: { ...s, age: parseInt(document.getElementById("eAge").value,10),
         city: document.getElementById("eCity").value.trim(),
         bio: document.getElementById("eBio").value.trim() }
@@ -568,7 +566,7 @@ async function loadMyProfile(){
 
   document.getElementById("deleteBtn").addEventListener("click", async () => {
     if (!confirm("Delete your dating profile? This can't be undone.")) return;
-    const { error: delErr } = await supabase.from("products").delete().eq("id", data.id);
+    const { error: delErr } = await _supabase.from("products").delete().eq("id", data.id);
     if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
     loadMyProfile();
   });
@@ -577,7 +575,7 @@ async function loadMyProfile(){
 async function reportProfile(productId){
   const reason = prompt("What's the issue with this profile?");
   if (!reason) return;
-  const { error } = await supabase.from("dating_reports").insert({
+  const { error } = await _supabase.from("dating_reports").insert({
     reported_product_id: productId,
     reporter_id: currentUser.id,
     reason
@@ -607,19 +605,19 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   const file = document.getElementById("fPhoto").files[0];
   if (file){
     const path = `dating/${currentUser.id}-${Date.now()}-${file.name}`;
-    const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+    const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Photo upload failed: ${uploadErr.message}</div>`;
       btn.disabled = false; btn.textContent = "Post my profile";
       return;
     }
-    const { data: pub } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     imageUrl = pub.publicUrl;
   }
 
   const productCode = `WG-${new Date().getFullYear()}-DT-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
 
-  const { error } = await supabase.from("products").insert({
+  const { error } = await _supabase.from("products").insert({
     user_id: currentUser.id,
     category: "Dating",
     product_code: productCode,
