@@ -245,10 +245,10 @@
 // CONFIG — fill in before deploying
 // ============================================================
 const SUPABASE_URL = "https://ryeylhawdmykbbmnfrrh.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5ZXlsaGF3ZG15a2JibW5mcnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MzU4NjcsImV4cCI6MjA4NjIxMTg2N30.6FpidGEaunpf8AwBIpjKwcC3a53iWmvaRxctj2ZYrSY';
 const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existing bucket name
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, supabaseKey);
 
 let currentUser = null;
 let currentLang = "en";
