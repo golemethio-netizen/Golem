@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dating — WanaGebya</title>
+<style>
+  :root{
+    --green:#0A291A;
+    --green-light:#123B27;
+    --gold:#F5A623;
+    --gold-soft:#FCE3B4;
+    --ink:#1B1B1B;
+    --paper:#FBF8F2;
+    --line:#E4DCC8;
+    --danger:#B3261E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  header{
+    background:var(--green);
+    color:#fff;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  header .brand{font-weight:700;font-size:1.1rem;letter-spacing:.02em;}
+  header .brand span{color:var(--gold);}
+  header nav a, header button.lang{
+    background:none;border:none;color:#fff;opacity:.85;
+    font-size:.9rem;cursor:pointer;margin-left:14px;text-decoration:none;
+  }
+  header nav a:hover{opacity:1;}
+
+  .tabs{
+    display:flex;gap:6px;max-width:960px;margin:20px auto 0;padding:0 16px;
+  }
+  .tab{
+    padding:10px 18px;border-radius:8px 8px 0 0;cursor:pointer;
+    background:#fff;border:1px solid var(--line);border-bottom:none;
+    font-size:.92rem;color:#555;
+  }
+  .tab.active{background:var(--paper);color:var(--green);font-weight:700;border-color:var(--gold);}
+
+  main{max-width:960px;margin:0 auto;padding:20px 16px 60px;}
+  .panel{
+    background:#fff;border:1px solid var(--line);border-radius:0 10px 10px 10px;
+    padding:20px;min-height:300px;
+  }
+
+  .gate{
+    text-align:center;padding:40px 20px;color:#555;
+  }
+  .gate button{
+    margin-top:14px;background:var(--gold);color:var(--green);border:none;
+    padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;
+  }
+
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+  .filters select, .filters input{
+    padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:.88rem;
+  }
+
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;
+  }
+  .card{
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;
+    background:#fff;transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08);}
+  .card .photo{
+    width:100%;aspect-ratio:1/1;background:var(--green-light) center/cover no-repeat;
+    display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-size:2rem;
+  }
+  .card .info{padding:10px 12px;}
+  .card .info .name-age{font-weight:700;font-size:.95rem;}
+  .card .info .meta{font-size:.8rem;color:#777;margin-top:2px;}
+
+  .empty{text-align:center;color:#888;padding:40px 10px;}
+
+  form.post-form{display:grid;gap:14px;max-width:520px;}
+  form.post-form label{font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;}
+  form.post-form input, form.post-form select, form.post-form textarea{
+    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-size:.92rem;font-family:inherit;
+  }
+  form.post-form textarea{min-height:110px;resize:vertical;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .checkbox-line{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:#444;}
+  .checkbox-line input{width:auto;margin-top:2px;}
+  .submit-btn{
+    background:var(--green);color:#fff;border:none;padding:12px;border-radius:8px;
+    font-weight:700;cursor:pointer;font-size:.95rem;
+  }
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .msg{font-size:.85rem;padding:10px;border-radius:7px;margin-top:6px;}
+  .msg.error{background:#FBEAE9;color:var(--danger);}
+  .msg.success{background:#E9F5EC;color:#1E6B37;}
+
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;
+    align-items:center;justify-content:center;padding:20px;z-index:50;
+  }
+  .modal{
+    background:#fff;border-radius:12px;max-width:420px;width:100%;overflow:hidden;
+    max-height:90vh;overflow-y:auto;
+  }
+  .modal .photo{width:100%;aspect-ratio:4/3;background:var(--green-light) center/cover no-repeat;}
+  .modal .body{padding:18px;}
+  .modal h3{margin:0 0 4px;}
+  .modal .meta{color:#777;font-size:.85rem;margin-bottom:12px;}
+  .modal .bio{font-size:.92rem;line-height:1.5;color:#333;}
+  .modal .actions{display:flex;gap:10px;margin-top:16px;}
+  .modal .actions button{
+    flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;cursor:pointer;
+  }
+  .btn-contact{background:var(--gold);color:var(--green);}
+  .btn-report{background:#fff;color:var(--danger);border:1px solid var(--danger) !important;}
+  .btn-close{background:none;border:none;font-size:1.1rem;float:right;cursor:pointer;color:#888;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">WanaGebya <span>Dating</span></div>
+  <nav>
+    <button class="lang" onclick="toggleLang()" id="langBtn">አማ</button>
+    <a href="index.html">← Marketplace</a>
+  </nav>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
+  <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
+</div>
+
+<main>
+  <div class="panel" id="gate" style="display:none;">
+    <div class="gate">
+      <p>You need to be signed in to view or post in Dating.</p>
+      <button onclick="window.location.href='login.html?redirect=dating.html'">Sign in</button>
+    </div>
+  </div>
+
+  <div class="panel" id="browsePanel" style="display:none;">
+    <div class="filters">
+      <select id="filterSeeking">
+        <option value="">Show: everyone</option>
+        <option value="Male">Men</option>
+        <option value="Female">Women</option>
+      </select>
+      <select id="filterType">
+        <option value="">Any purpose</option>
+        <option value="Friendship">Friendship</option>
+        <option value="Dating">Dating</option>
+        <option value="Marriage">Marriage</option>
+      </select>
+      <input type="text" id="filterCity" placeholder="City">
+      <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Filter</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="emptyState" style="display:none;">No profiles match yet — check back soon.</div>
+  </div>
+
+  <div class="panel" id="postPanel" style="display:none;">
+    <form class="post-form" id="postForm">
+      <div class="row2">
+        <div>
+          <label>Age</label>
+          <input type="number" id="fAge" min="18" max="99" required>
+        </div>
+        <div>
+          <label>City</label>
+          <input type="text" id="fCity" required>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>I am</label>
+          <select id="fGender" required>
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+        <div>
+          <label>Looking for</label>
+          <select id="fSeeking" required>
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Any</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Purpose</label>
+        <select id="fType" required>
+          <option value="">Select</option>
+          <option>Friendship</option>
+          <option>Dating</option>
+          <option>Marriage</option>
+        </select>
+      </div>
+      <div>
+        <label>About you (max 500 characters)</label>
+        <textarea id="fBio" maxlength="500" required placeholder="Tell people a bit about yourself..."></textarea>
+      </div>
+      <div>
+        <label>Photo</label>
+        <input type="file" id="fPhoto" accept="image/*">
+      </div>
+      <div class="checkbox-line">
+        <input type="checkbox" id="fAgeConfirm" required>
+        <label for="fAgeConfirm" style="margin:0;font-weight:400;">I confirm I am 18 years or older and this information is accurate.</label>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">Post my profile</button>
+      <div id="formMsg"></div>
+    </form>
+  </div>
+</main>
+
+<div id="modalRoot"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.7/supabase.min.js"></script>
+<script>
+// ============================================================
+// CONFIG — fill in before deploying
+// ============================================================
+const SUPABASE_URL = "https://ryeylhawdmykbbmnfrrh.supabase.co";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existing bucket name
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let currentLang = "en";
+
+// ---------- Auth gate ----------
+async function initAuth(){
+  const { data: { user } } = await supabase.auth.getUser();
+  currentUser = user;
+  document.getElementById("gate").style.display = user ? "none" : "block";
+  document.getElementById("browsePanel").style.display = user ? "block" : "none";
+  if (user) loadProfiles();
+}
+
+// ---------- Tabs ----------
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+  if (!currentUser){
+    document.getElementById("gate").style.display = "block";
+    document.getElementById("browsePanel").style.display = "none";
+    document.getElementById("postPanel").style.display = "none";
+    return;
+  }
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("browsePanel").style.display = tab === "browse" ? "block" : "none";
+  document.getElementById("postPanel").style.display = tab === "post" ? "block" : "none";
+}
+
+// ---------- Load / render profiles ----------
+async function loadProfiles(){
+  const seeking = document.getElementById("filterSeeking").value;
+  const type = document.getElementById("filterType").value;
+  const city = document.getElementById("filterCity").value.trim();
+
+  let query = supabase
+    .from("products")
+    .select("*")
+    .eq("category", "Dating")
+    .neq("user_id", currentUser.id) // don't show your own profile in the browse grid
+    .order("created_at", { ascending: false });
+
+  const { data, error } = await query;
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("emptyState");
+  grid.innerHTML = "";
+
+  if (error){
+    empty.textContent = "Couldn't load profiles right now.";
+    empty.style.display = "block";
+    console.error(error);
+    return;
+  }
+
+  let rows = data || [];
+  if (seeking) rows = rows.filter(r => (r.specs?.gender) === seeking);
+  if (type) rows = rows.filter(r => (r.specs?.relationship_type) === type);
+  if (city) rows = rows.filter(r => (r.specs?.city || "").toLowerCase().includes(city.toLowerCase()));
+
+  if (rows.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  rows.forEach(row => {
+    const img = (row.images && row.images[0]) || null;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openModal(row);
+    card.innerHTML = `
+      <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
+      <div class="info">
+        <div class="name-age">${row.specs?.gender || ""}, ${row.specs?.age || "?"}</div>
+        <div class="meta">${row.specs?.city || ""} · ${row.specs?.relationship_type || ""}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ---------- Modal ----------
+function openModal(row){
+  const img = (row.images && row.images[0]) || null;
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="photo" style="${img ? `background-image:url('${img}')` : ""}"></div>
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3>${row.specs?.gender || ""}, ${row.specs?.age || "?"}</h3>
+          <div class="meta">${row.specs?.city || ""} · Looking for ${row.specs?.seeking || ""} · ${row.specs?.relationship_type || ""}</div>
+          <div class="bio">${(row.specs?.bio || "").replace(/</g,"&lt;")}</div>
+          <div class="actions">
+            <button class="btn-contact" onclick="contactProfile('${row.id}')">Message</button>
+            <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; }
+
+function contactProfile(productId){
+  // TODO: wire to your existing messaging/chat system if you have one.
+  // Fallback for now: send them to your existing contact-seller flow.
+  window.location.href = `contact.html?product=${productId}`;
+}
+
+async function reportProfile(productId){
+  const reason = prompt("What's the issue with this profile?");
+  if (!reason) return;
+  const { error } = await supabase.from("dating_reports").insert({
+    reported_product_id: productId,
+    reporter_id: currentUser.id,
+    reason
+  });
+  alert(error ? "Couldn't submit report, try again." : "Report submitted. Thank you.");
+  closeModal();
+}
+
+// ---------- Post form ----------
+document.getElementById("postForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("submitBtn");
+  const msg = document.getElementById("formMsg");
+  msg.innerHTML = "";
+
+  const age = parseInt(document.getElementById("fAge").value, 10);
+  const ageConfirmed = document.getElementById("fAgeConfirm").checked;
+  if (age < 18 || !ageConfirmed){
+    msg.innerHTML = `<div class="msg error">You must be 18 or older to post here.</div>`;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Posting...";
+
+  let imageUrl = null;
+  const file = document.getElementById("fPhoto").files[0];
+  if (file){
+    const path = `dating/${currentUser.id}-${Date.now()}-${file.name}`;
+    const { error: uploadErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+    if (uploadErr){
+      msg.innerHTML = `<div class="msg error">Photo upload failed: ${uploadErr.message}</div>`;
+      btn.disabled = false; btn.textContent = "Post my profile";
+      return;
+    }
+    const { data: pub } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    imageUrl = pub.publicUrl;
+  }
+
+  const productCode = `WG-${new Date().getFullYear()}-DT-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+
+  const { error } = await supabase.from("products").insert({
+    user_id: currentUser.id,
+    category: "Dating",
+    product_code: productCode,
+    age_confirmed: true,
+    images: imageUrl ? [imageUrl] : [],
+    specs: {
+      age,
+      gender: document.getElementById("fGender").value,
+      seeking: document.getElementById("fSeeking").value,
+      relationship_type: document.getElementById("fType").value,
+      city: document.getElementById("fCity").value.trim(),
+      bio: document.getElementById("fBio").value.trim()
+    }
+  });
+
+  btn.disabled = false;
+  btn.textContent = "Post my profile";
+
+  if (error){
+    msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
+  } else {
+    msg.innerHTML = `<div class="msg success">Profile posted!</div>`;
+    document.getElementById("postForm").reset();
+  }
+});
+
+// ---------- Language toggle (stub — wire into your TRANSLATIONS system) ----------
+function toggleLang(){
+  currentLang = currentLang === "en" ? "am" : "en";
+  document.getElementById("langBtn").textContent = currentLang === "en" ? "አማ" : "EN";
+  // TODO: hook into your existing TRANSLATIONS dictionary + localStorage persistence
+}
+
+initAuth();
+</script>
+</body>
+</html>
