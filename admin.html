@@ -100,6 +100,10 @@
                 <i class="fas fa-flag"></i> Reports <span id="reportsBadge" class="admin-badge" style="background:#ff4757; color:white; padding:2px 8px; border-radius:10px; font-size:12px; display:none;">0</span>
             </button>
 
+            <button onclick="switchTab('dating', this)" class="tab-btn" style="background: #fce4ec; color: #c2185b;">
+                <i class="fas fa-heart"></i> Dating <span id="datingReportsBadge" class="admin-badge" style="background:#ff4757; color:white; padding:2px 8px; border-radius:10px; font-size:12px; display:none;">0</span>
+            </button>
+
             <button onclick="generateSponsorReport()" style="background:#F5A623; color:#1a1a1a; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto;">
                 <i class="fas fa-file-invoice"></i> Expiry Report (24h)
             </button>
@@ -316,6 +320,31 @@
             </div>
 
             <div id="reportsList">
+                <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+            </div>
+        </section>
+
+        <!-- DATING SECTION -->
+        <section id="datingSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+            <h3 style="margin:0 0 6px;"><i class="fas fa-heart" style="color:#c2185b;"></i> Dating — Reports</h3>
+            <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Profiles flagged by users for review.</p>
+
+            <div style="display:flex; gap:10px; margin-bottom:18px;">
+                <select id="datingReportsFilterStatus" onchange="loadDatingReports()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                    <option value="open">Open</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="dismissed">Dismissed</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <div id="datingReportsList">
+                <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+            </div>
+
+            <h3 style="margin:32px 0 6px;"><i class="fas fa-users" style="color:#c2185b;"></i> Dating — All Profiles</h3>
+            <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Most recent profiles, newest first. Remove any that violate policy.</p>
+            <div id="datingProfilesList">
                 <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
             </div>
         </section>
@@ -559,6 +588,7 @@
             const categoriesSection = document.getElementById('categoriesSection');
             const viewsSection      = document.getElementById('viewsSection');
             const reportsSection    = document.getElementById('reportsSection');
+            const datingSection     = document.getElementById('datingSection');
             const searchContainer   = document.getElementById('searchContainer');
             const viewTitle         = document.getElementById('viewTitle');
 
@@ -570,6 +600,7 @@
             categoriesSection.style.display = 'none';
             viewsSection.style.display      = 'none';
             reportsSection.style.display    = 'none';
+            datingSection.style.display     = 'none';
             searchContainer.style.display   = 'block';
 
             const searchInput = document.getElementById('adminSearchInput');
@@ -597,6 +628,11 @@
                 reportsSection.style.display = 'block';
                 searchContainer.style.display = 'none';
                 loadReports();
+            } else if (status === 'dating') {
+                datingSection.style.display = 'block';
+                searchContainer.style.display = 'none';
+                loadDatingReports();
+                loadDatingProfiles();
             } else {
                 itemsSection.style.display = 'block';
                 viewTitle.innerText = status.toUpperCase() + " ITEMS";
@@ -613,6 +649,7 @@
             const { count: userCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
             const { count: pendingCount } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending');
             const { count: openReports } = await _supabase.from('product_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
+            const { count: openDatingReports } = await _supabase.from('dating_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
 
             const marketValue = priceData?.reduce((sum, item) => sum + (item.price || 0), 0) || 0;
             
@@ -632,6 +669,12 @@
             if (reportsBadge) {
                 reportsBadge.innerText = openReports || 0;
                 reportsBadge.style.display = openReports > 0 ? 'inline-block' : 'none';
+            }
+
+            const datingReportsBadge = document.getElementById('datingReportsBadge');
+            if (datingReportsBadge) {
+                datingReportsBadge.innerText = openDatingReports || 0;
+                datingReportsBadge.style.display = openDatingReports > 0 ? 'inline-block' : 'none';
             }
         }
 
@@ -695,6 +738,109 @@
             if (error) { alert('Failed: ' + error.message); return; }
             logAction(newStatus === 'dismissed' ? 'Report Dismissed' : 'Report Reviewed', `Report ID: ${reportId}`);
             loadReports();
+            loadStats();
+        }
+
+        // --- DATING: REPORTS ---
+        async function loadDatingReports() {
+            const container = document.getElementById('datingReportsList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('datingReportsFilterStatus').value;
+            let query = _supabase.from('dating_reports')
+                .select('*, dating_profiles(id, user_id, gender, age, city, bio, photo_url)')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: reports, error } = await query;
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+
+            if (!reports || reports.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No reports here.</p>';
+                return;
+            }
+
+            const reporterIds = [...new Set(reports.map(r => r.reporter_id).filter(Boolean))];
+            let reporterMap = {};
+            if (reporterIds.length) {
+                const { data: reporters } = await _supabase.from('profiles').select('id, full_name, phone').in('id', reporterIds);
+                (reporters || []).forEach(r => reporterMap[r.id] = r);
+            }
+
+            container.innerHTML = reports.map(r => {
+                const reporter = reporterMap[r.reporter_id];
+                const profile = r.dating_profiles;
+                const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
+                return `
+                    <div style="display:flex; gap:14px; padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px; align-items:flex-start;">
+                        <img src="${escapeHtml(profile?.photo_url || '')}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#f5f5f5; flex-shrink:0;" onerror="this.style.display='none'">
+                        <div style="flex:1; min-width:0;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                                <div>
+                                    <strong>${profile ? escapeHtml(profile.gender) + ', ' + escapeHtml(String(profile.age)) : 'Profile removed'}</strong>
+                                    ${profile ? `<span style="color:#999; font-size:0.78rem;"> · ${escapeHtml(profile.city)}</span>` : ''}
+                                </div>
+                                <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                            </div>
+                            <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
+                            <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
+                            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                                ${r.status === 'open' ? `
+                                    <button onclick="resolveDatingReport('${r.id}', 'dismissed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ddd; background:white; border-radius:5px; cursor:pointer;">Dismiss</button>
+                                    <button onclick="resolveDatingReport('${r.id}', 'reviewed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #2ed573; color:#2ed573; background:white; border-radius:5px; cursor:pointer;">Mark Reviewed</button>
+                                    ${profile ? `<button onclick="deleteDatingProfile('${profile.id}', '${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer;">Remove Profile</button>` : ''}
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolveDatingReport(reportId, newStatus) {
+            const { error } = await _supabase.from('dating_reports').update({ status: newStatus }).eq('id', reportId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'dismissed' ? 'Dating Report Dismissed' : 'Dating Report Reviewed', `Report ID: ${reportId}`);
+            loadDatingReports();
+            loadStats();
+        }
+
+        // --- DATING: ALL PROFILES ---
+        async function loadDatingProfiles() {
+            const container = document.getElementById('datingProfilesList');
+            const { data: profiles, error } = await _supabase
+                .from('dating_profiles')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+            if (!profiles || profiles.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No dating profiles yet.</p>';
+                return;
+            }
+
+            container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">` +
+                profiles.map(p => `
+                    <div style="border:1px solid #eee; border-radius:10px; padding:12px;">
+                        <div style="display:flex; justify-content:space-between; gap:8px;">
+                            <strong>${escapeHtml(p.gender)}, ${escapeHtml(String(p.age))}</strong>
+                            <span style="color:#999; font-size:0.72rem;">${new Date(p.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div style="color:#888; font-size:0.8rem; margin:4px 0;">${escapeHtml(p.city)} · ${escapeHtml(p.relationship_type)}</div>
+                        <div style="font-size:0.8rem; color:#555; max-height:60px; overflow:hidden;">${escapeHtml((p.bio || '').slice(0, 120))}</div>
+                        <button onclick="deleteDatingProfile('${p.id}')" style="margin-top:8px; font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer; width:100%;">Remove Profile</button>
+                    </div>`).join('') +
+                `</div>`;
+        }
+
+        async function deleteDatingProfile(profileId, reportId) {
+            if (!confirm('Remove this dating profile? This cannot be undone.')) return;
+            const { error } = await _supabase.from('dating_profiles').delete().eq('id', profileId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            if (reportId) await _supabase.from('dating_reports').update({ status: 'reviewed' }).eq('id', reportId);
+            logAction('Dating Profile Removed', `Profile ID: ${profileId}`);
+            loadDatingReports();
+            loadDatingProfiles();
             loadStats();
         }
 
