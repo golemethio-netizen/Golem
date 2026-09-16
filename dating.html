@@ -171,7 +171,11 @@
         <option value="Dating">Dating</option>
         <option value="Marriage">Marriage</option>
       </select>
-      <input type="text" id="filterCity" placeholder="City">
+      <select id="filterCity">
+        <option value="">All cities</option>
+      </select>
+      <input type="number" id="filterMinAge" placeholder="Min age" min="18" max="99" style="width:90px;">
+      <input type="number" id="filterMaxAge" placeholder="Max age" min="18" max="99" style="width:90px;">
       <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Filter</button>
     </div>
     <div class="grid" id="grid"></div>
@@ -187,7 +191,9 @@
         </div>
         <div>
           <label>City</label>
-          <input type="text" id="fCity" required>
+          <select id="fCity" required>
+            <option value="">Select city</option>
+          </select>
         </div>
       </div>
       <div class="row2">
@@ -242,6 +248,8 @@
 
   <div class="panel" id="myProfilePanel" style="display:none;">
     <div id="myProfileContent"></div>
+    <h4 style="margin-top:24px;">Blocked users</h4>
+    <div id="blockedListContent"></div>
   </div>
 </main>
 
@@ -258,6 +266,35 @@ const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existi
 
 let currentUser = null;
 let currentLang = "en";
+let blockedIds = new Set();     // profiles/users I've blocked
+let blockedByIds = new Set();   // users who've blocked me (hide me from their view isn't client-enforceable, but we hide them from mine too)
+
+// Escape any user-supplied text before it touches innerHTML.
+function esc(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
+}
+
+// ---------- Ethiopian cities ----------
+// NOTE: swap this for the exact canonical city list already used in
+// script.js (sell.html / my-items.html / index.html) so values match
+// across the marketplace and dating for consistent filtering.
+const ETHIOPIAN_CITIES = [
+  "Addis Ababa","Dire Dawa","Mekelle","Gondar","Bahir Dar","Hawassa",
+  "Adama","Jimma","Jijiga","Dessie","Bishoftu","Sodo","Arba Minch",
+  "Hosaena","Harar","Dilla","Nekemte","Debre Birhan","Debre Markos",
+  "Shashamane","Asella","Gambela","Semera","Assosa","Other"
+];
+
+function populateCitySelects(){
+  const html = ETHIOPIAN_CITIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  const fCity = document.getElementById("fCity");
+  const filterCity = document.getElementById("filterCity");
+  if (fCity) fCity.insertAdjacentHTML("beforeend", html);
+  if (filterCity) filterCity.insertAdjacentHTML("beforeend", html);
+}
+populateCitySelects();
 
 // ---------- Auth gate ----------
 async function initAuth(){
@@ -272,6 +309,7 @@ async function initAuth(){
   document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
+    await loadBlockedIds();
     loadProfiles();
     refreshUnreadBadge();
   }
@@ -302,12 +340,13 @@ function updateHeaderAuthUI(){
 }
 
 // Re-check auth state after OAuth redirect completes, or if session changes
-_supabase.auth.onAuthStateChange((_event, session) => {
+_supabase.auth.onAuthStateChange(async (_event, session) => {
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
   document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
+    await loadBlockedIds();
     loadProfiles();
     refreshUnreadBadge();
   }
@@ -339,7 +378,7 @@ function switchTab(tab){
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
-  if (tab === "myprofile") loadMyProfile();
+  if (tab === "myprofile"){ loadMyProfile(); renderBlockedList(); }
 }
 
 // ---------- Load / render profiles ----------
@@ -366,10 +405,14 @@ async function loadProfiles(){
     return;
   }
 
-  let rows = data || [];
+  let rows = (data || []).filter(r => !blockedIds.has(r.user_id) && !blockedByIds.has(r.user_id));
   if (seeking) rows = rows.filter(r => r.gender === seeking);
   if (type) rows = rows.filter(r => r.relationship_type === type);
-  if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
+  if (city) rows = rows.filter(r => (r.city || "").toLowerCase() === city.toLowerCase());
+  const minAge = parseInt(document.getElementById("filterMinAge")?.value, 10);
+  const maxAge = parseInt(document.getElementById("filterMaxAge")?.value, 10);
+  if (!isNaN(minAge)) rows = rows.filter(r => (r.age || 0) >= minAge);
+  if (!isNaN(maxAge)) rows = rows.filter(r => (r.age || 0) <= maxAge);
 
   if (rows.length === 0){
     empty.style.display = "block";
@@ -378,15 +421,15 @@ async function loadProfiles(){
   empty.style.display = "none";
 
   rows.forEach(row => {
-    const img = row.photo_url || null;
+    const img = row.photo_url ? encodeURI(row.photo_url) : null;
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
     card.innerHTML = `
       <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
       <div class="info">
-        <div class="name-age">${row.gender || ""}, ${row.age || "?"}</div>
-        <div class="meta">${row.city || ""} · ${row.relationship_type || ""}</div>
+        <div class="name-age">${esc(row.gender)}, ${row.age || "?"}</div>
+        <div class="meta">${esc(row.city)} · ${esc(row.relationship_type)}</div>
       </div>`;
     grid.appendChild(card);
   });
@@ -394,7 +437,7 @@ async function loadProfiles(){
 
 // ---------- Modal ----------
 function openModal(row){
-  const img = row.photo_url || null;
+  const img = row.photo_url ? encodeURI(row.photo_url) : null;
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -402,12 +445,15 @@ function openModal(row){
         <div class="photo" style="${img ? `background-image:url('${img}')` : ""}"></div>
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.gender || ""}, ${row.age || "?"}</h3>
-          <div class="meta">${row.city || ""} · Looking for ${row.seeking || ""} · ${row.relationship_type || ""}</div>
-          <div class="bio">${(row.bio || "").replace(/</g,"&lt;")}</div>
+          <h3>${esc(row.gender)}, ${row.age || "?"}</h3>
+          <div class="meta">${esc(row.city)} · Looking for ${esc(row.seeking)} · ${esc(row.relationship_type)}</div>
+          <div class="bio">${esc(row.bio)}</div>
           <div class="actions">
             <button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
+          </div>
+          <div class="actions">
+            <button class="btn-report" onclick="blockUser('${row.user_id}')">Block this person</button>
           </div>
         </div>
       </div>
@@ -423,7 +469,7 @@ function contactProfile(profileId, recipientId){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3>Send a message</h3>
-          <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
+          <textarea id="composeBody" maxlength="1000" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
           <div class="actions">
             <button class="btn-contact" onclick="sendMessage('${profileId}','${recipientId}')">Send</button>
           </div>
@@ -437,6 +483,10 @@ async function sendMessage(profileId, recipientId){
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
+  if (blockedIds.has(recipientId) || blockedByIds.has(recipientId)){
+    msgBox.innerHTML = `<div class="msg error">You can't message this user.</div>`;
+    return;
+  }
   const { error } = await _supabase.from("dating_messages").insert({
     profile_id: profileId,
     sender_id: currentUser.id,
@@ -478,16 +528,18 @@ async function loadThreads(){
     threads[key].messages.push(m);
   });
 
-  Object.values(threads).forEach(thread => {
-    const last = thread.messages[0];
-    const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
-    const div = document.createElement("div");
-    div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;";
-    div.innerHTML = `<div style="font-weight:${unread?"700":"400"};">${last.body.slice(0,80)}</div>
-      <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>`;
-    div.onclick = () => openThread(thread);
-    list.appendChild(div);
-  });
+  Object.values(threads)
+    .filter(t => !blockedIds.has(t.other))
+    .forEach(thread => {
+      const last = thread.messages[0];
+      const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
+      const div = document.createElement("div");
+      div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;";
+      div.innerHTML = `<div style="font-weight:${unread?"700":"400"};">${esc(last.body.slice(0,80))}</div>
+        <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>`;
+      div.onclick = () => openThread(thread);
+      list.appendChild(div);
+    });
 }
 
 async function openThread(thread){
@@ -508,10 +560,10 @@ async function openThread(thread){
               <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
                 background:${m.sender_id===currentUser.id?"var(--gold-soft)":"#F0F0F0"};
                 padding:8px 12px;border-radius:10px;max-width:80%;font-size:.88rem;">
-                ${m.body.replace(/</g,"&lt;")}
+                ${esc(m.body)}
               </div>`).join("")}
           </div>
-          <textarea id="replyBody" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
+          <textarea id="replyBody" maxlength="1000" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
           <div class="actions">
             <button class="btn-contact" onclick="sendMessage('${thread.profileId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
           </div>
@@ -537,12 +589,16 @@ async function loadMyProfile(){
   el.innerHTML = `
     <form class="post-form" id="editForm">
       <div class="row2">
-        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${data.age||""}" required></div>
-        <div><label>City</label><input type="text" id="eCity" value="${data.city||""}" required></div>
+        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${esc(data.age)}" required></div>
+        <div><label>City</label>
+          <select id="eCity" required>
+            ${ETHIOPIAN_CITIES.map(c => `<option value="${esc(c)}" ${c===data.city?"selected":""}>${esc(c)}</option>`).join("")}
+          </select>
+        </div>
       </div>
       <div>
         <label>About you</label>
-        <textarea id="eBio" maxlength="500" required>${(data.bio||"").replace(/</g,"&lt;")}</textarea>
+        <textarea id="eBio" maxlength="500" required>${esc(data.bio)}</textarea>
       </div>
       <button type="submit" class="submit-btn">Save changes</button>
       <button type="button" class="submit-btn" style="background:var(--danger);" id="deleteBtn">Delete my profile</button>
@@ -568,6 +624,58 @@ async function loadMyProfile(){
     if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
     loadMyProfile();
   });
+}
+
+// ---------- Blocking ----------
+async function loadBlockedIds(){
+  blockedIds = new Set();
+  blockedByIds = new Set();
+  const [{ data: mine }, { data: theirs }] = await Promise.all([
+    _supabase.from("dating_blocks").select("blocked_id").eq("blocker_id", currentUser.id),
+    _supabase.from("dating_blocks").select("blocker_id").eq("blocked_id", currentUser.id)
+  ]);
+  (mine || []).forEach(r => blockedIds.add(r.blocked_id));
+  (theirs || []).forEach(r => blockedByIds.add(r.blocker_id));
+}
+
+async function blockUser(otherUserId){
+  if (otherUserId === currentUser.id) return;
+  if (!confirm("Block this person? You won't see each other's profiles or messages anymore.")) return;
+  const { error } = await _supabase.from("dating_blocks").insert({
+    blocker_id: currentUser.id,
+    blocked_id: otherUserId
+  });
+  if (error && error.code !== "23505"){ // ignore duplicate-block errors
+    alert("Couldn't block: " + error.message);
+    return;
+  }
+  blockedIds.add(otherUserId);
+  closeModal();
+  loadProfiles();
+}
+
+async function unblockUser(otherUserId){
+  const { error } = await _supabase.from("dating_blocks")
+    .delete()
+    .eq("blocker_id", currentUser.id)
+    .eq("blocked_id", otherUserId);
+  if (error){ alert("Couldn't unblock: " + error.message); return; }
+  blockedIds.delete(otherUserId);
+  renderBlockedList();
+}
+
+async function renderBlockedList(){
+  const el = document.getElementById("blockedListContent");
+  if (!el) return;
+  if (blockedIds.size === 0){
+    el.innerHTML = `<div class="empty" style="padding:16px 0;">You haven't blocked anyone.</div>`;
+    return;
+  }
+  el.innerHTML = [...blockedIds].map(id => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
+      <span style="font-size:.85rem;color:#555;">User ${esc(id.slice(0,8))}…</span>
+      <button class="btn-report" style="padding:6px 12px;" onclick="unblockUser('${id}')">Unblock</button>
+    </div>`).join("");
 }
 
 async function reportProfile(profileId){
