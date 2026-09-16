@@ -146,7 +146,7 @@
   <div class="panel" id="gate" style="display:none;">
     <div class="gate">
       <p>You need to be signed in to view or post in Dating.</p>
-      <button onclick="window.location.href='login.html?redirect=dating.html'">Sign in</button>
+      <button onclick="signInWithGoogle()">Sign in with Google</button>
     </div>
   </div>
 
@@ -245,25 +245,49 @@
 // CONFIG — fill in before deploying
 // ============================================================
 const SUPABASE_URL = "https://ryeylhawdmykbbmnfrrh.supabase.co";
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5ZXlsaGF3ZG15a2JibW5mcnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MzU4NjcsImV4cCI6MjA4NjIxMTg2N30.6FpidGEaunpf8AwBIpjKwcC3a53iWmvaRxctj2ZYrSY';
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
 const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existing bucket name
 
-const supabase = window.supabase.createClient(SUPABASE_URL, supabaseKey);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 let currentLang = "en";
 
 // ---------- Auth gate ----------
 async function initAuth(){
-  const { data: { user } } = await supabase.auth.getUser();
-  currentUser = user;
-  document.getElementById("gate").style.display = user ? "none" : "block";
-  document.getElementById("browsePanel").style.display = user ? "block" : "none";
-  if (user){
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUser = user;
+  } catch (err) {
+    console.error("Auth check failed:", err);
+    currentUser = null;
+  }
+  document.getElementById("gate").style.display = currentUser ? "none" : "block";
+  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
+  if (currentUser){
     loadProfiles();
     refreshUnreadBadge();
   }
 }
+
+async function signInWithGoogle(){
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.href }
+  });
+  if (error) alert("Sign-in failed: " + error.message);
+}
+
+// Re-check auth state after OAuth redirect completes, or if session changes
+supabase.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
+  document.getElementById("gate").style.display = currentUser ? "none" : "block";
+  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
+  if (currentUser){
+    loadProfiles();
+    refreshUnreadBadge();
+  }
+});
 
 async function refreshUnreadBadge(){
   const { count } = await supabase
