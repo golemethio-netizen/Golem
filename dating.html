@@ -314,7 +314,7 @@ _supabase.auth.onAuthStateChange((_event, session) => {
 });
 
 async function refreshUnreadBadge(){
-  const { count } = await supabase
+  const { count } = await _supabase
     .from("dating_messages")
     .select("*", { count: "exact", head: true })
     .eq("recipient_id", currentUser.id)
@@ -348,10 +348,9 @@ async function loadProfiles(){
   const type = document.getElementById("filterType").value;
   const city = document.getElementById("filterCity").value.trim();
 
-  let query = supabase
-    .from("products")
+  let query = _supabase
+    .from("dating_profiles")
     .select("*")
-    .eq("category", "Dating")
     .neq("user_id", currentUser.id) // don't show your own profile in the browse grid
     .order("created_at", { ascending: false });
 
@@ -368,9 +367,9 @@ async function loadProfiles(){
   }
 
   let rows = data || [];
-  if (seeking) rows = rows.filter(r => (r.specs?.gender) === seeking);
-  if (type) rows = rows.filter(r => (r.specs?.relationship_type) === type);
-  if (city) rows = rows.filter(r => (r.specs?.city || "").toLowerCase().includes(city.toLowerCase()));
+  if (seeking) rows = rows.filter(r => r.gender === seeking);
+  if (type) rows = rows.filter(r => r.relationship_type === type);
+  if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
 
   if (rows.length === 0){
     empty.style.display = "block";
@@ -379,15 +378,15 @@ async function loadProfiles(){
   empty.style.display = "none";
 
   rows.forEach(row => {
-    const img = (row.images && row.images[0]) || null;
+    const img = row.photo_url || null;
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
     card.innerHTML = `
       <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
       <div class="info">
-        <div class="name-age">${row.specs?.gender || ""}, ${row.specs?.age || "?"}</div>
-        <div class="meta">${row.specs?.city || ""} · ${row.specs?.relationship_type || ""}</div>
+        <div class="name-age">${row.gender || ""}, ${row.age || "?"}</div>
+        <div class="meta">${row.city || ""} · ${row.relationship_type || ""}</div>
       </div>`;
     grid.appendChild(card);
   });
@@ -395,7 +394,7 @@ async function loadProfiles(){
 
 // ---------- Modal ----------
 function openModal(row){
-  const img = (row.images && row.images[0]) || null;
+  const img = row.photo_url || null;
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -403,9 +402,9 @@ function openModal(row){
         <div class="photo" style="${img ? `background-image:url('${img}')` : ""}"></div>
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.specs?.gender || ""}, ${row.specs?.age || "?"}</h3>
-          <div class="meta">${row.specs?.city || ""} · Looking for ${row.specs?.seeking || ""} · ${row.specs?.relationship_type || ""}</div>
-          <div class="bio">${(row.specs?.bio || "").replace(/</g,"&lt;")}</div>
+          <h3>${row.gender || ""}, ${row.age || "?"}</h3>
+          <div class="meta">${row.city || ""} · Looking for ${row.seeking || ""} · ${row.relationship_type || ""}</div>
+          <div class="bio">${(row.bio || "").replace(/</g,"&lt;")}</div>
           <div class="actions">
             <button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
@@ -416,7 +415,7 @@ function openModal(row){
 }
 function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; }
 
-function contactProfile(productId, recipientId){
+function contactProfile(profileId, recipientId){
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -426,7 +425,7 @@ function contactProfile(productId, recipientId){
           <h3>Send a message</h3>
           <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
           <div class="actions">
-            <button class="btn-contact" onclick="sendMessage('${productId}','${recipientId}')">Send</button>
+            <button class="btn-contact" onclick="sendMessage('${profileId}','${recipientId}')">Send</button>
           </div>
           <div id="composeMsg"></div>
         </div>
@@ -434,12 +433,12 @@ function contactProfile(productId, recipientId){
     </div>`;
 }
 
-async function sendMessage(productId, recipientId){
+async function sendMessage(profileId, recipientId){
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
   const { error } = await _supabase.from("dating_messages").insert({
-    product_id: productId,
+    profile_id: profileId,
     sender_id: currentUser.id,
     recipient_id: recipientId,
     body
@@ -454,7 +453,7 @@ async function sendMessage(productId, recipientId){
 
 // ---------- Messages tab ----------
 async function loadThreads(){
-  const { data, error } = await supabase
+  const { data, error } = await _supabase
     .from("dating_messages")
     .select("*")
     .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
@@ -470,12 +469,12 @@ async function loadThreads(){
   }
   empty.style.display = "none";
 
-  // group by conversation = product_id + other participant
+  // group by conversation = profile_id + other participant
   const threads = {};
   data.forEach(m => {
     const other = m.sender_id === currentUser.id ? m.recipient_id : m.sender_id;
-    const key = `${m.product_id}__${other}`;
-    if (!threads[key]) threads[key] = { other, productId: m.product_id, messages: [] };
+    const key = `${m.profile_id}__${other}`;
+    if (!threads[key]) threads[key] = { other, profileId: m.profile_id, messages: [] };
     threads[key].messages.push(m);
   });
 
@@ -514,7 +513,7 @@ async function openThread(thread){
           </div>
           <textarea id="replyBody" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
           <div class="actions">
-            <button class="btn-contact" onclick="sendMessage('${thread.productId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
+            <button class="btn-contact" onclick="sendMessage('${thread.profileId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
           </div>
         </div>
       </div>
@@ -524,10 +523,9 @@ async function openThread(thread){
 // ---------- My Profile tab ----------
 async function loadMyProfile(){
   const el = document.getElementById("myProfileContent");
-  const { data, error } = await supabase
-    .from("products")
+  const { data, error } = await _supabase
+    .from("dating_profiles")
     .select("*")
-    .eq("category", "Dating")
     .eq("user_id", currentUser.id)
     .maybeSingle();
 
@@ -536,16 +534,15 @@ async function loadMyProfile(){
     return;
   }
 
-  const s = data.specs || {};
   el.innerHTML = `
     <form class="post-form" id="editForm">
       <div class="row2">
-        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${s.age||""}" required></div>
-        <div><label>City</label><input type="text" id="eCity" value="${s.city||""}" required></div>
+        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${data.age||""}" required></div>
+        <div><label>City</label><input type="text" id="eCity" value="${data.city||""}" required></div>
       </div>
       <div>
         <label>About you</label>
-        <textarea id="eBio" maxlength="500" required>${(s.bio||"").replace(/</g,"&lt;")}</textarea>
+        <textarea id="eBio" maxlength="500" required>${(data.bio||"").replace(/</g,"&lt;")}</textarea>
       </div>
       <button type="submit" class="submit-btn">Save changes</button>
       <button type="button" class="submit-btn" style="background:var(--danger);" id="deleteBtn">Delete my profile</button>
@@ -554,10 +551,11 @@ async function loadMyProfile(){
 
   document.getElementById("editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const { error: updErr } = await _supabase.from("products").update({
-      specs: { ...s, age: parseInt(document.getElementById("eAge").value,10),
-        city: document.getElementById("eCity").value.trim(),
-        bio: document.getElementById("eBio").value.trim() }
+    const { error: updErr } = await _supabase.from("dating_profiles").update({
+      age: parseInt(document.getElementById("eAge").value,10),
+      city: document.getElementById("eCity").value.trim(),
+      bio: document.getElementById("eBio").value.trim(),
+      updated_at: new Date().toISOString()
     }).eq("id", data.id);
     document.getElementById("editMsg").innerHTML = updErr
       ? `<div class="msg error">${updErr.message}</div>`
@@ -566,17 +564,17 @@ async function loadMyProfile(){
 
   document.getElementById("deleteBtn").addEventListener("click", async () => {
     if (!confirm("Delete your dating profile? This can't be undone.")) return;
-    const { error: delErr } = await _supabase.from("products").delete().eq("id", data.id);
+    const { error: delErr } = await _supabase.from("dating_profiles").delete().eq("id", data.id);
     if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
     loadMyProfile();
   });
 }
 
-async function reportProfile(productId){
+async function reportProfile(profileId){
   const reason = prompt("What's the issue with this profile?");
   if (!reason) return;
   const { error } = await _supabase.from("dating_reports").insert({
-    reported_product_id: productId,
+    reported_profile_id: profileId,
     reporter_id: currentUser.id,
     reason
   });
@@ -615,22 +613,21 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     imageUrl = pub.publicUrl;
   }
 
-  const productCode = `WG-${new Date().getFullYear()}-DT-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  const profileCode = `WGD-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  const genderVal = document.getElementById("fGender").value;
+  const cityVal = document.getElementById("fCity").value.trim();
 
-  const { error } = await _supabase.from("products").insert({
+  const { error } = await _supabase.from("dating_profiles").insert({
     user_id: currentUser.id,
-    category: "Dating",
-    product_code: productCode,
-    age_confirmed: true,
-    images: imageUrl ? [imageUrl] : [],
-    specs: {
-      age,
-      gender: document.getElementById("fGender").value,
-      seeking: document.getElementById("fSeeking").value,
-      relationship_type: document.getElementById("fType").value,
-      city: document.getElementById("fCity").value.trim(),
-      bio: document.getElementById("fBio").value.trim()
-    }
+    profile_code: profileCode,
+    age,
+    gender: genderVal,
+    seeking: document.getElementById("fSeeking").value,
+    relationship_type: document.getElementById("fType").value,
+    city: cityVal,
+    bio: document.getElementById("fBio").value.trim(),
+    photo_url: imageUrl,
+    age_confirmed: true
   });
 
   btn.disabled = false;
