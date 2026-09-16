@@ -146,6 +146,7 @@
 <div class="tabs">
   <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
+  <div class="tab" data-tab="matches" onclick="switchTab('matches')">Matches <span id="matchBadge"></span></div>
   <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
   <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')">My Profile</div>
 </div>
@@ -241,9 +242,14 @@
     </form>
   </div>
 
+  <div class="panel" id="matchesPanel" style="display:none;">
+    <div class="grid" id="matchesGrid"></div>
+    <div class="empty" id="matchesEmpty" style="display:none;">No matches yet. Like a profile in Browse — if they like you back, you'll match and can message each other.</div>
+  </div>
+
   <div class="panel" id="messagesPanel" style="display:none;">
     <div id="threadList"></div>
-    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message someone from Browse to start a conversation.</div>
+    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message a match to start a conversation.</div>
   </div>
 
   <div class="panel" id="myProfilePanel" style="display:none;">
@@ -268,6 +274,8 @@ let currentUser = null;
 let currentLang = "en";
 let blockedIds = new Set();     // profiles/users I've blocked
 let blockedByIds = new Set();   // users who've blocked me (hide me from their view isn't client-enforceable, but we hide them from mine too)
+let likedIds = new Set();       // users I've liked
+let matchedIds = new Set();     // users I've mutually matched with (messaging allowed)
 
 // Escape any user-supplied text before it touches innerHTML.
 function esc(str){
@@ -310,8 +318,10 @@ async function initAuth(){
   updateHeaderAuthUI();
   if (currentUser){
     await loadBlockedIds();
+    await loadLikesAndMatches();
     loadProfiles();
     refreshUnreadBadge();
+    refreshMatchBadge();
   }
 }
 
@@ -347,8 +357,10 @@ _supabase.auth.onAuthStateChange(async (_event, session) => {
   updateHeaderAuthUI();
   if (currentUser){
     await loadBlockedIds();
+    await loadLikesAndMatches();
     loadProfiles();
     refreshUnreadBadge();
+    refreshMatchBadge();
   }
 });
 
@@ -363,7 +375,7 @@ async function refreshUnreadBadge(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["browsePanel","postPanel","messagesPanel","myProfilePanel"];
+const PANELS = ["browsePanel","postPanel","matchesPanel","messagesPanel","myProfilePanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -374,9 +386,10 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
+  const map = { browse: "browsePanel", post: "postPanel", matches: "matchesPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
+  if (tab === "matches"){ loadMatches(); }
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "myprofile"){ loadMyProfile(); renderBlockedList(); }
 }
@@ -449,7 +462,11 @@ function openModal(row){
           <div class="meta">${esc(row.city)} · Looking for ${esc(row.seeking)} · ${esc(row.relationship_type)}</div>
           <div class="bio">${esc(row.bio)}</div>
           <div class="actions">
-            <button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>
+            ${matchedIds.has(row.user_id)
+              ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>`
+              : likedIds.has(row.user_id)
+                ? `<button class="btn-contact" disabled style="opacity:.6;cursor:default;">Liked — waiting on them</button>`
+                : `<button class="btn-contact" onclick="likeUser('${row.user_id}', this)">♥ Like</button>`}
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
           </div>
           <div class="actions">
@@ -485,6 +502,10 @@ async function sendMessage(profileId, recipientId){
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
   if (blockedIds.has(recipientId) || blockedByIds.has(recipientId)){
     msgBox.innerHTML = `<div class="msg error">You can't message this user.</div>`;
+    return;
+  }
+  if (!matchedIds.has(recipientId)){
+    msgBox.innerHTML = `<div class="msg error">You can only message someone you've matched with.</div>`;
     return;
   }
   const { error } = await _supabase.from("dating_messages").insert({
@@ -636,6 +657,86 @@ async function loadBlockedIds(){
   ]);
   (mine || []).forEach(r => blockedIds.add(r.blocked_id));
   (theirs || []).forEach(r => blockedByIds.add(r.blocker_id));
+}
+
+// ---------- Likes & Matches ----------
+async function loadLikesAndMatches(){
+  likedIds = new Set();
+  matchedIds = new Set();
+  const [{ data: sent }, { data: matches }] = await Promise.all([
+    _supabase.from("dating_likes").select("liked_id").eq("liker_id", currentUser.id),
+    _supabase.from("dating_matches").select("user_a,user_b")
+      .or(`user_a.eq.${currentUser.id},user_b.eq.${currentUser.id}`)
+  ]);
+  (sent || []).forEach(r => likedIds.add(r.liked_id));
+  (matches || []).forEach(r => matchedIds.add(r.user_a === currentUser.id ? r.user_b : r.user_a));
+}
+
+async function refreshMatchBadge(){
+  const badge = document.getElementById("matchBadge");
+  if (badge) badge.textContent = matchedIds.size ? `(${matchedIds.size})` : "";
+}
+
+async function likeUser(otherUserId, btnEl){
+  if (otherUserId === currentUser.id) return;
+  if (btnEl){ btnEl.disabled = true; btnEl.textContent = "..."; }
+  const { error } = await _supabase.from("dating_likes").insert({
+    liker_id: currentUser.id,
+    liked_id: otherUserId
+  });
+  if (error && error.code !== "23505"){ // ignore duplicate-like errors
+    alert("Couldn't like this profile: " + error.message);
+    if (btnEl){ btnEl.disabled = false; btnEl.textContent = "♥ Like"; }
+    return;
+  }
+  likedIds.add(otherUserId);
+  await loadLikesAndMatches();
+  refreshMatchBadge();
+  if (matchedIds.has(otherUserId)){
+    alert("It's a match! 🎉 You can now message each other from the Matches tab.");
+  }
+  closeModal();
+  loadProfiles();
+}
+
+async function loadMatches(){
+  await loadLikesAndMatches();
+  refreshMatchBadge();
+  const grid = document.getElementById("matchesGrid");
+  const empty = document.getElementById("matchesEmpty");
+  grid.innerHTML = "";
+
+  const ids = [...matchedIds].filter(id => !blockedIds.has(id) && !blockedByIds.has(id));
+  if (ids.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  const { data, error } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .in("user_id", ids);
+
+  if (error || !data){
+    empty.textContent = "Couldn't load matches right now.";
+    empty.style.display = "block";
+    return;
+  }
+
+  data.forEach(row => {
+    const img = row.photo_url ? encodeURI(row.photo_url) : null;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => contactProfile(row.id, row.user_id);
+    card.innerHTML = `
+      <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
+      <div class="info">
+        <div class="name-age">${esc(row.gender)}, ${row.age || "?"}</div>
+        <div class="meta">${esc(row.city)} · Tap to message</div>
+      </div>`;
+    grid.appendChild(card);
+  });
 }
 
 async function blockUser(otherUserId){
