@@ -138,6 +138,8 @@
 <div class="tabs">
   <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
+  <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
+  <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')">My Profile</div>
 </div>
 
 <main>
@@ -224,6 +226,15 @@
       <div id="formMsg"></div>
     </form>
   </div>
+
+  <div class="panel" id="messagesPanel" style="display:none;">
+    <div id="threadList"></div>
+    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message someone from Browse to start a conversation.</div>
+  </div>
+
+  <div class="panel" id="myProfilePanel" style="display:none;">
+    <div id="myProfileContent"></div>
+  </div>
 </main>
 
 <div id="modalRoot"></div>
@@ -248,21 +259,39 @@ async function initAuth(){
   currentUser = user;
   document.getElementById("gate").style.display = user ? "none" : "block";
   document.getElementById("browsePanel").style.display = user ? "block" : "none";
-  if (user) loadProfiles();
+  if (user){
+    loadProfiles();
+    refreshUnreadBadge();
+  }
+}
+
+async function refreshUnreadBadge(){
+  const { count } = await supabase
+    .from("dating_messages")
+    .select("*", { count: "exact", head: true })
+    .eq("recipient_id", currentUser.id)
+    .eq("read", false);
+  const badge = document.getElementById("unreadBadge");
+  badge.textContent = count ? `(${count})` : "";
 }
 
 // ---------- Tabs ----------
+const PANELS = ["browsePanel","postPanel","messagesPanel","myProfilePanel"];
+
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
   if (!currentUser){
     document.getElementById("gate").style.display = "block";
-    document.getElementById("browsePanel").style.display = "none";
-    document.getElementById("postPanel").style.display = "none";
+    PANELS.forEach(p => document.getElementById(p).style.display = "none");
     return;
   }
   document.getElementById("gate").style.display = "none";
-  document.getElementById("browsePanel").style.display = tab === "browse" ? "block" : "none";
-  document.getElementById("postPanel").style.display = tab === "post" ? "block" : "none";
+  PANELS.forEach(p => document.getElementById(p).style.display = "none");
+  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
+  document.getElementById(map[tab]).style.display = "block";
+
+  if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
+  if (tab === "myprofile") loadMyProfile();
 }
 
 // ---------- Load / render profiles ----------
@@ -330,7 +359,7 @@ function openModal(row){
           <div class="meta">${row.specs?.city || ""} · Looking for ${row.specs?.seeking || ""} · ${row.specs?.relationship_type || ""}</div>
           <div class="bio">${(row.specs?.bio || "").replace(/</g,"&lt;")}</div>
           <div class="actions">
-            <button class="btn-contact" onclick="contactProfile('${row.id}')">Message</button>
+            <button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
           </div>
         </div>
@@ -339,10 +368,160 @@ function openModal(row){
 }
 function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; }
 
-function contactProfile(productId){
-  // TODO: wire to your existing messaging/chat system if you have one.
-  // Fallback for now: send them to your existing contact-seller flow.
-  window.location.href = `contact.html?product=${productId}`;
+function contactProfile(productId, recipientId){
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3>Send a message</h3>
+          <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
+          <div class="actions">
+            <button class="btn-contact" onclick="sendMessage('${productId}','${recipientId}')">Send</button>
+          </div>
+          <div id="composeMsg"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function sendMessage(productId, recipientId){
+  const body = document.getElementById("composeBody").value.trim();
+  const msgBox = document.getElementById("composeMsg");
+  if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
+  const { error } = await supabase.from("dating_messages").insert({
+    product_id: productId,
+    sender_id: currentUser.id,
+    recipient_id: recipientId,
+    body
+  });
+  if (error){
+    msgBox.innerHTML = `<div class="msg error">Couldn't send: ${error.message}</div>`;
+  } else {
+    msgBox.innerHTML = `<div class="msg success">Sent.</div>`;
+    setTimeout(closeModal, 700);
+  }
+}
+
+// ---------- Messages tab ----------
+async function loadThreads(){
+  const { data, error } = await supabase
+    .from("dating_messages")
+    .select("*")
+    .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+    .order("created_at", { ascending: false });
+
+  const list = document.getElementById("threadList");
+  const empty = document.getElementById("messagesEmpty");
+  list.innerHTML = "";
+
+  if (error || !data || data.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  // group by conversation = product_id + other participant
+  const threads = {};
+  data.forEach(m => {
+    const other = m.sender_id === currentUser.id ? m.recipient_id : m.sender_id;
+    const key = `${m.product_id}__${other}`;
+    if (!threads[key]) threads[key] = { other, productId: m.product_id, messages: [] };
+    threads[key].messages.push(m);
+  });
+
+  Object.values(threads).forEach(thread => {
+    const last = thread.messages[0];
+    const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
+    const div = document.createElement("div");
+    div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;";
+    div.innerHTML = `<div style="font-weight:${unread?"700":"400"};">${last.body.slice(0,80)}</div>
+      <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>`;
+    div.onclick = () => openThread(thread);
+    list.appendChild(div);
+  });
+}
+
+async function openThread(thread){
+  thread.messages
+    .filter(m => m.recipient_id === currentUser.id && !m.read)
+    .forEach(m => supabase.from("dating_messages").update({ read: true }).eq("id", m.id).then(()=>{}));
+
+  const ordered = [...thread.messages].reverse();
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3>Conversation</h3>
+          <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:10px 0;">
+            ${ordered.map(m => `
+              <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
+                background:${m.sender_id===currentUser.id?"var(--gold-soft)":"#F0F0F0"};
+                padding:8px 12px;border-radius:10px;max-width:80%;font-size:.88rem;">
+                ${m.body.replace(/</g,"&lt;")}
+              </div>`).join("")}
+          </div>
+          <textarea id="replyBody" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
+          <div class="actions">
+            <button class="btn-contact" onclick="sendMessage('${thread.productId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ---------- My Profile tab ----------
+async function loadMyProfile(){
+  const el = document.getElementById("myProfileContent");
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("category", "Dating")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error || !data){
+    el.innerHTML = `<div class="empty">You haven't posted a profile yet. Use the "Post a Profile" tab.</div>`;
+    return;
+  }
+
+  const s = data.specs || {};
+  el.innerHTML = `
+    <form class="post-form" id="editForm">
+      <div class="row2">
+        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${s.age||""}" required></div>
+        <div><label>City</label><input type="text" id="eCity" value="${s.city||""}" required></div>
+      </div>
+      <div>
+        <label>About you</label>
+        <textarea id="eBio" maxlength="500" required>${(s.bio||"").replace(/</g,"&lt;")}</textarea>
+      </div>
+      <button type="submit" class="submit-btn">Save changes</button>
+      <button type="button" class="submit-btn" style="background:var(--danger);" id="deleteBtn">Delete my profile</button>
+      <div id="editMsg"></div>
+    </form>`;
+
+  document.getElementById("editForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const { error: updErr } = await supabase.from("products").update({
+      specs: { ...s, age: parseInt(document.getElementById("eAge").value,10),
+        city: document.getElementById("eCity").value.trim(),
+        bio: document.getElementById("eBio").value.trim() }
+    }).eq("id", data.id);
+    document.getElementById("editMsg").innerHTML = updErr
+      ? `<div class="msg error">${updErr.message}</div>`
+      : `<div class="msg success">Saved.</div>`;
+  });
+
+  document.getElementById("deleteBtn").addEventListener("click", async () => {
+    if (!confirm("Delete your dating profile? This can't be undone.")) return;
+    const { error: delErr } = await supabase.from("products").delete().eq("id", data.id);
+    if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
+    loadMyProfile();
+  });
 }
 
 async function reportProfile(productId){
