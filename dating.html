@@ -877,7 +877,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   const genderVal = document.getElementById("fGender").value;
   const cityVal = document.getElementById("fCity").value.trim();
 
-  const { error } = await _supabase.from("dating_profiles").insert({
+  const payload = {
     user_id: currentUser.id,
     profile_code: profileCode,
     display_name: document.getElementById("fName").value.trim(),
@@ -887,10 +887,19 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     relationship_type: document.getElementById("fType").value,
     city: cityVal,
     bio: document.getElementById("fBio").value.trim(),
-    photo_url: photoUrls[0] || null,
-    photos: photoUrls,
-    age_confirmed: true
-  });
+    age_confirmed: true,
+    updated_at: new Date().toISOString()
+  };
+  // Only overwrite photos if new ones were actually uploaded this time —
+  // otherwise re-posting without picking files would wipe an existing photo.
+  if (photoUrls.length > 0){
+    payload.photo_url = photoUrls[0];
+    payload.photos = photoUrls;
+  }
+
+  const { error } = await _supabase
+    .from("dating_profiles")
+    .upsert(payload, { onConflict: "user_id" });
 
   btn.disabled = false;
   btn.textContent = "Post my profile";
