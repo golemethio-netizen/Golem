@@ -146,7 +146,6 @@
 <div class="tabs">
   <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
-  <div class="tab" data-tab="matches" onclick="switchTab('matches')">Matches <span id="matchBadge"></span></div>
   <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
   <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')">My Profile</div>
 </div>
@@ -172,11 +171,7 @@
         <option value="Dating">Dating</option>
         <option value="Marriage">Marriage</option>
       </select>
-      <select id="filterCity">
-        <option value="">All cities</option>
-      </select>
-      <input type="number" id="filterMinAge" placeholder="Min age" min="18" max="99" style="width:90px;">
-      <input type="number" id="filterMaxAge" placeholder="Max age" min="18" max="99" style="width:90px;">
+      <input type="text" id="filterCity" placeholder="City">
       <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Filter</button>
     </div>
     <div class="grid" id="grid"></div>
@@ -184,10 +179,6 @@
   </div>
 
   <div class="panel" id="postPanel" style="display:none;">
-    <div class="empty" id="postExistsNotice" style="display:none;">
-      You've already posted a profile — head to <strong>My Profile</strong> to edit it instead of posting a new one.
-      <div style="margin-top:12px;"><button onclick="switchTab('myprofile')" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Go to My Profile</button></div>
-    </div>
     <form class="post-form" id="postForm">
       <div class="row2">
         <div>
@@ -196,9 +187,7 @@
         </div>
         <div>
           <label>City</label>
-          <select id="fCity" required>
-            <option value="">Select city</option>
-          </select>
+          <input type="text" id="fCity" required>
         </div>
       </div>
       <div class="row2">
@@ -246,20 +235,13 @@
     </form>
   </div>
 
-  <div class="panel" id="matchesPanel" style="display:none;">
-    <div class="grid" id="matchesGrid"></div>
-    <div class="empty" id="matchesEmpty" style="display:none;">No matches yet. Like a profile in Browse — if they like you back, you'll match and can message each other.</div>
-  </div>
-
   <div class="panel" id="messagesPanel" style="display:none;">
     <div id="threadList"></div>
-    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message a match to start a conversation.</div>
+    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message someone from Browse to start a conversation.</div>
   </div>
 
   <div class="panel" id="myProfilePanel" style="display:none;">
     <div id="myProfileContent"></div>
-    <h4 style="margin-top:24px;">Blocked users</h4>
-    <div id="blockedListContent"></div>
   </div>
 </main>
 
@@ -276,37 +258,6 @@ const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existi
 
 let currentUser = null;
 let currentLang = "en";
-let blockedIds = new Set();     // profiles/users I've blocked
-let blockedByIds = new Set();   // users who've blocked me (hide me from their view isn't client-enforceable, but we hide them from mine too)
-let likedIds = new Set();       // users I've liked
-let matchedIds = new Set();     // users I've mutually matched with (messaging allowed)
-
-// Escape any user-supplied text before it touches innerHTML.
-function esc(str){
-  return String(str ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-  }[c]));
-}
-
-// ---------- Ethiopian cities ----------
-// NOTE: swap this for the exact canonical city list already used in
-// script.js (sell.html / my-items.html / index.html) so values match
-// across the marketplace and dating for consistent filtering.
-const ETHIOPIAN_CITIES = [
-  "Addis Ababa","Dire Dawa","Mekelle","Gondar","Bahir Dar","Hawassa",
-  "Adama","Jimma","Jijiga","Dessie","Bishoftu","Sodo","Arba Minch",
-  "Hosaena","Harar","Dilla","Nekemte","Debre Birhan","Debre Markos",
-  "Shashamane","Asella","Gambela","Semera","Assosa","Other"
-];
-
-function populateCitySelects(){
-  const html = ETHIOPIAN_CITIES.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  const fCity = document.getElementById("fCity");
-  const filterCity = document.getElementById("filterCity");
-  if (fCity) fCity.insertAdjacentHTML("beforeend", html);
-  if (filterCity) filterCity.insertAdjacentHTML("beforeend", html);
-}
-populateCitySelects();
 
 // ---------- Auth gate ----------
 async function initAuth(){
@@ -321,11 +272,8 @@ async function initAuth(){
   document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    await loadBlockedIds();
-    await loadLikesAndMatches();
     loadProfiles();
     refreshUnreadBadge();
-    refreshMatchBadge();
   }
 }
 
@@ -354,17 +302,14 @@ function updateHeaderAuthUI(){
 }
 
 // Re-check auth state after OAuth redirect completes, or if session changes
-_supabase.auth.onAuthStateChange(async (_event, session) => {
+_supabase.auth.onAuthStateChange((_event, session) => {
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
   document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    await loadBlockedIds();
-    await loadLikesAndMatches();
     loadProfiles();
     refreshUnreadBadge();
-    refreshMatchBadge();
   }
 });
 
@@ -379,7 +324,7 @@ async function refreshUnreadBadge(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["browsePanel","postPanel","matchesPanel","messagesPanel","myProfilePanel"];
+const PANELS = ["browsePanel","postPanel","messagesPanel","myProfilePanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -390,13 +335,11 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { browse: "browsePanel", post: "postPanel", matches: "matchesPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
+  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
-  if (tab === "post"){ checkPostGate(); }
-  if (tab === "matches"){ loadMatches(); }
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
-  if (tab === "myprofile"){ loadMyProfile(); renderBlockedList(); }
+  if (tab === "myprofile") loadMyProfile();
 }
 
 // ---------- Load / render profiles ----------
@@ -423,14 +366,10 @@ async function loadProfiles(){
     return;
   }
 
-  let rows = (data || []).filter(r => !blockedIds.has(r.user_id) && !blockedByIds.has(r.user_id));
+  let rows = data || [];
   if (seeking) rows = rows.filter(r => r.gender === seeking);
   if (type) rows = rows.filter(r => r.relationship_type === type);
-  if (city) rows = rows.filter(r => (r.city || "").toLowerCase() === city.toLowerCase());
-  const minAge = parseInt(document.getElementById("filterMinAge")?.value, 10);
-  const maxAge = parseInt(document.getElementById("filterMaxAge")?.value, 10);
-  if (!isNaN(minAge)) rows = rows.filter(r => (r.age || 0) >= minAge);
-  if (!isNaN(maxAge)) rows = rows.filter(r => (r.age || 0) <= maxAge);
+  if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
 
   if (rows.length === 0){
     empty.style.display = "block";
@@ -439,63 +378,91 @@ async function loadProfiles(){
   empty.style.display = "none";
 
   rows.forEach(row => {
-    const img = row.photo_url ? encodeURI(row.photo_url) : null;
+    const img = row.photo_url || null;
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
     card.innerHTML = `
       <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
       <div class="info">
-        <div class="name-age">${esc(row.gender)}, ${row.age || "?"}</div>
-        <div class="meta">${esc(row.city)} · ${esc(row.relationship_type)}</div>
+        <div class="name-age">${row.gender || ""}, ${row.age || "?"}</div>
+        <div class="meta">${row.city || ""} · ${row.relationship_type || ""}</div>
       </div>`;
     grid.appendChild(card);
   });
 }
 
-// ---------- Post tab gate ----------
-async function checkPostGate(){
-  const notice = document.getElementById("postExistsNotice");
-  const form = document.getElementById("postForm");
-  const { data } = await _supabase
-    .from("dating_profiles")
-    .select("id")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-  const hasProfile = !!data;
-  notice.style.display = hasProfile ? "block" : "none";
-  form.style.display = hasProfile ? "none" : "grid";
-}
-
 // ---------- Modal ----------
-function openModal(row){
-  const img = row.photo_url ? encodeURI(row.photo_url) : null;
+async function openModal(row){
+  const img = row.photo_url || null;
   const root = document.getElementById("modalRoot");
+  const matched = await checkMatch(row.user_id);
+  const actionBtn = matched
+    ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>`
+    : `<button class="btn-contact" id="likeBtn" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like</button>`;
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
       <div class="modal">
         <div class="photo" style="${img ? `background-image:url('${img}')` : ""}"></div>
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${esc(row.gender)}, ${row.age || "?"}</h3>
-          <div class="meta">${esc(row.city)} · Looking for ${esc(row.seeking)} · ${esc(row.relationship_type)}</div>
-          <div class="bio">${esc(row.bio)}</div>
+          <h3>${row.gender || ""}, ${row.age || "?"}</h3>
+          <div class="meta">${row.city || ""} · Looking for ${row.seeking || ""} · ${row.relationship_type || ""}</div>
+          <div class="bio">${(row.bio || "").replace(/</g,"&lt;")}</div>
+          <div id="matchNotice"></div>
           <div class="actions">
-            ${matchedIds.has(row.user_id)
-              ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>`
-              : likedIds.has(row.user_id)
-                ? `<button class="btn-contact" disabled style="opacity:.6;cursor:default;">Liked — waiting on them</button>`
-                : `<button class="btn-contact" onclick="likeUser('${row.user_id}', this)">♥ Like</button>`}
+            ${actionBtn}
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
-          </div>
-          <div class="actions">
-            <button class="btn-report" onclick="blockUser('${row.user_id}')">Block this person</button>
           </div>
         </div>
       </div>
     </div>`;
 }
 function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; }
+
+// ---------- Likes / Matches ----------
+async function checkMatch(otherUserId){
+  const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
+  const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
+  const { data } = await _supabase
+    .from("dating_matches")
+    .select("id")
+    .eq("user_a", a)
+    .eq("user_b", b)
+    .maybeSingle();
+  return !!data;
+}
+
+async function likeProfile(profileId, otherUserId){
+  const btn = document.getElementById("likeBtn");
+  if (btn){ btn.disabled = true; btn.textContent = "Liking..."; }
+
+  const { error } = await _supabase.from("dating_likes").insert({
+    liker_id: currentUser.id,
+    liked_id: otherUserId
+  });
+
+  if (error && error.code !== "23505"){ // 23505 = already liked, ignore
+    if (btn){ btn.disabled = false; btn.textContent = "💛 Like"; }
+    alert("Couldn't like right now: " + error.message);
+    return;
+  }
+
+  const matched = await checkMatch(otherUserId);
+  const notice = document.getElementById("matchNotice");
+  if (matched){
+    if (notice) notice.innerHTML = `<div class="msg success">It's a match! You can message each other now.</div>`;
+    if (btn){
+      btn.textContent = "Message";
+      btn.onclick = () => contactProfile(profileId, otherUserId);
+      btn.disabled = false;
+    }
+    refreshUnreadBadge();
+  } else {
+    if (notice) notice.innerHTML = `<div class="msg success">Liked. If they like you back, it's a match.</div>`;
+    if (btn){ btn.textContent = "💛 Liked"; }
+  }
+}
 
 function contactProfile(profileId, recipientId){
   const root = document.getElementById("modalRoot");
@@ -505,7 +472,7 @@ function contactProfile(profileId, recipientId){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3>Send a message</h3>
-          <textarea id="composeBody" maxlength="1000" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
+          <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
           <div class="actions">
             <button class="btn-contact" onclick="sendMessage('${profileId}','${recipientId}')">Send</button>
           </div>
@@ -519,14 +486,6 @@ async function sendMessage(profileId, recipientId){
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
-  if (blockedIds.has(recipientId) || blockedByIds.has(recipientId)){
-    msgBox.innerHTML = `<div class="msg error">You can't message this user.</div>`;
-    return;
-  }
-  if (!matchedIds.has(recipientId)){
-    msgBox.innerHTML = `<div class="msg error">You can only message someone you've matched with.</div>`;
-    return;
-  }
   const { error } = await _supabase.from("dating_messages").insert({
     profile_id: profileId,
     sender_id: currentUser.id,
@@ -568,18 +527,16 @@ async function loadThreads(){
     threads[key].messages.push(m);
   });
 
-  Object.values(threads)
-    .filter(t => !blockedIds.has(t.other))
-    .forEach(thread => {
-      const last = thread.messages[0];
-      const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
-      const div = document.createElement("div");
-      div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;";
-      div.innerHTML = `<div style="font-weight:${unread?"700":"400"};">${esc(last.body.slice(0,80))}</div>
-        <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>`;
-      div.onclick = () => openThread(thread);
-      list.appendChild(div);
-    });
+  Object.values(threads).forEach(thread => {
+    const last = thread.messages[0];
+    const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
+    const div = document.createElement("div");
+    div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;";
+    div.innerHTML = `<div style="font-weight:${unread?"700":"400"};">${last.body.slice(0,80)}</div>
+      <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>`;
+    div.onclick = () => openThread(thread);
+    list.appendChild(div);
+  });
 }
 
 async function openThread(thread){
@@ -600,10 +557,10 @@ async function openThread(thread){
               <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
                 background:${m.sender_id===currentUser.id?"var(--gold-soft)":"#F0F0F0"};
                 padding:8px 12px;border-radius:10px;max-width:80%;font-size:.88rem;">
-                ${esc(m.body)}
+                ${m.body.replace(/</g,"&lt;")}
               </div>`).join("")}
           </div>
-          <textarea id="replyBody" maxlength="1000" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
+          <textarea id="replyBody" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
           <div class="actions">
             <button class="btn-contact" onclick="sendMessage('${thread.profileId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
           </div>
@@ -629,16 +586,12 @@ async function loadMyProfile(){
   el.innerHTML = `
     <form class="post-form" id="editForm">
       <div class="row2">
-        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${esc(data.age)}" required></div>
-        <div><label>City</label>
-          <select id="eCity" required>
-            ${ETHIOPIAN_CITIES.map(c => `<option value="${esc(c)}" ${c===data.city?"selected":""}>${esc(c)}</option>`).join("")}
-          </select>
-        </div>
+        <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${data.age||""}" required></div>
+        <div><label>City</label><input type="text" id="eCity" value="${data.city||""}" required></div>
       </div>
       <div>
         <label>About you</label>
-        <textarea id="eBio" maxlength="500" required>${esc(data.bio)}</textarea>
+        <textarea id="eBio" maxlength="500" required>${(data.bio||"").replace(/</g,"&lt;")}</textarea>
       </div>
       <button type="submit" class="submit-btn">Save changes</button>
       <button type="button" class="submit-btn" style="background:var(--danger);" id="deleteBtn">Delete my profile</button>
@@ -664,138 +617,6 @@ async function loadMyProfile(){
     if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
     loadMyProfile();
   });
-}
-
-// ---------- Blocking ----------
-async function loadBlockedIds(){
-  blockedIds = new Set();
-  blockedByIds = new Set();
-  const [{ data: mine }, { data: theirs }] = await Promise.all([
-    _supabase.from("dating_blocks").select("blocked_id").eq("blocker_id", currentUser.id),
-    _supabase.from("dating_blocks").select("blocker_id").eq("blocked_id", currentUser.id)
-  ]);
-  (mine || []).forEach(r => blockedIds.add(r.blocked_id));
-  (theirs || []).forEach(r => blockedByIds.add(r.blocker_id));
-}
-
-// ---------- Likes & Matches ----------
-async function loadLikesAndMatches(){
-  likedIds = new Set();
-  matchedIds = new Set();
-  const [{ data: sent }, { data: matches }] = await Promise.all([
-    _supabase.from("dating_likes").select("liked_id").eq("liker_id", currentUser.id),
-    _supabase.from("dating_matches").select("user_a,user_b")
-      .or(`user_a.eq.${currentUser.id},user_b.eq.${currentUser.id}`)
-  ]);
-  (sent || []).forEach(r => likedIds.add(r.liked_id));
-  (matches || []).forEach(r => matchedIds.add(r.user_a === currentUser.id ? r.user_b : r.user_a));
-}
-
-async function refreshMatchBadge(){
-  const badge = document.getElementById("matchBadge");
-  if (badge) badge.textContent = matchedIds.size ? `(${matchedIds.size})` : "";
-}
-
-async function likeUser(otherUserId, btnEl){
-  if (otherUserId === currentUser.id) return;
-  if (btnEl){ btnEl.disabled = true; btnEl.textContent = "..."; }
-  const { error } = await _supabase.from("dating_likes").insert({
-    liker_id: currentUser.id,
-    liked_id: otherUserId
-  });
-  if (error && error.code !== "23505"){ // ignore duplicate-like errors
-    alert("Couldn't like this profile: " + error.message);
-    if (btnEl){ btnEl.disabled = false; btnEl.textContent = "♥ Like"; }
-    return;
-  }
-  likedIds.add(otherUserId);
-  await loadLikesAndMatches();
-  refreshMatchBadge();
-  if (matchedIds.has(otherUserId)){
-    alert("It's a match! 🎉 You can now message each other from the Matches tab.");
-  }
-  closeModal();
-  loadProfiles();
-}
-
-async function loadMatches(){
-  await loadLikesAndMatches();
-  refreshMatchBadge();
-  const grid = document.getElementById("matchesGrid");
-  const empty = document.getElementById("matchesEmpty");
-  grid.innerHTML = "";
-
-  const ids = [...matchedIds].filter(id => !blockedIds.has(id) && !blockedByIds.has(id));
-  if (ids.length === 0){
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
-  const { data, error } = await _supabase
-    .from("dating_profiles")
-    .select("*")
-    .in("user_id", ids);
-
-  if (error || !data){
-    empty.textContent = "Couldn't load matches right now.";
-    empty.style.display = "block";
-    return;
-  }
-
-  data.forEach(row => {
-    const img = row.photo_url ? encodeURI(row.photo_url) : null;
-    const card = document.createElement("div");
-    card.className = "card";
-    card.onclick = () => contactProfile(row.id, row.user_id);
-    card.innerHTML = `
-      <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
-      <div class="info">
-        <div class="name-age">${esc(row.gender)}, ${row.age || "?"}</div>
-        <div class="meta">${esc(row.city)} · Tap to message</div>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
-
-async function blockUser(otherUserId){
-  if (otherUserId === currentUser.id) return;
-  if (!confirm("Block this person? You won't see each other's profiles or messages anymore.")) return;
-  const { error } = await _supabase.from("dating_blocks").insert({
-    blocker_id: currentUser.id,
-    blocked_id: otherUserId
-  });
-  if (error && error.code !== "23505"){ // ignore duplicate-block errors
-    alert("Couldn't block: " + error.message);
-    return;
-  }
-  blockedIds.add(otherUserId);
-  closeModal();
-  loadProfiles();
-}
-
-async function unblockUser(otherUserId){
-  const { error } = await _supabase.from("dating_blocks")
-    .delete()
-    .eq("blocker_id", currentUser.id)
-    .eq("blocked_id", otherUserId);
-  if (error){ alert("Couldn't unblock: " + error.message); return; }
-  blockedIds.delete(otherUserId);
-  renderBlockedList();
-}
-
-async function renderBlockedList(){
-  const el = document.getElementById("blockedListContent");
-  if (!el) return;
-  if (blockedIds.size === 0){
-    el.innerHTML = `<div class="empty" style="padding:16px 0;">You haven't blocked anyone.</div>`;
-    return;
-  }
-  el.innerHTML = [...blockedIds].map(id => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
-      <span style="font-size:.85rem;color:#555;">User ${esc(id.slice(0,8))}…</span>
-      <button class="btn-report" style="padding:6px 12px;" onclick="unblockUser('${id}')">Unblock</button>
-    </div>`).join("");
 }
 
 async function reportProfile(profileId){
@@ -826,20 +647,6 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
 
   btn.disabled = true;
   btn.textContent = "Posting...";
-
-  // Safety net: re-check right before insert in case a profile was
-  // created in another tab/session since this form was opened.
-  const { data: existing } = await _supabase
-    .from("dating_profiles")
-    .select("id")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-  if (existing){
-    msg.innerHTML = `<div class="msg error">You already have a profile — edit it from My Profile instead.</div>`;
-    btn.disabled = false; btn.textContent = "Post my profile";
-    setTimeout(() => switchTab("myprofile"), 1200);
-    return;
-  }
 
   let imageUrl = null;
   const file = document.getElementById("fPhoto").files[0];
@@ -876,12 +683,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   btn.textContent = "Post my profile";
 
   if (error){
-    if (error.code === "23505"){
-      msg.innerHTML = `<div class="msg error">You already have a profile — edit it from My Profile instead.</div>`;
-      setTimeout(() => switchTab("myprofile"), 1200);
-    } else {
-      msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
-    }
+    msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
   } else {
     msg.innerHTML = `<div class="msg success">Profile posted!</div>`;
     document.getElementById("postForm").reset();
