@@ -205,7 +205,8 @@
 </header>
 
 <div class="tabs">
-  <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
+  <div class="tab active" data-tab="home" onclick="switchTab('home')">Home</div>
+  <div class="tab" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
   <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
   <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')">My Profile</div>
@@ -217,6 +218,28 @@
       <p>You need to be signed in to view or post in Dating.</p>
       <button onclick="signInWithGoogle()">Sign in with Google</button>
     </div>
+  </div>
+
+  <div class="panel" id="homePanel" style="display:none;">
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div id="composerAvatar" style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--green-light);display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">👤</div>
+        <div style="flex:1;">
+          <textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or anything you'd like to post..." style="width:100%;min-height:60px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:.92rem;resize:vertical;"></textarea>
+          <div id="postImagePreview" style="margin-top:8px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#555;cursor:pointer;">
+              🖼️ Photo
+              <input type="file" id="postImage" accept="image/*" style="display:none;" onchange="previewPostImage()">
+            </label>
+            <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--gold);color:var(--green);border:none;border-radius:999px;padding:8px 22px;font-weight:700;cursor:pointer;">Post</button>
+          </div>
+          <div id="postMsg"></div>
+        </div>
+      </div>
+    </div>
+    <div id="feed"></div>
+    <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something.</div>
   </div>
 
   <div class="panel" id="browsePanel" style="display:none;">
@@ -344,11 +367,12 @@ async function initAuth(){
     currentUser = null;
   }
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
-  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
+  document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
     maybeShowSafetyNotice();
-    loadProfiles();
+    loadFeed();
+    setComposerAvatar();
     refreshUnreadBadge();
   }
 }
@@ -443,10 +467,11 @@ function openSettings(){
 _supabase.auth.onAuthStateChange((_event, session) => {
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
-  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
+  document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    loadProfiles();
+    loadFeed();
+    setComposerAvatar();
     refreshUnreadBadge();
   }
 });
@@ -462,7 +487,7 @@ async function refreshUnreadBadge(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["browsePanel","postPanel","messagesPanel","myProfilePanel"];
+const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","myProfilePanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -473,11 +498,152 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
+  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
+  if (tab === "home") loadFeed();
+  if (tab === "browse") loadProfiles();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "myprofile") loadMyProfile();
+}
+
+// ---------- Home feed ----------
+let pendingPostImageFile = null;
+
+async function setComposerAvatar(){
+  const el = document.getElementById("composerAvatar");
+  if (!el) return;
+  const { data } = await _supabase
+    .from("dating_profiles")
+    .select("photo_url, photos")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  const photo = data ? ((data.photos && data.photos[0]) || data.photo_url) : null;
+  el.innerHTML = photo ? `<img src="${esc(photo)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : "👤";
+}
+
+function previewPostImage(){
+  const file = document.getElementById("postImage").files[0];
+  pendingPostImageFile = file || null;
+  const preview = document.getElementById("postImagePreview");
+  if (!file){ preview.innerHTML = ""; return; }
+  const url = URL.createObjectURL(file);
+  preview.innerHTML = `<div style="position:relative;display:inline-block;">
+    <img src="${url}" style="max-height:140px;border-radius:8px;">
+    <button onclick="clearPostImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;">✕</button>
+  </div>`;
+}
+
+function clearPostImage(){
+  pendingPostImageFile = null;
+  document.getElementById("postImage").value = "";
+  document.getElementById("postImagePreview").innerHTML = "";
+}
+
+async function submitPost(){
+  const textarea = document.getElementById("postBody");
+  const body = textarea.value.trim();
+  const msg = document.getElementById("postMsg");
+  const btn = document.getElementById("postSubmitBtn");
+  if (!body){ msg.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
+
+  btn.disabled = true;
+  btn.textContent = "Posting...";
+
+  let imageUrl = null;
+  if (pendingPostImageFile){
+    const path = `dating-posts/${currentUser.id}-${Date.now()}-${pendingPostImageFile.name}`;
+    const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, pendingPostImageFile);
+    if (uploadErr){
+      msg.innerHTML = `<div class="msg error">Image upload failed: ${esc(uploadErr.message)}</div>`;
+      btn.disabled = false; btn.textContent = "Post";
+      return;
+    }
+    const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    imageUrl = pub.publicUrl;
+  }
+
+  const { error } = await _supabase.from("dating_posts").insert({
+    user_id: currentUser.id,
+    body,
+    image_url: imageUrl
+  });
+
+  btn.disabled = false;
+  btn.textContent = "Post";
+
+  if (error){
+    msg.innerHTML = `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
+    return;
+  }
+
+  textarea.value = "";
+  clearPostImage();
+  msg.innerHTML = "";
+  loadFeed();
+}
+
+async function loadFeed(){
+  const feed = document.getElementById("feed");
+  const empty = document.getElementById("feedEmpty");
+
+  const { data: blocks } = await _supabase
+    .from("dating_blocks")
+    .select("blocker_id, blocked_id")
+    .or(`blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}`);
+  const hiddenIds = new Set();
+  (blocks || []).forEach(b => hiddenIds.add(b.blocker_id === currentUser.id ? b.blocked_id : b.blocker_id));
+
+  const { data, error } = await _supabase
+    .from("dating_posts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error){ feed.innerHTML = `<p style="color:red;">${esc(error.message)}</p>`; return; }
+
+  const posts = (data || []).filter(p => !hiddenIds.has(p.user_id));
+  if (posts.length === 0){
+    feed.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  const authorIds = [...new Set(posts.map(p => p.user_id))];
+  const { data: authors } = await _supabase
+    .from("dating_profiles")
+    .select("user_id, display_name, gender, photo_url, photos")
+    .in("user_id", authorIds);
+  const authorMap = {};
+  (authors || []).forEach(a => authorMap[a.user_id] = a);
+
+  feed.innerHTML = posts.map(p => {
+    const a = authorMap[p.user_id];
+    const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
+    const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
+    const isMine = p.user_id === currentUser.id;
+    return `
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
+            <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()}</div>
+          </div>
+          ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>` : ""}
+        </div>
+        <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
+        ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+      </div>`;
+  }).join("");
+}
+
+async function deletePost(postId){
+  if (!confirm("Delete this post?")) return;
+  const { error } = await _supabase.from("dating_posts").delete().eq("id", postId);
+  if (error){ alert("Couldn't delete: " + error.message); return; }
+  loadFeed();
 }
 
 // ---------- Load / render profiles ----------
