@@ -702,13 +702,32 @@ async function loadThreads(){
     threads[key].messages.push(m);
   });
 
+  // fetch the other participant's profile (photo + name) for every thread in one query
+  const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
+  const { data: profiles } = await _supabase
+    .from("dating_profiles")
+    .select("user_id, display_name, gender, photo_url, photos")
+    .in("user_id", otherIds);
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
   Object.values(threads).forEach(thread => {
     const last = thread.messages[0];
     const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
+    const p = profileMap[thread.other];
+    thread.profile = p;
+    const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
+    const name = p ? (p.display_name || p.gender || "Someone") : "Someone";
+
     const div = document.createElement("div");
-    div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;";
-    div.innerHTML = `<div style="font-weight:${unread?"700":"400"};">${last.body.slice(0,80)}</div>
-      <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>`;
+    div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;gap:12px;align-items:center;";
+    div.innerHTML = `
+      <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${photo}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
+      <div style="min-width:0;flex:1;">
+        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${name}</div>
+        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.body.slice(0,80)}</div>
+        <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
+      </div>`;
     div.onclick = () => openThread(thread);
     list.appendChild(div);
   });
@@ -726,7 +745,7 @@ async function openThread(thread){
       <div class="modal">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>Conversation</h3>
+          <h3>${thread.profile ? (thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation"}</h3>
           <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:10px 0;">
             ${ordered.map(m => `
               <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
