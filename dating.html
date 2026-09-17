@@ -657,6 +657,12 @@ function contactProfile(profileId, recipientId){
     </div>`;
 }
 
+function esc(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
+}
+
 async function sendMessage(profileId, recipientId){
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
@@ -673,6 +679,24 @@ async function sendMessage(profileId, recipientId){
     msgBox.innerHTML = `<div class="msg success">Sent.</div>`;
     setTimeout(closeModal, 700);
   }
+}
+
+async function sendReply(profileId, recipientId){
+  const textarea = document.getElementById("replyBody");
+  const body = textarea.value.trim();
+  if (!body) return;
+  const { error } = await _supabase.from("dating_messages").insert({
+    profile_id: profileId,
+    sender_id: currentUser.id,
+    recipient_id: recipientId,
+    body
+  });
+  if (error){
+    alert("Couldn't send: " + error.message);
+    return;
+  }
+  textarea.value = "";
+  setTimeout(loadThreads, 800);
 }
 
 // ---------- Messages tab ----------
@@ -724,8 +748,8 @@ async function loadThreads(){
     div.innerHTML = `
       <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${photo}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${name}</div>
-        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.body.slice(0,80)}</div>
+        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}</div>
+        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(last.body.slice(0,80))}</div>
         <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
       </div>`;
     div.onclick = () => openThread(thread);
@@ -745,18 +769,18 @@ async function openThread(thread){
       <div class="modal">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${thread.profile ? (thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation"}</h3>
+          <h3>${esc(thread.profile ? (thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation")}</h3>
           <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:10px 0;">
             ${ordered.map(m => `
               <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
                 background:${m.sender_id===currentUser.id?"var(--gold-soft)":"#F0F0F0"};
                 padding:8px 12px;border-radius:10px;max-width:80%;font-size:.88rem;">
-                ${m.body.replace(/</g,"&lt;")}
+                ${esc(m.body)}
               </div>`).join("")}
           </div>
           <textarea id="replyBody" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
           <div class="actions">
-            <button class="btn-contact" onclick="sendMessage('${thread.profileId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
+            <button class="btn-contact" onclick="sendReply('${thread.profileId}','${thread.other}');">Reply</button>
           </div>
         </div>
       </div>
