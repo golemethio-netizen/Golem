@@ -184,6 +184,10 @@
   </div>
 
   <div class="panel" id="postPanel" style="display:none;">
+    <div class="empty" id="postExistsNotice" style="display:none;">
+      You've already posted a profile — head to <strong>My Profile</strong> to edit it instead of posting a new one.
+      <div style="margin-top:12px;"><button onclick="switchTab('myprofile')" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Go to My Profile</button></div>
+    </div>
     <form class="post-form" id="postForm">
       <div class="row2">
         <div>
@@ -389,6 +393,7 @@ function switchTab(tab){
   const map = { browse: "browsePanel", post: "postPanel", matches: "matchesPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
+  if (tab === "post"){ checkPostGate(); }
   if (tab === "matches"){ loadMatches(); }
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "myprofile"){ loadMyProfile(); renderBlockedList(); }
@@ -446,6 +451,20 @@ async function loadProfiles(){
       </div>`;
     grid.appendChild(card);
   });
+}
+
+// ---------- Post tab gate ----------
+async function checkPostGate(){
+  const notice = document.getElementById("postExistsNotice");
+  const form = document.getElementById("postForm");
+  const { data } = await _supabase
+    .from("dating_profiles")
+    .select("id")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  const hasProfile = !!data;
+  notice.style.display = hasProfile ? "block" : "none";
+  form.style.display = hasProfile ? "none" : "grid";
 }
 
 // ---------- Modal ----------
@@ -808,6 +827,20 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   btn.disabled = true;
   btn.textContent = "Posting...";
 
+  // Safety net: re-check right before insert in case a profile was
+  // created in another tab/session since this form was opened.
+  const { data: existing } = await _supabase
+    .from("dating_profiles")
+    .select("id")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  if (existing){
+    msg.innerHTML = `<div class="msg error">You already have a profile — edit it from My Profile instead.</div>`;
+    btn.disabled = false; btn.textContent = "Post my profile";
+    setTimeout(() => switchTab("myprofile"), 1200);
+    return;
+  }
+
   let imageUrl = null;
   const file = document.getElementById("fPhoto").files[0];
   if (file){
@@ -843,7 +876,12 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   btn.textContent = "Post my profile";
 
   if (error){
-    msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
+    if (error.code === "23505"){
+      msg.innerHTML = `<div class="msg error">You already have a profile — edit it from My Profile instead.</div>`;
+      setTimeout(() => switchTab("myprofile"), 1200);
+    } else {
+      msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
+    }
   } else {
     msg.innerHTML = `<div class="msg success">Profile posted!</div>`;
     document.getElementById("postForm").reset();
