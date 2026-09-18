@@ -347,6 +347,20 @@
             <div id="datingProfilesList">
                 <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
             </div>
+
+            <h3 style="margin:32px 0 6px;"><i class="fas fa-comment-dots" style="color:#c2185b;"></i> Dating — Home Feed Reports</h3>
+            <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Posts flagged by users on the Home feed.</p>
+            <div style="display:flex; gap:10px; margin-bottom:18px;">
+                <select id="postReportsFilterStatus" onchange="loadPostReports()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                    <option value="open">Open</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="dismissed">Dismissed</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div id="postReportsList">
+                <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+            </div>
         </section>
 
         <!-- CATEGORIES SECTION -->
@@ -633,6 +647,7 @@
                 searchContainer.style.display = 'none';
                 loadDatingReports();
                 loadDatingProfiles();
+                loadPostReports();
             } else {
                 itemsSection.style.display = 'block';
                 viewTitle.innerText = status.toUpperCase() + " ITEMS";
@@ -842,6 +857,73 @@
             loadDatingReports();
             loadDatingProfiles();
             loadStats();
+        }
+
+        // --- DATING: HOME FEED POST REPORTS ---
+        async function loadPostReports() {
+            const container = document.getElementById('postReportsList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('postReportsFilterStatus').value;
+            let query = _supabase.from('dating_post_reports')
+                .select('*, dating_posts(id, user_id, body, photo_url)')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: reports, error } = await query;
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+
+            if (!reports || reports.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No post reports here.</p>';
+                return;
+            }
+
+            const reporterIds = [...new Set(reports.map(r => r.reporter_id).filter(Boolean))];
+            let reporterMap = {};
+            if (reporterIds.length) {
+                const { data: reporters } = await _supabase.from('profiles').select('id, full_name, phone').in('id', reporterIds);
+                (reporters || []).forEach(r => reporterMap[r.id] = r);
+            }
+
+            container.innerHTML = reports.map(r => {
+                const reporter = reporterMap[r.reporter_id];
+                const post = r.dating_posts;
+                const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
+                return `
+                    <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                            <strong style="font-size:0.85rem;">${post ? 'Post by user ' + escapeHtml(post.user_id.slice(0,8)) + '…' : 'Post removed'}</strong>
+                            <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        ${post?.body ? `<p style="color:#555; font-size:0.85rem; margin:8px 0; background:#fafafa; padding:8px; border-radius:6px;">${escapeHtml(post.body.slice(0,300))}</p>` : ''}
+                        ${post?.photo_url ? `<img src="${escapeHtml(post.photo_url)}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
+                        <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
+                        <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            ${r.status === 'open' ? `
+                                <button onclick="resolvePostReport('${r.id}', 'dismissed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ddd; background:white; border-radius:5px; cursor:pointer;">Dismiss</button>
+                                <button onclick="resolvePostReport('${r.id}', 'reviewed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #2ed573; color:#2ed573; background:white; border-radius:5px; cursor:pointer;">Mark Reviewed</button>
+                                ${post ? `<button onclick="deleteReportedPost('${post.id}', '${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer;">Remove Post</button>` : ''}
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolvePostReport(reportId, newStatus) {
+            const { error } = await _supabase.from('dating_post_reports').update({ status: newStatus }).eq('id', reportId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'dismissed' ? 'Post Report Dismissed' : 'Post Report Reviewed', `Report ID: ${reportId}`);
+            loadPostReports();
+        }
+
+        async function deleteReportedPost(postId, reportId) {
+            if (!confirm('Remove this post? This cannot be undone.')) return;
+            const { error } = await _supabase.from('dating_posts').delete().eq('id', postId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            if (reportId) await _supabase.from('dating_post_reports').update({ status: 'reviewed' }).eq('id', reportId);
+            logAction('Dating Post Removed', `Post ID: ${postId}`);
+            loadPostReports();
         }
 
         async function rejectReportedProduct(productId, reportId) {
