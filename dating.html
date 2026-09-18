@@ -215,6 +215,7 @@
   <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
   <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
+  <div class="tab" data-tab="likes" onclick="switchTab('likes')">Likes <span id="likesBadge"></span></div>
   <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')">My Profile</div>
 </div>
 
@@ -323,6 +324,15 @@
     <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message someone from Browse to start a conversation.</div>
   </div>
 
+  <div class="panel" id="likesPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>People who <span>liked you</span></h2>
+      <p>Like them back to match and start chatting.</p>
+    </div>
+    <div class="grid" id="likesGrid"></div>
+    <div class="empty" id="likesEmpty" style="display:none;">No one has liked your profile yet.</div>
+  </div>
+
   <div class="panel" id="myProfilePanel" style="display:none;">
     <div id="myProfileContent"></div>
   </div>
@@ -361,6 +371,7 @@ async function initAuth(){
     maybeShowSafetyNotice();
     loadProfiles();
     refreshUnreadBadge();
+    refreshLikesBadge();
     startPresenceHeartbeat();
   }
 }
@@ -494,6 +505,7 @@ _supabase.auth.onAuthStateChange((_event, session) => {
   if (currentUser){
     loadProfiles();
     refreshUnreadBadge();
+    refreshLikesBadge();
   }
 });
 
@@ -507,8 +519,85 @@ async function refreshUnreadBadge(){
   badge.textContent = count ? `(${count})` : "";
 }
 
+async function refreshLikesBadge(){
+  const { count } = await _supabase
+    .from("dating_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("liked_id", currentUser.id)
+    .eq("seen", false);
+  const badge = document.getElementById("likesBadge");
+  badge.textContent = count ? `(${count})` : "";
+}
+
+async function loadLikesReceived(){
+  const grid = document.getElementById("likesGrid");
+  const empty = document.getElementById("likesEmpty");
+  grid.innerHTML = "";
+
+  const { data: likes, error } = await _supabase
+    .from("dating_likes")
+    .select("*")
+    .eq("liked_id", currentUser.id)
+    .order("created_at", { ascending: false });
+
+  if (error || !likes || likes.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+
+  // mark all as seen now that the tab is open, and clear the badge
+  const unseenIds = likes.filter(l => !l.seen).map(l => l.id);
+  if (unseenIds.length){
+    await _supabase.from("dating_likes").update({ seen: true }).in("id", unseenIds);
+  }
+  document.getElementById("likesBadge").textContent = "";
+
+  const likerIds = likes.map(l => l.liker_id);
+  const { data: profiles } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .in("user_id", likerIds);
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+  const { data: blocks } = await _supabase
+    .from("dating_blocks")
+    .select("blocked_id")
+    .eq("blocker_id", currentUser.id);
+  const blockedIds = new Set((blocks || []).map(b => b.blocked_id));
+
+  const rows = likes
+    .map(l => profileMap[l.liker_id])
+    .filter(p => p && !blockedIds.has(p.user_id));
+
+  if (rows.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  rows.forEach(row => {
+    const img = (row.photos && row.photos[0]) || row.photo_url || null;
+    const displayName = row.display_name || row.gender || "Someone";
+    const presence = presenceInfo(row.last_seen_at);
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openModal(row);
+    card.innerHTML = `
+      <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">
+        ${img ? "" : "👤"}
+        ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
+      </div>
+      <div class="info">
+        <div class="name-age">${displayName.toUpperCase()} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="meta">${row.city || ""} · ${row.relationship_type || ""}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
 // ---------- Tabs ----------
-const PANELS = ["browsePanel","postPanel","messagesPanel","myProfilePanel"];
+const PANELS = ["browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -519,10 +608,11 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
+  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
+  if (tab === "likes") loadLikesReceived();
   if (tab === "myprofile") loadMyProfile();
 }
 
