@@ -113,11 +113,18 @@
   .card .photo{
     width:100%;aspect-ratio:1/1;background:var(--green-light) center/cover no-repeat;
     display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-size:2rem;
+    position:relative;
+  }
+  .online-dot{
+    position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%;
+    background:#2ECC71;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.1);
   }
   .card .info{padding:10px 12px;}
   .card .info .name-age{font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:.02em;}
   .card .info .name-age .age{color:var(--gold);text-transform:none;font-weight:700;}
   .card .info .meta{font-size:.8rem;color:#777;margin-top:2px;}
+  .presence{font-size:.75rem;color:#999;margin-top:3px;}
+  .presence.is-online{color:#1E8E4F;font-weight:600;}
 
   .browse-header{margin-bottom:18px;}
   .browse-header h2{margin:0 0 6px;font-size:1.3rem;}
@@ -205,8 +212,7 @@
 </header>
 
 <div class="tabs">
-  <div class="tab active" data-tab="home" onclick="switchTab('home')">Home</div>
-  <div class="tab" data-tab="browse" onclick="switchTab('browse')">Browse</div>
+  <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
   <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
   <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')">My Profile</div>
@@ -218,28 +224,6 @@
       <p>You need to be signed in to view or post in Dating.</p>
       <button onclick="signInWithGoogle()">Sign in with Google</button>
     </div>
-  </div>
-
-  <div class="panel" id="homePanel" style="display:none;">
-    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div id="composerAvatar" style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--green-light);display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">👤</div>
-        <div style="flex:1;">
-          <textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or anything you'd like to post..." style="width:100%;min-height:60px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:.92rem;resize:vertical;"></textarea>
-          <div id="postImagePreview" style="margin-top:8px;"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#555;cursor:pointer;">
-              🖼️ Photo
-              <input type="file" id="postImage" accept="image/*" style="display:none;" onchange="previewPostImage()">
-            </label>
-            <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--gold);color:var(--green);border:none;border-radius:999px;padding:8px 22px;font-weight:700;cursor:pointer;">Post</button>
-          </div>
-          <div id="postMsg"></div>
-        </div>
-      </div>
-    </div>
-    <div id="feed"></div>
-    <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something.</div>
   </div>
 
   <div class="panel" id="browsePanel" style="display:none;">
@@ -260,8 +244,12 @@
         <option value="Marriage">Marriage</option>
       </select>
       <input type="text" id="filterCity" placeholder="City">
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 4px;">
+        <input type="checkbox" id="filterOnline" style="width:auto;"> Online now
+      </label>
       <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Filter</button>
     </div>
+    <div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:14px;"></div>
     <div class="grid" id="grid"></div>
     <div class="empty" id="emptyState" style="display:none;">No profiles match yet — check back soon.</div>
     <div class="more-wrap" id="moreWrap" style="display:none;">
@@ -367,14 +355,48 @@ async function initAuth(){
     currentUser = null;
   }
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
-  document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
+  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
     maybeShowSafetyNotice();
-    loadFeed();
-    setComposerAvatar();
+    loadProfiles();
     refreshUnreadBadge();
+    startPresenceHeartbeat();
   }
+}
+
+// ---------- Presence / last seen ----------
+const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
+let presenceTimer = null;
+
+function startPresenceHeartbeat(){
+  sendHeartbeat();
+  if (presenceTimer) clearInterval(presenceTimer);
+  presenceTimer = setInterval(() => {
+    if (document.visibilityState === "visible") sendHeartbeat();
+  }, 60 * 1000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && currentUser) sendHeartbeat();
+  });
+}
+
+async function sendHeartbeat(){
+  if (!currentUser) return;
+  await _supabase.from("dating_profiles")
+    .update({ last_seen_at: new Date().toISOString() })
+    .eq("user_id", currentUser.id);
+}
+
+function presenceInfo(lastSeenAt){
+  if (!lastSeenAt) return { online: false, text: "" };
+  const diffMs = Date.now() - new Date(lastSeenAt).getTime();
+  if (diffMs < ONLINE_THRESHOLD_MS) return { online: true, text: "Online now" };
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 60) return { online: false, text: `Active ${mins}m ago` };
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return { online: false, text: `Active ${hours}h ago` };
+  const days = Math.floor(hours / 24);
+  return { online: false, text: `Active ${days}d ago` };
 }
 
 function maybeShowSafetyNotice(){
@@ -467,11 +489,10 @@ function openSettings(){
 _supabase.auth.onAuthStateChange((_event, session) => {
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
-  document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
+  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    loadFeed();
-    setComposerAvatar();
+    loadProfiles();
     refreshUnreadBadge();
   }
 });
@@ -487,7 +508,7 @@ async function refreshUnreadBadge(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","myProfilePanel"];
+const PANELS = ["browsePanel","postPanel","messagesPanel","myProfilePanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -498,152 +519,11 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
+  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
-  if (tab === "home") loadFeed();
-  if (tab === "browse") loadProfiles();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "myprofile") loadMyProfile();
-}
-
-// ---------- Home feed ----------
-let pendingPostImageFile = null;
-
-async function setComposerAvatar(){
-  const el = document.getElementById("composerAvatar");
-  if (!el) return;
-  const { data } = await _supabase
-    .from("dating_profiles")
-    .select("photo_url, photos")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-  const photo = data ? ((data.photos && data.photos[0]) || data.photo_url) : null;
-  el.innerHTML = photo ? `<img src="${esc(photo)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : "👤";
-}
-
-function previewPostImage(){
-  const file = document.getElementById("postImage").files[0];
-  pendingPostImageFile = file || null;
-  const preview = document.getElementById("postImagePreview");
-  if (!file){ preview.innerHTML = ""; return; }
-  const url = URL.createObjectURL(file);
-  preview.innerHTML = `<div style="position:relative;display:inline-block;">
-    <img src="${url}" style="max-height:140px;border-radius:8px;">
-    <button onclick="clearPostImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;">✕</button>
-  </div>`;
-}
-
-function clearPostImage(){
-  pendingPostImageFile = null;
-  document.getElementById("postImage").value = "";
-  document.getElementById("postImagePreview").innerHTML = "";
-}
-
-async function submitPost(){
-  const textarea = document.getElementById("postBody");
-  const body = textarea.value.trim();
-  const msg = document.getElementById("postMsg");
-  const btn = document.getElementById("postSubmitBtn");
-  if (!body){ msg.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
-
-  btn.disabled = true;
-  btn.textContent = "Posting...";
-
-  let imageUrl = null;
-  if (pendingPostImageFile){
-    const path = `dating-posts/${currentUser.id}-${Date.now()}-${pendingPostImageFile.name}`;
-    const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, pendingPostImageFile);
-    if (uploadErr){
-      msg.innerHTML = `<div class="msg error">Image upload failed: ${esc(uploadErr.message)}</div>`;
-      btn.disabled = false; btn.textContent = "Post";
-      return;
-    }
-    const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-    imageUrl = pub.publicUrl;
-  }
-
-  const { error } = await _supabase.from("dating_posts").insert({
-    user_id: currentUser.id,
-    body,
-    image_url: imageUrl
-  });
-
-  btn.disabled = false;
-  btn.textContent = "Post";
-
-  if (error){
-    msg.innerHTML = `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
-    return;
-  }
-
-  textarea.value = "";
-  clearPostImage();
-  msg.innerHTML = "";
-  loadFeed();
-}
-
-async function loadFeed(){
-  const feed = document.getElementById("feed");
-  const empty = document.getElementById("feedEmpty");
-
-  const { data: blocks } = await _supabase
-    .from("dating_blocks")
-    .select("blocker_id, blocked_id")
-    .or(`blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}`);
-  const hiddenIds = new Set();
-  (blocks || []).forEach(b => hiddenIds.add(b.blocker_id === currentUser.id ? b.blocked_id : b.blocker_id));
-
-  const { data, error } = await _supabase
-    .from("dating_posts")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(50);
-
-  if (error){ feed.innerHTML = `<p style="color:red;">${esc(error.message)}</p>`; return; }
-
-  const posts = (data || []).filter(p => !hiddenIds.has(p.user_id));
-  if (posts.length === 0){
-    feed.innerHTML = "";
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
-  const authorIds = [...new Set(posts.map(p => p.user_id))];
-  const { data: authors } = await _supabase
-    .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
-    .in("user_id", authorIds);
-  const authorMap = {};
-  (authors || []).forEach(a => authorMap[a.user_id] = a);
-
-  feed.innerHTML = posts.map(p => {
-    const a = authorMap[p.user_id];
-    const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
-    const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
-    const isMine = p.user_id === currentUser.id;
-    return `
-      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
-            <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()}</div>
-          </div>
-          ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>` : ""}
-        </div>
-        <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-        ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
-      </div>`;
-  }).join("");
-}
-
-async function deletePost(postId){
-  if (!confirm("Delete this post?")) return;
-  const { error } = await _supabase.from("dating_posts").delete().eq("id", postId);
-  if (error){ alert("Couldn't delete: " + error.message); return; }
-  loadFeed();
 }
 
 // ---------- Load / render profiles ----------
@@ -651,6 +531,7 @@ async function loadProfiles(){
   const seeking = document.getElementById("filterSeeking").value;
   const type = document.getElementById("filterType").value;
   const city = document.getElementById("filterCity").value.trim();
+  const onlineOnly = document.getElementById("filterOnline").checked;
 
   const { data: blocks } = await _supabase
     .from("dating_blocks")
@@ -680,6 +561,19 @@ async function loadProfiles(){
   if (seeking) rows = rows.filter(r => r.gender === seeking);
   if (type) rows = rows.filter(r => r.relationship_type === type);
   if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
+  if (onlineOnly) rows = rows.filter(r => presenceInfo(r.last_seen_at).online);
+
+  // online people first, then most recently posted
+  rows.sort((a, b) => {
+    const aOnline = presenceInfo(a.last_seen_at).online;
+    const bOnline = presenceInfo(b.last_seen_at).online;
+    if (aOnline !== bOnline) return aOnline ? -1 : 1;
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  const onlineCount = rows.filter(r => presenceInfo(r.last_seen_at).online).length;
+  document.getElementById("onlineSummary").textContent =
+    onlineCount > 0 ? `🟢 ${onlineCount} ${onlineCount === 1 ? "person" : "people"} online now` : "";
 
   if (rows.length === 0){
     empty.style.display = "block";
@@ -702,14 +596,19 @@ function renderBrowseGrid(){
   rows.forEach(row => {
     const img = (row.photos && row.photos[0]) || row.photo_url || null;
     const displayName = row.display_name || row.gender || "Someone";
+    const presence = presenceInfo(row.last_seen_at);
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
     card.innerHTML = `
-      <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">${img ? "" : "👤"}</div>
+      <div class="photo" style="${img ? `background-image:url('${img}')` : ""}">
+        ${img ? "" : "👤"}
+        ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
+      </div>
       <div class="info">
         <div class="name-age">${displayName.toUpperCase()} <span class="age">${row.age || "?"} years old</span></div>
         <div class="meta">${row.city || ""} · ${row.relationship_type || ""}</div>
+        <div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>
       </div>`;
     grid.appendChild(card);
   });
@@ -726,6 +625,7 @@ function showMoreProfiles(){
 async function openModal(row){
   const photos = (row.photos && row.photos.length) ? row.photos : (row.photo_url ? [row.photo_url] : []);
   const mainPhoto = photos[0] || null;
+  const presence = presenceInfo(row.last_seen_at);
   const root = document.getElementById("modalRoot");
   const matched = await checkMatch(row.user_id);
   const actionBtn = matched
@@ -735,14 +635,14 @@ async function openModal(row){
     ? `<div class="thumb-row">${photos.map((p,i) => `<div class="thumb${i===0?" active":""}" style="background-image:url('${p}')" onclick="event.stopPropagation(); swapModalPhoto('${p}', this)"></div>`).join("")}</div>`
     : "";
   root.innerHTML = `
-    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
-      <div class="modal">
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">      <div class="modal">
         <div class="photo" id="modalMainPhoto" style="${mainPhoto ? `background-image:url('${mainPhoto}')` : ""}"></div>
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3>${row.display_name ? row.display_name + ", " : ""}${row.age || "?"}</h3>
           <div class="meta">${row.city || ""} · Looking for ${row.seeking || ""} · ${row.relationship_type || ""}</div>
+          <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:10px;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio">${(row.bio || "").replace(/</g,"&lt;")}</div>
           <div id="matchNotice"></div>
           <div class="actions">
@@ -823,12 +723,6 @@ function contactProfile(profileId, recipientId){
     </div>`;
 }
 
-function esc(str){
-  return String(str ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-  }[c]));
-}
-
 async function sendMessage(profileId, recipientId){
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
@@ -845,24 +739,6 @@ async function sendMessage(profileId, recipientId){
     msgBox.innerHTML = `<div class="msg success">Sent.</div>`;
     setTimeout(closeModal, 700);
   }
-}
-
-async function sendReply(profileId, recipientId){
-  const textarea = document.getElementById("replyBody");
-  const body = textarea.value.trim();
-  if (!body) return;
-  const { error } = await _supabase.from("dating_messages").insert({
-    profile_id: profileId,
-    sender_id: currentUser.id,
-    recipient_id: recipientId,
-    body
-  });
-  if (error){
-    alert("Couldn't send: " + error.message);
-    return;
-  }
-  textarea.value = "";
-  setTimeout(loadThreads, 800);
 }
 
 // ---------- Messages tab ----------
@@ -914,8 +790,8 @@ async function loadThreads(){
     div.innerHTML = `
       <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${photo}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}</div>
-        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(last.body.slice(0,80))}</div>
+        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${name}</div>
+        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.body.slice(0,80)}</div>
         <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
       </div>`;
     div.onclick = () => openThread(thread);
@@ -935,18 +811,18 @@ async function openThread(thread){
       <div class="modal">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${esc(thread.profile ? (thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation")}</h3>
+          <h3>${thread.profile ? (thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation"}</h3>
           <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:10px 0;">
             ${ordered.map(m => `
               <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
                 background:${m.sender_id===currentUser.id?"var(--gold-soft)":"#F0F0F0"};
                 padding:8px 12px;border-radius:10px;max-width:80%;font-size:.88rem;">
-                ${esc(m.body)}
+                ${m.body.replace(/</g,"&lt;")}
               </div>`).join("")}
           </div>
           <textarea id="replyBody" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
           <div class="actions">
-            <button class="btn-contact" onclick="sendReply('${thread.profileId}','${thread.other}');">Reply</button>
+            <button class="btn-contact" onclick="sendMessage('${thread.profileId}','${thread.other}'); setTimeout(loadThreads, 800);">Reply</button>
           </div>
         </div>
       </div>
