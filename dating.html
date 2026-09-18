@@ -700,7 +700,7 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    photo_url: imageUrl
+    image_url: imageUrl
   });
 
   btn.disabled = false;
@@ -769,7 +769,7 @@ async function loadFeed(){
                    : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
         </div>
         <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-        ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+        ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
       </div>`;
   }).join("");
 }
