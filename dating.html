@@ -131,6 +131,25 @@
   .browse-header h2 span{color:var(--gold);}
   .browse-header p{margin:0;color:#666;font-size:.88rem;max-width:520px;}
 
+  .composer{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:20px;background:var(--paper);}
+  .composer textarea{
+    width:100%;min-height:70px;border:1px solid var(--line);border-radius:7px;
+    padding:9px 11px;font-family:inherit;font-size:.9rem;resize:vertical;
+  }
+  .composer-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap;}
+  .composer-row input[type="file"]{font-size:.8rem;}
+
+  .feed-post{border-bottom:1px solid var(--line);padding:16px 0;display:flex;gap:12px;}
+  .feed-post:last-child{border-bottom:none;}
+  .feed-avatar{
+    width:42px;height:42px;border-radius:50%;flex-shrink:0;background-size:cover;background-position:center;
+    display:flex;align-items:center;justify-content:center;background-color:var(--green-light);color:var(--gold-soft);
+  }
+  .feed-post .who{font-weight:700;font-size:.88rem;color:var(--green);}
+  .feed-post .when{font-size:.75rem;color:#999;margin-bottom:6px;}
+  .feed-post .body-text{font-size:.9rem;color:#333;white-space:pre-wrap;margin-bottom:8px;}
+  .feed-post img.feed-photo{max-width:100%;border-radius:8px;display:block;}
+
   .more-wrap{text-align:right;margin-top:18px;}
   .more-btn{
     background:var(--gold);color:var(--green);border:none;border-radius:999px;
@@ -212,7 +231,8 @@
 </header>
 
 <div class="tabs">
-  <div class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
+  <div class="tab active" data-tab="home" onclick="switchTab('home')">Home</div>
+  <div class="tab" data-tab="browse" onclick="switchTab('browse')">Browse</div>
   <div class="tab" data-tab="post" onclick="switchTab('post')">Post a Profile</div>
   <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages <span id="unreadBadge"></span></div>
   <div class="tab" data-tab="likes" onclick="switchTab('likes')">Likes <span id="likesBadge"></span></div>
@@ -225,6 +245,23 @@
       <p>You need to be signed in to view or post in Dating.</p>
       <button onclick="signInWithGoogle()">Sign in with Google</button>
     </div>
+  </div>
+
+  <div class="panel" id="homePanel" style="display:none;">
+    <div class="browse-header">
+      <h2>Home <span>Feed</span></h2>
+      <p>Share an update or photo — visible to everyone browsing Dating.</p>
+    </div>
+    <div class="composer">
+      <textarea id="postBody" maxlength="500" placeholder="Share something..."></textarea>
+      <div class="composer-row">
+        <input type="file" id="postPhoto" accept="image/*">
+        <button class="submit-btn" id="postSubmitBtn" style="width:auto;padding:9px 20px;" onclick="submitHomePost()">Post</button>
+      </div>
+      <div id="postMsg"></div>
+    </div>
+    <div id="feedList"></div>
+    <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something.</div>
   </div>
 
   <div class="panel" id="browsePanel" style="display:none;">
@@ -365,11 +402,11 @@ async function initAuth(){
     currentUser = null;
   }
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
-  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
+  document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
     maybeShowSafetyNotice();
-    loadProfiles();
+    loadHomeFeed();
     refreshUnreadBadge();
     refreshLikesBadge();
     startPresenceHeartbeat();
@@ -500,10 +537,10 @@ function openSettings(){
 _supabase.auth.onAuthStateChange((_event, session) => {
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
-  document.getElementById("browsePanel").style.display = currentUser ? "block" : "none";
+  document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    loadProfiles();
+    loadHomeFeed();
     refreshUnreadBadge();
     refreshLikesBadge();
   }
@@ -596,8 +633,98 @@ async function loadLikesReceived(){
   });
 }
 
+// ---------- Home feed ----------
+async function loadHomeFeed(){
+  const list = document.getElementById("feedList");
+  const empty = document.getElementById("feedEmpty");
+  list.innerHTML = "";
+
+  const { data: posts, error } = await _supabase
+    .from("dating_posts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(30);
+
+  if (error || !posts || posts.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  const userIds = [...new Set(posts.map(p => p.user_id))];
+  const { data: profiles } = await _supabase
+    .from("dating_profiles")
+    .select("user_id, display_name, gender, photo_url, photos")
+    .in("user_id", userIds);
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+  posts.forEach(post => {
+    const author = profileMap[post.user_id];
+    const name = author ? (author.display_name || author.gender || "Someone") : "Someone";
+    const avatar = author ? ((author.photos && author.photos[0]) || author.photo_url) : null;
+    const div = document.createElement("div");
+    div.className = "feed-post";
+    div.innerHTML = `
+      <div class="feed-avatar" style="${avatar ? `background-image:url('${avatar}')` : ""}">${avatar ? "" : "👤"}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="who">${name}</div>
+        <div class="when">${new Date(post.created_at).toLocaleString()}</div>
+        ${post.body ? `<div class="body-text">${post.body.replace(/</g,"&lt;")}</div>` : ""}
+        ${post.photo_url ? `<img class="feed-photo" src="${post.photo_url}">` : ""}
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function submitHomePost(){
+  const btn = document.getElementById("postSubmitBtn");
+  const msg = document.getElementById("postMsg");
+  const body = document.getElementById("postBody").value.trim();
+  const file = document.getElementById("postPhoto").files[0];
+  msg.innerHTML = "";
+
+  if (!body && !file){
+    msg.innerHTML = `<div class="msg error">Write something or add a photo first.</div>`;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Posting...";
+
+  let photoUrl = null;
+  if (file){
+    const path = `dating-posts/${currentUser.id}-${Date.now()}-${file.name}`;
+    const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+    if (uploadErr){
+      msg.innerHTML = `<div class="msg error">Photo upload failed: ${uploadErr.message}</div>`;
+      btn.disabled = false; btn.textContent = "Post";
+      return;
+    }
+    const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    photoUrl = pub.publicUrl;
+  }
+
+  const { error } = await _supabase.from("dating_posts").insert({
+    user_id: currentUser.id,
+    body: body || null,
+    photo_url: photoUrl
+  });
+
+  btn.disabled = false;
+  btn.textContent = "Post";
+
+  if (error){
+    msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
+  } else {
+    document.getElementById("postBody").value = "";
+    document.getElementById("postPhoto").value = "";
+    loadHomeFeed();
+  }
+}
+
 // ---------- Tabs ----------
-const PANELS = ["browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel"];
+const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -608,9 +735,11 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel" };
+  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel" };
   document.getElementById(map[tab]).style.display = "block";
 
+  if (tab === "home") loadHomeFeed();
+  if (tab === "browse") loadProfiles();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "likes") loadLikesReceived();
   if (tab === "myprofile") loadMyProfile();
