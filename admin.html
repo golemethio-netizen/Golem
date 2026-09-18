@@ -866,7 +866,7 @@
 
             const filter = document.getElementById('postReportsFilterStatus').value;
             let query = _supabase.from('dating_post_reports')
-                .select('*, dating_posts(id, user_id, body, photo_url)')
+                .select('*, dating_posts(id, user_id, body, image_url)')
                 .order('created_at', { ascending: false });
             if (filter !== 'all') query = query.eq('status', filter);
 
@@ -896,7 +896,7 @@
                             <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
                         </div>
                         ${post?.body ? `<p style="color:#555; font-size:0.85rem; margin:8px 0; background:#fafafa; padding:8px; border-radius:6px;">${escapeHtml(post.body.slice(0,300))}</p>` : ''}
-                        ${post?.photo_url ? `<img src="${escapeHtml(post.photo_url)}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
+                        ${post?.image_url ? `<img src="${escapeHtml(post.image_url)}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
                         <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
                         <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
                         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
