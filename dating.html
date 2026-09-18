@@ -326,6 +326,89 @@
         </select>
       </div>
       <div>
+        <label>What I'm looking for</label>
+        <select id="fLookingFor" required>
+          <option value="">Select</option>
+          <option>Long-term relationship</option>
+          <option>Something casual</option>
+          <option>Marriage</option>
+          <option>New friends</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Interested in ages</label>
+          <input type="number" id="fAgeMin" min="18" max="99" placeholder="Min" required>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <input type="number" id="fAgeMax" min="18" max="99" placeholder="Max" required>
+        </div>
+      </div>
+      <div>
+        <label>My lifestyle</label>
+        <select id="fLifestyle" required>
+          <option value="">Select</option>
+          <option>Active & Outdoorsy</option>
+          <option>Homebody</option>
+          <option>Social & Outgoing</option>
+          <option>Balanced</option>
+          <option>Career-focused</option>
+          <option>Family-oriented</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Have kids?</label>
+          <select id="fHasKids" required>
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+        <div>
+          <label>Want kids?</label>
+          <select id="fWantsKids" required>
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+            <option>Maybe</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Religion</label>
+        <select id="fReligion" required>
+          <option value="">Select</option>
+          <option>Orthodox Christian</option>
+          <option>Protestant</option>
+          <option>Muslim</option>
+          <option>Catholic</option>
+          <option>Traditional</option>
+          <option>Other</option>
+          <option>Prefer not to say</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Occupation (optional)</label>
+          <input type="text" id="fOccupation" maxlength="60">
+        </div>
+        <div>
+          <label>Income (optional)</label>
+          <select id="fIncome">
+            <option selected>Prefer not to say</option>
+            <option>Under 10,000 ETB/mo</option>
+            <option>10,000–25,000 ETB/mo</option>
+            <option>25,000–50,000 ETB/mo</option>
+            <option>50,000–100,000 ETB/mo</option>
+            <option>100,000+ ETB/mo</option>
+          </select>
+        </div>
+      </div>
+      <div>
         <label>About you (max 500 characters)</label>
         <textarea id="fBio" maxlength="500" required placeholder="Tell people a bit about yourself..."></textarea>
       </div>
@@ -911,6 +994,16 @@ async function openModal(row){
           <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
           <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:10px;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio">${esc(row.bio || "")}</div>
+          <div class="meta" style="margin-top:8px;line-height:1.7;">
+            ${row.looking_for ? `<div>💍 Looking for: ${esc(row.looking_for)}</div>` : ""}
+            ${(row.age_min && row.age_max) ? `<div>🎂 Interested in ages ${esc(row.age_min)}–${esc(row.age_max)}</div>` : ""}
+            ${row.lifestyle ? `<div>🌿 Lifestyle: ${esc(row.lifestyle)}</div>` : ""}
+            ${row.has_kids ? `<div>👶 Has kids: ${esc(row.has_kids)}</div>` : ""}
+            ${row.wants_kids ? `<div>👶 Wants kids: ${esc(row.wants_kids)}</div>` : ""}
+            ${row.religion ? `<div>🙏 Religion: ${esc(row.religion)}</div>` : ""}
+            ${row.occupation ? `<div>💼 Occupation: ${esc(row.occupation)}</div>` : ""}
+            ${(row.income_range && row.income_range !== "Prefer not to say") ? `<div>💰 Income: ${esc(row.income_range)}</div>` : ""}
+          </div>
           <div id="matchNotice"></div>
           <div class="actions">
             ${actionBtn}
@@ -1004,6 +1097,10 @@ function esc(str){
   return String(str ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
   }[c]));
+}
+
+function opts(list, current){
+  return list.map(v => `<option ${v===current?"selected":""}>${esc(v)}</option>`).join("");
 }
 
 async function sendMessage(profileId, recipientId){
@@ -1155,6 +1252,56 @@ async function loadMyProfile(){
         <label>About you</label>
         <textarea id="eBio" maxlength="500" required>${esc(data.bio||"")}</textarea>
       </div>
+      <div>
+        <label>What I'm looking for</label>
+        <select id="eLookingFor" required>
+          <option value="">Select</option>
+          ${opts(["Long-term relationship","Something casual","Marriage","New friends","Not sure yet"], data.looking_for)}
+        </select>
+      </div>
+      <div class="row2">
+        <div><label>Interested in ages (min)</label><input type="number" id="eAgeMin" min="18" max="99" value="${esc(data.age_min||"")}" required></div>
+        <div><label>Interested in ages (max)</label><input type="number" id="eAgeMax" min="18" max="99" value="${esc(data.age_max||"")}" required></div>
+      </div>
+      <div>
+        <label>My lifestyle</label>
+        <select id="eLifestyle" required>
+          <option value="">Select</option>
+          ${opts(["Active & Outdoorsy","Homebody","Social & Outgoing","Balanced","Career-focused","Family-oriented","Other"], data.lifestyle)}
+        </select>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Have kids?</label>
+          <select id="eHasKids" required>
+            <option value="">Select</option>
+            ${opts(["Yes","No"], data.has_kids)}
+          </select>
+        </div>
+        <div>
+          <label>Want kids?</label>
+          <select id="eWantsKids" required>
+            <option value="">Select</option>
+            ${opts(["Yes","No","Maybe"], data.wants_kids)}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Religion</label>
+        <select id="eReligion" required>
+          <option value="">Select</option>
+          ${opts(["Orthodox Christian","Protestant","Muslim","Catholic","Traditional","Other","Prefer not to say"], data.religion)}
+        </select>
+      </div>
+      <div class="row2">
+        <div><label>Occupation (optional)</label><input type="text" id="eOccupation" maxlength="60" value="${esc(data.occupation||"")}"></div>
+        <div>
+          <label>Income (optional)</label>
+          <select id="eIncome">
+            ${opts(["Prefer not to say","Under 10,000 ETB/mo","10,000–25,000 ETB/mo","25,000–50,000 ETB/mo","50,000–100,000 ETB/mo","100,000+ ETB/mo"], data.income_range || "Prefer not to say")}
+          </select>
+        </div>
+      </div>
       <button type="submit" class="submit-btn">Save changes</button>
       <button type="button" class="submit-btn" style="background:var(--danger);" id="deleteBtn">Delete my profile</button>
       <div id="editMsg"></div>
@@ -1162,15 +1309,30 @@ async function loadMyProfile(){
 
   document.getElementById("editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+    const ageMin = parseInt(document.getElementById("eAgeMin").value, 10);
+    const ageMax = parseInt(document.getElementById("eAgeMax").value, 10);
+    if (ageMin > ageMax){
+      document.getElementById("editMsg").innerHTML = `<div class="msg error">Minimum age can't be greater than maximum age.</div>`;
+      return;
+    }
     const { error: updErr } = await _supabase.from("dating_profiles").update({
       display_name: document.getElementById("eName").value.trim(),
       age: parseInt(document.getElementById("eAge").value,10),
       city: document.getElementById("eCity").value.trim(),
       bio: document.getElementById("eBio").value.trim(),
+      looking_for: document.getElementById("eLookingFor").value,
+      age_min: ageMin,
+      age_max: ageMax,
+      lifestyle: document.getElementById("eLifestyle").value,
+      has_kids: document.getElementById("eHasKids").value,
+      wants_kids: document.getElementById("eWantsKids").value,
+      religion: document.getElementById("eReligion").value,
+      occupation: document.getElementById("eOccupation").value.trim() || null,
+      income_range: document.getElementById("eIncome").value,
       updated_at: new Date().toISOString()
     }).eq("id", data.id);
     document.getElementById("editMsg").innerHTML = updErr
-      ? `<div class="msg error">${updErr.message}</div>`
+      ? `<div class="msg error">${esc(updErr.message)}</div>`
       : `<div class="msg success">Saved.</div>`;
   });
 
@@ -1223,6 +1385,13 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     return;
   }
 
+  const ageMin = parseInt(document.getElementById("fAgeMin").value, 10);
+  const ageMax = parseInt(document.getElementById("fAgeMax").value, 10);
+  if (ageMin > ageMax){
+    msg.innerHTML = `<div class="msg error">Minimum age can't be greater than maximum age.</div>`;
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = "Posting...";
 
@@ -1254,6 +1423,15 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     relationship_type: document.getElementById("fType").value,
     city: cityVal,
     bio: document.getElementById("fBio").value.trim(),
+    looking_for: document.getElementById("fLookingFor").value,
+    age_min: ageMin,
+    age_max: ageMax,
+    lifestyle: document.getElementById("fLifestyle").value,
+    has_kids: document.getElementById("fHasKids").value,
+    wants_kids: document.getElementById("fWantsKids").value,
+    religion: document.getElementById("fReligion").value,
+    occupation: document.getElementById("fOccupation").value.trim() || null,
+    income_range: document.getElementById("fIncome").value,
     age_confirmed: true,
     updated_at: new Date().toISOString()
   };
