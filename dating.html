@@ -329,6 +329,7 @@
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
       <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
       <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
+      <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
     </nav>
     <div class="sidebar-account" id="accountBox" style="display:none;">
       <div class="who">
@@ -337,7 +338,7 @@
       </div>
       <div class="account-links">
         <button onclick="switchTab('myprofile');">Edit Profile</button>
-        <button onclick="openSettings()">Privacy Settings</button>
+        <button onclick="switchTab('settings');">Privacy Settings</button>
         <button class="danger" onclick="signOut()">Sign out</button>
       </div>
     </div>
@@ -586,6 +587,31 @@
   <div class="panel" id="myProfilePanel" style="display:none;">
     <div id="myProfileContent"></div>
   </div>
+
+  <!-- PRIVACY SETTINGS (NEW) -->
+  <div class="panel" id="settingsPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>Privacy <span>Settings</span></h2>
+      <p>Manage your account security and blocked contacts.</p>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+      <h3 style="margin-top:0;">Change Password</h3>
+      <div class="row2">
+        <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">New Password</label><input type="password" id="setNewPwd" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" placeholder="Min 6 characters"></div>
+        <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Confirm Password</label><input type="password" id="setNewPwdConf" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" placeholder="Confirm new password"></div>
+      </div>
+      <button onclick="updateAccountPassword()" class="submit-btn" style="width:auto;padding:10px 24px;margin-top:14px;">Update Password</button>
+      <div id="pwdMsg" style="margin-top:10px;"></div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+      <h3 style="margin-top:0;">Blocked Users</h3>
+      <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Users you have blocked cannot see your profile or message you.</p>
+      <div id="blockedUsersList">Loading...</div>
+    </div>
+  </div>
+
 </main>
 </div>
 
@@ -798,7 +824,6 @@ function renderAuthModal(){
   document.getElementById("authForm").addEventListener("submit", submitAuthForm);
 }
 
-// Re-added Google OAuth Function
 async function signInWithGoogle(){
   const { error } = await _supabase.auth.signInWithOAuth({
     provider: "google",
@@ -806,6 +831,7 @@ async function signInWithGoogle(){
   });
   if (error) alert("Sign-in failed: " + error.message);
 }
+
 async function submitAuthForm(e){
   e.preventDefault();
   const msg = document.getElementById("authMsg");
@@ -819,7 +845,7 @@ async function submitAuthForm(e){
     const raw = document.getElementById("authPhone").value.trim();
     const normalized = normalizeEthiopianPhone(raw);
     if (!isValidEthiopianPhone(normalized)){
-      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09) or Safaricom (07) number.</div>`;
+      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
       return;
     }
     realPhone = "+" + normalized;
@@ -925,10 +951,6 @@ document.addEventListener("click", (e) => {
   const notifWrap = document.getElementById("notifWrap");
   if (notifWrap && !notifWrap.contains(e.target)) document.getElementById("notifPanel")?.classList.remove("open");
 });
-
-function openSettings(){
-  alert("Settings coming soon — for now, use Edit Profile to update your details.");
-}
 
 _supabase.auth.onAuthStateChange((_event, session) => {
   const wasSignedIn = !!currentUser;
@@ -1200,7 +1222,7 @@ async function loadLikesReceived(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel"];
+const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -1211,7 +1233,7 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel" };
+  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "home") loadFeed();
@@ -1219,6 +1241,7 @@ function switchTab(tab){
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "likes") loadLikesReceived();
   if (tab === "myprofile") loadMyProfile();
+  if (tab === "settings") loadSettings();
 }
 
 // ---------- Home feed ----------
@@ -2164,7 +2187,6 @@ async function openThread(thread){
       </div>
     </div>`;
     
-    // Auto-scroll to bottom of chat
     const chatBox = document.getElementById("threadMessages");
     if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -2438,8 +2460,9 @@ async function loadMyProfile(){
     .maybeSingle();
 
   el.innerHTML = `
-    <div class="browse-header">
+    <div class="browse-header" style="display:flex; justify-content:space-between; align-items:center;">
       <h2>Edit <span>My Profile</span></h2>
+      <button onclick="switchTab('settings')" style="background:var(--paper); border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;"><i class="fas fa-cog"></i> Settings</button>
     </div>
     ${renderVerificationBox(data, latestRequest)}
     ${profileCompletenessBanner(data)}
@@ -2546,6 +2569,79 @@ async function loadMyProfile(){
     if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
     loadMyProfile();
   });
+}
+
+// ---------- Privacy Settings & Blocked Users ----------
+async function loadSettings() {
+  const list = document.getElementById("blockedUsersList");
+  list.innerHTML = "Loading...";
+
+  const { data: blocks, error } = await _supabase
+    .from("dating_blocks")
+    .select("id, blocked_id")
+    .eq("blocker_id", currentUser.id);
+
+  if (error) {
+    list.innerHTML = `<div class="msg error">Couldn't load blocked users.</div>`;
+    return;
+  }
+
+  if (!blocks || blocks.length === 0) {
+    list.innerHTML = `<div class="empty" style="padding: 20px 10px; font-size: 0.9rem;">You haven't blocked anyone.</div>`;
+    return;
+  }
+
+  const blockedIds = blocks.map(b => b.blocked_id);
+  const { data: profiles } = await _supabase
+    .from("dating_profiles")
+    .select("user_id, display_name, gender, photo_url, photos")
+    .in("user_id", blockedIds);
+
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+  list.innerHTML = blocks.map(b => {
+    const p = profileMap[b.blocked_id];
+    const name = p ? (p.display_name || p.gender || "Unknown User") : "Unknown User";
+    const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa;border:1px solid var(--line);">${photo ? "" : "👤"}</div>
+          <div style="font-weight:600;font-size:0.9rem;">${esc(name)}</div>
+        </div>
+        <button onclick="unblockUser('${b.id}')" style="background:var(--paper);border:1px solid var(--line);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:bold;cursor:pointer;color:#333;transition:0.2s;">Unblock</button>
+      </div>
+    `;
+  }).join("");
+}
+
+async function unblockUser(blockId) {
+  if(!confirm("Unblock this user? They will be able to see your profile and message you again if you match.")) return;
+  await _supabase.from("dating_blocks").delete().eq("id", blockId);
+  loadSettings();
+  loadProfiles(); // Refresh main feed
+}
+
+async function updateAccountPassword() {
+  const p1 = document.getElementById("setNewPwd").value;
+  const p2 = document.getElementById("setNewPwdConf").value;
+  const msg = document.getElementById("pwdMsg");
+
+  if (!p1 || p1.length < 6) { msg.innerHTML = `<div class="msg error">Password must be at least 6 characters.</div>`; return; }
+  if (p1 !== p2) { msg.innerHTML = `<div class="msg error">Passwords do not match.</div>`; return; }
+
+  msg.innerHTML = `<div class="msg">Updating...</div>`;
+  const { error } = await _supabase.auth.updateUser({ password: p1 });
+
+  if (error) {
+    msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
+  } else {
+    msg.innerHTML = `<div class="msg success">Password updated securely!</div>`;
+    document.getElementById("setNewPwd").value = '';
+    document.getElementById("setNewPwdConf").value = '';
+  }
 }
 
 async function reportProfile(profileId){
@@ -2657,7 +2753,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   } else {
     msg.innerHTML = `<div class="msg success">Profile Published Successfully!</div>`;
     document.getElementById("postForm").reset();
-    setTimeout(() => switchTab("myprofile"), 1500); // Send them to view their new profile
+    setTimeout(() => switchTab("myprofile"), 1500); 
   }
 });
 
