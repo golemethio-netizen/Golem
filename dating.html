@@ -579,6 +579,8 @@ let allBrowseRows = [];
 let visibleCount = 0;
 const PAGE_SIZE = 6;
 let currentLang = "en";
+let messageRealtimeChannel = null;
+let notifRealtimeChannel = null;
 
 // ---------- Presence / last seen ----------
 const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
@@ -636,6 +638,8 @@ async function initAuth(){
     startPresenceHeartbeat();
     startNotifPolling();
     setupPersonalCallChannel();
+    setupRealtimeMessaging();
+    setupRealtimeNotifications();
   }
 }
 
@@ -856,6 +860,7 @@ async function signInWithGoogle(){
 }
 
 async function signOut(){
+  teardownRealtimeChannels();
   await _supabase.auth.signOut();
 }
 
@@ -897,6 +902,7 @@ function openSettings(){
 
 // Re-check auth state after OAuth redirect completes, or if session changes
 _supabase.auth.onAuthStateChange((_event, session) => {
+  const wasSignedIn = !!currentUser;
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
@@ -908,6 +914,11 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     refreshLikesBadge();
     refreshNotifCount();
     startNotifPolling();
+    setupPersonalCallChannel();
+    setupRealtimeMessaging();
+    setupRealtimeNotifications();
+  } else if (wasSignedIn){
+    teardownRealtimeChannels();
   }
 });
 
@@ -951,6 +962,55 @@ async function refreshNotifCount(){
   if (!badge) return;
   badge.textContent = count > 9 ? "9+" : (count || "");
   badge.style.display = count ? "inline-block" : "none";
+}
+
+// ---------- Realtime: messages & notifications ----------
+// Requires Realtime replication to be enabled for dating_messages and
+// dating_notifications in the Supabase dashboard (Database > Replication).
+// Without that, these subscriptions silently receive nothing and the
+// app just falls back to the existing manual-refresh/polling behavior.
+function setupRealtimeMessaging(){
+  if (messageRealtimeChannel) return;
+  messageRealtimeChannel = _supabase
+    .channel(`dating-messages:${currentUser.id}`)
+    .on("postgres_changes", {
+      event: "INSERT", schema: "public", table: "dating_messages",
+      filter: `recipient_id=eq.${currentUser.id}`
+    }, (payload) => handleIncomingMessage(payload.new))
+    .subscribe();
+}
+
+function handleIncomingMessage(m){
+  refreshUnreadBadge();
+
+  const messagesTabVisible = document.getElementById("messagesPanel")?.style.display !== "none";
+  if (messagesTabVisible) loadThreads();
+
+  if (currentOpenThread &&
+      currentOpenThread.profileId === m.profile_id &&
+      currentOpenThread.other === m.sender_id){
+    currentOpenThread.messages.unshift(m);
+    openThread(currentOpenThread); // re-renders bubbles and marks it read since the thread is actively open
+  }
+}
+
+function setupRealtimeNotifications(){
+  if (notifRealtimeChannel) return;
+  notifRealtimeChannel = _supabase
+    .channel(`dating-notifications:${currentUser.id}`)
+    .on("postgres_changes", {
+      event: "INSERT", schema: "public", table: "dating_notifications",
+      filter: `user_id=eq.${currentUser.id}`
+    }, () => {
+      refreshNotifCount();
+      if (document.getElementById("notifPanel")?.classList.contains("open")) loadNotifications();
+    })
+    .subscribe();
+}
+
+function teardownRealtimeChannels(){
+  if (messageRealtimeChannel){ _supabase.removeChannel(messageRealtimeChannel); messageRealtimeChannel = null; }
+  if (notifRealtimeChannel){ _supabase.removeChannel(notifRealtimeChannel); notifRealtimeChannel = null; }
 }
 
 function notifIcon(type){
