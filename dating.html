@@ -75,6 +75,23 @@
   }
   .signin-pill:hover{background:#000;}
 
+  .auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+  .auth-tab{padding:8px 4px;font-size:.9rem;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .auth-tab.active{color:var(--green);border-bottom-color:var(--gold);}
+  .auth-method{display:flex;gap:8px;margin-bottom:16px;}
+  .auth-method button{
+    flex:1;padding:8px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:.85rem;color:#555;cursor:pointer;
+  }
+  .auth-method button.active{background:var(--paper);border-color:var(--gold);color:var(--green);font-weight:700;}
+  .auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#aaa;font-size:.78rem;}
+  .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line);}
+  .btn-google{
+    width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:.88rem;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .submit-btn[disabled]{opacity:.6;cursor:default;}
+
   .app-shell{display:flex;align-items:flex-start;}
   .sidebar{
     width:230px;flex-shrink:0;background:var(--green);min-height:calc(100vh - 64px);
@@ -169,23 +186,6 @@
   }
   form.post-form textarea{min-height:110px;resize:vertical;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-
-  .auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);}
-  .auth-tab{padding:8px 4px;font-size:.9rem;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
-  .auth-tab.active{color:var(--green);border-bottom-color:var(--gold);}
-  .auth-method{display:flex;gap:8px;margin-bottom:16px;}
-  .auth-method button{
-    flex:1;padding:8px;border-radius:8px;border:1px solid var(--line);background:#fff;
-    font-size:.85rem;color:#555;cursor:pointer;
-  }
-  .auth-method button.active{background:var(--paper);border-color:var(--gold);color:var(--green);font-weight:700;}
-  .auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#aaa;font-size:.78rem;}
-  .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line);}
-  .btn-google{
-    width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff;
-    font-size:.88rem;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-  }
-  .submit-btn[disabled]{opacity:.6;cursor:default;}
   .checkbox-line{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:#444;}
   .checkbox-line input{width:auto;margin-top:2px;}
   .submit-btn{
@@ -241,6 +241,22 @@
   }
   .reaction-picker span{cursor:pointer;font-size:1.1rem;}
 
+  .feed-post-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+  .post-actions{display:flex;gap:14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);}
+  .post-actions button{background:none;border:none;color:#666;font-size:.82rem;cursor:pointer;padding:4px 0;}
+  .post-actions button:hover{color:var(--green);}
+  .post-comments{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;}
+  .post-comment-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;max-height:220px;overflow-y:auto;}
+  .post-comment{font-size:.85rem;color:#333;background:var(--paper);padding:6px 10px;border-radius:8px;}
+  .post-comment strong{color:var(--green);margin-right:4px;}
+  .post-comment-input{display:flex;gap:8px;}
+  .post-comment-input input{
+    flex:1;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:.85rem;font-family:inherit;
+  }
+  .post-comment-input button{
+    background:var(--green);color:#fff;border:none;border-radius:999px;padding:7px 16px;font-size:.82rem;cursor:pointer;
+  }
+
   .call-overlay{
     position:fixed;inset:0;background:rgba(10,41,26,.92);z-index:90;
     display:flex;align-items:center;justify-content:center;
@@ -283,7 +299,7 @@
       <button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
       <div class="notif-panel" id="notifPanel">
         <div class="head">
-          <strong>Notifications</strong>
+          <strong>Notifications <span id="notifUnreadLabel" style="color:var(--gold);font-weight:700;"></span></strong>
           <button onclick="markAllNotificationsRead()">Mark all read</button>
         </div>
         <div id="notifList"></div>
@@ -335,6 +351,10 @@
               🖼️ Photo
               <input type="file" id="postImage" accept="image/*" style="display:none;" onchange="previewPostImage()">
             </label>
+            <select id="postVisibility" style="border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:.82rem;color:#555;">
+              <option value="public">🌍 Public — any member</option>
+              <option value="matches">👥 Matches only</option>
+            </select>
             <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--gold);color:var(--green);border:none;border-radius:999px;padding:8px 22px;font-weight:700;cursor:pointer;">Post</button>
           </div>
           <div id="postMsg"></div>
@@ -559,6 +579,8 @@ let allBrowseRows = [];
 let visibleCount = 0;
 const PAGE_SIZE = 6;
 let currentLang = "en";
+let messageRealtimeChannel = null;
+let notifRealtimeChannel = null;
 
 // ---------- Presence / last seen ----------
 const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
@@ -617,6 +639,8 @@ async function initAuth(){
     startPresenceHeartbeat();
     startNotifPolling();
     setupPersonalCallChannel();
+    setupRealtimeMessaging();
+    setupRealtimeNotifications();
   }
 }
 
@@ -705,11 +729,6 @@ function renderAuthModal(){
     ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>`
     : `<div><label>Email</label><input type="email" id="authEmail" required></div>`;
 
-  // Register asks for a couple more basics, mirroring the marketplace's
-  // signup form (script.js) so the shared `profiles` row this creates
-  // is properly filled in either way. When registering by phone, that
-  // phone number IS the identifier already, so no separate phone field;
-  // when registering by email, phone is a separate optional field.
   const registerExtraFields = !isSignin ? `
     <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required></div>
     <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required></div>
@@ -812,9 +831,6 @@ async function submitAuthForm(e){
     submitBtn.textContent = "Create Account";
     if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
     if (data.user && !data.session){
-      // Only expected if "Confirm email" is still on in Supabase — with
-      // it off (as it already is for the marketplace's phone accounts
-      // to work), signUp returns a live session and this branch never runs.
       msg.innerHTML = isPhone
         ? `<div class="msg success">Account created — sign in with your phone number and password.</div>`
         : `<div class="msg success">Check your email to confirm your account, then sign in.</div>`;
@@ -845,6 +861,7 @@ async function signInWithGoogle(){
 }
 
 async function signOut(){
+  teardownRealtimeChannels();
   await _supabase.auth.signOut();
 }
 
@@ -886,6 +903,7 @@ function openSettings(){
 
 // Re-check auth state after OAuth redirect completes, or if session changes
 _supabase.auth.onAuthStateChange((_event, session) => {
+  const wasSignedIn = !!currentUser;
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
@@ -898,6 +916,11 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     refreshNotifCount();
     refreshProfileCompleteBadge();
     startNotifPolling();
+    setupPersonalCallChannel();
+    setupRealtimeMessaging();
+    setupRealtimeNotifications();
+  } else if (wasSignedIn){
+    teardownRealtimeChannels();
   }
 });
 
@@ -943,6 +966,55 @@ async function refreshNotifCount(){
   badge.style.display = count ? "inline-block" : "none";
 }
 
+// ---------- Realtime: messages & notifications ----------
+// Requires Realtime replication to be enabled for dating_messages and
+// dating_notifications in the Supabase dashboard (Database > Replication).
+// Without that, these subscriptions silently receive nothing and the
+// app just falls back to the existing manual-refresh/polling behavior.
+function setupRealtimeMessaging(){
+  if (messageRealtimeChannel) return;
+  messageRealtimeChannel = _supabase
+    .channel(`dating-messages:${currentUser.id}`)
+    .on("postgres_changes", {
+      event: "INSERT", schema: "public", table: "dating_messages",
+      filter: `recipient_id=eq.${currentUser.id}`
+    }, (payload) => handleIncomingMessage(payload.new))
+    .subscribe();
+}
+
+function handleIncomingMessage(m){
+  refreshUnreadBadge();
+
+  const messagesTabVisible = document.getElementById("messagesPanel")?.style.display !== "none";
+  if (messagesTabVisible) loadThreads();
+
+  if (currentOpenThread &&
+      currentOpenThread.profileId === m.profile_id &&
+      currentOpenThread.other === m.sender_id){
+    currentOpenThread.messages.unshift(m);
+    openThread(currentOpenThread); // re-renders bubbles and marks it read since the thread is actively open
+  }
+}
+
+function setupRealtimeNotifications(){
+  if (notifRealtimeChannel) return;
+  notifRealtimeChannel = _supabase
+    .channel(`dating-notifications:${currentUser.id}`)
+    .on("postgres_changes", {
+      event: "INSERT", schema: "public", table: "dating_notifications",
+      filter: `user_id=eq.${currentUser.id}`
+    }, () => {
+      refreshNotifCount();
+      if (document.getElementById("notifPanel")?.classList.contains("open")) loadNotifications();
+    })
+    .subscribe();
+}
+
+function teardownRealtimeChannels(){
+  if (messageRealtimeChannel){ _supabase.removeChannel(messageRealtimeChannel); messageRealtimeChannel = null; }
+  if (notifRealtimeChannel){ _supabase.removeChannel(notifRealtimeChannel); notifRealtimeChannel = null; }
+}
+
 function notifIcon(type){
   return type === "match" ? "✨" : type === "like" ? "💛" : "💬";
 }
@@ -973,7 +1045,18 @@ async function loadNotifications(){
     .limit(30);
 
   if (error){ list.innerHTML = `<div class="notif-empty">Couldn't load notifications.</div>`; return; }
-  if (!data || data.length === 0){ list.innerHTML = `<div class="notif-empty">Nothing yet — likes, matches and messages will show up here.</div>`; return; }
+  if (!data || data.length === 0){
+    list.innerHTML = `<div class="notif-empty">Nothing yet — likes, matches and messages will show up here.</div>`;
+    const unreadLabelEmpty = document.getElementById("notifUnreadLabel");
+    if (unreadLabelEmpty) unreadLabelEmpty.textContent = "";
+    return;
+  }
+
+  const unreadLabel = document.getElementById("notifUnreadLabel");
+  if (unreadLabel){
+    const unreadCount = data.filter(n => !n.read).length;
+    unreadLabel.textContent = unreadCount ? `(${unreadCount} new)` : "";
+  }
 
   const actorIds = [...new Set(data.map(n => n.actor_id).filter(Boolean))];
   const { data: actors } = actorIds.length
@@ -1086,7 +1169,7 @@ async function loadLikesReceived(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} years old</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
       </div>`;
     grid.appendChild(card);
@@ -1174,14 +1257,21 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    image_url: imageUrl
+    image_url: imageUrl,
+    visibility: document.getElementById("postVisibility").value
   });
 
   btn.disabled = false;
   btn.textContent = "Post";
 
   if (error){
-    msg.innerHTML = `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
+    // dating_posts only accepts inserts from users who already have a
+    // dating_profiles row (see profile_owner_can_post policy) — give a
+    // helpful message instead of the raw RLS error in that case.
+    const isRlsBlock = error.code === "42501" || /row-level security/i.test(error.message || "");
+    msg.innerHTML = isRlsBlock
+      ? `<div class="msg error">Post a profile first (see the "Post a Profile" tab) before sharing to the Home feed.</div>`
+      : `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
     return;
   }
 
@@ -1218,34 +1308,145 @@ async function loadFeed(){
   }
   empty.style.display = "none";
 
+  const postIds = posts.map(p => p.id);
   const authorIds = [...new Set(posts.map(p => p.user_id))];
-  const { data: authors } = await _supabase
-    .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
-    .in("user_id", authorIds);
+
+  const [{ data: authors }, { data: reactions }, { data: comments }] = await Promise.all([
+    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified").in("user_id", authorIds),
+    _supabase.from("dating_post_reactions").select("*").in("post_id", postIds),
+    _supabase.from("dating_post_comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
+  ]);
+
   const authorMap = {};
   (authors || []).forEach(a => authorMap[a.user_id] = a);
 
-  feed.innerHTML = posts.map(p => {
-    const a = authorMap[p.user_id];
-    const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
-    const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
-    const isMine = p.user_id === currentUser.id;
-    return `
-      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
-            <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()}</div>
-          </div>
-          ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>`
-                   : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
-        </div>
-        <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-        ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
-      </div>`;
+  const reactionsByPost = {};
+  (reactions || []).forEach(r => { (reactionsByPost[r.post_id] ||= []).push(r); });
+
+  const commentsByPost = {};
+  (comments || []).forEach(c => { (commentsByPost[c.post_id] ||= []).push(c); });
+  // also need commenter profile info
+  const commenterIds = [...new Set((comments || []).map(c => c.user_id))];
+  const { data: commenterProfiles } = commenterIds.length
+    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified").in("user_id", commenterIds)
+    : { data: [] };
+  const commenterMap = {};
+  (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
+
+  feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap)).join("");
+}
+
+function renderFeedPost(p, a, postReactions, postComments, commenterMap){
+  const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
+  const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
+  const isMine = p.user_id === currentUser.id;
+  const visBadge = p.visibility === "matches" ? "👥 Matches only" : "🌍 Public";
+
+  const reactionCounts = {};
+  postReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
+  const myReaction = postReactions.find(r => r.user_id === currentUser.id);
+  const reactionRow = Object.keys(reactionCounts).length
+    ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
+        `<span class="reaction-pill${myReaction && myReaction.emoji===e ? " mine" : ""}" onclick="togglePostReaction('${p.id}','${e}')">${e} ${c}</span>`).join("")}</div>`
+    : "";
+
+  const commentsHtml = postComments.map(c => {
+    const cp = commenterMap[c.user_id];
+    const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
+    const canDelete = c.user_id === currentUser.id || isMine; // comment author, or the post owner moderating their own post
+    return `<div class="post-comment">
+      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}</strong> ${esc(c.body)}
+      ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.75rem;float:right;">✕</button>` : ""}
+    </div>`;
   }).join("");
+
+  return `
+    <div class="feed-post-card" id="post-${p.id}">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}${verifiedBadge(a && a.is_verified)}</div>
+          <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
+        </div>
+        ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>`
+                 : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
+      </div>
+      <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
+      ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+
+      <div class="post-actions">
+        <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
+        <button onclick="toggleCommentBox('${p.id}')">💬 Comment${postComments.length ? ` (${postComments.length})` : ""}</button>
+      </div>
+      ${reactionRow}
+
+      <div class="post-comments" id="comments-${p.id}" style="display:none;">
+        <div class="post-comment-list">${commentsHtml}</div>
+        <div class="post-comment-input">
+          <input type="text" id="commentInput-${p.id}" maxlength="500" placeholder="Write a comment...">
+          <button onclick="submitComment('${p.id}')">Send</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function toggleCommentBox(postId){
+  const box = document.getElementById(`comments-${postId}`);
+  if (box) box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+async function submitComment(postId){
+  const input = document.getElementById(`commentInput-${postId}`);
+  const body = input.value.trim();
+  if (!body) return;
+  const { error } = await _supabase.from("dating_post_comments").insert({
+    post_id: postId, user_id: currentUser.id, body
+  });
+  if (error){ alert("Couldn't comment: " + error.message); return; }
+  input.value = "";
+  loadFeed();
+}
+
+async function deleteComment(commentId, postId){
+  if (!confirm("Delete this comment?")) return;
+  const { error } = await _supabase.from("dating_post_comments").delete().eq("id", commentId);
+  if (error){ alert("Couldn't delete: " + error.message); return; }
+  loadFeed();
+}
+
+function showPostReactionPicker(event, postId){
+  event.stopPropagation();
+  document.getElementById("reactionPicker")?.remove();
+  const picker = document.createElement("div");
+  picker.id = "reactionPicker";
+  picker.className = "reaction-picker";
+  picker.innerHTML = REACTION_EMOJIS.map(e => `<span onclick="togglePostReaction('${postId}','${e}')">${e}</span>`).join("");
+  document.body.appendChild(picker);
+  const rect = event.target.getBoundingClientRect();
+  picker.style.top = (rect.bottom + window.scrollY + 4) + "px";
+  picker.style.left = Math.max(8, rect.left + window.scrollX - 60) + "px";
+  setTimeout(() => document.addEventListener("click", function closePicker(e){
+    if (!picker.contains(e.target)){ picker.remove(); document.removeEventListener("click", closePicker); }
+  }), 0);
+}
+
+async function togglePostReaction(postId, emoji){
+  document.getElementById("reactionPicker")?.remove();
+  const { data: existing } = await _supabase
+    .from("dating_post_reactions")
+    .select("*")
+    .eq("post_id", postId)
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (existing && existing.emoji === emoji){
+    await _supabase.from("dating_post_reactions").delete().eq("id", existing.id);
+  } else if (existing){
+    await _supabase.from("dating_post_reactions").update({ emoji }).eq("id", existing.id);
+  } else {
+    await _supabase.from("dating_post_reactions").insert({ post_id: postId, user_id: currentUser.id, emoji });
+  }
+  loadFeed();
 }
 
 async function deletePost(postId){
@@ -1346,7 +1547,7 @@ function renderBrowseGrid(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} years old</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>
       </div>`;
@@ -1381,7 +1582,7 @@ async function openModal(row){
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}</h3>
+          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}</h3>
           <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
           <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:10px;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio">${esc(row.bio || "")}</div>
@@ -1433,6 +1634,21 @@ async function checkMatch(otherUserId){
     .eq("user_b", b)
     .maybeSingle();
   return !!data;
+}
+
+async function unmatchUser(otherUserId, otherName){
+  if (!confirm(`Unmatch with ${otherName}? You'll stop seeing each other in Messages, and they'll need to match with you again before you can message.`)) return;
+  const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
+  const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
+  const { error } = await _supabase
+    .from("dating_matches")
+    .delete()
+    .eq("user_a", a)
+    .eq("user_b", b);
+  if (error){ alert("Couldn't unmatch right now: " + error.message); return; }
+  closeModal();
+  loadThreads();
+  refreshUnreadBadge();
 }
 
 async function likeProfile(profileId, otherUserId){
@@ -1854,14 +2070,14 @@ async function loadThreads(){
   const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
   const { data: profiles } = await _supabase
     .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
+    .select("user_id, display_name, gender, photo_url, photos, is_verified")
     .in("user_id", otherIds);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
   Object.values(threads).forEach(thread => {
     const last = thread.messages[0];
-    const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
+    const unreadCount = thread.messages.filter(m => !m.read && m.recipient_id === currentUser.id).length;
     const p = profileMap[thread.other];
     thread.profile = p;
     const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
@@ -1872,10 +2088,11 @@ async function loadThreads(){
     div.innerHTML = `
       <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}</div>
-        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
+        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}${verifiedBadge(p && p.is_verified)}</div>
+        <div style="font-weight:${unreadCount?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
         <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
-      </div>`;
+      </div>
+      ${unreadCount ? `<span style="background:var(--gold);color:var(--green);font-weight:700;font-size:.72rem;border-radius:999px;min-width:20px;height:20px;padding:0 6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${unreadCount > 9 ? "9+" : unreadCount}</span>` : ""}`;
     div.onclick = () => openThread(thread);
     list.appendChild(div);
   });
@@ -1900,6 +2117,7 @@ async function openThread(thread){
   });
 
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
+  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) : "";
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -1907,8 +2125,11 @@ async function openThread(thread){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-            ${otherName}
-            <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
+            ${otherName}${otherBadge}
+            <span style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
+              <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);font-size:.85rem;" onclick="unmatchUser('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Unmatch">✕</button>
+            </span>
           </h3>
           <div id="threadMessages" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin:10px 0;">
             ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [])).join("")}
@@ -2101,6 +2322,79 @@ function focusProfileField(id){
   setTimeout(() => { el.style.outline = ""; }, 1500);
 }
 
+// ---------- Verification ----------
+function verifiedBadge(isVerified){
+  return isVerified ? ` <span title="Verified profile" style="color:#1E8E4F;font-weight:700;">✓</span>` : "";
+}
+
+function renderVerificationBox(profile, latestRequest){
+  if (profile.is_verified){
+    return `<div class="msg success" style="margin-bottom:16px;">✓ Your profile is verified. This badge shows next to your name across the site.</div>`;
+  }
+  if (latestRequest && latestRequest.status === "pending"){
+    return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:16px;">⏳ Your verification photo is under review — this usually takes a day or two.</div>`;
+  }
+  const rejectedNote = (latestRequest && latestRequest.status === "rejected" && latestRequest.reviewer_note)
+    ? `<div style="margin-top:6px;">Reviewer note: ${esc(latestRequest.reviewer_note)}</div>` : "";
+  const rejectedHeader = (latestRequest && latestRequest.status === "rejected")
+    ? `<div class="msg error" style="margin-bottom:16px;">Your last verification photo wasn't approved.${rejectedNote}
+        <div style="margin-top:8px;"><button type="button" class="submit-btn" style="width:auto;padding:8px 18px;" onclick="openVerificationModal()">Try again</button></div>
+       </div>`
+    : `<div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:.88rem;color:#444;">Get a ✓ Verified badge by confirming a quick selfie matches your profile photos.</div>
+        <button type="button" class="submit-btn" style="width:auto;padding:8px 18px;flex-shrink:0;" onclick="openVerificationModal()">Get Verified</button>
+       </div>`;
+  return rejectedHeader;
+}
+
+function openVerificationModal(){
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3>Verify your profile</h3>
+          <div class="bio" style="margin-bottom:14px;">
+            Take or upload a clear selfie of your face. A moderator compares it to your profile photos — this stays private and is only used for review.
+          </div>
+          <input type="file" id="verifySelfie" accept="image/*" capture="user">
+          <div class="actions">
+            <button class="btn-contact" onclick="submitVerification()">Submit for review</button>
+          </div>
+          <div id="verifyMsg"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function submitVerification(){
+  const fileInput = document.getElementById("verifySelfie");
+  const msg = document.getElementById("verifyMsg");
+  const file = fileInput.files[0];
+  if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
+
+  msg.innerHTML = `<div class="msg">Uploading...</div>`;
+  const path = `dating/verification/${currentUser.id}-${Date.now()}-${file.name}`;
+  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+  if (uploadErr){
+    msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
+    return;
+  }
+  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+
+  const { error } = await _supabase.from("dating_verification_requests").insert({
+    user_id: currentUser.id,
+    selfie_url: pub.publicUrl
+  });
+  if (error){
+    msg.innerHTML = `<div class="msg error">Couldn't submit: ${esc(error.message)}</div>`;
+    return;
+  }
+  closeModal();
+  loadMyProfile();
+}
+
 async function loadMyProfile(){
   const el = document.getElementById("myProfileContent");
   const { data, error } = await _supabase
@@ -2114,7 +2408,16 @@ async function loadMyProfile(){
     return;
   }
 
+  const { data: latestRequest } = await _supabase
+    .from("dating_verification_requests")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   el.innerHTML = `
+    ${renderVerificationBox(data, latestRequest)}
     ${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
       <div><label>First name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
