@@ -361,6 +361,20 @@
             <div id="postReportsList">
                 <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
             </div>
+
+            <h3 style="margin:32px 0 6px;"><i class="fas fa-check-circle" style="color:#c2185b;"></i> Dating — Verification Requests</h3>
+            <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Selfies submitted for the ✓ Verified badge. Compare against the profile's photos before approving.</p>
+            <div style="display:flex; gap:10px; margin-bottom:18px;">
+                <select id="verificationFilterStatus" onchange="loadVerificationRequests()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div id="verificationList">
+                <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+            </div>
         </section>
 
         <!-- CATEGORIES SECTION -->
@@ -648,6 +662,7 @@
                 loadDatingReports();
                 loadDatingProfiles();
                 loadPostReports();
+                loadVerificationRequests();
             } else {
                 itemsSection.style.display = 'block';
                 viewTitle.innerText = status.toUpperCase() + " ITEMS";
@@ -665,6 +680,7 @@
             const { count: pendingCount } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending');
             const { count: openReports } = await _supabase.from('product_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
             const { count: openDatingReports } = await _supabase.from('dating_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
+            const { count: pendingVerifications } = await _supabase.from('dating_verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
 
             const marketValue = priceData?.reduce((sum, item) => sum + (item.price || 0), 0) || 0;
             
@@ -688,8 +704,9 @@
 
             const datingReportsBadge = document.getElementById('datingReportsBadge');
             if (datingReportsBadge) {
-                datingReportsBadge.innerText = openDatingReports || 0;
-                datingReportsBadge.style.display = openDatingReports > 0 ? 'inline-block' : 'none';
+                const datingTotal = (openDatingReports || 0) + (pendingVerifications || 0);
+                datingReportsBadge.innerText = datingTotal;
+                datingReportsBadge.style.display = datingTotal > 0 ? 'inline-block' : 'none';
             }
         }
 
@@ -924,6 +941,81 @@
             if (reportId) await _supabase.from('dating_post_reports').update({ status: 'reviewed' }).eq('id', reportId);
             logAction('Dating Post Removed', `Post ID: ${postId}`);
             loadPostReports();
+        }
+
+        // --- DATING: VERIFICATION REQUESTS ---
+        async function loadVerificationRequests() {
+            const container = document.getElementById('verificationList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('verificationFilterStatus').value;
+            let query = _supabase.from('dating_verification_requests')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: requests, error } = await query;
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No verification requests here.</p>';
+                return;
+            }
+
+            // Batch-fetch the requester's current profile photo + name so
+            // the reviewer can eyeball it next to the submitted selfie.
+            const userIds = [...new Set(requests.map(r => r.user_id))];
+            const { data: profiles } = await _supabase.from('dating_profiles').select('user_id, display_name, age, city, photo_url, photos, is_verified').in('user_id', userIds);
+            const profileMap = {};
+            (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+            container.innerHTML = requests.map(r => {
+                const profile = profileMap[r.user_id];
+                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
+                return `
+                    <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                            <strong style="font-size:0.85rem;">${profile ? escapeHtml(profile.display_name || 'Profile') + (profile.age ? ', ' + profile.age : '') + (profile.city ? ' · ' + escapeHtml(profile.city) : '') : 'Profile removed'}${profile?.is_verified ? ' <span style="color:#2ed573;">✓ already verified</span>' : ''}</strong>
+                            <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        <div style="display:flex; gap:12px; margin:10px 0; flex-wrap:wrap;">
+                            <div>
+                                <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Submitted selfie</div>
+                                <img src="${escapeHtml(r.selfie_url)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                            </div>
+                            ${profilePhoto ? `
+                            <div>
+                                <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Profile photo</div>
+                                <img src="${escapeHtml(profilePhoto)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                            </div>` : ''}
+                        </div>
+                        <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Submitted ${new Date(r.created_at).toLocaleDateString()}${r.reviewed_at ? ' · reviewed ' + new Date(r.reviewed_at).toLocaleDateString() : ''}</p>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            ${r.status === 'pending' ? `
+                                <button onclick="resolveVerification('${r.id}', 'approved')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve</button>
+                                <button onclick="promptRejectVerification('${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ff4757; color:#ff4757; background:white; border-radius:5px; cursor:pointer;">Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolveVerification(requestId, newStatus, note) {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const update = { status: newStatus, reviewed_by: user?.id || null };
+            if (note) update.reviewer_note = note;
+            const { error } = await _supabase.from('dating_verification_requests').update(update).eq('id', requestId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'approved' ? 'Verification Approved' : 'Verification Rejected', `Request ID: ${requestId}`);
+            loadVerificationRequests();
+            loadStats();
+        }
+
+        function promptRejectVerification(requestId) {
+            const note = prompt('Optional note for the user on why this was rejected (shown to them):');
+            if (note === null) return; // cancelled
+            resolveVerification(requestId, 'rejected', note.trim() || null);
         }
 
         async function rejectReportedProduct(productId, reportId) {
