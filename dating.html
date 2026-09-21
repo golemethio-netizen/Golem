@@ -1167,7 +1167,7 @@ async function loadLikesReceived(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} years old</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
       </div>`;
     grid.appendChild(card);
@@ -1310,7 +1310,7 @@ async function loadFeed(){
   const authorIds = [...new Set(posts.map(p => p.user_id))];
 
   const [{ data: authors }, { data: reactions }, { data: comments }] = await Promise.all([
-    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos").in("user_id", authorIds),
+    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified").in("user_id", authorIds),
     _supabase.from("dating_post_reactions").select("*").in("post_id", postIds),
     _supabase.from("dating_post_comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
   ]);
@@ -1326,7 +1326,7 @@ async function loadFeed(){
   // also need commenter profile info
   const commenterIds = [...new Set((comments || []).map(c => c.user_id))];
   const { data: commenterProfiles } = commenterIds.length
-    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender").in("user_id", commenterIds)
+    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified").in("user_id", commenterIds)
     : { data: [] };
   const commenterMap = {};
   (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
@@ -1353,7 +1353,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
     const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
     const canDelete = c.user_id === currentUser.id || isMine; // comment author, or the post owner moderating their own post
     return `<div class="post-comment">
-      <strong>${esc(cname)}</strong> ${esc(c.body)}
+      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}</strong> ${esc(c.body)}
       ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.75rem;float:right;">✕</button>` : ""}
     </div>`;
   }).join("");
@@ -1363,7 +1363,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
       <div style="display:flex;gap:10px;align-items:center;">
         <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
+          <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}${verifiedBadge(a && a.is_verified)}</div>
           <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
         </div>
         ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>`
@@ -1545,7 +1545,7 @@ function renderBrowseGrid(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} years old</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>
       </div>`;
@@ -1580,7 +1580,7 @@ async function openModal(row){
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}</h3>
+          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}</h3>
           <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
           <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:10px;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio">${esc(row.bio || "")}</div>
@@ -2053,7 +2053,7 @@ async function loadThreads(){
   const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
   const { data: profiles } = await _supabase
     .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
+    .select("user_id, display_name, gender, photo_url, photos, is_verified")
     .in("user_id", otherIds);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
@@ -2071,7 +2071,7 @@ async function loadThreads(){
     div.innerHTML = `
       <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}</div>
+        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}${verifiedBadge(p && p.is_verified)}</div>
         <div style="font-weight:${unreadCount?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80))}</div>
         <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
       </div>
@@ -2100,6 +2100,7 @@ async function openThread(thread){
   });
 
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
+  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) : "";
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -2107,7 +2108,7 @@ async function openThread(thread){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-            ${otherName}
+            ${otherName}${otherBadge}
             <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
           </h3>
           <div id="threadMessages" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin:10px 0;">
@@ -2189,6 +2190,79 @@ async function refreshOpenThreadMessages(){
 }
 
 // ---------- My Profile tab ----------
+// ---------- Verification ----------
+function verifiedBadge(isVerified){
+  return isVerified ? ` <span title="Verified profile" style="color:#1E8E4F;font-weight:700;">✓</span>` : "";
+}
+
+function renderVerificationBox(profile, latestRequest){
+  if (profile.is_verified){
+    return `<div class="msg success" style="margin-bottom:16px;">✓ Your profile is verified. This badge shows next to your name across the site.</div>`;
+  }
+  if (latestRequest && latestRequest.status === "pending"){
+    return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:16px;">⏳ Your verification photo is under review — this usually takes a day or two.</div>`;
+  }
+  const rejectedNote = (latestRequest && latestRequest.status === "rejected" && latestRequest.reviewer_note)
+    ? `<div style="margin-top:6px;">Reviewer note: ${esc(latestRequest.reviewer_note)}</div>` : "";
+  const rejectedHeader = (latestRequest && latestRequest.status === "rejected")
+    ? `<div class="msg error" style="margin-bottom:16px;">Your last verification photo wasn't approved.${rejectedNote}
+        <div style="margin-top:8px;"><button type="button" class="submit-btn" style="width:auto;padding:8px 18px;" onclick="openVerificationModal()">Try again</button></div>
+       </div>`
+    : `<div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:.88rem;color:#444;">Get a ✓ Verified badge by confirming a quick selfie matches your profile photos.</div>
+        <button type="button" class="submit-btn" style="width:auto;padding:8px 18px;flex-shrink:0;" onclick="openVerificationModal()">Get Verified</button>
+       </div>`;
+  return rejectedHeader;
+}
+
+function openVerificationModal(){
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3>Verify your profile</h3>
+          <div class="bio" style="margin-bottom:14px;">
+            Take or upload a clear selfie of your face. A moderator compares it to your profile photos — this stays private and is only used for review.
+          </div>
+          <input type="file" id="verifySelfie" accept="image/*" capture="user">
+          <div class="actions">
+            <button class="btn-contact" onclick="submitVerification()">Submit for review</button>
+          </div>
+          <div id="verifyMsg"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function submitVerification(){
+  const fileInput = document.getElementById("verifySelfie");
+  const msg = document.getElementById("verifyMsg");
+  const file = fileInput.files[0];
+  if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
+
+  msg.innerHTML = `<div class="msg">Uploading...</div>`;
+  const path = `dating/verification/${currentUser.id}-${Date.now()}-${file.name}`;
+  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+  if (uploadErr){
+    msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
+    return;
+  }
+  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+
+  const { error } = await _supabase.from("dating_verification_requests").insert({
+    user_id: currentUser.id,
+    selfie_url: pub.publicUrl
+  });
+  if (error){
+    msg.innerHTML = `<div class="msg error">Couldn't submit: ${esc(error.message)}</div>`;
+    return;
+  }
+  closeModal();
+  loadMyProfile();
+}
+
 async function loadMyProfile(){
   const el = document.getElementById("myProfileContent");
   const { data, error } = await _supabase
@@ -2202,7 +2276,16 @@ async function loadMyProfile(){
     return;
   }
 
+  const { data: latestRequest } = await _supabase
+    .from("dating_verification_requests")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   el.innerHTML = `
+    ${renderVerificationBox(data, latestRequest)}
     <form class="post-form" id="editForm">
       <div><label>First name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
       <div class="row2">
