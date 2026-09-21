@@ -243,7 +243,7 @@
       <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Post a Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
       <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
-      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Profile</div>
+      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Profile <span id="profileCompleteBadge"></span></div>
     </nav>
     <div class="sidebar-account" id="accountBox" style="display:none;">
       <div class="who">
@@ -553,6 +553,7 @@ async function initAuth(){
     refreshUnreadBadge();
     refreshLikesBadge();
     refreshNotifCount();
+    refreshProfileCompleteBadge();
     startPresenceHeartbeat();
     startNotifPolling();
   }
@@ -649,6 +650,7 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     refreshUnreadBadge();
     refreshLikesBadge();
     refreshNotifCount();
+    refreshProfileCompleteBadge();
     startNotifPolling();
   }
 });
@@ -926,7 +928,7 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    photo_url: imageUrl
+    image_url: imageUrl
   });
 
   btn.disabled = false;
@@ -995,7 +997,7 @@ async function loadFeed(){
                    : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
         </div>
         <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-        ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+        ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
       </div>`;
   }).join("");
 }
@@ -1370,6 +1372,63 @@ async function openThread(thread){
     </div>`;
 }
 
+function computeProfileCompleteness(data){
+  const checklist = [
+    { label: "About you", done: !!(data.bio && data.bio.trim()), focus: "eBio" },
+    { label: "What you're looking for", done: !!data.looking_for, focus: "eLookingFor" },
+    { label: "Age range you're interested in", done: !!(data.age_min && data.age_max), focus: "eAgeMin" },
+    { label: "Your lifestyle", done: !!data.lifestyle, focus: "eLifestyle" },
+    { label: "Whether you have kids", done: !!data.has_kids, focus: "eHasKids" },
+    { label: "Whether you want kids", done: !!data.wants_kids, focus: "eWantsKids" },
+    { label: "Religion", done: !!data.religion, focus: "eReligion" }
+  ];
+  const done = checklist.filter(c => c.done).length;
+  return { percent: Math.round((done / checklist.length) * 100), missing: checklist.filter(c => !c.done) };
+}
+
+function profileCompletenessBanner(data){
+  const { percent, missing } = computeProfileCompleteness(data);
+  if (percent >= 100) return "";
+
+  return `
+    <div style="background:#FFF9EE;border:1px solid var(--gold);border-radius:10px;padding:14px 16px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong style="font-size:.9rem;color:var(--green);">Your profile is ${percent}% complete</strong>
+        <span style="font-size:.78rem;color:#999;">${missing.length} thing${missing.length === 1 ? "" : "s"} left</span>
+      </div>
+      <div style="background:#EFE6CE;border-radius:999px;height:6px;overflow:hidden;margin-bottom:10px;">
+        <div style="background:var(--gold);height:100%;width:${percent}%;"></div>
+      </div>
+      <div style="font-size:.8rem;color:#666;margin-bottom:6px;">Complete profiles get more matches. Add:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${missing.map(m => `<button type="button" onclick="focusProfileField('${m.focus}')" style="font-size:.76rem;padding:5px 10px;border:1px solid var(--gold);background:#fff;color:var(--green);border-radius:999px;cursor:pointer;">+ ${esc(m.label)}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+async function refreshProfileCompleteBadge(){
+  const badge = document.getElementById("profileCompleteBadge");
+  if (!badge || !currentUser) return;
+  const { data } = await _supabase
+    .from("dating_profiles")
+    .select("bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  if (!data){ badge.textContent = ""; return; }
+  const { percent } = computeProfileCompleteness(data);
+  badge.textContent = percent < 100 ? "●" : "";
+  badge.style.color = "var(--gold)";
+}
+
+function focusProfileField(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.focus();
+  el.style.outline = "2px solid var(--gold)";
+  setTimeout(() => { el.style.outline = ""; }, 1500);
+}
+
 // ---------- My Profile tab ----------
 async function loadMyProfile(){
   const el = document.getElementById("myProfileContent");
@@ -1385,6 +1444,7 @@ async function loadMyProfile(){
   }
 
   el.innerHTML = `
+    ${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
       <div><label>First name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
       <div class="row2">
@@ -1477,6 +1537,7 @@ async function loadMyProfile(){
     document.getElementById("editMsg").innerHTML = updErr
       ? `<div class="msg error">${esc(updErr.message)}</div>`
       : `<div class="msg success">Saved.</div>`;
+    if (!updErr) refreshProfileCompleteBadge();
   });
 
   document.getElementById("deleteBtn").addEventListener("click", async () => {
