@@ -613,11 +613,18 @@ let authMethod = "email";    // 'email' | 'phone'
 let authPhoneStep = "enter"; // 'enter' | 'verify'
 
 function normalizeEthiopianPhone(raw){
-  const digits = raw.trim().replace(/[\s-]/g, "");
+  let digits = raw.trim().replace(/[\s\-()]/g, "");
+  if (digits.startsWith("00")) digits = "+" + digits.slice(2);   // 00251... -> +251...
   if (digits.startsWith("+")) return digits;
-  if (digits.startsWith("0")) return "+251" + digits.slice(1);
   if (digits.startsWith("251")) return "+" + digits;
-  return "+251" + digits;
+  if (digits.startsWith("0")) return "+251" + digits.slice(1);   // 0912345678 / 0711234567
+  return "+251" + digits;                                        // 912345678 / 711234567
+}
+
+// Ethio Telecom mobile numbers start 09x; Safaricom Ethiopia numbers
+// start 07x. Both are 9 digits after the country code.
+function isValidEthiopianPhone(e164){
+  return /^\+251[79]\d{8}$/.test(e164);
 }
 
 function openAuthModal(tab){
@@ -655,7 +662,7 @@ function renderAuthModal(){
 
   const phoneForm = authPhoneStep === "enter" ? `
     <div class="post-form" style="gap:12px;display:grid;">
-      <div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678" required></div>
+      <div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>
       <button type="button" class="submit-btn" onclick="sendPhoneOtp()">Send code</button>
       <div id="authMsg"></div>
     </div>` : `
@@ -736,6 +743,10 @@ async function sendPhoneOtp(){
   const raw = document.getElementById("authPhone").value.trim();
   if (!raw){ msg.innerHTML = `<div class="msg error">Enter a phone number.</div>`; return; }
   const phone = normalizeEthiopianPhone(raw);
+  if (!isValidEthiopianPhone(phone)){
+    msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
+    return;
+  }
 
   const { error } = await _supabase.auth.signInWithOtp({ phone });
   if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
