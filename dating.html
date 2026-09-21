@@ -169,23 +169,6 @@
   }
   form.post-form textarea{min-height:110px;resize:vertical;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-
-  .auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);}
-  .auth-tab{padding:8px 4px;font-size:.9rem;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
-  .auth-tab.active{color:var(--green);border-bottom-color:var(--gold);}
-  .auth-method{display:flex;gap:8px;margin-bottom:16px;}
-  .auth-method button{
-    flex:1;padding:8px;border-radius:8px;border:1px solid var(--line);background:#fff;
-    font-size:.85rem;color:#555;cursor:pointer;
-  }
-  .auth-method button.active{background:var(--paper);border-color:var(--gold);color:var(--green);font-weight:700;}
-  .auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#aaa;font-size:.78rem;}
-  .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line);}
-  .btn-google{
-    width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff;
-    font-size:.88rem;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-  }
-  .submit-btn[disabled]{opacity:.6;cursor:default;}
   .checkbox-line{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:#444;}
   .checkbox-line input{width:auto;margin-top:2px;}
   .submit-btn{
@@ -220,6 +203,46 @@
   .btn-contact{background:var(--gold);color:var(--green);}
   .btn-report{background:#fff;color:var(--danger);border:1px solid var(--danger) !important;}
   .btn-close{background:none;border:none;font-size:1.1rem;float:right;cursor:pointer;color:#888;}
+  .call-btn{
+    background:var(--gold);color:var(--green);border:none;border-radius:50%;
+    width:34px;height:34px;font-size:1rem;cursor:pointer;flex-shrink:0;
+  }
+  .reaction-row{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+  .reaction-pill{
+    background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:2px 8px;font-size:.75rem;cursor:pointer;
+  }
+  .reaction-pill.mine{border-color:var(--gold);background:var(--gold-soft);}
+  .react-add{
+    position:absolute;bottom:-6px;right:-6px;background:#fff;border:1px solid var(--line);
+    border-radius:50%;width:18px;height:18px;font-size:.7rem;line-height:16px;text-align:center;
+    cursor:pointer;color:#888;
+  }
+  .reaction-picker{
+    position:absolute;z-index:80;background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:6px 10px;box-shadow:0 6px 18px rgba(0,0,0,.15);display:flex;gap:6px;
+  }
+  .reaction-picker span{cursor:pointer;font-size:1.1rem;}
+
+  .call-overlay{
+    position:fixed;inset:0;background:rgba(10,41,26,.92);z-index:90;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .call-card{text-align:center;color:#fff;}
+  .call-avatar{
+    width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.1);
+    display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto 16px;
+  }
+  .call-name{font-size:1.2rem;font-weight:700;margin-bottom:6px;}
+  .call-status{color:var(--gold-soft);margin-bottom:26px;font-size:.95rem;}
+  .call-actions{display:flex;gap:16px;justify-content:center;}
+  .call-actions button{
+    border:none;border-radius:999px;padding:12px 24px;font-weight:700;cursor:pointer;font-size:.9rem;
+  }
+  .call-accept{background:#2ECC71;color:#fff;}
+  .call-decline{background:var(--danger);color:#fff;}
+  .call-mute{background:rgba(255,255,255,.15);color:#fff;}
+
   @media (max-width: 768px){
     .app-shell{flex-direction:column;}
     .sidebar{width:100%;min-height:auto;flex-direction:column;}
@@ -238,7 +261,7 @@
   <nav>
     <button class="lang" onclick="toggleLang()" id="langBtn">አማ</button>
     <a href="index.html">← Marketplace</a>
-    <button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')" style="display:block;">👤 Sign In/Register</button>
+    <button class="signin-pill" id="headerAuthBtn" onclick="signInWithGoogle()" style="display:block;">👤 Sign In/Register</button>
     <div class="notif-wrap" id="notifWrap" style="display:none;">
       <button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
       <div class="notif-panel" id="notifPanel">
@@ -260,7 +283,7 @@
       <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Post a Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
       <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
-      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Profile <span id="profileCompleteBadge"></span></div>
+      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Profile</div>
     </nav>
     <div class="sidebar-account" id="accountBox" style="display:none;">
       <div class="who">
@@ -279,7 +302,7 @@
   <div class="panel" id="gate" style="display:none;">
     <div class="gate">
       <p>You need to be signed in to view or post in Dating.</p>
-      <button onclick="openAuthModal('signin')">Sign In / Register</button>
+      <button onclick="signInWithGoogle()">Sign in with Google</button>
     </div>
   </div>
 
@@ -501,6 +524,8 @@
 </div>
 
 <div id="modalRoot"></div>
+<div id="callRoot"></div>
+<audio id="remoteAudio" autoplay></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -512,6 +537,7 @@
 const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existing bucket name
 
 let currentUser = null;
+let currentOpenThread = null;
 let allBrowseRows = [];
 let visibleCount = 0;
 const PAGE_SIZE = 6;
@@ -570,9 +596,9 @@ async function initAuth(){
     refreshUnreadBadge();
     refreshLikesBadge();
     refreshNotifCount();
-    refreshProfileCompleteBadge();
     startPresenceHeartbeat();
     startNotifPolling();
+    setupPersonalCallChannel();
   }
 }
 
@@ -605,196 +631,6 @@ function maybeShowSafetyNotice(){
 function dismissSafetyNotice(){
   try { localStorage.setItem("wg_dating_safety_seen", "1"); } catch(e){}
   closeModal();
-}
-
-// ---------- Sign in / Register modal ----------
-let authTab = "signin";      // 'signin' | 'register'
-let authMethod = "email";    // 'email' | 'phone'
-
-function normalizeEthiopianPhone(raw){
-  let p = String(raw || "").trim().replace(/[^\d+]/g, "");
-  p = p.replace(/^\+/, "");
-  if (p.startsWith("0") && p.length === 10) p = "251" + p.slice(1);
-  else if (p.length === 9 && /^[79]/.test(p)) p = "251" + p;
-  return p; // expected shape: 251[79]XXXXXXXX (9 = Ethio Telecom, 7 = Safaricom Ethiopia)
-}
-
-// Ethio Telecom mobile numbers start 09x; Safaricom Ethiopia numbers
-// start 07x. Both are 9 digits after the country code.
-function isValidEthiopianPhone(p){
-  return /^251[79]\d{8}$/.test(p);
-}
-
-// Supabase's native Phone provider needs an SMS provider (and to be
-// switched on at all) to work — same reason the marketplace avoids it.
-// Instead we turn the phone number into a fake, never-shown email
-// address and sign up/in with that as a normal email+password account.
-// Using the SAME domain as script.js's phoneToPseudoEmail means a
-// phone number already registered on the marketplace logs into the
-// dating site as the same account, and vice versa.
-function phoneToPseudoEmail(p){
-  return p + "@phone.wanagebya.com";
-}
-
-function openAuthModal(tab){
-  authTab = tab || "signin";
-  authMethod = "email";
-  renderAuthModal();
-}
-
-function switchAuthTab(tab){
-  authTab = tab;
-  renderAuthModal();
-}
-
-function switchAuthMethod(method){
-  authMethod = method;
-  renderAuthModal();
-}
-
-function renderAuthModal(){
-  const root = document.getElementById("modalRoot");
-  const isSignin = authTab === "signin";
-  const isPhone = authMethod === "phone";
-
-  // Phone and email both use password auth here — phone is treated
-  // exactly like a second "email" identifier (Supabase supports
-  // signUp/signInWithPassword with { phone, password } the same way
-  // it does with { email, password }). No SMS/OTP step at all, same
-  // as the existing WanaGebya marketplace registration/login.
-  const identifierField = isPhone
-    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>`
-    : `<div><label>Email</label><input type="email" id="authEmail" required></div>`;
-
-  // Register asks for a couple more basics, mirroring the marketplace's
-  // signup form (script.js) so the shared `profiles` row this creates
-  // is properly filled in either way. When registering by phone, that
-  // phone number IS the identifier already, so no separate phone field;
-  // when registering by email, phone is a separate optional field.
-  const registerExtraFields = !isSignin ? `
-    <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required></div>
-    <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required></div>
-    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="e.g. 0912345678"></div>` : ""}
-  ` : "";
-
-  const form = `
-    <form class="post-form" id="authForm" style="gap:12px;">
-      ${identifierField}
-      <div><label>Password</label><input type="password" id="authPassword" minlength="6" required></div>
-      ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required></div>` : ""}
-      ${registerExtraFields}
-      <button type="submit" class="submit-btn">${isSignin ? "Sign In" : "Create Account"}</button>
-      ${(isSignin && !isPhone) ? `<div style="text-align:right;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;">Forgot password?</button></div>` : ""}
-      <div id="authMsg"></div>
-    </form>`;
-
-  root.innerHTML = `
-    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
-      <div class="modal">
-        <div class="body">
-          <button class="btn-close" onclick="closeModal()">✕</button>
-          <div class="auth-tabs">
-            <div class="auth-tab ${isSignin ? "active" : ""}" onclick="switchAuthTab('signin')">Sign In</div>
-            <div class="auth-tab ${!isSignin ? "active" : ""}" onclick="switchAuthTab('register')">Register</div>
-          </div>
-          <div class="auth-method">
-            <button class="${authMethod === "email" ? "active" : ""}" onclick="switchAuthMethod('email')">✉️ Email</button>
-            <button class="${authMethod === "phone" ? "active" : ""}" onclick="switchAuthMethod('phone')">📱 Phone</button>
-          </div>
-          ${form}
-          <div class="auth-divider">or</div>
-          <button class="btn-google" onclick="signInWithGoogle()">🔵 Continue with Google</button>
-        </div>
-      </div>
-    </div>`;
-
-  document.getElementById("authForm").addEventListener("submit", submitAuthForm);
-}
-
-async function submitAuthForm(e){
-  e.preventDefault();
-  const msg = document.getElementById("authMsg");
-  const isPhone = authMethod === "phone";
-  const password = document.getElementById("authPassword").value;
-  const submitBtn = e.target.querySelector("button[type=submit]");
-
-  let identifier;  // { email } — phone is converted to a pseudo-email too, see phoneToPseudoEmail
-  let realPhone = null;
-  if (isPhone){
-    const raw = document.getElementById("authPhone").value.trim();
-    const normalized = normalizeEthiopianPhone(raw);
-    if (!isValidEthiopianPhone(normalized)){
-      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
-      return;
-    }
-    realPhone = "+" + normalized;
-    identifier = { email: phoneToPseudoEmail(normalized) };
-  } else {
-    identifier = { email: document.getElementById("authEmail").value.trim() };
-  }
-
-  if (authTab === "register"){
-    const confirm = document.getElementById("authPasswordConfirm").value;
-    if (password !== confirm){
-      msg.innerHTML = `<div class="msg error">Passwords don't match.</div>`;
-      return;
-    }
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = authTab === "signin" ? "Signing in..." : "Creating account...";
-
-  if (authTab === "signin"){
-    const { error } = await _supabase.auth.signInWithPassword({ ...identifier, password });
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Sign In";
-    if (error){
-      if (isPhone && /Invalid login credentials/i.test(error.message)){
-        msg.innerHTML = `<div class="msg error">No account found with that phone number, or the password is wrong.</div>`;
-      } else {
-        msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
-      }
-      return;
-    }
-    closeModal();
-  } else {
-    const fullName = document.getElementById("authFullName").value.trim();
-    const location = document.getElementById("authLocation").value.trim();
-    const phoneNumber = isPhone ? realPhone : (document.getElementById("authRegPhone")?.value.trim() || null);
-
-    const { data, error } = await _supabase.auth.signUp({
-      ...identifier, password,
-      options: {
-        data: { full_name: fullName, phone_number: phoneNumber, location },
-        ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating.html" })
-      }
-    });
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Create Account";
-    if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
-    if (data.user && !data.session){
-      // Only expected if "Confirm email" is still on in Supabase — with
-      // it off (as it already is for the marketplace's phone accounts
-      // to work), signUp returns a live session and this branch never runs.
-      msg.innerHTML = isPhone
-        ? `<div class="msg success">Account created — sign in with your phone number and password.</div>`
-        : `<div class="msg success">Check your email to confirm your account, then sign in.</div>`;
-    } else {
-      closeModal();
-    }
-  }
-}
-
-async function sendPasswordReset(){
-  const email = document.getElementById("authEmail").value.trim();
-  const msg = document.getElementById("authMsg");
-  if (!email){ msg.innerHTML = `<div class="msg error">Enter your email above first.</div>`; return; }
-  const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/dating.html"
-  });
-  msg.innerHTML = error
-    ? `<div class="msg error">${esc(error.message)}</div>`
-    : `<div class="msg success">Password reset email sent.</div>`;
 }
 
 async function signInWithGoogle(){
@@ -857,7 +693,6 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     refreshUnreadBadge();
     refreshLikesBadge();
     refreshNotifCount();
-    refreshProfileCompleteBadge();
     startNotifPolling();
   }
 });
@@ -1135,7 +970,7 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    image_url: imageUrl
+    photo_url: imageUrl
   });
 
   btn.disabled = false;
@@ -1204,7 +1039,7 @@ async function loadFeed(){
                    : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
         </div>
         <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-        ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+        ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
       </div>`;
   }).join("");
 }
@@ -1381,7 +1216,7 @@ function swapModalPhoto(url, thumbEl){
   thumbEl.parentElement.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
   thumbEl.classList.add("active");
 }
-function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; }
+function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; }
 
 // ---------- Likes / Matches ----------
 async function checkMatch(otherUserId){
@@ -1488,7 +1323,300 @@ async function sendReply(profileId, recipientId){
     return;
   }
   textarea.value = "";
-  setTimeout(loadThreads, 800);
+  await refreshCurrentThreadAfterSend(profileId, recipientId);
+}
+
+async function refreshCurrentThreadAfterSend(profileId, other){
+  const { data } = await _supabase
+    .from("dating_messages")
+    .select("*")
+    .eq("profile_id", profileId)
+    .or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${other}),and(sender_id.eq.${other},recipient_id.eq.${currentUser.id})`)
+    .order("created_at", { ascending: false });
+  if (currentOpenThread){
+    currentOpenThread.messages = data || [];
+    openThread(currentOpenThread);
+  }
+  refreshUnreadBadge();
+}
+
+// ---------- Voice calls (WebRTC, signaled over Supabase Realtime) ----------
+// NOTE: uses free public STUN only. Works on most home/office networks;
+// can fail on strict carrier-grade NAT or some corporate firewalls without
+// a paid TURN relay (e.g. Twilio, Xirsys) — add one to ICE_SERVERS below
+// if you need higher reliability.
+const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
+
+let personalCallChannel = null;
+let activeCallChannel = null;
+let peerConnection = null;
+let localCallStream = null;
+let currentCallId = null;
+let currentCallPeerId = null;
+let currentCallRow = null;
+let callTimer = null;
+let callStartedAt = null;
+
+function setupPersonalCallChannel(){
+  if (personalCallChannel) return;
+  personalCallChannel = _supabase.channel(`call:${currentUser.id}`);
+  personalCallChannel.on("broadcast", { event: "ring" }, (msg) => {
+    showIncomingCallUI(msg.payload);
+  });
+  personalCallChannel.subscribe();
+}
+
+async function startCall(recipientId, recipientName){
+  if (peerConnection){ alert("You're already in a call."); return; }
+  currentCallId = (crypto.randomUUID ? crypto.randomUUID() : `${currentUser.id}-${Date.now()}`);
+  currentCallPeerId = recipientId;
+
+  const myName = currentUser.user_metadata?.full_name || "Someone";
+  const notifyChan = _supabase.channel(`call:${recipientId}`);
+  await new Promise(res => notifyChan.subscribe(status => { if (status === "SUBSCRIBED") res(); }));
+  notifyChan.send({ type: "broadcast", event: "ring",
+    payload: { callId: currentCallId, callerId: currentUser.id, callerName: myName } });
+  _supabase.removeChannel(notifyChan);
+
+  const { data: callRow } = await _supabase.from("dating_calls").insert({
+    caller_id: currentUser.id, recipient_id: recipientId, status: "ringing"
+  }).select().single();
+  currentCallRow = callRow;
+
+  showOutgoingCallUI(recipientName);
+  await joinCallSignaling(currentCallId, true);
+}
+
+function showIncomingCallUI(payload){
+  if (peerConnection){ return; } // already in a call, ignore
+  currentCallId = payload.callId;
+  currentCallPeerId = payload.callerId;
+  document.getElementById("callRoot").innerHTML = `
+    <div class="call-overlay">
+      <div class="call-card">
+        <div class="call-avatar">📞</div>
+        <div class="call-name">${esc(payload.callerName || "Someone")}</div>
+        <div class="call-status">Incoming call...</div>
+        <div class="call-actions">
+          <button class="call-accept" onclick="acceptCall()">Accept</button>
+          <button class="call-decline" onclick="declineCall()">Decline</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function showOutgoingCallUI(name){
+  document.getElementById("callRoot").innerHTML = `
+    <div class="call-overlay">
+      <div class="call-card">
+        <div class="call-avatar">📞</div>
+        <div class="call-name">${esc(name)}</div>
+        <div class="call-status" id="callStatusText">Calling...</div>
+        <div class="call-actions">
+          <button class="call-decline" onclick="endCall(true)">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function showActiveCallUI(name){
+  document.getElementById("callRoot").innerHTML = `
+    <div class="call-overlay">
+      <div class="call-card">
+        <div class="call-avatar">📞</div>
+        <div class="call-name">${esc(name || "In call")}</div>
+        <div class="call-status" id="callStatusText">00:00</div>
+        <div class="call-actions">
+          <button class="call-mute" id="muteBtn" onclick="toggleMute()">🎙️ Mute</button>
+          <button class="call-decline" onclick="endCall(true)">Hang up</button>
+        </div>
+      </div>
+    </div>`;
+  callStartedAt = Date.now();
+  callTimer = setInterval(() => {
+    const secs = Math.floor((Date.now() - callStartedAt) / 1000);
+    const mm = String(Math.floor(secs / 60)).padStart(2, "0");
+    const ss = String(secs % 60).padStart(2, "0");
+    const el = document.getElementById("callStatusText");
+    if (el) el.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+
+async function acceptCall(){
+  const { data: callRow } = await _supabase
+    .from("dating_calls")
+    .select("*")
+    .eq("caller_id", currentCallPeerId)
+    .eq("recipient_id", currentUser.id)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  currentCallRow = callRow;
+  if (currentCallRow){
+    await _supabase.from("dating_calls").update({ status: "accepted" }).eq("id", currentCallRow.id);
+  }
+  showActiveCallUI("In call");
+  await joinCallSignaling(currentCallId, false);
+}
+
+async function declineCall(){
+  const chan = _supabase.channel(`callsig:${currentCallId}`);
+  await new Promise(res => chan.subscribe(status => { if (status === "SUBSCRIBED") res(); }));
+  chan.send({ type: "broadcast", event: "signal", payload: { type: "hangup", from: currentUser.id } });
+  _supabase.removeChannel(chan);
+
+  const { data: callRow } = await _supabase
+    .from("dating_calls")
+    .select("*")
+    .eq("caller_id", currentCallPeerId)
+    .eq("recipient_id", currentUser.id)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (callRow) await _supabase.from("dating_calls").update({ status: "declined", ended_at: new Date().toISOString() }).eq("id", callRow.id);
+
+  document.getElementById("callRoot").innerHTML = "";
+  currentCallId = null; currentCallPeerId = null;
+}
+
+async function joinCallSignaling(callId, isInitiator){
+  activeCallChannel = _supabase.channel(`callsig:${callId}`);
+  activeCallChannel.on("broadcast", { event: "signal" }, async (msg) => {
+    const data = msg.payload;
+    if (data.from === currentUser.id) return;
+    if (data.type === "answer" && isInitiator){
+      document.getElementById("callStatusText") && showActiveCallUI(document.querySelector(".call-name")?.textContent);
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+    } else if (data.type === "offer" && !isInitiator){
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      sendSignal({ type: "answer", sdp: answer });
+    } else if (data.type === "ice"){
+      try { await peerConnection.addIceCandidate(data.candidate); } catch (e){}
+    } else if (data.type === "hangup"){
+      endCall(false);
+    }
+  });
+  await new Promise(res => activeCallChannel.subscribe(status => { if (status === "SUBSCRIBED") res(); }));
+
+  try {
+    localCallStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err){
+    alert("Couldn't access microphone: " + err.message);
+    endCall(true);
+    return;
+  }
+
+  peerConnection = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  localCallStream.getTracks().forEach(t => peerConnection.addTrack(t, localCallStream));
+  peerConnection.ontrack = (e) => {
+    document.getElementById("remoteAudio").srcObject = e.streams[0];
+  };
+  peerConnection.onicecandidate = (e) => {
+    if (e.candidate) sendSignal({ type: "ice", candidate: e.candidate });
+  };
+  peerConnection.onconnectionstatechange = () => {
+    if (peerConnection && ["disconnected","failed","closed"].includes(peerConnection.connectionState)){
+      endCall(false);
+    }
+  };
+
+  if (isInitiator){
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    sendSignal({ type: "offer", sdp: offer });
+  }
+}
+
+function sendSignal(data){
+  if (!activeCallChannel) return;
+  activeCallChannel.send({ type: "broadcast", event: "signal", payload: { ...data, from: currentUser.id } });
+}
+
+function toggleMute(){
+  if (!localCallStream) return;
+  const track = localCallStream.getAudioTracks()[0];
+  track.enabled = !track.enabled;
+  const btn = document.getElementById("muteBtn");
+  if (btn) btn.textContent = track.enabled ? "🎙️ Mute" : "🔇 Unmuted";
+}
+
+async function endCall(notifyPeer){
+  if (notifyPeer) sendSignal({ type: "hangup" });
+  if (callTimer){ clearInterval(callTimer); callTimer = null; }
+  if (peerConnection){ peerConnection.close(); peerConnection = null; }
+  if (localCallStream){ localCallStream.getTracks().forEach(t => t.stop()); localCallStream = null; }
+  if (activeCallChannel){ _supabase.removeChannel(activeCallChannel); activeCallChannel = null; }
+  document.getElementById("remoteAudio").srcObject = null;
+  document.getElementById("callRoot").innerHTML = "";
+
+  if (currentCallRow){
+    await _supabase.from("dating_calls").update({ status: "ended", ended_at: new Date().toISOString() }).eq("id", currentCallRow.id);
+  }
+  currentCallId = null; currentCallPeerId = null; currentCallRow = null; callStartedAt = null;
+}
+
+// ---------- Voice messages ----------
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+
+async function toggleVoiceRecording(profileId, recipientId){
+  const btn = document.getElementById("micBtn");
+  const status = document.getElementById("recordStatus");
+
+  if (!isRecording){
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(audioChunks, { type: "audio/webm" });
+        await sendVoiceMessage(profileId, recipientId, blob);
+      };
+      mediaRecorder.start();
+      isRecording = true;
+      btn.textContent = "⏹️";
+      btn.style.background = "var(--danger)";
+      btn.style.color = "#fff";
+      status.textContent = "Recording... tap again to send.";
+    } catch (err){
+      status.textContent = "Couldn't access microphone: " + err.message;
+    }
+  } else {
+    mediaRecorder.stop();
+    isRecording = false;
+    btn.textContent = "🎤";
+    btn.style.background = "";
+    btn.style.color = "";
+    status.textContent = "Sending voice message...";
+  }
+}
+
+async function sendVoiceMessage(profileId, recipientId, blob){
+  const status = document.getElementById("recordStatus");
+  const path = `dating/voice/${currentUser.id}-${Date.now()}.webm`;
+  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, blob);
+  if (uploadErr){
+    if (status) status.textContent = "Voice upload failed: " + uploadErr.message;
+    return;
+  }
+  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  const { error } = await _supabase.from("dating_messages").insert({
+    profile_id: profileId,
+    sender_id: currentUser.id,
+    recipient_id: recipientId,
+    voice_url: pub.publicUrl
+  });
+  if (error){
+    if (status) status.textContent = "Couldn't send: " + error.message;
+    return;
+  }
+  if (status) status.textContent = "";
+  await refreshCurrentThreadAfterSend(profileId, recipientId);
 }
 
 // ---------- Messages tab ----------
@@ -1541,7 +1669,7 @@ async function loadThreads(){
       <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
         <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}</div>
-        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(last.body.slice(0,80))}</div>
+        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80))}</div>
         <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
       </div>`;
     div.onclick = () => openThread(thread);
@@ -1550,90 +1678,110 @@ async function loadThreads(){
 }
 
 async function openThread(thread){
+  currentOpenThread = thread;
   thread.messages
     .filter(m => m.recipient_id === currentUser.id && !m.read)
     .forEach(m => _supabase.from("dating_messages").update({ read: true }).eq("id", m.id).then(()=>{}));
 
   const ordered = [...thread.messages].reverse();
+  const msgIds = ordered.map(m => m.id);
+  const { data: reactions } = await _supabase
+    .from("dating_message_reactions")
+    .select("*")
+    .in("message_id", msgIds.length ? msgIds : ["00000000-0000-0000-0000-000000000000"]);
+  const reactionsByMsg = {};
+  (reactions || []).forEach(r => {
+    if (!reactionsByMsg[r.message_id]) reactionsByMsg[r.message_id] = [];
+    reactionsByMsg[r.message_id].push(r);
+  });
+
+  const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
       <div class="modal">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${esc(thread.profile ? (thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation")}</h3>
-          <div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:10px 0;">
-            ${ordered.map(m => `
-              <div style="align-self:${m.sender_id===currentUser.id?"flex-end":"flex-start"};
-                background:${m.sender_id===currentUser.id?"var(--gold-soft)":"#F0F0F0"};
-                padding:8px 12px;border-radius:10px;max-width:80%;font-size:.88rem;">
-                ${esc(m.body)}
-              </div>`).join("")}
+          <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            ${otherName}
+            <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
+          </h3>
+          <div id="threadMessages" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin:10px 0;">
+            ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [])).join("")}
           </div>
-          <textarea id="replyBody" maxlength="1000" placeholder="Reply..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
-          <div class="actions">
+          <textarea id="replyBody" maxlength="1000" placeholder="Reply..." style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
+          <div class="actions" style="align-items:center;">
+            <button class="btn-report" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message">🎤</button>
             <button class="btn-contact" onclick="sendReply('${thread.profileId}','${thread.other}');">Reply</button>
           </div>
+          <div id="recordStatus" style="font-size:.8rem;color:#999;margin-top:4px;"></div>
         </div>
       </div>
     </div>`;
 }
 
-function computeProfileCompleteness(data){
-  const checklist = [
-    { label: "About you", done: !!(data.bio && data.bio.trim()), focus: "eBio" },
-    { label: "What you're looking for", done: !!data.looking_for, focus: "eLookingFor" },
-    { label: "Age range you're interested in", done: !!(data.age_min && data.age_max), focus: "eAgeMin" },
-    { label: "Your lifestyle", done: !!data.lifestyle, focus: "eLifestyle" },
-    { label: "Whether you have kids", done: !!data.has_kids, focus: "eHasKids" },
-    { label: "Whether you want kids", done: !!data.wants_kids, focus: "eWantsKids" },
-    { label: "Religion", done: !!data.religion, focus: "eReligion" }
-  ];
-  const done = checklist.filter(c => c.done).length;
-  return { percent: Math.round((done / checklist.length) * 100), missing: checklist.filter(c => !c.done) };
-}
-
-function profileCompletenessBanner(data){
-  const { percent, missing } = computeProfileCompleteness(data);
-  if (percent >= 100) return "";
-
+function renderMessageBubble(m, msgReactions){
+  const mine = m.sender_id === currentUser.id;
+  const reactionCounts = {};
+  msgReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
+  const myReaction = msgReactions.find(r => r.user_id === currentUser.id);
+  const reactionRow = Object.keys(reactionCounts).length
+    ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
+        `<span class="reaction-pill${myReaction && myReaction.emoji===e ? " mine" : ""}" onclick="toggleReaction('${m.id}','${e}')">${e} ${c}</span>`).join("")}</div>`
+    : "";
+  const content = m.voice_url
+    ? `<audio controls src="${esc(m.voice_url)}" style="max-width:220px;height:36px;"></audio>`
+    : esc(m.body || "");
   return `
-    <div style="background:#FFF9EE;border:1px solid var(--gold);border-radius:10px;padding:14px 16px;margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <strong style="font-size:.9rem;color:var(--green);">Your profile is ${percent}% complete</strong>
-        <span style="font-size:.78rem;color:#999;">${missing.length} thing${missing.length === 1 ? "" : "s"} left</span>
+    <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;">
+      <div class="msg-bubble" style="background:${mine?"var(--gold-soft)":"#F0F0F0"};padding:8px 12px;border-radius:10px;font-size:.88rem;position:relative;">
+        ${content}
+        <span class="react-add" onclick="showReactionPicker(event,'${m.id}')">＋</span>
       </div>
-      <div style="background:#EFE6CE;border-radius:999px;height:6px;overflow:hidden;margin-bottom:10px;">
-        <div style="background:var(--gold);height:100%;width:${percent}%;"></div>
-      </div>
-      <div style="font-size:.8rem;color:#666;margin-bottom:6px;">Complete profiles get more matches. Add:</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${missing.map(m => `<button type="button" onclick="focusProfileField('${m.focus}')" style="font-size:.76rem;padding:5px 10px;border:1px solid var(--gold);background:#fff;color:var(--green);border-radius:999px;cursor:pointer;">+ ${esc(m.label)}</button>`).join("")}
-      </div>
+      ${reactionRow}
     </div>`;
 }
 
-async function refreshProfileCompleteBadge(){
-  const badge = document.getElementById("profileCompleteBadge");
-  if (!badge || !currentUser) return;
-  const { data } = await _supabase
-    .from("dating_profiles")
-    .select("bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-  if (!data){ badge.textContent = ""; return; }
-  const { percent } = computeProfileCompleteness(data);
-  badge.textContent = percent < 100 ? "●" : "";
-  badge.style.color = "var(--gold)";
+const REACTION_EMOJIS = ["❤️","😂","😮","😢","👍","🔥"];
+
+function showReactionPicker(event, messageId){
+  event.stopPropagation();
+  const existing = document.getElementById("reactionPicker");
+  if (existing) existing.remove();
+  const picker = document.createElement("div");
+  picker.id = "reactionPicker";
+  picker.className = "reaction-picker";
+  picker.innerHTML = REACTION_EMOJIS.map(e => `<span onclick="toggleReaction('${messageId}','${e}')">${e}</span>`).join("");
+  document.body.appendChild(picker);
+  const rect = event.target.getBoundingClientRect();
+  picker.style.top = (rect.bottom + window.scrollY + 4) + "px";
+  picker.style.left = Math.max(8, rect.left + window.scrollX - 60) + "px";
+  setTimeout(() => document.addEventListener("click", function closePicker(e){
+    if (!picker.contains(e.target)){ picker.remove(); document.removeEventListener("click", closePicker); }
+  }), 0);
 }
 
-function focusProfileField(id){
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "center" });
-  el.focus();
-  el.style.outline = "2px solid var(--gold)";
-  setTimeout(() => { el.style.outline = ""; }, 1500);
+async function toggleReaction(messageId, emoji){
+  document.getElementById("reactionPicker")?.remove();
+  const { data: existing } = await _supabase
+    .from("dating_message_reactions")
+    .select("*")
+    .eq("message_id", messageId)
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (existing && existing.emoji === emoji){
+    await _supabase.from("dating_message_reactions").delete().eq("id", existing.id);
+  } else if (existing){
+    await _supabase.from("dating_message_reactions").update({ emoji }).eq("id", existing.id);
+  } else {
+    await _supabase.from("dating_message_reactions").insert({ message_id: messageId, user_id: currentUser.id, emoji });
+  }
+  refreshOpenThreadMessages();
+}
+
+async function refreshOpenThreadMessages(){
+  if (currentOpenThread) openThread(currentOpenThread);
 }
 
 // ---------- My Profile tab ----------
@@ -1651,7 +1799,6 @@ async function loadMyProfile(){
   }
 
   el.innerHTML = `
-    ${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
       <div><label>First name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
       <div class="row2">
@@ -1744,7 +1891,6 @@ async function loadMyProfile(){
     document.getElementById("editMsg").innerHTML = updErr
       ? `<div class="msg error">${esc(updErr.message)}</div>`
       : `<div class="msg success">Saved.</div>`;
-    if (!updErr) refreshProfileCompleteBadge();
   });
 
   document.getElementById("deleteBtn").addEventListener("click", async () => {
