@@ -666,11 +666,23 @@ function renderAuthModal(){
     ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>`
     : `<div><label>Email</label><input type="email" id="authEmail" required></div>`;
 
+  // Register asks for a couple more basics, mirroring the marketplace's
+  // signup form (script.js) so the shared `profiles` row this creates
+  // is properly filled in either way. When registering by phone, that
+  // phone number IS the identifier already, so no separate phone field;
+  // when registering by email, phone is a separate optional field.
+  const registerExtraFields = !isSignin ? `
+    <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required></div>
+    <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required></div>
+    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="e.g. 0912345678"></div>` : ""}
+  ` : "";
+
   const form = `
     <form class="post-form" id="authForm" style="gap:12px;">
       ${identifierField}
       <div><label>Password</label><input type="password" id="authPassword" minlength="6" required></div>
       ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required></div>` : ""}
+      ${registerExtraFields}
       <button type="submit" class="submit-btn">${isSignin ? "Sign In" : "Create Account"}</button>
       ${(isSignin && !isPhone) ? `<div style="text-align:right;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;">Forgot password?</button></div>` : ""}
       <div id="authMsg"></div>
@@ -746,11 +758,16 @@ async function submitAuthForm(e){
     }
     closeModal();
   } else {
+    const fullName = document.getElementById("authFullName").value.trim();
+    const location = document.getElementById("authLocation").value.trim();
+    const phoneNumber = isPhone ? realPhone : (document.getElementById("authRegPhone")?.value.trim() || null);
+
     const { data, error } = await _supabase.auth.signUp({
       ...identifier, password,
-      options: isPhone
-        ? { data: { phone_number: realPhone } }
-        : { emailRedirectTo: window.location.origin + "/dating.html" }
+      options: {
+        data: { full_name: fullName, phone_number: phoneNumber, location },
+        ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating.html" })
+      }
     });
     submitBtn.disabled = false;
     submitBtn.textContent = "Create Account";
