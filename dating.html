@@ -241,6 +241,22 @@
   }
   .reaction-picker span{cursor:pointer;font-size:1.1rem;}
 
+  .feed-post-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+  .post-actions{display:flex;gap:14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);}
+  .post-actions button{background:none;border:none;color:#666;font-size:.82rem;cursor:pointer;padding:4px 0;}
+  .post-actions button:hover{color:var(--green);}
+  .post-comments{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;}
+  .post-comment-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;max-height:220px;overflow-y:auto;}
+  .post-comment{font-size:.85rem;color:#333;background:var(--paper);padding:6px 10px;border-radius:8px;}
+  .post-comment strong{color:var(--green);margin-right:4px;}
+  .post-comment-input{display:flex;gap:8px;}
+  .post-comment-input input{
+    flex:1;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:.85rem;font-family:inherit;
+  }
+  .post-comment-input button{
+    background:var(--green);color:#fff;border:none;border-radius:999px;padding:7px 16px;font-size:.82rem;cursor:pointer;
+  }
+
   .call-overlay{
     position:fixed;inset:0;background:rgba(10,41,26,.92);z-index:90;
     display:flex;align-items:center;justify-content:center;
@@ -335,6 +351,10 @@
               🖼️ Photo
               <input type="file" id="postImage" accept="image/*" style="display:none;" onchange="previewPostImage()">
             </label>
+            <select id="postVisibility" style="border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:.82rem;color:#555;">
+              <option value="public">🌍 Public — any member</option>
+              <option value="matches">👥 Matches only</option>
+            </select>
             <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--gold);color:var(--green);border:none;border-radius:999px;padding:8px 22px;font-weight:700;cursor:pointer;">Post</button>
           </div>
           <div id="postMsg"></div>
@@ -1164,7 +1184,8 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    photo_url: imageUrl
+    photo_url: imageUrl,
+    visibility: document.getElementById("postVisibility").value
   });
 
   btn.disabled = false;
@@ -1208,34 +1229,134 @@ async function loadFeed(){
   }
   empty.style.display = "none";
 
+  const postIds = posts.map(p => p.id);
   const authorIds = [...new Set(posts.map(p => p.user_id))];
-  const { data: authors } = await _supabase
-    .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
-    .in("user_id", authorIds);
+
+  const [{ data: authors }, { data: reactions }, { data: comments }] = await Promise.all([
+    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos").in("user_id", authorIds),
+    _supabase.from("dating_post_reactions").select("*").in("post_id", postIds),
+    _supabase.from("dating_post_comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
+  ]);
+
   const authorMap = {};
   (authors || []).forEach(a => authorMap[a.user_id] = a);
 
-  feed.innerHTML = posts.map(p => {
-    const a = authorMap[p.user_id];
-    const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
-    const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
-    const isMine = p.user_id === currentUser.id;
-    return `
-      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
-            <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()}</div>
-          </div>
-          ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>`
-                   : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
-        </div>
-        <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-        ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
-      </div>`;
+  const reactionsByPost = {};
+  (reactions || []).forEach(r => { (reactionsByPost[r.post_id] ||= []).push(r); });
+
+  const commentsByPost = {};
+  (comments || []).forEach(c => { (commentsByPost[c.post_id] ||= []).push(c); });
+  // also need commenter profile info
+  const commenterIds = [...new Set((comments || []).map(c => c.user_id))];
+  const { data: commenterProfiles } = commenterIds.length
+    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender").in("user_id", commenterIds)
+    : { data: [] };
+  const commenterMap = {};
+  (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
+
+  feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap)).join("");
+}
+
+function renderFeedPost(p, a, postReactions, postComments, commenterMap){
+  const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
+  const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
+  const isMine = p.user_id === currentUser.id;
+  const visBadge = p.visibility === "matches" ? "👥 Matches only" : "🌍 Public";
+
+  const reactionCounts = {};
+  postReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
+  const myReaction = postReactions.find(r => r.user_id === currentUser.id);
+  const reactionRow = Object.keys(reactionCounts).length
+    ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
+        `<span class="reaction-pill${myReaction && myReaction.emoji===e ? " mine" : ""}" onclick="togglePostReaction('${p.id}','${e}')">${e} ${c}</span>`).join("")}</div>`
+    : "";
+
+  const commentsHtml = postComments.map(c => {
+    const cp = commenterMap[c.user_id];
+    const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
+    return `<div class="post-comment"><strong>${esc(cname)}</strong> ${esc(c.body)}</div>`;
   }).join("");
+
+  return `
+    <div class="feed-post-card" id="post-${p.id}">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
+          <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
+        </div>
+        ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>`
+                 : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
+      </div>
+      <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
+      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+
+      <div class="post-actions">
+        <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
+        <button onclick="toggleCommentBox('${p.id}')">💬 Comment${postComments.length ? ` (${postComments.length})` : ""}</button>
+      </div>
+      ${reactionRow}
+
+      <div class="post-comments" id="comments-${p.id}" style="display:none;">
+        <div class="post-comment-list">${commentsHtml}</div>
+        <div class="post-comment-input">
+          <input type="text" id="commentInput-${p.id}" maxlength="500" placeholder="Write a comment...">
+          <button onclick="submitComment('${p.id}')">Send</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function toggleCommentBox(postId){
+  const box = document.getElementById(`comments-${postId}`);
+  if (box) box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+async function submitComment(postId){
+  const input = document.getElementById(`commentInput-${postId}`);
+  const body = input.value.trim();
+  if (!body) return;
+  const { error } = await _supabase.from("dating_post_comments").insert({
+    post_id: postId, user_id: currentUser.id, body
+  });
+  if (error){ alert("Couldn't comment: " + error.message); return; }
+  input.value = "";
+  loadFeed();
+}
+
+function showPostReactionPicker(event, postId){
+  event.stopPropagation();
+  document.getElementById("reactionPicker")?.remove();
+  const picker = document.createElement("div");
+  picker.id = "reactionPicker";
+  picker.className = "reaction-picker";
+  picker.innerHTML = REACTION_EMOJIS.map(e => `<span onclick="togglePostReaction('${postId}','${e}')">${e}</span>`).join("");
+  document.body.appendChild(picker);
+  const rect = event.target.getBoundingClientRect();
+  picker.style.top = (rect.bottom + window.scrollY + 4) + "px";
+  picker.style.left = Math.max(8, rect.left + window.scrollX - 60) + "px";
+  setTimeout(() => document.addEventListener("click", function closePicker(e){
+    if (!picker.contains(e.target)){ picker.remove(); document.removeEventListener("click", closePicker); }
+  }), 0);
+}
+
+async function togglePostReaction(postId, emoji){
+  document.getElementById("reactionPicker")?.remove();
+  const { data: existing } = await _supabase
+    .from("dating_post_reactions")
+    .select("*")
+    .eq("post_id", postId)
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (existing && existing.emoji === emoji){
+    await _supabase.from("dating_post_reactions").delete().eq("id", existing.id);
+  } else if (existing){
+    await _supabase.from("dating_post_reactions").update({ emoji }).eq("id", existing.id);
+  } else {
+    await _supabase.from("dating_post_reactions").insert({ post_id: postId, user_id: currentUser.id, emoji });
+  }
+  loadFeed();
 }
 
 async function deletePost(postId){
