@@ -75,6 +75,23 @@
   }
   .signin-pill:hover{background:#000;}
 
+  .auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+  .auth-tab{padding:8px 4px;font-size:.9rem;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .auth-tab.active{color:var(--green);border-bottom-color:var(--gold);}
+  .auth-method{display:flex;gap:8px;margin-bottom:16px;}
+  .auth-method button{
+    flex:1;padding:8px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:.85rem;color:#555;cursor:pointer;
+  }
+  .auth-method button.active{background:var(--paper);border-color:var(--gold);color:var(--green);font-weight:700;}
+  .auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#aaa;font-size:.78rem;}
+  .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line);}
+  .btn-google{
+    width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:.88rem;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .submit-btn[disabled]{opacity:.6;cursor:default;}
+
   .app-shell{display:flex;align-items:flex-start;}
   .sidebar{
     width:230px;flex-shrink:0;background:var(--green);min-height:calc(100vh - 64px);
@@ -261,7 +278,7 @@
   <nav>
     <button class="lang" onclick="toggleLang()" id="langBtn">አማ</button>
     <a href="index.html">← Marketplace</a>
-    <button class="signin-pill" id="headerAuthBtn" onclick="signInWithGoogle()" style="display:block;">👤 Sign In/Register</button>
+    <button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')" style="display:block;">👤 Sign In/Register</button>
     <div class="notif-wrap" id="notifWrap" style="display:none;">
       <button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
       <div class="notif-panel" id="notifPanel">
@@ -302,7 +319,7 @@
   <div class="panel" id="gate" style="display:none;">
     <div class="gate">
       <p>You need to be signed in to view or post in Dating.</p>
-      <button onclick="signInWithGoogle()">Sign in with Google</button>
+      <button onclick="openAuthModal('signin')">Sign In / Register</button>
     </div>
   </div>
 
@@ -631,6 +648,183 @@ function maybeShowSafetyNotice(){
 function dismissSafetyNotice(){
   try { localStorage.setItem("wg_dating_safety_seen", "1"); } catch(e){}
   closeModal();
+}
+
+// ---------- Sign in / Register modal ----------
+let authTab = "signin";      // 'signin' | 'register'
+let authMethod = "email";    // 'email' | 'phone'
+
+function normalizeEthiopianPhone(raw){
+  let p = String(raw || "").trim().replace(/[^\d+]/g, "");
+  p = p.replace(/^\+/, "");
+  if (p.startsWith("0") && p.length === 10) p = "251" + p.slice(1);
+  else if (p.length === 9 && /^[79]/.test(p)) p = "251" + p;
+  return p; // expected shape: 251[79]XXXXXXXX (9 = Ethio Telecom, 7 = Safaricom Ethiopia)
+}
+
+// Ethio Telecom mobile numbers start 09x; Safaricom Ethiopia numbers
+// start 07x. Both are 9 digits after the country code.
+function isValidEthiopianPhone(p){
+  return /^251[79]\d{8}$/.test(p);
+}
+
+// Supabase's native Phone provider needs an SMS provider (and to be
+// switched on at all) to work — same reason the marketplace avoids it.
+// Instead we turn the phone number into a fake, never-shown email
+// address and sign up/in with that as a normal email+password account.
+// Using the SAME domain as script.js's phoneToPseudoEmail means a
+// phone number already registered on the marketplace logs into the
+// dating site as the same account, and vice versa.
+function phoneToPseudoEmail(p){
+  return p + "@phone.wanagebya.com";
+}
+
+function openAuthModal(tab){
+  authTab = tab || "signin";
+  authMethod = "email";
+  renderAuthModal();
+}
+
+function switchAuthTab(tab){
+  authTab = tab;
+  renderAuthModal();
+}
+
+function switchAuthMethod(method){
+  authMethod = method;
+  renderAuthModal();
+}
+
+function renderAuthModal(){
+  const root = document.getElementById("modalRoot");
+  const isSignin = authTab === "signin";
+  const isPhone = authMethod === "phone";
+
+  const identifierField = isPhone
+    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>`
+    : `<div><label>Email</label><input type="email" id="authEmail" required></div>`;
+
+  const registerExtraFields = !isSignin ? `
+    <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required></div>
+    <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required></div>
+    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="e.g. 0912345678"></div>` : ""}
+  ` : "";
+
+  const form = `
+    <form class="post-form" id="authForm" style="gap:12px;">
+      ${identifierField}
+      <div><label>Password</label><input type="password" id="authPassword" minlength="6" required></div>
+      ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required></div>` : ""}
+      ${registerExtraFields}
+      <button type="submit" class="submit-btn">${isSignin ? "Sign In" : "Create Account"}</button>
+      ${(isSignin && !isPhone) ? `<div style="text-align:right;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;">Forgot password?</button></div>` : ""}
+      <div id="authMsg"></div>
+    </form>`;
+
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <div class="auth-tabs">
+            <div class="auth-tab ${isSignin ? "active" : ""}" onclick="switchAuthTab('signin')">Sign In</div>
+            <div class="auth-tab ${!isSignin ? "active" : ""}" onclick="switchAuthTab('register')">Register</div>
+          </div>
+          <div class="auth-method">
+            <button class="${authMethod === "email" ? "active" : ""}" onclick="switchAuthMethod('email')">✉️ Email</button>
+            <button class="${authMethod === "phone" ? "active" : ""}" onclick="switchAuthMethod('phone')">📱 Phone</button>
+          </div>
+          ${form}
+          <div class="auth-divider">or</div>
+          <button class="btn-google" onclick="signInWithGoogle()">🔵 Continue with Google</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById("authForm").addEventListener("submit", submitAuthForm);
+}
+
+async function submitAuthForm(e){
+  e.preventDefault();
+  const msg = document.getElementById("authMsg");
+  const isPhone = authMethod === "phone";
+  const password = document.getElementById("authPassword").value;
+  const submitBtn = e.target.querySelector("button[type=submit]");
+
+  let identifier;  // { email } — phone is converted to a pseudo-email too, see phoneToPseudoEmail
+  let realPhone = null;
+  if (isPhone){
+    const raw = document.getElementById("authPhone").value.trim();
+    const normalized = normalizeEthiopianPhone(raw);
+    if (!isValidEthiopianPhone(normalized)){
+      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
+      return;
+    }
+    realPhone = "+" + normalized;
+    identifier = { email: phoneToPseudoEmail(normalized) };
+  } else {
+    identifier = { email: document.getElementById("authEmail").value.trim() };
+  }
+
+  if (authTab === "register"){
+    const confirm = document.getElementById("authPasswordConfirm").value;
+    if (password !== confirm){
+      msg.innerHTML = `<div class="msg error">Passwords don't match.</div>`;
+      return;
+    }
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = authTab === "signin" ? "Signing in..." : "Creating account...";
+
+  if (authTab === "signin"){
+    const { error } = await _supabase.auth.signInWithPassword({ ...identifier, password });
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Sign In";
+    if (error){
+      if (isPhone && /Invalid login credentials/i.test(error.message)){
+        msg.innerHTML = `<div class="msg error">No account found with that phone number, or the password is wrong.</div>`;
+      } else {
+        msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
+      }
+      return;
+    }
+    closeModal();
+  } else {
+    const fullName = document.getElementById("authFullName").value.trim();
+    const location = document.getElementById("authLocation").value.trim();
+    const phoneNumber = isPhone ? realPhone : (document.getElementById("authRegPhone")?.value.trim() || null);
+
+    const { data, error } = await _supabase.auth.signUp({
+      ...identifier, password,
+      options: {
+        data: { full_name: fullName, phone_number: phoneNumber, location },
+        ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating.html" })
+      }
+    });
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Create Account";
+    if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
+    if (data.user && !data.session){
+      msg.innerHTML = isPhone
+        ? `<div class="msg success">Account created — sign in with your phone number and password.</div>`
+        : `<div class="msg success">Check your email to confirm your account, then sign in.</div>`;
+    } else {
+      closeModal();
+    }
+  }
+}
+
+async function sendPasswordReset(){
+  const email = document.getElementById("authEmail").value.trim();
+  const msg = document.getElementById("authMsg");
+  if (!email){ msg.innerHTML = `<div class="msg error">Enter your email above first.</div>`; return; }
+  const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + "/dating.html"
+  });
+  msg.innerHTML = error
+    ? `<div class="msg error">${esc(error.message)}</div>`
+    : `<div class="msg success">Password reset email sent.</div>`;
 }
 
 async function signInWithGoogle(){
