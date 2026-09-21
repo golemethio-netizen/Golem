@@ -610,7 +610,6 @@ function dismissSafetyNotice(){
 // ---------- Sign in / Register modal ----------
 let authTab = "signin";      // 'signin' | 'register'
 let authMethod = "email";    // 'email' | 'phone'
-let authPhoneStep = "enter"; // 'enter' | 'verify'
 
 function normalizeEthiopianPhone(raw){
   let digits = raw.trim().replace(/[\s\-()]/g, "");
@@ -630,49 +629,42 @@ function isValidEthiopianPhone(e164){
 function openAuthModal(tab){
   authTab = tab || "signin";
   authMethod = "email";
-  authPhoneStep = "enter";
   renderAuthModal();
 }
 
 function switchAuthTab(tab){
   authTab = tab;
-  authPhoneStep = "enter";
   renderAuthModal();
 }
 
 function switchAuthMethod(method){
   authMethod = method;
-  authPhoneStep = "enter";
   renderAuthModal();
 }
 
 function renderAuthModal(){
   const root = document.getElementById("modalRoot");
   const isSignin = authTab === "signin";
+  const isPhone = authMethod === "phone";
 
-  const emailForm = `
-    <form class="post-form" id="authEmailForm" style="gap:12px;">
-      <div><label>Email</label><input type="email" id="authEmail" required></div>
+  // Phone and email both use password auth here — phone is treated
+  // exactly like a second "email" identifier (Supabase supports
+  // signUp/signInWithPassword with { phone, password } the same way
+  // it does with { email, password }). No SMS/OTP step at all, same
+  // as the existing WanaGebya marketplace registration/login.
+  const identifierField = isPhone
+    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>`
+    : `<div><label>Email</label><input type="email" id="authEmail" required></div>`;
+
+  const form = `
+    <form class="post-form" id="authForm" style="gap:12px;">
+      ${identifierField}
       <div><label>Password</label><input type="password" id="authPassword" minlength="6" required></div>
       ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required></div>` : ""}
       <button type="submit" class="submit-btn">${isSignin ? "Sign In" : "Create Account"}</button>
-      ${isSignin ? `<div style="text-align:right;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;">Forgot password?</button></div>` : ""}
+      ${(isSignin && !isPhone) ? `<div style="text-align:right;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;">Forgot password?</button></div>` : ""}
       <div id="authMsg"></div>
     </form>`;
-
-  const phoneForm = authPhoneStep === "enter" ? `
-    <div class="post-form" style="gap:12px;display:grid;">
-      <div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>
-      <button type="button" class="submit-btn" onclick="sendPhoneOtp()">Send code</button>
-      <div id="authMsg"></div>
-    </div>` : `
-    <div class="post-form" style="gap:12px;display:grid;">
-      <p style="font-size:.85rem;color:#666;margin:0;">We texted a code to <strong>${esc(window._authPhonePending || "")}</strong>.</p>
-      <div><label>Enter code</label><input type="text" id="authOtp" inputmode="numeric" maxlength="6" required></div>
-      <button type="button" class="submit-btn" onclick="verifyPhoneOtp()">Verify & continue</button>
-      <button type="button" onclick="authPhoneStep='enter'; renderAuthModal();" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;text-align:left;">Use a different number</button>
-      <div id="authMsg"></div>
-    </div>`;
 
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -687,23 +679,35 @@ function renderAuthModal(){
             <button class="${authMethod === "email" ? "active" : ""}" onclick="switchAuthMethod('email')">✉️ Email</button>
             <button class="${authMethod === "phone" ? "active" : ""}" onclick="switchAuthMethod('phone')">📱 Phone</button>
           </div>
-          ${authMethod === "email" ? emailForm : phoneForm}
+          ${form}
           <div class="auth-divider">or</div>
           <button class="btn-google" onclick="signInWithGoogle()">🔵 Continue with Google</button>
         </div>
       </div>
     </div>`;
 
-  const form = document.getElementById("authEmailForm");
-  if (form) form.addEventListener("submit", submitEmailAuth);
+  document.getElementById("authForm").addEventListener("submit", submitAuthForm);
 }
 
-async function submitEmailAuth(e){
+async function submitAuthForm(e){
   e.preventDefault();
   const msg = document.getElementById("authMsg");
-  const email = document.getElementById("authEmail").value.trim();
+  const isPhone = authMethod === "phone";
   const password = document.getElementById("authPassword").value;
   const submitBtn = e.target.querySelector("button[type=submit]");
+
+  let identifier; // { email } or { phone }
+  if (isPhone){
+    const raw = document.getElementById("authPhone").value.trim();
+    const phone = normalizeEthiopianPhone(raw);
+    if (!isValidEthiopianPhone(phone)){
+      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
+      return;
+    }
+    identifier = { phone };
+  } else {
+    identifier = { email: document.getElementById("authEmail").value.trim() };
+  }
 
   if (authTab === "register"){
     const confirm = document.getElementById("authPasswordConfirm").value;
@@ -717,54 +721,30 @@ async function submitEmailAuth(e){
   submitBtn.textContent = authTab === "signin" ? "Signing in..." : "Creating account...";
 
   if (authTab === "signin"){
-    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    const { error } = await _supabase.auth.signInWithPassword({ ...identifier, password });
     submitBtn.disabled = false;
     submitBtn.textContent = "Sign In";
     if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
     closeModal();
   } else {
     const { data, error } = await _supabase.auth.signUp({
-      email, password,
-      options: { emailRedirectTo: window.location.origin + "/dating.html" }
+      ...identifier, password,
+      options: isPhone ? undefined : { emailRedirectTo: window.location.origin + "/dating.html" }
     });
     submitBtn.disabled = false;
     submitBtn.textContent = "Create Account";
     if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
     if (data.user && !data.session){
-      msg.innerHTML = `<div class="msg success">Check your email to confirm your account, then sign in.</div>`;
+      // Only expected if your Supabase project still has "Confirm email"
+      // (or "Confirm phone") turned on — with it off, this branch is
+      // never hit and the account signs in immediately.
+      msg.innerHTML = isPhone
+        ? `<div class="msg success">Account created — sign in with your phone number and password.</div>`
+        : `<div class="msg success">Check your email to confirm your account, then sign in.</div>`;
     } else {
       closeModal();
     }
   }
-}
-
-async function sendPhoneOtp(){
-  const msg = document.getElementById("authMsg");
-  const raw = document.getElementById("authPhone").value.trim();
-  if (!raw){ msg.innerHTML = `<div class="msg error">Enter a phone number.</div>`; return; }
-  const phone = normalizeEthiopianPhone(raw);
-  if (!isValidEthiopianPhone(phone)){
-    msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
-    return;
-  }
-
-  const { error } = await _supabase.auth.signInWithOtp({ phone });
-  if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
-
-  window._authPhonePending = phone;
-  authPhoneStep = "verify";
-  renderAuthModal();
-}
-
-async function verifyPhoneOtp(){
-  const msg = document.getElementById("authMsg");
-  const code = document.getElementById("authOtp").value.trim();
-  const phone = window._authPhonePending;
-  if (!code){ msg.innerHTML = `<div class="msg error">Enter the code we texted you.</div>`; return; }
-
-  const { error } = await _supabase.auth.verifyOtp({ phone, token: code, type: "sms" });
-  if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
-  closeModal();
 }
 
 async function sendPasswordReset(){
