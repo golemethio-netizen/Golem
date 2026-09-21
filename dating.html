@@ -1634,6 +1634,21 @@ async function checkMatch(otherUserId){
   return !!data;
 }
 
+async function unmatchUser(otherUserId, otherName){
+  if (!confirm(`Unmatch with ${otherName}? You'll stop seeing each other in Messages, and they'll need to match with you again before you can message.`)) return;
+  const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
+  const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
+  const { error } = await _supabase
+    .from("dating_matches")
+    .delete()
+    .eq("user_a", a)
+    .eq("user_b", b);
+  if (error){ alert("Couldn't unmatch right now: " + error.message); return; }
+  closeModal();
+  loadThreads();
+  refreshUnreadBadge();
+}
+
 async function likeProfile(profileId, otherUserId){
   const btn = document.getElementById("likeBtn");
   if (btn){ btn.disabled = true; btn.textContent = "Liking..."; }
@@ -2109,7 +2124,10 @@ async function openThread(thread){
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
             ${otherName}${otherBadge}
-            <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
+            <span style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
+              <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);font-size:.85rem;" onclick="unmatchUser('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Unmatch">✕</button>
+            </span>
           </h3>
           <div id="threadMessages" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin:10px 0;">
             ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [])).join("")}
