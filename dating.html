@@ -1184,7 +1184,7 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    photo_url: imageUrl,
+    image_url: imageUrl,
     visibility: document.getElementById("postVisibility").value
   });
 
@@ -1192,7 +1192,13 @@ async function submitPost(){
   btn.textContent = "Post";
 
   if (error){
-    msg.innerHTML = `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
+    // dating_posts only accepts inserts from users who already have a
+    // dating_profiles row (see profile_owner_can_post policy) — give a
+    // helpful message instead of the raw RLS error in that case.
+    const isRlsBlock = error.code === "42501" || /row-level security/i.test(error.message || "");
+    msg.innerHTML = isRlsBlock
+      ? `<div class="msg error">Post a profile first (see the "Post a Profile" tab) before sharing to the Home feed.</div>`
+      : `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
     return;
   }
 
@@ -1274,7 +1280,11 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
   const commentsHtml = postComments.map(c => {
     const cp = commenterMap[c.user_id];
     const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
-    return `<div class="post-comment"><strong>${esc(cname)}</strong> ${esc(c.body)}</div>`;
+    const canDelete = c.user_id === currentUser.id || isMine; // comment author, or the post owner moderating their own post
+    return `<div class="post-comment">
+      <strong>${esc(cname)}</strong> ${esc(c.body)}
+      ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.75rem;float:right;">✕</button>` : ""}
+    </div>`;
   }).join("");
 
   return `
@@ -1289,7 +1299,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
       </div>
       <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+      ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
@@ -1321,6 +1331,13 @@ async function submitComment(postId){
   });
   if (error){ alert("Couldn't comment: " + error.message); return; }
   input.value = "";
+  loadFeed();
+}
+
+async function deleteComment(commentId, postId){
+  if (!confirm("Delete this comment?")) return;
+  const { error } = await _supabase.from("dating_post_comments").delete().eq("id", commentId);
+  if (error){ alert("Couldn't delete: " + error.message); return; }
   loadFeed();
 }
 
