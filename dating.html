@@ -1324,6 +1324,23 @@ async function submitPost(){
   loadFeed();
 }
 
+async function viewProfileFromFeed(userId){
+  if (userId === currentUser.id){
+    switchTab("myprofile");
+    return;
+  }
+  const { data, error } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error || !data){
+    alert("This person doesn't have a dating profile to view.");
+    return;
+  }
+  openModal(data);
+}
+
 async function loadFeed(){
   const feed = document.getElementById("feed");
   const empty = document.getElementById("feedEmpty");
@@ -1406,9 +1423,9 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
   return `
     <div class="feed-post-card" id="post-${p.id}">
       <div style="display:flex;gap:12px;align-items:center;">
-        <div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
+        <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:700;font-size:.95rem;color:var(--ink);">${esc(name)}${verifiedBadge(a && a.is_verified)}</div>
+          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}</div>
           <div style="font-size:.8rem;color:#888;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
         </div>
         ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:1.1rem;">✕</button>`
