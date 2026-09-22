@@ -15,19 +15,43 @@
     }
 
     /* Full-screen Hero Container with Background Image */
-    .welcome-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background-image: url('wanaager.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.welcome-container {
+  position: relative;
+  width: 100vw;
+  /* Use svh (small viewport height) so mobile browser toolbars don't push content down */
+  height: 100vh;
+  height: 100svh;
+  
+  /* Background Image Settings */
+  background-image: url('./wanaager.png');
+  background-size: cover;          /* Cover the screen while preserving aspect ratio */
+  background-position: center center; /* Keep main focal point centered */
+  background-repeat: no-repeat;
+  background-attachment: scroll;   /* Best performance and consistency across iOS/Android */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;                /* Prevent scrollbars caused by background sizing */
+}
 
+/* Responsive adjustments for phones */
+@media (max-width: 600px) {
+  .welcome-card {
+    width: 85%;
+    padding: 1.8rem 1.2rem;
+    border-radius: 16px;
+  }
+  
+  .welcome-title {
+    font-size: 1.3rem;
+  }
+  
+  .welcome-description {
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+}
     /* Dark Overlay for Text Readability */
     .overlay {
       position: absolute;
