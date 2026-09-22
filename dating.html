@@ -325,6 +325,7 @@
     <nav class="side-nav">
       <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
       <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
+      <div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
       <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
       <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
@@ -449,6 +450,16 @@
     <div class="more-wrap" id="moreWrap" style="display:none;">
       <button class="more-btn" id="moreBtn" onclick="showMoreProfiles()">Load More Profiles</button>
     </div>
+  </div>
+
+  <!-- NEW MEMBERS -->
+  <div class="panel" id="newMembersPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>New <span>Members</span></h2>
+      <p>People who've just joined, newest first.</p>
+    </div>
+    <div class="grid" id="newMembersGrid"></div>
+    <div class="empty" id="newMembersEmpty" style="display:none;">No new members to show right now.</div>
   </div>
 
   <!-- SETUP PROFILE -->
@@ -1258,7 +1269,7 @@ async function loadLikesReceived(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel","settingsPanel"];
+const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -1269,11 +1280,12 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
+  const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "home") loadFeed();
   if (tab === "browse") loadProfiles();
+  if (tab === "newmembers") loadNewMembers();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "likes") loadLikesReceived();
   if (tab === "myprofile") loadMyProfile();
@@ -1675,6 +1687,75 @@ function renderBrowseGrid(){
   });
 
   moreWrap.style.display = allBrowseRows.length > visibleCount ? "block" : "none";
+}
+
+// ---------- New Members ----------
+function joinedAgoText(createdAt){
+  if (!createdAt) return "";
+  const diffMs = Date.now() - new Date(createdAt).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "Joined just now";
+  if (mins < 60) return `Joined ${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `Joined ${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `Joined ${days}d ago`;
+  return `Joined ${new Date(createdAt).toLocaleDateString()}`;
+}
+
+async function loadNewMembers(){
+  const grid = document.getElementById("newMembersGrid");
+  const empty = document.getElementById("newMembersEmpty");
+  grid.innerHTML = "";
+
+  const { data: blocks } = await _supabase
+    .from("dating_blocks")
+    .select("blocker_id, blocked_id")
+    .or(`blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}`);
+  const blockedIds = new Set();
+  (blocks || []).forEach(b => blockedIds.add(b.blocker_id === currentUser.id ? b.blocked_id : b.blocker_id));
+
+  const { data, error } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .neq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error){
+    empty.textContent = "Couldn't load new members right now.";
+    empty.style.display = "block";
+    console.error(error);
+    return;
+  }
+
+  const rows = (data || []).filter(r => !blockedIds.has(r.user_id));
+  if (rows.length === 0){
+    empty.textContent = "No new members to show right now.";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  rows.forEach(row => {
+    const img = (row.photos && row.photos[0]) || row.photo_url || null;
+    const displayName = esc(row.display_name || row.gender || "Someone");
+    const presence = presenceInfo(row.last_seen_at);
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openModal(row);
+    card.innerHTML = `
+      <div class="photo" style="${img ? `background-image:url('${esc(img)}')` : ""}">
+        ${img ? "" : "👤"}
+        ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
+      </div>
+      <div class="info">
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
+        <div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(row.created_at)}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
 }
 
 function showMoreProfiles(){
