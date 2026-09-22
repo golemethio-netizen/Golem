@@ -1303,7 +1303,7 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    photo_url: imageUrl,
+    image_url: imageUrl,
     visibility: document.getElementById("postVisibility").value
   });
 
@@ -1432,7 +1432,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
       <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
-      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
+      ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
