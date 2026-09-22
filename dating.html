@@ -402,10 +402,46 @@
         <option value="Marriage">Marriage</option>
       </select>
       <input type="text" id="filterCity" placeholder="Filter by City...">
+      <input type="number" id="filterAgeMin" placeholder="Min age" min="18" max="99" style="width:90px;">
+      <input type="number" id="filterAgeMax" placeholder="Max age" min="18" max="99" style="width:90px;">
+      <select id="filterReligion">
+        <option value="">Any Religion</option>
+        <option>Orthodox Christian</option>
+        <option>Protestant</option>
+        <option>Muslim</option>
+        <option>Catholic</option>
+        <option>Traditional</option>
+        <option>Other</option>
+      </select>
+      <select id="filterLifestyle">
+        <option value="">Any Lifestyle</option>
+        <option>Active & Outdoorsy</option>
+        <option>Homebody</option>
+        <option>Social & Outgoing</option>
+        <option>Balanced</option>
+        <option>Career-focused</option>
+        <option>Family-oriented</option>
+        <option>Other</option>
+      </select>
+      <select id="filterHasKids">
+        <option value="">Has kids: Any</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <select id="filterWantsKids">
+        <option value="">Wants kids: Any</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+        <option value="Maybe">Maybe</option>
+      </select>
       <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
         <input type="checkbox" id="filterOnline" style="width:18px; height:18px;"> Online now
       </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
+        <input type="checkbox" id="filterVerified" style="width:18px; height:18px;"> Verified only
+      </label>
       <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer; font-weight:bold;">Filter Results</button>
+      <button onclick="clearBrowseFilters()" style="background:none;border:1px solid var(--line);color:#666;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.85rem;">Clear filters</button>
     </div>
     <div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:16px;"></div>
     <div class="grid" id="grid"></div>
@@ -1535,6 +1571,13 @@ async function loadProfiles(){
   const type = document.getElementById("filterType").value;
   const city = document.getElementById("filterCity").value.trim();
   const onlineOnly = document.getElementById("filterOnline").checked;
+  const verifiedOnly = document.getElementById("filterVerified").checked;
+  const ageMin = parseInt(document.getElementById("filterAgeMin").value, 10);
+  const ageMax = parseInt(document.getElementById("filterAgeMax").value, 10);
+  const religion = document.getElementById("filterReligion").value;
+  const lifestyle = document.getElementById("filterLifestyle").value;
+  const hasKids = document.getElementById("filterHasKids").value;
+  const wantsKids = document.getElementById("filterWantsKids").value;
 
   const { data: blocks } = await _supabase
     .from("dating_blocks")
@@ -1566,6 +1609,13 @@ async function loadProfiles(){
   if (type) rows = rows.filter(r => r.relationship_type === type);
   if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
   if (onlineOnly) rows = rows.filter(r => presenceInfo(r.last_seen_at).online);
+  if (verifiedOnly) rows = rows.filter(r => r.is_verified);
+  if (!isNaN(ageMin)) rows = rows.filter(r => (r.age || 0) >= ageMin);
+  if (!isNaN(ageMax)) rows = rows.filter(r => (r.age || 0) <= ageMax);
+  if (religion) rows = rows.filter(r => r.religion === religion);
+  if (lifestyle) rows = rows.filter(r => r.lifestyle === lifestyle);
+  if (hasKids) rows = rows.filter(r => r.has_kids === hasKids);
+  if (wantsKids) rows = rows.filter(r => r.wants_kids === wantsKids);
 
   rows.sort((a, b) => {
     const aOnline = presenceInfo(a.last_seen_at).online;
@@ -1588,6 +1638,14 @@ async function loadProfiles(){
   allBrowseRows = rows;
   visibleCount = PAGE_SIZE;
   renderBrowseGrid();
+}
+
+function clearBrowseFilters(){
+  ["filterSeeking","filterType","filterReligion","filterLifestyle","filterHasKids","filterWantsKids"]
+    .forEach(id => document.getElementById(id).value = "");
+  ["filterCity","filterAgeMin","filterAgeMax"].forEach(id => document.getElementById(id).value = "");
+  ["filterOnline","filterVerified"].forEach(id => document.getElementById(id).checked = false);
+  loadProfiles();
 }
 
 function renderBrowseGrid(){
