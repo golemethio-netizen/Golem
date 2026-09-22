@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,51 +7,55 @@
 <title>Dating — WanaGebya</title>
 <style>
   :root{
-    --green:#0A291A;
-    --green-light:#123B27;
+    --green:#00b894;
+    --green-light:#e8fdf5;
     --gold:#F5A623;
     --gold-soft:#FCE3B4;
     --ink:#1B1B1B;
-    --paper:#FBF8F2;
-    --line:#E4DCC8;
-    --danger:#B3261E;
+    --paper:#f4f7f6;
+    --line:#e2e8f0;
+    --danger:#ff4757;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background:var(--paper);
     color:var(--ink);
   }
   header{
-    background:var(--green);
+    background: #1a1a2e;
     color:#fff;
     padding:18px 20px;
     display:flex;
     align-items:center;
     justify-content:space-between;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
-  header .brand{font-weight:700;font-size:1.1rem;letter-spacing:.02em;}
-  header .brand span{color:var(--gold);}
+  header .brand{font-weight:700;font-size:1.2rem;letter-spacing:.02em;}
+  header .brand span{color:var(--green);}
   header nav a, header button.lang{
     background:none;border:none;color:#fff;opacity:.85;
     font-size:.9rem;cursor:pointer;margin-left:14px;text-decoration:none;
+    font-weight: 600;
   }
-  header nav a:hover{opacity:1;}
+  header nav a:hover{opacity:1; color:var(--green);}
 
-  .notif-wrap{position:relative;margin-left:10px;}
+  .notif-wrap{position:relative;margin-left:10px; display: inline-block;}
   .notif-bell{
-    background:rgba(255,255,255,.08);border:none;border-radius:50%;
+    background:rgba(255,255,255,.1);border:none;border-radius:50%;
     width:38px;height:38px;font-size:1.05rem;cursor:pointer;color:#fff;position:relative;
+    transition: 0.2s;
   }
+  .notif-bell:hover { background: rgba(255,255,255,.2); }
   .notif-count{
     position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;
     font-size:.65rem;font-weight:700;border-radius:999px;padding:1px 5px;line-height:1.3;
   }
   .notif-panel{
     display:none;position:absolute;right:0;top:calc(100% + 8px);background:#fff;color:var(--ink);
-    border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);width:320px;max-height:420px;
-    overflow-y:auto;z-index:60;
+    border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);width:320px;max-height:420px;
+    overflow-y:auto;z-index:100;
   }
   .notif-panel.open{display:block;}
   .notif-panel .head{
@@ -58,244 +63,239 @@
     padding:12px 14px;border-bottom:1px solid var(--line);
   }
   .notif-panel .head strong{font-size:.9rem;}
-  .notif-panel .head button{background:none;border:none;color:var(--green);font-size:.78rem;cursor:pointer;}
+  .notif-panel .head button{background:none;border:none;color:var(--green);font-size:.78rem;cursor:pointer; font-weight:bold;}
   .notif-item{
     display:block;width:100%;text-align:left;background:none;border:none;
     padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer;font-size:.85rem;color:#333;
   }
   .notif-item:hover{background:var(--paper);}
-  .notif-item.unread{background:#FFF9EE;font-weight:600;}
+  .notif-item.unread{background:#e8fdf5;font-weight:600;}
   .notif-item .when{display:block;font-weight:400;font-size:.72rem;color:#999;margin-top:2px;}
   .notif-empty{padding:24px 14px;text-align:center;color:#aaa;font-size:.85rem;}
   .signin-pill{
     display:inline-flex;align-items:center;gap:6px;
-    background:#111;color:#fff;border:none;border-radius:999px;
+    background:var(--green);color:#fff;border:none;border-radius:999px;
     padding:9px 16px;font-size:.88rem;font-weight:600;cursor:pointer;
-    margin-left:14px;opacity:1 !important;
+    margin-left:14px;opacity:1 !important; transition: 0.2s;
   }
-  .signin-pill:hover{background:#000;}
+  .signin-pill:hover{background:#009688;}
 
   .auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);}
   .auth-tab{padding:8px 4px;font-size:.9rem;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
-  .auth-tab.active{color:var(--green);border-bottom-color:var(--gold);}
+  .auth-tab.active{color:var(--green);border-bottom-color:var(--green);}
   .auth-method{display:flex;gap:8px;margin-bottom:16px;}
   .auth-method button{
     flex:1;padding:8px;border-radius:8px;border:1px solid var(--line);background:#fff;
     font-size:.85rem;color:#555;cursor:pointer;
   }
-  .auth-method button.active{background:var(--paper);border-color:var(--gold);color:var(--green);font-weight:700;}
+  .auth-method button.active{background:var(--paper);border-color:var(--green);color:var(--green);font-weight:700;}
   .auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#aaa;font-size:.78rem;}
   .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line);}
   .btn-google{
     width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff;
     font-size:.88rem;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+    font-weight:bold;
   }
   .submit-btn[disabled]{opacity:.6;cursor:default;}
 
-  .app-shell{display:flex;align-items:flex-start;}
+  .app-shell{display:flex;align-items:flex-start; max-width:1200px; margin: 0 auto;}
   .sidebar{
-    width:230px;flex-shrink:0;background:var(--green);min-height:calc(100vh - 64px);
+    width:230px;flex-shrink:0;background:#fff;min-height:calc(100vh - 75px);
     display:flex;flex-direction:column;justify-content:space-between;
+    border-right: 1px solid var(--line);
   }
   .side-nav{padding:18px 0;}
   .side-nav .tab{
     display:flex;align-items:center;gap:10px;padding:12px 22px;cursor:pointer;
-    color:rgba(255,255,255,.75);font-size:.92rem;border-left:3px solid transparent;
+    color:#555;font-size:.92rem;border-left:3px solid transparent; font-weight:600;
   }
-  .side-nav .tab:hover{background:rgba(255,255,255,.06);color:#fff;}
-  .side-nav .tab.active{background:rgba(255,255,255,.1);color:#fff;font-weight:700;border-left-color:var(--gold);}
+  .side-nav .tab:hover{background:var(--paper);color:var(--green);}
+  .side-nav .tab.active{background:#e8fdf5;color:var(--green);font-weight:700;border-left-color:var(--green);}
   .side-icon{font-size:1.05rem;width:20px;text-align:center;}
-  .side-nav .tab #unreadBadge, .side-nav .tab #likesBadge{margin-left:auto;color:var(--gold);font-weight:700;}
+  .side-nav .tab #unreadBadge, .side-nav .tab #likesBadge{margin-left:auto;color:var(--danger);font-weight:700;}
 
-  .sidebar-account{border-top:1px solid rgba(255,255,255,.15);padding:16px 20px;}
+  .sidebar-account{border-top:1px solid var(--line);padding:16px 20px;}
   .sidebar-account .who{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
   .sidebar-account .who img, .sidebar-account .who .avatar-fallback{
-    width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--gold);
-    display:flex;align-items:center;justify-content:center;color:var(--green);font-weight:700;flex-shrink:0;
+    width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--green);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0;
   }
-  .sidebar-account .who .name{color:#fff;font-weight:700;font-size:.9rem;}
+  .sidebar-account .who .name{color:#333;font-weight:700;font-size:.9rem;}
   .account-links{display:flex;gap:12px;flex-wrap:wrap;}
   .account-links button{
-    background:none;border:none;color:rgba(255,255,255,.75);font-size:.8rem;
-    cursor:pointer;padding:0;
+    background:none;border:none;color:#666;font-size:.8rem;
+    cursor:pointer;padding:0; font-weight:600;
   }
-  .account-links button:hover{color:#fff;text-decoration:underline;}
-  .account-links button.danger{color:#F5A0A0;}
+  .account-links button:hover{color:var(--green);text-decoration:underline;}
+  .account-links button.danger{color:var(--danger);}
 
-  main{flex:1;max-width:960px;margin:0 auto;padding:24px 16px 60px;}
+  main{flex:1;max-width:960px;margin:0 auto;padding:24px 20px 60px;}
   .panel{
-    background:#fff;border:1px solid var(--line);border-radius:10px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;
     padding:20px;min-height:300px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
   }
 
-  .gate{
-    text-align:center;padding:40px 20px;color:#555;
-  }
+  .gate{ text-align:center;padding:60px 20px;color:#555; }
+  .gate h2 { color: #1a1a2e; margin-bottom: 10px; }
   .gate button{
-    margin-top:14px;background:var(--gold);color:var(--green);border:none;
-    padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;
+    margin-top:20px;background:var(--green);color:#fff;border:none;
+    padding:12px 28px;border-radius:8px;font-weight:700;cursor:pointer; font-size: 1rem;
   }
 
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
   .filters select, .filters input{
-    padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:.88rem;
+    padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:.88rem; outline: none; font-family: inherit;
   }
 
   .grid{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;
   }
   .card{
-    border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;
     background:#fff;transition:transform .12s ease, box-shadow .12s ease;
   }
-  .card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08);}
+  .card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
   .card .photo{
-    width:100%;aspect-ratio:1/1;background:var(--green-light) center/cover no-repeat;
-    display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-size:2rem;
+    width:100%;aspect-ratio:1/1;background:var(--paper) center/cover no-repeat;
+    display:flex;align-items:center;justify-content:center;color:#ccc;font-size:3rem;
     position:relative;
   }
   .online-dot{
-    position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%;
+    position:absolute;top:10px;right:10px;width:14px;height:14px;border-radius:50%;
     background:#2ECC71;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.1);
   }
-  .card .info{padding:10px 12px;}
-  .card .info .name-age{font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:.02em;}
-  .card .info .name-age .age{color:var(--gold);text-transform:none;font-weight:700;}
-  .card .info .meta{font-size:.8rem;color:#777;margin-top:2px;}
-  .presence{font-size:.75rem;color:#999;margin-top:3px;}
-  .verified-badge{color:#2ECC71;font-weight:900;font-size:.9em;}
-  .msg-controls{position:absolute;top:-10px;right:4px;display:flex;gap:4px;opacity:0;transition:opacity .15s;}
-  .msg-bubble:hover .msg-controls{opacity:1;}
-  .msg-ctrl-btn{
-    background:#fff;border:1px solid var(--line);border-radius:50%;width:20px;height:20px;
-    display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;cursor:pointer;
-  }
-  .msg-edited{font-size:.7rem;color:#999;font-style:italic;}
-  .msg-ctrl-btn-solid{
-    background:var(--green);color:#fff;border:none;border-radius:6px;padding:5px 12px;
-    font-size:.78rem;cursor:pointer;
-  }
+  .card .info{padding:14px;}
+  .card .info .name-age{font-weight:700;font-size:1rem;color:#1a1a2e; letter-spacing:.02em;}
+  .card .info .name-age .age{color:#666; font-weight:400; font-size: 0.9rem;}
+  .card .info .meta{font-size:.85rem;color:#777;margin-top:4px;}
+  .presence{font-size:.8rem;color:#999;margin-top:6px;}
   .presence.is-online{color:#1E8E4F;font-weight:600;}
 
-  .browse-header{margin-bottom:18px;}
-  .browse-header h2{margin:0 0 6px;font-size:1.3rem;}
-  .browse-header h2 span{color:var(--gold);}
-  .browse-header p{margin:0;color:#666;font-size:.88rem;max-width:520px;}
+  .browse-header{margin-bottom:20px;}
+  .browse-header h2{margin:0 0 8px;font-size:1.5rem; color: #1a1a2e;}
+  .browse-header h2 span{color:var(--green);}
+  .browse-header p{margin:0;color:#666;font-size:.9rem;max-width:600px;}
 
-  .more-wrap{text-align:right;margin-top:18px;}
+  .more-wrap{text-align:center;margin-top:24px;}
   .more-btn{
-    background:var(--gold);color:var(--green);border:none;border-radius:999px;
-    padding:10px 26px;font-weight:700;cursor:pointer;font-size:.85rem;letter-spacing:.03em;
+    background:#f1f5f9;color:#333;border:1px solid #cbd5e1;border-radius:999px;
+    padding:10px 32px;font-weight:700;cursor:pointer;font-size:.9rem;
   }
   .more-btn:disabled{opacity:.5;cursor:default;}
+  .empty{text-align:center;color:#888;padding:60px 10px; font-size: 1.1rem;}
 
-  .empty{text-align:center;color:#888;padding:40px 10px;}
-
-  form.post-form{display:grid;gap:14px;max-width:520px;}
-  form.post-form label{font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;}
+  form.post-form{display:grid;gap:16px;max-width:560px;}
+  form.post-form label{font-size:.9rem;font-weight:600;color:#333;display:block;margin-bottom:6px;}
   form.post-form input, form.post-form select, form.post-form textarea{
-    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-size:.92rem;font-family:inherit;
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;
   }
-  form.post-form textarea{min-height:110px;resize:vertical;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .checkbox-line{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:#444;}
-  .checkbox-line input{width:auto;margin-top:2px;}
+  form.post-form input:focus, form.post-form select:focus, form.post-form textarea:focus { border-color: var(--green); }
+  form.post-form textarea{min-height:120px;resize:vertical;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .checkbox-line{display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:#444;}
+  .checkbox-line input{width:auto;margin-top:3px; transform: scale(1.2);}
   .submit-btn{
-    background:var(--green);color:#fff;border:none;padding:12px;border-radius:8px;
-    font-weight:700;cursor:pointer;font-size:.95rem;
+    background:var(--green);color:#fff;border:none;padding:14px;border-radius:8px;
+    font-weight:700;cursor:pointer;font-size:1rem; transition: 0.2s;
   }
   .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
-  .msg{font-size:.85rem;padding:10px;border-radius:7px;margin-top:6px;}
-  .msg.error{background:#FBEAE9;color:var(--danger);}
-  .msg.success{background:#E9F5EC;color:#1E6B37;}
+  .submit-btn:hover:not(:disabled){ background: #009688; }
+  
+  .msg{font-size:.9rem;padding:12px;border-radius:8px;margin-top:10px; font-weight: 600;}
+  .msg.error{background:#FBEAE9;color:var(--danger); border: 1px solid #f5c6cb;}
+  .msg.success{background:#e8fdf5;color:#1E8E4F; border: 1px solid #c3e6cb;}
 
   .modal-backdrop{
-    position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;
-    align-items:center;justify-content:center;padding:20px;z-index:50;
+    position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;
+    align-items:center;justify-content:center;padding:20px;z-index:5000;
   }
   .modal{
-    background:#fff;border-radius:12px;max-width:420px;width:100%;overflow:hidden;
-    max-height:90vh;overflow-y:auto;
+    background:#fff;border-radius:16px;max-width:480px;width:100%;overflow:hidden;
+    max-height:90vh;overflow-y:auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   }
-  .modal .photo{width:100%;aspect-ratio:4/3;background:var(--green-light) center/cover no-repeat;}
-  .thumb-row{display:flex;gap:6px;padding:10px 18px 0;}
-  .thumb{width:48px;height:48px;border-radius:6px;background-size:cover;background-position:center;cursor:pointer;opacity:.6;}
-  .thumb.active{opacity:1;outline:2px solid var(--gold);}
-  .modal .body{padding:18px;}
-  .modal h3{margin:0 0 4px;}
-  .modal .meta{color:#777;font-size:.85rem;margin-bottom:12px;}
-  .modal .bio{font-size:.92rem;line-height:1.5;color:#333;}
-  .modal .actions{display:flex;gap:10px;margin-top:16px;}
+  .modal .photo{width:100%;aspect-ratio:4/3;background:var(--paper) center/cover no-repeat;}
+  .thumb-row{display:flex;gap:8px;padding:12px 20px 0;}
+  .thumb{width:56px;height:56px;border-radius:8px;background-size:cover;background-position:center;cursor:pointer;opacity:.5; transition: 0.2s;}
+  .thumb.active, .thumb:hover {opacity:1;outline:3px solid var(--green);}
+  .modal .body{padding:20px;}
+  .modal h3{margin:0 0 6px; font-size: 1.4rem;}
+  .modal .meta{color:#666;font-size:.9rem;margin-bottom:16px;}
+  .modal .bio{font-size:1rem;line-height:1.6;color:#333;}
+  .modal .actions{display:flex;gap:10px;margin-top:20px;}
   .modal .actions button{
-    flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;cursor:pointer;
+    flex:1;padding:12px;border-radius:10px;border:none;font-weight:700;cursor:pointer; font-size: 1rem;
   }
-  .btn-contact{background:var(--gold);color:var(--green);}
+  .btn-contact{background:var(--green);color:#fff;}
   .btn-report{background:#fff;color:var(--danger);border:1px solid var(--danger) !important;}
-  .btn-close{background:none;border:none;font-size:1.1rem;float:right;cursor:pointer;color:#888;}
+  .btn-close{background:rgba(0,0,0,0.05);border:none;width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; float:right;cursor:pointer;color:#555;}
   .call-btn{
-    background:var(--gold);color:var(--green);border:none;border-radius:50%;
-    width:34px;height:34px;font-size:1rem;cursor:pointer;flex-shrink:0;
+    background:var(--green);color:#fff;border:none;border-radius:50%;
+    width:40px;height:40px;font-size:1.1rem;cursor:pointer;flex-shrink:0; display:flex; align-items: center; justify-content: center;
   }
-  .reaction-row{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+  
+  .reaction-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
   .reaction-pill{
     background:#fff;border:1px solid var(--line);border-radius:999px;
-    padding:2px 8px;font-size:.75rem;cursor:pointer;
+    padding:4px 10px;font-size:.8rem;cursor:pointer; font-weight: 600;
   }
-  .reaction-pill.mine{border-color:var(--gold);background:var(--gold-soft);}
+  .reaction-pill.mine{border-color:var(--green);background:#e8fdf5; color: var(--green);}
   .react-add{
-    position:absolute;bottom:-6px;right:-6px;background:#fff;border:1px solid var(--line);
-    border-radius:50%;width:18px;height:18px;font-size:.7rem;line-height:16px;text-align:center;
-    cursor:pointer;color:#888;
+    position:absolute;bottom:-8px;right:-8px;background:#fff;border:1px solid var(--line);
+    border-radius:50%;width:22px;height:22px;font-size:.8rem; display:flex; align-items:center; justify-content:center;
+    cursor:pointer;color:#666; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
   .reaction-picker{
     position:absolute;z-index:80;background:#fff;border:1px solid var(--line);border-radius:999px;
-    padding:6px 10px;box-shadow:0 6px 18px rgba(0,0,0,.15);display:flex;gap:6px;
+    padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:flex;gap:8px;
   }
-  .reaction-picker span{cursor:pointer;font-size:1.1rem;}
+  .reaction-picker span{cursor:pointer;font-size:1.3rem; transition: transform 0.1s;}
+  .reaction-picker span:hover { transform: scale(1.2); }
 
-  .feed-post-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
-  .post-actions{display:flex;gap:14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);}
-  .post-actions button{background:none;border:none;color:#666;font-size:.82rem;cursor:pointer;padding:4px 0;}
+  .feed-post-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .post-actions{display:flex;gap:16px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);}
+  .post-actions button{background:none;border:none;color:#666;font-size:.85rem;cursor:pointer;padding:4px 0; font-weight: 600;}
   .post-actions button:hover{color:var(--green);}
-  .post-comments{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;}
-  .post-comment-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;max-height:220px;overflow-y:auto;}
-  .post-comment{font-size:.85rem;color:#333;background:var(--paper);padding:6px 10px;border-radius:8px;}
-  .post-comment strong{color:var(--green);margin-right:4px;}
-  .post-comment-input{display:flex;gap:8px;}
+  .post-comments{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;}
+  .post-comment-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;max-height:240px;overflow-y:auto;}
+  .post-comment{font-size:.88rem;color:#333;background:var(--paper);padding:8px 12px;border-radius:10px;}
+  .post-comment strong{color:var(--green);margin-right:6px;}
+  .post-comment-input{display:flex;gap:10px;}
   .post-comment-input input{
-    flex:1;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:.85rem;font-family:inherit;
+    flex:1;border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:.9rem;font-family:inherit; outline: none;
   }
   .post-comment-input button{
-    background:var(--green);color:#fff;border:none;border-radius:999px;padding:7px 16px;font-size:.82rem;cursor:pointer;
+    background:var(--green);color:#fff;border:none;border-radius:999px;padding:9px 20px;font-size:.85rem;cursor:pointer; font-weight: bold;
   }
 
   .call-overlay{
-    position:fixed;inset:0;background:rgba(10,41,26,.92);z-index:90;
+    position:fixed;inset:0;background:rgba(26, 26, 46,.95);z-index:9000;
     display:flex;align-items:center;justify-content:center;
   }
   .call-card{text-align:center;color:#fff;}
   .call-avatar{
-    width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.1);
-    display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto 16px;
+    width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.1);
+    display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto 20px;
   }
-  .call-name{font-size:1.2rem;font-weight:700;margin-bottom:6px;}
-  .call-status{color:var(--gold-soft);margin-bottom:26px;font-size:.95rem;}
-  .call-actions{display:flex;gap:16px;justify-content:center;}
+  .call-name{font-size:1.5rem;font-weight:700;margin-bottom:8px;}
+  .call-status{color:#aaa;margin-bottom:30px;font-size:1rem;}
+  .call-actions{display:flex;gap:20px;justify-content:center;}
   .call-actions button{
-    border:none;border-radius:999px;padding:12px 24px;font-weight:700;cursor:pointer;font-size:.9rem;
+    border:none;border-radius:999px;padding:14px 30px;font-weight:700;cursor:pointer;font-size:1rem;
   }
   .call-accept{background:#2ECC71;color:#fff;}
   .call-decline{background:var(--danger);color:#fff;}
-  .call-mute{background:rgba(255,255,255,.15);color:#fff;}
+  .call-mute{background:rgba(255,255,255,.2);color:#fff;}
 
   @media (max-width: 768px){
     .app-shell{flex-direction:column;}
-    .sidebar{width:100%;min-height:auto;flex-direction:column;}
-    .side-nav{display:flex;overflow-x:auto;padding:8px;gap:2px;}
-    .side-nav .tab{flex-shrink:0;border-left:none;border-bottom:3px solid transparent;padding:10px 14px;white-space:nowrap;}
-    .side-nav .tab.active{border-left-color:transparent;border-bottom-color:var(--gold);}
-    .sidebar-account{border-top:none;border-bottom:1px solid rgba(255,255,255,.15);}
-    main{padding:16px 12px 40px;}
+    .sidebar{width:100%;min-height:auto;flex-direction:column; border-right:none; border-bottom: 1px solid var(--line);}
+    .side-nav{display:flex;overflow-x:auto;padding:10px;gap:6px;}
+    .side-nav .tab{flex-shrink:0;border-left:none;border-bottom:3px solid transparent;padding:10px 14px;white-space:nowrap; border-radius: 8px;}
+    .side-nav .tab.active{border-left-color:transparent;border-bottom-color:transparent; background: #e8fdf5;}
+    .sidebar-account{border-top:none; padding: 12px 16px;}
+    main{padding:16px 12px 80px;}
+    .row2 { grid-template-columns: 1fr; gap: 12px; }
   }
 </style>
 </head>
@@ -303,15 +303,15 @@
 
 <header>
   <div class="brand">WanaGebya <span>Dating</span></div>
-  <nav>
-    <button class="lang" onclick="toggleLang()" id="langBtn">አማ</button>
-    <a href="index.html">← Marketplace</a>
-    <button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')" style="display:block;">👤 Sign In/Register</button>
+  <nav style="display: flex; align-items: center;">
+    <button class="lang" onclick="toggleLang()" id="langBtn" style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px;">EN</button>
+    <a href="index.html" style="margin-left: 20px;">← Back to Shop</a>
+    <button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')">👤 Sign In</button>
     <div class="notif-wrap" id="notifWrap" style="display:none;">
       <button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
       <div class="notif-panel" id="notifPanel">
         <div class="head">
-          <strong>Notifications</strong>
+          <strong>Notifications <span id="notifUnreadLabel" style="color:var(--green);font-weight:700;"></span></strong>
           <button onclick="markAllNotificationsRead()">Mark all read</button>
         </div>
         <div id="notifList"></div>
@@ -324,11 +324,12 @@
   <aside class="sidebar">
     <nav class="side-nav">
       <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
-      <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse</div>
-      <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Post a Profile</div>
+      <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
+      <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
       <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
-      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Profile</div>
+      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
+      <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
     </nav>
     <div class="sidebar-account" id="accountBox" style="display:none;">
       <div class="who">
@@ -336,107 +337,118 @@
         <div class="name" id="menuName"></div>
       </div>
       <div class="account-links">
-        <button onclick="switchTab('myprofile');">Edit profile</button>
-        <button onclick="openSettings()">Settings</button>
+        <button onclick="switchTab('myprofile');">Edit Profile</button>
+        <button onclick="switchTab('settings');">Privacy Settings</button>
         <button class="danger" onclick="signOut()">Sign out</button>
       </div>
     </div>
   </aside>
 
 <main>
+  <!-- GATEKEEPER -->
   <div class="panel" id="gate" style="display:none;">
     <div class="gate">
-      <p>You need to be signed in to view or post in Dating.</p>
-      <button onclick="openAuthModal('signin')">Sign In / Register</button>
+      <h2>Welcome to WanaGebya Dating ❤️</h2>
+      <p>Connect with singles in Ethiopia looking for friendship, dating, or marriage. You must be signed in to browse or match.</p>
+      <button onclick="openAuthModal('signin')">Sign In / Register Now</button>
     </div>
   </div>
 
+  <!-- HOME FEED -->
   <div class="panel" id="homePanel" style="display:none;">
-    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div id="composerAvatar" style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--green-light);display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">👤</div>
+    <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div id="composerAvatar" style="width:46px;height:46px;border-radius:50%;flex-shrink:0;background:var(--paper);display:flex;align-items:center;justify-content:center;color:#aaa; font-size: 1.5rem;">👤</div>
         <div style="flex:1;">
-          <textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or anything you'd like to post..." style="width:100%;min-height:60px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:.92rem;resize:vertical;"></textarea>
+          <textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or what you are looking for..." style="width:100%;min-height:70px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:.95rem;resize:vertical; outline:none;"></textarea>
           <div id="postImagePreview" style="margin-top:8px;"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#555;cursor:pointer;">
-              🖼️ Photo
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px; flex-wrap:wrap; gap: 10px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:.9rem;color:#444;cursor:pointer; font-weight:600; background: var(--paper); padding: 8px 14px; border-radius: 20px;">
+              🖼️ Add Photo
               <input type="file" id="postImage" accept="image/*" style="display:none;" onchange="previewPostImage()">
             </label>
-            <select id="postVisibility" style="border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:.82rem;color:#555;">
-              <option value="public">🌍 Public — any member</option>
-              <option value="matches">👥 Matches only</option>
-            </select>
-            <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--gold);color:var(--green);border:none;border-radius:999px;padding:8px 22px;font-weight:700;cursor:pointer;">Post</button>
+            <div style="display: flex; gap: 10px; align-items:center;">
+                <select id="postVisibility" style="border:1px solid var(--line);border-radius:20px;padding:8px 12px;font-size:.85rem;color:#555; outline:none;">
+                  <option value="public">🌍 Public (Everyone)</option>
+                  <option value="matches">👥 Only My Matches</option>
+                </select>
+                <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--green);color:#fff;border:none;border-radius:20px;padding:8px 24px;font-weight:700;cursor:pointer;">Post</button>
+            </div>
           </div>
           <div id="postMsg"></div>
         </div>
       </div>
     </div>
     <div id="feed"></div>
-    <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something.</div>
+    <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something!</div>
   </div>
 
+  <!-- BROWSE MATCHES -->
   <div class="panel" id="browsePanel" style="display:none;">
     <div class="browse-header">
       <h2>Find Singles <span>Online</span></h2>
-      <p>Browse people near you looking for friendship, dating, or marriage — like a profile to start a conversation once it's mutual.</p>
+      <p>Browse people near you looking for friendship, dating, or marriage. Like a profile to start chatting.</p>
     </div>
     <div class="filters">
       <select id="filterSeeking">
-        <option value="">Show: everyone</option>
+        <option value="">Show: Everyone</option>
         <option value="Male">Men</option>
         <option value="Female">Women</option>
       </select>
       <select id="filterType">
-        <option value="">Any purpose</option>
+        <option value="">Any Purpose</option>
         <option value="Friendship">Friendship</option>
         <option value="Dating">Dating</option>
         <option value="Marriage">Marriage</option>
       </select>
-      <input type="text" id="filterCity" placeholder="City">
-      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 4px;">
-        <input type="checkbox" id="filterOnline" style="width:auto;"> Online now
+      <input type="text" id="filterCity" placeholder="Filter by City...">
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
+        <input type="checkbox" id="filterOnline" style="width:18px; height:18px;"> Online now
       </label>
-      <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;">Filter</button>
+      <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer; font-weight:bold;">Filter Results</button>
     </div>
-    <div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:14px;"></div>
+    <div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:16px;"></div>
     <div class="grid" id="grid"></div>
-    <div class="empty" id="emptyState" style="display:none;">No profiles match yet — check back soon.</div>
+    <div class="empty" id="emptyState" style="display:none;">No profiles match your filters yet — check back soon.</div>
     <div class="more-wrap" id="moreWrap" style="display:none;">
-      <button class="more-btn" id="moreBtn" onclick="showMoreProfiles()">More</button>
+      <button class="more-btn" id="moreBtn" onclick="showMoreProfiles()">Load More Profiles</button>
     </div>
   </div>
 
+  <!-- SETUP PROFILE -->
   <div class="panel" id="postPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>Create Your <span>Dating Profile</span></h2>
+      <p>Fill out the details below to start matching with people.</p>
+    </div>
     <form class="post-form" id="postForm">
       <div>
-        <label>First name (shown publicly)</label>
-        <input type="text" id="fName" maxlength="30" required>
+        <label>First Name (Shown Publicly)</label>
+        <input type="text" id="fName" maxlength="30" placeholder="Your name" required>
       </div>
       <div class="row2">
         <div>
           <label>Age</label>
-          <input type="number" id="fAge" min="18" max="99" required>
+          <input type="number" id="fAge" min="18" max="99" placeholder="18+" required>
         </div>
         <div>
           <label>City</label>
-          <input type="text" id="fCity" required>
+          <input type="text" id="fCity" placeholder="e.g. Addis Ababa" required>
         </div>
       </div>
       <div class="row2">
         <div>
-          <label>I am</label>
+          <label>I Am A</label>
           <select id="fGender" required>
-            <option value="">Select</option>
+            <option value="">Select Gender</option>
             <option>Male</option>
             <option>Female</option>
           </select>
         </div>
         <div>
-          <label>Looking for</label>
+          <label>Looking For</label>
           <select id="fSeeking" required>
-            <option value="">Select</option>
+            <option value="">Select Gender</option>
             <option>Male</option>
             <option>Female</option>
             <option>Any</option>
@@ -444,18 +456,18 @@
         </div>
       </div>
       <div>
-        <label>Purpose</label>
+        <label>My Goal / Purpose</label>
         <select id="fType" required>
-          <option value="">Select</option>
+          <option value="">Select Goal</option>
           <option>Friendship</option>
           <option>Dating</option>
           <option>Marriage</option>
         </select>
       </div>
       <div>
-        <label>What I'm looking for</label>
+        <label>What I'm Looking For Details</label>
         <select id="fLookingFor" required>
-          <option value="">Select</option>
+          <option value="">Select Details</option>
           <option>Long-term relationship</option>
           <option>Something casual</option>
           <option>Marriage</option>
@@ -465,18 +477,18 @@
       </div>
       <div class="row2">
         <div>
-          <label>Interested in ages</label>
-          <input type="number" id="fAgeMin" min="18" max="99" placeholder="Min" required>
+          <label>Interested In Ages (Min)</label>
+          <input type="number" id="fAgeMin" min="18" max="99" placeholder="Min Age" required>
         </div>
         <div>
-          <label>&nbsp;</label>
-          <input type="number" id="fAgeMax" min="18" max="99" placeholder="Max" required>
+          <label>Interested In Ages (Max)</label>
+          <input type="number" id="fAgeMax" min="18" max="99" placeholder="Max Age" required>
         </div>
       </div>
       <div>
-        <label>My lifestyle</label>
+        <label>My Lifestyle</label>
         <select id="fLifestyle" required>
-          <option value="">Select</option>
+          <option value="">Select Lifestyle</option>
           <option>Active & Outdoorsy</option>
           <option>Homebody</option>
           <option>Social & Outgoing</option>
@@ -488,7 +500,7 @@
       </div>
       <div class="row2">
         <div>
-          <label>Have kids?</label>
+          <label>Have Kids?</label>
           <select id="fHasKids" required>
             <option value="">Select</option>
             <option>Yes</option>
@@ -496,7 +508,7 @@
           </select>
         </div>
         <div>
-          <label>Want kids?</label>
+          <label>Want Kids?</label>
           <select id="fWantsKids" required>
             <option value="">Select</option>
             <option>Yes</option>
@@ -508,7 +520,7 @@
       <div>
         <label>Religion</label>
         <select id="fReligion" required>
-          <option value="">Select</option>
+          <option value="">Select Religion</option>
           <option>Orthodox Christian</option>
           <option>Protestant</option>
           <option>Muslim</option>
@@ -520,11 +532,11 @@
       </div>
       <div class="row2">
         <div>
-          <label>Occupation (optional)</label>
-          <input type="text" id="fOccupation" maxlength="60">
+          <label>Occupation (Optional)</label>
+          <input type="text" id="fOccupation" maxlength="60" placeholder="e.g. Engineer">
         </div>
         <div>
-          <label>Income (optional)</label>
+          <label>Income (Optional)</label>
           <select id="fIncome">
             <option selected>Prefer not to say</option>
             <option>Under 10,000 ETB/mo</option>
@@ -536,54 +548,91 @@
         </div>
       </div>
       <div>
-        <label>About you (max 500 characters)</label>
-        <textarea id="fBio" maxlength="500" required placeholder="Tell people a bit about yourself..."></textarea>
+        <label>About You (Max 500 chars)</label>
+        <textarea id="fBio" maxlength="500" required placeholder="Tell people a bit about your hobbies, interests, and what makes you unique..."></textarea>
       </div>
       <div>
-        <label>Photos (up to 3)</label>
-        <input type="file" id="fPhoto" accept="image/*" multiple>
+        <label>Upload Photos (Up to 3)</label>
+        <input type="file" id="fPhoto" accept="image/*" multiple style="padding: 6px; background: #fff;">
       </div>
-      <div class="checkbox-line">
+      <div class="checkbox-line" style="background: #fff9ee; padding: 12px; border-radius: 8px; border: 1px solid #fce3b4;">
         <input type="checkbox" id="fAgeConfirm" required>
-        <label for="fAgeConfirm" style="margin:0;font-weight:400;">I confirm I am 18 years or older and this information is accurate.</label>
+        <label for="fAgeConfirm" style="margin:0;font-weight:600; color: #8a6d1f;">I confirm I am 18 years or older and this information is accurate.</label>
       </div>
-      <button type="submit" class="submit-btn" id="submitBtn">Post my profile</button>
+      <button type="submit" class="submit-btn" id="submitBtn">Publish My Profile</button>
       <div id="formMsg"></div>
     </form>
   </div>
 
+  <!-- MESSAGES -->
   <div class="panel" id="messagesPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>Your <span>Messages</span></h2>
+    </div>
     <div id="threadList"></div>
-    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Message someone from Browse to start a conversation.</div>
+    <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Match with someone from Browse to start a conversation!</div>
   </div>
 
+  <!-- LIKES -->
   <div class="panel" id="likesPanel" style="display:none;">
     <div class="browse-header">
-      <h2>People who <span>liked you</span></h2>
+      <h2>People Who <span>Liked You</span></h2>
       <p>Like them back to match and start chatting.</p>
     </div>
     <div class="grid" id="likesGrid"></div>
-    <div class="empty" id="likesEmpty" style="display:none;">No one has liked your profile yet.</div>
+    <div class="empty" id="likesEmpty" style="display:none;">No one has liked your profile yet. Make sure you have a great photo!</div>
   </div>
 
+  <!-- MY PROFILE -->
   <div class="panel" id="myProfilePanel" style="display:none;">
     <div id="myProfileContent"></div>
   </div>
+
+  <!-- PRIVACY SETTINGS (NEW) -->
+  <div class="panel" id="settingsPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>Privacy <span>Settings</span></h2>
+      <p>Manage your account security and blocked contacts.</p>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+      <h3 style="margin-top:0;">Change Password</h3>
+      <div class="row2">
+        <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">New Password</label><input type="password" id="setNewPwd" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" placeholder="Min 6 characters"></div>
+        <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Confirm Password</label><input type="password" id="setNewPwdConf" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" placeholder="Confirm new password"></div>
+      </div>
+      <button onclick="updateAccountPassword()" class="submit-btn" style="width:auto;padding:10px 24px;margin-top:14px;">Update Password</button>
+      <div id="pwdMsg" style="margin-top:10px;"></div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+      <h3 style="margin-top:0;">Blocked Users</h3>
+      <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Users you have blocked cannot see your profile or message you.</p>
+      <div id="blockedUsersList">Loading...</div>
+    </div>
+  </div>
+
 </main>
 </div>
 
+<!-- ROOT CONTAINERS -->
 <div id="modalRoot"></div>
 <div id="callRoot"></div>
 <audio id="remoteAudio" autoplay></audio>
 
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 // ============================================================
-// Uses the shared _supabase client from config.js (same client
-// your other pages already use — no separate key/config here).
+// WanaGebya Dating Engine (Includes Real-Time & WebRTC calls)
 // ============================================================
-const STORAGE_BUCKET = "product-images"; // <-- confirm this matches your existing bucket name
+const STORAGE_BUCKET = "avatars"; // Changed to avatars based on previous WanaGebya config
+
+// Ensure _supabase exists before running
+if (typeof _supabase === 'undefined') {
+    alert("CRITICAL ERROR: config.js is not loaded properly. Cannot connect to Supabase.");
+}
 
 let currentUser = null;
 let currentOpenThread = null;
@@ -591,6 +640,8 @@ let allBrowseRows = [];
 let visibleCount = 0;
 const PAGE_SIZE = 6;
 let currentLang = "en";
+let messageRealtimeChannel = null;
+let notifRealtimeChannel = null;
 
 // ---------- Presence / last seen ----------
 const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
@@ -645,9 +696,12 @@ async function initAuth(){
     refreshUnreadBadge();
     refreshLikesBadge();
     refreshNotifCount();
+    refreshProfileCompleteBadge();
     startPresenceHeartbeat();
     startNotifPolling();
     setupPersonalCallChannel();
+    setupRealtimeMessaging();
+    setupRealtimeNotifications();
   }
 }
 
@@ -660,13 +714,13 @@ function maybeShowSafetyNotice(){
     <div class="modal-backdrop">
       <div class="modal">
         <div class="body">
-          <h3>Stay safe while dating</h3>
-          <div class="bio" style="margin-bottom:14px;">
+          <h3>Stay Safe While Dating 🛡️</h3>
+          <div class="bio" style="margin-bottom:14px; background: #fff9ee; padding: 15px; border-radius: 8px; border: 1px solid #fce3b4;">
             A few basics before you start browsing:
-            <ul style="padding-left:18px;margin:10px 0;">
-              <li>Meet new people in a public place for the first few times.</li>
-              <li>Never send money, gifts, or account/card details to someone you haven't met in person.</li>
-              <li>Trust your instincts — if something feels off, stop replying and use Report or Block.</li>
+            <ul style="padding-left:18px;margin:10px 0; line-height: 1.6;">
+              <li>Meet new people in a <b>public place</b> for the first few times.</li>
+              <li><b>Never send money</b>, gifts, or account/card details to someone you haven't met.</li>
+              <li>Trust your instincts — if something feels off, use Report or Block.</li>
               <li>Tell a friend or family member where you're going for a first meetup.</li>
             </ul>
           </div>
@@ -683,30 +737,21 @@ function dismissSafetyNotice(){
 }
 
 // ---------- Sign in / Register modal ----------
-let authTab = "signin";      // 'signin' | 'register'
-let authMethod = "email";    // 'email' | 'phone'
+let authTab = "signin";      
+let authMethod = "email";    
 
 function normalizeEthiopianPhone(raw){
   let p = String(raw || "").trim().replace(/[^\d+]/g, "");
   p = p.replace(/^\+/, "");
   if (p.startsWith("0") && p.length === 10) p = "251" + p.slice(1);
   else if (p.length === 9 && /^[79]/.test(p)) p = "251" + p;
-  return p; // expected shape: 251[79]XXXXXXXX (9 = Ethio Telecom, 7 = Safaricom Ethiopia)
+  return p; 
 }
 
-// Ethio Telecom mobile numbers start 09x; Safaricom Ethiopia numbers
-// start 07x. Both are 9 digits after the country code.
 function isValidEthiopianPhone(p){
   return /^251[79]\d{8}$/.test(p);
 }
 
-// Supabase's native Phone provider needs an SMS provider (and to be
-// switched on at all) to work — same reason the marketplace avoids it.
-// Instead we turn the phone number into a fake, never-shown email
-// address and sign up/in with that as a normal email+password account.
-// Using the SAME domain as script.js's phoneToPseudoEmail means a
-// phone number already registered on the marketplace logs into the
-// dating site as the same account, and vice versa.
 function phoneToPseudoEmail(p){
   return p + "@phone.wanagebya.com";
 }
@@ -733,29 +778,29 @@ function renderAuthModal(){
   const isPhone = authMethod === "phone";
 
   const identifierField = isPhone
-    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. 0912345678 (Ethio Telecom) or 0711234567 (Safaricom)" required></div>`
-    : `<div><label>Email</label><input type="email" id="authEmail" required></div>`;
+    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="09..." required class="modal-input"></div>`
+    : `<div><label>Email</label><input type="email" id="authEmail" placeholder="you@email.com" required class="modal-input"></div>`;
 
   const registerExtraFields = !isSignin ? `
-    <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required></div>
-    <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required></div>
-    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="e.g. 0912345678"></div>` : ""}
+    <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required class="modal-input"></div>
+    <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required class="modal-input"></div>
+    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="09..." class="modal-input"></div>` : ""}
   ` : "";
 
   const form = `
-    <form class="post-form" id="authForm" style="gap:12px;">
+    <form class="post-form" id="authForm" style="gap:12px; max-width: 100%;">
       ${identifierField}
-      <div><label>Password</label><input type="password" id="authPassword" minlength="6" required></div>
-      ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required></div>` : ""}
+      <div><label>Password</label><input type="password" id="authPassword" minlength="6" required class="modal-input"></div>
+      ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required class="modal-input"></div>` : ""}
       ${registerExtraFields}
-      <button type="submit" class="submit-btn">${isSignin ? "Sign In" : "Create Account"}</button>
-      ${(isSignin && !isPhone) ? `<div style="text-align:right;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.8rem;cursor:pointer;padding:0;">Forgot password?</button></div>` : ""}
+      <button type="submit" class="submit-btn" style="width:100%; margin-top: 10px;">${isSignin ? "Sign In" : "Create Account"}</button>
+      ${(isSignin && !isPhone) ? `<div style="text-align:right; margin-top: 8px;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.85rem;cursor:pointer;padding:0;font-weight:600;">Forgot password?</button></div>` : ""}
       <div id="authMsg"></div>
     </form>`;
 
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
-      <div class="modal">
+      <div class="modal" style="max-width: 400px;">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <div class="auth-tabs">
@@ -768,12 +813,23 @@ function renderAuthModal(){
           </div>
           ${form}
           <div class="auth-divider">or</div>
-          <button class="btn-google" onclick="signInWithGoogle()">🔵 Continue with Google</button>
+          <button class="btn-google" onclick="signInWithGoogle()">
+            <svg style="width:18px;height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
         </div>
       </div>
     </div>`;
 
   document.getElementById("authForm").addEventListener("submit", submitAuthForm);
+}
+
+async function signInWithGoogle(){
+  const { error } = await _supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin + "/dating.html" }
+  });
+  if (error) alert("Sign-in failed: " + error.message);
 }
 
 async function submitAuthForm(e){
@@ -783,7 +839,7 @@ async function submitAuthForm(e){
   const password = document.getElementById("authPassword").value;
   const submitBtn = e.target.querySelector("button[type=submit]");
 
-  let identifier;  // { email } — phone is converted to a pseudo-email too, see phoneToPseudoEmail
+  let identifier; 
   let realPhone = null;
   if (isPhone){
     const raw = document.getElementById("authPhone").value.trim();
@@ -815,7 +871,7 @@ async function submitAuthForm(e){
     submitBtn.textContent = "Sign In";
     if (error){
       if (isPhone && /Invalid login credentials/i.test(error.message)){
-        msg.innerHTML = `<div class="msg error">No account found with that phone number, or the password is wrong.</div>`;
+        msg.innerHTML = `<div class="msg error">No account found with that phone number, or wrong password.</div>`;
       } else {
         msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
       }
@@ -859,15 +915,8 @@ async function sendPasswordReset(){
     : `<div class="msg success">Password reset email sent.</div>`;
 }
 
-async function signInWithGoogle(){
-  const { error } = await _supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: window.location.origin + "/dating.html" }
-  });
-  if (error) alert("Sign-in failed: " + error.message);
-}
-
 async function signOut(){
+  teardownRealtimeChannels();
   await _supabase.auth.signOut();
 }
 
@@ -879,7 +928,7 @@ function updateHeaderAuthUI(){
   if (currentUser){
     pillBtn.style.display = "none";
     accountBox.style.display = "block";
-    notifWrap.style.display = "block";
+    notifWrap.style.display = "inline-block";
 
     const fullName = currentUser.user_metadata?.full_name || currentUser.email || "Account";
     const photoUrl = currentUser.user_metadata?.avatar_url || null;
@@ -888,7 +937,7 @@ function updateHeaderAuthUI(){
     document.getElementById("menuName").textContent = fullName;
 
     const avatarHtml = photoUrl
-      ? `<img src="${photoUrl}" alt="">`
+      ? `<img src="${photoUrl}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`
       : `<span class="avatar-fallback">${initial}</span>`;
     document.getElementById("menuAvatar").innerHTML = avatarHtml;
   } else {
@@ -903,12 +952,8 @@ document.addEventListener("click", (e) => {
   if (notifWrap && !notifWrap.contains(e.target)) document.getElementById("notifPanel")?.classList.remove("open");
 });
 
-function openSettings(){
-  alert("Settings coming soon — for now, use Edit Profile to update your details.");
-}
-
-// Re-check auth state after OAuth redirect completes, or if session changes
 _supabase.auth.onAuthStateChange((_event, session) => {
+  const wasSignedIn = !!currentUser;
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "block";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
@@ -919,7 +964,13 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     refreshUnreadBadge();
     refreshLikesBadge();
     refreshNotifCount();
+    refreshProfileCompleteBadge();
     startNotifPolling();
+    setupPersonalCallChannel();
+    setupRealtimeMessaging();
+    setupRealtimeNotifications();
+  } else if (wasSignedIn){
+    teardownRealtimeChannels();
   }
 });
 
@@ -943,36 +994,14 @@ async function refreshLikesBadge(){
   badge.textContent = count ? `(${count})` : "";
 }
 
-// ---------- Notifications (Realtime, not polling) ----------
-let notifRealtimeChannel = null;
+// ---------- Notifications ----------
+let notifPollTimer = null;
 
 function startNotifPolling(){
-  // Despite the name (kept so existing call sites don't need touching),
-  // this now uses Supabase Realtime (postgres_changes) instead of a
-  // setInterval poll — instant updates instead of up-to-45s delay.
-  // Requires dating-migration-v17-enable-realtime.sql to have been run
-  // (adds dating_notifications/dating_messages to the realtime publication).
-  if (notifRealtimeChannel) return;
-  notifRealtimeChannel = _supabase
-    .channel(`dating-realtime:${currentUser.id}`)
-    .on("postgres_changes", {
-      event: "INSERT", schema: "public", table: "dating_notifications",
-      filter: `user_id=eq.${currentUser.id}`
-    }, () => {
-      refreshNotifCount();
-    })
-    .on("postgres_changes", {
-      event: "INSERT", schema: "public", table: "dating_messages",
-      filter: `recipient_id=eq.${currentUser.id}`
-    }, (payload) => {
-      refreshUnreadBadge();
-      // if that conversation is currently open, refresh it live
-      if (currentOpenThread && payload.new.profile_id === currentOpenThread.profileId
-          && payload.new.sender_id === currentOpenThread.other){
-        refreshCurrentThreadAfterSend(currentOpenThread.profileId, currentOpenThread.other);
-      }
-    })
-    .subscribe();
+  if (notifPollTimer) clearInterval(notifPollTimer);
+  notifPollTimer = setInterval(() => {
+    if (document.visibilityState === "visible" && currentUser) refreshNotifCount();
+  }, 45 * 1000);
 }
 
 async function refreshNotifCount(){
@@ -985,6 +1014,51 @@ async function refreshNotifCount(){
   if (!badge) return;
   badge.textContent = count > 9 ? "9+" : (count || "");
   badge.style.display = count ? "inline-block" : "none";
+}
+
+// ---------- Realtime: messages & notifications ----------
+function setupRealtimeMessaging(){
+  if (messageRealtimeChannel) return;
+  messageRealtimeChannel = _supabase
+    .channel(`dating-messages:${currentUser.id}`)
+    .on("postgres_changes", {
+      event: "INSERT", schema: "public", table: "dating_messages",
+      filter: `recipient_id=eq.${currentUser.id}`
+    }, (payload) => handleIncomingMessage(payload.new))
+    .subscribe();
+}
+
+function handleIncomingMessage(m){
+  refreshUnreadBadge();
+
+  const messagesTabVisible = document.getElementById("messagesPanel")?.style.display !== "none";
+  if (messagesTabVisible) loadThreads();
+
+  if (currentOpenThread &&
+      currentOpenThread.profileId === m.profile_id &&
+      currentOpenThread.other === m.sender_id){
+    currentOpenThread.messages.unshift(m);
+    openThread(currentOpenThread);
+  }
+}
+
+function setupRealtimeNotifications(){
+  if (notifRealtimeChannel) return;
+  notifRealtimeChannel = _supabase
+    .channel(`dating-notifications:${currentUser.id}`)
+    .on("postgres_changes", {
+      event: "INSERT", schema: "public", table: "dating_notifications",
+      filter: `user_id=eq.${currentUser.id}`
+    }, () => {
+      refreshNotifCount();
+      if (document.getElementById("notifPanel")?.classList.contains("open")) loadNotifications();
+    })
+    .subscribe();
+}
+
+function teardownRealtimeChannels(){
+  if (messageRealtimeChannel){ _supabase.removeChannel(messageRealtimeChannel); messageRealtimeChannel = null; }
+  if (notifRealtimeChannel){ _supabase.removeChannel(notifRealtimeChannel); notifRealtimeChannel = null; }
 }
 
 function notifIcon(type){
@@ -1017,7 +1091,18 @@ async function loadNotifications(){
     .limit(30);
 
   if (error){ list.innerHTML = `<div class="notif-empty">Couldn't load notifications.</div>`; return; }
-  if (!data || data.length === 0){ list.innerHTML = `<div class="notif-empty">Nothing yet — likes, matches and messages will show up here.</div>`; return; }
+  if (!data || data.length === 0){
+    list.innerHTML = `<div class="notif-empty">Nothing yet — likes, matches and messages will show up here.</div>`;
+    const unreadLabelEmpty = document.getElementById("notifUnreadLabel");
+    if (unreadLabelEmpty) unreadLabelEmpty.textContent = "";
+    return;
+  }
+
+  const unreadLabel = document.getElementById("notifUnreadLabel");
+  if (unreadLabel){
+    const unreadCount = data.filter(n => !n.read).length;
+    unreadLabel.textContent = unreadCount ? `(${unreadCount} new)` : "";
+  }
 
   const actorIds = [...new Set(data.map(n => n.actor_id).filter(Boolean))];
   const { data: actors } = actorIds.length
@@ -1054,7 +1139,6 @@ async function handleNotifClick(idx){
     return;
   }
 
-  // like / match — open that person's profile card if we can find it
   if (n.actor_id){
     const { data: profile } = await _supabase
       .from("dating_profiles")
@@ -1130,7 +1214,7 @@ async function loadLikesReceived(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${row.is_verified ? ` <span class="verified-badge" title="Verified">✓</span>` : ""} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
       </div>`;
     grid.appendChild(card);
@@ -1138,10 +1222,10 @@ async function loadLikesReceived(){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel"];
+const PANELS = ["homePanel","browsePanel","postPanel","messagesPanel","likesPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+  document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
   if (!currentUser){
     document.getElementById("gate").style.display = "block";
     PANELS.forEach(p => document.getElementById(p).style.display = "none");
@@ -1149,7 +1233,7 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel" };
+  const map = { home: "homePanel", browse: "browsePanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "home") loadFeed();
@@ -1157,6 +1241,7 @@ function switchTab(tab){
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "likes") loadLikesReceived();
   if (tab === "myprofile") loadMyProfile();
+  if (tab === "settings") loadSettings();
 }
 
 // ---------- Home feed ----------
@@ -1182,7 +1267,7 @@ function previewPostImage(){
   const url = URL.createObjectURL(file);
   preview.innerHTML = `<div style="position:relative;display:inline-block;">
     <img src="${url}" style="max-height:140px;border-radius:8px;">
-    <button onclick="clearPostImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;">✕</button>
+    <button onclick="clearPostImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold;">✕</button>
   </div>`;
 }
 
@@ -1226,7 +1311,10 @@ async function submitPost(){
   btn.textContent = "Post";
 
   if (error){
-    msg.innerHTML = `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
+    const isRlsBlock = error.code === "42501" || /row-level security/i.test(error.message || "");
+    msg.innerHTML = isRlsBlock
+      ? `<div class="msg error">Post a profile first (see the "Setup Profile" tab) before sharing to the Home feed.</div>`
+      : `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
     return;
   }
 
@@ -1267,7 +1355,7 @@ async function loadFeed(){
   const authorIds = [...new Set(posts.map(p => p.user_id))];
 
   const [{ data: authors }, { data: reactions }, { data: comments }] = await Promise.all([
-    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos").in("user_id", authorIds),
+    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified").in("user_id", authorIds),
     _supabase.from("dating_post_reactions").select("*").in("post_id", postIds),
     _supabase.from("dating_post_comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
   ]);
@@ -1280,10 +1368,10 @@ async function loadFeed(){
 
   const commentsByPost = {};
   (comments || []).forEach(c => { (commentsByPost[c.post_id] ||= []).push(c); });
-  // also need commenter profile info
+  
   const commenterIds = [...new Set((comments || []).map(c => c.user_id))];
   const { data: commenterProfiles } = commenterIds.length
-    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender").in("user_id", commenterIds)
+    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified").in("user_id", commenterIds)
     : { data: [] };
   const commenterMap = {};
   (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
@@ -1308,22 +1396,26 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
   const commentsHtml = postComments.map(c => {
     const cp = commenterMap[c.user_id];
     const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
-    return `<div class="post-comment"><strong>${esc(cname)}</strong> ${esc(c.body)}</div>`;
+    const canDelete = c.user_id === currentUser.id || isMine; 
+    return `<div class="post-comment">
+      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}</strong> ${esc(c.body)}
+      ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;float:right; font-weight:bold;">✕</button>` : ""}
+    </div>`;
   }).join("");
 
   return `
     <div class="feed-post-card" id="post-${p.id}">
-      <div style="display:flex;gap:10px;align-items:center;">
-        <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:700;font-size:.88rem;color:var(--green);">${esc(name)}</div>
-          <div style="font-size:.75rem;color:#999;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
+          <div style="font-weight:700;font-size:.95rem;color:var(--ink);">${esc(name)}${verifiedBadge(a && a.is_verified)}</div>
+          <div style="font-size:.8rem;color:#888;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
         </div>
-        ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;">✕</button>`
-                 : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.78rem;">Report</button>`}
+        ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:1.1rem;">✕</button>`
+                 : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
-      <div style="margin-top:10px;font-size:.9rem;color:var(--ink);white-space:pre-wrap;">${esc(p.body)}</div>
-      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:10px;max-width:100%;border-radius:8px;">` : ""}
+      <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
+      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
@@ -1335,7 +1427,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
         <div class="post-comment-list">${commentsHtml}</div>
         <div class="post-comment-input">
           <input type="text" id="commentInput-${p.id}" maxlength="500" placeholder="Write a comment...">
-          <button onclick="submitComment('${p.id}')">Send</button>
+          <button onclick="submitComment('${p.id}')">Post</button>
         </div>
       </div>
     </div>`;
@@ -1357,6 +1449,15 @@ async function submitComment(postId){
   input.value = "";
   loadFeed();
 }
+
+async function deleteComment(commentId, postId){
+  if (!confirm("Delete this comment?")) return;
+  const { error } = await _supabase.from("dating_post_comments").delete().eq("id", commentId);
+  if (error){ alert("Couldn't delete: " + error.message); return; }
+  loadFeed();
+}
+
+const REACTION_EMOJIS = ["❤️","😂","😮","😢","👍","🔥"];
 
 function showPostReactionPicker(event, postId){
   event.stopPropagation();
@@ -1428,7 +1529,7 @@ async function loadProfiles(){
   let query = _supabase
     .from("dating_profiles")
     .select("*")
-    .neq("user_id", currentUser.id) // don't show your own profile in the browse grid
+    .neq("user_id", currentUser.id) 
     .order("created_at", { ascending: false });
 
   const { data, error } = await query;
@@ -1491,7 +1592,7 @@ function renderBrowseGrid(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${row.is_verified ? ` <span class="verified-badge" title="Verified">✓</span>` : ""} <span class="age">${row.age || "?"} years old</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>
       </div>`;
@@ -1514,9 +1615,8 @@ async function openModal(row){
   const root = document.getElementById("modalRoot");
   const matched = await checkMatch(row.user_id);
   const actionBtn = matched
-    ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">Message</button>
-       <button class="btn-report" onclick="unmatchUser('${row.user_id}')">Unmatch</button>`
-    : `<button class="btn-contact" id="likeBtn" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like</button>`;
+    ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">💬 Message</button>`
+    : `<button class="btn-contact" id="likeBtn" style="background:var(--gold); color:var(--ink);" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like Profile</button>`;
   const thumbs = photos.length > 1
     ? `<div class="thumb-row">${photos.map((p,i) => `<div class="thumb${i===0?" active":""}" data-idx="${i}" style="background-image:url('${esc(p)}')"></div>`).join("")}</div>`
     : "";
@@ -1527,19 +1627,19 @@ async function openModal(row){
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${row.is_verified ? ` <span class="verified-badge" title="Verified">✓</span>` : ""}</h3>
+          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}</h3>
           <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
-          <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:10px;">${presence.online ? "🟢 " : ""}${presence.text}</div>
-          <div class="bio">${esc(row.bio || "")}</div>
-          <div class="meta" style="margin-top:8px;line-height:1.7;">
-            ${row.looking_for ? `<div>💍 Looking for: ${esc(row.looking_for)}</div>` : ""}
-            ${(row.age_min && row.age_max) ? `<div>🎂 Interested in ages ${esc(row.age_min)}–${esc(row.age_max)}</div>` : ""}
-            ${row.lifestyle ? `<div>🌿 Lifestyle: ${esc(row.lifestyle)}</div>` : ""}
-            ${row.has_kids ? `<div>👶 Has kids: ${esc(row.has_kids)}</div>` : ""}
-            ${row.wants_kids ? `<div>👶 Wants kids: ${esc(row.wants_kids)}</div>` : ""}
-            ${row.religion ? `<div>🙏 Religion: ${esc(row.religion)}</div>` : ""}
-            ${row.occupation ? `<div>💼 Occupation: ${esc(row.occupation)}</div>` : ""}
-            ${(row.income_range && row.income_range !== "Prefer not to say") ? `<div>💰 Income: ${esc(row.income_range)}</div>` : ""}
+          <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:12px; font-weight:600;">${presence.online ? "🟢 " : ""}${presence.text}</div>
+          <div class="bio" style="background:#f4f7f6; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">${esc(row.bio || "")}</div>
+          <div class="meta" style="margin-top:12px;line-height:1.8;">
+            ${row.looking_for ? `<div>💍 <b>Looking for:</b> ${esc(row.looking_for)}</div>` : ""}
+            ${(row.age_min && row.age_max) ? `<div>🎂 <b>Interested in ages:</b> ${esc(row.age_min)}–${esc(row.age_max)}</div>` : ""}
+            ${row.lifestyle ? `<div>🌿 <b>Lifestyle:</b> ${esc(row.lifestyle)}</div>` : ""}
+            ${row.has_kids ? `<div>👶 <b>Has kids:</b> ${esc(row.has_kids)}</div>` : ""}
+            ${row.wants_kids ? `<div>🍼 <b>Wants kids:</b> ${esc(row.wants_kids)}</div>` : ""}
+            ${row.religion ? `<div>🙏 <b>Religion:</b> ${esc(row.religion)}</div>` : ""}
+            ${row.occupation ? `<div>💼 <b>Occupation:</b> ${esc(row.occupation)}</div>` : ""}
+            ${(row.income_range && row.income_range !== "Prefer not to say") ? `<div>💰 <b>Income:</b> ${esc(row.income_range)}</div>` : ""}
           </div>
           <div id="matchNotice"></div>
           <div class="actions">
@@ -1550,9 +1650,7 @@ async function openModal(row){
         </div>
       </div>
     </div>`;
-  // Delegated click handling for thumbnails avoids interpolating raw
-  // photo URLs into inline JS (a stored-XSS vector if a URL ever
-  // contained a quote character).
+  
   root.querySelectorAll(".thumb").forEach(el => {
     el.addEventListener("click", (ev) => {
       ev.stopPropagation();
@@ -1581,14 +1679,19 @@ async function checkMatch(otherUserId){
   return !!data;
 }
 
-async function unmatchUser(otherUserId){
-  if (!confirm("Unmatch? You'll no longer be able to message each other, and this can't be undone from here (you'd need to like each other again to re-match).")) return;
+async function unmatchUser(otherUserId, otherName){
+  if (!confirm(`Unmatch with ${otherName}? You'll stop seeing each other in Messages, and they'll need to match with you again before you can message.`)) return;
   const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
   const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
-  const { error } = await _supabase.from("dating_matches").delete().eq("user_a", a).eq("user_b", b);
-  if (error){ alert("Couldn't unmatch: " + error.message); return; }
+  const { error } = await _supabase
+    .from("dating_matches")
+    .delete()
+    .eq("user_a", a)
+    .eq("user_b", b);
+  if (error){ alert("Couldn't unmatch right now: " + error.message); return; }
   closeModal();
   loadThreads();
+  refreshUnreadBadge();
 }
 
 async function likeProfile(profileId, otherUserId){
@@ -1600,8 +1703,8 @@ async function likeProfile(profileId, otherUserId){
     liked_id: otherUserId
   });
 
-  if (error && error.code !== "23505"){ // 23505 = already liked, ignore
-    if (btn){ btn.disabled = false; btn.textContent = "💛 Like"; }
+  if (error && error.code !== "23505"){ 
+    if (btn){ btn.disabled = false; btn.textContent = "💛 Like Profile"; }
     alert("Couldn't like right now: " + error.message);
     return;
   }
@@ -1609,15 +1712,17 @@ async function likeProfile(profileId, otherUserId){
   const matched = await checkMatch(otherUserId);
   const notice = document.getElementById("matchNotice");
   if (matched){
-    if (notice) notice.innerHTML = `<div class="msg success">It's a match! You can message each other now.</div>`;
+    if (notice) notice.innerHTML = `<div class="msg success">🎉 It's a match! You can message each other now.</div>`;
     if (btn){
-      btn.textContent = "Message";
+      btn.textContent = "💬 Message";
+      btn.style.background = "var(--green)";
+      btn.style.color = "white";
       btn.onclick = () => contactProfile(profileId, otherUserId);
       btn.disabled = false;
     }
     refreshUnreadBadge();
   } else {
-    if (notice) notice.innerHTML = `<div class="msg success">Liked. If they like you back, it's a match.</div>`;
+    if (notice) notice.innerHTML = `<div class="msg success">💛 Liked! If they like you back, it's a match.</div>`;
     if (btn){ btn.textContent = "💛 Liked"; }
   }
 }
@@ -1626,13 +1731,13 @@ function contactProfile(profileId, recipientId){
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
-      <div class="modal">
+      <div class="modal" style="max-width: 400px;">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>Send a message</h3>
-          <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:100px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.92rem;"></textarea>
+          <h3 style="margin-bottom: 15px;">Send a message</h3>
+          <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem; outline:none;"></textarea>
           <div class="actions">
-            <button class="btn-contact" onclick="sendMessage('${profileId}','${recipientId}')">Send</button>
+            <button class="btn-contact" onclick="sendMessage('${profileId}','${recipientId}')" style="width: 100%;">Send Message 🚀</button>
           </div>
           <div id="composeMsg"></div>
         </div>
@@ -1663,7 +1768,7 @@ async function sendMessage(profileId, recipientId){
   if (error){
     msgBox.innerHTML = `<div class="msg error">Couldn't send: ${error.message}</div>`;
   } else {
-    msgBox.innerHTML = `<div class="msg success">Sent.</div>`;
+    msgBox.innerHTML = `<div class="msg success">Sent!</div>`;
     setTimeout(closeModal, 700);
   }
 }
@@ -1700,11 +1805,7 @@ async function refreshCurrentThreadAfterSend(profileId, other){
   refreshUnreadBadge();
 }
 
-// ---------- Voice calls (WebRTC, signaled over Supabase Realtime) ----------
-// NOTE: uses free public STUN only. Works on most home/office networks;
-// can fail on strict carrier-grade NAT or some corporate firewalls without
-// a paid TURN relay (e.g. Twilio, Xirsys) — add one to ICE_SERVERS below
-// if you need higher reliability.
+// ---------- Voice calls ----------
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
 let personalCallChannel = null;
@@ -1748,7 +1849,7 @@ async function startCall(recipientId, recipientName){
 }
 
 function showIncomingCallUI(payload){
-  if (peerConnection){ return; } // already in a call, ignore
+  if (peerConnection){ return; } 
   currentCallId = payload.callId;
   currentCallPeerId = payload.callerId;
   document.getElementById("callRoot").innerHTML = `
@@ -1758,7 +1859,7 @@ function showIncomingCallUI(payload){
         <div class="call-name">${esc(payload.callerName || "Someone")}</div>
         <div class="call-status">Incoming call...</div>
         <div class="call-actions">
-          <button class="call-accept" onclick="acceptCall()">Accept</button>
+          <button class="call-accept" onclick="acceptCall()">Answer</button>
           <button class="call-decline" onclick="declineCall()">Decline</button>
         </div>
       </div>
@@ -1771,7 +1872,7 @@ function showOutgoingCallUI(name){
       <div class="call-card">
         <div class="call-avatar">📞</div>
         <div class="call-name">${esc(name)}</div>
-        <div class="call-status" id="callStatusText">Calling...</div>
+        <div class="call-status" id="callStatusText">Ringing...</div>
         <div class="call-actions">
           <button class="call-decline" onclick="endCall(true)">Cancel</button>
         </div>
@@ -1783,9 +1884,9 @@ function showActiveCallUI(name){
   document.getElementById("callRoot").innerHTML = `
     <div class="call-overlay">
       <div class="call-card">
-        <div class="call-avatar">📞</div>
+        <div class="call-avatar" style="background: rgba(46, 204, 113, 0.2);">📞</div>
         <div class="call-name">${esc(name || "In call")}</div>
-        <div class="call-status" id="callStatusText">00:00</div>
+        <div class="call-status" id="callStatusText" style="color: #2ecc71; font-weight:bold;">00:00</div>
         <div class="call-actions">
           <button class="call-mute" id="muteBtn" onclick="toggleMute()">🎙️ Mute</button>
           <button class="call-decline" onclick="endCall(true)">Hang up</button>
@@ -1939,17 +2040,17 @@ async function toggleVoiceRecording(profileId, recipientId){
       };
       mediaRecorder.start();
       isRecording = true;
-      btn.textContent = "⏹️";
+      btn.textContent = "⏹️ Stop";
       btn.style.background = "var(--danger)";
       btn.style.color = "#fff";
-      status.textContent = "Recording... tap again to send.";
+      status.textContent = "Recording... tap Stop to send.";
     } catch (err){
       status.textContent = "Couldn't access microphone: " + err.message;
     }
   } else {
     mediaRecorder.stop();
     isRecording = false;
-    btn.textContent = "🎤";
+    btn.textContent = "🎤 Voice";
     btn.style.background = "";
     btn.style.color = "";
     status.textContent = "Sending voice message...";
@@ -1997,7 +2098,6 @@ async function loadThreads(){
   }
   empty.style.display = "none";
 
-  // group by conversation = profile_id + other participant
   const threads = {};
   data.forEach(m => {
     const other = m.sender_id === currentUser.id ? m.recipient_id : m.sender_id;
@@ -2006,32 +2106,34 @@ async function loadThreads(){
     threads[key].messages.push(m);
   });
 
-  // fetch the other participant's profile (photo + name) for every thread in one query
   const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
   const { data: profiles } = await _supabase
     .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
+    .select("user_id, display_name, gender, photo_url, photos, is_verified")
     .in("user_id", otherIds);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
   Object.values(threads).forEach(thread => {
     const last = thread.messages[0];
-    const unread = thread.messages.some(m => !m.read && m.recipient_id === currentUser.id);
+    const unreadCount = thread.messages.filter(m => !m.read && m.recipient_id === currentUser.id).length;
     const p = profileMap[thread.other];
     thread.profile = p;
     const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
     const name = p ? (p.display_name || p.gender || "Someone") : "Someone";
 
     const div = document.createElement("div");
-    div.style.cssText = "padding:12px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;gap:12px;align-items:center;";
+    div.style.cssText = "padding:16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor:pointer; display:flex; gap:14px; align-items:center; margin-bottom: 10px; transition: 0.2s;";
+    div.onmouseover = () => div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
+    div.onmouseout = () => div.style.boxShadow = "none";
     div.innerHTML = `
-      <div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--green-light)"};display:flex;align-items:center;justify-content:center;color:var(--gold-soft);">${photo ? "" : "👤"}</div>
+      <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:.85rem;color:var(--green);">${esc(name)}</div>
-        <div style="font-weight:${unread?"700":"400"};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80))}</div>
-        <div class="meta" style="font-size:.78rem;color:#999;">${new Date(last.created_at).toLocaleString()}</div>
-      </div>`;
+        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}</div>
+        <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
+        <div class="meta" style="font-size:.78rem;color:#999; margin-top: 4px;">${new Date(last.created_at).toLocaleString()}</div>
+      </div>
+      ${unreadCount ? `<span style="background:var(--green);color:#fff;font-weight:700;font-size:.8rem;border-radius:999px;min-width:24px;height:24px;padding:0 6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${unreadCount > 9 ? "9+" : unreadCount}</span>` : ""}`;
     div.onclick = () => openThread(thread);
     list.appendChild(div);
   });
@@ -2056,30 +2158,40 @@ async function openThread(thread){
   });
 
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
+  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) : "";
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
       <div class="modal">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-            ${otherName}
-            <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call">📞</button>
-            <button class="call-btn" style="background:var(--danger);color:#fff;" onclick="unmatchUser('${thread.other}'); closeModal();" title="Unmatch">💔</button>
+          <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px; margin-bottom:15px; border-bottom:1px solid var(--line); padding-bottom:10px;">
+            <span style="font-size: 1.1rem;">${otherName}${otherBadge}</span>
+            <span style="display:flex;gap:8px;flex-shrink:0;">
+              <button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call" style="width:34px; height:34px; font-size:0.9rem;">📞</button>
+              <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);width:34px; height:34px; font-size:0.9rem;" onclick="unmatchUser('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Unmatch">✕</button>
+            </span>
           </h3>
-          <div id="threadMessages" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin:10px 0;">
+          <div id="threadMessages" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin:10px 0; padding-right:5px;">
             ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [])).join("")}
           </div>
-          <textarea id="replyBody" maxlength="1000" placeholder="Reply..." style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-family:inherit;"></textarea>
-          <div class="actions" style="align-items:center;">
-            <button class="btn-report" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message">🎤</button>
-            <button class="btn-contact" onclick="sendReply('${thread.profileId}','${thread.other}');">Reply</button>
+          <div style="background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 15px;">
+              <textarea id="replyBody" maxlength="1000" placeholder="Type a message..." style="width:100%;min-height:50px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit; outline:none; resize:none;"></textarea>
+              <div class="actions" style="align-items:center; margin-top:8px; gap:8px;">
+                <button class="btn-report" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message" style="flex:0 0 50px; border:1px solid #ddd !important; color:#555;">🎤</button>
+                <button class="btn-contact" onclick="sendReply('${thread.profileId}','${thread.other}');" style="border-radius: 8px;">Send Message</button>
+              </div>
+              <div id="recordStatus" style="font-size:.8rem;color:#e67e22;margin-top:6px; font-weight:bold; text-align:center;"></div>
           </div>
-          <div id="recordStatus" style="font-size:.8rem;color:#999;margin-top:4px;"></div>
         </div>
       </div>
     </div>`;
+    
+    const chatBox = document.getElementById("threadMessages");
+    if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+const EDIT_WINDOW_MS = 15 * 60 * 1000; 
 
 function renderMessageBubble(m, msgReactions){
   const mine = m.sender_id === currentUser.id;
@@ -2094,53 +2206,51 @@ function renderMessageBubble(m, msgReactions){
   if (m.deleted_at){
     return `
       <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;">
-        <div class="msg-bubble" style="background:#eee;padding:8px 12px;border-radius:10px;font-size:.85rem;color:#999;font-style:italic;">
-          Message deleted
+        <div class="msg-bubble" style="background:#f1f5f9;padding:10px 14px;border-radius:12px;font-size:.85rem;color:#94a3b8;font-style:italic; border:1px solid #e2e8f0;">
+          🚫 This message was deleted
         </div>
       </div>`;
   }
 
+  const canEdit = mine && !m.voice_url && (Date.now() - new Date(m.created_at).getTime() < EDIT_WINDOW_MS);
   const content = m.voice_url
     ? `<audio controls src="${esc(m.voice_url)}" style="max-width:220px;height:36px;"></audio>`
-    : esc(m.body || "");
+    : `<span id="msgBody-${m.id}">${esc(m.body || "")}</span>${m.edited_at ? ` <span style="font-size:.7rem;color:#94a3b8;">(edited)</span>` : ""}`;
 
-  const withinEditWindow = mine && !m.voice_url && (Date.now() - new Date(m.created_at).getTime()) < 15 * 60 * 1000;
-  const ownControls = mine
-    ? `<span class="msg-controls">
-        ${withinEditWindow ? `<span class="msg-ctrl-btn" onclick="startEditMessage('${m.id}')" title="Edit">✏️</span>` : ""}
-        <span class="msg-ctrl-btn" onclick="deleteMessage('${m.id}')" title="Delete">🗑️</span>
-       </span>`
-    : "";
+  const ownControls = mine ? `
+    ${canEdit ? `<span class="react-add" style="right:26px;" title="Edit" onclick="startEditMessage('${m.id}')">✏️</span>` : ""}
+    <span class="react-add" onclick="deleteMessage('${m.id}')" title="Delete" style="color:var(--danger);">🗑️</span>
+  ` : `<span class="react-add" onclick="showReactionPicker(event,'${m.id}')">＋</span>`;
 
   return `
-    <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;">
-      <div class="msg-bubble" id="bubble-${m.id}" style="background:${mine?"var(--gold-soft)":"#F0F0F0"};padding:8px 12px;border-radius:10px;font-size:.88rem;position:relative;">
-        <span class="msg-content">${content}</span>${m.edited_at ? ` <span class="msg-edited">(edited)</span>` : ""}
+    <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;" data-message-id="${m.id}">
+      <div class="msg-bubble" style="background:${mine?"var(--green)":"#f1f5f9"}; color:${mine?"#fff":"#333"}; padding:10px 14px;border-radius:14px;font-size:.9rem;position:relative; line-height:1.4; border: 1px solid ${mine?"var(--green)":"#e2e8f0"};">
+        ${content}
         ${ownControls}
-        <span class="react-add" onclick="showReactionPicker(event,'${m.id}')">＋</span>
       </div>
       ${reactionRow}
     </div>`;
 }
 
 function startEditMessage(messageId){
-  const bubble = document.getElementById(`bubble-${messageId}`);
-  if (!bubble) return;
-  const contentSpan = bubble.querySelector(".msg-content");
-  const currentText = contentSpan.textContent;
-  bubble.innerHTML = `
-    <textarea id="editArea-${messageId}" style="width:100%;min-height:50px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:.85rem;">${currentText}</textarea>
-    <div style="display:flex;gap:6px;margin-top:6px;">
-      <button class="msg-ctrl-btn-solid" onclick="saveEditMessage('${messageId}')">Save</button>
-      <button class="msg-ctrl-btn-solid" style="background:#999;" onclick="refreshOpenThreadMessages()">Cancel</button>
+  const span = document.getElementById(`msgBody-${messageId}`);
+  if (!span) return;
+  const currentText = span.textContent;
+  const wrapper = span.parentElement;
+  wrapper.innerHTML = `
+    <textarea id="editBody-${messageId}" maxlength="1000" style="width:100%;min-height:60px;font-family:inherit;font-size:.9rem;padding:8px;border-radius:8px;border:1px solid #fff; color:#333; outline:none;">${esc(currentText)}</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="saveEditMessage('${messageId}')" style="font-size:.8rem;padding:6px 12px;border:none;background:#fff;color:var(--green);border-radius:6px;cursor:pointer; font-weight:bold;">Save</button>
+      <button onclick="refreshOpenThreadMessages()" style="font-size:.8rem;padding:6px 12px;border:1px solid #fff;background:transparent; color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
     </div>`;
 }
 
 async function saveEditMessage(messageId){
-  const textarea = document.getElementById(`editArea-${messageId}`);
+  const textarea = document.getElementById(`editBody-${messageId}`);
   const newBody = textarea.value.trim();
   if (!newBody) return;
-  const { error } = await _supabase.from("dating_messages")
+  const { error } = await _supabase
+    .from("dating_messages")
     .update({ body: newBody, edited_at: new Date().toISOString() })
     .eq("id", messageId);
   if (error){ alert("Couldn't save edit: " + error.message); return; }
@@ -2148,20 +2258,19 @@ async function saveEditMessage(messageId){
 }
 
 async function deleteMessage(messageId){
-  if (!confirm("Delete this message? This can't be undone.")) return;
-  const { error } = await _supabase.from("dating_messages")
+  if (!confirm("Delete this message for everyone? This can't be undone.")) return;
+  const { error } = await _supabase
+    .from("dating_messages")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", messageId);
   if (error){ alert("Couldn't delete: " + error.message); return; }
   refreshOpenThreadMessages();
+  loadThreads();
 }
-
-const REACTION_EMOJIS = ["❤️","😂","😮","😢","👍","🔥"];
 
 function showReactionPicker(event, messageId){
   event.stopPropagation();
-  const existing = document.getElementById("reactionPicker");
-  if (existing) existing.remove();
+  document.getElementById("reactionPicker")?.remove();
   const picker = document.createElement("div");
   picker.id = "reactionPicker";
   picker.className = "reaction-picker";
@@ -2199,6 +2308,136 @@ async function refreshOpenThreadMessages(){
 }
 
 // ---------- My Profile tab ----------
+function computeProfileCompleteness(data){
+  const checklist = [
+    { label: "About you", done: !!(data.bio && data.bio.trim()), focus: "eBio" },
+    { label: "What you're looking for", done: !!data.looking_for, focus: "eLookingFor" },
+    { label: "Age range you're interested in", done: !!(data.age_min && data.age_max), focus: "eAgeMin" },
+    { label: "Your lifestyle", done: !!data.lifestyle, focus: "eLifestyle" },
+    { label: "Whether you have kids", done: !!data.has_kids, focus: "eHasKids" },
+    { label: "Whether you want kids", done: !!data.wants_kids, focus: "eWantsKids" },
+    { label: "Religion", done: !!data.religion, focus: "eReligion" }
+  ];
+  const done = checklist.filter(c => c.done).length;
+  return { percent: Math.round((done / checklist.length) * 100), missing: checklist.filter(c => !c.done) };
+}
+
+function profileCompletenessBanner(data){
+  const { percent, missing } = computeProfileCompleteness(data);
+  if (percent >= 100) return "";
+
+  return `
+    <div style="background:#FFF9EE;border:1px solid #fce3b4;border-radius:12px;padding:16px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <strong style="font-size:1rem;color:#8a6d1f;">Your profile is ${percent}% complete</strong>
+        <span style="font-size:.8rem;color:#b89028; font-weight:bold;">${missing.length} thing${missing.length === 1 ? "" : "s"} left</span>
+      </div>
+      <div style="background:#fce3b4;border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px;">
+        <div style="background:var(--gold);height:100%;width:${percent}%;"></div>
+      </div>
+      <div style="font-size:.85rem;color:#8a6d1f;margin-bottom:10px;">Complete profiles get 3x more matches! Add:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${missing.map(m => `<button type="button" onclick="focusProfileField('${m.focus}')" style="font-size:.8rem;padding:6px 12px;border:1px solid var(--gold);background:#fff;color:#8a6d1f;border-radius:999px;cursor:pointer; font-weight:600;">+ ${esc(m.label)}</button>`).join("")}
+      </div>
+    </div>`;
+}
+
+async function refreshProfileCompleteBadge(){
+  const badge = document.getElementById("profileCompleteBadge");
+  if (!badge || !currentUser) return;
+  const { data } = await _supabase
+    .from("dating_profiles")
+    .select("bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  if (!data){ badge.textContent = ""; return; }
+  const { percent } = computeProfileCompleteness(data);
+  badge.textContent = percent < 100 ? "●" : "";
+  badge.style.color = "var(--danger)";
+}
+
+function focusProfileField(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.focus();
+  el.style.outline = "3px solid var(--gold)";
+  setTimeout(() => { el.style.outline = ""; }, 1500);
+}
+
+// ---------- Verification ----------
+function verifiedBadge(isVerified){
+  return isVerified ? ` <span title="Verified profile" style="color:#1E8E4F;font-weight:700;">✓</span>` : "";
+}
+
+function renderVerificationBox(profile, latestRequest){
+  if (profile.is_verified){
+    return `<div class="msg success" style="margin-bottom:20px; font-size:1rem;">✅ Your profile is officially verified!</div>`;
+  }
+  if (latestRequest && latestRequest.status === "pending"){
+    return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px; border: 1px solid #fce3b4;">⏳ Your verification photo is under review. Please check back later.</div>`;
+  }
+  const rejectedNote = (latestRequest && latestRequest.status === "rejected" && latestRequest.reviewer_note)
+    ? `<div style="margin-top:6px; font-weight:normal;">Reviewer note: ${esc(latestRequest.reviewer_note)}</div>` : "";
+  const rejectedHeader = (latestRequest && latestRequest.status === "rejected")
+    ? `<div class="msg error" style="margin-bottom:20px;">Your last verification photo wasn't approved.${rejectedNote}
+        <div style="margin-top:10px;"><button type="button" class="submit-btn" style="width:auto;padding:8px 20px; border-radius:8px;" onclick="openVerificationModal()">Try Again</button></div>
+       </div>`
+    : `<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+        <div style="font-size:.95rem;color:#333; flex:1; min-width:200px;"><b>Get a Verified Badge ✅</b><br><span style="font-size:0.85rem; color:#666;">Confirm a quick selfie matches your profile photos to stand out.</span></div>
+        <button type="button" class="submit-btn" style="width:auto;padding:10px 24px;flex-shrink:0; border-radius:8px;" onclick="openVerificationModal()">Get Verified</button>
+       </div>`;
+  return rejectedHeader;
+}
+
+function openVerificationModal(){
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal" style="max-width:400px;">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3 style="margin-bottom: 10px;">Verify Your Profile ✅</h3>
+          <div class="bio" style="margin-bottom:16px; font-size: 0.95rem; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            Upload a clear selfie of your face. A moderator will compare it to your profile photos. <b>This photo stays private and is only used for review.</b>
+          </div>
+          <input type="file" id="verifySelfie" accept="image/*" capture="user" style="margin-bottom: 15px; width: 100%; padding: 10px; border: 2px dashed #ccc; border-radius: 8px; cursor: pointer;">
+          <div class="actions">
+            <button class="btn-contact" onclick="submitVerification()" style="width: 100%;">Submit for Review</button>
+          </div>
+          <div id="verifyMsg"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function submitVerification(){
+  const fileInput = document.getElementById("verifySelfie");
+  const msg = document.getElementById("verifyMsg");
+  const file = fileInput.files[0];
+  if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
+
+  msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading... please wait.</div>`;
+  const path = `dating/verification/${currentUser.id}-${Date.now()}-${file.name}`;
+  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+  if (uploadErr){
+    msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
+    return;
+  }
+  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+
+  const { error } = await _supabase.from("dating_verification_requests").insert({
+    user_id: currentUser.id,
+    selfie_url: pub.publicUrl
+  });
+  if (error){
+    msg.innerHTML = `<div class="msg error">Couldn't submit: ${esc(error.message)}</div>`;
+    return;
+  }
+  closeModal();
+  loadMyProfile();
+}
+
 async function loadMyProfile(){
   const el = document.getElementById("myProfileContent");
   const { data, error } = await _supabase
@@ -2208,12 +2447,25 @@ async function loadMyProfile(){
     .maybeSingle();
 
   if (error || !data){
-    el.innerHTML = `<div class="empty">You haven't posted a profile yet. Use the "Post a Profile" tab.</div>`;
+    el.innerHTML = `<div class="empty" style="font-size: 1.1rem; padding: 60px 20px;">You haven't posted a profile yet.<br><br> Go to the <b>Setup Profile</b> tab to get started!</div>`;
     return;
   }
 
+  const { data: latestRequest } = await _supabase
+    .from("dating_verification_requests")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   el.innerHTML = `
-    <div id="verificationSection" style="margin-bottom:16px;"></div>
+    <div class="browse-header" style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>Edit <span>My Profile</span></h2>
+      <button onclick="switchTab('settings')" style="background:var(--paper); border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;"><i class="fas fa-cog"></i> Settings</button>
+    </div>
+    ${renderVerificationBox(data, latestRequest)}
+    ${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
       <div><label>First name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
       <div class="row2">
@@ -2221,22 +2473,22 @@ async function loadMyProfile(){
         <div><label>City</label><input type="text" id="eCity" value="${esc(data.city||"")}" required></div>
       </div>
       <div>
-        <label>About you</label>
+        <label>About You</label>
         <textarea id="eBio" maxlength="500" required>${esc(data.bio||"")}</textarea>
       </div>
       <div>
-        <label>What I'm looking for</label>
+        <label>What I'm Looking For</label>
         <select id="eLookingFor" required>
           <option value="">Select</option>
           ${opts(["Long-term relationship","Something casual","Marriage","New friends","Not sure yet"], data.looking_for)}
         </select>
       </div>
       <div class="row2">
-        <div><label>Interested in ages (min)</label><input type="number" id="eAgeMin" min="18" max="99" value="${esc(data.age_min||"")}" required></div>
-        <div><label>Interested in ages (max)</label><input type="number" id="eAgeMax" min="18" max="99" value="${esc(data.age_max||"")}" required></div>
+        <div><label>Interested In Ages (Min)</label><input type="number" id="eAgeMin" min="18" max="99" value="${esc(data.age_min||"")}" required></div>
+        <div><label>Interested In Ages (Max)</label><input type="number" id="eAgeMax" min="18" max="99" value="${esc(data.age_max||"")}" required></div>
       </div>
       <div>
-        <label>My lifestyle</label>
+        <label>My Lifestyle</label>
         <select id="eLifestyle" required>
           <option value="">Select</option>
           ${opts(["Active & Outdoorsy","Homebody","Social & Outgoing","Balanced","Career-focused","Family-oriented","Other"], data.lifestyle)}
@@ -2244,14 +2496,14 @@ async function loadMyProfile(){
       </div>
       <div class="row2">
         <div>
-          <label>Have kids?</label>
+          <label>Have Kids?</label>
           <select id="eHasKids" required>
             <option value="">Select</option>
             ${opts(["Yes","No"], data.has_kids)}
           </select>
         </div>
         <div>
-          <label>Want kids?</label>
+          <label>Want Kids?</label>
           <select id="eWantsKids" required>
             <option value="">Select</option>
             ${opts(["Yes","No","Maybe"], data.wants_kids)}
@@ -2266,16 +2518,18 @@ async function loadMyProfile(){
         </select>
       </div>
       <div class="row2">
-        <div><label>Occupation (optional)</label><input type="text" id="eOccupation" maxlength="60" value="${esc(data.occupation||"")}"></div>
+        <div><label>Occupation (Optional)</label><input type="text" id="eOccupation" maxlength="60" value="${esc(data.occupation||"")}"></div>
         <div>
-          <label>Income (optional)</label>
+          <label>Income (Optional)</label>
           <select id="eIncome">
             ${opts(["Prefer not to say","Under 10,000 ETB/mo","10,000–25,000 ETB/mo","25,000–50,000 ETB/mo","50,000–100,000 ETB/mo","100,000+ ETB/mo"], data.income_range || "Prefer not to say")}
           </select>
         </div>
       </div>
-      <button type="submit" class="submit-btn">Save changes</button>
-      <button type="button" class="submit-btn" style="background:var(--danger);" id="deleteBtn">Delete my profile</button>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="submit" class="submit-btn" style="flex:2;">Save Changes</button>
+          <button type="button" class="submit-btn" style="background:var(--danger); flex:1;" id="deleteBtn">Delete Profile</button>
+      </div>
       <div id="editMsg"></div>
     </form>`;
 
@@ -2305,85 +2559,100 @@ async function loadMyProfile(){
     }).eq("id", data.id);
     document.getElementById("editMsg").innerHTML = updErr
       ? `<div class="msg error">${esc(updErr.message)}</div>`
-      : `<div class="msg success">Saved.</div>`;
+      : `<div class="msg success">Changes Saved!</div>`;
+    if (!updErr) refreshProfileCompleteBadge();
   });
 
   document.getElementById("deleteBtn").addEventListener("click", async () => {
-    if (!confirm("Delete your dating profile? This can't be undone.")) return;
+    if (!confirm("Are you sure you want to permanently delete your dating profile? This cannot be undone.")) return;
     const { error: delErr } = await _supabase.from("dating_profiles").delete().eq("id", data.id);
     if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
     loadMyProfile();
   });
-
-  renderVerificationSection(data);
 }
 
-// ---------- Verification ----------
-async function renderVerificationSection(profileData){
-  const el = document.getElementById("verificationSection");
-  if (!el) return;
+// ---------- Privacy Settings & Blocked Users ----------
+async function loadSettings() {
+  const list = document.getElementById("blockedUsersList");
+  list.innerHTML = "Loading...";
 
-  if (profileData.is_verified){
-    el.innerHTML = `<div class="msg success">✅ Your profile is verified.</div>`;
+  const { data: blocks, error } = await _supabase
+    .from("dating_blocks")
+    .select("id, blocked_id")
+    .eq("blocker_id", currentUser.id);
+
+  if (error) {
+    list.innerHTML = `<div class="msg error">Couldn't load blocked users.</div>`;
     return;
   }
 
-  const { data: reqs } = await _supabase
-    .from("dating_verification_requests")
-    .select("*")
-    .eq("user_id", currentUser.id)
-    .order("created_at", { ascending: false })
-    .limit(1);
-  const latest = reqs && reqs[0];
-
-  if (latest && latest.status === "pending"){
-    el.innerHTML = `<div class="msg" style="background:#FFF7E0;color:#8A6D00;">⏳ Verification pending review.</div>`;
+  if (!blocks || blocks.length === 0) {
+    list.innerHTML = `<div class="empty" style="padding: 20px 10px; font-size: 0.9rem;">You haven't blocked anyone.</div>`;
     return;
   }
 
-  const rejectedNote = latest && latest.status === "rejected"
-    ? `<div class="msg error">Your last verification request was rejected${latest.reviewer_note ? ": " + esc(latest.reviewer_note) : "."} You can try again below.</div>`
-    : "";
+  const blockedIds = blocks.map(b => b.blocked_id);
+  const { data: profiles } = await _supabase
+    .from("dating_profiles")
+    .select("user_id, display_name, gender, photo_url, photos")
+    .in("user_id", blockedIds);
 
-  el.innerHTML = `
-    ${rejectedNote}
-    <div style="border:1px solid var(--line);border-radius:10px;padding:14px;">
-      <div style="font-weight:700;margin-bottom:6px;">Get verified</div>
-      <p style="font-size:.85rem;color:#666;margin:0 0 10px;">Upload a clear selfie so people can trust your profile is really you. Reviewed by our team, not shown publicly.</p>
-      <input type="file" id="verifySelfie" accept="image/*">
-      <button class="submit-btn" style="margin-top:10px;width:auto;padding:9px 20px;" onclick="submitVerification()">Submit for review</button>
-      <div id="verifyMsg"></div>
-    </div>`;
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+  list.innerHTML = blocks.map(b => {
+    const p = profileMap[b.blocked_id];
+    const name = p ? (p.display_name || p.gender || "Unknown User") : "Unknown User";
+    const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa;border:1px solid var(--line);">${photo ? "" : "👤"}</div>
+          <div style="font-weight:600;font-size:0.9rem;">${esc(name)}</div>
+        </div>
+        <button onclick="unblockUser('${b.id}')" style="background:var(--paper);border:1px solid var(--line);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:bold;cursor:pointer;color:#333;transition:0.2s;">Unblock</button>
+      </div>
+    `;
+  }).join("");
 }
 
-async function submitVerification(){
-  const file = document.getElementById("verifySelfie").files[0];
-  const msg = document.getElementById("verifyMsg");
-  if (!file){ msg.innerHTML = `<div class="msg error">Choose a selfie photo first.</div>`; return; }
+async function unblockUser(blockId) {
+  if(!confirm("Unblock this user? They will be able to see your profile and message you again if you match.")) return;
+  await _supabase.from("dating_blocks").delete().eq("id", blockId);
+  loadSettings();
+  loadProfiles(); // Refresh main feed
+}
 
-  msg.innerHTML = `<div class="msg" style="background:var(--paper);">Uploading...</div>`;
-  const path = `dating/verify/${currentUser.id}-${Date.now()}-${file.name}`;
-  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
-  if (uploadErr){ msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`; return; }
-  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+async function updateAccountPassword() {
+  const p1 = document.getElementById("setNewPwd").value;
+  const p2 = document.getElementById("setNewPwdConf").value;
+  const msg = document.getElementById("pwdMsg");
 
-  const { error } = await _supabase.from("dating_verification_requests").insert({
-    user_id: currentUser.id,
-    selfie_url: pub.publicUrl
-  });
-  if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
-  loadMyProfile();
+  if (!p1 || p1.length < 6) { msg.innerHTML = `<div class="msg error">Password must be at least 6 characters.</div>`; return; }
+  if (p1 !== p2) { msg.innerHTML = `<div class="msg error">Passwords do not match.</div>`; return; }
+
+  msg.innerHTML = `<div class="msg">Updating...</div>`;
+  const { error } = await _supabase.auth.updateUser({ password: p1 });
+
+  if (error) {
+    msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
+  } else {
+    msg.innerHTML = `<div class="msg success">Password updated securely!</div>`;
+    document.getElementById("setNewPwd").value = '';
+    document.getElementById("setNewPwdConf").value = '';
+  }
 }
 
 async function reportProfile(profileId){
-  const reason = prompt("What's the issue with this profile?");
+  const reason = prompt("What is the issue with this profile?");
   if (!reason) return;
   const { error } = await _supabase.from("dating_reports").insert({
     reported_profile_id: profileId,
     reporter_id: currentUser.id,
     reason
   });
-  alert(error ? "Couldn't submit report, try again." : "Report submitted. Thank you.");
+  alert(error ? "Couldn't submit report, please try again." : "Report submitted successfully. Thank you.");
   closeModal();
 }
 
@@ -2424,7 +2693,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   }
 
   btn.disabled = true;
-  btn.textContent = "Posting...";
+  btn.textContent = "Publishing Profile...";
 
   let photoUrls = [];
   const files = Array.from(document.getElementById("fPhoto").files).slice(0, 3);
@@ -2433,7 +2702,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Photo upload failed: ${uploadErr.message}</div>`;
-      btn.disabled = false; btn.textContent = "Post my profile";
+      btn.disabled = false; btn.textContent = "Publish My Profile";
       return;
     }
     const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
@@ -2466,8 +2735,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     age_confirmed: true,
     updated_at: new Date().toISOString()
   };
-  // Only overwrite photos if new ones were actually uploaded this time —
-  // otherwise re-posting without picking files would wipe an existing photo.
+  
   if (photoUrls.length > 0){
     payload.photo_url = photoUrls[0];
     payload.photos = photoUrls;
@@ -2478,21 +2746,20 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     .upsert(payload, { onConflict: "user_id" });
 
   btn.disabled = false;
-  btn.textContent = "Post my profile";
+  btn.textContent = "Publish My Profile";
 
   if (error){
     msg.innerHTML = `<div class="msg error">Something went wrong: ${error.message}</div>`;
   } else {
-    msg.innerHTML = `<div class="msg success">Profile posted!</div>`;
+    msg.innerHTML = `<div class="msg success">Profile Published Successfully!</div>`;
     document.getElementById("postForm").reset();
+    setTimeout(() => switchTab("myprofile"), 1500); 
   }
 });
 
-// ---------- Language toggle (stub — wire into your TRANSLATIONS system) ----------
 function toggleLang(){
   currentLang = currentLang === "en" ? "am" : "en";
   document.getElementById("langBtn").textContent = currentLang === "en" ? "አማ" : "EN";
-  // TODO: hook into your existing TRANSLATIONS dictionary + localStorage persistence
 }
 
 initAuth();
