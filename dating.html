@@ -1985,10 +1985,9 @@ async function loadNewMembers(){
   }
   empty.style.display = "none";
 
-  rows.forEach(row => {
+ rows.forEach(row => {
     const img = (row.photos && row.photos[0]) || row.photo_url || null;
     const displayName = esc(row.display_name || row.gender || "Someone");
-    const presence = presenceInfo(row.last_seen_at);
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
