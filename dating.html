@@ -21,9 +21,13 @@
   /* Use svh (small viewport height) so mobile browser toolbars don't push content down */
   height: 100vh;
   height: 100svh;
-  
-  /* Background Image Settings */
-  background-image: url('./wanaager.png');
+  min-height: 480px; /* keeps the card fully visible on very short/landscape phone screens */
+
+  /* Fallback gradient shows immediately and stays visible if the
+     background photo is slow to load, missing, or fails on some
+     hosts — never leaves a plain white/blank hero behind the overlay. */
+  background-color: #0A291A;
+  background-image: linear-gradient(135deg, #0A291A, #123B27), url('./wanaager.png');
   background-size: cover;          /* Cover the screen while preserving aspect ratio */
   background-position: center center; /* Keep main focal point centered */
   background-repeat: no-repeat;
@@ -32,7 +36,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;                /* Prevent scrollbars caused by background sizing */
+  overflow-y: auto;                /* scroll instead of clipping the card on short viewports */
+  padding: 20px 0;
 }
 
 /* Responsive adjustments for phones */
@@ -107,6 +112,9 @@
       font-weight: 600;
       text-decoration: none;
       border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
       transition: background-color 0.2s ease, transform 0.1s ease;
       box-shadow: 0 4px 12px rgba(0, 135, 81, 0.3);
     }
@@ -447,6 +455,7 @@
       <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
       <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
+      <div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
       <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
       <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
     </nav>
@@ -465,7 +474,7 @@
 
 <main>
   <!-- GATEKEEPER -->
-  <div class="welcome-container">
+  <div class="welcome-container" id="gate">
     <div class="overlay"></div>
 
     <div class="welcome-card">
@@ -477,7 +486,7 @@
         Connect with singles in Ethiopia looking for friendship, dating, or marriage. You must be signed in to browse or match.
       </p>
 
-      <a href="#signin" class="btn-signin">Sign In / Register Now</a>
+      <button type="button" class="btn-signin" onclick="openAuthModal('signin')">Sign In / Register Now</button>
     </div>
   </div>
 
@@ -756,6 +765,15 @@
     <div class="empty" id="likesEmpty" style="display:none;">No one has liked your profile yet. Make sure you have a great photo!</div>
   </div>
 
+  <div class="panel" id="visitorsPanel" style="display:none;">
+    <div class="browse-header">
+      <h2>Who <span>Viewed You</span></h2>
+      <p>People who've recently looked at your profile, most recent first.</p>
+    </div>
+    <div class="grid" id="visitorsGrid"></div>
+    <div class="empty" id="visitorsEmpty" style="display:none;">No one has viewed your profile yet.</div>
+  </div>
+
   <!-- MY PROFILE -->
   <div class="panel" id="myProfilePanel" style="display:none;">
     <div id="myProfileContent"></div>
@@ -868,6 +886,7 @@ async function initAuth(){
     setComposerAvatar();
     refreshUnreadBadge();
     refreshLikesBadge();
+    refreshVisitorsBadge();
     refreshNotifCount();
     refreshProfileCompleteBadge();
     startPresenceHeartbeat();
@@ -1136,6 +1155,7 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     setComposerAvatar();
     refreshUnreadBadge();
     refreshLikesBadge();
+    refreshVisitorsBadge();
     refreshNotifCount();
     refreshProfileCompleteBadge();
     startNotifPolling();
@@ -1165,6 +1185,16 @@ async function refreshLikesBadge(){
     .eq("seen", false);
   const badge = document.getElementById("likesBadge");
   badge.textContent = count ? `(${count})` : "";
+}
+
+async function refreshVisitorsBadge(){
+  const { count } = await _supabase
+    .from("dating_profile_views")
+    .select("*", { count: "exact", head: true })
+    .eq("viewed_user_id", currentUser.id)
+    .eq("seen", false);
+  const badge = document.getElementById("visitorsBadge");
+  if (badge) badge.textContent = count ? `(${count})` : "";
 }
 
 // ---------- Notifications ----------
@@ -1394,8 +1424,88 @@ async function loadLikesReceived(){
   });
 }
 
+// ---------- Visitors (who viewed you) ----------
+async function loadVisitors(){
+  const grid = document.getElementById("visitorsGrid");
+  const empty = document.getElementById("visitorsEmpty");
+  grid.innerHTML = "";
+
+  const { data: visits, error } = await _supabase
+    .from("dating_profile_views")
+    .select("*")
+    .eq("viewed_user_id", currentUser.id)
+    .order("last_viewed_at", { ascending: false })
+    .limit(50);
+
+  if (error || !visits || visits.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+
+  const unseenIds = visits.filter(v => !v.seen).map(v => v.id);
+  if (unseenIds.length){
+    await _supabase.from("dating_profile_views").update({ seen: true }).in("id", unseenIds);
+  }
+  const badge = document.getElementById("visitorsBadge");
+  if (badge) badge.textContent = "";
+
+  const viewerIds = visits.map(v => v.viewer_id);
+  const { data: profiles } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .in("user_id", viewerIds);
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+  const { data: blocks } = await _supabase
+    .from("dating_blocks")
+    .select("blocker_id, blocked_id")
+    .or(`blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}`);
+  const blockedIds = new Set();
+  (blocks || []).forEach(b => blockedIds.add(b.blocker_id === currentUser.id ? b.blocked_id : b.blocker_id));
+
+  const visitMap = {};
+  visits.forEach(v => visitMap[v.viewer_id] = v.last_viewed_at);
+
+  const rows = visits.map(v => profileMap[v.viewer_id]).filter(p => p && !blockedIds.has(p.user_id));
+
+  if (rows.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  rows.forEach(row => {
+    const img = (row.photos && row.photos[0]) || row.photo_url || null;
+    const displayName = esc(row.display_name || row.gender || "Someone");
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openModal(row);
+    card.innerHTML = `
+      <div class="photo" style="${img ? `background-image:url('${esc(img)}')` : ""}">
+        ${img ? "" : "👤"}
+      </div>
+      <div class="info">
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
+        <div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(visitMap[row.user_id]).replace("Joined", "Viewed")}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+async function recordProfileView(viewedUserId){
+  if (!currentUser || viewedUserId === currentUser.id) return;
+  try {
+    await _supabase.from("dating_profile_views").upsert(
+      { viewer_id: currentUser.id, viewed_user_id: viewedUserId, last_viewed_at: new Date().toISOString(), seen: false },
+      { onConflict: "viewer_id,viewed_user_id" }
+    );
+  } catch (e){ /* non-critical — never block opening the profile over this */ }
+}
+
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","myProfilePanel","settingsPanel"];
+const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -1406,7 +1516,7 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
+  const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "home") loadFeed();
@@ -1414,6 +1524,7 @@ function switchTab(tab){
   if (tab === "newmembers") loadNewMembers();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
   if (tab === "likes") loadLikesReceived();
+  if (tab === "visitors") loadVisitors();
   if (tab === "myprofile") loadMyProfile();
   if (tab === "settings") loadSettings();
 }
@@ -1891,6 +2002,7 @@ function showMoreProfiles(){
 
 // ---------- Modal ----------
 async function openModal(row){
+  recordProfileView(row.user_id);
   const photos = (row.photos && row.photos.length) ? row.photos : (row.photo_url ? [row.photo_url] : []);
   const mainPhoto = photos[0] || null;
   const presence = presenceInfo(row.last_seen_at);
