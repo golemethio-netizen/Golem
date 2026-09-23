@@ -16,32 +16,11 @@
 
     /* Full-screen Hero Container with Background Image */
 .welcome-container {
-  /* Fixed + inset:0 rather than relative + 100vw/100vh: this div is
-     nested inside <main>, which has its own padding and a max-width
-     wrapper (.app-shell). 100vw there overflows past the right edge
-     of the viewport instead of sitting flush — position:fixed takes
-     it out of that flow entirely so it's always truly full-screen
-     regardless of ancestor padding, on any device. */
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  min-height: 480px; /* keeps the card fully visible on very short/landscape phone screens */
-
-  /* Fallback gradient shows immediately and stays visible if the
-     background photo is slow to load, missing, or fails on some
-     hosts — never leaves a plain white/blank hero behind the overlay. */
-  background-color: #0A291A;
- background-image: linear-gradient(135deg, rgba(10, 41, 26, 0.75), rgba(18, 59, 39, 0.75)), url('wanaager.png');
-  background-size: cover;          /* Cover the screen while preserving aspect ratio */
-  background-position: center center; /* Keep main focal point centered */
+  background-image: url('assets/hero-bg.jpg'); /* Verify path accuracy */
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
-  background-attachment: scroll;   /* Best performance and consistency across iOS/Android */
-  
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow-y: auto;                /* scroll instead of clipping the card on short viewports */
-  padding: 20px 0;
+  background-color: var(--dark-bg); /* Fallback only */
 }
 
 /* Responsive adjustments for phones */
