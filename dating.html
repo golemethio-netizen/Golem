@@ -16,11 +16,15 @@
 
     /* Full-screen Hero Container with Background Image */
 .welcome-container {
-  position: relative;
-  width: 100vw;
-  /* Use svh (small viewport height) so mobile browser toolbars don't push content down */
-  height: 100vh;
-  height: 100svh;
+  /* Fixed + inset:0 rather than relative + 100vw/100vh: this div is
+     nested inside <main>, which has its own padding and a max-width
+     wrapper (.app-shell). 100vw there overflows past the right edge
+     of the viewport instead of sitting flush — position:fixed takes
+     it out of that flow entirely so it's always truly full-screen
+     regardless of ancestor padding, on any device. */
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
   min-height: 480px; /* keeps the card fully visible on very short/landscape phone screens */
 
   /* Fallback gradient shows immediately and stays visible if the
@@ -877,7 +881,7 @@ async function initAuth(){
     console.error("Auth check failed:", err);
     currentUser = null;
   }
-  document.getElementById("gate").style.display = currentUser ? "none" : "block";
+  document.getElementById("gate").style.display = currentUser ? "none" : "flex";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
@@ -1116,11 +1120,13 @@ function updateHeaderAuthUI(){
   const pillBtn = document.getElementById("headerAuthBtn");
   const accountBox = document.getElementById("accountBox");
   const notifWrap = document.getElementById("notifWrap");
+  const sidebar = document.querySelector(".sidebar");
 
   if (currentUser){
     pillBtn.style.display = "none";
     accountBox.style.display = "block";
     notifWrap.style.display = "inline-block";
+    if (sidebar) sidebar.style.display = "";
 
     const fullName = currentUser.user_metadata?.full_name || currentUser.email || "Account";
     const photoUrl = currentUser.user_metadata?.avatar_url || null;
@@ -1136,6 +1142,11 @@ function updateHeaderAuthUI(){
     pillBtn.style.display = "block";
     accountBox.style.display = "none";
     notifWrap.style.display = "none";
+    // Signed-out visitors have nothing to do with Browse/Messages/Likes/etc.,
+    // and leaving this rendered squeezes the full-screen welcome hero into
+    // whatever space is left next to (desktop) or below (mobile) a dead
+    // navigation list. Hide it until they're actually signed in.
+    if (sidebar) sidebar.style.display = "none";
   }
 }
 
@@ -1147,7 +1158,7 @@ document.addEventListener("click", (e) => {
 _supabase.auth.onAuthStateChange((_event, session) => {
   const wasSignedIn = !!currentUser;
   currentUser = session?.user || null;
-  document.getElementById("gate").style.display = currentUser ? "none" : "block";
+  document.getElementById("gate").style.display = currentUser ? "none" : "flex";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
@@ -1510,7 +1521,7 @@ const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","message
 function switchTab(tab){
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
   if (!currentUser){
-    document.getElementById("gate").style.display = "block";
+    document.getElementById("gate").style.display = "flex";
     PANELS.forEach(p => document.getElementById(p).style.display = "none");
     return;
   }
@@ -2643,21 +2654,35 @@ async function saveEditMessage(messageId){
   const textarea = document.getElementById(`editBody-${messageId}`);
   const newBody = textarea.value.trim();
   if (!newBody) return;
+  const editedAt = new Date().toISOString();
   const { error } = await _supabase
     .from("dating_messages")
-    .update({ body: newBody, edited_at: new Date().toISOString() })
+    .update({ body: newBody, edited_at: editedAt })
     .eq("id", messageId);
   if (error){ alert("Couldn't save edit: " + error.message); return; }
+  // openThread() only re-fetches reactions from the DB, not the messages
+  // themselves — without updating the in-memory copy here, the open
+  // thread would keep showing the pre-edit text until reopened.
+  if (currentOpenThread){
+    const msg = currentOpenThread.messages.find(x => x.id === messageId);
+    if (msg){ msg.body = newBody; msg.edited_at = editedAt; }
+  }
   refreshOpenThreadMessages();
+  loadThreads();
 }
 
 async function deleteMessage(messageId){
   if (!confirm("Delete this message for everyone? This can't be undone.")) return;
+  const deletedAt = new Date().toISOString();
   const { error } = await _supabase
     .from("dating_messages")
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: deletedAt })
     .eq("id", messageId);
   if (error){ alert("Couldn't delete: " + error.message); return; }
+  if (currentOpenThread){
+    const msg = currentOpenThread.messages.find(x => x.id === messageId);
+    if (msg) msg.deleted_at = deletedAt;
+  }
   refreshOpenThreadMessages();
   loadThreads();
 }
