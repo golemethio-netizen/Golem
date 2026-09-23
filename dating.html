@@ -16,11 +16,11 @@
 
     /* Full-screen Hero Container with Background Image */
 .welcome-container {
-  background-image: url('assets/wanaager.png'); /* Verify path accuracy */
+  background-image: url('wanaager.png'); /* Verify exact path & case */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: var(--dark-bg); /* Fallback only */
+  background-color: var(--dark-bg); /* Rendered behind image as fallback */
 }
 
 /* Responsive adjustments for phones */
@@ -1276,9 +1276,9 @@ async function loadNotifications(){
   const list = document.getElementById("notifList");
   list.innerHTML = `<div class="notif-empty">Loading…</div>`;
 
-  const { data, error } = await _supabase
-    .from("dating_notifications")
-    .select("*")
+  const { data, error } = await supabase
+  .from('dating_profiles')
+  .select('user_id, display_name, age, city, gender, relationship_type, photos, is_verified, last_seen_at');
     .eq("user_id", currentUser.id)
     .order("created_at", { ascending: false })
     .limit(30);
