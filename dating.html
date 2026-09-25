@@ -2641,13 +2641,30 @@ async function loadThreads(){
   });
 
   const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
+
+  // Filter out anyone in a block relationship with the current user (in
+  // either direction) — blocking doesn't delete the underlying match or
+  // message history, so without this, a blocked conversation would still
+  // show up in the thread list with an (RLS-rejected) call button.
+  const { data: blockRows } = await _supabase
+    .from("dating_blocks")
+    .select("blocker_id, blocked_id")
+    .or(`blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}`);
+  const blockedIds = new Set(
+    (blockRows || []).map(b => b.blocker_id === currentUser.id ? b.blocked_id : b.blocker_id)
+  );
+  const visibleOtherIds = otherIds.filter(id => !blockedIds.has(id));
+
   const { data: profiles } = await _supabase
     .from("dating_profiles")
     .select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, call_privacy")
+    .in("user_id", visibleOtherIds.length ? visibleOtherIds : ["00000000-0000-0000-0000-000000000000"]);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
-  Object.values(threads).forEach(thread => {
+  Object.values(threads)
+    .filter(thread => !blockedIds.has(thread.other))
+    .forEach(thread => {
     const last = thread.messages[0];
     const unreadCount = thread.messages.filter(m => !m.read && m.recipient_id === currentUser.id).length;
     const p = profileMap[thread.other];
