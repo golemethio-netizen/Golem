@@ -791,6 +791,33 @@
     </div>
 
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+      <h3 style="margin-top:0;">Who Can Contact You</h3>
+      <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Control who can call you and who can see when you were last active.</p>
+      <div class="row2">
+        <div>
+          <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can call you</label>
+          <select id="setCallPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
+            <option value="everybody">Everybody</option>
+            <option value="verified">Verified profiles only</option>
+            <option value="matches">My matches only</option>
+            <option value="nobody">Nobody</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can see your last seen time</label>
+          <select id="setLastSeenPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
+            <option value="everybody">Everybody</option>
+            <option value="verified">Verified profiles only</option>
+            <option value="matches">My matches only</option>
+            <option value="nobody">Nobody</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="updateContactPrivacy()" class="submit-btn" style="width:auto;padding:10px 24px;margin-top:14px;">Save Preferences</button>
+      <div id="contactPrivacyMsg" style="margin-top:10px;"></div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
       <h3 style="margin-top:0;">Change Password</h3>
       <div class="row2">
         <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">New Password</label><input type="password" id="setNewPwd" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" placeholder="Min 6 characters"></div>
@@ -800,33 +827,7 @@
       <div id="pwdMsg" style="margin-top:10px;"></div>
     </div>
 
-    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-      <h3 style="margin-top:0;">Who Can Contact You</h3>
-      <div class="row2">
-        <div>
-          <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can call you</label>
-          <select id="setCallPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;">
-            <option value="everybody">Everybody</option>
-            <option value="verified">Verified members only</option>
-            <option value="matches">My matches only</option>
-            <option value="nobody">Nobody</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can see your last seen / online status</label>
-          <select id="setLastSeenPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;">
-            <option value="everybody">Everybody</option>
-            <option value="verified">Verified members only</option>
-            <option value="matches">My matches only</option>
-            <option value="nobody">Nobody</option>
-          </select>
-        </div>
-      </div>
-      <button onclick="updateContactPrivacy()" class="submit-btn" style="width:auto;padding:10px 24px;margin-top:14px;">Save Privacy Settings</button>
-      <div id="privacyMsg" style="margin-top:10px;"></div>
-    </div>
-
-    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
       <h3 style="margin-top:0;">Blocked Users</h3>
       <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Users you have blocked cannot see your profile or message you.</p>
       <div id="blockedUsersList">Loading...</div>
@@ -857,62 +858,14 @@ if (typeof _supabase === 'undefined') {
 
 let currentUser = null;
 let currentOpenThread = null;
-
-// ---------- Privacy (call / last-seen visibility) ----------
-// Cached per-session so every card/list render doesn't need its own
-// round trip; refreshed at sign-in and whenever a grid reloads.
-let myPrivacyContext = { isVerified: false, matchedIds: new Set() };
-
-async function refreshMyPrivacyContext(){
-  if (!currentUser) return;
-  const [{ data: me }, { data: matches }] = await Promise.all([
-    _supabase.from("dating_profiles").select("is_verified").eq("user_id", currentUser.id).maybeSingle(),
-    _supabase.from("dating_matches").select("user_a, user_b").or(`user_a.eq.${currentUser.id},user_b.eq.${currentUser.id}`)
-  ]);
-  myPrivacyContext.isVerified = !!(me && me.is_verified);
-  myPrivacyContext.matchedIds = new Set(
-    (matches || []).map(m => m.user_a === currentUser.id ? m.user_b : m.user_a)
-  );
-}
-
-// Whether the CURRENT viewer is allowed to see `row`'s last-seen/online
-// status, based on the profile owner's own last_seen_privacy setting.
-function canSeeLastSeen(row){
-  if (row.user_id === currentUser?.id) return true; // always see your own
-  const pref = row.last_seen_privacy || "everybody";
-  if (pref === "everybody") return true;
-  if (pref === "nobody") return false;
-  if (pref === "verified") return myPrivacyContext.isVerified;
-  if (pref === "matches") return myPrivacyContext.matchedIds.has(row.user_id);
-  return true;
-}
-
-// Whether the CURRENT viewer is allowed to call `row`, based on the
-// recipient's own call_privacy setting. This is a UX pre-check only —
-// the database enforces the real rule independently (dating_can_call),
-// so hiding/showing this button can never be the actual security gate.
-function canCall(row){
-  if (!row || row.user_id === currentUser?.id) return false;
-  const pref = row.call_privacy || "everybody";
-  if (pref === "everybody") return true;
-  if (pref === "nobody") return false;
-  if (pref === "verified") return myPrivacyContext.isVerified;
-  if (pref === "matches") return myPrivacyContext.matchedIds.has(row.user_id);
-  return true;
-}
-
-// Presence markup respecting last-seen privacy — used everywhere a
-// card currently shows an online dot / "Active Xm ago" text.
-function renderPresenceGated(row){
-  if (!canSeeLastSeen(row)) return { online: false, text: "" };
-  return presenceInfo(row.last_seen_at);
-}
 let allBrowseRows = [];
 let visibleCount = 0;
 const PAGE_SIZE = 6;
 let currentLang = "en";
 let messageRealtimeChannel = null;
 let notifRealtimeChannel = null;
+let myProfile = null;       // own dating_profiles row: is_verified, call_privacy, last_seen_privacy
+let myMatchedIds = new Set(); // ids of everyone currentUser is matched with
 
 // ---------- Presence / last seen ----------
 const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
@@ -948,6 +901,79 @@ function presenceInfo(lastSeenAt){
   return { online: false, text: `Active ${days}d ago` };
 }
 
+// ---------- Contact privacy (who can call you / see your last seen) ----------
+async function fetchMyProfile(){
+  if (!currentUser) return null;
+  const { data } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  myProfile = data || null;
+  return myProfile;
+}
+
+async function refreshMyMatchedIds(){
+  if (!currentUser) return;
+  const { data } = await _supabase
+    .from("dating_matches")
+    .select("user_a, user_b")
+    .or(`user_a.eq.${currentUser.id},user_b.eq.${currentUser.id}`);
+  myMatchedIds = new Set((data || []).map(r => r.user_a === currentUser.id ? r.user_b : r.user_a));
+}
+
+// profile.last_seen_privacy governs whether the CURRENT viewer may see
+// profile's online/last-active status. "matches"/"verified" checks look
+// at the viewer's own relationship to profile, not profile's own status.
+function canSeeLastSeen(profile){
+  if (!profile || !currentUser) return false;
+  if (profile.user_id === currentUser.id) return true;
+  const pref = profile.last_seen_privacy || "everybody";
+  if (pref === "everybody") return true;
+  if (pref === "nobody") return false;
+  if (pref === "verified") return !!(myProfile && myProfile.is_verified);
+  if (pref === "matches") return myMatchedIds.has(profile.user_id);
+  return true;
+}
+
+// Wrap presenceInfo() with the privacy check — use this everywhere a
+// card/modal renders online status instead of calling presenceInfo() directly.
+function visiblePresence(profile){
+  return canSeeLastSeen(profile) ? presenceInfo(profile.last_seen_at) : { online: false, text: "" };
+}
+
+// profile.call_privacy governs whether the CURRENT user (as caller) may
+// call profile. This is a friendly pre-check for the UI — the real
+// enforcement is the "caller_start_call" RLS policy on dating_calls
+// (v22 migration), so this can't be bypassed by skipping the button.
+function canCall(profile){
+  if (!profile || !currentUser) return false;
+  if (profile.user_id === currentUser.id) return false;
+  if (!myProfile || !myProfile.is_platinum) return false; // voice calls are Platinum-only
+  const pref = profile.call_privacy || "everybody";
+  if (pref === "nobody") return false;
+  if (pref === "verified") return !!(myProfile && myProfile.is_verified);
+  return true; // "everybody" and "matches" — matching is already required to reach the call button at all
+}
+
+async function updateContactPrivacy(){
+  const callPrivacy = document.getElementById("setCallPrivacy").value;
+  const lastSeenPrivacy = document.getElementById("setLastSeenPrivacy").value;
+  const msg = document.getElementById("contactPrivacyMsg");
+  msg.innerHTML = `<div class="msg">Saving...</div>`;
+  const { error } = await _supabase
+    .from("dating_profiles")
+    .update({ call_privacy: callPrivacy, last_seen_privacy: lastSeenPrivacy })
+    .eq("user_id", currentUser.id);
+  if (error){
+    msg.innerHTML = `<div class="msg error">Couldn't save: ${esc(error.message)}</div>`;
+    return;
+  }
+  if (myProfile){ myProfile.call_privacy = callPrivacy; myProfile.last_seen_privacy = lastSeenPrivacy; }
+  msg.innerHTML = `<div class="msg success">Saved.</div>`;
+}
+
+
 // ---------- Auth gate ----------
 async function initAuth(){
   try {
@@ -962,7 +988,8 @@ async function initAuth(){
   updateHeaderAuthUI();
   if (currentUser){
     maybeShowSafetyNotice();
-    refreshMyPrivacyContext();
+    fetchMyProfile();
+    refreshMyMatchedIds();
     loadFeed();
     setComposerAvatar();
     refreshUnreadBadge();
@@ -1239,7 +1266,8 @@ _supabase.auth.onAuthStateChange((_event, session) => {
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    refreshMyPrivacyContext();
+    fetchMyProfile();
+    refreshMyMatchedIds();
     loadFeed();
     setComposerAvatar();
     refreshUnreadBadge();
@@ -1253,6 +1281,8 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     setupRealtimeNotifications();
   } else if (wasSignedIn){
     teardownRealtimeChannels();
+    myProfile = null;
+    myMatchedIds = new Set();
   }
 });
 
@@ -1449,6 +1479,7 @@ async function markAllNotificationsRead(){
 }
 
 async function loadLikesReceived(){
+  await refreshMyMatchedIds();
   const grid = document.getElementById("likesGrid");
   const empty = document.getElementById("likesEmpty");
   grid.innerHTML = "";
@@ -1496,7 +1527,7 @@ async function loadLikesReceived(){
   rows.forEach(row => {
     const img = (row.photos && row.photos[0]) || row.photo_url || null;
     const displayName = esc(row.display_name || row.gender || "Someone");
-    const presence = renderPresenceGated(row);
+    const presence = visiblePresence(row);
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
@@ -1506,7 +1537,7 @@ async function loadLikesReceived(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
       </div>`;
     grid.appendChild(card);
@@ -1575,7 +1606,7 @@ async function loadVisitors(){
         ${img ? "" : "👤"}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(visitMap[row.user_id]).replace("Joined", "Viewed")}</div>
       </div>`;
@@ -1746,7 +1777,7 @@ async function loadFeed(){
   const authorIds = [...new Set(posts.map(p => p.user_id))];
 
   const [{ data: authors }, { data: reactions }, { data: comments }] = await Promise.all([
-    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified").in("user_id", authorIds),
+    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum").in("user_id", authorIds),
     _supabase.from("dating_post_reactions").select("*").in("post_id", postIds),
     _supabase.from("dating_post_comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
   ]);
@@ -1762,7 +1793,7 @@ async function loadFeed(){
   
   const commenterIds = [...new Set((comments || []).map(c => c.user_id))];
   const { data: commenterProfiles } = commenterIds.length
-    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified").in("user_id", commenterIds)
+    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified, is_platinum").in("user_id", commenterIds)
     : { data: [] };
   const commenterMap = {};
   (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
@@ -1789,7 +1820,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
     const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
     const canDelete = c.user_id === currentUser.id || isMine; 
     return `<div class="post-comment">
-      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}</strong> ${esc(c.body)}
+      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}${platinumBadge(cp && cp.is_platinum)}</strong> ${esc(c.body)}
       ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;float:right; font-weight:bold;">✕</button>` : ""}
     </div>`;
   }).join("");
@@ -1799,7 +1830,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
       <div style="display:flex;gap:12px;align-items:center;">
         <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
-          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}</div>
+          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}${platinumBadge(a && a.is_platinum)}</div>
           <div style="font-size:.8rem;color:#888;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
         </div>
         ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:1.1rem;">✕</button>`
@@ -1905,6 +1936,7 @@ async function reportPost(postId){
 
 // ---------- Load / render profiles ----------
 async function loadProfiles(){
+  await refreshMyMatchedIds();
   const seeking = document.getElementById("filterSeeking").value;
   const type = document.getElementById("filterType").value;
   const city = document.getElementById("filterCity").value.trim();
@@ -1946,7 +1978,7 @@ async function loadProfiles(){
   if (seeking) rows = rows.filter(r => r.gender === seeking);
   if (type) rows = rows.filter(r => r.relationship_type === type);
   if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
-  if (onlineOnly) rows = rows.filter(r => renderPresenceGated(r).online);
+  if (onlineOnly) rows = rows.filter(r => visiblePresence(r).online);
   if (verifiedOnly) rows = rows.filter(r => r.is_verified);
   if (!isNaN(ageMin)) rows = rows.filter(r => (r.age || 0) >= ageMin);
   if (!isNaN(ageMax)) rows = rows.filter(r => (r.age || 0) <= ageMax);
@@ -1956,13 +1988,13 @@ async function loadProfiles(){
   if (wantsKids) rows = rows.filter(r => r.wants_kids === wantsKids);
 
   rows.sort((a, b) => {
-    const aOnline = renderPresenceGated(a).online;
-    const bOnline = renderPresenceGated(b).online;
+    const aOnline = visiblePresence(a).online;
+    const bOnline = visiblePresence(b).online;
     if (aOnline !== bOnline) return aOnline ? -1 : 1;
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
-  const onlineCount = rows.filter(r => renderPresenceGated(r).online).length;
+  const onlineCount = rows.filter(r => visiblePresence(r).online).length;
   document.getElementById("onlineSummary").textContent =
     onlineCount > 0 ? `🟢 ${onlineCount} ${onlineCount === 1 ? "person" : "people"} online now` : "";
 
@@ -1995,7 +2027,7 @@ function renderBrowseGrid(){
   rows.forEach(row => {
     const img = (row.photos && row.photos[0]) || row.photo_url || null;
     const displayName = esc(row.display_name || row.gender || "Someone");
-    const presence = renderPresenceGated(row);
+    const presence = visiblePresence(row);
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
@@ -2005,7 +2037,7 @@ function renderBrowseGrid(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>
       </div>`;
@@ -2030,6 +2062,7 @@ function joinedAgoText(createdAt){
 }
 
 async function loadNewMembers(){
+  await refreshMyMatchedIds();
   const grid = document.getElementById("newMembersGrid");
   const empty = document.getElementById("newMembersEmpty");
   grid.innerHTML = "";
@@ -2066,7 +2099,7 @@ async function loadNewMembers(){
   rows.forEach(row => {
     const img = (row.photos && row.photos[0]) || row.photo_url || null;
     const displayName = esc(row.display_name || row.gender || "Someone");
-    const presence = renderPresenceGated(row);
+    const presence = visiblePresence(row);
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openModal(row);
@@ -2076,7 +2109,7 @@ async function loadNewMembers(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(row.created_at)}</div>
       </div>`;
@@ -2094,15 +2127,12 @@ async function openModal(row){
   recordProfileView(row.user_id);
   const photos = (row.photos && row.photos.length) ? row.photos : (row.photo_url ? [row.photo_url] : []);
   const mainPhoto = photos[0] || null;
-  const presence = renderPresenceGated(row);
+  const presence = visiblePresence(row);
   const root = document.getElementById("modalRoot");
   const matched = await checkMatch(row.user_id);
   const actionBtn = matched
     ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">💬 Message</button>`
     : `<button class="btn-contact" id="likeBtn" style="background:var(--gold); color:var(--ink);" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like Profile</button>`;
-  const callBtn = canCall(row)
-    ? `<button class="btn-contact" style="background:var(--paper);color:var(--green);" onclick="startCall('${row.user_id}','${esc(row.display_name || row.gender || "them").replace(/'/g,"&#39;")}')">📞 Call</button>`
-    : "";
   const thumbs = photos.length > 1
     ? `<div class="thumb-row">${photos.map((p,i) => `<div class="thumb${i===0?" active":""}" data-idx="${i}" style="background-image:url('${esc(p)}')"></div>`).join("")}</div>`
     : "";
@@ -2113,7 +2143,7 @@ async function openModal(row){
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}</h3>
+          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)}</h3>
           <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
           <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:12px; font-weight:600;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio" style="background:#f4f7f6; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">${esc(row.bio || "")}</div>
@@ -2130,7 +2160,6 @@ async function openModal(row){
           <div id="matchNotice"></div>
           <div class="actions">
             ${actionBtn}
-            ${callBtn}
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
             <button class="btn-report" onclick="blockProfile('${row.user_id}')">Block</button>
           </div>
@@ -2316,8 +2345,27 @@ function setupPersonalCallChannel(){
 
 async function startCall(recipientId, recipientName){
   if (peerConnection){ alert("You're already in a call."); return; }
+  if (!myProfile || !myProfile.is_platinum){
+    alert("Voice calls are a Platinum feature. Upgrade to Platinum to start calling your matches.");
+    return;
+  }
   currentCallId = (crypto.randomUUID ? crypto.randomUUID() : `${currentUser.id}-${Date.now()}`);
   currentCallPeerId = recipientId;
+
+  // Create (and verify) the call row BEFORE ringing the other person —
+  // previously this rang first and inserted after, with no error check,
+  // so a blocked/failed insert still left the recipient seeing an
+  // incoming call for a call that was never actually logged.
+  const { data: callRow, error: callErr } = await _supabase.from("dating_calls").insert({
+    caller_id: currentUser.id, recipient_id: recipientId, status: "ringing"
+  }).select().single();
+  if (callErr){
+    alert("Couldn't start the call: " + callErr.message);
+    currentCallId = null;
+    currentCallPeerId = null;
+    return;
+  }
+  currentCallRow = callRow;
 
   const myName = currentUser.user_metadata?.full_name || "Someone";
   const notifyChan = _supabase.channel(`call:${recipientId}`);
@@ -2325,11 +2373,6 @@ async function startCall(recipientId, recipientName){
   notifyChan.send({ type: "broadcast", event: "ring",
     payload: { callId: currentCallId, callerId: currentUser.id, callerName: myName } });
   _supabase.removeChannel(notifyChan);
-
-  const { data: callRow } = await _supabase.from("dating_calls").insert({
-    caller_id: currentUser.id, recipient_id: recipientId, status: "ringing"
-  }).select().single();
-  currentCallRow = callRow;
 
   showOutgoingCallUI(recipientName);
   await joinCallSignaling(currentCallId, true);
@@ -2515,6 +2558,10 @@ async function toggleVoiceRecording(profileId, recipientId){
   const status = document.getElementById("recordStatus");
 
   if (!isRecording){
+    if (!myProfile || (!myProfile.is_verified && !myProfile.is_platinum)){
+      if (status) status.textContent = "Voice messages require a verified profile. Verify your profile to unlock this.";
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder = new MediaRecorder(stream);
@@ -2596,8 +2643,7 @@ async function loadThreads(){
   const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
   const { data: profiles } = await _supabase
     .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos, is_verified, call_privacy")
-    .in("user_id", otherIds);
+    .select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, call_privacy")
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
@@ -2616,7 +2662,7 @@ async function loadThreads(){
     div.innerHTML = `
       <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}</div>
+        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(p && p.is_platinum)}</div>
         <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
         <div class="meta" style="font-size:.78rem;color:#999; margin-top: 4px;">${new Date(last.created_at).toLocaleString()}</div>
       </div>
@@ -2645,8 +2691,23 @@ async function openThread(thread){
   });
 
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
-  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) : "";
+  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(thread.profile.is_platinum) : "";
   const callAllowed = thread.profile ? canCall(thread.profile) : true;
+  const notPlatinum = !myProfile || !myProfile.is_platinum;
+  const callTooltip = notPlatinum
+    ? "Voice calls are a Platinum feature — upgrade to start calling"
+    : (thread.profile && thread.profile.call_privacy === "verified" ? "This person only accepts calls from verified profiles" : "This person isn't accepting calls right now");
+  const callBtnHtml = callAllowed
+    ? `<button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call" style="width:34px; height:34px; font-size:0.9rem;">📞</button>`
+    : `<button class="call-btn" disabled title="${callTooltip}" style="width:34px; height:34px; font-size:0.9rem;opacity:.4;cursor:not-allowed;">📞</button>`;
+
+  // Read receipts ("Seen") are a Platinum perk — only show if the LAST
+  // message in the thread is mine and has actually been read.
+  const lastMsg = ordered[ordered.length - 1];
+  const showSeen = lastMsg && lastMsg.sender_id === currentUser.id && lastMsg.read && !lastMsg.deleted_at
+    && myProfile && myProfile.is_platinum;
+  const seenHtml = showSeen ? `<div style="text-align:right;font-size:.72rem;color:#999;margin-top:-6px;">Seen</div>` : "";
+
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -2656,12 +2717,13 @@ async function openThread(thread){
           <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px; margin-bottom:15px; border-bottom:1px solid var(--line); padding-bottom:10px;">
             <span style="font-size: 1.1rem;">${otherName}${otherBadge}</span>
             <span style="display:flex;gap:8px;flex-shrink:0;">
-              ${callAllowed ? `<button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call" style="width:34px; height:34px; font-size:0.9rem;">📞</button>` : ""}
+              ${callBtnHtml}
               <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);width:34px; height:34px; font-size:0.9rem;" onclick="unmatchUser('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Unmatch">✕</button>
             </span>
           </h3>
           <div id="threadMessages" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin:10px 0; padding-right:5px;">
             ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [])).join("")}
+            ${seenHtml}
           </div>
           <div style="background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 15px;">
               <textarea id="replyBody" maxlength="1000" placeholder="Type a message..." style="width:100%;min-height:50px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit; outline:none; resize:none;"></textarea>
@@ -2872,6 +2934,24 @@ function verifiedBadge(isVerified){
   return isVerified ? ` <span title="Verified profile" style="color:#1E8E4F;font-weight:700;">✓</span>` : "";
 }
 
+function platinumBadge(isPlatinum){
+  return isPlatinum ? ` <span title="Platinum member" style="color:#B8860B;font-weight:700;">💎</span>` : "";
+}
+
+function renderTierBox(profile){
+  const tier = profile.is_platinum ? "Platinum" : (profile.is_verified ? "Verified" : "Basic");
+  const limits = profile.is_platinum
+    ? "Unlimited messaging, voice messages, and calls — plus read receipts."
+    : (profile.is_verified
+        ? "4 text messages per day, 4 voice messages per week. Go Platinum for unlimited messaging and calls."
+        : "4 text messages total, no voice messages, no calls. Verify your profile for daily messaging + voice, or go Platinum for unlimited.");
+  const color = profile.is_platinum ? "#B8860B" : (profile.is_verified ? "#1E8E4F" : "#666");
+  return `<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+    <div style="font-weight:700;color:${color};">${profile.is_platinum ? "💎 " : ""}${tier} tier</div>
+    <div style="font-size:.85rem;color:#666;margin-top:4px;">${limits}</div>
+  </div>`;
+}
+
 function renderVerificationBox(profile, latestRequest){
   if (profile.is_verified){
     return `<div class="msg success" style="margin-bottom:20px; font-size:1rem;">✅ Your profile is officially verified!</div>`;
@@ -3037,6 +3117,7 @@ async function loadMyProfile(){
       <button onclick="switchTab('settings')" style="background:var(--paper); border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;"><i class="fas fa-cog"></i> Settings</button>
     </div>
     ${renderPhotoEditor(data)}
+    ${renderTierBox(data)}
     ${renderVerificationBox(data, latestRequest)}
     ${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
@@ -3146,18 +3227,16 @@ async function loadMyProfile(){
 
 // ---------- Privacy Settings & Blocked Users ----------
 async function loadSettings() {
-  const { data: myProfile } = await _supabase
-    .from("dating_profiles")
-    .select("call_privacy, last_seen_privacy")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-  if (myProfile){
-    document.getElementById("setCallPrivacy").value = myProfile.call_privacy || "everybody";
-    document.getElementById("setLastSeenPrivacy").value = myProfile.last_seen_privacy || "everybody";
-  }
-
   const list = document.getElementById("blockedUsersList");
   list.innerHTML = "Loading...";
+
+  // Populate the call/last-seen dropdowns from the current profile —
+  // reuse myProfile if it's already loaded this session, otherwise fetch it.
+  const profileForPrivacy = myProfile || await fetchMyProfile();
+  if (profileForPrivacy){
+    document.getElementById("setCallPrivacy").value = profileForPrivacy.call_privacy || "everybody";
+    document.getElementById("setLastSeenPrivacy").value = profileForPrivacy.last_seen_privacy || "everybody";
+  }
 
   const { data: blocks, error } = await _supabase
     .from("dating_blocks")
@@ -3205,21 +3284,6 @@ async function unblockUser(blockId) {
   await _supabase.from("dating_blocks").delete().eq("id", blockId);
   loadSettings();
   loadProfiles(); // Refresh main feed
-}
-
-async function updateContactPrivacy(){
-  const msg = document.getElementById("privacyMsg");
-  const call_privacy = document.getElementById("setCallPrivacy").value;
-  const last_seen_privacy = document.getElementById("setLastSeenPrivacy").value;
-
-  const { error } = await _supabase
-    .from("dating_profiles")
-    .update({ call_privacy, last_seen_privacy, updated_at: new Date().toISOString() })
-    .eq("user_id", currentUser.id);
-
-  msg.innerHTML = error
-    ? `<div class="msg error">${esc(error.message)}</div>`
-    : `<div class="msg success">Privacy settings saved.</div>`;
 }
 
 async function updateAccountPassword() {
