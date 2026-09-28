@@ -1,3 +1,4 @@
+# Allow search engines to crawl public pages, but restrict private app pages
 User-agent: *
 Allow: /
 Disallow: /admin.html
@@ -5,14 +6,5 @@ Disallow: /profile.html
 Disallow: /saved.html
 Disallow: /my-items.html
 
-Sitemap: https://wanagebya.com/sitemap.xml
-# Allow all search engine crawlers to access the site
-User-agent: *
-Allow: /
-# Allow all search engine crawlers to access the site
-User-agent: *
-Allow: /
-
 # Direct crawlers to your XML sitemap
-Sitemap: https://www.wanagebya.com/dating.html
-
+Sitemap: https://www.wanagebya.com/sitemap.xml
