@@ -867,8 +867,11 @@
         }
 
         async function togglePlatinum(userId, grant) {
-            const { error } = await _supabase.from('dating_profiles').update({ is_platinum: grant }).eq('user_id', userId);
+            // .select() so we can tell when row-level security silently blocks the
+            // update (it reports success with zero rows changed instead of an error).
+            const { data, error } = await _supabase.from('dating_profiles').update({ is_platinum: grant }).eq('user_id', userId).select('user_id');
             if (error) { alert('Failed: ' + error.message); return; }
+            if (!data || data.length === 0) { alert('Nothing was changed. Your admin account may not have permission to edit dating profiles — run the v27 migration.'); return; }
             logAction(grant ? 'Platinum Granted' : 'Platinum Revoked', `User ID: ${userId}`);
             loadDatingProfiles();
         }
