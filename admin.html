@@ -854,6 +854,7 @@
             container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">` +
                 profiles.map(p => `
                     <div style="border:1px solid #eee; border-radius:10px; padding:12px;">
+                        ${profileThumbHtml(p)}
                         <div style="display:flex; justify-content:space-between; gap:8px;">
                             <strong>${escapeHtml(p.gender)}, ${escapeHtml(String(p.age))}${platinumActive(p) ? ' <span style="color:#B8860B;">💎</span>' : ''}${p.is_verified ? ' <span style="color:#1E8E4F;">✓</span>' : ''}</strong>
                             <span style="color:#999; font-size:0.72rem;">${new Date(p.created_at).toLocaleDateString()}</span>
@@ -873,6 +874,11 @@
                         <button onclick="deleteDatingProfile('${p.id}')" style="margin-top:6px; font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer; width:100%;">Remove Profile</button>
                     </div>`).join('') +
                 `</div>`;
+        }
+
+        function profileThumbHtml(p) {
+            const u = (p.photos && p.photos[0]) || p.photo_url;
+            return u ? `<a href="${escapeHtml(u)}" target="_blank" rel="noopener"><img src="${escapeHtml(u)}" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;"></a>` : '';
         }
 
         function platinumActive(p) {
@@ -997,13 +1003,13 @@
             // Batch-fetch the requester's current profile photo + name so
             // the reviewer can eyeball it next to the submitted selfie.
             const userIds = [...new Set(requests.map(r => r.user_id))];
-            const { data: profiles } = await _supabase.from('dating_profiles').select('user_id, display_name, age, city, photo_url, photos, is_verified').in('user_id', userIds);
+            const { data: profiles } = await _supabase.from('dating_profiles').select('*').in('user_id', userIds);
             const profileMap = {};
             (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
             container.innerHTML = requests.map(r => {
                 const profile = profileMap[r.user_id];
-                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const profileImages = profile ? ((profile.photos && profile.photos.length) ? profile.photos : (profile.photo_url ? [profile.photo_url] : [])) : [];
                 const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
                 return `
                     <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
@@ -1014,14 +1020,22 @@
                         <div style="display:flex; gap:12px; margin:10px 0; flex-wrap:wrap;">
                             <div>
                                 <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Submitted selfie</div>
-                                <img src="${escapeHtml(r.selfie_url)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                                <a href="${escapeHtml(r.selfie_url)}" target="_blank" rel="noopener"><img src="${escapeHtml(r.selfie_url)}" style="width:150px; height:150px; object-fit:cover; border-radius:8px; border:2px solid #c2185b;"></a>
                             </div>
-                            ${profilePhoto ? `
                             <div>
-                                <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Profile photo</div>
-                                <img src="${escapeHtml(profilePhoto)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
-                            </div>` : ''}
+                                <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Profile photos (${profileImages.length})</div>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    ${profileImages.length ? profileImages.map(u => `<a href="${escapeHtml(u)}" target="_blank" rel="noopener"><img src="${escapeHtml(u)}" style="width:150px; height:150px; object-fit:cover; border-radius:8px; border:1px solid #eee;"></a>`).join('') : '<span style="color:#bbb; font-size:0.8rem;">No profile photos</span>'}
+                                </div>
+                            </div>
                         </div>
+                        ${profile ? `
+                        <div style="background:#fafafa; border:1px solid #eee; border-radius:8px; padding:10px 12px; font-size:0.8rem; color:#555; line-height:1.7;">
+                            <div><b>${escapeHtml(profile.display_name || '—')}</b>, ${escapeHtml(String(profile.age || '?'))} · ${escapeHtml(profile.gender || '')} · ${escapeHtml(profile.city || '')}</div>
+                            <div>Seeking ${escapeHtml(profile.seeking || '—')} · ${escapeHtml(profile.relationship_type || '—')}${profile.profile_code ? ' · ' + escapeHtml(profile.profile_code) : ''}</div>
+                            ${profile.occupation ? `<div>Occupation: ${escapeHtml(profile.occupation)}</div>` : ''}
+                            ${profile.bio ? `<div style="margin-top:4px; white-space:pre-wrap;">${escapeHtml(profile.bio)}</div>` : ''}
+                        </div>` : ''}
                         <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Submitted ${new Date(r.created_at).toLocaleDateString()}${r.reviewed_at ? ' · reviewed ' + new Date(r.reviewed_at).toLocaleDateString() : ''}</p>
                         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
                             ${r.status === 'pending' ? `
