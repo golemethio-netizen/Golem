@@ -870,6 +870,7 @@ let messageRealtimeChannel = null;
 let notifRealtimeChannel = null;
 let myProfile = null;       // own dating_profiles row: is_verified, call_privacy, last_seen_privacy
 let myMatchedIds = new Set(); // ids of everyone currentUser is matched with
+let returnThread = null;      // conversation to go back to after viewing a profile opened from it
 
 // ---------- Presence / last seen ----------
 const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
@@ -1769,11 +1770,18 @@ async function submitPost(){
   loadFeed();
 }
 
-async function viewProfileFromFeed(userId){
+// Opens someone's profile. The row is always fetched fresh, and the
+// viewer's own verification/match status is loaded first, so the owner's
+// current privacy settings (e.g. who may see last seen) are applied
+// correctly rather than from a stale copy.
+async function openProfileByUserId(userId, opts = {}){
   if (userId === currentUser.id){
+    closeModal();
     switchTab("myprofile");
     return;
   }
+  if (!myProfile) await fetchMyProfile();
+  await refreshMyMatchedIds();
   const { data, error } = await _supabase
     .from("dating_profiles")
     .select("*")
@@ -1783,7 +1791,26 @@ async function viewProfileFromFeed(userId){
     alert("This person doesn't have a dating profile to view.");
     return;
   }
+  returnThread = opts.returnTo || null;
+  // Otherwise an incoming message would re-render the chat over this profile.
+  currentOpenThread = null;
   openModal(data);
+}
+
+async function viewProfileFromFeed(userId){
+  return openProfileByUserId(userId);
+}
+
+// Clicking a person in Messages. From inside an open chat, the profile
+// gets a "Back to chat" button.
+async function viewProfileFromThread(userId, fromOpenChat){
+  return openProfileByUserId(userId, { returnTo: fromOpenChat ? currentOpenThread : null });
+}
+
+function backToThread(){
+  const t = returnThread;
+  returnThread = null;
+  if (t) openThread(t);
 }
 
 async function loadFeed(){
@@ -2200,6 +2227,7 @@ async function openModal(row){
           </div>
           <div id="matchNotice"></div>
           <div class="actions">
+            ${returnThread ? `<button class="btn-report" onclick="backToThread()">← Back to chat</button>` : ""}
             ${actionBtn}
             <button class="btn-report" onclick="reportProfile('${row.id}')">Report</button>
             <button class="btn-report" onclick="blockProfile('${row.user_id}')">Block</button>
@@ -2221,7 +2249,7 @@ function swapModalPhoto(url, thumbEl){
   thumbEl.parentElement.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
   thumbEl.classList.add("active");
 }
-function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; }
+function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; returnThread = null; }
 
 // ---------- Likes / Matches ----------
 async function checkMatch(otherUserId){
@@ -2722,7 +2750,7 @@ async function loadThreads(){
     div.onmouseover = () => div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
     div.onmouseout = () => div.style.boxShadow = "none";
     div.innerHTML = `
-      <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
+      <div onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" style="cursor:pointer;width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
         <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(p && p.is_platinum)}</div>
         <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
@@ -2754,6 +2782,7 @@ async function openThread(thread){
 
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
   const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(thread.profile.is_platinum) : "";
+  const headerPhoto = thread.profile ? ((thread.profile.photos && thread.profile.photos[0]) || thread.profile.photo_url) : null;
   const callAllowed = thread.profile ? canCall(thread.profile) : true;
   const notPlatinum = !myProfile || !myProfile.is_platinum;
   const callTooltip = notPlatinum
@@ -2777,7 +2806,10 @@ async function openThread(thread){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px; margin-bottom:15px; border-bottom:1px solid var(--line); padding-bottom:10px;">
-            <span style="font-size: 1.1rem;">${otherName}${otherBadge}</span>
+            <span onclick="viewProfileFromThread('${thread.other}', true)" title="View profile" style="display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;">
+              <span style="width:36px;height:36px;border-radius:50%;flex-shrink:0;border:1px solid var(--line);background:${headerPhoto ? `url('${esc(headerPhoto)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;font-size:1rem;color:#bbb;">${headerPhoto ? "" : "👤"}</span>
+              <span style="font-size: 1.1rem;">${otherName}${otherBadge}</span>
+            </span>
             <span style="display:flex;gap:8px;flex-shrink:0;">
               ${callBtnHtml}
               <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);width:34px; height:34px; font-size:0.9rem;" onclick="unmatchUser('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Unmatch">✕</button>
