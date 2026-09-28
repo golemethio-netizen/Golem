@@ -500,6 +500,10 @@
       <div style="display:flex;gap:12px;align-items:flex-start;">
         <div id="composerAvatar" style="width:46px;height:46px;border-radius:50%;flex-shrink:0;background:var(--paper);display:flex;align-items:center;justify-content:center;color:#aaa; font-size: 1.5rem;">👤</div>
         <div style="flex:1;">
+          <div id="profileGateNotice" style="display:none;background:#FFF9EE;color:#8A6D1F;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:.88rem;">
+            Set up your profile to post and send messages.
+            <a href="#" onclick="switchTab('post');return false;" style="color:var(--green);font-weight:700;">Set up now</a>
+          </div>
           <textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or what you are looking for..." style="width:100%;min-height:70px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:.95rem;resize:vertical; outline:none;"></textarea>
           <div id="postImagePreview" style="margin-top:8px;"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px; flex-wrap:wrap; gap: 10px;">
@@ -910,7 +914,31 @@ async function fetchMyProfile(){
     .eq("user_id", currentUser.id)
     .maybeSingle();
   myProfile = data || null;
+  applyProfileGates();
   return myProfile;
+}
+
+// Posting and messaging need a dating profile. The database enforces this
+// too (posts/comments via RLS, messages via a trigger); these checks just
+// give a clear message and a way forward instead of a raw error.
+async function requireProfile(action){
+  if (!myProfile) await fetchMyProfile();
+  if (myProfile) return true;
+  if (confirm(`You need to set up your profile before you can ${action}. Set it up now?`)){
+    closeModal();
+    switchTab("post");
+  }
+  return false;
+}
+
+function applyProfileGates(){
+  const notice = document.getElementById("profileGateNotice");
+  const hasProfile = !!myProfile;
+  if (notice) notice.style.display = hasProfile ? "none" : "block";
+  ["postBody", "postImage", "postVisibility", "postSubmitBtn"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !hasProfile;
+  });
 }
 
 async function refreshMyMatchedIds(){
@@ -1283,6 +1311,7 @@ _supabase.auth.onAuthStateChange((_event, session) => {
     teardownRealtimeChannels();
     myProfile = null;
     myMatchedIds = new Set();
+    applyProfileGates();
   }
 });
 
@@ -1683,6 +1712,7 @@ function clearPostImage(){
 }
 
 async function submitPost(){
+  if (!(await requireProfile("post to the Home feed"))) return;
   const textarea = document.getElementById("postBody");
   const body = textarea.value.trim();
   const msg = document.getElementById("postMsg");
@@ -1861,6 +1891,7 @@ function toggleCommentBox(postId){
 }
 
 async function submitComment(postId){
+  if (!(await requireProfile("comment on posts"))) return;
   const input = document.getElementById(`commentInput-${postId}`);
   const body = input.value.trim();
   if (!body) return;
@@ -2272,6 +2303,7 @@ function opts(list, current){
 }
 
 async function sendMessage(profileId, recipientId){
+  if (!(await requireProfile("send messages"))) return;
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
@@ -2290,6 +2322,7 @@ async function sendMessage(profileId, recipientId){
 }
 
 async function sendReply(profileId, recipientId){
+  if (!(await requireProfile("send messages"))) return;
   const textarea = document.getElementById("replyBody");
   const body = textarea.value.trim();
   if (!body) return;
@@ -2345,6 +2378,7 @@ function setupPersonalCallChannel(){
 
 async function startCall(recipientId, recipientName){
   if (peerConnection){ alert("You're already in a call."); return; }
+  if (!(await requireProfile("make calls"))) return;
   if (!myProfile || !myProfile.is_platinum){
     alert("Voice calls are a Platinum feature. Upgrade to Platinum to start calling your matches.");
     return;
@@ -2558,6 +2592,7 @@ async function toggleVoiceRecording(profileId, recipientId){
   const status = document.getElementById("recordStatus");
 
   if (!isRecording){
+    if (!(await requireProfile("send messages"))) return;
     if (!myProfile || (!myProfile.is_verified && !myProfile.is_platinum)){
       if (status) status.textContent = "Voice messages require a verified profile. Verify your profile to unlock this.";
       return;
@@ -3432,6 +3467,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   } else {
     msg.innerHTML = `<div class="msg success">Profile Published Successfully!</div>`;
     document.getElementById("postForm").reset();
+    fetchMyProfile();
     setTimeout(() => switchTab("myprofile"), 1500); 
   }
 });
