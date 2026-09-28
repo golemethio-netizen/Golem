@@ -978,7 +978,7 @@ function visiblePresence(profile){
 function canCall(profile){
   if (!profile || !currentUser) return false;
   if (profile.user_id === currentUser.id) return false;
-  if (!myProfile || !myProfile.is_platinum) return false; // voice calls are Platinum-only
+  if (!isPlatinumActive(myProfile)) return false; // voice calls are Platinum-only
   const pref = profile.call_privacy || "everybody";
   if (pref === "nobody") return false;
   if (pref === "verified") return !!(myProfile && myProfile.is_verified);
@@ -1288,15 +1288,23 @@ document.addEventListener("click", (e) => {
   if (notifWrap && !notifWrap.contains(e.target)) document.getElementById("notifPanel")?.classList.remove("open");
 });
 
-_supabase.auth.onAuthStateChange((_event, session) => {
+let didProfileSetupRedirect = false; // only nudge once per page load, not on every token refresh
+
+_supabase.auth.onAuthStateChange(async (_event, session) => {
   const wasSignedIn = !!currentUser;
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "flex";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    fetchMyProfile();
+    await fetchMyProfile();
     refreshMyMatchedIds();
+    // Signed in (Google, email or phone) but no dating profile yet:
+    // go straight to profile setup instead of an empty Home feed.
+    if (_event === "SIGNED_IN" && !myProfile && !didProfileSetupRedirect){
+      didProfileSetupRedirect = true;
+      switchTab("post");
+    }
     loadFeed();
     setComposerAvatar();
     refreshUnreadBadge();
@@ -1567,7 +1575,7 @@ async function loadLikesReceived(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
       </div>`;
     grid.appendChild(card);
@@ -1642,7 +1650,7 @@ async function loadVisitors(){
         ${img ? "" : "👤"}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(visitMap[row.user_id]).replace("Joined", "Viewed")}</div>
       </div>`;
@@ -1844,7 +1852,7 @@ async function loadFeed(){
   const authorIds = [...new Set(posts.map(p => p.user_id))];
 
   const [{ data: authors }, { data: reactions }, { data: comments }] = await Promise.all([
-    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum").in("user_id", authorIds),
+    _supabase.from("dating_profiles").select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, platinum_until").in("user_id", authorIds),
     _supabase.from("dating_post_reactions").select("*").in("post_id", postIds),
     _supabase.from("dating_post_comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
   ]);
@@ -1860,7 +1868,7 @@ async function loadFeed(){
   
   const commenterIds = [...new Set((comments || []).map(c => c.user_id))];
   const { data: commenterProfiles } = commenterIds.length
-    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified, is_platinum").in("user_id", commenterIds)
+    ? await _supabase.from("dating_profiles").select("user_id, display_name, gender, is_verified, is_platinum, platinum_until").in("user_id", commenterIds)
     : { data: [] };
   const commenterMap = {};
   (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
@@ -1887,7 +1895,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
     const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
     const canDelete = c.user_id === currentUser.id || isMine; 
     return `<div class="post-comment">
-      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}${platinumBadge(cp && cp.is_platinum)}</strong> ${esc(c.body)}
+      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}${platinumBadge(isPlatinumActive(cp && cp))}</strong> ${esc(c.body)}
       ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;float:right; font-weight:bold;">✕</button>` : ""}
     </div>`;
   }).join("");
@@ -1897,7 +1905,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
       <div style="display:flex;gap:12px;align-items:center;">
         <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
-          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}${platinumBadge(a && a.is_platinum)}</div>
+          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}${platinumBadge(isPlatinumActive(a && a))}</div>
           <div style="font-size:.8rem;color:#888;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
         </div>
         ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:1.1rem;">✕</button>`
@@ -2105,7 +2113,7 @@ function renderBrowseGrid(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>
       </div>`;
@@ -2177,7 +2185,7 @@ async function loadNewMembers(){
         ${presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
         <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
         <div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(row.created_at)}</div>
       </div>`;
@@ -2211,7 +2219,7 @@ async function openModal(row){
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}${platinumBadge(row.is_platinum)}</h3>
+          <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))}</h3>
           <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
           <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:12px; font-weight:600;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio" style="background:#f4f7f6; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">${esc(row.bio || "")}</div>
@@ -2280,6 +2288,7 @@ async function unmatchUser(otherUserId, otherName){
 }
 
 async function likeProfile(profileId, otherUserId){
+  if (!(await requireProfile("like profiles"))) return;
   const btn = document.getElementById("likeBtn");
   if (btn){ btn.disabled = true; btn.textContent = "Liking..."; }
 
@@ -2352,7 +2361,7 @@ async function sendMessage(profileId, recipientId){
     body
   });
   if (error){
-    msgBox.innerHTML = `<div class="msg error">Couldn't send: ${error.message}</div>`;
+    msgBox.innerHTML = `<div class="msg error">Couldn't send: ${esc(error.message)}</div>`;
   } else {
     msgBox.innerHTML = `<div class="msg success">Sent!</div>`;
     setTimeout(closeModal, 700);
@@ -2417,7 +2426,7 @@ function setupPersonalCallChannel(){
 async function startCall(recipientId, recipientName){
   if (peerConnection){ alert("You're already in a call."); return; }
   if (!(await requireProfile("make calls"))) return;
-  if (!myProfile || !myProfile.is_platinum){
+  if (!isPlatinumActive(myProfile)){
     alert("Voice calls are a Platinum feature. Upgrade to Platinum to start calling your matches.");
     return;
   }
@@ -2631,7 +2640,7 @@ async function toggleVoiceRecording(profileId, recipientId){
 
   if (!isRecording){
     if (!(await requireProfile("send messages"))) return;
-    if (!myProfile || (!myProfile.is_verified && !myProfile.is_platinum)){
+    if (!myProfile || (!myProfile.is_verified && !isPlatinumActive(myProfile))){
       if (status) status.textContent = "Voice messages require a verified profile. Verify your profile to unlock this.";
       return;
     }
@@ -2730,7 +2739,7 @@ async function loadThreads(){
 
   const { data: profiles } = await _supabase
     .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, call_privacy")
+    .select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, platinum_until, call_privacy")
     .in("user_id", visibleOtherIds.length ? visibleOtherIds : ["00000000-0000-0000-0000-000000000000"]);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
@@ -2752,7 +2761,7 @@ async function loadThreads(){
     div.innerHTML = `
       <div onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" style="cursor:pointer;width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(p && p.is_platinum)}</div>
+        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(isPlatinumActive(p && p))}</div>
         <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
         <div class="meta" style="font-size:.78rem;color:#999; margin-top: 4px;">${new Date(last.created_at).toLocaleString()}</div>
       </div>
@@ -2781,10 +2790,10 @@ async function openThread(thread){
   });
 
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
-  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(thread.profile.is_platinum) : "";
+  const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(isPlatinumActive(thread.profile)) : "";
   const headerPhoto = thread.profile ? ((thread.profile.photos && thread.profile.photos[0]) || thread.profile.photo_url) : null;
   const callAllowed = thread.profile ? canCall(thread.profile) : true;
-  const notPlatinum = !myProfile || !myProfile.is_platinum;
+  const notPlatinum = !isPlatinumActive(myProfile);
   const callTooltip = notPlatinum
     ? "Voice calls are a Platinum feature — upgrade to start calling"
     : (thread.profile && thread.profile.call_privacy === "verified" ? "This person only accepts calls from verified profiles" : "This person isn't accepting calls right now");
@@ -2796,7 +2805,7 @@ async function openThread(thread){
   // message in the thread is mine and has actually been read.
   const lastMsg = ordered[ordered.length - 1];
   const showSeen = lastMsg && lastMsg.sender_id === currentUser.id && lastMsg.read && !lastMsg.deleted_at
-    && myProfile && myProfile.is_platinum;
+    && isPlatinumActive(myProfile);
   const seenHtml = showSeen ? `<div style="text-align:right;font-size:.72rem;color:#999;margin-top:-6px;">Seen</div>` : "";
 
   const root = document.getElementById("modalRoot");
@@ -3028,21 +3037,37 @@ function verifiedBadge(isVerified){
   return isVerified ? ` <span title="Verified profile" style="color:#1E8E4F;font-weight:700;">✓</span>` : "";
 }
 
-function platinumBadge(isPlatinum){
-  return isPlatinum ? ` <span title="Platinum member" style="color:#B8860B;font-weight:700;">💎</span>` : "";
+// A Platinum plan can have an end date (platinum_until, v28). The database
+// already stops honouring an expired plan on its own; this makes the UI agree,
+// so a lapsed member doesn't keep the badge, the call button or the
+// "Platinum tier" label. No end date (older grants) means it doesn't expire.
+function isPlatinumActive(p){
+  if (!p || !p.is_platinum) return false;
+  return !p.platinum_until || new Date(p.platinum_until) > new Date();
+}
+
+function platinumBadge(isActive){
+  return isActive ? ` <span title="Platinum member" style="color:#B8860B;font-weight:700;">💎</span>` : "";
 }
 
 function renderTierBox(profile){
-  const tier = profile.is_platinum ? "Platinum" : (profile.is_verified ? "Verified" : "Basic");
-  const limits = profile.is_platinum
+  const plat = isPlatinumActive(profile);
+  const tier = plat ? "Platinum" : (profile.is_verified ? "Verified" : "Basic");
+  const planNote = (plat && profile.platinum_until)
+    ? ` <span style="font-weight:400;color:#666;">· ${profile.platinum_plan ? esc(profile.platinum_plan) + ", " : ""}until ${new Date(profile.platinum_until).toLocaleDateString()}</span>`
+    : "";
+  const expiredNote = (profile.is_platinum && !plat)
+    ? `<div style="font-size:.8rem;color:#B3261E;margin-top:4px;">Your Platinum plan ended on ${new Date(profile.platinum_until).toLocaleDateString()}. Renew to get unlimited messaging and calls back.</div>` : "";
+  const limits = plat
     ? "Unlimited messaging, voice messages, and calls — plus read receipts."
     : (profile.is_verified
         ? "4 text messages per day, 4 voice messages per week. Go Platinum for unlimited messaging and calls."
         : "4 text messages total, no voice messages, no calls. Verify your profile for daily messaging + voice, or go Platinum for unlimited.");
-  const color = profile.is_platinum ? "#B8860B" : (profile.is_verified ? "#1E8E4F" : "#666");
+  const color = plat ? "#B8860B" : (profile.is_verified ? "#1E8E4F" : "#666");
   return `<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-    <div style="font-weight:700;color:${color};">${profile.is_platinum ? "💎 " : ""}${tier} tier</div>
+    <div style="font-weight:700;color:${color};">${plat ? "💎 " : ""}${tier} tier${planNote}</div>
     <div style="font-size:.85rem;color:#666;margin-top:4px;">${limits}</div>
+    ${expiredNote}
   </div>`;
 }
 
