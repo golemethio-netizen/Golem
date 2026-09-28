@@ -1586,7 +1586,13 @@ async function loadVisitors(){
     .order("last_viewed_at", { ascending: false })
     .limit(50);
 
-  if (error || !visits || visits.length === 0){
+  if (error){
+    console.error("Couldn't load visitors:", error.message);
+    empty.style.display = "none";
+    grid.innerHTML = `<div class="msg error" style="grid-column:1/-1;">Couldn't load your visitors right now. Please try again later.</div>`;
+    return;
+  }
+  if (!visits || visits.length === 0){
     empty.style.display = "block";
     return;
   }
@@ -1645,12 +1651,16 @@ async function loadVisitors(){
 
 async function recordProfileView(viewedUserId){
   if (!currentUser || viewedUserId === currentUser.id) return;
+  // Goes through a database function rather than a direct upsert: an upsert
+  // fails on any repeat visit because the viewer isn't allowed to read the
+  // existing row (only the person being viewed is). Never block opening
+  // the profile over this, but do log failures so they can be diagnosed.
   try {
-    await _supabase.from("dating_profile_views").upsert(
-      { viewer_id: currentUser.id, viewed_user_id: viewedUserId, last_viewed_at: new Date().toISOString(), seen: false },
-      { onConflict: "viewer_id,viewed_user_id" }
-    );
-  } catch (e){ /* non-critical — never block opening the profile over this */ }
+    const { error } = await _supabase.rpc("dating_record_profile_view", { p_viewed: viewedUserId });
+    if (error) console.warn("Couldn't record profile view:", error.message);
+  } catch (e){
+    console.warn("Couldn't record profile view:", e);
+  }
 }
 
 // ---------- Tabs ----------
