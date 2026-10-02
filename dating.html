@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dating — Wana</title>
+<title>Dating — WanaGebya</title>
 <style>
 
 * {
@@ -1290,25 +1290,21 @@ document.addEventListener("click", (e) => {
 
 let didProfileSetupRedirect = false; // only nudge once per page load, not on every token refresh
 
-_supabase.auth.onAuthStateChange((_event, session) => {
+_supabase.auth.onAuthStateChange(async (_event, session) => {
   const wasSignedIn = !!currentUser;
   currentUser = session?.user || null;
   document.getElementById("gate").style.display = currentUser ? "none" : "flex";
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
-    // Not awaited on purpose: supabase-js runs this callback while it holds
-    // its auth lock, so awaiting another Supabase call in here can hang the
-    // client. Chain on the promise instead.
-    fetchMyProfile().then(() => {
-      // Signed in (Google, email or phone) but no dating profile yet:
-      // go straight to profile setup instead of an empty Home feed.
-      if (_event === "SIGNED_IN" && !myProfile && !didProfileSetupRedirect){
-        didProfileSetupRedirect = true;
-        switchTab("post");
-      }
-    });
+    await fetchMyProfile();
     refreshMyMatchedIds();
+    // Signed in (Google, email or phone) but no dating profile yet:
+    // go straight to profile setup instead of an empty Home feed.
+    if (_event === "SIGNED_IN" && !myProfile && !didProfileSetupRedirect){
+      didProfileSetupRedirect = true;
+      switchTab("post");
+    }
     loadFeed();
     setComposerAvatar();
     refreshUnreadBadge();
@@ -1979,7 +1975,6 @@ function showPostReactionPicker(event, postId){
 
 async function togglePostReaction(postId, emoji){
   document.getElementById("reactionPicker")?.remove();
-  if (!(await requireProfile("react to posts"))) return;
   const { data: existing } = await _supabase
     .from("dating_post_reactions")
     .select("*")
