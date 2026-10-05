@@ -2018,8 +2018,9 @@ async function reportPost(postId){
 }
 
 // ---------- Load / render profiles ----------
-async function loadProfiles(){
+async function loadProfiles() {
   await refreshMyMatchedIds();
+
   const seeking = document.getElementById("filterSeeking").value;
   const type = document.getElementById("filterType").value;
   const city = document.getElementById("filterCity").value.trim();
@@ -2032,44 +2033,44 @@ async function loadProfiles(){
   const hasKids = document.getElementById("filterHasKids").value;
   const wantsKids = document.getElementById("filterWantsKids").value;
 
-  const { data: blocks } = await _supabase
-    .from("dating_blocks")
-    .select("blocker_id, blocked_id")
-    .or(`blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}`);
-  const blockedIds = new Set();
-  (blocks || []).forEach(b => blockedIds.add(b.blocker_id === currentUser.id ? b.blocked_id : b.blocker_id));
-
-  let query = _supabase
-    .from("dating_profiles")
-    .select("*")
-    .neq("user_id", currentUser.id) 
-    .order("created_at", { ascending: false });
-
-  const { data, error } = await query;
   const grid = document.getElementById("grid");
   const empty = document.getElementById("emptyState");
   grid.innerHTML = "";
 
-  if (error){
+  // 1. Build dynamic Supabase Query (Filtering on Server)
+  let query = _supabase
+    .from("dating_profiles")
+    .select("*")
+    .neq("user_id", currentUser.id);
+
+  if (seeking) query = query.eq("gender", seeking);
+  if (type) query = query.eq("relationship_type", type);
+  if (city) query = query.ilike("city", `%${city}%`);
+  if (verifiedOnly) query = query.eq("is_verified", true);
+  if (!isNaN(ageMin)) query = query.gte("age", ageMin);
+  if (!isNaN(ageMax)) query = query.lte("age", ageMax);
+  if (religion) query = query.eq("religion", religion);
+  if (lifestyle) query = query.eq("lifestyle", lifestyle);
+  if (hasKids) query = query.eq("has_kids", hasKids);
+  if (wantsKids) query = query.eq("wants_kids", wantsKids);
+
+  // 2. Fetch Filtered Data
+  const { data, error } = await query.order("created_at", { ascending: false });
+
+  if (error) {
     empty.textContent = "Couldn't load profiles right now.";
     empty.style.display = "block";
     console.error(error);
     return;
   }
 
-  let rows = (data || []).filter(r => !blockedIds.has(r.user_id));
-  if (seeking) rows = rows.filter(r => r.gender === seeking);
-  if (type) rows = rows.filter(r => r.relationship_type === type);
-  if (city) rows = rows.filter(r => (r.city || "").toLowerCase().includes(city.toLowerCase()));
-  if (onlineOnly) rows = rows.filter(r => visiblePresence(r).online);
-  if (verifiedOnly) rows = rows.filter(r => r.is_verified);
-  if (!isNaN(ageMin)) rows = rows.filter(r => (r.age || 0) >= ageMin);
-  if (!isNaN(ageMax)) rows = rows.filter(r => (r.age || 0) <= ageMax);
-  if (religion) rows = rows.filter(r => r.religion === religion);
-  if (lifestyle) rows = rows.filter(r => r.lifestyle === lifestyle);
-  if (hasKids) rows = rows.filter(r => r.has_kids === hasKids);
-  if (wantsKids) rows = rows.filter(r => r.wants_kids === wantsKids);
+  // 3. Post-process online status & client render limits
+  let rows = data || [];
+  if (onlineOnly) {
+    rows = rows.filter(r => visiblePresence(r).online);
+  }
 
+  // Sort online profiles to the top
   rows.sort((a, b) => {
     const aOnline = visiblePresence(a).online;
     const bOnline = visiblePresence(b).online;
@@ -2079,15 +2080,15 @@ async function loadProfiles(){
 
   const onlineCount = rows.filter(r => visiblePresence(r).online).length;
   document.getElementById("onlineSummary").textContent =
-    onlineCount > 0 ? `🟢 ${onlineCount} ${onlineCount === 1 ? "person" : "people"} online now` : "";
+    onlineCount > 0 ? `🟢 \({onlineCount}\){onlineCount === 1 ? "person" : "people"} online now` : "";
 
-  if (rows.length === 0){
+  if (rows.length === 0) {
     empty.style.display = "block";
     document.getElementById("moreWrap").style.display = "none";
     return;
   }
+  
   empty.style.display = "none";
-
   allBrowseRows = rows;
   visibleCount = PAGE_SIZE;
   renderBrowseGrid();
