@@ -31,7 +31,7 @@
      background photo is slow to load, missing, or fails on some
      hosts — never leaves a plain white/blank hero behind the overlay. */
   background-color: #0A291A;
- background-image: linear-gradient(135deg, rgba(10, 41, 26, 0.75), rgba(18, 59, 39, 0.75)), url('wanaager.png');
+ background-image: linear-gradient(135deg, rgba(10, 41, 26, 0.75), rgba(18, 59, 39, 0.75)), url('wanaagar.png');
   background-size: cover;          /* Cover the screen while preserving aspect ratio */
   background-position: center center; /* Keep main focal point centered */
   background-repeat: no-repeat;
@@ -1764,7 +1764,7 @@ async function submitPost(){
   const { error } = await _supabase.from("dating_posts").insert({
     user_id: currentUser.id,
     body,
-    image_url: imageUrl,
+    photo_url: imageUrl,
     visibility: document.getElementById("postVisibility").value
   });
 
@@ -1919,7 +1919,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
       <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
-      ${p.image_url ? `<img src="${esc(p.image_url)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
+      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
@@ -3130,6 +3130,108 @@ function renderVerificationBox(profile, latestRequest){
   return rejectedHeader;
 }
 
+// ---------- Platinum upgrade (manual payment + transaction number review) ----------
+// IMPORTANT: PLATINUM_PAYMENT_ACCOUNT below is a placeholder. Fill in your
+// real bank account or Telebirr/CBE Birr number before this goes live —
+// sending members a wrong or fake account number would mean their real
+// money goes nowhere. This is intentionally left unfilled rather than
+// guessed, since a wrong number here is actively harmful, not just a bug.
+const PLATINUM_PAYMENT_ACCOUNT = {
+  bank: "FILL IN YOUR BANK NAME (e.g. Commercial Bank of Ethiopia)",
+  accountName: "FILL IN THE ACCOUNT HOLDER NAME",
+  accountNumber: "FILL IN YOUR ACCOUNT NUMBER",
+  telebirr: "FILL IN YOUR TELEBIRR NUMBER (optional, leave blank to hide)"
+};
+
+const PLATINUM_PLANS = {
+  weekly:  { label: "Weekly",  price: 100, unit: "/ week" },
+  monthly: { label: "Monthly", price: 500, unit: "/ month" }
+};
+
+function renderPlatinumBox(profile, latestPlatinumRequest){
+  if (isPlatinumActive(profile)) return ""; // renderTierBox already shows active-plan details
+
+  if (latestPlatinumRequest && latestPlatinumRequest.status === "pending"){
+    const plan = PLATINUM_PLANS[latestPlatinumRequest.plan];
+    return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px;border:1px solid #fce3b4;">
+      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request (ref: ${esc(latestPlatinumRequest.transaction_number)}) is under review.
+    </div>`;
+  }
+
+  const rejectedNote = (latestPlatinumRequest && latestPlatinumRequest.status === "rejected")
+    ? `<div class="msg error" style="margin-bottom:12px;">Your last Platinum request wasn't approved.${latestPlatinumRequest.reviewer_note ? ` ${esc(latestPlatinumRequest.reviewer_note)}` : ""} You can try again below.</div>`
+    : "";
+
+  return `
+    ${rejectedNote}
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+      <div style="font-weight:700;margin-bottom:10px;">💎 Go Platinum</div>
+      <p style="font-size:.85rem;color:#666;margin:0 0 14px;">Unlimited messaging, voice messages, and calls — plus read receipts.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" onclick="choosePlatinumPlan('weekly')" style="flex:1;min-width:140px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">
+          <div style="font-weight:700;">Weekly</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#B8860B;margin:4px 0;">100 Birr</div>
+          <div style="font-size:.75rem;color:#999;">per week</div>
+        </button>
+        <button type="button" onclick="choosePlatinumPlan('monthly')" style="flex:1;min-width:140px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">
+          <div style="font-weight:700;">Monthly</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#B8860B;margin:4px 0;">500 Birr</div>
+          <div style="font-size:.75rem;color:#999;">per month</div>
+        </button>
+      </div>
+    </div>`;
+}
+
+function choosePlatinumPlan(planKey){
+  const plan = PLATINUM_PLANS[planKey];
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal" style="max-width:420px;">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3 style="margin-bottom:6px;">${esc(plan.label)} Platinum — ${plan.price} Birr</h3>
+          <div class="bio" style="margin-bottom:14px;font-size:.9rem;background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
+            <div style="font-weight:700;margin-bottom:6px;">Send ${plan.price} Birr to:</div>
+            <div>🏦 Bank: ${esc(PLATINUM_PAYMENT_ACCOUNT.bank)}</div>
+            <div>👤 Account name: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountName)}</div>
+            <div>🔢 Account number: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountNumber)}</div>
+            ${PLATINUM_PAYMENT_ACCOUNT.telebirr ? `<div>📱 Telebirr: ${esc(PLATINUM_PAYMENT_ACCOUNT.telebirr)}</div>` : ""}
+            <div style="margin-top:8px;color:#666;">After sending, enter the transaction reference number below. We'll review and activate your plan — this isn't instant.</div>
+          </div>
+          <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
+          <div class="actions">
+            <button class="btn-contact" style="width:100%;" onclick="submitPlatinumRequest('${planKey}', ${plan.price})">Submit for Review</button>
+          </div>
+          <div id="platinumReqMsg"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function submitPlatinumRequest(planKey, amount){
+  const txnInput = document.getElementById("platinumTxnNumber");
+  const msg = document.getElementById("platinumReqMsg");
+  const transactionNumber = txnInput.value.trim();
+  if (transactionNumber.length < 3){
+    msg.innerHTML = `<div class="msg error">Enter the transaction number from your payment.</div>`;
+    return;
+  }
+  msg.innerHTML = `<div class="msg" style="color:var(--green);">Submitting...</div>`;
+  const { error } = await _supabase.from("dating_platinum_requests").insert({
+    user_id: currentUser.id,
+    plan: planKey,
+    amount_birr: amount,
+    transaction_number: transactionNumber
+  });
+  if (error){
+    msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
+    return;
+  }
+  closeModal();
+  loadMyProfile();
+}
+
 function openVerificationModal(){
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
@@ -3269,6 +3371,14 @@ async function loadMyProfile(){
     .limit(1)
     .maybeSingle();
 
+  const { data: latestPlatinumRequest } = await _supabase
+    .from("dating_platinum_requests")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   el.innerHTML = `
     <div class="browse-header" style="display:flex; justify-content:space-between; align-items:center;">
       <h2>Edit <span>My Profile</span></h2>
@@ -3276,6 +3386,7 @@ async function loadMyProfile(){
     </div>
     ${renderPhotoEditor(data)}
     ${renderTierBox(data)}
+    ${renderPlatinumBox(data, latestPlatinumRequest)}
     ${renderVerificationBox(data, latestRequest)}
     ${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
