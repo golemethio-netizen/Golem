@@ -38,8 +38,13 @@
   background-attachment: scroll;   /* Best performance and consistency across iOS/Android */
   
   display: flex;
-  align-items: center;
-  justify-content: center;
+  -webkit-overflow-scrolling: touch;
+  /* The card centers itself with margin:auto (see .welcome-card) rather
+     than align-items:center here — centering via the child's margin avoids
+     a well-known flexbox quirk where a centered item taller than its
+     container can't be scrolled up to reveal its top, even with
+     overflow-y:auto on the parent. With margin:auto that top edge is
+     always reachable by scrolling. */
   overflow-y: auto;                /* scroll instead of clipping the card on short viewports */
   padding: 20px 0;
 }
@@ -84,6 +89,7 @@
       text-align: center;
       max-width: 460px;
       width: 90%;
+      margin: auto;
     }
 
     .welcome-title {
@@ -478,7 +484,7 @@
 
 <main>
   <!-- GATEKEEPER -->
-  <div class="welcome-container" id="gate">
+  <div class="welcome-container" id="gate" style="display:none;">
     <div class="overlay"></div>
 
     <div class="welcome-card">
@@ -491,6 +497,7 @@
       </p>
 
       <button type="button" class="btn-signin" onclick="openAuthModal('signin')">Sign In / Register Now</button>
+      <a href="index.html" style="display:inline-block;margin-top:14px;font-size:.85rem;color:#4a5568;text-decoration:none;">← Back to marketplace</a>
     </div>
   </div>
 
@@ -1895,7 +1902,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
     const cname = cp ? (cp.display_name || cp.gender || "Someone") : "Someone";
     const canDelete = c.user_id === currentUser.id || isMine; 
     return `<div class="post-comment">
-      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}${platinumBadge(isPlatinumActive(cp && cp))}</strong> ${esc(c.body)}
+      <strong>${esc(cname)}${verifiedBadge(cp && cp.is_verified)}${platinumBadge(isPlatinumActive(cp))}</strong> ${esc(c.body)}
       ${canDelete ? `<button onclick="deleteComment('${c.id}','${p.id}')" style="background:none;border:none;color:#999;cursor:pointer;font-size:.85rem;float:right; font-weight:bold;">✕</button>` : ""}
     </div>`;
   }).join("");
@@ -1905,7 +1912,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
       <div style="display:flex;gap:12px;align-items:center;">
         <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
-          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}${platinumBadge(isPlatinumActive(a && a))}</div>
+          <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}${platinumBadge(isPlatinumActive(a))}</div>
           <div style="font-size:.8rem;color:#888;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
         </div>
         ${isMine ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:1.1rem;">✕</button>`
@@ -2459,8 +2466,31 @@ async function startCall(recipientId, recipientName){
   await joinCallSignaling(currentCallId, true);
 }
 
-function showIncomingCallUI(payload){
-  if (peerConnection){ return; } 
+// A "ring" arrives over a broadcast channel, which anyone who knows your
+// user id can publish to — the database call rules (matched, Platinum,
+// not blocked, privacy setting, all enforced by v24/v28's dating_can_call)
+// only guard the dating_calls row, not the ring broadcast itself. So before
+// showing anything we confirm the caller really created a call row aimed
+// at us in the last couple of minutes — that row can only exist if the
+// database's own rules already approved the call.
+async function isLegitimateIncomingCall(callerId){
+  if (!callerId || callerId === currentUser.id) return false;
+  const since = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+  const { data } = await _supabase
+    .from("dating_calls")
+    .select("id")
+    .eq("caller_id", callerId)
+    .eq("recipient_id", currentUser.id)
+    .eq("status", "ringing")
+    .gt("started_at", since)
+    .limit(1)
+    .maybeSingle();
+  return !!data;
+}
+
+async function showIncomingCallUI(payload){
+  if (peerConnection){ return; }
+  if (!payload || !(await isLegitimateIncomingCall(payload.callerId))) return; // forged/unapproved ring: ignore silently
   currentCallId = payload.callId;
   currentCallPeerId = payload.callerId;
   document.getElementById("callRoot").innerHTML = `
@@ -2515,18 +2545,26 @@ function showActiveCallUI(name){
 }
 
 async function acceptCall(){
+  // Must match the still-ringing call, not just the most recent row between
+  // these two people — otherwise a stale/ended call from earlier could be
+  // picked up instead of the one actually being answered.
   const { data: callRow } = await _supabase
     .from("dating_calls")
     .select("*")
     .eq("caller_id", currentCallPeerId)
     .eq("recipient_id", currentUser.id)
+    .eq("status", "ringing")
     .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
   currentCallRow = callRow;
-  if (currentCallRow){
-    await _supabase.from("dating_calls").update({ status: "accepted" }).eq("id", currentCallRow.id);
+  if (!currentCallRow){
+    document.getElementById("callRoot").innerHTML = "";
+    currentCallId = null; currentCallPeerId = null;
+    alert("This call is no longer available.");
+    return;
   }
+  await _supabase.from("dating_calls").update({ status: "accepted" }).eq("id", currentCallRow.id);
   showActiveCallUI("In call");
   await joinCallSignaling(currentCallId, false);
 }
@@ -2542,6 +2580,7 @@ async function declineCall(){
     .select("*")
     .eq("caller_id", currentCallPeerId)
     .eq("recipient_id", currentUser.id)
+    .eq("status", "ringing")
     .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -2761,7 +2800,7 @@ async function loadThreads(){
     div.innerHTML = `
       <div onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" style="cursor:pointer;width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(isPlatinumActive(p && p))}</div>
+        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(isPlatinumActive(p))}</div>
         <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
         <div class="meta" style="font-size:.78rem;color:#999; margin-top: 4px;">${new Date(last.created_at).toLocaleString()}</div>
       </div>
@@ -3233,7 +3272,7 @@ async function loadMyProfile(){
   el.innerHTML = `
     <div class="browse-header" style="display:flex; justify-content:space-between; align-items:center;">
       <h2>Edit <span>My Profile</span></h2>
-      <button onclick="switchTab('settings')" style="background:var(--paper); border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;"><i class="fas fa-cog"></i> Settings</button>
+      <button onclick="switchTab('settings')" style="background:var(--paper); border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;">⚙️ Settings</button>
     </div>
     ${renderPhotoEditor(data)}
     ${renderTierBox(data)}
