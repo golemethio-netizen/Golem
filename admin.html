@@ -464,7 +464,6 @@
     <script>
         let currentView = 'pending';
         let currentAdminEmail = 'System'; // Added for Audit Logging
-        let viewsDataCache = [];
 
         // Escape user-supplied text before inserting into innerHTML —
         // prevents stored XSS via product/user fields reviewed here.
@@ -476,18 +475,23 @@
         }
 
         // Escape text that will be embedded inside a single-quoted JS string
-        // within an inline onclick="..." attribute.
+        // within an inline onclick="..." attribute. HTML-escaping alone is
+        // NOT enough here — entities decode back to real characters before
+        // the browser parses the attribute as JS, so a plain HTML-escaped
+        // apostrophe would still break out of the string and execute.
         function escapeJsAttr(str) {
             if (str === null || str === undefined) return '';
             return String(str)
                 .replace(/\\/g, '\\\\')
                 .replace(/'/g, "\\'")
-                .replace(/"/g, '"')
+                .replace(/"/g, '&quot;')
                 .replace(/\n/g, '\\n')
                 .replace(/</g, '\\x3C');
         }
 
         // --- PASSWORD RECOVERY INTERCEPTOR ---
+        // When a user clicks a reset link, Supabase redirects back here with a recovery session.
+        // We detect it and show a manual set-password form.
         (async () => {
             const params = new URLSearchParams(window.location.hash.replace('#', '?'));
             if (params.get('type') === 'recovery') {
@@ -500,7 +504,7 @@
             }
         })();
 
-        // Manual entry fallback
+        // Manual entry fallback (used when no pre-generated password is stored)
         function showSetPasswordModal(email) {
             document.getElementById('pwdModal')?.remove();
             const modal = document.createElement('div');
@@ -513,7 +517,7 @@
                 <div style="background:white; border-radius:16px; padding:32px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center;">
                     <div style="font-size:2.5rem; margin-bottom:10px;">&#128272;</div>
                     <h2 style="margin:0 0 6px; color:#333;">Set New Password</h2>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${escapeHtml(email)}</strong></p>
+                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Account: <strong>${email}</strong></p>
                     <input type="password" id="newPwdInput" placeholder="Enter new password (min 6 chars)"
                         style="width:100%; padding:14px; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; box-sizing:border-box; margin-bottom:10px;"
                         oninput="this.style.borderColor='#0A291A'"
@@ -588,6 +592,7 @@
             }
         }
 
+        // Action Tracker Helper
         async function logAction(actionName, details) {
             try {
                 await _supabase.from('audit_logs').insert([{
@@ -617,6 +622,7 @@
             const searchContainer   = document.getElementById('searchContainer');
             const viewTitle         = document.getElementById('viewTitle');
 
+            // Hide all
             itemsSection.style.display      = 'none';
             usersSection.style.display      = 'none';
             utmSection.style.display        = 'none';
@@ -723,6 +729,7 @@
                 return;
             }
 
+            // Batch-fetch reporter names (one query instead of one per report)
             const reporterIds = [...new Set(reports.map(r => r.reporter_id).filter(Boolean))];
             let reporterMap = {};
             if (reporterIds.length) {
@@ -832,6 +839,9 @@
         }
 
         // --- DATING: ALL PROFILES ---
+        // Cached so typing in the search box re-filters instantly instead of
+        // re-querying the database on every keystroke. Cleared whenever the
+        // Dating tab is opened fresh (see switchTab) so it never goes stale.
         let _datingProfilesCache = null;
         let _datingProfilesContactMap = {};
 
@@ -848,6 +858,10 @@
                 if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
                 _datingProfilesCache = profiles || [];
 
+                // Join the real account (name/email/phone) so a client can
+                // actually be identified and contacted, not just their
+                // dating-profile persona — the marketplace's "Registered
+                // Users" tab already does this; the dating side didn't.
                 const userIds = _datingProfilesCache.map(p => p.user_id);
                 _datingProfilesContactMap = {};
                 if (userIds.length) {
@@ -906,6 +920,8 @@
             return !!(p && p.is_platinum && (!p.platinum_until || new Date(p.platinum_until) > new Date()));
         }
 
+        // Grants go through the v28 database function so that extending an
+        // active plan adds to the time left instead of resetting it.
         async function grantPlatinum(userId) {
             const plan = document.getElementById('plan-' + userId).value;
             const { data, error } = await _supabase.rpc('dating_grant_platinum', { p_user: userId, p_plan: plan });
@@ -1019,6 +1035,8 @@
                 return;
             }
 
+            // Batch-fetch the requester's current profile photo + name so
+            // the reviewer can eyeball it next to the submitted selfie.
             const userIds = [...new Set(requests.map(r => r.user_id))];
             const { data: profiles } = await _supabase.from('dating_profiles').select('user_id, display_name, age, city, photo_url, photos, is_verified').in('user_id', userIds);
             const profileMap = {};
@@ -1069,7 +1087,7 @@
 
         function promptRejectVerification(requestId) {
             const note = prompt('Optional note for the user on why this was rejected (shown to them):');
-            if (note === null) return;
+            if (note === null) return; // cancelled
             resolveVerification(requestId, 'rejected', note.trim() || null);
         }
 
@@ -1087,7 +1105,7 @@
 
                 let totalBytes = files.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
                 const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
-                const limitMB = 1000;
+                const limitMB = 1000; // 1GB Limit
                 const percentage = (totalMB / limitMB) * 100;
 
                 document.getElementById('storageUsage').innerText = `${totalMB} MB`;
@@ -1102,6 +1120,7 @@
         }
 
         // --- 4. LOAD ITEMS ---
+        // ── STOCK BADGE HELPER ──
         function getStockBadge(stockStatus, quantity, category) {
             if (category === 'Jobs' || category === 'Services') return '';
             if (!stockStatus || stockStatus === 'in_stock') {
@@ -1119,11 +1138,13 @@
             return '';
         }
 
+        // ── ADMIN STOCK UPDATE ──
         async function updateStock(id, stockStatus, quantity) {
             const updates = { stock_status: stockStatus, quantity: quantity || null };
             const { error } = await _supabase.from('products').update(updates).eq('id', id);
             if (error) { alert('Failed to update stock: ' + error.message); return; }
             logAction('Stock Updated', 'Admin set stock_status=' + stockStatus + (quantity ? ', qty=' + quantity : '') + ' for item ' + id);
+            // Update badge in place
             const badge = document.getElementById('stock-badge-' + id);
             if (badge) badge.outerHTML = '<span id="stock-badge-' + id + '">' + getStockBadge(stockStatus, quantity || null, '') + '</span>';
         }
@@ -1154,6 +1175,7 @@
                     if (timeLeft < twentyFourHours) expiringClass = 'expiring-soon';
                 }
 
+                // Show UTM Source visually if it exists in db
                 const utmDisplay = item.utm_source ? 
                     `<p style="font-size:0.75rem; color:#27ae60; margin-top:5px; font-weight:600;"><i class="fas fa-satellite-dish"></i> Traffic: ${escapeHtml(item.utm_source)}</p>` : '';
 
@@ -1172,6 +1194,7 @@
                             Seller: <a href="tel:${escapeHtml(item.seller_phone)}" style="color:#0A291A; text-decoration:none;">${escapeHtml(item.seller_phone)}</a>
                         </p>
 
+                        <!-- Stock badge + admin quick control -->
                         <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <span id="stock-badge-${item.id}">${getStockBadge(item.stock_status, item.quantity, item.category)}</span>
                             ${item.category !== 'Jobs' && item.category !== 'Services' ? `
@@ -1290,6 +1313,7 @@
         window.permanentlyDelete = async (id, imageUrl) => {
             if (confirm("Delete forever? This will also remove the image from storage.")) {
                 try {
+                    // Extract file path from Supabase Public URL
                     const urlObj = new URL(imageUrl);
                     const pathParts = urlObj.pathname.split('/product-images/');
                     if (pathParts.length > 1) {
@@ -1305,9 +1329,14 @@
                     checkStorageUsage();
                     loadStats();
                 } else if (!error && (!data || data.length === 0)) {
+                    // No exception was thrown, but nothing was actually deleted —
+                    // this is the signature of a Row Level Security policy silently
+                    // filtering the row out, not a real success.
                     alert("Delete blocked: the database silently refused to remove this row (0 rows affected, no error). This is almost always a Row Level Security policy — ask Claude to check the products table's DELETE policy.");
                     console.error('permanentlyDelete: 0 rows affected — likely RLS block. id:', id);
                 } else {
+                    // Most common cause: an order still references this product,
+                    // and the foreign key won't allow the row to be removed.
                     const isFkError = /foreign key|violates/i.test(error.message || '');
                     alert(
                         isFkError
@@ -1342,104 +1371,200 @@
             renderUserTable(users, filter);
         }
 
+        // Accounts created via the Phone tab get an internal placeholder email
+        // like 2519XXXXXXXX@phone.wanagebya.com — never shown to the user, but
+        // we need to recognize it here so the admin table shows their real
+        // phone number instead of that fake address.
         function isPhoneAccount(email) {
             return !!email && /@phone\.wanagebya\.com$/i.test(email);
         }
 
         function renderUserTable(users, currentFilter) {
             const list = document.getElementById('userList');
-            if (!users || users.length === 0) {
-                list.innerHTML = "<p style='color:#777; text-align:center; padding:20px;'>No registered users found.</p>";
-                return;
-            }
-
-            list.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
-                    <div style="display:flex; gap:8px;">
-                        <button onclick="loadUsers('all')" style="padding:6px 12px; border-radius:6px; border:none; background:${currentFilter==='all'?'#333':'#eee'}; color:${currentFilter==='all'?'#fff':'#333'}; cursor:pointer; font-size:0.85rem;">All Users</button>
-                        <button onclick="loadUsers('verified')" style="padding:6px 12px; border-radius:6px; border:none; background:${currentFilter==='verified'?'#2ed573':'#eee'}; color:${currentFilter==='verified'?'#fff':'#333'}; cursor:pointer; font-size:0.85rem;">Verified</button>
-                    </div>
-                    <span style="font-size:0.85rem; color:#666;">Total Shown: <strong>${users.length}</strong></span>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
-                        <thead>
-                            <tr style="background:#f8f9fa; border-bottom:2px solid #ddd;">
-                                <th style="padding:10px;">User</th>
-                                <th style="padding:10px;">Contact</th>
-                                <th style="padding:10px;">Role</th>
-                                <th style="padding:10px;">Status</th>
-                                <th style="padding:10px;">Joined</th>
-                                <th style="padding:10px; text-align:right;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${users.map(u => {
-                                const isPhone = isPhoneAccount(u.email);
-                                const contactDisplay = isPhone ? (u.phone_number || u.phone || 'Phone User') : (u.email || u.phone_number || 'N/A');
-                                return `
-                                <tr style="border-bottom:1px solid #eee;">
-                                    <td style="padding:10px; font-weight:600;">
-                                        ${escapeHtml(u.full_name || 'Anonymous')}
-                                        ${u.is_verified ? '<i class="fas fa-check-circle" style="color:#2ed573; margin-left:4px;" title="Verified"></i>' : ''}
-                                    </td>
-                                    <td style="padding:10px; color:#555;">${escapeHtml(contactDisplay)}</td>
-                                    <td style="padding:10px;">${u.is_admin ? '<span style="background:#333; color:white; padding:2px 6px; border-radius:4px; font-size:0.75rem;">ADMIN</span>' : 'User'}</td>
-                                    <td style="padding:10px;">${u.is_banned ? '<span style="color:#ff4757; font-weight:bold;">Banned</span>' : '<span style="color:#2ed573;">Active</span>'}</td>
-                                    <td style="padding:10px; color:#888; font-size:0.8rem;">${new Date(u.created_at).toLocaleDateString()}</td>
-                                    <td style="padding:10px; text-align:right;">
-                                        <button onclick="toggleBanUser('${u.id}', ${!u.is_banned})" style="padding:4px 8px; border:none; border-radius:4px; background:${u.is_banned?'#2ed573':'#ff4757'}; color:white; cursor:pointer; font-size:0.75rem;">
-                                            ${u.is_banned ? 'Unban' : 'Ban'}
-                                        </button>
-                                    </td>
-                                </tr>`;
-                            }).join('')}
-                        </tbody>
-                    </table>
+            const filterHTML = `
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                    <button onclick="loadUsers('all')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #ddd; background: ${currentFilter === 'all' ? '#333' : 'white'}; color: ${currentFilter === 'all' ? 'white' : '#333'}; cursor:pointer;">All Users (${users.length})</button>
+                    <button onclick="loadUsers('verified')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #2ed573; background: ${currentFilter === 'verified' ? '#2ed573' : 'white'}; color: ${currentFilter === 'verified' ? 'white' : '#2ed573'}; cursor:pointer;">Verified Sellers</button>
+                    <button onclick="loadUsers('guest')" style="padding: 5px 15px; border-radius: 20px; border: 1px solid #a4b0be; background: ${currentFilter === 'guest' ? '#a4b0be' : 'white'}; color: ${currentFilter === 'guest' ? 'white' : '#a4b0be'}; cursor:pointer;">Guest Users</button>
                 </div>
             `;
+
+            list.innerHTML = filterHTML + `
+                <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #eee; text-align:left; color: #666; font-size: 0.9rem;">
+                            <th style="padding:12px;">User Info</th>
+                            <th>Location</th>
+                            <th>Source (UTM)</th>
+                            <th>Joined</th>
+                            <th>Admin</th>
+                            <th>Status</th>
+                            <th style="text-align:right; padding-right:12px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(u => {
+                            const phoneAcct = isPhoneAccount(u.email);
+                            return `
+                            <tr style="border-bottom: 1px solid #eee; height:70px;">
+                                <td style="padding:12px;">
+                                    <div style="display:flex; flex-direction:column;">
+                                        <strong>${escapeHtml(u.full_name || 'Anonymous User')}</strong>
+                                        ${phoneAcct
+                                            ? `<span style="font-size:0.75rem; color:#0A291A; font-weight:600;"><i class="fas fa-phone" style="margin-right:3px;"></i>${escapeHtml(u.phone || 'No phone on file')}</span>
+                                               <span style="font-size:0.65rem; color:#999;">Phone sign-up</span>`
+                                            : `<span style="font-size:0.75rem; color:#888;">${escapeHtml(u.email || 'No email')}</span>
+                                               ${u.phone ? `<span style="font-size:0.7rem; color:#888;"><i class="fas fa-phone" style="margin-right:3px;"></i>${escapeHtml(u.phone)}</span>` : ''}`
+                                        }
+                                    </div>
+                                </td>
+                                <td style="font-size:0.85rem; color:#555;">${escapeHtml(u.location || 'Unknown')}</td>
+                                <td style="font-size:0.85rem; color:#555;">
+                                    ${u.utm_source ? `<span style="background:#e1f5fe; color:#0288d1; padding:3px 8px; border-radius:12px; font-weight:600; font-size:0.75rem;">${escapeHtml(u.utm_source)}</span>` : 'Organic'}
+                                </td>
+                                <td style="font-size:0.85rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</td>
+                                <td>
+                                    <button onclick="toggleAdmin('${u.id}', ${u.is_admin})" title="Toggle Admin Rights" style="border:none; background:none; cursor:pointer; font-size:1.2rem;">
+                                        ${u.is_admin ? '🛡️' : '👤'}
+                                    </button>
+                                </td>
+                                <td>
+                                    ${u.is_verified ? 
+                                        '<span style="background:#e8fdf5; color:#2ed573; border:1px solid #2ed573; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:bold;"><i class="fas fa-check"></i> VERIFIED</span>' : 
+                                        '<span style="background:#f1f2f6; color:#a4b0be; border:1px solid #ddd; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:bold;">COMMUNITY</span>'}
+                                </td>
+                                <td style="text-align:right; padding-right:12px;">
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                                        <button onclick="toggleVerification('${u.id}', ${u.is_verified})" class="${u.is_verified ? 'btn-reject' : 'btn-approve'}" style="padding: 6px 12px; font-size: 0.75rem; border:none; border-radius:5px; cursor:pointer;">
+                                            ${u.is_verified ? 'Revoke' : 'Verify'}
+                                        </button>
+                                        ${phoneAcct
+                                            ? `<span title="Phone accounts have no real inbox — reset manually via Telegram" style="padding: 5px 10px; font-size:0.75rem; color:#ccc;"><i class="fas fa-envelope"></i> N/A</span>`
+                                            : `<button onclick="sendPasswordReset('${escapeJsAttr(u.email)}')" title="Send password reset email" style="border:none; background:#0088cc; color:white; border-radius:5px; cursor:pointer; padding: 5px 10px; font-size:0.75rem; font-weight:600;">
+                                            <i class="fas fa-envelope"></i> Reset
+                                        </button>`
+                                        }
+                                        <button onclick="deleteUserAccount('${u.id}', '${escapeJsAttr(u.full_name || u.phone || u.email)}')" style="border:1px solid #ff4757; color:#ff4757; background:none; border-radius:5px; cursor:pointer; padding: 5px 8px;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;}).join('')}
+                    </tbody>
+                </table>
+                </div>`;
         }
 
-        async function toggleBanUser(userId, banState) {
-            const actionText = banState ? 'ban' : 'unban';
-            if (!confirm(`Are you sure you want to ${actionText} this user?`)) return;
-            const { error } = await _supabase.from('profiles').update({ is_banned: banState }).eq('id', userId);
-            if (error) { alert('Failed: ' + error.message); return; }
-            logAction(`User ${banState ? 'Banned' : 'Unbanned'}`, `User ID: ${userId}`);
-            loadUsers();
-        }
+        window.toggleVerification = async (userId, currentStatus) => {
+            const verb = currentStatus ? "revoke verification from" : "verify";
+            if (!confirm(`Are you sure you want to ${verb} this seller?`)) return;
+            const { error } = await _supabase.from('profiles').update({ is_verified: !currentStatus }).eq('id', userId);
+            if (!error) {
+                logAction('User Verification Update', `Set verification status to ${!currentStatus} for User ID: ${userId}`);
+                loadUsers(); 
+            } else alert("Error: " + error.message);
+        };
 
-        // --- 7. AUDIT LOGS ---
+        window.toggleAdmin = async (userId, currentStatus) => {
+            if (!confirm(`Are you sure you want to ${currentStatus ? 'remove' : 'grant'} admin rights?`)) return;
+            const { error } = await _supabase.rpc('set_admin_status', {
+                target_user_id: userId,
+                new_status: !currentStatus
+            });
+            if (!error) { 
+                logAction('Admin Rights Update', `Set Admin to ${!currentStatus} for User ID: ${userId}`);
+                loadUsers(); loadStats(); 
+            } else alert("Error: " + error.message);
+        };
+
+        window.deleteUserAccount = async (userId, identifier) => {
+            if (!confirm(`⚠️ DANGER: Are you sure you want to permanently delete ${identifier}?`)) return;
+            try {
+                const { data: sessionData } = await _supabase.auth.getSession();
+                const token = sessionData?.session?.access_token;
+                if (!token) { alert("Your session expired — please sign in again."); return; }
+
+                const res = await fetch(`${_supabase.supabaseUrl}/functions/v1/admin-delete-user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'apikey': _supabase.supabaseKey
+                    },
+                    body: JSON.stringify({ targetUserId: userId })
+                });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || 'Delete failed');
+
+                logAction('Account Deleted', `Permanently deleted user account: ${identifier} (ID: ${userId})`);
+                alert("User deleted.");
+                loadUsers();
+            } catch (err) { alert("Failed to delete user: " + err.message); }
+        };
+
+        // --- PASSWORD RESET: Send magic reset email via Supabase Auth ---
+        window.sendPasswordReset = async (email) => {
+            if (!email || email === 'undefined') { alert("No email found for this user."); return; }
+            if (!confirm(`Send a password reset email to:\n\n${email}\n\nThe user will receive a link to set a new password.`)) return;
+            try {
+                const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.href.split('#')[0]  // redirect back to this same page
+                });
+                if (error) throw error;
+                logAction('Password Reset Sent', `Reset email sent to: ${email}`);
+                alert(`✅ Password reset email sent to ${email}`);
+            } catch (err) {
+                alert("Failed to send reset email: " + err.message);
+            }
+        };
+
+
+
+
+
+        
+        // --- 7. LOAD AUDIT LOGS ---
         async function loadLogs() {
             const list = document.getElementById('auditLogList');
-            list.innerHTML = "<p style='color:#888; text-align:center; padding:20px;'>Loading logs...</p>";
-
+            list.innerHTML = "<p>Loading logs...</p>";
+            
             const { data: logs, error } = await _supabase
                 .from('audit_logs')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(100);
 
-            if (error) { list.innerHTML = `<p style="color:red;">Error loading logs: ${error.message}</p>`; return; }
-            if (!logs || logs.length === 0) { list.innerHTML = "<p style='color:#888; text-align:center; padding:20px;'>No audit logs recorded yet.</p>"; return; }
+            if (error) {
+                list.innerHTML = `<p style="color:#ff4757;">⚠️ Error Loading Logs. Ensure you created the 'audit_logs' table.</p><p>${error.message}</p>`;
+                return;
+            }
+
+            if (!logs || logs.length === 0) {
+                list.innerHTML = `<p style="color:#888;">No audit logs recorded yet.</p>`;
+                return;
+            }
 
             list.innerHTML = `
-                <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
                     <thead>
-                        <tr style="background:#fafafa; border-bottom:2px solid #eee; text-align:left;">
-                            <th style="padding:10px;">Timestamp</th>
-                            <th style="padding:10px;">Admin / Actor</th>
-                            <th style="padding:10px;">Action</th>
-                            <th style="padding:10px;">Details</th>
+                        <tr style="border-bottom: 2px solid #ddd; text-align:left; color: #333; font-size: 0.9rem;">
+                            <th style="padding:12px;">Date & Time</th>
+                            <th>User / Admin Account</th>
+                            <th>Action Performed</th>
+                            <th>Details / Target</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${logs.map(l => `
-                            <tr style="border-bottom:1px solid #f0f0f0;">
-                                <td style="padding:10px; color:#888; white-space:nowrap;">${new Date(l.created_at).toLocaleString()}</td>
-                                <td style="padding:10px; font-weight:600; color:#333;">${escapeHtml(l.admin_email || 'System')}</td>
-                                <td style="padding:10px;"><span style="background:#fff3e0; color:#d97706; padding:2px 6px; border-radius:4px; font-weight:700;">${escapeHtml(l.action)}</span></td>
-                                <td style="padding:10px; color:#555;">${escapeHtml(l.details)}</td>
+                        ${logs.map(log => `
+                            <tr style="border-bottom: 1px solid #eee; font-size:0.85rem;">
+                                <td style="padding:12px; color:#666; white-space:nowrap;">
+                                    ${new Date(log.created_at).toLocaleDateString()} at ${new Date(log.created_at).toLocaleTimeString()}
+                                </td>
+                                <td><strong>${log.admin_email || 'Unknown'}</strong></td>
+                                <td><span style="background:#f1f2f6; padding:3px 8px; border-radius:12px; font-weight:600; color:#333;">${log.action}</span></td>
+                                <td style="color:#555;">${log.details || '-'}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -1447,423 +1572,623 @@
             `;
         }
 
-        // --- 8. UTM BUILDER & PRODUCT DEEPLINKS ---
-        function generateUTM() {
+        // --- 8. UTM GENERATOR LOGIC ---
+        window.openUTMBuilderForProduct = (id) => {
+            // Find the UTM tab button and simulate click
+            const utmBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Marketing'));
+            if(utmBtn) switchTab('utm', utmBtn);
+
+            // Always use wanagebya.com as the base — never localhost
+            const baseUrl = 'https://wanagebya.com';
+
+            // Use index.html with the product id param (matches your actual site structure)
+            document.getElementById('utmUrl').value = `${baseUrl}/product.html?id=${id}`;
+            document.getElementById('utmSource').value = 'telegram';
+            document.getElementById('utmMedium').value = 'social';
+            document.getElementById('utmCampaign').value = 'featured_ad';
+            document.getElementById('utmResult').value = '';
+
+            // Pre-generate URL
+            generateUTM();
+        };
+
+        window.generateUTM = () => {
             const url = document.getElementById('utmUrl').value.trim();
             const source = document.getElementById('utmSource').value.trim();
             const medium = document.getElementById('utmMedium').value.trim();
             const campaign = document.getElementById('utmCampaign').value.trim();
 
             if (!url || !source) {
-                alert('Target URL and Campaign Source are required.');
+                alert("Target URL and Campaign Source are required!");
                 return;
             }
 
-            let finalUrl;
             try {
-                finalUrl = new URL(url);
+                const urlObj = new URL(url);
+                urlObj.searchParams.set('utm_source', source);
+                if (medium) urlObj.searchParams.set('utm_medium', medium);
+                if (campaign) urlObj.searchParams.set('utm_campaign', campaign);
+                
+                document.getElementById('utmResult').value = urlObj.toString();
             } catch (e) {
-                alert('Please enter a valid Target URL (including http:// or https://).');
-                return;
+                alert("Please enter a valid Target URL (e.g., https://yoursite.com)");
             }
+        };
 
-            finalUrl.searchParams.set('utm_source', source);
-            if (medium) finalUrl.searchParams.set('utm_medium', medium);
-            if (campaign) finalUrl.searchParams.set('utm_campaign', campaign);
-
-            document.getElementById('utmResult').value = finalUrl.toString();
-        }
-
-        function copyUTM() {
-            const resultArea = document.getElementById('utmResult');
-            if (!resultArea.value) return;
-            resultArea.select();
+        window.copyUTM = () => {
+            const res = document.getElementById('utmResult');
+            if(!res.value) return;
+            res.select();
             document.execCommand('copy');
-            alert('Tracking URL copied to clipboard!');
-        }
+            alert("UTM Link copied to clipboard!");
+            logAction('UTM URL Created & Copied', `Generated for Campaign: ${document.getElementById('utmCampaign').value || 'N/A'}`);
+        };
 
-        function openUTMBuilderForProduct(productId) {
-            const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'product.html');
-            const targetUrl = `${baseUrl}?id=${productId}`;
-            
-            switchTab('utm', document.querySelector('.tab-btn[onclick*="utm"]'));
-            document.getElementById('utmUrl').value = targetUrl;
-            document.getElementById('utmSource').value = 'telegram';
-            document.getElementById('utmMedium').value = 'social';
-            document.getElementById('utmCampaign').value = 'featured_product';
-            generateUTM();
-        }
+        // --- 9. SUPPORT TICKETS ---
+        async function loadTickets() {
+            const list = document.getElementById('ticketList');
+            const { data: tickets, error } = await _supabase.from('support_tickets').select('*').eq('is_resolved', false).order('created_at', { ascending: false });
 
-        // --- 9. CATEGORY MANAGER ---
-        async function loadAdminCategories() {
-            const list = document.getElementById('adminCatList');
-            const parentSelect = document.getElementById('subCatParent');
-            list.innerHTML = '<p style="color:#bbb; text-align:center; padding:30px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
-
-            const { data: categories, error } = await _supabase.from('categories').select('*, subcategories(*)').order('name');
-            if (error) { list.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
-
-            if (parentSelect) {
-                parentSelect.innerHTML = '<option value="">— Select category —</option>' +
-                    categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-            }
-
-            if (!categories || categories.length === 0) {
-                list.innerHTML = '<p style="color:#bbb; text-align:center; padding:20px;">No categories configured.</p>';
+            if (error || !tickets || tickets.length === 0) {
+                list.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>No active support tickets.</p>";
                 return;
             }
 
-            list.innerHTML = categories.map(cat => {
-                const subs = cat.subcategories || [];
-                return `
-                    <div class="cat-panel" id="cat-panel-${cat.id}">
-                        <div class="cat-panel-head" onclick="toggleCatPanel('${cat.id}')">
-                            <span class="cat-panel-icon native-emoji">${escapeHtml(cat.icon || '🏷️')}</span>
-                            <span class="cat-panel-title">${escapeHtml(cat.name)}</span>
-                            ${cat.amharic_name ? `<span class="cat-panel-am">${escapeHtml(cat.amharic_name)}</span>` : ''}
-                            <span class="cat-panel-count">(${subs.length} subcategories)</span>
-                            <div class="cat-panel-actions" onclick="event.stopPropagation()">
-                                <button onclick="adminDeleteCategory('${cat.id}', '${escapeJsAttr(cat.name)}')" class="cat-act-btn" style="background:#fff0f0; color:#ff4757;">Delete</button>
-                            </div>
-                            <i class="fas fa-chevron-down cat-panel-chevron" id="chevron-${cat.id}"></i>
+            list.innerHTML = tickets.map(t => `
+                <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #ff4757; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <h4 style="color:#333;">${escapeHtml(t.subject || 'No Subject')}</h4>
+                            <p style="margin: 10px 0; color:#555; line-height:1.4;">${escapeHtml(t.message)}</p>
+                            <small style="color:#888;">From: <strong>${escapeHtml(t.user_email)}</strong> • ${new Date(t.created_at).toLocaleDateString()}</small>
                         </div>
-                        <div id="cat-body-${cat.id}" style="display:none;">
-                            <div class="subcat-wrap">
-                                ${subs.length === 0 ? '<em style="color:#aaa; font-size:0.8rem;">No subcategories yet</em>' : 
-                                    subs.map(s => `
-                                        <span class="subcat-chip">
-                                            ${escapeHtml(s.name)} ${s.amharic_name ? `(${escapeHtml(s.amharic_name)})` : ''}
-                                            <button onclick="adminDeleteSubcategory('${s.id}', '${escapeJsAttr(s.name)}')" title="Remove subcategory">&times;</button>
-                                        </span>
-                                    `).join('')}
-                            </div>
-                            <div class="quick-sub-row">
-                                <input type="text" id="quickSub-${cat.id}" placeholder="+ Quick add subcategory name...">
-                                <button onclick="quickAddSub('${cat.id}')">Add</button>
-                            </div>
-                        </div>
-                    </div>`;
-            }).join('');
+                        <button onclick="resolveTicket('${t.id}')" style="background:#2ed573; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                            Mark Resolved
+                        </button>
+                    </div>
+                </div>`).join('');
         }
 
-        function toggleCatPanel(catId) {
-            const body = document.getElementById(`cat-body-${catId}`);
-            const chevron = document.getElementById(`chevron-${catId}`);
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                chevron.classList.add('open');
-            } else {
-                body.style.display = 'none';
-                chevron.classList.remove('open');
+        window.resolveTicket = async (id) => {
+            const { error } = await _supabase.from('support_tickets').update({ is_resolved: true }).eq('id', id);
+            if (!error) { 
+                logAction('Ticket Resolved', `Marked Support Ticket ID: ${id} as resolved`);
+                loadTickets(); loadStats(); 
             }
+        };
+        
+        // Search Bar Event Listener
+        document.getElementById('adminSearchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            if (currentView === 'users') {
+                document.querySelectorAll('#userList table tbody tr').forEach(row => {
+                    row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+                });
+            } else {
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
+                });
+            }
+        });
+
+        // ═══════════════════════════════════════════════════
+        //  CATEGORY & SUBCATEGORY MANAGER
+        // ═══════════════════════════════════════════════════
+        let _adminCats = [];
+
+        // ── Fetch ──────────────────────────────────────────
+        async function fetchAdminCats() {
+            const { data, error } = await _supabase
+                .from('categories')
+                .select('*, subcategories(*)')
+                .order('sort_order', { ascending: true });
+            if (error) { console.error(error); return []; }
+            return data || [];
         }
 
-        async function adminAddCategory() {
-            const name = document.getElementById('newCatName').value.trim();
-            const icon = document.getElementById('newCatIcon').value.trim();
-            const amharic = document.getElementById('newCatAmharic').value.trim();
-
-            if (!name) { alert('Category name is required.'); return; }
-
-            const { error } = await _supabase.from('categories').insert([{
-                name: name,
-                icon: icon || '🏷️',
-                amharic_name: amharic || null
-            }]);
-
-            if (error) { alert('Error creating category: ' + error.message); return; }
-            
-            document.getElementById('newCatName').value = '';
-            document.getElementById('newCatIcon').value = '';
-            document.getElementById('newCatAmharic').value = '';
-            logAction('Category Added', `Added category: ${name}`);
-            loadAdminCategories();
+        async function loadAdminCategories() {
+            document.getElementById('adminCatList').innerHTML =
+                '<p style="color:#bbb;text-align:center;padding:30px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+            _adminCats = await fetchAdminCats();
+            populateParentSelect();
+            renderAdminCatList(_adminCats);
         }
 
-        async function adminAddSubcategory() {
-            const categoryId = document.getElementById('subCatParent').value;
-            const name = document.getElementById('newSubName').value.trim();
-            const amharic = document.getElementById('newSubAmharic').value.trim();
+        function populateParentSelect() {
+            const sel = document.getElementById('subCatParent');
+            sel.innerHTML = '<option value="">— Select category —</option>';
+            _adminCats.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+        }
 
-            if (!categoryId || !name) { alert('Parent Category and Subcategory Name are required.'); return; }
+        // ── Render ─────────────────────────────────────────
+        function renderAdminCatList(cats) {
+            const list = document.getElementById('adminCatList');
+            if (!cats.length) {
+                list.innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;">No categories yet. Add one above!</p>';
+                return;
+            }
+            list.innerHTML = cats.map(cat => buildAdminCatPanel(cat)).join('');
+        }
 
-            const { error } = await _supabase.from('subcategories').insert([{
-                category_id: categoryId,
-                name: name,
-                amharic_name: amharic || null
-            }]);
+        function buildAdminCatPanel(cat) {
+            const subs = cat.subcategories || [];
+            const iconHtml = cat.icon
+                ? (cat.icon.startsWith('fa')
+                    ? `<i class="${cat.icon} cat-panel-icon"></i>`
+                    : `<span class="cat-panel-icon">${cat.icon}</span>`)
+                : '<span class="cat-panel-icon">📦</span>';
+            const chips = subs.map(s => `
+                <span class="subcat-chip">
+                    ${s.amharic_name ? `<span style="color:#aaa;font-size:0.72rem;">${s.amharic_name} /</span>` : ''}
+                    ${s.name}
+                    <button title="Delete subcategory" onclick="adminDeleteSub('${s.id}','${cat.id}')">✕</button>
+                </span>`).join('');
 
-            if (error) { alert('Error creating subcategory: ' + error.message); return; }
+            return `
+            <div class="cat-panel" id="acp-${cat.id}">
+                <div class="cat-panel-head" onclick="toggleAdminPanel('${cat.id}')">
+                    ${iconHtml}
+                    <div style="flex:1;min-width:0;">
+                        <span class="cat-panel-title">${cat.name}</span>
+                        ${cat.amharic_name ? `<span class="cat-panel-am"> / ${cat.amharic_name}</span>` : ''}
+                    </div>
+                    <span class="cat-panel-count">${subs.length} sub${subs.length !== 1 ? 's' : ''}</span>
+                    <div class="cat-panel-actions" onclick="event.stopPropagation()">
+                        <button class="cat-act-btn" style="background:#fff8e1;color:#f57f17;"
+                            onclick="adminStartRename('${cat.id}','${escQ(cat.name)}','${escQ(cat.icon||'')}','${escQ(cat.amharic_name||'')}')">
+                            <i class="fas fa-pen"></i> Rename
+                        </button>
+                        <button class="cat-act-btn" style="background:#fff0f0;color:#c62828;"
+                            onclick="adminDeleteCat('${cat.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <i class="fas fa-chevron-down cat-panel-chevron" id="achev-${cat.id}"></i>
+                </div>
+                <div id="acbody-${cat.id}" style="display:none;">
+                    <div class="subcat-wrap">${chips || '<span style="color:#ccc;font-size:0.82rem;">No subcategories yet.</span>'}</div>
+                    <div class="quick-sub-row">
+                        <input id="qsub-${cat.id}" type="text" placeholder="Quick-add subcategory…"
+                            onkeydown="if(event.key==='Enter') adminQuickSub('${cat.id}')">
+                        <button onclick="adminQuickSub('${cat.id}')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>`;
+            // Before (Broken when receiving an emoji character):
+// `<i class="${cat.icon} cat-panel-icon"></i>`
 
+// After (Fixed):
+`${renderCategoryIcon(cat.icon)}`
+        }
+
+        window.toggleAdminPanel = (id) => {
+            const body  = document.getElementById(`acbody-${id}`);
+            const chev  = document.getElementById(`achev-${id}`);
+            const open  = body.style.display === 'block';
+            body.style.display = open ? 'none' : 'block';
+            chev.classList.toggle('open', !open);
+        };
+
+        window.filterAdminCats = (q) => {
+            const t = q.toLowerCase();
+            const filtered = _adminCats.filter(c =>
+                c.name.toLowerCase().includes(t) ||
+                (c.amharic_name || '').toLowerCase().includes(t) ||
+                (c.subcategories || []).some(s => s.name.toLowerCase().includes(t))
+            );
+            renderAdminCatList(filtered);
+        };
+
+        // ── Add Category ───────────────────────────────────
+   async function adminAddCategory() {
+    const name = document.getElementById('newCatName').value.trim();
+    const icon = document.getElementById('newCatIcon').value.trim();
+    const amharic = document.getElementById('newCatAmharic').value.trim();
+
+    if (!name) {
+        alert('Category Name is required.');
+        return;
+    }
+
+    // Explicitly target your supabase client context instance
+    const { data, error } = await _supabase
+        .from('categories')
+        .insert([
+            { 
+                name: name, 
+                icon: icon || null, 
+                amharic_name: amharic || null 
+            }
+        ]);
+
+    if (error) {
+        console.error(error);
+        alert('Error: ' + error.message);
+        return;
+    }
+
+    alert('Category added successfully!');
+    loadAdminCategories(); // Reload layout view
+}
+
+        // ── Add Subcategory ────────────────────────────────
+        window.adminAddSubcategory = async () => {
+            const parentId = document.getElementById('subCatParent').value;
+            const name     = document.getElementById('newSubName').value.trim();
+            const amharic  = document.getElementById('newSubAmharic').value.trim();
+            if (!parentId) { alert('Select a parent category.'); return; }
+            if (!name) { flashField('newSubName', 'Enter subcategory name'); return; }
+            await insertSub(parentId, name, amharic);
             document.getElementById('newSubName').value = '';
             document.getElementById('newSubAmharic').value = '';
-            logAction('Subcategory Added', `Added subcategory: ${name}`);
-            loadAdminCategories();
-        }
+        };
 
-        async function quickAddSub(categoryId) {
-            const input = document.getElementById(`quickSub-${categoryId}`);
-            const name = input.value.trim();
-            if (!name) return;
+        window.adminQuickSub = async (catId) => {
+            const inp = document.getElementById(`qsub-${catId}`);
+            const name = inp.value.trim();
+            if (!name) { inp.focus(); return; }
+            await insertSub(catId, name, '');
+            inp.value = '';
+        };
 
-            const { error } = await _supabase.from('subcategories').insert([{
-                category_id: categoryId,
-                name: name
-            }]);
-
-            if (error) { alert('Error: ' + error.message); return; }
-            logAction('Quick Subcategory Added', `Added: ${name}`);
-            loadAdminCategories();
-        }
-
-        async function adminDeleteCategory(id, name) {
-            if (!confirm(`Are you sure you want to delete category "${name}" and all its subcategories?`)) return;
-            const { error } = await _supabase.from('categories').delete().eq('id', id);
-            if (error) { alert('Delete failed: ' + error.message); return; }
-            logAction('Category Deleted', `Deleted category: ${name}`);
-            loadAdminCategories();
-        }
-
-        async function adminDeleteSubcategory(id, name) {
-            if (!confirm(`Delete subcategory "${name}"?`)) return;
-            const { error } = await _supabase.from('subcategories').delete().eq('id', id);
-            if (error) { alert('Delete failed: ' + error.message); return; }
-            logAction('Subcategory Deleted', `Deleted subcategory: ${name}`);
-            loadAdminCategories();
-        }
-
-        function filterAdminCats(query) {
-            const q = query.toLowerCase().trim();
-            document.querySelectorAll('.cat-panel').forEach(panel => {
-                const text = panel.innerText.toLowerCase();
-                panel.style.display = text.includes(q) ? 'block' : 'none';
+        async function insertSub(categoryId, name, amharic) {
+            const { error } = await _supabase.from('subcategories').insert({
+                category_id: categoryId, name, amharic_name: amharic || null
             });
+            if (error) { alert('Error: ' + error.message); return; }
+            const cat = _adminCats.find(c => String(c.id) === String(categoryId));
+            logAction('Subcategory Added', `"${name}" under "${cat?.name || categoryId}"`);
+            catToast('Subcategory added!', '#0A291A');
+            loadAdminCategories();
         }
 
-        // --- 10. PRODUCT VIEWS ANALYTICS ---
-        async function loadViewsData() {
-            const filter = document.getElementById('vFilterStatus')?.value || 'approved';
-            
-            let query = _supabase.from('products').select('id, name, category, price, views_count, status, image');
-            if (filter !== 'all') query = query.eq('status', filter);
+        // ── Delete Category ────────────────────────────────
+        window.adminDeleteCat = async (id) => {
+            const cat = _adminCats.find(c => String(c.id) === String(id));
+            const n = (cat?.subcategories || []).length;
+            const msg = n
+                ? `Delete "${cat?.name}" and its ${n} subcategor${n===1?'y':'ies'}? Cannot be undone.`
+                : `Delete category "${cat?.name}"? Cannot be undone.`;
+            if (!confirm(msg)) return;
+            await _supabase.from('subcategories').delete().eq('category_id', id);
+            const { error } = await _supabase.from('categories').delete().eq('id', id);
+            if (error) { alert('Error: ' + error.message); return; }
+            logAction('Category Deleted', `"${cat?.name}"`);
+            catToast('Category deleted.', '#ff4757');
+            loadAdminCategories();
+        };
 
-            const { data, error } = await query.order('views_count', { ascending: false });
-            if (error) { console.error("Views data load error:", error); return; }
+        // ── Delete Subcategory ─────────────────────────────
+        window.adminDeleteSub = async (subId, catId) => {
+            const cat = _adminCats.find(c => String(c.id) === String(catId));
+            const sub = (cat?.subcategories || []).find(s => String(s.id) === String(subId));
+            if (!confirm(`Remove subcategory "${sub?.name}"?`)) return;
+            const { error } = await _supabase.from('subcategories').delete().eq('id', subId);
+            if (error) { alert('Error: ' + error.message); return; }
+            logAction('Subcategory Deleted', `"${sub?.name}" from "${cat?.name}"`);
+            catToast('Subcategory removed.', '#F5A623');
+            loadAdminCategories();
+        };
 
-            viewsDataCache = data || [];
-            
-            const totalViews = viewsDataCache.reduce((sum, item) => sum + (item.views_count || 0), 0);
-            const trackedCount = viewsDataCache.length;
-            const avgViews = trackedCount > 0 ? Math.round(totalViews / trackedCount) : 0;
-            const topItem = viewsDataCache[0] ? `${viewsDataCache[0].name.slice(0, 15)}... (${viewsDataCache[0].views_count || 0})` : 'None';
+        // ── Rename Category ────────────────────────────────
+        window.adminStartRename = (id, name, icon, amharic) => {
+            const row = document.getElementById(`acp-${id}`);
+            const head = row.querySelector('.cat-panel-head');
+            head.style.background = '#fffde7';
+            head.innerHTML = `
+                <div style="display:flex;gap:7px;align-items:center;width:100%;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                    <input id="rn-icon-${id}" value="${icon}" placeholder="Icon/emoji"
+                        style="width:100px;padding:7px 9px;border-radius:6px;border:1.5px solid #ffe082;font-size:0.83rem;outline:none;font-family:inherit;">
+                    <input id="rn-name-${id}" value="${name}" placeholder="Category name"
+                        style="flex:1;min-width:130px;padding:7px 9px;border-radius:6px;border:1.5px solid #ffe082;font-size:0.83rem;outline:none;font-family:inherit;">
+                    <input id="rn-am-${id}" value="${amharic}" placeholder="Amharic (opt)"
+                        style="width:150px;padding:7px 9px;border-radius:6px;border:1.5px solid #ffe082;font-size:0.83rem;outline:none;font-family:inherit;">
+                    <button onclick="adminSaveRename('${id}')"
+                        style="background:#f57f17;color:white;border:none;padding:8px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.82rem;">Save</button>
+                    <button onclick="loadAdminCategories()"
+                        style="background:#eee;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.82rem;">Cancel</button>
+                </div>`;
+        };
 
-            document.getElementById('vKpiTotal').innerText = totalViews.toLocaleString();
-            document.getElementById('vKpiTop').innerText = topItem;
-            document.getElementById('vKpiAvg').innerText = avgViews.toLocaleString();
-            document.getElementById('vKpiCount').innerText = trackedCount;
+        window.adminSaveRename = async (id) => {
+            const name    = document.getElementById('rn-name-' + id)?.value.trim();
+            const icon    = document.getElementById('rn-icon-' + id)?.value.trim();
+            const amharic = document.getElementById('rn-am-'   + id)?.value.trim();
 
-            renderViewsBarChart(viewsDataCache.slice(0, 10));
-            renderViewsCategoryBreakdown(viewsDataCache);
-            renderViewsTable();
+            if (!name) { alert('Name cannot be empty.'); return; }
 
-            loadUniqueVisitorKPIs();
-        }
+            // Show saving state
+            const saveBtn = document.querySelector(`#acp-${id} button`);
+            if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
 
-        async function loadUniqueVisitorKPIs() {
-            try {
-                const now = new Date();
-                const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            // Check session is active (RLS requires auth)
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) { alert('Session expired. Please sign in again.'); return; }
 
-                const { data: todayViews } = await _supabase.from('product_views').select('viewer_ip, user_id').gte('viewed_at', todayStart);
-                const { data: weekViews } = await _supabase.from('product_views').select('viewer_ip, user_id').gte('viewed_at', weekAgo);
-                const { data: allViews } = await _supabase.from('product_views').select('viewer_ip, user_id');
+            const { data, error } = await _supabase
+                .from('categories')
+                .update({ name, icon: icon || null, amharic_name: amharic || null })
+                .eq('id', id)
+                .select();
 
-                const getUniques = (list) => {
-                    if (!list) return 0;
-                    const set = new Set();
-                    list.forEach(v => set.add(v.user_id || v.viewer_ip));
-                    return set.size;
-                };
-
-                document.getElementById('vKpiVisitorsToday').innerText = getUniques(todayViews).toLocaleString();
-                document.getElementById('vKpiVisitorsWeek').innerText = getUniques(weekViews).toLocaleString();
-                document.getElementById('vKpiUniqueVisitors').innerText = getUniques(allViews).toLocaleString();
-            } catch (err) {
-                console.log("Visitor tracking analytics info:", err.message);
-            }
-        }
-
-        function renderViewsBarChart(topItems) {
-            const container = document.getElementById('vBarChart');
-            if (!topItems || topItems.length === 0) {
-                container.innerHTML = '<p style="color:#aaa; text-align:center; padding:30px 0;">No view data yet.</p>';
+            if (error) {
+                console.error('Rename error:', error);
+                alert('Save failed: ' + error.message + '\n\nMake sure your Supabase RLS policy allows admins to UPDATE categories.');
+                if (saveBtn) { saveBtn.textContent = 'Save'; saveBtn.disabled = false; }
                 return;
             }
 
-            const maxViews = Math.max(...topItems.map(i => i.views_count || 0), 1);
+            if (!data || data.length === 0) {
+                alert('Update had no effect. Check that:\n1. Your RLS policy allows admin UPDATE on categories\n2. The category ID exists:\n' + id);
+                if (saveBtn) { saveBtn.textContent = 'Save'; saveBtn.disabled = false; }
+                return;
+            }
 
-            container.innerHTML = topItems.map(item => {
-                const views = item.views_count || 0;
-                const pct = Math.round((views / maxViews) * 100);
+            logAction('Category Renamed', 'Updated to: "' + name + '"');
+            catToast('Category updated! ✓', '#f57f17');
+            loadAdminCategories();
+        };
+
+        // ── Helpers ────────────────────────────────────────
+        function escQ(s) { return String(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+        function flashField(id, msg) {
+            const el = document.getElementById(id);
+            el.style.borderColor = '#ff4757';
+            el.placeholder = msg;
+            el.focus();
+            setTimeout(() => { el.style.borderColor = ''; }, 1800);
+        }
+        function catToast(msg, color) {
+            let t = document.getElementById('_catToast');
+            if (!t) { t = document.createElement('div'); t.id = '_catToast'; document.body.appendChild(t); }
+            t.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+                background:${color};color:white;padding:11px 24px;border-radius:10px;
+                font-weight:700;font-size:0.9rem;z-index:9999;
+                box-shadow:0 6px 20px rgba(0,0,0,0.2);transition:opacity .3s;`;
+            t.textContent = msg; t.style.opacity = '1';
+            clearTimeout(t._t);
+            t._t = setTimeout(() => { t.style.opacity = '0'; }, 2800);
+        }
+
+
+// Helper to decide if the value is an explicit CSS class names list or an emoji character string
+function renderCategoryIcon(iconString) {
+    if (!iconString) return `<span class="cat-panel-icon native-emoji">📁</span>`;
+    
+    // Check if it contains 'fa-' which implies a Font Awesome class string (e.g., 'fas fa-baby')
+    if (iconString.includes('fa-')) {
+        return `<i class="${iconString} cat-panel-icon"></i>`;
+    }
+    
+    // Otherwise, treat it as a pure emoji text character
+    return `<span class="cat-panel-icon native-emoji">${iconString}</span>`;
+}
+        
+
+        // ═══════════════════════════════════════════════
+        // PRODUCT PERFORMANCE & VIEWS ANALYTICS
+        // ═══════════════════════════════════════════════
+        let _viewsData = [];
+
+        async function loadViewsData() {
+            const statusFilter = document.getElementById('vFilterStatus')?.value || 'approved';
+
+            // Reset UI to loading state
+            document.getElementById('vBarChart').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+            document.getElementById('vCatBreakdown').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+            document.getElementById('vTableBody').innerHTML = '<tr><td colspan="7" style="padding:40px;text-align:center;color:#bbb;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</td></tr>';
+
+            let query = _supabase
+                .from('products')
+                .select('id, name, price, category, status, view_count, image')
+                .order('view_count', { ascending: false });
+
+            if (statusFilter !== 'all') {
+                query = query.eq('status', statusFilter);
+            }
+
+            const { data, error } = await query;
+
+            if (error) {
+                document.getElementById('vBarChart').innerHTML = `<p style="color:#ff4757;text-align:center;padding:20px;">Error: ${error.message}</p>`;
+                return;
+            }
+
+            _viewsData = (data || []).map(p => ({ ...p, view_count: p.view_count || 0 }));
+
+            renderKPIs();
+            renderBarChart();
+            renderCategoryBreakdown();
+            renderViewsTable();
+            loadUniqueVisitorCount();
+        }
+
+        async function loadUniqueVisitorCount() {
+            const elToday = document.getElementById('vKpiVisitorsToday');
+            const elWeek  = document.getElementById('vKpiVisitorsWeek');
+            const elAll   = document.getElementById('vKpiUniqueVisitors');
+
+            // "Today" = since local midnight in the admin's own timezone
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+
+            // Rolling 7-day window, not calendar week
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - 7);
+
+            try {
+                const [today, week, all] = await Promise.all([
+                    _supabase.rpc('get_unique_visitor_count', { since: todayStart.toISOString() }),
+                    _supabase.rpc('get_unique_visitor_count', { since: weekStart.toISOString() }),
+                    _supabase.rpc('get_unique_visitor_count', { since: null })
+                ]);
+                if (today.error) throw today.error;
+                if (week.error) throw week.error;
+                if (all.error) throw all.error;
+
+                elToday.innerText = (today.data ?? 0).toLocaleString();
+                elWeek.innerText  = (week.data ?? 0).toLocaleString();
+                elAll.innerText   = (all.data ?? 0).toLocaleString();
+            } catch (err) {
+                elToday.innerText = elWeek.innerText = elAll.innerText = '—';
+                console.log('Site reach unavailable:', err.message);
+            }
+        }
+
+        function renderKPIs() {
+            const total   = _viewsData.reduce((s, p) => s + p.view_count, 0);
+            const top     = _viewsData[0];
+            const avg     = _viewsData.length ? Math.round(total / _viewsData.length) : 0;
+
+            document.getElementById('vKpiTotal').innerText  = total.toLocaleString();
+            document.getElementById('vKpiTop').innerText    = top ? `${top.view_count.toLocaleString()} (${top.name.slice(0,18)}…)` : '—';
+            document.getElementById('vKpiAvg').innerText    = avg.toLocaleString();
+            document.getElementById('vKpiCount').innerText  = _viewsData.length;
+        }
+
+        function renderBarChart() {
+            const top10 = [..._viewsData].sort((a,b) => b.view_count - a.view_count).slice(0, 10);
+            const max   = top10[0]?.view_count || 1;
+
+            const COLORS = ['#0A291A','#1976d2','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#f5f5f5'];
+
+            if (top10.length === 0) {
+                document.getElementById('vBarChart').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;">No view data yet.</p>';
+                return;
+            }
+
+            document.getElementById('vBarChart').innerHTML = top10.map((p, i) => {
+                const pct = Math.max(4, Math.round((p.view_count / max) * 100));
+                const label = p.name.length > 30 ? p.name.slice(0, 28) + '…' : p.name;
                 return `
-                    <div style="display:flex; align-items:center; gap:10px; font-size:0.8rem;">
-                        <div style="width:120px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#333; font-weight:600;" title="${escapeHtml(item.name)}">
-                            ${escapeHtml(item.name)}
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:0.75rem; color:#999; width:16px; text-align:right; flex-shrink:0;">${i+1}</span>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:0.78rem; color:#333; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px;">${label}</div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="flex:1; background:#f0f4f8; border-radius:20px; height:10px; overflow:hidden;">
+                                <div style="width:${pct}%; background:${COLORS[i] || COLORS[4]}; height:100%; border-radius:20px; transition:width 0.6s ease;"></div>
+                            </div>
+                            <span style="font-size:0.78rem; font-weight:700; color:#0A291A; flex-shrink:0; width:40px; text-align:right;">${p.view_count.toLocaleString()}</span>
                         </div>
-                        <div style="flex:1; background:#f0f0f0; height:12px; border-radius:6px; overflow:hidden;">
-                            <div style="width:${pct}%; background:#0A291A; height:100%; border-radius:6px; transition:width 0.5s;"></div>
-                        </div>
-                        <div style="width:40px; text-align:right; font-weight:700; color:#555;">${views}</div>
-                    </div>`;
+                    </div>
+                </div>`;
             }).join('');
         }
 
-        function renderViewsCategoryBreakdown(items) {
-            const container = document.getElementById('vCatBreakdown');
+        function renderCategoryBreakdown() {
             const catMap = {};
-
-            items.forEach(item => {
-                const cat = item.category || 'Uncategorized';
-                catMap[cat] = (catMap[cat] || 0) + (item.views_count || 0);
+            _viewsData.forEach(p => {
+                const cat = p.category || 'Uncategorized';
+                if (!catMap[cat]) catMap[cat] = { views: 0, count: 0 };
+                catMap[cat].views += p.view_count;
+                catMap[cat].count++;
             });
 
-            const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-            const totalViews = items.reduce((sum, i) => sum + (i.views_count || 0), 0) || 1;
+            const sorted = Object.entries(catMap).sort((a,b) => b[1].views - a[1].views);
+            const maxV   = sorted[0]?.[1].views || 1;
 
-            if (sortedCats.length === 0) {
-                container.innerHTML = '<p style="color:#aaa; text-align:center; padding:30px 0;">No category data.</p>';
+            const CAT_COLORS = ['#0A291A','#F5A623','#fd79a8','#e17055','#0984e3','#F5A623','#74b3ff','#55efc4'];
+
+            if (sorted.length === 0) {
+                document.getElementById('vCatBreakdown').innerHTML = '<p style="color:#bbb;text-align:center;padding:40px 0;">No data.</p>';
                 return;
             }
 
-            container.innerHTML = sortedCats.map(([cat, views]) => {
-                const pct = Math.round((views / totalViews) * 100);
+            document.getElementById('vCatBreakdown').innerHTML = sorted.map(([cat, d], i) => {
+                const pct = Math.max(4, Math.round((d.views / maxV) * 100));
+                const color = CAT_COLORS[i % CAT_COLORS.length];
                 return `
-                    <div style="font-size:0.82rem;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-weight:600; color:#444;">
-                            <span>${escapeHtml(cat)}</span>
-                            <span>${views.toLocaleString()} views (${pct}%)</span>
-                        </div>
-                        <div style="background:#eee; height:8px; border-radius:4px; overflow:hidden;">
-                            <div style="width:${pct}%; background:#F5A623; height:100%; border-radius:4px;"></div>
-                        </div>
-                    </div>`;
+                <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="font-size:0.8rem; font-weight:700; color:#333;">${cat}</span>
+                        <span style="font-size:0.78rem; color:#888;">${d.views.toLocaleString()} views · ${d.count} item${d.count>1?'s':''}</span>
+                    </div>
+                    <div style="background:#f0f4f8; border-radius:20px; height:9px; overflow:hidden;">
+                        <div style="width:${pct}%; background:${color}; height:100%; border-radius:20px; transition:width 0.6s;"></div>
+                    </div>
+                </div>`;
             }).join('');
         }
 
         function renderViewsTable() {
-            const tbody = document.getElementById('vTableBody');
-            const search = (document.getElementById('vSearchInput')?.value || '').toLowerCase().trim();
-            const sort = document.getElementById('vSortSelect')?.value || 'views_desc';
+            const search = (document.getElementById('vSearchInput')?.value || '').toLowerCase();
+            const sort   = document.getElementById('vSortSelect')?.value || 'views_desc';
+            const maxViews = Math.max(..._viewsData.map(p => p.view_count), 1);
 
-            let filtered = viewsDataCache.filter(i => 
-                (i.name || '').toLowerCase().includes(search) || 
-                (i.category || '').toLowerCase().includes(search)
+            let filtered = _viewsData.filter(p =>
+                !search ||
+                p.name?.toLowerCase().includes(search) ||
+                p.category?.toLowerCase().includes(search)
             );
 
-            filtered.sort((a, b) => {
-                if (sort === 'views_desc') return (b.views_count || 0) - (a.views_count || 0);
-                if (sort === 'views_asc') return (a.views_count || 0) - (b.views_count || 0);
-                if (sort === 'name_asc') return (a.name || '').localeCompare(b.name || '');
-                if (sort === 'price_desc') return (b.price || 0) - (a.price || 0);
+            filtered.sort((a,b) => {
+                if (sort === 'views_desc') return b.view_count - a.view_count;
+                if (sort === 'views_asc')  return a.view_count - b.view_count;
+                if (sort === 'name_asc')   return (a.name||'').localeCompare(b.name||'');
+                if (sort === 'price_desc') return (b.price||0) - (a.price||0);
                 return 0;
             });
 
-            document.getElementById('vTableCount').innerText = `Showing ${filtered.length} of ${viewsDataCache.length} products`;
+            document.getElementById('vTableCount').innerText = `Showing ${filtered.length} of ${_viewsData.length} products`;
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="padding:30px; text-align:center; color:#aaa;">No matching products found.</td></tr>';
+                document.getElementById('vTableBody').innerHTML = '<tr><td colspan="7" style="padding:40px;text-align:center;color:#bbb;">No products match your search.</td></tr>';
                 return;
             }
 
-            const maxViews = Math.max(...viewsDataCache.map(i => i.views_count || 0), 1);
+            document.getElementById('vTableBody').innerHTML = filtered.map((p, i) => {
+                const viewPct = Math.round((p.view_count / maxViews) * 100);
+                const perfColor = viewPct >= 70 ? '#2ed573' : viewPct >= 35 ? '#f39c12' : '#dfe6e9';
+                const perfLabel = viewPct >= 70 ? '🔥 Hot' : viewPct >= 35 ? '📈 Active' : '😴 Low';
+                const statusBadge = {
+                    approved: '<span style="background:#e8fdf5;color:#F5A623;border:1px solid #2ed573;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Live</span>',
+                    sold:     '<span style="background:#fff3e0;color:#F5A623;border:1px solid #ffa502;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Sold</span>',
+                    pending:  '<span style="background:#f0f4ff;color:#0088cc;border:1px solid #0088cc;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Pending</span>',
+                    rejected: '<span style="background:#fff0f0;color:#ff4757;border:1px solid #ff4757;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;">Rejected</span>',
+                }[p.status] || '';
 
-            tbody.innerHTML = filtered.map((item, index) => {
-                const views = item.views_count || 0;
-                const perfPct = Math.round((views / maxViews) * 100);
-                const statusBadge = item.status === 'approved' ? '<span style="color:#2ed573; font-weight:700;">Live</span>' :
-                                    item.status === 'sold' ? '<span style="color:#ffa502; font-weight:700;">Sold</span>' :
-                                    '<span style="color:#ff4757; font-weight:700;">Archived</span>';
-
-                return `
-                    <tr style="border-bottom:1px solid #eee;">
-                        <td style="padding:12px 14px; color:#aaa;">${index + 1}</td>
-                        <td style="padding:12px 14px; font-weight:600;">
-                            <a href="product.html?id=${item.id}" target="_blank" style="color:#0A291A; text-decoration:none;">
-                                ${escapeHtml(item.name)}
-                            </a>
-                        </td>
-                        <td style="padding:12px 14px; color:#666;">${escapeHtml(item.category || 'General')}</td>
-                        <td style="padding:12px 14px; font-weight:600; color:#2ed573;">${(item.price || 0).toLocaleString()}</td>
-                        <td style="padding:12px 14px; text-align:right; font-weight:700; color:#333;">${views.toLocaleString()}</td>
-                        <td style="padding:12px 14px; text-align:center;">${statusBadge}</td>
-                        <td style="padding:12px 14px; width:120px;">
-                            <div style="background:#eee; height:6px; border-radius:3px; overflow:hidden;">
-                                <div style="width:${perfPct}%; background:#0A291A; height:100%;"></div>
+                return `<tr style="border-bottom:1px solid #f0f0f0; ${i % 2 === 0 ? '' : 'background:#fafafa;'} transition:background 0.15s;" onmouseover="this.style.background='#f0f7f4'" onmouseout="this.style.background='${i%2===0?'white':'#fafafa'}'">
+                    <td style="padding:10px 14px; color:#aaa; font-size:0.8rem;">${i+1}</td>
+                    <td style="padding:10px 14px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${p.image ? `<img src="${p.image}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : '<div style="width:38px;height:38px;border-radius:8px;background:#eee;flex-shrink:0;"></div>'}
+                            <span style="font-weight:600; color:#333; font-size:0.88rem;">${escapeHtml(p.name || '—')}</span>
+                        </div>
+                    </td>
+                    <td style="padding:10px 14px; color:#666; font-size:0.82rem;">${escapeHtml(p.category || '—')}</td>
+                    <td style="padding:10px 14px; font-weight:700; color:#2ed573;">${(p.price||0).toLocaleString()}</td>
+                    <td style="padding:10px 14px; text-align:right;">
+                        <span style="font-size:1rem; font-weight:800; color:#0A291A;">${p.view_count.toLocaleString()}</span>
+                    </td>
+                    <td style="padding:10px 14px; text-align:center;">${statusBadge}</td>
+                    <td style="padding:10px 14px; min-width:120px;">
+                        <div style="display:flex; align-items:center; gap:7px;">
+                            <div style="flex:1; background:#f0f4f8; border-radius:20px; height:8px; overflow:hidden;">
+                                <div style="width:${viewPct}%; background:${perfColor}; height:100%; border-radius:20px;"></div>
                             </div>
-                        </td>
-                    </tr>`;
+                            <span style="font-size:0.72rem; flex-shrink:0;">${perfLabel}</span>
+                        </div>
+                    </td>
+                </tr>`;
             }).join('');
         }
 
         function exportViewsCSV() {
-            if (!viewsDataCache || viewsDataCache.length === 0) { alert('No data to export.'); return; }
-            let csv = 'Product Name,Category,Price (ETB),Views Count,Status\n';
-            viewsDataCache.forEach(i => {
-                const name = `"${(i.name || '').replace(/"/g, '""')}"`;
-                const cat = `"${(i.category || '').replace(/"/g, '""')}"`;
-                csv += `${name},${cat},${i.price || 0},${i.views_count || 0},${i.status}\n`;
-            });
-
+            if (!_viewsData.length) { alert('No data to export.'); return; }
+            const headers = ['Rank','Name','Category','Price (ETB)','Views','Status'];
+            const rows = [..._viewsData]
+                .sort((a,b) => b.view_count - a.view_count)
+                .map((p,i) => [i+1, `"${p.name}"`, `"${p.category||''}"`, p.price||0, p.view_count, p.status]);
+            const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `wanagebya-product-views-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.href = URL.createObjectURL(blob);
+            a.download = `product_views_${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
         }
+        // ═══════════════════════════════════════════════
 
-        // --- 11. SUPPORT TICKETS ---
-        async function loadTickets() {
-            const container = document.getElementById('ticketList');
-            container.innerHTML = '<p style="color:#aaa;">Loading support tickets...</p>';
-
-            const { data: tickets, error } = await _supabase
-                .from('support_tickets')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) { container.innerHTML = `<p style="color:red;">Error loading tickets: ${error.message}</p>`; return; }
-            if (!tickets || tickets.length === 0) { container.innerHTML = '<p style="color:#888;">No support tickets found.</p>'; return; }
-
-            container.innerHTML = tickets.map(t => `
-                <div style="background:white; border-radius:8px; padding:15px; border-left:4px solid ${t.is_resolved ? '#2ed573' : '#ff4757'}; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <strong style="font-size:1rem;">${escapeHtml(t.subject || 'Support Request')}</strong>
-                            <p style="font-size:0.8rem; color:#888; margin-top:2px;">From: ${escapeHtml(t.contact_info || 'Anonymous')} · ${new Date(t.created_at).toLocaleString()}</p>
-                        </div>
-                        <span style="background:${t.is_resolved ? '#e8fdf5' : '#fff0f0'}; color:${t.is_resolved ? '#2ed573' : '#ff4757'}; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">
-                            ${t.is_resolved ? 'RESOLVED' : 'OPEN'}
-                        </span>
-                    </div>
-                    <p style="color:#555; font-size:0.9rem; margin-top:10px; background:#f9f9f9; padding:10px; border-radius:6px;">${escapeHtml(t.message)}</p>
-                    <div style="margin-top:10px; display:flex; gap:10px; justify-content:flex-end;">
-                        <button onclick="toggleTicketResolved('${t.id}', ${!t.is_resolved})" style="background:${t.is_resolved ? '#666' : '#2ed573'}; color:white; border:none; padding:6px 12px; border-radius:5px; font-weight:600; cursor:pointer; font-size:0.8rem;">
-                            ${t.is_resolved ? 'Reopen Ticket' : 'Mark as Resolved'}
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function toggleTicketResolved(ticketId, isResolved) {
-            const { error } = await _supabase.from('support_tickets').update({ is_resolved: isResolved }).eq('id', ticketId);
-            if (error) { alert('Failed: ' + error.message); return; }
-            logAction('Support Ticket Updated', `Ticket ID: ${ticketId} set to ${isResolved ? 'Resolved' : 'Open'}`);
-            loadTickets();
-            loadStats();
-        }
     </script>
 </body>
 </html>
