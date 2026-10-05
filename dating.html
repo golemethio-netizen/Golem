@@ -2172,14 +2172,13 @@ async function loadNewMembers(){
     return;
   }
 
-  const rows = (data || []).filter(r => !blockedIds.has(r.user_id));
+const rows = (data || []).filter(r => !blockedIds.has(r.user_id));
   if (rows.length === 0){
-    empty.textContent = "No new members to show right now.";
     empty.style.display = "block";
     return;
   }
-  empty.style.display = "none";
 
+  empty.style.display = "none";
   rows.forEach(row => {
     const img = (row.photos && row.photos[0]) || row.photo_url || null;
     const displayName = esc(row.display_name || row.gender || "Someone");
