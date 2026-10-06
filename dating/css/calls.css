@@ -1,1 +1,92 @@
+/* Audio / Video Call Screen Overlay */
+.call-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(15px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 20px;
+}
 
+.call-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.call-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--primary);
+  object-fit: cover;
+  box-shadow: 0 0 25px rgba(255, 75, 114, 0.4);
+}
+
+.call-status {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Video Grid layout */
+.video-grid {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  margin: 20px 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: #000;
+}
+
+.remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.local-video {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 100px;
+  height: 140px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: var(--shadow);
+}
+
+/* Call Control Buttons */
+.call-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.btn-call-control {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--border-color);
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-call-control.end-call {
+  background-color: var(--danger);
+}
