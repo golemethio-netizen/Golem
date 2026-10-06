@@ -860,7 +860,33 @@
 // ============================================================
 // Wana Dating Engine (Includes Real-Time & WebRTC calls)
 // ============================================================
-const STORAGE_BUCKET = "avatars"; // Changed to avatars based on previous WanaGebya config
+// Split from one shared "avatars" bucket into purpose-specific buckets
+// (see dating-migration-v9-private-storage.sql). Only profile photos are
+// truly public; post media, voice messages and verification selfies are
+// private buckets read through short-lived signed URLs, not public ones.
+const BUCKET_PROFILE_PHOTOS = "dating-profile-photos";
+const BUCKET_POST_MEDIA = "dating-post-media";
+const BUCKET_VOICE_MESSAGES = "dating-voice-messages";
+const BUCKET_VERIFICATION = "dating-verification";
+
+// Resolves a stored photo/voice/selfie value to something <img>/<audio>
+// can load. New rows store a bare object PATH in a private bucket and
+// need a signed URL; old rows (from before this split) already hold a
+// full "avatars" public URL and are returned unchanged. Signed URLs are
+// cached in-memory for their lifetime so re-rendering a feed/thread
+// doesn't re-request one per render.
+const _signedUrlCache = new Map(); // key: `${bucket}:${path}` -> { url, expiresAt }
+async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600){
+  if (!pathOrUrl) return null;
+  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl; // pre-migration full URL
+  const key = `${bucket}:${pathOrUrl}`;
+  const cached = _signedUrlCache.get(key);
+  if (cached && cached.expiresAt > Date.now() + 30000) return cached.url;
+  const { data, error } = await _supabase.storage.from(bucket).createSignedUrl(pathOrUrl, expiresInSeconds);
+  if (error || !data) { console.warn(`Couldn't sign URL for ${key}:`, error && error.message); return null; }
+  _signedUrlCache.set(key, { url: data.signedUrl, expiresAt: Date.now() + expiresInSeconds * 1000 });
+  return data.signedUrl;
+}
 
 // Ensure _supabase exists before running
 if (typeof _supabase === 'undefined') {
@@ -1750,15 +1776,18 @@ async function submitPost(){
 
   let imageUrl = null;
   if (pendingPostImageFile){
-    const path = `dating-posts/${currentUser.id}-${Date.now()}-${pendingPostImageFile.name}`;
-    const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, pendingPostImageFile);
+    // Path starts with the uploader's id (no sub-folder) so it matches
+    // the "name LIKE auth.uid()||'-%'" write policy on this bucket, and
+    // stores as a PATH — not a public URL — since post media visibility
+    // is gated by dating_can_view_post_media() per-post.
+    const path = `${currentUser.id}-${Date.now()}-${pendingPostImageFile.name}`;
+    const { error: uploadErr } = await _supabase.storage.from(BUCKET_POST_MEDIA).upload(path, pendingPostImageFile);
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Image upload failed: ${esc(uploadErr.message)}</div>`;
       btn.disabled = false; btn.textContent = "Post";
       return;
     }
-    const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-    imageUrl = pub.publicUrl;
+    imageUrl = path; // stored as a path now; resolved to a signed URL when the feed renders it
   }
 
   const { error } = await _supabase.from("dating_posts").insert({
@@ -1880,10 +1909,18 @@ async function loadFeed(){
   const commenterMap = {};
   (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
 
-  feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap)).join("");
+  // Post images live in the private dating-post-media bucket now, gated
+  // per-post by dating_can_view_post_media() — resolve each to a signed
+  // URL up front so renderFeedPost can stay a plain synchronous template.
+  const postPhotoUrls = {};
+  await Promise.all(posts.filter(p => p.photo_url).map(async p => {
+    postPhotoUrls[p.id] = await resolvePrivateUrl(BUCKET_POST_MEDIA, p.photo_url);
+  }));
+
+  feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap, postPhotoUrls[p.id])).join("");
 }
 
-function renderFeedPost(p, a, postReactions, postComments, commenterMap){
+function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolvedPhotoUrl){
   const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
   const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
   const isMine = p.user_id === currentUser.id;
@@ -1919,7 +1956,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap){
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
       <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
-      ${p.photo_url ? `<img src="${esc(p.photo_url)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
+      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
@@ -2714,18 +2751,19 @@ async function toggleVoiceRecording(profileId, recipientId){
 
 async function sendVoiceMessage(profileId, recipientId, blob){
   const status = document.getElementById("recordStatus");
-  const path = `dating/voice/${currentUser.id}-${Date.now()}.webm`;
-  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, blob);
+  // Path starts with the sender's id (no sub-folder) to match the
+  // "name LIKE auth.uid()||'-%'" write policy on this private bucket.
+  const path = `${currentUser.id}-${Date.now()}.webm`;
+  const { error: uploadErr } = await _supabase.storage.from(BUCKET_VOICE_MESSAGES).upload(path, blob);
   if (uploadErr){
     if (status) status.textContent = "Voice upload failed: " + uploadErr.message;
     return;
   }
-  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
   const { error } = await _supabase.from("dating_messages").insert({
     profile_id: profileId,
     sender_id: currentUser.id,
     recipient_id: recipientId,
-    voice_url: pub.publicUrl
+    voice_url: path // stored as a path; resolved to a signed URL when the thread renders it
   });
   if (error){
     if (status) status.textContent = "Couldn't send: " + error.message;
@@ -2828,6 +2866,13 @@ async function openThread(thread){
     reactionsByMsg[r.message_id].push(r);
   });
 
+  // Voice clips live in the private dating-voice-messages bucket —
+  // resolve each to a signed URL up front, same approach as post images.
+  const voiceUrls = {};
+  await Promise.all(ordered.filter(m => m.voice_url).map(async m => {
+    voiceUrls[m.id] = await resolvePrivateUrl(BUCKET_VOICE_MESSAGES, m.voice_url);
+  }));
+
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
   const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(isPlatinumActive(thread.profile)) : "";
   const headerPhoto = thread.profile ? ((thread.profile.photos && thread.profile.photos[0]) || thread.profile.photo_url) : null;
@@ -2864,7 +2909,7 @@ async function openThread(thread){
             </span>
           </h3>
           <div id="threadMessages" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin:10px 0; padding-right:5px;">
-            ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [])).join("")}
+            ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [], voiceUrls[m.id])).join("")}
             ${seenHtml}
           </div>
           <div style="background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 15px;">
@@ -2885,7 +2930,7 @@ async function openThread(thread){
 
 const EDIT_WINDOW_MS = 15 * 60 * 1000; 
 
-function renderMessageBubble(m, msgReactions){
+function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   const mine = m.sender_id === currentUser.id;
   const reactionCounts = {};
   msgReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
@@ -2906,7 +2951,9 @@ function renderMessageBubble(m, msgReactions){
 
   const canEdit = mine && !m.voice_url && (Date.now() - new Date(m.created_at).getTime() < EDIT_WINDOW_MS);
   const content = m.voice_url
-    ? `<audio controls src="${esc(m.voice_url)}" style="max-width:220px;height:36px;"></audio>`
+    ? (resolvedVoiceUrl
+        ? `<audio controls src="${esc(resolvedVoiceUrl)}" style="max-width:220px;height:36px;"></audio>`
+        : `<span style="font-size:.8rem;color:#94a3b8;font-style:italic;">Voice message unavailable</span>`)
     : `<span id="msgBody-${m.id}">${esc(m.body || "")}</span>${m.edited_at ? ` <span style="font-size:.7rem;color:#94a3b8;">(edited)</span>` : ""}`;
 
   const ownControls = mine ? `
@@ -3260,17 +3307,19 @@ async function submitVerification(){
   if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
 
   msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading... please wait.</div>`;
-  const path = `dating/verification/${currentUser.id}-${Date.now()}-${file.name}`;
-  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+  // Private bucket — path starts with the uploader's id to match the
+  // write policy, and we store the PATH (not a public URL): only the
+  // uploader and admins can ever read it, via a signed URL.
+  const path = `${currentUser.id}-${Date.now()}-${file.name}`;
+  const { error: uploadErr } = await _supabase.storage.from(BUCKET_VERIFICATION).upload(path, file);
   if (uploadErr){
     msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
     return;
   }
-  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
 
   const { error } = await _supabase.from("dating_verification_requests").insert({
     user_id: currentUser.id,
-    selfie_url: pub.publicUrl
+    selfie_url: path
   });
   if (error){
     msg.innerHTML = `<div class="msg error">Couldn't submit: ${esc(error.message)}</div>`;
@@ -3322,14 +3371,14 @@ async function changeProfilePhoto(index, inputEl){
     return;
   }
 
-  const path = `dating/${currentUser.id}-${Date.now()}-${file.name}`;
-  const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+  const path = `${currentUser.id}-${Date.now()}-${file.name}`;
+  const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file);
   if (uploadErr){
     if (statusEl) statusEl.style.display = "none";
     msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
     return;
   }
-  const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+  const { data: pub } = _supabase.storage.from(BUCKET_PROFILE_PHOTOS).getPublicUrl(path);
 
   const photos = (profile.photos && profile.photos.length ? [...profile.photos] : (profile.photo_url ? [profile.photo_url] : []));
   while (photos.length <= index) photos.push(null);
@@ -3629,14 +3678,14 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   let photoUrls = [];
   const files = Array.from(document.getElementById("fPhoto").files).slice(0, 3);
   for (const file of files){
-    const path = `dating/${currentUser.id}-${Date.now()}-${file.name}`;
-    const { error: uploadErr } = await _supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+    const path = `${currentUser.id}-${Date.now()}-${file.name}`;
+    const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file);
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Photo upload failed: ${uploadErr.message}</div>`;
       btn.disabled = false; btn.textContent = "Publish My Profile";
       return;
     }
-    const { data: pub } = _supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const { data: pub } = _supabase.storage.from(BUCKET_PROFILE_PHOTOS).getPublicUrl(path);
     photoUrls.push(pub.publicUrl);
   }
 
