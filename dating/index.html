@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dating — WanaGebya</title>
 <link rel="stylesheet" href="css/dating.css">
-<link rel="stylesheet" href="css/profile.css">
-<link rel="stylesheet" href="css/messaging.css">
-<link rel="stylesheet" href="css/calls.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <link rel="stylesheet" href="css/messaging.css">
+  <link rel="stylesheet" href="css/calls.css">
 </head>
 <body>
 
@@ -428,19 +428,36 @@
 <audio id="remoteAudio" autoplay></audio>
 
 <!-- SCRIPTS — load order matters: uploads -> app -> auth -> features -->
+<!-- 1. External Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../config.js"></script>
+
+<!-- 2. Global Configuration (Ensure path is correct: config.js or ../config.js) -->
+<script src="config.js"></script>
+
+<!-- 3. Base Utilities & Core Services -->
+<script src="js/i18n.js"></script>
 <script src="js/uploads.js"></script>
-<script src="js/app.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/notifications.js"></script>
+
+<!-- 4. Domain Feature Scripts -->
 <script src="js/profiles.js"></script>
 <script src="js/matching.js"></script>
 <script src="js/messaging.js"></script>
-<script src="js/notifications.js"></script>
 <script src="js/calls.js"></script>
 <script src="js/verification.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/i18n.js"></script>
-<script>initAuth();</script>
+
+<!-- 5. App Orchestrator / Entry Point (ALWAYS LAST) -->
+<script src="js/app.js"></script>
+
+<!-- 6. Trigger App Initialization -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initAuth === 'function') {
+      initAuth();
+    }
+  });
+</script>
 </body>
 </html>
