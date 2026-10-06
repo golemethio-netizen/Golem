@@ -377,6 +377,20 @@
             <div id="verificationList">
                 <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
             </div>
+
+            <h3 style="margin:32px 0 6px;"><i class="fas fa-gem" style="color:#B8860B;"></i> Dating — Platinum Requests</h3>
+            <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Members who paid by bank transfer / Telebirr and submitted a transaction number. Verify the transaction against your real account before approving — approving immediately activates their plan.</p>
+            <div style="display:flex; gap:10px; margin-bottom:18px;">
+                <select id="platinumFilterStatus" onchange="loadPlatinumRequests()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div id="platinumRequestsList">
+                <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+            </div>
         </section>
 
         <!-- CATEGORIES SECTION -->
@@ -665,6 +679,7 @@
                 loadDatingProfiles(true);
                 loadPostReports();
                 loadVerificationRequests();
+                loadPlatinumRequests();
             } else {
                 itemsSection.style.display = 'block';
                 viewTitle.innerText = status.toUpperCase() + " ITEMS";
@@ -683,6 +698,8 @@
             const { count: openReports } = await _supabase.from('product_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
             const { count: openDatingReports } = await _supabase.from('dating_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
             const { count: pendingVerifications } = await _supabase.from('dating_verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+            const { count: openPostReports } = await _supabase.from('dating_post_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
+            const { count: pendingPlatinumRequests } = await _supabase.from('dating_platinum_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
 
             const marketValue = priceData?.reduce((sum, item) => sum + (item.price || 0), 0) || 0;
             
@@ -706,7 +723,7 @@
 
             const datingReportsBadge = document.getElementById('datingReportsBadge');
             if (datingReportsBadge) {
-                const datingTotal = (openDatingReports || 0) + (pendingVerifications || 0);
+                const datingTotal = (openDatingReports || 0) + (pendingVerifications || 0) + (openPostReports || 0) + (pendingPlatinumRequests || 0);
                 datingReportsBadge.innerText = datingTotal;
                 datingReportsBadge.style.display = datingTotal > 0 ? 'inline-block' : 'none';
             }
@@ -1089,6 +1106,83 @@
             const note = prompt('Optional note for the user on why this was rejected (shown to them):');
             if (note === null) return; // cancelled
             resolveVerification(requestId, 'rejected', note.trim() || null);
+        }
+
+        async function loadPlatinumRequests() {
+            const container = document.getElementById('platinumRequestsList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('platinumFilterStatus').value;
+            let query = _supabase.from('dating_platinum_requests')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: requests, error } = await query;
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>` +
+                    (error.message.includes('does not exist') ? '<p style="color:#999;font-size:0.8rem;">Run dating-migration-v32-platinum-requests.sql first.</p>' : '');
+                return;
+            }
+
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No Platinum requests here.</p>';
+                return;
+            }
+
+            const userIds = [...new Set(requests.map(r => r.user_id))];
+            const { data: profiles } = await _supabase.from('dating_profiles').select('user_id, display_name, age, city, photo_url, photos').in('user_id', userIds);
+            const profileMap = {};
+            (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+            const planLabel = { weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly' };
+
+            container.innerHTML = requests.map(r => {
+                const profile = profileMap[r.user_id];
+                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
+                return `
+                    <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                ${profilePhoto ? `<img src="${escapeHtml(profilePhoto)}" style="width:40px; height:40px; object-fit:cover; border-radius:50%;">` : ''}
+                                <strong style="font-size:0.85rem;">${profile ? escapeHtml(profile.display_name || 'Profile') + (profile.age ? ', ' + profile.age : '') + (profile.city ? ' · ' + escapeHtml(profile.city) : '') : 'Profile removed'}</strong>
+                            </div>
+                            <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        <div style="margin:10px 0; background:#fffbee; border:1px solid #fce3b4; border-radius:8px; padding:10px 12px; font-size:0.82rem;">
+                            <div><strong>${escapeHtml(planLabel[r.plan] || r.plan)}</strong> plan · ${r.amount_birr} Birr</div>
+                            <div style="margin-top:4px;">Transaction #: <code style="background:#fff;padding:2px 6px;border-radius:4px;">${escapeHtml(r.transaction_number)}</code></div>
+                        </div>
+                        <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Submitted ${new Date(r.created_at).toLocaleDateString()}${r.reviewed_at ? ' · reviewed ' + new Date(r.reviewed_at).toLocaleDateString() : ''}</p>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            ${r.status === 'pending' ? `
+                                <button onclick="resolvePlatinumRequest('${r.id}', 'approved')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve &amp; Activate</button>
+                                <button onclick="promptRejectPlatinumRequest('${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ff4757; color:#ff4757; background:white; border-radius:5px; cursor:pointer;">Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolvePlatinumRequest(requestId, newStatus, note) {
+            if (newStatus === 'approved' && !confirm('Confirm you have verified this transaction number against your real bank/Telebirr account before approving?')) return;
+            const update = { status: newStatus };
+            if (note) update.reviewer_note = note;
+            // Approving this row triggers dating_apply_platinum_request() server-side
+            // (v32), which calls dating_grant_platinum() in the same transaction —
+            // the plan activates immediately, there's no separate grant step needed.
+            const { error } = await _supabase.from('dating_platinum_requests').update(update).eq('id', requestId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'approved' ? 'Platinum Request Approved' : 'Platinum Request Rejected', `Request ID: ${requestId}`);
+            loadPlatinumRequests();
+            loadStats();
+        }
+
+        function promptRejectPlatinumRequest(requestId) {
+            const note = prompt('Optional note for the user on why this was rejected (shown to them):');
+            if (note === null) return; // cancelled
+            resolvePlatinumRequest(requestId, 'rejected', note.trim() || null);
         }
 
         async function rejectReportedProduct(productId, reportId) {
