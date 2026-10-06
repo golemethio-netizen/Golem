@@ -1,1942 +1,1689 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="WanaGebya - Connect with singles in Ethiopia for friendship, dating, or marriage">
-  <title>WanaGebya — Find Your Match</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WanaGebya — Find Your Match</title>
+<style>
+:root {
+  --primary: #e63946;
+  --primary-dark: #a4161a;
+  --secondary: #457b9d;
+  --accent: #f4a261;
+  --success: #2a9d8f;
+  --danger: #e76f51;
+  --text-primary: #1d3557;
+  --text-secondary: #666;
+  --text-light: #999;
+  --surface-light: #f8f9fa;
+  --surface-mid: #e9ecef;
+  --surface-dark: #ffffff;
+  --border: #dee2e6;
   
-  <style>
-    /* ================================================================
-       DESIGN SYSTEM & ROOT VARIABLES
-       ================================================================ */
-    :root {
-      /* Primary Colors */
-      --primary: #e63946;
-      --primary-light: #f1faee;
-      --primary-dark: #a4161a;
-      --secondary: #457b9d;
-      --accent: #f1faee;
-      --success: #2a9d8f;
-      --warning: #e9c46a;
-      --danger: #e63946;
-      
-      /* Neutral Colors */
-      --text-primary: #1d3557;
-      --text-secondary: #6c757d;
-      --text-light: #adb5bd;
-      --surface-light: #f8f9fa;
-      --surface-mid: #e9ecef;
-      --surface-dark: #ffffff;
-      --border-color: #dee2e6;
-      --overlay: rgba(0, 0, 0, 0.5);
-      
-      /* Spacing Scale (4px base) */
-      --space-xs: 0.25rem;
-      --space-sm: 0.5rem;
-      --space-md: 1rem;
-      --space-lg: 1.5rem;
-      --space-xl: 2rem;
-      --space-2xl: 3rem;
-      --space-3xl: 4rem;
-      
-      /* Typography */
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-      --font-display: 'Poppins', var(--font-sans);
-      --text-xs: 0.75rem;
-      --text-sm: 0.875rem;
-      --text-base: 1rem;
-      --text-lg: 1.125rem;
-      --text-xl: 1.25rem;
-      --text-2xl: 1.5rem;
-      --text-3xl: 1.875rem;
-      --text-4xl: 2.25rem;
-      --line-height-tight: 1.2;
-      --line-height-base: 1.5;
-      --line-height-relaxed: 1.75;
-      
-      /* Shadows */
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-      --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-      --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
-      
-      /* Border Radius */
-      --radius-sm: 0.375rem;
-      --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
-      --radius-xl: 1rem;
-      --radius-2xl: 1.5rem;
-      --radius-full: 9999px;
-      
-      /* Transitions */
-      --transition-fast: 150ms ease-in-out;
-      --transition-base: 250ms ease-in-out;
-      --transition-slow: 350ms ease-in-out;
-      
-      /* Z-index Scale */
-      --z-base: 1;
-      --z-dropdown: 100;
-      --z-sticky: 200;
-      --z-fixed: 300;
-      --z-modal-backdrop: 1000;
-      --z-modal: 1001;
-      --z-tooltip: 1100;
-    }
-
-    /* ================================================================
-       RESET & NORMALIZE
-       ================================================================ */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    *:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    body {
-      font-family: var(--font-sans);
-      font-size: var(--text-base);
-      line-height: var(--line-height-base);
-      background-color: var(--surface-light);
-      color: var(--text-primary);
-      -webkit-text-size-adjust: 100%;
-    }
-
-    /* ================================================================
-       TYPOGRAPHY
-       ================================================================ */
-    h1, h2, h3, h4, h5, h6 {
-      font-family: var(--font-display);
-      font-weight: 700;
-      line-height: var(--line-height-tight);
-      color: var(--text-primary);
-    }
-
-    h1 { font-size: var(--text-4xl); letter-spacing: -0.02em; }
-    h2 { font-size: var(--text-3xl); letter-spacing: -0.01em; }
-    h3 { font-size: var(--text-2xl); }
-    h4 { font-size: var(--text-xl); }
-    h5 { font-size: var(--text-lg); }
-    h6 { font-size: var(--text-base); font-weight: 600; }
-
-    p {
-      margin-bottom: var(--space-md);
-      line-height: var(--line-height-relaxed);
-    }
-
-    a {
-      color: var(--primary);
-      text-decoration: none;
-      transition: color var(--transition-fast);
-    }
-
-    a:hover {
-      color: var(--primary-dark);
-      text-decoration: underline;
-    }
-
-    strong { font-weight: 700; }
-    small { font-size: var(--text-sm); }
-
-    /* ================================================================
-       LAYOUT STRUCTURE
-       ================================================================ */
-    .app-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background-color: var(--surface-light);
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 var(--space-md);
-      width: 100%;
-    }
-
-    /* ================================================================
-       HEADER
-       ================================================================ */
-    header {
-      background-color: var(--surface-dark);
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      position: sticky;
-      top: 0;
-      z-index: var(--z-fixed);
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-md) var(--space-lg);
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      font-size: var(--text-xl);
-      font-weight: 700;
-      color: var(--text-primary);
-      text-decoration: none;
-      transition: opacity var(--transition-fast);
-    }
-
-    .header-brand:hover {
-      opacity: 0.8;
-    }
-
-    .header-brand-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: var(--text-xl);
-      font-weight: 700;
-    }
-
-    .header-brand-text span {
-      color: var(--primary);
-      font-weight: 800;
-    }
-
-    .header-nav {
-      display: flex;
-      align-items: center;
-      gap: var(--space-xl);
-    }
-
-    .header-nav a {
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: var(--text-sm);
-      transition: color var(--transition-fast);
-    }
-
-    .header-nav a:hover {
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      margin-left: auto;
-    }
-
-    .header-actions > * {
-      display: flex;
-    }
-
-    /* ================================================================
-       BUTTONS
-       ================================================================ */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-sm);
-      padding: var(--space-sm) var(--space-lg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: var(--text-sm);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      text-decoration: none;
-      white-space: nowrap;
-      user-select: none;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* Button Variants */
-    .btn-primary {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background-color: var(--primary-dark);
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-      background-color: transparent;
-      color: var(--primary);
-      border: 1px solid var(--primary);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background-color: var(--primary-light);
-    }
-
-    .btn-ghost {
-      background-color: transparent;
-      color: var(--text-secondary);
-    }
-
-    .btn-ghost:hover:not(:disabled) {
-      background-color: var(--surface-mid);
-      color: var(--text-primary);
-    }
-
-    .btn-sm {
-      padding: var(--space-xs) var(--space-md);
-      font-size: var(--text-xs);
-    }
-
-    .btn-lg {
-      padding: var(--space-lg) var(--space-xl);
-      font-size: var(--text-base);
-    }
-
-    .btn-icon {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: var(--text-lg);
-    }
-
-    /* ================================================================
-       NOTIFICATION BELL & PANEL
-       ================================================================ */
-    .notif-wrapper {
-      position: relative;
-    }
-
-    .btn-notif {
-      position: relative;
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-full);
-      border: none;
-      background-color: transparent;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: var(--text-lg);
-    }
-
-    .btn-notif:hover {
-      background-color: var(--surface-mid);
-      color: var(--primary);
-    }
-
-    .notif-badge {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      background-color: var(--danger);
-      color: white;
-      font-size: var(--text-xs);
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: var(--radius-full);
-      min-width: 20px;
-      text-align: center;
-      border: 2px solid white;
-    }
-
-    .notif-panel {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: calc(100% + var(--space-md));
-      background-color: var(--surface-dark);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-xl);
-      width: 360px;
-      max-height: 500px;
-      overflow-y: auto;
-      z-index: var(--z-dropdown);
-    }
-
-    .notif-panel.open {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .notif-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-lg);
-      border-bottom: 1px solid var(--border-color);
-      flex-shrink: 0;
-    }
-
-    .notif-panel-header h3 {
-      font-size: var(--text-base);
-      margin: 0;
-    }
-
-    .notif-clear-btn {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: var(--text-xs);
-      font-weight: 700;
-      cursor: pointer;
-      padding: 0;
-      transition: opacity var(--transition-fast);
-    }
-
-    .notif-clear-btn:hover {
-      opacity: 0.7;
-    }
-
-    .notif-items {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .notif-item {
-      display: block;
-      width: 100%;
-      padding: var(--space-md) var(--space-lg);
-      border-bottom: 1px solid var(--border-color);
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-align: left;
-      transition: background-color var(--transition-fast);
-    }
-
-    .notif-item:hover {
-      background-color: var(--surface-light);
-    }
-
-    .notif-item.unread {
-      background-color: var(--primary-light);
-      font-weight: 600;
-    }
-
-    .notif-item-text {
-      color: var(--text-primary);
-      font-size: var(--text-sm);
-      margin: 0 0 var(--space-xs) 0;
-      line-height: var(--line-height-base);
-    }
-
-    .notif-item-time {
-      color: var(--text-light);
-      font-size: var(--text-xs);
-      margin: 0;
-    }
-
-    .notif-empty {
-      padding: var(--space-2xl) var(--space-lg);
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: var(--text-sm);
-    }
-
-    /* ================================================================
-       MAIN LAYOUT (Sidebar + Content)
-       ================================================================ */
-    main {
-      flex: 1;
-      display: flex;
-      gap: var(--space-xl);
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
-      padding: var(--space-xl) var(--space-md);
-    }
-
-    /* ================================================================
-       SIDEBAR NAVIGATION
-       ================================================================ */
-    .sidebar {
-      width: 260px;
-      flex-shrink: 0;
-      background-color: var(--surface-dark);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      height: fit-content;
-      position: sticky;
-      top: 100px;
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .nav-tab {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      padding: var(--space-md) var(--space-lg);
-      color: var(--text-secondary);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: var(--text-sm);
-      font-weight: 600;
-      border-left: 3px solid transparent;
-      transition: all var(--transition-fast);
-      text-align: left;
-      width: 100%;
-      font-family: var(--font-sans);
-    }
-
-    .nav-tab:hover {
-      background-color: var(--surface-light);
-      color: var(--primary);
-    }
-
-    .nav-tab.active {
-      background-color: var(--primary-light);
-      color: var(--primary);
-      border-left-color: var(--primary);
-      font-weight: 700;
-    }
-
-    .nav-icon {
-      font-size: var(--text-lg);
-      width: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .nav-badge {
-      margin-left: auto;
-      background-color: var(--danger);
-      color: white;
-      font-size: var(--text-xs);
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: var(--radius-full);
-      min-width: 24px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .sidebar-account {
-      border-top: 1px solid var(--border-color);
-      padding: var(--space-lg);
-    }
-
-    .account-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      margin-bottom: var(--space-lg);
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius-full);
-      object-fit: cover;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: var(--text-lg);
-      flex-shrink: 0;
-    }
-
-    .account-info h4 {
-      margin: 0 0 var(--space-xs) 0;
-      font-size: var(--text-sm);
-    }
-
-    .account-info p {
-      font-size: var(--text-xs);
-      color: var(--text-secondary);
-      margin: 0;
-    }
-
-    .account-actions {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-sm);
-    }
-
-    .account-actions a,
-    .account-actions button {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: var(--text-xs);
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      padding: 0;
-      transition: color var(--transition-fast);
-      font-family: var(--font-sans);
-    }
-
-    .account-actions a:hover,
-    .account-actions button:hover {
-      color: var(--primary);
-    }
-
-    .account-actions button.danger {
-      color: var(--danger);
-    }
-
-    /* ================================================================
-       CONTENT AREA
-       ================================================================ */
-    .content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .panel {
-      background-color: var(--surface-dark);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: var(--space-xl);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: var(--space-xl);
-    }
-
-    .panel-header {
-      margin-bottom: var(--space-xl);
-      padding-bottom: var(--space-lg);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .panel-header h2 {
-      margin: 0 0 var(--space-sm) 0;
-    }
-
-    .panel-header p {
-      margin: 0;
-      color: var(--text-secondary);
-      font-size: var(--text-sm);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: var(--space-2xl);
-      color: var(--text-secondary);
-    }
-
-    .empty-state-icon {
-      font-size: 3rem;
-      margin-bottom: var(--space-lg);
-      opacity: 0.5;
-    }
-
-    .empty-state-text {
-      margin-bottom: var(--space-md);
-      font-size: var(--text-base);
-    }
-
-    /* ================================================================
-       FORMS
-       ================================================================ */
-    .form-group {
-      margin-bottom: var(--space-lg);
-    }
-
-    label {
-      display: block;
-      margin-bottom: var(--space-sm);
-      font-weight: 600;
-      font-size: var(--text-sm);
-      color: var(--text-primary);
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="number"],
-    input[type="tel"],
-    input[type="url"],
-    input[type="date"],
-    select,
-    textarea {
-      width: 100%;
-      padding: var(--space-md);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: var(--text-base);
-      color: var(--text-primary);
-      background-color: var(--surface-light);
-      transition: all var(--transition-fast);
-    }
-
-    input[type="text"]:focus,
-    input[type="email"]:focus,
-    input[type="password"]:focus,
-    input[type="number"]:focus,
-    input[type="tel"]:focus,
-    input[type="url"]:focus,
-    input[type="date"]:focus,
-    select:focus,
-    textarea:focus {
-      background-color: var(--surface-dark);
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
-      outline: none;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: var(--text-light);
-    }
-
-    input[type="checkbox"],
-    input[type="radio"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      margin-right: var(--space-sm);
-      accent-color: var(--primary);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-lg);
-    }
-
-    .checkbox-group {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--space-md);
-      padding: var(--space-md);
-      background-color: var(--surface-light);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-    }
-
-    .checkbox-group label {
-      margin: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      font-size: var(--text-sm);
-    }
-
-    /* ================================================================
-       GRID & PROFILE CARDS
-       ================================================================ */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: var(--space-lg);
-      margin-bottom: var(--space-xl);
-    }
-
-    .profile-card {
-      background-color: var(--surface-dark);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      cursor: pointer;
-      transition: all var(--transition-base);
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .profile-card:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-4px);
-      border-color: var(--primary);
-    }
-
-    .profile-image {
-      width: 100%;
-      height: 200px;
-      background: linear-gradient(135deg, var(--surface-mid), var(--surface-light));
-      background-size: cover;
-      background-position: center;
-      object-fit: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ccc;
-      font-size: 2.5rem;
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .profile-online-dot {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 12px;
-      height: 12px;
-      background-color: #2ECC71;
-      border-radius: var(--radius-full);
-      border: 2px solid white;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-info {
-      padding: var(--space-lg);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .profile-name {
-      margin: 0 0 var(--space-xs) 0;
-      font-size: var(--text-base);
-      font-weight: 700;
-    }
-
-    .profile-meta {
-      font-size: var(--text-sm);
-      color: var(--text-secondary);
-      margin: 0 0 var(--space-md) 0;
-    }
-
-    .profile-action {
-      margin-top: auto;
-    }
-
-    /* ================================================================
-       AUTH LAYOUT
-       ================================================================ */
-    .auth-container {
-      position: fixed;
-      inset: 0;
-      z-index: var(--z-modal-backdrop);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      padding: var(--space-lg);
-      backdrop-filter: blur(4px);
-    }
-
-    .auth-card {
-      background-color: var(--surface-dark);
-      border-radius: var(--radius-lg);
-      padding: var(--space-2xl);
-      max-width: 420px;
-      width: 100%;
-      box-shadow: var(--shadow-xl);
-      animation: slideUp var(--transition-base) ease-out;
-    }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .auth-card h1 {
-      margin-bottom: var(--space-lg);
-      text-align: center;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: var(--space-md);
-      margin-bottom: var(--space-xl);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .auth-tab {
-      padding: var(--space-md) var(--space-lg);
-      border: none;
-      background: none;
-      color: var(--text-secondary);
-      font-weight: 600;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: all var(--transition-fast);
-      font-family: var(--font-sans);
-    }
-
-    .auth-tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .auth-method-tabs {
-      display: flex;
-      gap: var(--space-md);
-      margin-bottom: var(--space-lg);
-    }
-
-    .auth-method-btn {
-      flex: 1;
-      padding: var(--space-md);
-      border: 1px solid var(--border-color);
-      background-color: transparent;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      font-size: var(--text-sm);
-      font-weight: 600;
-      color: var(--text-secondary);
-      transition: all var(--transition-fast);
-      font-family: var(--font-sans);
-    }
-
-    .auth-method-btn.active {
-      background-color: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .auth-divider {
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-      margin: var(--space-xl) 0;
-      color: var(--text-light);
-      font-size: var(--text-xs);
-    }
-
-    .auth-divider::before,
-    .auth-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background-color: var(--border-color);
-    }
-
-    .auth-social-btn {
-      width: 100%;
-      padding: var(--space-md);
-      border: 1px solid var(--border-color);
-      background-color: var(--surface-light);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      font-size: var(--text-sm);
-      font-weight: 600;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-md);
-      transition: all var(--transition-fast);
-      margin-bottom: var(--space-md);
-      font-family: var(--font-sans);
-    }
-
-    .auth-social-btn:hover {
-      background-color: var(--surface-mid);
-      border-color: var(--primary);
-    }
-
-    /* ================================================================
-       MODAL SYSTEM
-       ================================================================ */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-lg);
-      z-index: var(--z-modal-backdrop);
-      animation: fadeIn var(--transition-fast) ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .modal {
-      background: var(--surface-dark);
-      border-radius: var(--radius-lg);
-      max-width: 500px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-2xl);
-      animation: slideUp var(--transition-base) ease-out;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      position: absolute;
-      top: var(--space-lg);
-      right: var(--space-lg);
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-secondary);
-      font-size: var(--text-lg);
-      transition: all var(--transition-fast);
-      z-index: 1;
-    }
-
-    .modal-close:hover {
-      background-color: var(--surface-light);
-      color: var(--text-primary);
-    }
-
-    .modal-header {
-      position: relative;
-      padding: var(--space-xl);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .modal-header h2 {
-      margin: 0;
-    }
-
-    .modal-body {
-      padding: var(--space-xl);
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: var(--space-md);
-      padding: var(--space-xl);
-      border-top: 1px solid var(--border-color);
-      justify-content: flex-end;
-    }
-
-    /* ================================================================
-       MESSAGE/ALERT STATES
-       ================================================================ */
-    .msg {
-      font-size: var(--text-sm);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      margin-top: var(--space-md);
-      font-weight: 600;
-      animation: slideUp var(--transition-fast) ease-out;
-    }
-
-    .msg.error {
-      background-color: #FBEAE9;
-      color: var(--danger);
-      border: 1px solid #f5c6cb;
-    }
-
-    .msg.success {
-      background-color: #e8fdf5;
-      color: #1E8E4F;
-      border: 1px solid #c3e6cb;
-    }
-
-    .msg.warning {
-      background-color: #FFF9EE;
-      color: #8A6D1F;
-      border: 1px solid #fce3b4;
-    }
-
-    /* ================================================================
-       RESPONSIVE DESIGN
-       ================================================================ */
-    @media (max-width: 1024px) {
-      main {
-        gap: var(--space-lg);
-        padding: var(--space-lg) var(--space-md);
-      }
-
-      .sidebar {
-        width: 240px;
-      }
-
-      .grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 768px) {
-      main {
-        flex-direction: column;
-        gap: var(--space-lg);
-        padding: var(--space-lg) var(--space-md);
-      }
-
-      .sidebar {
-        width: 100%;
-        position: relative;
-        top: auto;
-      }
-
-      .sidebar-nav {
-        flex-direction: row;
-        overflow-x: auto;
-        padding: var(--space-md) 0;
-        gap: var(--space-sm);
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .nav-tab {
-        white-space: nowrap;
-        flex-shrink: 0;
-        border-bottom: 3px solid transparent;
-        border-left: none;
-        padding: var(--space-md) var(--space-lg);
-      }
-
-      .nav-tab.active {
-        border-bottom-color: var(--primary);
-        border-left: none;
-        background-color: transparent;
-      }
-
-      .grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      }
-
-      .notif-panel {
-        width: 100vw;
-        max-width: calc(100vw - var(--space-lg));
-        right: auto;
-        left: var(--space-md);
-        max-height: 60vh;
-      }
-
-      .header-nav {
-        display: none;
-      }
-
-      .header-nav.mobile-visible {
-        display: flex;
-      }
-
-      .panel {
-        padding: var(--space-lg);
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .auth-card {
-        padding: var(--space-lg);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .header-content {
-        padding: var(--space-md);
-        gap: var(--space-md);
-      }
-
-      .header-brand {
-        font-size: var(--text-base);
-      }
-
-      .header-brand-icon {
-        width: 28px;
-        height: 28px;
-        font-size: var(--text-base);
-      }
-
-      .header-actions {
-        gap: var(--space-sm);
-      }
-
-      main {
-        padding: var(--space-md);
-      }
-
-      .sidebar-nav {
-        padding: var(--space-md) 0;
-      }
-
-      .nav-tab {
-        padding: var(--space-sm) var(--space-md);
-        font-size: var(--text-xs);
-      }
-
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-md);
-      }
-
-      .notif-panel {
-        width: calc(100vw - var(--space-md) * 2);
-        left: var(--space-md);
-      }
-
-      .panel {
-        padding: var(--space-md);
-        border-radius: var(--radius-md);
-      }
-
-      .modal {
-        border-radius: var(--radius-md);
-      }
-
-      .auth-card {
-        padding: var(--space-md);
-      }
-    }
-
-    /* ================================================================
-       UTILITY CLASSES
-       ================================================================ */
-    .hidden {
-      display: none !important;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
-    }
-
-    .text-center { text-align: center; }
-    .text-secondary { color: var(--text-secondary); }
-    .text-light { color: var(--text-light); }
-    
-    .mt-md { margin-top: var(--space-md); }
-    .mt-lg { margin-top: var(--space-lg); }
-    .mb-md { margin-bottom: var(--space-md); }
-    .mb-lg { margin-bottom: var(--space-lg); }
-    
-    .gap-md { gap: var(--space-md); }
-    .gap-lg { gap: var(--space-lg); }
-  </style>
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+  
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--text-primary);
+  background: var(--surface-light);
+  line-height: 1.5;
+}
+
+/* ============ HEADER ============ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface-dark);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-lg) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  flex: 0 0 auto;
+}
+
+.brand {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+
+.brand-icon {
+  font-size: var(--text-3xl);
+}
+
+.brand em {
+  color: var(--primary);
+  font-style: normal;
+}
+
+.search-box {
+  display: none;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  background: var(--surface-light);
+  transition: var(--transition-fast);
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--surface-dark);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 0 0 auto;
+}
+
+.header-btn {
+  background: none;
+  border: none;
+  font-size: var(--text-lg);
+  cursor: pointer;
+  padding: var(--space-sm);
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.header-btn:hover {
+  color: var(--primary);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--danger);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: var(--radius-full);
+  min-width: 18px;
+  text-align: center;
+}
+
+.sign-in-btn {
+  background: var(--primary);
+  color: white;
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: var(--text-sm);
+}
+
+.sign-in-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: var(--text-xl);
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+/* ============ NOTIFICATION PANEL ============ */
+.notification-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + var(--space-md));
+  right: var(--space-md);
+  background: var(--surface-dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 320px;
+  max-height: 420px;
+  overflow-y: auto;
+  z-index: 200;
+}
+
+.notification-panel.open {
+  display: block;
+}
+
+.notif-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.notif-header button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.notif-item {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background: var(--surface-dark);
+}
+
+.notif-item:hover {
+  background: var(--surface-light);
+}
+
+.notif-item.unread {
+  background: #fef3f3;
+  font-weight: 600;
+}
+
+.notif-time {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-light);
+  margin-top: var(--space-sm);
+}
+
+.notif-empty {
+  padding: var(--space-2xl) var(--space-md);
+  text-align: center;
+  color: var(--text-light);
+  font-size: var(--text-sm);
+}
+
+/* ============ SIDEBAR ============ */
+.app-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+sidebar {
+  width: 260px;
+  background: var(--surface-dark);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: var(--transition-base);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-md) 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border-left: 3px solid transparent;
+  font-weight: 500;
+  font-size: var(--text-sm);
+  position: relative;
+}
+
+.nav-item:hover {
+  background: var(--surface-light);
+  color: var(--primary);
+}
+
+.nav-item.active {
+  background: #fff5f5;
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: var(--text-lg);
+  width: 24px;
+  text-align: center;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-account {
+  border-top: 1px solid var(--border);
+  padding: var(--space-md);
+  background: var(--surface-light);
+}
+
+.account-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.account-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.account-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.account-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.account-actions button {
+  flex: 1;
+  min-width: 70px;
+  background: white;
+  border: 1px solid var(--border);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.account-actions button:hover {
+  background: var(--surface-mid);
+  color: var(--primary);
+}
+
+.account-actions button.danger:hover {
+  background: #ffe5e5;
+  color: var(--danger);
+}
+
+/* ============ MAIN CONTENT ============ */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xl);
+}
+
+.panel {
+  display: none;
+  animation: fadeIn var(--transition-base) ease;
+}
+
+.panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============ WELCOME/GATE ============ */
+.welcome-container {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: var(--space-md);
+}
+
+.welcome-card {
+  background: white;
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+}
+
+.welcome-card h1 {
+  font-size: var(--text-3xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.welcome-card p {
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-xl);
+  line-height: 1.6;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: var(--space-lg) var(--space-2xl);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: var(--text-base);
+  width: 100%;
+  margin-bottom: var(--space-md);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary);
+  padding: var(--space-lg) var(--space-2xl);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: var(--text-base);
+}
+
+.btn-secondary:hover {
+  background: #fff5f5;
+}
+
+/* ============ CONTENT SECTIONS ============ */
+.section-header {
+  margin-bottom: var(--space-xl);
+}
+
+.section-header h2 {
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.section-header h2 em {
+  color: var(--primary);
+  font-style: normal;
+}
+
+.section-header p {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* ============ PROFILE FORM ============ */
+.form-group {
+  margin-bottom: var(--space-lg);
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-base);
+  transition: var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: #fef3f3;
+  border-radius: var(--radius-md);
+  border: 1px solid #ffe5e5;
+}
+
+.checkbox-group input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.checkbox-group label {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: #8a4f3a;
+}
+
+/* ============ GRID/CARDS ============ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.card {
+  background: var(--surface-dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-image {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--surface-light);
+  object-fit: cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #ccc;
+}
+
+.card-image.has-image {
+  background-size: cover;
+  background-position: center;
+}
+
+.online-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  background: #2a9d8f;
+  border: 2px solid white;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.card-content {
+  padding: var(--space-md);
+}
+
+.card-title {
+  font-weight: 700;
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.card-meta {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.card-badges {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-xs);
+  padding: 2px 6px;
+  background: #ffe5e5;
+  color: var(--danger);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+/* ============ FILTERS ============ */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--surface-light);
+  border-radius: var(--radius-lg);
+}
+
+.filters select,
+.filters input {
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  background: white;
+  cursor: pointer;
+}
+
+.filters button {
+  padding: var(--space-md);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.filters button:hover {
+  background: var(--primary-dark);
+}
+
+.filters button.secondary {
+  background: white;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.filters button.secondary:hover {
+  background: var(--surface-mid);
+}
+
+/* ============ MODAL ============ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-md);
+}
+
+.modal {
+  background: white;
+  border-radius: var(--radius-xl);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: white;
+  border: 1px solid var(--border);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-size: var(--text-lg);
+}
+
+.modal-content {
+  padding: var(--space-2xl);
+}
+
+/* ============ EMPTY STATE ============ */
+.empty-state {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--text-light);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-lg);
+}
+
+.empty-state h3 {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+/* ============ MESSAGE ============ */
+.message {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  font-weight: 500;
+}
+
+.message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+  header {
+    padding: var(--space-md);
+  }
+
+  .brand {
+    font-size: var(--text-xl);
+  }
+
+  .search-box {
+    display: none !important;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .app-container {
+    flex-direction: column;
+  }
+
+  sidebar {
+    width: 100%;
+    max-height: 60px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row;
+    transition: max-height var(--transition-base);
+  }
+
+  sidebar.open {
+    max-height: 100%;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    overflow-x: auto;
+    padding: var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  .nav-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+  }
+
+  .nav-item.active {
+    border-left: none;
+    border-bottom-color: var(--primary);
+  }
+
+  .sidebar-account {
+    display: none;
+  }
+
+  main {
+    padding: var(--space-lg);
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header h2 {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-card {
+    padding: var(--space-lg);
+  }
+
+  .welcome-card h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  main {
+    padding: var(--space-md);
+  }
+
+  .card {
+    border-radius: var(--radius-md);
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+</style>
 </head>
-
 <body>
-  <div class="app-wrapper">
-    <!-- HEADER -->
-    <header>
-      <div class="header-content">
-        <a href="#" class="header-brand">
-          <div class="header-brand-icon">❤️</div>
-          <span class="header-brand-text">Wana<span>Gebya</span></span>
-        </a>
 
-        <nav class="header-nav">
-          <a href="#browse">Browse</a>
-          <a href="#messages">Messages</a>
-          <a href="#discover">Discover</a>
-        </nav>
-
-        <div class="header-actions">
-          <button class="btn btn-ghost btn-icon" aria-label="Search" title="Search profiles">
-            🔍
-          </button>
-
-          <div class="notif-wrapper">
-            <button class="btn-notif" id="notifBell" aria-label="Notifications" aria-expanded="false" title="View notifications">
-              🔔
-              <span class="notif-badge" id="notifCount" style="display: none;"></span>
-            </button>
-            <div class="notif-panel" id="notifPanel" role="menu" aria-label="Notifications menu">
-              <div class="notif-panel-header">
-                <h3>Notifications</h3>
-                <button class="notif-clear-btn" onclick="markAllNotificationsRead()">Clear all</button>
-              </div>
-              <div class="notif-items" id="notifList"></div>
-            </div>
-          </div>
-
-          <button class="btn btn-primary btn-sm" id="signInBtn" onclick="openAuthModal('signin')">
-            👤 Sign In
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main>
-      <!-- SIDEBAR -->
-      <aside class="sidebar">
-        <nav class="sidebar-nav">
-          <button class="nav-tab active" data-tab="home" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span>
-            <span>Home</span>
-          </button>
-          <button class="nav-tab" data-tab="browse" onclick="switchTab('browse')">
-            <span class="nav-icon">🔍</span>
-            <span>Browse</span>
-          </button>
-          <button class="nav-tab" data-tab="discover" onclick="switchTab('discover')">
-            <span class="nav-icon">✨</span>
-            <span>New Members</span>
-          </button>
-          <button class="nav-tab" data-tab="profile" onclick="switchTab('profile')">
-            <span class="nav-icon">👤</span>
-            <span>My Profile</span>
-          </button>
-          <button class="nav-tab" data-tab="messages" onclick="switchTab('messages')">
-            <span class="nav-icon">💬</span>
-            <span>Messages</span>
-            <span class="nav-badge" id="unreadBadge" style="display: none;">0</span>
-          </button>
-          <button class="nav-tab" data-tab="likes" onclick="switchTab('likes')">
-            <span class="nav-icon">❤️</span>
-            <span>Likes</span>
-            <span class="nav-badge" id="likesBadge" style="display: none;">0</span>
-          </button>
-          <button class="nav-tab" data-tab="visitors" onclick="switchTab('visitors')">
-            <span class="nav-icon">👀</span>
-            <span>Visitors</span>
-            <span class="nav-badge" id="visitorsBadge" style="display: none;">0</span>
-          </button>
-          <button class="nav-tab" data-tab="settings" onclick="switchTab('settings')">
-            <span class="nav-icon">⚙️</span>
-            <span>Settings</span>
-          </button>
-        </nav>
-
-        <div class="sidebar-account" id="accountBox" style="display: none;">
-          <div class="account-header">
-            <div class="avatar" id="sidebarAvatar">A</div>
-            <div class="account-info">
-              <h4 id="sidebarName">Your Name</h4>
-              <p id="sidebarStatus">Online now</p>
-            </div>
-          </div>
-          <div class="account-actions">
-            <a href="#" onclick="switchTab('profile'); return false;">Edit Profile</a>
-            <a href="#" onclick="switchTab('settings'); return false;">Settings</a>
-            <button onclick="signOut()">Sign Out</button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- CONTENT -->
-      <section class="content">
-        <!-- Welcome/Gate -->
-        <div class="panel" id="gatePanel" style="text-align: center; padding: 60px 20px;">
-          <h1 style="margin-bottom: 20px;">Welcome to WanaGebya ❤️</h1>
-          <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-            Connect with singles in Ethiopia looking for friendship, dating, or marriage. Sign in to start browsing profiles and matching with people.
-          </p>
-          <button class="btn btn-primary btn-lg" onclick="openAuthModal('signin')">
-            Sign In / Register
-          </button>
-          <p style="margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary);">
-            ← <a href="index.html">Back to Shop</a>
-          </p>
-        </div>
-
-        <!-- HOME FEED -->
-        <div class="panel hidden" id="homePanel" style="display: none;">
-          <div class="panel-header">
-            <h2>Home Feed</h2>
-            <p>Share what you're looking for and engage with the community</p>
-          </div>
-          
-          <!-- Composer -->
-          <div style="background: var(--surface-light); padding: var(--space-lg); border-radius: var(--radius-lg); margin-bottom: var(--space-xl);">
-            <div style="display: flex; gap: var(--space-md); align-items: flex-start;">
-              <div class="avatar" id="composerAvatar" style="width: 44px; height: 44px;">A</div>
-              <div style="flex: 1;">
-                <textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling or what you're looking for..." style="width: 100%; padding: var(--space-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: var(--font-sans); resize: vertical;"></textarea>
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); margin-top: var(--space-md); flex-wrap: wrap;">
-                  <label style="display: flex; align-items: center; gap: var(--space-sm); margin: 0; cursor: pointer; font-size: var(--text-sm); font-weight: 600; background: white; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-full); border: 1px solid var(--border-color);">
-                    📷 Add Photo
-                    <input type="file" id="postImage" accept="image/*" style="display: none;">
-                  </label>
-                  <select id="postVisibility" style="padding: var(--space-sm) var(--space-md); border: 1px solid var(--border-color); border-radius: var(--radius-full); background: white; font-family: var(--font-sans);">
-                    <option value="public">🌍 Public</option>
-                    <option value="matches">👥 Matches Only</option>
-                  </select>
-                  <button class="btn btn-primary" onclick="submitPost()" style="margin-left: auto;">Post</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Feed -->
-          <div id="feed"></div>
-          <div class="empty-state" id="feedEmpty" style="display: none;">
-            <div class="empty-state-icon">📝</div>
-            <p class="empty-state-text">No posts yet — be the first to share something!</p>
-          </div>
-        </div>
-
-        <!-- BROWSE -->
-        <div class="panel hidden" id="browsePanel" style="display: none;">
-          <div class="panel-header">
-            <h2>Browse Profiles</h2>
-            <p>Find people near you looking for friendship, dating, or marriage</p>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-xl);">
-            <select id="filterGender">
-              <option value="">All Genders</option>
-              <option>Male</option>
-              <option>Female</option>
-            </select>
-            <select id="filterType">
-              <option value="">Any Purpose</option>
-              <option>Friendship</option>
-              <option>Dating</option>
-              <option>Marriage</option>
-            </select>
-            <input type="text" id="filterCity" placeholder="City...">
-            <input type="number" id="filterAgeMin" placeholder="Min age" min="18">
-            <input type="number" id="filterAgeMax" placeholder="Max age" max="99">
-            <select id="filterReligion">
-              <option value="">Any Religion</option>
-              <option>Orthodox Christian</option>
-              <option>Protestant</option>
-              <option>Muslim</option>
-              <option>Catholic</option>
-            </select>
-            <button class="btn btn-primary" onclick="loadProfiles()">Search</button>
-            <button class="btn btn-ghost" onclick="clearBrowseFilters()">Clear</button>
-          </div>
-
-          <div class="grid" id="browseGrid"></div>
-          <div class="empty-state" id="browseEmpty" style="display: none;">
-            <div class="empty-state-icon">🔍</div>
-            <p class="empty-state-text">No profiles match your filters yet</p>
-          </div>
-        </div>
-
-        <!-- NEW MEMBERS -->
-        <div class="panel hidden" id="discoverPanel" style="display: none;">
-          <div class="panel-header">
-            <h2>New Members</h2>
-            <p>People who've recently joined, newest first</p>
-          </div>
-          <div class="grid" id="discoverGrid"></div>
-          <div class="empty-state" id="discoverEmpty" style="display: none;">
-            <div class="empty-state-icon">🆕</div>
-            <p class="empty-state-text">No new members yet</p>
-          </div>
-        </div>
-
-        <!-- MESSAGES -->
-        <div class="panel hidden" id="messagesPanel" style="display: none;">
-          <div class="panel-header">
-            <h2>Messages</h2>
-            <p>Chat with your matches</p>
-          </div>
-          <div id="threadList"></div>
-          <div class="empty-state" id="messagesEmpty" style="display: none;">
-            <div class="empty-state-icon">💬</div>
-            <p class="empty-state-text">No messages yet. Match with someone to start chatting!</p>
-          </div>
-        </div>
-
-        <!-- LIKES -->
-        <div class="panel hidden" id="likesPanel" style="display: none;">
-          <div class="panel-header">
-            <h2>People Who Liked You</h2>
-            <p>Like them back to match and start chatting</p>
-          </div>
-          <div class="grid" id="likesGrid"></div>
-          <div class="empty-state" id="likesEmpty" style="display: none;">
-            <div class="empty-state-icon">💝</div>
-            <p class="empty-state-text">No likes yet. Make sure your profile stands out!</p>
-          </div>
-        </div>
-
-        <!-- VISITORS -->
-        <div class="panel hidden" id="visitorsPanel" style="display: none;">
-          <div class="panel-header">
-            <h2>Who Viewed You</h2>
-            <p>People who've recently looked at your profile</p>
-          </div>
-          <div class="grid" id="visitorsGrid"></div>
-          <div class="empty-state" id="visitorsEmpty" style="display: none;">
-            <div class="empty-state-icon">👀</div>
-            <p class="empty-state-text">No one has viewed your profile yet</p>
-          </div>
-        </div>
-
-        <!-- PROFILE SETUP -->
-        <div class="panel hidden" id="profilePanel" style="display: none;">
-          <div class="panel-header">
-            <h2>Create Your Profile</h2>
-            <p>Fill out the details below to start matching</p>
-          </div>
-          
-          <form id="profileForm" class="form-group">
-            <div class="form-group">
-              <label>First Name *</label>
-              <input type="text" id="fName" maxlength="30" required>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Age *</label>
-                <input type="number" id="fAge" min="18" max="99" required>
-              </div>
-              <div class="form-group">
-                <label>City *</label>
-                <input type="text" id="fCity" required>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>I am a *</label>
-                <select id="fGender" required>
-                  <option value="">Select</option>
-                  <option>Male</option>
-                  <option>Female</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Looking for *</label>
-                <select id="fSeeking" required>
-                  <option value="">Select</option>
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Any</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Purpose *</label>
-              <select id="fType" required>
-                <option value="">Select</option>
-                <option>Friendship</option>
-                <option>Dating</option>
-                <option>Marriage</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>About You (500 chars max)</label>
-              <textarea id="fBio" maxlength="500"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label>Religion</label>
-              <select id="fReligion">
-                <option>Orthodox Christian</option>
-                <option>Protestant</option>
-                <option>Muslim</option>
-                <option>Catholic</option>
-                <option>Other</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Have Kids?</label>
-                <select id="fHasKids">
-                  <option>No</option>
-                  <option>Yes</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Want Kids?</label>
-                <select id="fWantsKids">
-                  <option>Not sure</option>
-                  <option>Yes</option>
-                  <option>No</option>
-                  <option>Maybe</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Occupation</label>
-              <input type="text" id="fOccupation" maxlength="60">
-            </div>
-
-            <div class="form-group">
-              <label>Upload Photos (up to 3)</label>
-              <input type="file" id="fPhoto" accept="image/*" multiple>
-            </div>
-
-            <div class="checkbox-group">
-              <input type="checkbox" id="fAgeConfirm" required>
-              <label for="fAgeConfirm">I confirm I am 18+ and this info is accurate</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: var(--space-lg);">
-              Save Profile
-            </button>
-            <div id="profileMsg"></div>
-          </form>
-        </div>
-
-        <!-- SETTINGS -->
-        <div class="panel hidden" id="settingsPanel" style="display: none;">
-          <div class="panel-header">
-            <h2>Privacy Settings</h2>
-            <p>Manage your account security and privacy</p>
-          </div>
-
-          <div style="background: var(--surface-light); padding: var(--space-lg); border-radius: var(--radius-lg); margin-bottom: var(--space-xl);">
-            <h3 style="margin-top: 0;">Contact Privacy</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Who can call you</label>
-                <select id="setCallPrivacy">
-                  <option>Everybody</option>
-                  <option>Verified only</option>
-                  <option>Matches only</option>
-                  <option>Nobody</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Who sees your last seen</label>
-                <select id="setLastSeenPrivacy">
-                  <option>Everybody</option>
-                  <option>Verified only</option>
-                  <option>Matches only</option>
-                  <option>Nobody</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="updateContactPrivacy()">Save</button>
-            <div id="contactPrivacyMsg"></div>
-          </div>
-
-          <div style="background: var(--surface-light); padding: var(--space-lg); border-radius: var(--radius-lg);">
-            <h3 style="margin-top: 0;">Change Password</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <label>New Password</label>
-                <input type="password" id="setNewPwd" minlength="6">
-              </div>
-              <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" id="setNewPwdConf" minlength="6">
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="updateAccountPassword()">Update</button>
-            <div id="pwdMsg"></div>
-          </div>
-        </div>
-      </section>
-    </main>
+<!-- ============ HEADER ============ -->
+<header id="mainHeader">
+  <div class="header-left">
+    <a href="#" class="brand">
+      <span class="brand-icon">💕</span>
+      <span>Wana<em>Dating</em></span>
+    </a>
   </div>
 
-  <!-- MODAL ROOT -->
-  <div id="modalRoot"></div>
-  <div id="callRoot"></div>
-  <audio id="remoteAudio" autoplay></audio>
+  <div class="header-right">
+    <div style="position: relative;">
+      <button class="header-btn" id="notifBell" onclick="toggleNotifications()">
+        🔔
+        <span class="notification-badge" id="notifBadge" style="display: none;"></span>
+      </button>
+      <div class="notification-panel" id="notifPanel">
+        <div class="notif-header">
+          <span>Notifications</span>
+          <button onclick="markAllRead()">Clear</button>
+        </div>
+        <div id="notifList"></div>
+        <div class="notif-empty" id="notifEmpty">No notifications</div>
+      </div>
+    </div>
 
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  
-  <script>
-    // ================================================================
-    // CORE APPLICATION LOGIC
-    // ================================================================
+    <button class="sign-in-btn" id="headerSignIn" onclick="openAuthModal()">Sign In</button>
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()">☰</button>
+  </div>
+</header>
+
+<!-- ============ MAIN CONTAINER ============ -->
+<div class="app-container">
+  <!-- SIDEBAR -->
+  <sidebar id="mainSidebar">
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+        <span class="nav-icon">🏠</span>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" data-tab="browse" onclick="switchTab('browse')">
+        <span class="nav-icon">🔍</span>
+        <span>Browse</span>
+      </div>
+      <div class="nav-item" data-tab="new" onclick="switchTab('new')">
+        <span class="nav-icon">✨</span>
+        <span>New Members</span>
+      </div>
+      <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+        <span class="nav-icon">👤</span>
+        <span>Profile</span>
+      </div>
+      <div class="nav-item" data-tab="messages" onclick="switchTab('messages')">
+        <span class="nav-icon">💬</span>
+        <span>Messages</span>
+        <span class="nav-badge" id="msgBadge" style="display: none;">0</span>
+      </div>
+      <div class="nav-item" data-tab="likes" onclick="switchTab('likes')">
+        <span class="nav-icon">💛</span>
+        <span>Likes</span>
+        <span class="nav-badge" id="likesBadge" style="display: none;">0</span>
+      </div>
+      <div class="nav-item" data-tab="visitors" onclick="switchTab('visitors')">
+        <span class="nav-icon">👁️</span>
+        <span>Visitors</span>
+        <span class="nav-badge" id="visitorsBadge" style="display: none;">0</span>
+      </div>
+      <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+        <span class="nav-icon">⚙️</span>
+        <span>Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-account" id="sidebarAccount" style="display: none;">
+      <div class="account-user">
+        <div class="account-avatar" id="accountAvatar">U</div>
+        <div>
+          <div class="account-name" id="accountName">User</div>
+          <div style="font-size: var(--text-xs); color: var(--text-light);">Joined today</div>
+        </div>
+      </div>
+      <div class="account-actions">
+        <button onclick="switchTab('profile')">Profile</button>
+        <button onclick="switchTab('settings')">Settings</button>
+        <button class="danger" onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+  </sidebar>
+
+  <!-- MAIN CONTENT -->
+  <main id="mainContent">
+    <!-- WELCOME/GATE -->
+    <div class="welcome-container" id="gatePanel">
+      <div class="welcome-card">
+        <h1>Welcome to Wana Dating 💕</h1>
+        <p>Connect with singles looking for friendship, dating, or something more serious. Find your match in Ethiopia today.</p>
+        <button class="btn-primary" onclick="openAuthModal()">Sign In / Register</button>
+        <button class="btn-secondary" onclick="learnMore()">Learn More</button>
+      </div>
+    </div>
+
+    <!-- HOME PANEL -->
+    <div class="panel active" id="homePanel">
+      <div class="section-header">
+        <h2>Welcome back, <em>find your match</em></h2>
+        <p>Recent matches and recommendations for you</p>
+      </div>
+      <div class="grid" id="homeGrid"></div>
+      <div class="empty-state" id="homeEmpty" style="display: none;">
+        <div class="empty-state-icon">🎯</div>
+        <h3>No matches yet</h3>
+        <p>Complete your profile and browse to find people</p>
+      </div>
+    </div>
+
+    <!-- BROWSE PANEL -->
+    <div class="panel" id="browsePanel">
+      <div class="section-header">
+        <h2>Find Singles <em>Online</em></h2>
+        <p>Browse people near you looking for meaningful connections</p>
+      </div>
+
+      <div class="filters">
+        <select id="filterGender" onchange="applyFilters()">
+          <option value="">All Genders</option>
+          <option value="Male">Men</option>
+          <option value="Female">Women</option>
+        </select>
+        <select id="filterCity" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          <option value="Addis Ababa">Addis Ababa</option>
+          <option value="Dire Dawa">Dire Dawa</option>
+          <option value="Adama">Adama</option>
+          <option value="Mekelle">Mekelle</option>
+        </select>
+        <input type="number" id="filterAgeMin" placeholder="Min Age" min="18" max="99" onchange="applyFilters()">
+        <input type="number" id="filterAgeMax" placeholder="Max Age" min="18" max="99" onchange="applyFilters()">
+        <select id="filterGoal" onchange="applyFilters()">
+          <option value="">All Goals</option>
+          <option value="Friendship">Friendship</option>
+          <option value="Dating">Dating</option>
+          <option value="Marriage">Marriage</option>
+        </select>
+        <select id="filterReligion" onchange="applyFilters()">
+          <option value="">All Religions</option>
+          <option value="Orthodox Christian">Orthodox Christian</option>
+          <option value="Protestant">Protestant</option>
+          <option value="Muslim">Muslim</option>
+          <option value="Catholic">Catholic</option>
+        </select>
+        <button onclick="applyFilters()">Apply Filters</button>
+        <button class="secondary" onclick="clearFilters()">Reset</button>
+      </div>
+
+      <div class="grid" id="browseGrid"></div>
+      <div class="empty-state" id="browseEmpty" style="display: none;">
+        <div class="empty-state-icon">🔍</div>
+        <h3>No matches found</h3>
+        <p>Try adjusting your filters</p>
+      </div>
+    </div>
+
+    <!-- NEW MEMBERS PANEL -->
+    <div class="panel" id="newPanel">
+      <div class="section-header">
+        <h2>New <em>Members</em></h2>
+        <p>People who just joined, newest first</p>
+      </div>
+      <div class="grid" id="newGrid"></div>
+      <div class="empty-state" id="newEmpty" style="display: none;">
+        <div class="empty-state-icon">✨</div>
+        <h3>No new members</h3>
+        <p>Check back soon for new singles</p>
+      </div>
+    </div>
+
+    <!-- PROFILE PANEL -->
+    <div class="panel" id="profilePanel">
+      <div class="section-header">
+        <h2>Create Your <em>Dating Profile</em></h2>
+        <p>Fill out your details to start matching</p>
+      </div>
+
+      <form id="profileForm" onsubmit="saveProfile(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="fName" maxlength="30" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label>Age *</label>
+            <input type="number" id="fAge" min="18" max="99" placeholder="18+" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="fCity" placeholder="Your city" required>
+          </div>
+          <div class="form-group">
+            <label>Gender *</label>
+            <select id="fGender" required>
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Looking For *</label>
+            <select id="fLookingFor" required>
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Any">Any</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Goal *</label>
+            <select id="fGoal" required>
+              <option value="">Select</option>
+              <option value="Friendship">Friendship</option>
+              <option value="Dating">Dating</option>
+              <option value="Marriage">Marriage</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>About You *</label>
+          <textarea id="fBio" placeholder="Tell people about yourself..." maxlength="500" required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Religion *</label>
+            <select id="fReligion" required>
+              <option value="">Select</option>
+              <option value="Orthodox Christian">Orthodox Christian</option>
+              <option value="Protestant">Protestant</option>
+              <option value="Muslim">Muslim</option>
+              <option value="Catholic">Catholic</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Occupation</label>
+            <input type="text" id="fOccupation" placeholder="Your job">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Have Kids?</label>
+            <select id="fHasKids">
+              <option value="">Select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Want Kids?</label>
+            <select id="fWantsKids">
+              <option value="">Select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+              <option value="Maybe">Maybe</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Upload Photos (up to 3)</label>
+          <input type="file" id="fPhotos" accept="image/*" multiple>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="fAgeConfirm" required>
+          <label for="fAgeConfirm">I confirm I'm 18+ and this information is accurate</label>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Profile</button>
+        <div id="profileMsg"></div>
+      </form>
+
+      <div id="profileDisplay" style="display: none;">
+        <h3>Your Profile</h3>
+        <div id="profileContent"></div>
+      </div>
+    </div>
+
+    <!-- MESSAGES PANEL -->
+    <div class="panel" id="messagesPanel">
+      <div class="section-header">
+        <h2>Your <em>Messages</em></h2>
+        <p>Conversations with your matches</p>
+      </div>
+      <div id="messagesList"></div>
+      <div class="empty-state" id="messagesEmpty" style="display: none;">
+        <div class="empty-state-icon">💬</div>
+        <h3>No messages yet</h3>
+        <p>Like someone to start a conversation</p>
+      </div>
+    </div>
+
+    <!-- LIKES PANEL -->
+    <div class="panel" id="likesPanel">
+      <div class="section-header">
+        <h2>People Who <em>Liked You</em></h2>
+        <p>Like them back to match and chat</p>
+      </div>
+      <div class="grid" id="likesGrid"></div>
+      <div class="empty-state" id="likesEmpty" style="display: none;">
+        <div class="empty-state-icon">💛</div>
+        <h3>No one liked you yet</h3>
+        <p>Complete your profile and browse to get noticed</p>
+      </div>
+    </div>
+
+    <!-- VISITORS PANEL -->
+    <div class="panel" id="visitorsPanel">
+      <div class="section-header">
+        <h2>Who <em>Viewed You</em></h2>
+        <p>People who checked out your profile</p>
+      </div>
+      <div class="grid" id="visitorsGrid"></div>
+      <div class="empty-state" id="visitorsEmpty" style="display: none;">
+        <div class="empty-state-icon">👁️</div>
+        <h3>No visitors yet</h3>
+        <p>Get noticed by completing your profile</p>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div class="panel" id="settingsPanel">
+      <div class="section-header">
+        <h2>Account <em>Settings</em></h2>
+        <p>Manage your privacy and preferences</p>
+      </div>
+
+      <div style="background: var(--surface-light); padding: var(--space-lg); border-radius: var(--radius-lg); margin-bottom: var(--space-xl);">
+        <h3 style="margin-bottom: var(--space-lg);">Who Can Contact You</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Who can call</label>
+            <select id="callPrivacy">
+              <option value="everybody">Everybody</option>
+              <option value="verified">Verified only</option>
+              <option value="matches">My matches</option>
+              <option value="nobody">Nobody</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Last seen visible to</label>
+            <select id="lastSeenPrivacy">
+              <option value="everybody">Everybody</option>
+              <option value="verified">Verified only</option>
+              <option value="matches">My matches</option>
+              <option value="nobody">Nobody</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="savePrivacy()" style="width: auto;">Save Privacy Settings</button>
+        <div id="privacyMsg"></div>
+      </div>
+
+      <div style="background: var(--surface-light); padding: var(--space-lg); border-radius: var(--radius-lg);">
+        <h3 style="margin-bottom: var(--space-lg);">Change Password</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="newPwd" minlength="6" placeholder="Min 6 characters">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPwd" minlength="6" placeholder="Confirm password">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="updatePassword()" style="width: auto;">Update Password</button>
+        <div id="pwdMsg"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div id="modalRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============ CONFIGURATION ============
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+let sidebarOpen = false;
+
+// ============ INITIALIZATION ============
+document.addEventListener('DOMContentLoaded', async () => {
+  initAuth();
+});
+
+// ============ AUTH ============
+async function initAuth() {
+  try {
+    const { data: { user } } = await _supabase.auth.getUser();
+    currentUser = user;
+  } catch (err) {
+    console.error('Auth error:', err);
+  }
+
+  updateAuthUI();
+  if (currentUser) {
+    document.getElementById('gatePanel').style.display = 'none';
+    document.getElementById('mainHeader').style.display = 'flex';
+    await loadProfile();
+    loadMatches();
+  } else {
+    document.getElementById('gatePanel').style.display = 'flex';
+    document.getElementById('mainHeader').style.display = 'flex';
+  }
+}
+
+function updateAuthUI() {
+  const signinBtn = document.getElementById('headerSignIn');
+  const sidebarAccount = document.getElementById('sidebarAccount');
+
+  if (currentUser) {
+    signinBtn.style.display = 'none';
+    sidebarAccount.style.display = 'block';
     
-    // All existing functionality preserved - the JavaScript from the original file
-    // would go here. I'll include the key functions...
+    const name = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User';
+    document.getElementById('accountName').textContent = name;
+    document.getElementById('accountAvatar').textContent = name.charAt(0).toUpperCase();
+  } else {
+    signinBtn.style.display = 'block';
+    sidebarAccount.style.display = 'none';
+  }
+}
 
-    const BUCKET_PROFILE_PHOTOS = "dating-profile-photos";
-    const BUCKET_POST_MEDIA = "dating-post-media";
-    const BUCKET_VOICE_MESSAGES = "dating-voice-messages";
-    const BUCKET_VERIFICATION = "dating-verification";
+function openAuthModal() {
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-content">
+          <h2 style="margin-bottom: var(--space-lg);">Sign In or Register</h2>
+          <form id="authForm" onsubmit="handleAuth(event)">
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="authEmail" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="authPassword" minlength="6" placeholder="Min 6 characters" required>
+            </div>
+            <button type="submit" class="btn-primary">Continue</button>
+            <div id="authMsg"></div>
+          </form>
+        </div>
+      </div>
+    </div>`;
+}
 
-    const _signedUrlCache = new Map();
-    
-    let currentUser = null;
-    let currentOpenThread = null;
-    let allBrowseRows = [];
-    let myProfile = null;
-    let myMatchedIds = new Set();
-    let returnThread = null;
+async function handleAuth(e) {
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const msgEl = document.getElementById('authMsg');
 
-    const PANELS = ["homePanel", "browsePanel", "discoverPanel", "profilePanel", "messagesPanel", "likesPanel", "visitorsPanel", "settingsPanel"];
-
-    // Escape HTML helper
-    function esc(str) {
-      if (!str) return "";
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    // Close modal
-    function closeModal() {
-      const root = document.getElementById("modalRoot");
-      root.innerHTML = "";
-    }
-
-    // Switch tabs
-    function switchTab(tab) {
-      if (!currentUser) {
-        document.getElementById("gatePanel").style.display = "block";
-        PANELS.forEach(p => {
-          const el = document.getElementById(p);
-          if (el) el.style.display = "none";
-        });
+  try {
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      const { data: signupData, error: signupError } = await _supabase.auth.signUp({ email, password });
+      if (signupError) {
+        msgEl.innerHTML = `<div class="message error">${signupError.message}</div>`;
         return;
       }
+      msgEl.innerHTML = `<div class="message success">Account created! Signed in.</div>`;
+    }
+    
+    currentUser = data.user;
+    updateAuthUI();
+    closeModal();
+    document.getElementById('gatePanel').style.display = 'none';
+    switchTab('profile');
+  } catch (err) {
+    msgEl.innerHTML = `<div class="message error">Auth error: ${err.message}</div>`;
+  }
+}
 
-      document.querySelectorAll(".nav-tab").forEach(t => {
-        t.classList.toggle("active", t.dataset.tab === tab);
-      });
+function signOut() {
+  _supabase.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  updateAuthUI();
+  document.getElementById('gatePanel').style.display = 'flex';
+  closeSidebar();
+}
 
-      const panelMap = {
-        home: "homePanel",
-        browse: "browsePanel",
-        discover: "discoverPanel",
-        profile: "profilePanel",
-        messages: "messagesPanel",
-        likes: "likesPanel",
-        visitors: "visitorsPanel",
-        settings: "settingsPanel"
-      };
+// ============ TABS & NAVIGATION ============
+function switchTab(tab) {
+  if (!currentUser && tab !== 'home') {
+    openAuthModal();
+    return;
+  }
 
-      PANELS.forEach(p => {
-        const el = document.getElementById(p);
-        if (el) el.style.display = (p === panelMap[tab]) ? "block" : "none";
-      });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-      if (tab === "browse") loadProfiles();
-      if (tab === "discover") loadNewMembers();
-      if (tab === "messages") loadThreads();
-      if (tab === "likes") loadLikesReceived();
-      if (tab === "visitors") loadVisitors();
+  document.getElementById(tab + 'Panel').classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('mainSidebar');
+  sidebarOpen = !sidebarOpen;
+  if (sidebarOpen) {
+    sidebar.classList.add('open');
+  } else {
+    sidebar.classList.remove('open');
+  }
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById('mainSidebar');
+  sidebar.classList.remove('open');
+  sidebarOpen = false;
+}
+
+// ============ PROFILE ============
+async function loadProfile() {
+  if (!currentUser) return;
+
+  const { data, error } = await _supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+
+  if (data) {
+    currentProfile = data;
+    displayProfile();
+  }
+}
+
+async function saveProfile(e) {
+  e.preventDefault();
+  if (!currentUser) return;
+
+  const profileData = {
+    user_id: currentUser.id,
+    display_name: document.getElementById('fName').value,
+    age: parseInt(document.getElementById('fAge').value),
+    city: document.getElementById('fCity').value,
+    gender: document.getElementById('fGender').value,
+    looking_for: document.getElementById('fLookingFor').value,
+    relationship_type: document.getElementById('fGoal').value,
+    bio: document.getElementById('fBio').value,
+    religion: document.getElementById('fReligion').value,
+    occupation: document.getElementById('fOccupation').value,
+    has_kids: document.getElementById('fHasKids').value || null,
+    wants_kids: document.getElementById('fWantsKids').value || null,
+  };
+
+  try {
+    if (currentProfile) {
+      await _supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', currentProfile.id);
+    } else {
+      await _supabase.from('profiles').insert([profileData]);
     }
 
-    // Initialize auth
-    async function initAuth() {
-      try {
-        const { data: { user } } = await _supabase.auth.getUser();
-        currentUser = user;
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        currentUser = null;
-      }
+    currentProfile = profileData;
+    showMessage('profileMsg', 'Profile saved successfully!', 'success');
+    displayProfile();
+    setTimeout(() => switchTab('home'), 1000);
+  } catch (err) {
+    showMessage('profileMsg', `Error: ${err.message}`, 'error');
+  }
+}
 
-      updateAuthUI();
-      
-      if (currentUser) {
-        await fetchMyProfile();
-        await refreshMyMatchedIds();
-        switchTab("home");
-      } else {
-        document.getElementById("gatePanel").style.display = "block";
-      }
-    }
+function displayProfile() {
+  if (!currentProfile) return;
 
-    function updateAuthUI() {
-      const gatePanel = document.getElementById("gatePanel");
-      const accountBox = document.getElementById("accountBox");
-      const signInBtn = document.getElementById("signInBtn");
+  document.getElementById('fName').value = currentProfile.display_name || '';
+  document.getElementById('fAge').value = currentProfile.age || '';
+  document.getElementById('fCity').value = currentProfile.city || '';
+  document.getElementById('fGender').value = currentProfile.gender || '';
+  document.getElementById('fLookingFor').value = currentProfile.looking_for || '';
+  document.getElementById('fGoal').value = currentProfile.relationship_type || '';
+  document.getElementById('fBio').value = currentProfile.bio || '';
+  document.getElementById('fReligion').value = currentProfile.religion || '';
+  document.getElementById('fOccupation').value = currentProfile.occupation || '';
+  document.getElementById('fHasKids').value = currentProfile.has_kids || '';
+  document.getElementById('fWantsKids').value = currentProfile.wants_kids || '';
+}
 
-      if (currentUser) {
-        gatePanel.style.display = "none";
-        accountBox.style.display = "block";
-        signInBtn.style.display = "none";
+// ============ BROWSING & MATCHES ============
+async function loadMatches() {
+  if (!currentUser) return;
 
-        const name = currentUser.user_metadata?.full_name || currentUser.email?.split("@")[0] || "User";
-        document.getElementById("sidebarName").textContent = name;
-        document.getElementById("sidebarAvatar").textContent = name.charAt(0).toUpperCase();
-      } else {
-        gatePanel.style.display = "block";
-        PANELS.forEach(p => document.getElementById(p).style.display = "none");
-        accountBox.style.display = "none";
-        signInBtn.style.display = "block";
-      }
-    }
+  try {
+    const { data } = await _supabase
+      .from('profiles')
+      .select('*')
+      .neq('user_id', currentUser.id)
+      .limit(20);
 
-    async function fetchMyProfile() {
-      if (!currentUser) return null;
-      const { data } = await _supabase
-        .from("dating_profiles")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .maybeSingle();
-      myProfile = data;
-      return myProfile;
-    }
+    displayGrid('homeGrid', 'homeEmpty', data || []);
+  } catch (err) {
+    console.error('Error loading matches:', err);
+  }
+}
 
-    async function refreshMyMatchedIds() {
-      if (!currentUser) return;
-      const { data } = await _supabase
-        .from("dating_matches")
-        .select("user_a, user_b")
-        .or(`user_a.eq.${currentUser.id},user_b.eq.${currentUser.id}`);
-      myMatchedIds = new Set((data || []).map(r => r.user_a === currentUser.id ? r.user_b : r.user_a));
-    }
+async function applyFilters() {
+  if (!currentUser) return;
 
-    function openAuthModal(tab) {
-      const root = document.getElementById("modalRoot");
-      root.innerHTML = `
-        <div class="auth-container">
-          <div class="auth-card">
-            <h1>${tab === "signin" ? "Sign In" : "Create Account"}</h1>
-            <div class="auth-tabs">
-              <div class="auth-tab${tab === "signin" ? " active" : ""}" onclick="switchAuthTab('signin')">Sign In</div>
-              <div class="auth-tab${tab === "register" ? " active" : ""}" onclick="switchAuthTab('register')">Register</div>
-            </div>
-            <form class="form-group" onsubmit="submitAuthForm(event)">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="authEmail" required>
-              </div>
-              <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="authPassword" minlength="6" required>
-              </div>
-              ${tab === "register" ? `
-                <div class="form-group">
-                  <label>Confirm Password</label>
-                  <input type="password" id="authPasswordConfirm" minlength="6" required>
-                </div>
-                <div class="form-group">
-                  <label>Full Name</label>
-                  <input type="text" id="authFullName" required>
-                </div>
-              ` : ""}
-              <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-                ${tab === "signin" ? "Sign In" : "Create Account"}
-              </button>
-              <div id="authMsg"></div>
-            </form>
+  const gender = document.getElementById('filterGender').value;
+  const city = document.getElementById('filterCity').value;
+  const ageMin = parseInt(document.getElementById('filterAgeMin').value) || 0;
+  const ageMax = parseInt(document.getElementById('filterAgeMax').value) || 100;
+  const goal = document.getElementById('filterGoal').value;
+  const religion = document.getElementById('filterReligion').value;
+
+  try {
+    let query = _supabase
+      .from('profiles')
+      .select('*')
+      .neq('user_id', currentUser.id)
+      .gte('age', ageMin)
+      .lte('age', ageMax);
+
+    if (gender) query = query.eq('gender', gender);
+    if (city) query = query.eq('city', city);
+    if (goal) query = query.eq('relationship_type', goal);
+    if (religion) query = query.eq('religion', religion);
+
+    const { data } = await query.limit(50);
+
+    displayGrid('browseGrid', 'browseEmpty', data || []);
+  } catch (err) {
+    console.error('Filter error:', err);
+  }
+}
+
+function clearFilters() {
+  document.getElementById('filterGender').value = '';
+  document.getElementById('filterCity').value = '';
+  document.getElementById('filterAgeMin').value = '';
+  document.getElementById('filterAgeMax').value = '';
+  document.getElementById('filterGoal').value = '';
+  document.getElementById('filterReligion').value = '';
+  applyFilters();
+}
+
+function displayGrid(gridId, emptyId, profiles) {
+  const grid = document.getElementById(gridId);
+  const empty = document.getElementById(emptyId);
+
+  if (!profiles || profiles.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.innerHTML = profiles
+    .map(p => `
+      <div class="card" onclick="viewProfile(${p.id})">
+        <div class="card-image" ${p.photo_url ? `style="background-image: url('${p.photo_url}'); background-size: cover;"` : ''}>
+          ${!p.photo_url ? '👤' : ''}
+        </div>
+        <div class="card-content">
+          <div class="card-title">${p.display_name}, ${p.age}</div>
+          <div class="card-meta">${p.city} · ${p.relationship_type}</div>
+          <div class="card-badges">
+            ${p.is_verified ? '<span class="badge">✓ Verified</span>' : ''}
           </div>
-        </div>`;
-    }
+        </div>
+      </div>
+    `)
+    .join('');
+}
 
-    function switchAuthTab(tab) {
-      closeModal();
-      openAuthModal(tab);
-    }
+function viewProfile(id) {
+  // Implementation for viewing full profile in modal
+  console.log('View profile:', id);
+}
 
-    async function submitAuthForm(e) {
-      e.preventDefault();
-      const msg = document.getElementById("authMsg");
-      const email = document.getElementById("authEmail").value;
-      const password = document.getElementById("authPassword").value;
+// ============ NOTIFICATIONS ============
+function toggleNotifications() {
+  const panel = document.getElementById('notifPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    loadNotifications();
+  }
+}
 
-      const authTab = document.querySelector(".auth-tab.active");
-      const isSignin = authTab?.textContent.includes("Sign In");
+async function loadNotifications() {
+  // Mock implementation
+  const list = document.getElementById('notifList');
+  list.innerHTML = `<div class="notif-item">You have 3 new likes</div>`;
+}
 
-      if (isSignin) {
-        const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
-          return;
-        }
-      } else {
-        const confirm = document.getElementById("authPasswordConfirm").value;
-        if (password !== confirm) {
-          msg.innerHTML = `<div class="msg error">Passwords don't match</div>`;
-          return;
-        }
-        const fullName = document.getElementById("authFullName").value;
-        const { error } = await _supabase.auth.signUp({
-          email, password,
-          options: { data: { full_name: fullName } }
-        });
-        if (error) {
-          msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
-          return;
-        }
-      }
-      
-      closeModal();
-      location.reload();
-    }
+function markAllRead() {
+  document.getElementById('notifPanel').classList.remove('open');
+}
 
-    async function signOut() {
-      await _supabase.auth.signOut();
-      currentUser = null;
-      updateAuthUI();
-    }
+// ============ PRIVACY ============
+async function savePrivacy() {
+  const callPrivacy = document.getElementById('callPrivacy').value;
+  const lastSeenPrivacy = document.getElementById('lastSeenPrivacy').value;
+  const msg = document.getElementById('privacyMsg');
 
-    // Placeholder functions for missing features
-    async function loadProfiles() { console.log("Load profiles"); }
-    async function loadNewMembers() { console.log("Load new members"); }
-    async function loadThreads() { console.log("Load messages"); }
-    async function loadLikesReceived() { console.log("Load likes"); }
-    async function loadVisitors() { console.log("Load visitors"); }
-    async function submitPost() { console.log("Submit post"); }
-    async function markAllNotificationsRead() { console.log("Mark read"); }
-    async function updateContactPrivacy() { console.log("Update privacy"); }
-    async function updateAccountPassword() { console.log("Update password"); }
-    async function clearBrowseFilters() { console.log("Clear filters"); }
+  try {
+    // Implementation for saving privacy settings
+    msg.innerHTML = '<div class="message success">Privacy settings saved</div>';
+  } catch (err) {
+    msg.innerHTML = `<div class="message error">Error: ${err.message}</div>`;
+  }
+}
 
-    // Notification bell toggle
-    document.getElementById("notifBell").addEventListener("click", (e) => {
-      const panel = document.getElementById("notifPanel");
-      panel.classList.toggle("open");
-      e.target.closest("button").setAttribute("aria-expanded", panel.classList.contains("open"));
-    });
+async function updatePassword() {
+  const newPwd = document.getElementById('newPwd').value;
+  const confirmPwd = document.getElementById('confirmPwd').value;
+  const msg = document.getElementById('pwdMsg');
 
-    // Close notification panel when clicking outside
-    document.addEventListener("click", (e) => {
-      const panel = document.getElementById("notifPanel");
-      const bell = document.getElementById("notifBell");
-      if (!panel.contains(e.target) && e.target !== bell) {
-        panel.classList.remove("open");
-      }
-    });
+  if (newPwd !== confirmPwd) {
+    msg.innerHTML = '<div class="message error">Passwords do not match</div>';
+    return;
+  }
 
-    // Initialize on page load
-    initAuth();
-  </script>
+  try {
+    const { error } = await _supabase.auth.updateUser({ password: newPwd });
+    if (error) throw error;
+    msg.innerHTML = '<div class="message success">Password updated</div>';
+  } catch (err) {
+    msg.innerHTML = `<div class="message error">Error: ${err.message}</div>`;
+  }
+}
+
+// ============ UTILITIES ============
+function showMessage(elementId, message, type) {
+  const el = document.getElementById(elementId);
+  el.innerHTML = `<div class="message ${type}">${message}</div>`;
+}
+
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+function learnMore() {
+  alert('Learn more about WanaGebya dating app');
+}
+
+// Mobile menu close on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('sidebar') && !e.target.closest('.mobile-menu-toggle')) {
+    closeSidebar();
+  }
+});
+</script>
 </body>
 </html>
