@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanaGebya Dating Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px; font-weight: 600; transition: 0.2s; font-family: inherit; font-size: 0.9rem; }
+        .tab-btn.active { background: #c2185b; color: white; }
+        .admin-badge { background:#ff4757; color:white; padding:2px 8px; border-radius:10px; font-size:12px; }
+    </style>
+</head>
+<body style="background: #f7f8f6;">
+
+    <header class="golem-header">
+        <div class="logo">WanaGebya Dating Admin</div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
+            <button class="signin-btn" onclick="location.href='dating.html'" style="background:#666;">View Dating Site</button>
+            <button class="signin-btn" onclick="location.href='admin.html'" style="background:#888;">Full Admin</button>
+            <button class="signin-btn" onclick="_supabase.auth.signOut().then(() => location.reload())">Sign Out</button>
+        </div>
+    </header>
+
+    <div class="container" style="padding: 20px; max-width: 1100px; margin: 0 auto;">
+
+        <!-- SUB-NAV: five dating admin sections, one page, no other admin areas -->
+        <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+            <button onclick="switchDatingTab('reports', this)" class="tab-btn active">
+                <i class="fas fa-flag"></i> Profile Reports <span id="reportsBadge" class="admin-badge" style="display:none;">0</span>
+            </button>
+            <button onclick="switchDatingTab('profiles', this)" class="tab-btn">
+                <i class="fas fa-users"></i> All Profiles
+            </button>
+            <button onclick="switchDatingTab('postReports', this)" class="tab-btn">
+                <i class="fas fa-comment-dots"></i> Post Reports <span id="postReportsBadge" class="admin-badge" style="display:none;">0</span>
+            </button>
+            <button onclick="switchDatingTab('verification', this)" class="tab-btn">
+                <i class="fas fa-check-circle"></i> Verification <span id="verificationBadge" class="admin-badge" style="display:none;">0</span>
+            </button>
+            <button onclick="switchDatingTab('platinum', this)" class="tab-btn">
+                <i class="fas fa-gem"></i> Platinum Requests <span id="platinumBadge" class="admin-badge" style="display:none;">0</span>
+            </button>
+        </div>
+
+        <main>
+            <!-- PROFILE REPORTS -->
+            <section id="datingReportsSection" style="background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-heart" style="color:#c2185b;"></i> Dating — Reports</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Profiles flagged by users for review.</p>
+                <div style="display:flex; gap:10px; margin-bottom:18px;">
+                    <select id="datingReportsFilterStatus" onchange="loadDatingReports()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                        <option value="open">Open</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="dismissed">Dismissed</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div id="datingReportsList">
+                    <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+                </div>
+            </section>
+
+            <!-- ALL PROFILES -->
+            <section id="datingProfilesSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-users" style="color:#c2185b;"></i> Dating — All Profiles</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 6px;">Search finds a specific client by name, city, email, or phone. Clear the box to go back to newest-first.</p>
+                <input type="text" id="datingProfileSearch" oninput="loadDatingProfiles()" placeholder="Search by name, city, email, or phone…"
+                    style="width:100%; max-width:420px; padding:9px 13px; border-radius:7px; border:1px solid #ddd; font-size:0.85rem; outline:none; margin-bottom:16px;">
+                <div id="datingProfilesList">
+                    <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+                </div>
+            </section>
+
+            <!-- HOME FEED POST REPORTS -->
+            <section id="postReportsSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-comment-dots" style="color:#c2185b;"></i> Dating — Home Feed Reports</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Posts flagged by users on the Home feed.</p>
+                <div style="display:flex; gap:10px; margin-bottom:18px;">
+                    <select id="postReportsFilterStatus" onchange="loadPostReports()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                        <option value="open">Open</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="dismissed">Dismissed</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div id="postReportsList">
+                    <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+                </div>
+            </section>
+
+            <!-- VERIFICATION REQUESTS -->
+            <section id="verificationSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-check-circle" style="color:#c2185b;"></i> Dating — Verification Requests</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Selfies submitted for the ✓ Verified badge. Compare against the profile's photos before approving.</p>
+                <div style="display:flex; gap:10px; margin-bottom:18px;">
+                    <select id="verificationFilterStatus" onchange="loadVerificationRequests()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div id="verificationList">
+                    <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+                </div>
+            </section>
+
+            <!-- PLATINUM REQUESTS -->
+            <section id="platinumSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-gem" style="color:#B8860B;"></i> Dating — Platinum Requests</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Members who paid by bank transfer / Telebirr and submitted a transaction number. Verify the transaction against your real account before approving — approving immediately activates their plan.</p>
+                <div style="display:flex; gap:10px; margin-bottom:18px;">
+                    <select id="platinumFilterStatus" onchange="loadPlatinumRequests()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div id="platinumRequestsList">
+                    <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        let currentAdminEmail = 'System';
+
+        // ---------- Sub-nav (local to this page; no other admin areas exist here) ----------
+        const DATING_SECTIONS = {
+            reports: 'datingReportsSection',
+            profiles: 'datingProfilesSection',
+            postReports: 'postReportsSection',
+            verification: 'verificationSection',
+            platinum: 'platinumSection'
+        };
+        function switchDatingTab(tab, btn) {
+            Object.values(DATING_SECTIONS).forEach(id => document.getElementById(id).style.display = 'none');
+            document.getElementById(DATING_SECTIONS[tab]).style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            if (tab === 'reports') loadDatingReports();
+            if (tab === 'profiles') loadDatingProfiles();
+            if (tab === 'postReports') loadPostReports();
+            if (tab === 'verification') loadVerificationRequests();
+            if (tab === 'platinum') loadPlatinumRequests();
+        }
+
+        // ---------- Auth + logging (same pattern as admin.html) ----------
+        async function checkAdmin() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) { window.location.href = 'index.html'; return false; }
+            const { data: profile } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single();
+            if (!profile?.is_admin) {
+                alert("Restricted Access: Admin Only.");
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentAdminEmail = user.email || profile.email || 'Admin';
+            document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
+            return true;
+        }
+
+        async function logAction(actionName, details) {
+            try {
+                await _supabase.from('audit_logs').insert([{
+                    admin_email: currentAdminEmail,
+                    action: `[ADMIN] ${actionName}`,
+                    details: details
+                }]);
+            } catch (err) {
+                console.error("Audit log failed:", err);
+            }
+        }
+
+        // Escape user-supplied text before inserting into innerHTML.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        // Lightweight stand-in for the main admin.html's loadStats() — this
+        // page only needs the four dating badge counts, not the whole
+        // marketplace stats dashboard.
+        async function refreshDatingBadges() {
+            const [
+                { count: openReports },
+                { count: openPostReports },
+                { count: pendingVerifications },
+                { count: pendingPlatinum }
+            ] = await Promise.all([
+                _supabase.from('dating_reports').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+                _supabase.from('dating_post_reports').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+                _supabase.from('dating_verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                _supabase.from('dating_platinum_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+            ]);
+            const setBadge = (id, n) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerText = n || 0;
+                el.style.display = n > 0 ? 'inline-block' : 'none';
+            };
+            setBadge('reportsBadge', openReports);
+            setBadge('postReportsBadge', openPostReports);
+            setBadge('verificationBadge', pendingVerifications);
+            setBadge('platinumBadge', pendingPlatinum);
+        }
+
+        // Every function below calls refreshDatingBadges() wherever the main
+        // admin.html called loadStats() — same effect, scoped to this page.
+
+        // ---------- PROFILE REPORTS ----------
+        async function loadDatingReports() {
+            const container = document.getElementById('datingReportsList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('datingReportsFilterStatus').value;
+            let query = _supabase.from('dating_reports')
+                .select('*, dating_profiles(id, user_id, gender, age, city, bio, photo_url)')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: reports, error } = await query;
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+
+            if (!reports || reports.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No reports here.</p>';
+                return;
+            }
+
+            const reporterIds = [...new Set(reports.map(r => r.reporter_id).filter(Boolean))];
+            let reporterMap = {};
+            if (reporterIds.length) {
+                const { data: reporters } = await _supabase.from('profiles').select('id, full_name, phone').in('id', reporterIds);
+                (reporters || []).forEach(r => reporterMap[r.id] = r);
+            }
+
+            container.innerHTML = reports.map(r => {
+                const reporter = reporterMap[r.reporter_id];
+                const profile = r.dating_profiles;
+                const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
+                return `
+                    <div style="display:flex; gap:14px; padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px; align-items:flex-start;">
+                        <img src="${escapeHtml(profile?.photo_url || '')}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#f5f5f5; flex-shrink:0;" onerror="this.style.display='none'">
+                        <div style="flex:1; min-width:0;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                                <div>
+                                    <strong>${profile ? escapeHtml(profile.gender) + ', ' + escapeHtml(String(profile.age)) : 'Profile removed'}</strong>
+                                    ${profile ? `<span style="color:#999; font-size:0.78rem;"> · ${escapeHtml(profile.city)}</span>` : ''}
+                                </div>
+                                <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                            </div>
+                            <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
+                            <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
+                            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                                ${r.status === 'open' ? `
+                                    <button onclick="resolveDatingReport('${r.id}', 'dismissed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ddd; background:white; border-radius:5px; cursor:pointer;">Dismiss</button>
+                                    <button onclick="resolveDatingReport('${r.id}', 'reviewed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #2ed573; color:#2ed573; background:white; border-radius:5px; cursor:pointer;">Mark Reviewed</button>
+                                    ${profile ? `<button onclick="deleteDatingProfile('${profile.id}', '${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer;">Remove Profile</button>` : ''}
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolveDatingReport(reportId, newStatus) {
+            const { error } = await _supabase.from('dating_reports').update({ status: newStatus }).eq('id', reportId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'dismissed' ? 'Dating Report Dismissed' : 'Dating Report Reviewed', `Report ID: ${reportId}`);
+            loadDatingReports();
+            refreshDatingBadges();
+        }
+
+        // ---------- ALL PROFILES ----------
+        // Cached so typing in the search box re-filters instantly instead of
+        // re-querying the database on every keystroke.
+        let _datingProfilesCache = null;
+        let _datingProfilesContactMap = {};
+
+        async function loadDatingProfiles(forceRefresh) {
+            const container = document.getElementById('datingProfilesList');
+
+            if (!_datingProfilesCache || forceRefresh) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+                const { data: profiles, error } = await _supabase
+                    .from('dating_profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(300);
+                if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+                _datingProfilesCache = profiles || [];
+
+                const userIds = _datingProfilesCache.map(p => p.user_id);
+                _datingProfilesContactMap = {};
+                if (userIds.length) {
+                    const { data: contacts } = await _supabase
+                        .from('profiles')
+                        .select('id, full_name, email, phone_number')
+                        .in('id', userIds);
+                    (contacts || []).forEach(c => _datingProfilesContactMap[c.id] = c);
+                }
+            }
+
+            const q = (document.getElementById('datingProfileSearch')?.value || '').trim().toLowerCase();
+            const profiles = !q ? _datingProfilesCache : _datingProfilesCache.filter(p => {
+                const contact = _datingProfilesContactMap[p.user_id] || {};
+                return [p.display_name, p.city, contact.full_name, contact.email, contact.phone_number]
+                    .some(v => (v || '').toLowerCase().includes(q));
+            });
+
+            if (profiles.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#bbb; padding:30px;">${q ? 'No profiles match that search.' : 'No dating profiles yet.'}</p>`;
+                return;
+            }
+
+            container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px;">` +
+                profiles.map(p => {
+                    const contact = _datingProfilesContactMap[p.user_id] || {};
+                    return `
+                    <div style="border:1px solid #eee; border-radius:10px; padding:12px;">
+                        <div style="display:flex; justify-content:space-between; gap:8px;">
+                            <strong>${escapeHtml(p.display_name || contact.full_name || 'Unnamed')}${platinumActive(p) ? ' <span style="color:#B8860B;">💎</span>' : ''}${p.is_verified ? ' <span style="color:#1E8E4F;">✓</span>' : ''}</strong>
+                            <span style="color:#999; font-size:0.72rem;">${new Date(p.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div style="color:#888; font-size:0.8rem; margin:4px 0;">${escapeHtml(p.gender)}, ${escapeHtml(String(p.age))} · ${escapeHtml(p.city)} · ${escapeHtml(p.relationship_type)}</div>
+                        <div style="font-size:0.78rem; color:#666; margin:4px 0;">
+                            ${contact.email ? `<div><i class="fas fa-envelope" style="width:14px;color:#aaa;"></i> ${escapeHtml(contact.email)}</div>` : ''}
+                            ${contact.phone_number ? `<div><i class="fas fa-phone" style="width:14px;color:#aaa;"></i> ${escapeHtml(contact.phone_number)}</div>` : ''}
+                        </div>
+                        <div style="font-size:0.8rem; color:#555; max-height:60px; overflow:hidden;">${escapeHtml((p.bio || '').slice(0, 120))}</div>
+                        ${platinumActive(p) ? `<div style="font-size:0.72rem;color:#B8860B;margin-top:6px;">${p.platinum_until ? `${escapeHtml(p.platinum_plan || 'plan')} · until ${new Date(p.platinum_until).toLocaleDateString()}` : 'Platinum · no end date'}</div>` : (p.is_platinum ? `<div style="font-size:0.72rem;color:#B3261E;margin-top:6px;">Expired ${p.platinum_until ? new Date(p.platinum_until).toLocaleDateString() : ''}</div>` : '')}
+                        <div style="display:flex;gap:6px;margin-top:8px;">
+                            <select id="plan-${p.user_id}" style="flex:1;font-size:0.75rem;padding:5px;border:1px solid #ddd;border-radius:5px;">
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly" selected>Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                            <button onclick="grantPlatinum('${p.user_id}')" style="font-size:0.75rem;padding:5px 10px;border:none;background:#B8860B;color:white;border-radius:5px;cursor:pointer;">${platinumActive(p) ? 'Extend' : 'Grant'}</button>
+                        </div>
+                        ${p.is_platinum ? `<button onclick="revokePlatinum('${p.user_id}')" style="margin-top:6px;font-size:0.75rem;padding:5px 10px;border:none;background:#888;color:white;border-radius:5px;cursor:pointer;width:100%;">Revoke Platinum</button>` : ''}
+                        <button onclick="deleteDatingProfile('${p.id}')" style="margin-top:6px; font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer; width:100%;">Remove Profile</button>
+                    </div>`;
+                }).join('') +
+                `</div>`;
+        }
+
+        function platinumActive(p) {
+            return !!(p && p.is_platinum && (!p.platinum_until || new Date(p.platinum_until) > new Date()));
+        }
+
+        async function grantPlatinum(userId) {
+            const plan = document.getElementById('plan-' + userId).value;
+            const { data, error } = await _supabase.rpc('dating_grant_platinum', { p_user: userId, p_plan: plan });
+            if (error) { alert('Failed: ' + error.message + '\n\n(If this says the function does not exist, run the v28 platinum-plans migration.)'); return; }
+            logAction('Platinum Granted', `User ID: ${userId}, plan: ${plan}, until: ${data}`);
+            loadDatingProfiles(true);
+        }
+
+        async function revokePlatinum(userId) {
+            if (!confirm('Revoke Platinum for this member now?')) return;
+            const { error } = await _supabase.rpc('dating_revoke_platinum', { p_user: userId });
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction('Platinum Revoked', `User ID: ${userId}`);
+            loadDatingProfiles(true);
+        }
+
+        async function deleteDatingProfile(profileId, reportId) {
+            if (!confirm('Remove this dating profile? This cannot be undone.')) return;
+            const { error } = await _supabase.from('dating_profiles').delete().eq('id', profileId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            if (reportId) await _supabase.from('dating_reports').update({ status: 'reviewed' }).eq('id', reportId);
+            logAction('Dating Profile Removed', `Profile ID: ${profileId}`);
+            loadDatingReports();
+            loadDatingProfiles(true);
+            refreshDatingBadges();
+        }
+
+        // ---------- HOME FEED POST REPORTS ----------
+        async function loadPostReports() {
+            const container = document.getElementById('postReportsList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('postReportsFilterStatus').value;
+            let query = _supabase.from('dating_post_reports')
+                .select('*, dating_posts(id, user_id, body, image_url)')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: reports, error } = await query;
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+
+            if (!reports || reports.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No post reports here.</p>';
+                return;
+            }
+
+            const reporterIds = [...new Set(reports.map(r => r.reporter_id).filter(Boolean))];
+            let reporterMap = {};
+            if (reporterIds.length) {
+                const { data: reporters } = await _supabase.from('profiles').select('id, full_name, phone').in('id', reporterIds);
+                (reporters || []).forEach(r => reporterMap[r.id] = r);
+            }
+
+            container.innerHTML = reports.map(r => {
+                const reporter = reporterMap[r.reporter_id];
+                const post = r.dating_posts;
+                const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
+                return `
+                    <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                            <strong style="font-size:0.85rem;">${post ? 'Post by user ' + escapeHtml(post.user_id.slice(0,8)) + '…' : 'Post removed'}</strong>
+                            <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        ${post?.body ? `<p style="color:#555; font-size:0.85rem; margin:8px 0; background:#fafafa; padding:8px; border-radius:6px;">${escapeHtml(post.body.slice(0,300))}</p>` : ''}
+                        ${post?.image_url ? `<img src="${escapeHtml(post.image_url)}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
+                        <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
+                        <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            ${r.status === 'open' ? `
+                                <button onclick="resolvePostReport('${r.id}', 'dismissed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ddd; background:white; border-radius:5px; cursor:pointer;">Dismiss</button>
+                                <button onclick="resolvePostReport('${r.id}', 'reviewed')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #2ed573; color:#2ed573; background:white; border-radius:5px; cursor:pointer;">Mark Reviewed</button>
+                                ${post ? `<button onclick="deleteReportedPost('${post.id}', '${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer;">Remove Post</button>` : ''}
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolvePostReport(reportId, newStatus) {
+            const { error } = await _supabase.from('dating_post_reports').update({ status: newStatus }).eq('id', reportId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'dismissed' ? 'Post Report Dismissed' : 'Post Report Reviewed', `Report ID: ${reportId}`);
+            loadPostReports();
+            refreshDatingBadges();
+        }
+
+        async function deleteReportedPost(postId, reportId) {
+            if (!confirm('Remove this post? This cannot be undone.')) return;
+            const { error } = await _supabase.from('dating_posts').delete().eq('id', postId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            if (reportId) await _supabase.from('dating_post_reports').update({ status: 'reviewed' }).eq('id', reportId);
+            logAction('Dating Post Removed', `Post ID: ${postId}`);
+            loadPostReports();
+            refreshDatingBadges();
+        }
+
+        // ---------- VERIFICATION REQUESTS ----------
+        async function loadVerificationRequests() {
+            const container = document.getElementById('verificationList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('verificationFilterStatus').value;
+            let query = _supabase.from('dating_verification_requests')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: requests, error } = await query;
+            if (error) { container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>`; return; }
+
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No verification requests here.</p>';
+                return;
+            }
+
+            const userIds = [...new Set(requests.map(r => r.user_id))];
+            const { data: profiles } = await _supabase.from('dating_profiles').select('user_id, display_name, age, city, photo_url, photos, is_verified').in('user_id', userIds);
+            const profileMap = {};
+            (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+            container.innerHTML = requests.map(r => {
+                const profile = profileMap[r.user_id];
+                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
+                return `
+                    <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                            <strong style="font-size:0.85rem;">${profile ? escapeHtml(profile.display_name || 'Profile') + (profile.age ? ', ' + profile.age : '') + (profile.city ? ' · ' + escapeHtml(profile.city) : '') : 'Profile removed'}${profile?.is_verified ? ' <span style="color:#2ed573;">✓ already verified</span>' : ''}</strong>
+                            <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        <div style="display:flex; gap:12px; margin:10px 0; flex-wrap:wrap;">
+                            <div>
+                                <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Submitted selfie</div>
+                                <img src="${escapeHtml(r.selfie_url)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                            </div>
+                            ${profilePhoto ? `
+                            <div>
+                                <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Profile photo</div>
+                                <img src="${escapeHtml(profilePhoto)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                            </div>` : ''}
+                        </div>
+                        <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Submitted ${new Date(r.created_at).toLocaleDateString()}${r.reviewed_at ? ' · reviewed ' + new Date(r.reviewed_at).toLocaleDateString() : ''}</p>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            ${r.status === 'pending' ? `
+                                <button onclick="resolveVerification('${r.id}', 'approved')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve</button>
+                                <button onclick="promptRejectVerification('${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ff4757; color:#ff4757; background:white; border-radius:5px; cursor:pointer;">Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolveVerification(requestId, newStatus, note) {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const update = { status: newStatus, reviewed_by: user?.id || null };
+            if (note) update.reviewer_note = note;
+            const { error } = await _supabase.from('dating_verification_requests').update(update).eq('id', requestId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'approved' ? 'Verification Approved' : 'Verification Rejected', `Request ID: ${requestId}`);
+            loadVerificationRequests();
+            refreshDatingBadges();
+        }
+
+        function promptRejectVerification(requestId) {
+            const note = prompt('Optional note for the user on why this was rejected (shown to them):');
+            if (note === null) return;
+            resolveVerification(requestId, 'rejected', note.trim() || null);
+        }
+
+        // ---------- PLATINUM REQUESTS ----------
+        async function loadPlatinumRequests() {
+            const container = document.getElementById('platinumRequestsList');
+            container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+
+            const filter = document.getElementById('platinumFilterStatus').value;
+            let query = _supabase.from('dating_platinum_requests')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: requests, error } = await query;
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error: ${escapeHtml(error.message)}</p>` +
+                    (error.message.includes('does not exist') ? '<p style="color:#999;font-size:0.8rem;">Run dating-migration-v32-platinum-requests.sql first.</p>' : '');
+                return;
+            }
+
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px;">No Platinum requests here.</p>';
+                return;
+            }
+
+            const userIds = [...new Set(requests.map(r => r.user_id))];
+            const { data: profiles } = await _supabase.from('dating_profiles').select('user_id, display_name, age, city, photo_url, photos').in('user_id', userIds);
+            const profileMap = {};
+            (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+            const planLabel = { weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly' };
+
+            container.innerHTML = requests.map(r => {
+                const profile = profileMap[r.user_id];
+                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
+                return `
+                    <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                ${profilePhoto ? `<img src="${escapeHtml(profilePhoto)}" style="width:40px; height:40px; object-fit:cover; border-radius:50%;">` : ''}
+                                <strong style="font-size:0.85rem;">${profile ? escapeHtml(profile.display_name || 'Profile') + (profile.age ? ', ' + profile.age : '') + (profile.city ? ' · ' + escapeHtml(profile.city) : '') : 'Profile removed'}</strong>
+                            </div>
+                            <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        <div style="margin:10px 0; background:#fffbee; border:1px solid #fce3b4; border-radius:8px; padding:10px 12px; font-size:0.82rem;">
+                            <div><strong>${escapeHtml(planLabel[r.plan] || r.plan)}</strong> plan · ${r.amount_birr} Birr</div>
+                            <div style="margin-top:4px;">Transaction #: <code style="background:#fff;padding:2px 6px;border-radius:4px;">${escapeHtml(r.transaction_number)}</code></div>
+                        </div>
+                        <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Submitted ${new Date(r.created_at).toLocaleDateString()}${r.reviewed_at ? ' · reviewed ' + new Date(r.reviewed_at).toLocaleDateString() : ''}</p>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            ${r.status === 'pending' ? `
+                                <button onclick="resolvePlatinumRequest('${r.id}', 'approved')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve &amp; Activate</button>
+                                <button onclick="promptRejectPlatinumRequest('${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ff4757; color:#ff4757; background:white; border-radius:5px; cursor:pointer;">Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function resolvePlatinumRequest(requestId, newStatus, note) {
+            if (newStatus === 'approved' && !confirm('Confirm you have verified this transaction number against your real bank/Telebirr account before approving?')) return;
+            const update = { status: newStatus };
+            if (note) update.reviewer_note = note;
+            const { error } = await _supabase.from('dating_platinum_requests').update(update).eq('id', requestId);
+            if (error) { alert('Failed: ' + error.message); return; }
+            logAction(newStatus === 'approved' ? 'Platinum Request Approved' : 'Platinum Request Rejected', `Request ID: ${requestId}`);
+            loadPlatinumRequests();
+            refreshDatingBadges();
+        }
+
+        function promptRejectPlatinumRequest(requestId) {
+            const note = prompt('Optional note for the user on why this was rejected (shown to them):');
+            if (note === null) return;
+            resolvePlatinumRequest(requestId, 'rejected', note.trim() || null);
+        }
+
+        // ---------- INIT ----------
+        document.addEventListener('DOMContentLoaded', async () => {
+            const ok = await checkAdmin();
+            if (!ok) return;
+            loadDatingReports();
+            refreshDatingBadges();
+        });
+    </script>
+</body>
+</html>
