@@ -1375,6 +1375,45 @@ header button.lang:hover{
   .panel{padding:14px!important}
 }
 
+
+/* ---------- Recommended for You ---------- */
+.recommended-panel{background:linear-gradient(180deg,#ffffff 0%,#f8fbfa 100%)}
+.recommend-hero{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+  padding:18px 20px;margin-bottom:18px;border:1px solid #dcefe8;
+  border-radius:16px;background:linear-gradient(135deg,#effaf6,#fff);
+}
+.recommend-hero h2{margin:0 0 5px;font-size:1.45rem;font-weight:800;letter-spacing:-.02em}
+.recommend-hero p{margin:0;color:var(--muted);font-size:.9rem;max-width:650px}
+.recommend-refresh{
+  border:1px solid var(--green);background:#fff;color:var(--green-dark);
+  border-radius:999px;padding:9px 15px;font-weight:700;cursor:pointer;white-space:nowrap
+}
+.recommend-refresh:hover{background:var(--green-soft)}
+.recommend-card{position:relative}
+.recommend-score{
+  position:absolute;top:10px;left:10px;z-index:2;
+  background:rgba(255,255,255,.95);color:var(--green-dark);
+  border:1px solid rgba(13,155,108,.25);border-radius:999px;
+  padding:5px 9px;font-size:.76rem;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.08)
+}
+.recommend-reasons{
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:8px
+}
+.recommend-reason{
+  background:var(--green-soft);color:var(--green-dark);border-radius:999px;
+  padding:4px 8px;font-size:.7rem;font-weight:700
+}
+.recommend-empty{
+  padding:45px 18px;text-align:center;color:var(--muted);
+  border:1px dashed var(--line-strong);border-radius:14px;background:#fff
+}
+.recommend-empty strong{display:block;color:var(--ink);font-size:1.05rem;margin-bottom:6px}
+@media(max-width:600px){
+  .recommend-hero{padding:15px;flex-direction:column}
+  .recommend-refresh{width:100%}
+}
+
 </style>
 
 </head>
@@ -1404,6 +1443,7 @@ header button.lang:hover{
     <nav class="side-nav">
       <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
       <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
+      <div class="tab" data-tab="recommended" onclick="switchTab('recommended')"><span class="side-icon">✨</span> Recommended <span id="recommendedBadge"></span></div>
       <div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
       <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
@@ -1475,6 +1515,22 @@ header button.lang:hover{
     </div>
     <div id="feed"></div>
     <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something!</div>
+  </div>
+
+  <!-- RECOMMENDED FOR YOU -->
+  <div class="panel recommended-panel" id="recommendedPanel" style="display:none;">
+    <div class="recommend-hero">
+      <div>
+        <h2>✨ Recommended <span style="color:var(--green);">for You</span></h2>
+        <p>Profiles ranked using your preferences, mutual compatibility, shared lifestyle, family goals, location, verification and recent activity.</p>
+      </div>
+      <button class="recommend-refresh" onclick="loadRecommendedProfiles()">↻ Refresh</button>
+    </div>
+    <div class="grid" id="recommendedGrid"></div>
+    <div class="recommend-empty" id="recommendedEmpty" style="display:none;">
+      <strong>No strong recommendations yet</strong>
+      Complete more of your profile or adjust your preferences to discover better matches.
+    </div>
   </div>
 
   <!-- BROWSE MATCHES -->
@@ -2640,7 +2696,7 @@ async function recordProfileView(viewedUserId){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
+const PANELS = ["homePanel","recommendedPanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
@@ -2651,10 +2707,11 @@ function switchTab(tab){
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
+  const map = { home: "homePanel", recommended: "recommendedPanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
   if (tab === "home") loadFeed();
+  if (tab === "recommended") loadRecommendedProfiles();
   if (tab === "browse") loadProfiles();
   if (tab === "newmembers") loadNewMembers();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
@@ -4663,6 +4720,167 @@ function toggleLang(){
 }
 
 initAuth();
+
+// ---------- Recommended for You ----------
+function recommendationGenderMatch(me, candidate){
+  const mySeeking = (me?.seeking || "").toLowerCase();
+  const theirGender = (candidate?.gender || "").toLowerCase();
+  const theirSeeking = (candidate?.seeking || "").toLowerCase();
+  const myGender = (me?.gender || "").toLowerCase();
+
+  const accepts = (pref, gender) => !pref || pref === "any" || pref === gender;
+  return accepts(mySeeking, theirGender) && accepts(theirSeeking, myGender);
+}
+
+function recommendationAgeMatch(me, candidate){
+  const age = Number(candidate?.age);
+  const min = Number(me?.age_min);
+  const max = Number(me?.age_max);
+  const reciprocalMin = Number(candidate?.age_min);
+  const reciprocalMax = Number(candidate?.age_max);
+  if (!age) return false;
+  const myRangeOk = Number.isFinite(min) && Number.isFinite(max) ? age >= min && age <= max : true;
+  const theirRangeOk = Number.isFinite(reciprocalMin) && Number.isFinite(reciprocalMax)
+    ? Number(me?.age) >= reciprocalMin && Number(me?.age) <= reciprocalMax
+    : true;
+  return myRangeOk && theirRangeOk;
+}
+
+function scoreRecommendation(me, candidate){
+  let score = 0;
+  const reasons = [];
+
+  // Hard compatibility gets the largest weight.
+  if (recommendationGenderMatch(me, candidate)) { score += 24; reasons.push("Mutual preference"); }
+  else return { score: 0, reasons: [] };
+
+  if (recommendationAgeMatch(me, candidate)) { score += 20; reasons.push("Age range fits"); }
+  else return { score: 0, reasons: [] };
+
+  if (me.relationship_type && candidate.relationship_type &&
+      me.relationship_type === candidate.relationship_type) {
+    score += 15; reasons.push(`${candidate.relationship_type} goal`);
+  }
+
+  if (me.looking_for && candidate.looking_for &&
+      me.looking_for === candidate.looking_for) {
+    score += 8; reasons.push("Same relationship style");
+  }
+
+  if (me.lifestyle && candidate.lifestyle && me.lifestyle === candidate.lifestyle) {
+    score += 10; reasons.push("Shared lifestyle");
+  }
+
+  if (me.wants_kids && candidate.wants_kids && me.wants_kids === candidate.wants_kids) {
+    score += 8; reasons.push("Family goals align");
+  }
+
+  if (me.has_kids && candidate.has_kids && me.has_kids === candidate.has_kids) {
+    score += 4; reasons.push("Similar family situation");
+  }
+
+  if (me.religion && candidate.religion &&
+      me.religion !== "Prefer not to say" &&
+      candidate.religion === me.religion) {
+    score += 6; reasons.push("Same religion");
+  }
+
+  if (me.city && candidate.city &&
+      me.city.trim().toLowerCase() === candidate.city.trim().toLowerCase()) {
+    score += 8; reasons.push("Same city");
+  }
+
+  if (candidate.is_verified) { score += 4; reasons.push("Verified"); }
+
+  const presence = visiblePresence(candidate);
+  if (presence.online) { score += 3; reasons.push("Online now"); }
+
+  if (candidate.created_at) {
+    const days = (Date.now() - new Date(candidate.created_at).getTime()) / 86400000;
+    if (days <= 7) { score += 2; reasons.push("New member"); }
+  }
+
+  return { score: Math.min(100, score), reasons: reasons.slice(0, 4) };
+}
+
+function createRecommendationCard(row, match){
+  const card = createProfileCard(row, {
+    showOnlineDot: true,
+    extraMeta: `
+      <div class="recommend-reasons">
+        ${match.reasons.map(r => `<span class="recommend-reason">${esc(r)}</span>`).join("")}
+      </div>`
+  });
+  card.classList.add("recommend-card");
+  const badge = document.createElement("div");
+  badge.className = "recommend-score";
+  badge.textContent = `${match.score}% match`;
+  card.querySelector(".photo").appendChild(badge);
+  return card;
+}
+
+async function loadRecommendedProfiles(){
+  const grid = document.getElementById("recommendedGrid");
+  const empty = document.getElementById("recommendedEmpty");
+  if (!grid || !currentUser) return;
+
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:35px;color:var(--muted);">Finding your best matches…</div>`;
+  empty.style.display = "none";
+
+  const me = myProfile || await fetchMyProfile();
+  if (!me){
+    grid.innerHTML = "";
+    empty.style.display = "block";
+    empty.querySelector("strong").textContent = "Complete your profile first";
+    return;
+  }
+
+  const [blockedIds, likesResult] = await Promise.all([
+    fetchBlockedIds(),
+    _supabase.from("dating_likes").select("liked_id").eq("liker_id", currentUser.id)
+  ]);
+
+  const likedIds = new Set((likesResult.data || []).map(x => x.liked_id));
+
+  const { data, error } = await _supabase
+    .from("dating_profiles")
+    .select("*")
+    .neq("user_id", currentUser.id)
+    .limit(100);
+
+  if (error){
+    grid.innerHTML = "";
+    empty.style.display = "block";
+    empty.querySelector("strong").textContent = "Recommendations are temporarily unavailable";
+    console.error("Recommended profiles:", error);
+    return;
+  }
+
+  const candidates = (data || [])
+    .filter(p => !blockedIds.has(p.user_id))
+    .filter(p => !myMatchedIds.has(p.user_id))
+    .filter(p => !likedIds.has(p.user_id))
+    .map(p => ({ profile:p, match:scoreRecommendation(me,p) }))
+    .filter(x => x.match.score >= 45)
+    .sort((a,b) => {
+      if (b.match.score !== a.match.score) return b.match.score - a.match.score;
+      const ao = visiblePresence(a.profile).online ? 1 : 0;
+      const bo = visiblePresence(b.profile).online ? 1 : 0;
+      return bo - ao;
+    })
+    .slice(0, 12);
+
+  grid.innerHTML = "";
+  if (!candidates.length){
+    empty.style.display = "block";
+    return;
+  }
+
+  candidates.forEach(({profile, match}) => {
+    grid.appendChild(createRecommendationCard(profile, match));
+  });
+}
+
 </script>
 </body>
 </html>
