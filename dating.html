@@ -1,41 +1,44 @@
-<!DOCTYPE html>
-
+ </div><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Dating — WanaGebya</title>
+<title>EthiopianPersonals.com — The #1 Ethiopian Dating Site</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <style>
 
 /* =========================================================
-   Wana Dating — Professional Design System
+   EthiopianPersonals.com — Brand System
    ========================================================= */
 :root {
-  --green: #0d9b6c;
-  --green-dark: #0a7a55;
-  --green-soft: #e6f7f1;
-  --green-glow: rgba(13, 155, 108, 0.18);
+  --green: #0f8a5f;
+  --green-dark: #0a6948;
+  --green-soft: #eaf6f1;
+  --green-glow: rgba(15, 138, 95, 0.18);
+  --yellow: #f8c300;
+  --yellow-soft: #fef9e6;
+  --red: #d9383a;
+  --red-soft: #fcebeb;
   --gold: #d4a017;
   --gold-soft: #fbf3e0;
-  --ink: #12141a;
-  --ink-soft: #3d4450;
+  --ink: #111827;
+  --ink-soft: #374151;
   --muted: #6b7280;
-  --paper: #f6f7f9;
+  --paper: #f4f6f9;
   --surface: #ffffff;
-  --line: #e8eaef;
-  --line-strong: #d5d9e2;
-  --danger: #e5484d;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --danger: #d9383a;
   --danger-soft: #fdecec;
-  --shadow-sm: 0 1px 2px rgba(18, 20, 26, 0.04);
-  --shadow: 0 4px 16px rgba(18, 20, 26, 0.06);
-  --shadow-lg: 0 12px 40px rgba(18, 20, 26, 0.12);
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04);
+  --shadow: 0 4px 16px rgba(17, 24, 39, 0.06);
+  --shadow-lg: 0 12px 40px rgba(17, 24, 39, 0.12);
   --radius: 14px;
   --radius-sm: 10px;
   --radius-full: 999px;
-  --header-h: 64px;
+  --header-h: 68px;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Playfair Display", Georgia, serif;
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -51,7 +54,7 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font);
-  background: var(--paper);
+  background: linear-gradient(180deg, #f8fafc 0%, #f2f5f8 100%);
   color: var(--ink);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -70,7 +73,7 @@ button, input, select, textarea {
   min-height: 480px;
   background-color: #0a1f16;
   background-image:
-    linear-gradient(160deg, rgba(8, 28, 20, 0.82) 0%, rgba(13, 50, 36, 0.72) 50%, rgba(8, 28, 20, 0.88) 100%),
+    linear-gradient(160deg, rgba(10, 31, 22, 0.85) 0%, rgba(15, 60, 42, 0.78) 50%, rgba(10, 31, 22, 0.9) 100%),
     url("wanaagar.png");
   background-size: cover;
   background-position: center center;
@@ -85,7 +88,7 @@ button, input, select, textarea {
 .overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 30% 20%, rgba(13, 155, 108, 0.12), transparent 55%);
+  background: radial-gradient(ellipse at 30% 20%, rgba(15, 138, 95, 0.15), transparent 55%);
   z-index: 1;
   pointer-events: none;
 }
@@ -100,7 +103,7 @@ button, input, select, textarea {
   border-radius: 24px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
   text-align: center;
-  max-width: 440px;
+  max-width: 460px;
   width: 92%;
   margin: auto;
 }
@@ -115,7 +118,11 @@ button, input, select, textarea {
   letter-spacing: -0.02em;
 }
 
-.heart-icon { color: #e63946; }
+.welcome-title span.green { color: var(--green); }
+.welcome-title span.yellow { color: var(--yellow); }
+.welcome-title span.red { color: var(--red); }
+
+.heart-icon { color: var(--red); }
 
 .welcome-description {
   color: var(--ink-soft);
@@ -142,7 +149,7 @@ button, input, select, textarea {
 }
 .btn-signin:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(13, 155, 108, 0.35);
+  box-shadow: 0 10px 28px rgba(15, 138, 95, 0.35);
 }
 .btn-signin:active { transform: translateY(0); }
 
@@ -158,10 +165,12 @@ button, input, select, textarea {
 
 /* ---------- Header ---------- */
 header {
-  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
-  color: #fff;
-  padding: 0 24px;
   height: var(--header-h);
+  padding: 0 28px;
+  background: rgba(17, 24, 39, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -173,18 +182,19 @@ header {
 
 header .brand {
   font-weight: 800;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
+  font-size: 1.32rem;
+  letter-spacing: -0.04em;
+  color: #fff;
+  text-decoration: none;
 }
-header .brand span {
-  color: #3dd68c;
-  font-weight: 700;
-}
+header .brand span.green { color: #2ecc71; }
+header .brand span.yellow { color: var(--yellow); }
+header .brand span.red { color: var(--red); }
 
 header nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 header nav a,
@@ -194,18 +204,18 @@ header button.lang {
   color: rgba(255, 255, 255, 0.85);
   font-size: 0.875rem;
   cursor: pointer;
-  margin-left: 8px;
+  margin-left: 4px;
   text-decoration: none;
   font-weight: 500;
   padding: 8px 12px;
   border-radius: 8px;
-  transition: background var(--transition), color var(--transition);
+  transition: background var(--transition), color var(--transition), transform var(--transition);
 }
 header nav a:hover,
 header button.lang:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  opacity: 1;
+  transform: translateY(-1px);
 }
 
 .notif-wrap {
@@ -239,7 +249,7 @@ header button.lang:hover {
   line-height: 1.2;
   min-width: 18px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(229, 72, 77, 0.4);
+  box-shadow: 0 2px 6px rgba(217, 56, 58, 0.4);
 }
 .notif-panel {
   display: none;
@@ -249,7 +259,7 @@ header button.lang:hover {
   background: var(--surface);
   color: var(--ink);
   border-radius: 16px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 18px 50px rgba(17, 24, 39, 0.16);
   width: 340px;
   max-height: 440px;
   overflow-y: auto;
@@ -326,14 +336,14 @@ header button.lang:hover {
   cursor: pointer;
   margin-left: 10px;
   transition: transform var(--transition), box-shadow var(--transition);
-  box-shadow: 0 4px 12px var(--green-glow);
+  box-shadow: 0 6px 18px rgba(15, 138, 95, 0.25);
 }
 .signin-pill:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(13, 155, 108, 0.35);
+  box-shadow: 0 8px 22px rgba(15, 138, 95, 0.35);
 }
 
-/* ---------- Auth modal bits ---------- */
+/* ---------- Auth modal ---------- */
 .auth-tabs {
   display: flex;
   gap: 4px;
@@ -412,61 +422,82 @@ header button.lang:hover {
   background: var(--paper);
   border-color: var(--line-strong);
 }
-.submit-btn[disabled] { opacity: 0.55; cursor: default; }
 
-/* ---------- App shell ---------- */
+/* ---------- App Shell Layout ---------- */
 .app-shell {
-  display: flex;
-  align-items: flex-start;
-  max-width: 1240px;
-  margin: 0 auto;
-  min-height: calc(100vh - var(--header-h));
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr) 250px !important;
+  grid-template-areas: "sidebar content rail" !important;
+  align-items: start !important;
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  min-height: calc(100vh - var(--header-h)) !important;
+  gap: 0 !important;
 }
 
 .sidebar {
-  width: 240px;
-  flex-shrink: 0;
-  background: var(--surface);
-  min-height: calc(100vh - var(--header-h));
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  grid-area: sidebar !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: calc(100vh - var(--header-h)) !important;
+  min-height: calc(100vh - var(--header-h)) !important;
+  position: sticky !important;
+  top: var(--header-h) !important;
+  align-self: start !important;
+  overflow-y: auto !important;
+  background: rgba(255, 255, 255, 0.94);
   border-right: 1px solid var(--line);
-  position: sticky;
-  top: var(--header-h);
-  height: calc(100vh - var(--header-h));
-  overflow-y: auto;
+  box-shadow: 8px 0 30px rgba(17, 24, 39, 0.025);
+  justify-content: space-between;
 }
 
-.side-nav { padding: 16px 10px; }
+.side-nav {
+  padding: 20px 12px;
+}
+.side-nav::before {
+  content: 'DISCOVER';
+  display: block;
+  padding: 0 13px 10px;
+  color: #9aa3b2;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
 .side-nav .tab {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 14px;
+  padding: 12px 14px;
   cursor: pointer;
   color: var(--ink-soft);
-  font-size: 0.9rem;
-  border-radius: 10px;
+  font-size: 0.91rem;
+  border-radius: 12px;
   font-weight: 500;
-  margin-bottom: 2px;
-  border-left: none;
-  transition: background var(--transition), color var(--transition);
+  margin-bottom: 4px;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+  width: 100%;
 }
 .side-nav .tab:hover {
-  background: var(--paper);
+  background: #f1f8f5;
   color: var(--green-dark);
+  transform: translateX(2px);
 }
 .side-nav .tab.active {
-  background: var(--green-soft);
+  background: linear-gradient(90deg, #e5f8f1, #effaf6);
   color: var(--green-dark);
   font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--green);
 }
+
 .side-icon {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   width: 22px;
   text-align: center;
-  opacity: 0.9;
 }
 .side-nav .tab #unreadBadge,
 .side-nav .tab #likesBadge,
@@ -480,8 +511,8 @@ header button.lang:hover {
 
 .sidebar-account {
   border-top: 1px solid var(--line);
-  padding: 16px 18px;
-  background: var(--paper);
+  padding: 18px;
+  background: #f8fafc;
 }
 .sidebar-account .who {
   display: flex;
@@ -526,50 +557,123 @@ header button.lang:hover {
 }
 .account-links button:hover {
   color: var(--green);
-  text-decoration: none;
 }
 .account-links button.danger { color: var(--danger); }
 
 main {
-  flex: 1;
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 28px 24px 80px;
-  width: 100%;
+  grid-area: content !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 30px 28px 90px !important;
 }
 
 .panel {
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 24px;
   min-height: 300px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 30px rgba(17, 24, 39, 0.045);
 }
 
-.gate {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--ink-soft);
+/* Home Panel Overrides */
+#homePanel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  min-height: 0;
 }
-.gate h2 {
-  color: var(--ink);
-  margin-bottom: 10px;
-  font-family: var(--font-display);
-}
-.gate button {
-  margin-top: 20px;
-  background: var(--green);
+
+.ep-hero {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  padding: 28px 30px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #0a6948 0%, #0f8a5f 54%, #2ecc71 100%);
   color: #fff;
-  border: none;
-  padding: 12px 28px;
-  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(10, 105, 72, 0.22);
+}
+.ep-hero::after {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -70px;
+  top: -80px;
+  border: 42px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+.ep-hero .eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.88;
+  margin-bottom: 7px;
+}
+.ep-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3vw, 2.15rem);
+  line-height: 1.15;
+  margin: 0 0 8px;
+  letter-spacing: -0.03em;
+  position: relative;
+  z-index: 1;
+}
+.ep-hero p {
+  max-width: 650px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.93rem;
+  position: relative;
+  z-index: 1;
+}
+.ep-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+  position: relative;
+  z-index: 2;
+}
+.ep-quick-actions button {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 999px;
+  padding: 9px 14px;
   font-weight: 700;
   cursor: pointer;
-  font-size: 1rem;
+  backdrop-filter: blur(8px);
+  transition: 0.2s;
+}
+.ep-quick-actions button:hover {
+  background: #fff;
+  color: var(--green-dark);
+  transform: translateY(-1px);
 }
 
-/* ---------- Filters & browse ---------- */
+.ep-composer {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 26px rgba(17, 24, 39, 0.04);
+}
+.ep-composer textarea {
+  background: #f8fafc !important;
+  border-color: #e8edf2 !important;
+  border-radius: 15px !important;
+  min-height: 78px !important;
+}
+
+/* ---------- Filters & Browse ---------- */
 .filters {
   display: flex;
   gap: 10px;
@@ -605,21 +709,21 @@ main {
 
 .card {
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
   background: var(--surface);
   transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 6px 22px rgba(17, 24, 39, 0.06);
 }
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px) !important;
+  box-shadow: var(--shadow-lg) !important;
   border-color: transparent;
 }
 .card .photo {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1.08;
   background: linear-gradient(145deg, #eef1f5, #e2e6ec) center / cover no-repeat;
   display: flex;
   align-items: center;
@@ -672,7 +776,7 @@ main {
   font-size: 1.55rem;
   color: var(--ink);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 .browse-header h2 span { color: var(--green); }
 .browse-header p {
@@ -724,7 +828,8 @@ form.post-form label {
 }
 form.post-form input,
 form.post-form select,
-form.post-form textarea {
+form.post-form textarea,
+.modal-input {
   width: 100%;
   padding: 11px 14px;
   border: 1px solid var(--line);
@@ -738,7 +843,8 @@ form.post-form textarea {
 }
 form.post-form input:focus,
 form.post-form select:focus,
-form.post-form textarea:focus {
+form.post-form textarea:focus,
+.modal-input:focus {
   border-color: var(--green);
   box-shadow: 0 0 0 3px var(--green-glow);
 }
@@ -773,7 +879,7 @@ form.post-form textarea {
   cursor: pointer;
   font-size: 1rem;
   transition: transform var(--transition), box-shadow var(--transition);
-  box-shadow: 0 4px 14px var(--green-glow);
+  box-shadow: 0 7px 18px rgba(15, 138, 95, 0.18);
 }
 .submit-btn:disabled {
   opacity: 0.5;
@@ -782,7 +888,7 @@ form.post-form textarea {
 }
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(13, 155, 108, 0.3);
+  box-shadow: 0 10px 24px rgba(15, 138, 95, 0.3);
 }
 
 .msg {
@@ -795,12 +901,12 @@ form.post-form textarea {
 .msg.error {
   background: var(--danger-soft);
   color: var(--danger);
-  border: 1px solid #f5c6cb;
+  border: 1px solid #f8c4c4;
 }
 .msg.success {
   background: var(--green-soft);
-  color: #0f7a4f;
-  border: 1px solid #b8e6d4;
+  color: #0d6e4a;
+  border: 1px solid #b2e2cd;
 }
 
 /* ---------- Modal ---------- */
@@ -808,7 +914,7 @@ form.post-form textarea {
   position: fixed;
   inset: 0;
   background: rgba(10, 14, 20, 0.72);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -824,7 +930,7 @@ form.post-form textarea {
   overflow: hidden;
   max-height: 92vh;
   overflow-y: auto;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
   animation: modalUp 0.25s ease;
 }
 @keyframes modalUp {
@@ -896,7 +1002,7 @@ form.post-form textarea {
 .btn-contact {
   background: linear-gradient(135deg, var(--green), var(--green-dark));
   color: #fff;
-  box-shadow: 0 4px 12px var(--green-glow);
+  box-shadow: 0 7px 18px rgba(15, 138, 95, 0.18);
 }
 .btn-report {
   background: var(--surface);
@@ -1099,7 +1205,7 @@ form.post-form textarea {
   justify-content: center;
   font-size: 3rem;
   margin: 0 auto 24px;
-  box-shadow: 0 0 40px rgba(13, 155, 108, 0.2);
+  box-shadow: 0 0 40px rgba(15, 138, 95, 0.2);
 }
 .call-name {
   font-size: 1.6rem;
@@ -1135,7 +1241,7 @@ form.post-form textarea {
 .call-decline {
   background: var(--danger);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(229, 72, 77, 0.3);
+  box-shadow: 0 4px 16px rgba(217, 56, 58, 0.3);
 }
 .call-mute {
   background: rgba(255, 255, 255, 0.12);
@@ -1143,510 +1249,151 @@ form.post-form textarea {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 768px) {
-  .app-shell { flex-direction: column; }
-  .sidebar {
-    width: 100%;
-    min-height: auto;
-    height: auto;
-    position: static;
-    flex-direction: column;
-    border-right: none;
-    border-bottom: 1px solid var(--line);
-  }
-  .side-nav {
-    display: flex;
-    overflow-x: auto;
-    padding: 10px 12px;
-    gap: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .side-nav .tab {
-    flex-shrink: 0;
-    border-radius: 10px;
-    padding: 10px 14px;
-    white-space: nowrap;
-    margin-bottom: 0;
-  }
-  .side-nav .tab.active {
-    background: var(--green-soft);
-  }
-  .sidebar-account {
-    border-top: none;
-    padding: 12px 16px;
-  }
-  main { padding: 16px 12px 80px; }
-  .row2 { grid-template-columns: 1fr; gap: 12px; }
-  .panel { padding: 16px; border-radius: 14px; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-  header { padding: 0 14px; }
-}
-
-
-/* =========================================================
-   Wana Dating — UI polish layer
-   IMPORTANT: this layer keeps the original layout contract.
-   The application CSS above remains authoritative for structure.
-   ========================================================= */
-
-:root{
-  --ui-green:#0d9b6c;
-  --ui-green-dark:#0a7a55;
-  --ui-mint:#eaf8f3;
-  --ui-ink:#12141a;
-  --ui-muted:#6b7280;
-  --ui-line:#e6e9ee;
-  --ui-shadow:0 10px 30px rgba(18,20,26,.07);
-  --ui-shadow-lg:0 20px 55px rgba(18,20,26,.12);
-  --ui-radius:18px;
-}
-
-/* Keep the original structural layout intact */
-html,body{min-height:100%}
-body{
-  background:
-    radial-gradient(circle at 88% 0%,rgba(13,155,108,.07),transparent 26rem),
-    var(--paper);
-}
-header{
-  position:sticky!important;
-  top:0!important;
-  z-index:200!important;
-  backdrop-filter:blur(14px);
-}
-.app-shell{
-  display:flex!important;
-  align-items:flex-start!important;
-  max-width:1240px!important;
-  width:100%!important;
-  margin:0 auto!important;
-}
-.sidebar{
-  flex:0 0 240px!important;
-  width:240px!important;
-  min-width:240px!important;
-  position:sticky!important;
-  top:var(--header-h)!important;
-  height:calc(100vh - var(--header-h))!important;
-  overflow-y:auto!important;
-}
-main{
-  flex:1 1 auto!important;
-  min-width:0!important;
-  width:auto!important;
-  max-width:980px!important;
-  margin:0 auto!important;
-}
-
-/* Header: clean, compact and aligned */
-header .brand{
-  font-weight:800!important;
-  letter-spacing:-.03em!important;
-}
-header nav{
-  display:flex!important;
-  align-items:center!important;
-  gap:8px!important;
-}
-header nav a,
-header button.lang{
-  transition:background .2s ease,color .2s ease,transform .2s ease!important;
-}
-header nav a:hover,
-header button.lang:hover{
-  transform:translateY(-1px);
-}
-.signin-pill{
-  box-shadow:0 6px 18px rgba(13,155,108,.18)!important;
-}
-
-/* Sidebar */
-.side-nav .tab{
-  transition:background .18s ease,color .18s ease,transform .18s ease!important;
-}
-.side-nav .tab:hover{transform:translateX(2px)}
-.side-nav .tab.active{
-  box-shadow:inset 3px 0 0 var(--green)!important;
-}
-
-/* Main content */
-.panel{
-  border-radius:20px!important;
-  box-shadow:var(--ui-shadow)!important;
-}
-.browse-header h2{
-  letter-spacing:-.025em!important;
-}
-.filters{
-  box-shadow:none!important;
-}
-.grid{
-  gap:18px!important;
-}
-.card{
-  border-radius:18px!important;
-  box-shadow:0 6px 22px rgba(18,20,26,.06)!important;
-}
-.card:hover{
-  transform:translateY(-5px)!important;
-  box-shadow:var(--ui-shadow-lg)!important;
-}
-.card .photo{
-  aspect-ratio:1/1.08!important;
-}
-
-/* Home composer */
-#homePanel > div:first-of-type{
-  border-radius:18px!important;
-  box-shadow:0 5px 20px rgba(18,20,26,.045)!important;
-}
-
-/* Forms */
-.post-form input,
-.post-form select,
-.post-form textarea,
-.modal-input{
-  transition:border-color .18s ease,box-shadow .18s ease!important;
-}
-.post-form input:focus,
-.post-form select:focus,
-.post-form textarea:focus,
-.modal-input:focus{
-  border-color:var(--green)!important;
-  box-shadow:0 0 0 3px var(--green-glow)!important;
-}
-.submit-btn,
-.btn-contact{
-  box-shadow:0 7px 18px rgba(13,155,108,.18)!important;
-}
-
-/* Modals and notifications */
-.modal{
-  border-radius:20px!important;
-  box-shadow:0 24px 70px rgba(0,0,0,.20)!important;
-}
-.modal-backdrop{
-  backdrop-filter:blur(6px)!important;
-}
-.notif-panel{
-  box-shadow:0 18px 50px rgba(18,20,26,.16)!important;
-}
-
-/* Keep gate centered within the main content area */
-#gate{
-  width:100%;
-  min-height:calc(100vh - var(--header-h) - 56px);
-}
-
-/* Mobile: preserve the original responsive behavior */
-@media(max-width:768px){
-  .app-shell{
-    display:flex!important;
-    flex-direction:column!important;
-    width:100%!important;
-  }
-  .sidebar{
-    flex:0 0 auto!important;
-    width:100%!important;
-    min-width:0!important;
-    min-height:auto!important;
-    height:auto!important;
-    position:sticky!important;
-    top:var(--header-h)!important;
-    z-index:150!important;
-  }
-  main{
-    width:100%!important;
-    max-width:none!important;
-    min-width:0!important;
-    margin:0!important;
-  }
-  .side-nav .tab:hover{transform:none}
-  .grid{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:12px!important;
-  }
-  .card .photo{aspect-ratio:1/1.15!important}
-}
-
-@media(max-width:420px){
-  .grid{gap:9px!important}
-  .panel{padding:14px!important}
-}
-
-
-/* =========================================================
-   Wana Dating — 2026 Professional Home Experience
-   ========================================================= */
-:root{
-  --brand:#10a874;
-  --brand-deep:#087a57;
-  --rose:#ef476f;
-  --navy:#111827;
-  --bg:#f5f7fa;
-  --card:#ffffff;
-}
-body{background:linear-gradient(180deg,#f8fafc 0%,#f2f5f8 100%)}
-header{height:68px;padding:0 28px;background:rgba(13,18,28,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
-header .brand{font-size:1.32rem;letter-spacing:-.04em}
-header .brand:before{content:'♥';display:inline-grid;place-items:center;width:27px;height:27px;margin-right:8px;border-radius:9px;background:linear-gradient(135deg,#20c997,#0a8f66);font-size:.8rem;color:#fff;vertical-align:middle;box-shadow:0 5px 16px rgba(16,168,116,.28)}
-.app-shell{max-width:1480px;min-height:calc(100vh - 68px);gap:0}
-.sidebar{width:248px;background:rgba(255,255,255,.94);border-right:1px solid #e5e9ef;box-shadow:8px 0 30px rgba(17,24,39,.025)}
-.side-nav{padding:20px 12px}
-.side-nav:before{content:'DISCOVER';display:block;padding:0 13px 10px;color:#9aa3b2;font-size:.68rem;font-weight:800;letter-spacing:.12em}
-.side-nav .tab{position:relative;padding:12px 14px;margin-bottom:4px;border-radius:12px;font-size:.91rem;gap:13px}
-.side-nav .tab:hover{background:#f1f8f5;transform:translateX(2px)}
-.side-nav .tab.active{background:linear-gradient(90deg,#e5f8f1,#effaf6);color:#087a57;box-shadow:inset 3px 0 0 #10a874}
-.side-icon{font-size:1.05rem}
-.sidebar-account{padding:18px;background:#f8fafc}
-main{max-width:none;min-width:0;padding:30px 28px 90px}
-.panel{border:1px solid #e5e9ef;border-radius:20px;box-shadow:0 8px 30px rgba(17,24,39,.045);background:rgba(255,255,255,.96)}
-#homePanel{background:transparent;border:0;box-shadow:none;padding:0;min-height:0}
-.wana-home-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:24px;align-items:start}
-.wana-feed-column{min-width:0}
-.wana-hero{position:relative;overflow:hidden;margin-bottom:20px;padding:28px 30px;border-radius:22px;background:linear-gradient(135deg,#0d7f5b 0%,#10a874 54%,#34c995 100%);color:#fff;box-shadow:0 16px 40px rgba(8,122,87,.18)}
-.wana-hero:after{content:'';position:absolute;width:220px;height:220px;right:-70px;top:-80px;border:42px solid rgba(255,255,255,.08);border-radius:50%}
-.wana-hero .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.82;margin-bottom:7px}
-.wana-hero h1{font-family:var(--font-display);font-size:clamp(1.65rem,3vw,2.15rem);line-height:1.15;margin:0 0 8px;letter-spacing:-.03em;position:relative;z-index:1}
-.wana-hero p{max-width:650px;margin:0;color:rgba(255,255,255,.88);font-size:.93rem;position:relative;z-index:1}
-.wana-quick-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px;position:relative;z-index:2}
-.wana-quick-actions button{border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.13);color:#fff;border-radius:999px;padding:9px 14px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);transition:.2s}
-.wana-quick-actions button:hover{background:#fff;color:#087a57;transform:translateY(-1px)}
-.wana-composer{background:#fff;border:1px solid #e5e9ef;border-radius:20px;padding:18px;margin-bottom:20px;box-shadow:0 8px 26px rgba(17,24,39,.04)}
-.wana-composer textarea{background:#f8fafc!important;border-color:#e8edf2!important;border-radius:15px!important;min-height:78px!important}
-.wana-discover{position:sticky;top:88px;background:#fff;border:1px solid #e5e9ef;border-radius:22px;padding:18px;box-shadow:0 12px 34px rgba(17,24,39,.06)}
-.wana-discover-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}
-.wana-discover-head h3{font-size:1.02rem;margin:0;font-weight:800;color:#111827}
-.wana-discover-head p{font-size:.76rem;color:#8a93a1;margin:3px 0 0}
-.wana-discover-head button{border:0;background:#f1f8f5;color:#087a57;border-radius:9px;padding:7px 9px;cursor:pointer;font-weight:800}
-.wana-rec-list{display:grid;gap:11px}
-.wana-rec{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:11px;align-items:center;padding:8px;border-radius:15px;cursor:pointer;transition:.2s;border:1px solid transparent}
-.wana-rec:hover{background:#f7faf9;border-color:#e2eee9;transform:translateY(-1px)}
-.wana-rec-photo{width:62px;height:72px;border-radius:13px;background:#edf1f4 center/cover no-repeat;display:grid;place-items:center;font-size:1.5rem;color:#aab2bd;position:relative;overflow:hidden}
-.wana-rec-photo:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.15))}
-.wana-rec .online{position:absolute;z-index:2;right:5px;bottom:5px;width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid #fff}
-.wana-rec-name{font-weight:800;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#172033}
-.wana-rec-meta{font-size:.74rem;color:#8993a1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wana-match{font-size:.7rem;font-weight:800;color:#087a57;background:#e9f8f2;padding:5px 7px;border-radius:8px;white-space:nowrap}
-.wana-discover-footer{margin-top:13px;padding-top:13px;border-top:1px solid #eef0f3;text-align:center}
-.wana-discover-footer button{border:0;background:none;color:#087a57;font-size:.82rem;font-weight:800;cursor:pointer}
-.wana-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.wana-stat{background:#fff;border:1px solid #e5e9ef;border-radius:15px;padding:13px 14px}
-.wana-stat strong{display:block;font-size:1.08rem;color:#172033}
-.wana-stat span{font-size:.7rem;color:#8b94a2}
-@media(max-width:1100px){.wana-home-layout{grid-template-columns:minmax(0,1fr) 290px}.sidebar{width:220px}}
-@media(max-width:900px){.wana-home-layout{grid-template-columns:1fr}.wana-discover{position:relative;top:auto}.wana-rec-list{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:22px 18px 70px}}
-@media(max-width:650px){header{padding:0 15px}.sidebar{width:100%;height:auto;min-height:0;position:sticky;top:68px;z-index:150;border-right:0;border-bottom:1px solid #e5e9ef}.app-shell{display:block}.side-nav{display:flex;overflow-x:auto;padding:8px;gap:5px}.side-nav:before{display:none}.side-nav .tab{white-space:nowrap;padding:9px 12px;margin:0}.sidebar-account{display:none!important}main{padding:16px 12px 60px}.wana-hero{padding:22px 20px}.wana-rec-list{grid-template-columns:1fr}.wana-stats{gap:7px}.wana-stat{padding:10px}}
-</style>
-<style id="wana-dating-maintenance-patch">
-  .profile-media-loading{background:#eef2f5!important;position:relative}
-  .profile-media-loading::after{content:"";width:18px;height:18px;border:2px solid #cbd5df;border-top-color:var(--green);border-radius:50%;animation:wanaSpin .7s linear infinite;position:absolute;left:50%;top:50%;margin:-9px}
-  @keyframes wanaSpin{to{transform:rotate(360deg)}}
-  .compatibility-note{margin:10px 0;padding:9px 12px;border-radius:10px;background:var(--green-soft);color:var(--green-dark);font-size:.8rem;font-weight:600}
-</style>
-<style id="wana-sidebar-layout-fix">
-/* Keep the dating navigation on the LEFT for desktop/tablet widths.
-   Several older responsive rules in this file changed .app-shell to a
-   vertical layout at 768px. This final layer intentionally wins. */
-@media (min-width: 701px) {
-  .app-shell {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    max-width: 1480px !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
-
-  .app-shell > .sidebar {
-    display: flex !important;
-    flex: 0 0 248px !important;
-    width: 248px !important;
-    min-width: 248px !important;
-    position: sticky !important;
-    top: 68px !important;
-    height: calc(100vh - 68px) !important;
-    min-height: calc(100vh - 68px) !important;
-    align-self: flex-start !important;
-  }
-
-  .app-shell > main {
-    display: block !important;
-    flex: 1 1 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 30px 28px 90px !important;
-  }
-
-  .side-nav .tab {
-    width: 100% !important;
-  }
-}
-
-/* Only turn the navigation into a top/mobile bar on genuinely small screens. */
-@media (max-width: 700px) {
-  .app-shell {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  .app-shell > .sidebar {
-    width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: sticky !important;
-    top: 68px !important;
-  }
-
-  .app-shell > main {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-  }
-}
-</style>
-<style id="final-sidebar-main-layout">
-/* FINAL WANA LAYOUT FIX
-   Desktop/tablet: sidebar is permanently column 1 and all tab panels are
-   rendered in main column 2. Mobile only stacks at 600px and below. */
-@media (min-width: 601px) {
-  html, body { width: 100%; min-width: 0; }
-  .app-shell {
-    display: grid !important;
-    grid-template-columns: 248px minmax(0, 1fr) !important;
-    grid-template-rows: auto !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    max-width: 1480px !important;
-    min-width: 0 !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
-  .app-shell > .sidebar {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    width: 248px !important;
-    min-width: 248px !important;
-    max-width: 248px !important;
-    height: calc(100vh - 68px) !important;
-    min-height: calc(100vh - 68px) !important;
-    position: sticky !important;
-    top: 68px !important;
-    align-self: start !important;
-    overflow-y: auto !important;
-  }
-  .app-shell > main {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 30px 28px 90px !important;
-    box-sizing: border-box !important;
-  }
-  .app-shell > main > .panel,
-  .app-shell > main > #gate {
-    width: 100% !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
-  }
-  .side-nav .tab { width: 100% !important; box-sizing: border-box !important; }
-}
-
-@media (max-width: 600px) {
-  .app-shell {
-    display: block !important;
-    width: 100% !important;
-    max-width: none !important;
-  }
-  .app-shell > .sidebar {
-    display: flex !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: sticky !important;
-    top: 68px !important;
-  }
-  .app-shell > main {
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 16px 12px 60px !important;
-  }
-}
-</style>
-<style id="wana-sidebar-main-final">
-/* =========================================================
-   FINAL SIDEBAR + MAIN CONTENT LAYOUT
-   Sidebar = column 1, selected panel = column 2.
-   Only very small phones stack the navigation.
-   ========================================================= */
-.app-shell {
-  display: grid !important;
-  grid-template-columns: 260px minmax(0, 1fr) !important;
-  grid-template-areas: "sidebar content" !important;
-  align-items: start !important;
-  width: 100% !important;
-  max-width: 1480px !important;
-  margin: 0 auto !important;
-  min-height: calc(100vh - var(--header-h)) !important;
-  gap: 0 !important;
-}
-
-.app-shell > .sidebar {
-  grid-area: sidebar !important;
-  display: flex !important;
-  flex-direction: column !important;
-  width: 260px !important;
-  min-width: 260px !important;
-  max-width: 260px !important;
-  height: calc(100vh - var(--header-h)) !important;
-  min-height: calc(100vh - var(--header-h)) !important;
-  position: sticky !important;
-  top: var(--header-h) !important;
-  align-self: start !important;
-  overflow-y: auto !important;
-}
-
-.app-shell > main {
-  grid-area: content !important;
+/* ---------- Right Match Rail ---------- */
+.wana-right-match-rail {
+  grid-area: rail !important;
   display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  padding: 22px 12px 70px 0 !important;
   margin: 0 !important;
-  padding: 28px 28px 80px !important;
-  overflow: visible !important;
+  box-sizing: border-box !important;
+  align-self: start !important;
+}
+.wana-right-match-card {
+  position: sticky;
+  top: 86px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px 10px 12px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
+}
+.wana-right-match-head {
+  text-align: center;
+  padding: 2px 4px 12px;
+}
+.wana-right-match-head h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+.wana-right-match-head h3 span { color: var(--green); }
+.wana-right-match-list {
+  display: grid;
+  gap: 12px;
+}
+.wana-right-match {
+  min-width: 0;
+  cursor: pointer;
+}
+.wana-right-match-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: #edf1f4 center / cover no-repeat;
+  display: grid;
+  place-items: center;
+  color: #aab2bd;
+  font-size: 2rem;
+  overflow: hidden;
+  position: relative;
+}
+.wana-right-match-photo .online {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #fff;
+}
+.wana-right-match-name {
+  margin-top: 7px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wana-right-match-meta {
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-top: 1px;
+  min-height: 16px;
+}
+.wana-right-match-btn {
+  width: 100%;
+  margin-top: 7px;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 8px;
+  background: var(--green);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.wana-right-match-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+.wana-right-match-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #eef0f3;
+}
+.wana-right-match-footer button {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 10px;
+  background: var(--green);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.wana-right-match-footer button:hover { filter: brightness(0.95); }
+.wana-right-match-empty {
+  padding: 18px 8px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
 }
 
-/* Every selectable panel occupies the main/content column. */
-.app-shell > main > .panel,
-.app-shell > main > #gate {
-  grid-area: content !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+/* Maintenance patch styles */
+.profile-media-loading { background: #eef2f5 !important; position: relative; }
+.profile-media-loading::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5df;
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: wanaSpin 0.7s linear infinite;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -9px;
+}
+@keyframes wanaSpin { to { transform: rotate(360deg); } }
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .app-shell > #rightMatchRail { display: none !important; }
+  .app-shell {
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+    grid-template-areas: "sidebar content" !important;
+  }
 }
 
-.side-nav .tab {
-  width: 100% !important;
-}
-
-/* Phone layout only. */
 @media (max-width: 600px) {
   .app-shell {
     display: block !important;
@@ -1663,662 +1410,489 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
     position: sticky !important;
     top: var(--header-h) !important;
   }
+  .side-nav {
+    display: flex;
+    overflow-x: auto;
+    padding: 8px;
+    gap: 5px;
+  }
+  .side-nav::before { display: none; }
+  .side-nav .tab {
+    white-space: nowrap;
+    padding: 9px 12px;
+    margin: 0;
+  }
+  .sidebar-account { display: none !important; }
   .app-shell > main {
     width: 100% !important;
     min-width: 0 !important;
     padding: 16px 12px 60px !important;
   }
-}
-</style>
-
-<style id="wana-new-matches-rail">
-/* Right-side New Matches feature */
-.app-shell > main{
-  min-width:0;
-}
-.wana-right-match-rail{
-  flex:0 0 250px;
-  width:250px;
-  margin:0;
-  padding:22px 12px 70px 0;
-  min-width:0;
-}
-.wana-right-match-card{
-  position:sticky;
-  top:86px;
-  background:#fff;
-  border:1px solid #e5e9ef;
-  border-radius:18px;
-  padding:14px 10px 12px;
-  box-shadow:0 10px 28px rgba(17,24,39,.06);
-}
-.wana-right-match-head{
-  text-align:center;
-  padding:2px 4px 12px;
-}
-.wana-right-match-head h3{
-  margin:0;
-  font-size:.92rem;
-  font-weight:800;
-  color:#4b4f57;
-}
-.wana-right-match-head h3 span{color:#4b8ee8}
-.wana-right-match-list{
-  display:grid;
-  gap:12px;
-}
-.wana-right-match{
-  min-width:0;
-}
-.wana-right-match-photo{
-  width:100%;
-  aspect-ratio:1/1;
-  border-radius:8px;
-  background:#edf1f4 center/cover no-repeat;
-  display:grid;
-  place-items:center;
-  color:#aab2bd;
-  font-size:2rem;
-  overflow:hidden;
-  position:relative;
-}
-.wana-right-match-photo .online{
-  position:absolute;
-  right:7px;
-  bottom:7px;
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#22c55e;
-  border:2px solid #fff;
-}
-.wana-right-match-name{
-  margin-top:7px;
-  font-size:.72rem;
-  font-weight:800;
-  color:#4b4f57;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.wana-right-match-meta{
-  font-size:.68rem;
-  color:#8b94a2;
-  margin-top:1px;
-  min-height:16px;
-}
-.wana-right-match-btn{
-  width:100%;
-  margin-top:7px;
-  border:0;
-  border-radius:999px;
-  padding:6px 8px;
-  background:#6651a6;
-  color:#fff;
-  font-size:.62rem;
-  font-weight:800;
-  cursor:pointer;
-  transition:transform .18s ease,opacity .18s ease;
-}
-.wana-right-match-btn:hover{
-  transform:translateY(-1px);
-  opacity:.92;
-}
-.wana-right-match-footer{
-  margin-top:12px;
-  padding-top:10px;
-  border-top:1px solid #eef0f3;
-}
-.wana-right-match-footer button{
-  width:100%;
-  border:0;
-  border-radius:999px;
-  padding:9px 10px;
-  background:#f04458;
-  color:#fff;
-  font-size:.68rem;
-  font-weight:800;
-  cursor:pointer;
-}
-.wana-right-match-footer button:hover{filter:brightness(.96)}
-.wana-right-match-empty{
-  padding:18px 8px;
-  text-align:center;
-  color:#7d8795;
-  font-size:.76rem;
-  line-height:1.45;
-}
-@media(max-width:1050px){
-  .wana-right-match-rail{
-    flex-basis:215px;
-    width:215px;
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
   }
-}
-@media(max-width:900px){
-  .wana-right-match-rail{display:none}
-}
-</style>
-
-<style id="wana-right-rail-layout-final">
-/* Final three-column desktop layout: sidebar | selected panel | new matches rail */
-@media (min-width: 601px){
-  .app-shell{
-    display:grid !important;
-    grid-template-columns:260px minmax(0,1fr) 250px !important;
-    grid-template-areas:"sidebar content rail" !important;
-    align-items:start !important;
-    width:100% !important;
-    max-width:1480px !important;
-    margin:0 auto !important;
-    min-height:calc(100vh - var(--header-h)) !important;
-    gap:0 !important;
-  }
-  .app-shell > .sidebar{
-    grid-area:sidebar !important;
-  }
-  .app-shell > main{
-    grid-area:content !important;
-    min-width:0 !important;
-    width:auto !important;
-    max-width:none !important;
-  }
-  .app-shell > #rightMatchRail{
-    grid-area:rail !important;
-    display:block !important;
-    width:250px !important;
-    min-width:250px !important;
-    max-width:250px !important;
-    padding:22px 12px 70px 0 !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
-    align-self:start !important;
-  }
-}
-@media (max-width: 600px){
-  .app-shell > #rightMatchRail{display:none !important;}
-}
-</style>
-<style id="wana-right-rail-layout">
-@media (min-width:701px){
-  .app-shell > main{
-    flex:1 1 auto !important;
-    min-width:0 !important;
-    max-width:none !important;
-  }
-}
-@media (max-width:700px){
-  .wana-right-match-rail{display:none!important}
+  .row2 { grid-template-columns: 1fr; gap: 12px; }
+  header { padding: 0 14px; }
 }
 </style>
 </head>
 <body>
 <header>
-<div class="brand">Wana <span>Dating</span></div>
-<nav style="display: flex; align-items: center;">
-<button class="lang" id="langBtn" onclick="toggleLang()" style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px;">EN</button>
-<a href="index.html" style="margin-left: 20px;">← Back to Shop</a>
-<button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')">👤 Sign In</button>
-<div class="notif-wrap" id="notifWrap" style="display:none;">
-<button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
-<div class="notif-panel" id="notifPanel">
-<div class="head">
-<strong>Notifications <span id="notifUnreadLabel" style="color:var(--green);font-weight:700;"></span></strong>
-<button onclick="markAllNotificationsRead()">Mark all read</button>
-</div>
-<div id="notifList"></div>
-</div>
-</div>
-</nav>
+  <a href="#" class="brand">Ethiopian<span class="green">P</span><span class="yellow">e</span><span class="red">r</span>sonals.com</a>
+  <nav style="display: flex; align-items: center;">
+    <button class="lang" id="langBtn" onclick="toggleLang()" style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px;">EN</button>
+    <a href="index.html" style="margin-left: 10px;">← Main Site</a>
+    <button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')">👤 Sign In</button>
+    <div class="notif-wrap" id="notifWrap" style="display:none;">
+      <button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="head">
+          <strong>Notifications <span id="notifUnreadLabel" style="color:var(--green);font-weight:700;"></span></strong>
+          <button onclick="markAllNotificationsRead()">Mark all read</button>
+        </div>
+        <div id="notifList"></div>
+      </div>
+    </div>
+  </nav>
 </header>
+
 <div class="app-shell">
-<aside class="sidebar">
-<nav class="side-nav">
-<div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
-<div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
-<div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
-<div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
-<div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
-<div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
-<div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
-<div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
-<div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
-</nav>
-<div class="sidebar-account" id="accountBox" style="display:none;">
-<div class="who">
-<span id="menuAvatar"></span>
-<div class="name" id="menuName"></div>
-</div>
-<div class="account-links">
-<button onclick="switchTab('myprofile');">Edit Profile</button>
-<button onclick="switchTab('settings');">Privacy Settings</button>
-<button class="danger" onclick="signOut()">Sign out</button>
-</div>
-</div>
-</aside>
-<main>
-<!-- GATEKEEPER -->
-<div class="welcome-container" id="gate" style="display:none;">
-<div class="overlay"></div>
-<div class="welcome-card">
-<h1 class="welcome-title">
-        Welcome to Wana Dating <span class="heart-icon">❤️</span>
-</h1>
-<p class="welcome-description">
-        Connect with singles in Ethiopia looking for friendship, dating, or marriage. You must be signed in to browse or match.
-      </p>
-<button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
-<a href="index.html" style="display:inline-block;margin-top:16px;font-size:.85rem;color:#6b7280;text-decoration:none;font-weight:500;transition:color .2s;">← Back to marketplace</a>
-</div>
-</div>
-<!-- HOME FEED -->
-<div class="panel" id="homePanel" style="display:none;">
-<div class="wana-hero">
-<div class="eyebrow">Wana Dating</div>
-<h1>Meet someone who feels right. ❤️</h1>
-<p>Discover genuine connections based on your preferences, lifestyle and relationship goals.</p>
-<div class="wana-quick-actions">
-<button onclick="switchTab('browse')">🔎 Discover matches</button>
-<button onclick="switchTab('newmembers')">✨ New members</button>
-<button onclick="switchTab('myprofile')">✦ Improve my profile</button>
-</div>
-</div>
-<div class="wana-home-layout">
-<div class="wana-feed-column">
-<div class="wana-composer">
-<div style="display:flex;gap:12px;align-items:flex-start;">
-<div id="composerAvatar" style="width:46px;height:46px;border-radius:50%;flex-shrink:0;background:var(--paper);display:flex;align-items:center;justify-content:center;color:#aaa; font-size: 1.5rem;">👤</div>
-<div style="flex:1;">
-<div id="profileGateNotice" style="display:none;background:#FFF9EE;color:#8A6D1F;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:.88rem;">
-            Set up your profile to post and send messages.
-            <a href="#" onclick="switchTab('post');return false;" style="color:var(--green);font-weight:700;">Set up now</a>
-</div>
-<textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or what you are looking for..." style="width:100%;min-height:70px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:.95rem;resize:vertical; outline:none;"></textarea>
-<div id="postImagePreview" style="margin-top:8px;"></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px; flex-wrap:wrap; gap: 10px;">
-<label style="display:flex;align-items:center;gap:6px;font-size:.9rem;color:#444;cursor:pointer; font-weight:600; background: var(--paper); padding: 8px 14px; border-radius: 20px;">
-              🖼️ Add Photo
-              <input accept="image/*" id="postImage" onchange="previewPostImage()" style="display:none;" type="file"/>
-</label>
-<div style="display: flex; gap: 10px; align-items:center;">
-<select id="postVisibility" style="border:1px solid var(--line);border-radius:20px;padding:8px 12px;font-size:.85rem;color:#555; outline:none;">
-<option value="public">🌍 Public (Everyone)</option>
-<option value="matches">👥 Only My Matches</option>
-</select>
-<button id="postSubmitBtn" onclick="submitPost()" style="background:var(--green);color:#fff;border:none;border-radius:20px;padding:8px 24px;font-weight:700;cursor:pointer;">Post</button>
-</div>
-</div>
-<div id="postMsg"></div>
-</div>
-</div>
-</div>
-<div id="feed"></div>
-<div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something!</div>
-</div>
-<!-- BROWSE MATCHES -->
-</div>
-</div>
-<div class="panel" id="browsePanel"  style="display:none;">
-<div class="browse-header">
-<h2>Find Singles <span>Online</span></h2>
-<p>Browse people near you looking for friendship, dating, or marriage. Like a profile to start chatting.</p>
-</div>
-<div class="filters">
-<select id="filterSeeking">
-<option value="">Show: Everyone</option>
-<option value="Male">Men</option>
-<option value="Female">Women</option>
-</select>
-<select id="filterType">
-<option value="">Any Purpose</option>
-<option value="Friendship">Friendship</option>
-<option value="Dating">Dating</option>
-<option value="Marriage">Marriage</option>
-</select>
-<input id="filterCity" placeholder="Filter by City..." type="text"/>
-<input id="filterAgeMin" max="99" min="18" placeholder="Min age" style="width:90px;" type="number"/>
-<input id="filterAgeMax" max="99" min="18" placeholder="Max age" style="width:90px;" type="number"/>
-<select id="filterReligion">
-<option value="">Any Religion</option>
-<option>Orthodox Christian</option>
-<option>Protestant</option>
-<option>Muslim</option>
-<option>Catholic</option>
-<option>Traditional</option>
-<option>Other</option>
-</select>
-<select id="filterLifestyle">
-<option value="">Any Lifestyle</option>
-<option>Active &amp; Outdoorsy</option>
-<option>Homebody</option>
-<option>Social &amp; Outgoing</option>
-<option>Balanced</option>
-<option>Career-focused</option>
-<option>Family-oriented</option>
-<option>Other</option>
-</select>
-<select id="filterHasKids">
-<option value="">Has kids: Any</option>
-<option value="Yes">Yes</option>
-<option value="No">No</option>
-</select>
-<select id="filterWantsKids">
-<option value="">Wants kids: Any</option>
-<option value="Yes">Yes</option>
-<option value="No">No</option>
-<option value="Maybe">Maybe</option>
-</select>
-<label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
-<input id="filterOnline" style="width:18px; height:18px;" type="checkbox"/> Online now
-      </label>
-<label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
-<input id="filterVerified" style="width:18px; height:18px;" type="checkbox"/> Verified only
-      </label>
-<button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer; font-weight:bold;">Filter Results</button>
-<button onclick="clearBrowseFilters()" style="background:none;border:1px solid var(--line);color:#666;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.85rem;">Clear filters</button>
-</div>
-<div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:16px;"></div>
-<div class="grid" id="grid"></div>
-<div class="empty" id="emptyState" style="display:none;">No profiles match your filters yet — check back soon.</div>
-<div class="more-wrap" id="moreWrap" style="display:none;">
-<button class="more-btn" id="moreBtn" onclick="showMoreProfiles()">Load More Profiles</button>
-</div>
-</div><div class="panel" id="newMembersPanel" style="display:none;">
-<div class="browse-header">
-<h2>New <span>Members</span></h2>
-<p>People who've just joined, newest first.</p>
-</div>
-<div class="grid" id="newMembersGrid"></div>
-<div class="empty" id="newMembersEmpty" style="display:none;">No new members to show right now.</div>
-</div><div class="panel" id="postPanel" style="display:none;">
-<div class="browse-header">
-<h2>Create Your <span>Dating Profile</span></h2>
-<p>Fill out the details below to start matching with people.</p>
-</div>
-<form class="post-form" id="postForm">
-<div>
-<label>First Name (Shown Publicly)</label>
-<input id="fName" maxlength="30" placeholder="Your name" required="" type="text"/>
-</div>
-<div class="row2">
-<div>
-<label>Age</label>
-<input id="fAge" max="99" min="18" placeholder="18+" required="" type="number"/>
-</div>
-<div>
-<label>City</label>
-<input id="fCity" placeholder="e.g. Addis Ababa" required="" type="text"/>
-</div>
-</div>
-<div class="row2">
-<div>
-<label>I Am A</label>
-<select id="fGender" required="">
-<option value="">Select Gender</option>
-<option>Male</option>
-<option>Female</option>
-</select>
-</div>
-<div>
-<label>Looking For</label>
-<select id="fSeeking" required="">
-<option value="">Select Gender</option>
-<option>Male</option>
-<option>Female</option>
-<option>Any</option>
-</select>
-</div>
-</div>
-<div>
-<label>My Goal / Purpose</label>
-<select id="fType" required="">
-<option value="">Select Goal</option>
-<option>Friendship</option>
-<option>Dating</option>
-<option>Marriage</option>
-</select>
-</div>
-<div>
-<label>What I'm Looking For Details</label>
-<select id="fLookingFor" required="">
-<option value="">Select Details</option>
-<option>Long-term relationship</option>
-<option>Something casual</option>
-<option>Marriage</option>
-<option>New friends</option>
-<option>Not sure yet</option>
-</select>
-</div>
-<div class="row2">
-<div>
-<label>Interested In Ages (Min)</label>
-<input id="fAgeMin" max="99" min="18" placeholder="Min Age" required="" type="number"/>
-</div>
-<div>
-<label>Interested In Ages (Max)</label>
-<input id="fAgeMax" max="99" min="18" placeholder="Max Age" required="" type="number"/>
-</div>
-</div>
-<div>
-<label>My Lifestyle</label>
-<select id="fLifestyle" required="">
-<option value="">Select Lifestyle</option>
-<option>Active &amp; Outdoorsy</option>
-<option>Homebody</option>
-<option>Social &amp; Outgoing</option>
-<option>Balanced</option>
-<option>Career-focused</option>
-<option>Family-oriented</option>
-<option>Other</option>
-</select>
-</div>
-<div class="row2">
-<div>
-<label>Have Kids?</label>
-<select id="fHasKids" required="">
-<option value="">Select</option>
-<option>Yes</option>
-<option>No</option>
-</select>
-</div>
-<div>
-<label>Want Kids?</label>
-<select id="fWantsKids" required="">
-<option value="">Select</option>
-<option>Yes</option>
-<option>No</option>
-<option>Maybe</option>
-</select>
-</div>
-</div>
-<div>
-<label>Religion</label>
-<select id="fReligion" required="">
-<option value="">Select Religion</option>
-<option>Orthodox Christian</option>
-<option>Protestant</option>
-<option>Muslim</option>
-<option>Catholic</option>
-<option>Traditional</option>
-<option>Other</option>
-<option>Prefer not to say</option>
-</select>
-</div>
-<div class="row2">
-<div>
-<label>Occupation (Optional)</label>
-<input id="fOccupation" maxlength="60" placeholder="e.g. Engineer" type="text"/>
-</div>
-<div>
-<label>Income (Optional)</label>
-<select id="fIncome">
-<option selected="">Prefer not to say</option>
-<option>Under 10,000 ETB/mo</option>
-<option>10,000–25,000 ETB/mo</option>
-<option>25,000–50,000 ETB/mo</option>
-<option>50,000–100,000 ETB/mo</option>
-<option>100,000+ ETB/mo</option>
-</select>
-</div>
-</div>
-<div>
-<label>About You (Max 500 chars)</label>
-<textarea id="fBio" maxlength="500" placeholder="Tell people a bit about your hobbies, interests, and what makes you unique..." required=""></textarea>
-</div>
-<div>
-<label>Upload Photos (Up to 3)</label>
-<input accept="image/*" id="fPhoto" multiple="" style="padding: 6px; background: #fff;" type="file"/>
-</div>
-<div class="checkbox-line" style="background: #fff9ee; padding: 12px; border-radius: 8px; border: 1px solid #fce3b4;">
-<input id="fAgeConfirm" required="" type="checkbox"/>
-<label for="fAgeConfirm" style="margin:0;font-weight:600; color: #8a6d1f;">I confirm I am 18 years or older and this information is accurate.</label>
-</div>
-<button class="submit-btn" id="submitBtn" type="submit">Publish My Profile</button>
-<div id="formMsg"></div>
-</form>
-</div><div class="panel" id="messagesPanel" style="display:none;">
-<div class="browse-header">
-<h2>Your <span>Messages</span></h2>
-</div>
-<div id="threadList"></div>
-<div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Match with someone from Browse to start a conversation!</div>
-</div><div class="panel" id="likesPanel" style="display:none;">
-<div class="browse-header">
-<h2>People Who <span>Liked You</span></h2>
-<p>Like them back to match and start chatting.</p>
-</div>
-<div class="grid" id="likesGrid"></div>
-<div class="empty" id="likesEmpty" style="display:none;">No one has liked your profile yet. Make sure you have a great photo!</div>
-</div><div class="panel" id="visitorsPanel" style="display:none;">
-<div class="browse-header">
-<h2>Who <span>Viewed You</span></h2>
-<p>People who've recently looked at your profile, most recent first.</p>
-</div>
-<div class="grid" id="visitorsGrid"></div>
-<div class="empty" id="visitorsEmpty" style="display:none;">No one has viewed your profile yet.</div>
-</div><div class="panel" id="myProfilePanel" style="display:none;">
-<div id="myProfileContent"></div>
-</div><div class="panel" id="settingsPanel" style="display:none;">
-<div class="browse-header">
-<h2>Privacy <span>Settings</span></h2>
-<p>Manage your account security and blocked contacts.</p>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-<h3 style="margin-top:0;">Who Can Contact You</h3>
-<p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Control who can call you and who can see when you were last active.</p>
-<div class="row2">
-<div>
-<label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can call you</label>
-<select id="setCallPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
-<option value="everybody">Everybody</option>
-<option value="verified">Verified profiles only</option>
-<option value="matches">My matches only</option>
-<option value="nobody">Nobody</option>
-</select>
-</div>
-<div>
-<label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can see your last seen time</label>
-<select id="setLastSeenPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
-<option value="everybody">Everybody</option>
-<option value="verified">Verified profiles only</option>
-<option value="matches">My matches only</option>
-<option value="nobody">Nobody</option>
-</select>
-</div>
-</div>
-<button class="submit-btn" onclick="updateContactPrivacy()" style="width:auto;padding:10px 24px;margin-top:14px;">Save Preferences</button>
-<div id="contactPrivacyMsg" style="margin-top:10px;"></div>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-<h3 style="margin-top:0;">Change Password</h3>
-<div class="row2">
-<div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">New Password</label><input id="setNewPwd" placeholder="Min 6 characters" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" type="password"/></div>
-<div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Confirm Password</label><input id="setNewPwdConf" placeholder="Confirm new password" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" type="password"/></div>
-</div>
-<button class="submit-btn" onclick="updateAccountPassword()" style="width:auto;padding:10px 24px;margin-top:14px;">Update Password</button>
-<div id="pwdMsg" style="margin-top:10px;"></div>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-<h3 style="margin-top:0;">Blocked Users</h3>
-<p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Users you have blocked cannot see your profile or message you.</p>
-<div id="blockedUsersList">Loading...</div>
-</div>
-</div></main>
-<aside class="wana-right-match-rail" id="rightMatchRail">
-  <div class="wana-right-match-card">
-    <div class="wana-right-match-head">
-      <h3>New matches on <span id="matchRailCountry">Ethiopia</span></h3>
+  <!-- Left Sidebar Navigation -->
+  <aside class="sidebar">
+    <nav class="side-nav">
+      <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
+      <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
+      <div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
+      <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
+      <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
+      <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
+      <div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
+      <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
+      <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
+    </nav>
+    <div class="sidebar-account" id="accountBox" style="display:none;">
+      <div class="who">
+        <span id="menuAvatar"></span>
+        <div class="name" id="menuName"></div>
+      </div>
+      <div class="account-links">
+        <button onclick="switchTab('myprofile');">Edit Profile</button>
+        <button onclick="switchTab('settings');">Settings</button>
+        <button class="danger" onclick="signOut()">Sign out</button>
+      </div>
     </div>
-    <div class="wana-right-match-list" id="homeRecommendedList">
-      <div class="wana-right-match-empty">Finding your best matches…</div>
+  </aside>
+
+  <!-- Main Content Panels -->
+  <main>
+    <!-- GATEKEEPER / WELCOME HERO -->
+    <div class="welcome-container" id="gate" style="display:none;">
+      <div class="overlay"></div>
+      <div class="welcome-card">
+        <h1 class="welcome-title">
+          Ethiopian<span class="green">P</span><span class="yellow">e</span><span class="red">r</span>sonals <span class="heart-icon">❤️</span>
+        </h1>
+        <p class="welcome-description">
+          Connect with Ethiopian singles worldwide for friendship, romance, and marriage. Sign in to browse profiles and meet your match.
+        </p>
+        <button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Free</button>
+        <a href="index.html" style="display:inline-block;margin-top:16px;font-size:.85rem;color:#6b7280;text-decoration:none;font-weight:500;">← Return to Main Site</a>
+      </div>
     </div>
-    <div class="wana-right-match-footer">
-      <button type="button" onclick="switchTab('browse')">SEE ALL YOUR MATCHES</button>
+
+    <!-- HOME FEED -->
+    <div class="panel" id="homePanel" style="display:none;">
+      <div class="ep-hero">
+        <div class="eyebrow">EthiopianPersonals.com</div>
+        <h1>Meet Someone Special Today 🇪🇹</h1>
+        <p>Discover genuine connections based on your values, cultural background, and relationship goals.</p>
+        <div class="ep-quick-actions">
+          <button onclick="switchTab('browse')">🔎 Discover matches</button>
+          <button onclick="switchTab('newmembers')">✨ New members</button>
+          <button onclick="switchTab('myprofile')">✦ Improve my profile</button>
+        </div>
+      </div>
+
+      <div class="ep-composer">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div id="composerAvatar" style="width:46px;height:46px;border-radius:50%;flex-shrink:0;background:var(--paper);display:flex;align-items:center;justify-content:center;color:#aaa; font-size: 1.5rem;">👤</div>
+          <div style="flex:1;">
+            <div id="profileGateNotice" style="display:none;background:#FFF9EE;color:#8A6D1F;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:.88rem;">
+              Set up your dating profile to start posting and sending messages.
+              <a href="#" onclick="switchTab('post');return false;" style="color:var(--green);font-weight:700;">Set up now</a>
+            </div>
+            <textarea id="postBody" maxlength="1000" placeholder="Share what's on your mind or what you're looking for..." style="width:100%;min-height:70px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:.95rem;resize:vertical; outline:none;"></textarea>
+            <div id="postImagePreview" style="margin-top:8px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px; flex-wrap:wrap; gap: 10px;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:.9rem;color:#444;cursor:pointer; font-weight:600; background: var(--paper); padding: 8px 14px; border-radius: 20px;">
+                🖼️ Add Photo
+                <input accept="image/*" id="postImage" onchange="previewPostImage()" style="display:none;" type="file"/>
+              </label>
+              <div style="display: flex; gap: 10px; align-items:center;">
+                <select id="postVisibility" style="border:1px solid var(--line);border-radius:20px;padding:8px 12px;font-size:.85rem;color:#555; outline:none;">
+                  <option value="public">🌍 Public (Everyone)</option>
+                  <option value="matches">👥 Only My Matches</option>
+                </select>
+                <button id="postSubmitBtn" onclick="submitPost()" style="background:var(--green);color:#fff;border:none;border-radius:20px;padding:8px 24px;font-weight:700;cursor:pointer;">Post</button>
+              </div>
+            </div>
+            <div id="postMsg"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="feed"></div>
+      <div class="empty" id="feedEmpty" style="display:none;">No posts yet — share something to introduce yourself!</div>
     </div>
-  </div>
-</aside>
+
+    <!-- BROWSE MATCHES -->
+    <div class="panel" id="browsePanel" style="display:none;">
+      <div class="browse-header">
+        <h2>Find Ethiopian <span>Singles</span></h2>
+        <p>Search members in Ethiopia and across the diaspora looking for friendship, dating, or marriage.</p>
+      </div>
+      <div class="filters">
+        <select id="filterSeeking">
+          <option value="">Show: Everyone</option>
+          <option value="Male">Men</option>
+          <option value="Female">Women</option>
+        </select>
+        <select id="filterType">
+          <option value="">Any Purpose</option>
+          <option value="Friendship">Friendship</option>
+          <option value="Dating">Dating</option>
+          <option value="Marriage">Marriage</option>
+        </select>
+        <input id="filterCity" placeholder="Filter by City or Country..." type="text"/>
+        <input id="filterAgeMin" max="99" min="18" placeholder="Min age" style="width:90px;" type="number"/>
+        <input id="filterAgeMax" max="99" min="18" placeholder="Max age" style="width:90px;" type="number"/>
+        <select id="filterReligion">
+          <option value="">Any Religion</option>
+          <option>Orthodox Christian</option>
+          <option>Protestant</option>
+          <option>Muslim</option>
+          <option>Catholic</option>
+          <option>Traditional</option>
+          <option>Other</option>
+        </select>
+        <select id="filterLifestyle">
+          <option value="">Any Lifestyle</option>
+          <option>Active &amp; Outdoorsy</option>
+          <option>Homebody</option>
+          <option>Social &amp; Outgoing</option>
+          <option>Balanced</option>
+          <option>Career-focused</option>
+          <option>Family-oriented</option>
+          <option>Other</option>
+        </select>
+        <select id="filterHasKids">
+          <option value="">Has kids: Any</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+        <select id="filterWantsKids">
+          <option value="">Wants kids: Any</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Maybe">Maybe</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
+          <input id="filterOnline" style="width:18px; height:18px;" type="checkbox"/> Online now
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
+          <input id="filterVerified" style="width:18px; height:18px;" type="checkbox"/> Verified only
+        </label>
+        <button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer; font-weight:bold;">Filter Results</button>
+        <button onclick="clearBrowseFilters()" style="background:none;border:1px solid var(--line);color:#666;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.85rem;">Clear filters</button>
+      </div>
+      <div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:16px;"></div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="emptyState" style="display:none;">No profiles match your filters yet — check back soon!</div>
+      <div class="more-wrap" id="moreWrap" style="display:none;">
+        <button class="more-btn" id="moreBtn" onclick="showMoreProfiles()">Load More Profiles</button>
+      </div>
+    </div>
+
+    <!-- NEW MEMBERS -->
+    <div class="panel" id="newMembersPanel" style="display:none;">
+      <div class="browse-header">
+        <h2>New <span>Members</span></h2>
+        <p>Singles who have recently joined EthiopianPersonals.com.</p>
+      </div>
+      <div class="grid" id="newMembersGrid"></div>
+      <div class="empty" id="newMembersEmpty" style="display:none;">No new members to show right now.</div>
+    </div>
+
+    <!-- SETUP PROFILE -->
+    <div class="panel" id="postPanel" style="display:none;">
+      <div class="browse-header">
+        <h2>Create Your <span>Personals Profile</span></h2>
+        <p>Complete your profile details to start matching with members.</p>
+      </div>
+      <form class="post-form" id="postForm">
+        <div>
+          <label>First Name (Shown Publicly)</label>
+          <input id="fName" maxlength="30" placeholder="Your first name" required="" type="text"/>
+        </div>
+        <div class="row2">
+          <div>
+            <label>Age</label>
+            <input id="fAge" max="99" min="18" placeholder="18+" required="" type="number"/>
+          </div>
+          <div>
+            <label>City &amp; Country</label>
+            <input id="fCity" placeholder="e.g. Addis Ababa, Ethiopia or Washington DC, USA" required="" type="text"/>
+          </div>
+        </div>
+        <div class="row2">
+          <div>
+            <label>I Am A</label>
+            <select id="fGender" required="">
+              <option value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+          <div>
+            <label>Looking For</label>
+            <select id="fSeeking" required="">
+              <option value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Any</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Relationship Purpose</label>
+          <select id="fType" required="">
+            <option value="">Select Goal</option>
+            <option>Friendship</option>
+            <option>Dating</option>
+            <option>Marriage</option>
+          </select>
+        </div>
+        <div>
+          <label>What I'm Seeking Details</label>
+          <select id="fLookingFor" required="">
+            <option value="">Select Details</option>
+            <option>Long-term relationship</option>
+            <option>Something casual</option>
+            <option>Marriage</option>
+            <option>New friends</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div>
+            <label>Interested In Ages (Min)</label>
+            <input id="fAgeMin" max="99" min="18" placeholder="Min Age" required="" type="number"/>
+          </div>
+          <div>
+            <label>Interested In Ages (Max)</label>
+            <input id="fAgeMax" max="99" min="18" placeholder="Max Age" required="" type="number"/>
+          </div>
+        </div>
+        <div>
+          <label>My Lifestyle</label>
+          <select id="fLifestyle" required="">
+            <option value="">Select Lifestyle</option>
+            <option>Active &amp; Outdoorsy</option>
+            <option>Homebody</option>
+            <option>Social &amp; Outgoing</option>
+            <option>Balanced</option>
+            <option>Career-focused</option>
+            <option>Family-oriented</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div>
+            <label>Have Kids?</label>
+            <select id="fHasKids" required="">
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+          <div>
+            <label>Want Kids?</label>
+            <select id="fWantsKids" required="">
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+              <option>Maybe</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Religion</label>
+          <select id="fReligion" required="">
+            <option value="">Select Religion</option>
+            <option>Orthodox Christian</option>
+            <option>Protestant</option>
+            <option>Muslim</option>
+            <option>Catholic</option>
+            <option>Traditional</option>
+            <option>Other</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div>
+            <label>Occupation (Optional)</label>
+            <input id="fOccupation" maxlength="60" placeholder="e.g. Software Engineer" type="text"/>
+          </div>
+          <div>
+            <label>Income Range (Optional)</label>
+            <select id="fIncome">
+              <option selected="">Prefer not to say</option>
+              <option>Under 10,000 ETB/mo</option>
+              <option>10,000–25,000 ETB/mo</option>
+              <option>25,000–50,000 ETB/mo</option>
+              <option>50,000–100,000 ETB/mo</option>
+              <option>100,000+ ETB/mo</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>About You (Max 500 chars)</label>
+          <textarea id="fBio" maxlength="500" placeholder="Tell people a bit about your values, culture, background, and interests..." required=""></textarea>
+        </div>
+        <div>
+          <label>Upload Photos (Up to 3)</label>
+          <input accept="image/*" id="fPhoto" multiple="" style="padding: 6px; background: #fff;" type="file"/>
+        </div>
+        <div class="checkbox-line" style="background: #fff9ee; padding: 12px; border-radius: 8px; border: 1px solid #fce3b4;">
+          <input id="fAgeConfirm" required="" type="checkbox"/>
+          <label for="fAgeConfirm" style="margin:0;font-weight:600; color: #8a6d1f;">I confirm I am 18 years or older and this information is accurate.</label>
+        </div>
+        <button class="submit-btn" id="submitBtn" type="submit">Publish My Profile</button>
+        <div id="formMsg"></div>
+      </form>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="panel" id="messagesPanel" style="display:none;">
+      <div class="browse-header">
+        <h2>Your <span>Messages</span></h2>
+      </div>
+      <div id="threadList"></div>
+      <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Like and match with members in Browse to start chatting!</div>
+    </div>
+
+    <!-- LIKES -->
+    <div class="panel" id="likesPanel" style="display:none;">
+      <div class="browse-header">
+        <h2>People Who <span>Liked You</span></h2>
+        <p>Like them back to match and open conversations.</p>
+      </div>
+      <div class="grid" id="likesGrid"></div>
+      <div class="empty" id="likesEmpty" style="display:none;">No likes yet. Make sure your profile has a great photo!</div>
+    </div>
+
+    <!-- VISITORS -->
+    <div class="panel" id="visitorsPanel" style="display:none;">
+      <div class="browse-header">
+        <h2>Who <span>Viewed You</span></h2>
+        <p>Members who have recently checked out your profile.</p>
+      </div>
+      <div class="grid" id="visitorsGrid"></div>
+      <div class="empty" id="visitorsEmpty" style="display:none;">No profile visitors yet.</div>
+    </div>
+
+    <!-- MY PROFILE -->
+    <div class="panel" id="myProfilePanel" style="display:none;">
+      <div id="myProfileContent"></div>
+    </div>
+
+    <!-- PRIVACY SETTINGS -->
+    <div class="panel" id="settingsPanel" style="display:none;">
+      <div class="browse-header">
+        <h2>Privacy <span>Settings</span></h2>
+        <p>Manage contact preferences and account security.</p>
+      </div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+        <h3 style="margin-top:0;">Who Can Contact You</h3>
+        <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Control calling options and activity visibility.</p>
+        <div class="row2">
+          <div>
+            <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can call you</label>
+            <select id="setCallPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
+              <option value="everybody">Everybody</option>
+              <option value="verified">Verified profiles only</option>
+              <option value="matches">My matches only</option>
+              <option value="nobody">Nobody</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can see your last active status</label>
+            <select id="setLastSeenPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
+              <option value="everybody">Everybody</option>
+              <option value="verified">Verified profiles only</option>
+              <option value="matches">My matches only</option>
+              <option value="nobody">Nobody</option>
+            </select>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="updateContactPrivacy()" style="width:auto;padding:10px 24px;margin-top:14px;">Save Preferences</button>
+        <div id="contactPrivacyMsg" style="margin-top:10px;"></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+        <h3 style="margin-top:0;">Change Password</h3>
+        <div class="row2">
+          <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">New Password</label><input id="setNewPwd" placeholder="Min 6 characters" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" type="password"/></div>
+          <div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Confirm Password</label><input id="setNewPwdConf" placeholder="Confirm new password" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" type="password"/></div>
+        </div>
+        <button class="submit-btn" onclick="updateAccountPassword()" style="width:auto;padding:10px 24px;margin-top:14px;">Update Password</button>
+        <div id="pwdMsg" style="margin-top:10px;"></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+        <h3 style="margin-top:0;">Blocked Users</h3>
+        <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Blocked members cannot see your profile or send you messages.</p>
+        <div id="blockedUsersList">Loading...</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Match Rail -->
+  <aside class="wana-right-match-rail" id="rightMatchRail">
+    <div class="wana-right-match-card">
+      <div class="wana-right-match-head">
+        <h3>Featured <span id="matchRailCountry">Ethiopian Singles</span></h3>
+      </div>
+      <div class="wana-right-match-list" id="homeRecommendedList">
+        <div class="wana-right-match-empty">Finding your best matches…</div>
+      </div>
+      <div class="wana-right-match-footer">
+        <button type="button" onclick="switchTab('browse')">SEE ALL MATCHES</button>
+      </div>
+    </div>
+  </aside>
 </div>
-
-<!-- NEW MEMBERS -->
-
-<!-- SETUP PROFILE -->
-
-<!-- MESSAGES -->
-
-<!-- LIKES -->
-
-
-<!-- MY PROFILE -->
-
-<!-- PRIVACY SETTINGS (NEW) -->
-
-
 
 <!-- ROOT CONTAINERS -->
 <div id="modalRoot"></div>
 <div id="callRoot"></div>
 <audio autoplay="" id="remoteAudio"></audio>
+
 <!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 // ============================================================
-// Wana Dating Engine
+// EthiopianPersonals.com Core Engine
 // ============================================================
-// Structure (search by these section markers):
-//   1. Storage / signed URLs
-//   2. State & presence
-//   3. Contact privacy
-//   4. Auth gate & modal
-//   5. Notifications & realtime
-//   6. Home feed (posts, reactions, comments)
-//   7. Browse / New Members / profile cards
-//   8. Profile modal, likes, matches
-//   9. Voice calls (WebRTC)
-//  10. Voice messages
-//  11. Messages tab & thread UI
-//  12. My Profile, verification, Platinum
-//  13. Privacy settings & blocks
-//  14. Setup-profile form
-// ============================================================
-// Storage is split into purpose-specific buckets
-// (dating-migration-v9-private-storage.sql). Profile photos are public;
-// post media, voice messages and verification selfies are private and
-// served via short-lived signed URLs.
 const BUCKET_PROFILE_PHOTOS = "dating-profile-photos";
 const BUCKET_POST_MEDIA = "dating-post-media";
 const BUCKET_VOICE_MESSAGES = "dating-voice-messages";
 const BUCKET_VERIFICATION = "dating-verification";
 
-// Resolves a stored photo/voice/selfie value to something <img>/<audio>
-// can load. New rows store a bare object PATH in a private bucket and
-// need a signed URL; old rows (from before this split) already hold a
-// full "avatars" public URL and are returned unchanged. Signed URLs are
-// cached in-memory for their lifetime so re-rendering a feed/thread
-// doesn't re-request one per render.
-const _signedUrlCache = new Map(); // key: `${bucket}:${path}` -> { url, expiresAt }
+const _signedUrlCache = new Map();
 async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600){
   if (!pathOrUrl) return null;
-  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl; // pre-migration full URL
+  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
   const key = `${bucket}:${pathOrUrl}`;
   const cached = _signedUrlCache.get(key);
   if (cached && cached.expiresAt > Date.now() + 30000) return cached.url;
@@ -2328,10 +1902,9 @@ async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600){
   return data.signedUrl;
 }
 
-// Ensure _supabase exists before running
 if (typeof _supabase === 'undefined') {
     document.body.innerHTML = '<div style="padding:48px 20px;text-align:center;font-family:sans-serif;">' +
-      '<h2>Can\'t connect</h2><p>config.js did not load, so Supabase is unavailable.</p></div>';
+      '<h2>Can\'t connect</h2><p>config.js did not load properly.</p></div>';
     throw new Error("config.js is not loaded; _supabase is undefined.");
 }
 
@@ -2343,12 +1916,12 @@ const PAGE_SIZE = 6;
 let currentLang = "en";
 let messageRealtimeChannel = null;
 let notifRealtimeChannel = null;
-let myProfile = null;       // own dating_profiles row: is_verified, call_privacy, last_seen_privacy
-let myMatchedIds = new Set(); // ids of everyone currentUser is matched with
-let returnThread = null;      // conversation to go back to after viewing a profile opened from it
+let myProfile = null;
+let myMatchedIds = new Set();
+let returnThread = null;
 
 // ---------- Presence / last seen ----------
-const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
+const ONLINE_THRESHOLD_MS = 3 * 60 * 1000;
 let presenceTimer = null;
 
 function startPresenceHeartbeat(){
@@ -2381,7 +1954,6 @@ function presenceInfo(lastSeenAt){
   return { online: false, text: `Active ${days}d ago` };
 }
 
-// ---------- Contact privacy (who can call you / see your last seen) ----------
 async function fetchMyProfile(){
   if (!currentUser) return null;
   const { data } = await _supabase
@@ -2394,13 +1966,10 @@ async function fetchMyProfile(){
   return myProfile;
 }
 
-// Posting and messaging need a dating profile. The database enforces this
-// too (posts/comments via RLS, messages via a trigger); these checks just
-// give a clear message and a way forward instead of a raw error.
 async function requireProfile(action){
   if (!myProfile) await fetchMyProfile();
   if (myProfile) return true;
-  if (confirm(`You need to set up your profile before you can ${action}. Set it up now?`)){
+  if (confirm(`Please set up your profile before you can ${action}. Create it now?`)){
     closeModal();
     switchTab("post");
   }
@@ -2426,7 +1995,6 @@ async function refreshMyMatchedIds(){
   myMatchedIds = new Set((data || []).map(r => r.user_a === currentUser.id ? r.user_b : r.user_a));
 }
 
-/** Returns a Set of user ids that are blocked (in either direction) relative to currentUser. */
 async function fetchBlockedIds(){
   if (!currentUser) return new Set();
   const { data } = await _supabase
@@ -2438,9 +2006,6 @@ async function fetchBlockedIds(){
   return ids;
 }
 
-// profile.last_seen_privacy governs whether the CURRENT viewer may see
-// profile's online/last-active status. "matches"/"verified" checks look
-// at the viewer's own relationship to profile, not profile's own status.
 function canSeeLastSeen(profile){
   if (!profile || !currentUser) return false;
   if (profile.user_id === currentUser.id) return true;
@@ -2452,24 +2017,18 @@ function canSeeLastSeen(profile){
   return true;
 }
 
-// Wrap presenceInfo() with the privacy check — use this everywhere a
-// card/modal renders online status instead of calling presenceInfo() directly.
 function visiblePresence(profile){
   return canSeeLastSeen(profile) ? presenceInfo(profile.last_seen_at) : { online: false, text: "" };
 }
 
-// profile.call_privacy governs whether the CURRENT user (as caller) may
-// call profile. This is a friendly pre-check for the UI — the real
-// enforcement is the "caller_start_call" RLS policy on dating_calls
-// (v22 migration), so this can't be bypassed by skipping the button.
 function canCall(profile){
   if (!profile || !currentUser) return false;
   if (profile.user_id === currentUser.id) return false;
-  if (!isPlatinumActive(myProfile)) return false; // voice calls are Platinum-only
+  if (!isPlatinumActive(myProfile)) return false;
   const pref = profile.call_privacy || "everybody";
   if (pref === "nobody") return false;
   if (pref === "verified") return !!(myProfile && myProfile.is_verified);
-  return true; // "everybody" and "matches" — matching is already required to reach the call button at all
+  return true;
 }
 
 async function updateContactPrivacy(){
@@ -2486,11 +2045,10 @@ async function updateContactPrivacy(){
     return;
   }
   if (myProfile){ myProfile.call_privacy = callPrivacy; myProfile.last_seen_privacy = lastSeenPrivacy; }
-  msg.innerHTML = `<div class="msg success">Saved.</div>`;
+  msg.innerHTML = `<div class="msg success">Preferences saved.</div>`;
 }
 
-
-// ---------- Auth gate ----------
+// ---------- Auth Gate ----------
 async function initAuth(){
   try {
     const { data: { user } } = await _supabase.auth.getUser();
@@ -2523,45 +2081,44 @@ async function initAuth(){
 
 function maybeShowSafetyNotice(){
   let seen = false;
-  try { seen = localStorage.getItem("wg_dating_safety_seen") === "1"; } catch(e){}
+  try { seen = localStorage.getItem("ep_dating_safety_seen") === "1"; } catch(e){}
   if (seen) return;
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop">
       <div class="modal">
         <div class="body">
-          <h3>Stay Safe While Dating 🛡️</h3>
+          <h3>Safety First 🛡️</h3>
           <div class="bio" style="margin-bottom:14px; background: #fff9ee; padding: 15px; border-radius: 8px; border: 1px solid #fce3b4;">
-            A few basics before you start browsing:
+            Safety tips for EthiopianPersonals members:
             <ul style="padding-left:18px;margin:10px 0; line-height: 1.6;">
-              <li>Meet new people in a <b>public place</b> for the first few times.</li>
-              <li><b>Never send money</b>, gifts, or account/card details to someone you haven't met.</li>
-              <li>Trust your instincts — if something feels off, use Report or Block.</li>
-              <li>Tell a friend or family member where you're going for a first meetup.</li>
+              <li>Always meet initial dates in a public venue.</li>
+              <li>Never send money, funds, or financial details to anyone online.</li>
+              <li>Trust your intuition — report or block suspicious profiles.</li>
+              <li>Share details of your meetup plans with someone you trust.</li>
             </ul>
           </div>
           <div class="actions">
-            <button class="btn-contact" onclick="dismissSafetyNotice()">Got it, continue</button>
+            <button class="btn-contact" onclick="dismissSafetyNotice()">I Understand</button>
           </div>
         </div>
       </div>
     </div>`;
 }
 function dismissSafetyNotice(){
-  try { localStorage.setItem("wg_dating_safety_seen", "1"); } catch(e){}
+  try { localStorage.setItem("ep_dating_safety_seen", "1"); } catch(e){}
   closeModal();
 }
 
-// ---------- Sign in / Register modal ----------
-let authTab = "signin";      
-let authMethod = "email";    
+let authTab = "signin";
+let authMethod = "email";
 
 function normalizeEthiopianPhone(raw){
   let p = String(raw || "").trim().replace(/[^\d+]/g, "");
   p = p.replace(/^\+/, "");
   if (p.startsWith("0") && p.length === 10) p = "251" + p.slice(1);
   else if (p.length === 9 && /^[79]/.test(p)) p = "251" + p;
-  return p; 
+  return p;
 }
 
 function isValidEthiopianPhone(p){
@@ -2569,7 +2126,7 @@ function isValidEthiopianPhone(p){
 }
 
 function phoneToPseudoEmail(p){
-  return p + "@phone.wanagebya.com";
+  return p + "@phone.ethiopianpersonals.com";
 }
 
 function openAuthModal(tab){
@@ -2595,11 +2152,11 @@ function renderAuthModal(){
 
   const identifierField = isPhone
     ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="09..." required class="modal-input"></div>`
-    : `<div><label>Email</label><input type="email" id="authEmail" placeholder="you@email.com" required class="modal-input"></div>`;
+    : `<div><label>Email address</label><input type="email" id="authEmail" placeholder="you@example.com" required class="modal-input"></div>`;
 
   const registerExtraFields = !isSignin ? `
     <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required class="modal-input"></div>
-    <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required class="modal-input"></div>
+    <div><label>City / Location</label><input type="text" id="authLocation" maxlength="80" required class="modal-input"></div>
     ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="09..." class="modal-input"></div>` : ""}
   ` : "";
 
@@ -2661,7 +2218,7 @@ async function submitAuthForm(e){
     const raw = document.getElementById("authPhone").value.trim();
     const normalized = normalizeEthiopianPhone(raw);
     if (!isValidEthiopianPhone(normalized)){
-      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
+      msg.innerHTML = `<div class="msg error">Enter a valid phone number (09... or 07...).</div>`;
       return;
     }
     realPhone = "+" + normalized;
@@ -2673,7 +2230,7 @@ async function submitAuthForm(e){
   if (authTab === "register"){
     const confirm = document.getElementById("authPasswordConfirm").value;
     if (password !== confirm){
-      msg.innerHTML = `<div class="msg error">Passwords don't match.</div>`;
+      msg.innerHTML = `<div class="msg error">Passwords do not match.</div>`;
       return;
     }
   }
@@ -2686,11 +2243,7 @@ async function submitAuthForm(e){
     submitBtn.disabled = false;
     submitBtn.textContent = "Sign In";
     if (error){
-      if (isPhone && /Invalid login credentials/i.test(error.message)){
-        msg.innerHTML = `<div class="msg error">No account found with that phone number, or wrong password.</div>`;
-      } else {
-        msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
-      }
+      msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
       return;
     }
     closeModal();
@@ -2711,8 +2264,8 @@ async function submitAuthForm(e){
     if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
     if (data.user && !data.session){
       msg.innerHTML = isPhone
-        ? `<div class="msg success">Account created — sign in with your phone number and password.</div>`
-        : `<div class="msg success">Check your email to confirm your account, then sign in.</div>`;
+        ? `<div class="msg success">Account created — please sign in.</div>`
+        : `<div class="msg success">Please check your email to confirm registration before signing in.</div>`;
     } else {
       closeModal();
     }
@@ -2728,7 +2281,7 @@ async function sendPasswordReset(){
   });
   msg.innerHTML = error
     ? `<div class="msg error">${esc(error.message)}</div>`
-    : `<div class="msg success">Password reset email sent.</div>`;
+    : `<div class="msg success">Password reset link sent to your email.</div>`;
 }
 
 async function signOut(){
@@ -2762,10 +2315,6 @@ function updateHeaderAuthUI(){
     pillBtn.style.display = "block";
     accountBox.style.display = "none";
     notifWrap.style.display = "none";
-    // Signed-out visitors have nothing to do with Browse/Messages/Likes/etc.,
-    // and leaving this rendered squeezes the full-screen welcome hero into
-    // whatever space is left next to (desktop) or below (mobile) a dead
-    // navigation list. Hide it until they're actually signed in.
     if (sidebar) sidebar.style.display = "none";
   }
 }
@@ -2775,7 +2324,7 @@ document.addEventListener("click", (e) => {
   if (notifWrap && !notifWrap.contains(e.target)) document.getElementById("notifPanel")?.classList.remove("open");
 });
 
-let didProfileSetupRedirect = false; // only nudge once per page load, not on every token refresh
+let didProfileSetupRedirect = false;
 
 _supabase.auth.onAuthStateChange(async (_event, session) => {
   const wasSignedIn = !!currentUser;
@@ -2786,8 +2335,6 @@ _supabase.auth.onAuthStateChange(async (_event, session) => {
   if (currentUser){
     await fetchMyProfile();
     refreshMyMatchedIds();
-    // Signed in (Google, email or phone) but no dating profile yet:
-    // go straight to profile setup instead of an empty Home feed.
     if (_event === "SIGNED_IN" && !myProfile && !didProfileSetupRedirect){
       didProfileSetupRedirect = true;
       switchTab("post");
@@ -2863,7 +2410,6 @@ async function refreshNotifCount(){
   badge.style.display = count ? "inline-block" : "none";
 }
 
-// ---------- Realtime: messages & notifications ----------
 function setupRealtimeMessaging(){
   if (messageRealtimeChannel) return;
   messageRealtimeChannel = _supabase
@@ -2877,7 +2423,6 @@ function setupRealtimeMessaging(){
 
 function handleIncomingMessage(m){
   refreshUnreadBadge();
-
   const messagesTabVisible = document.getElementById("messagesPanel")?.style.display !== "none";
   if (messagesTabVisible) loadThreads();
 
@@ -3046,7 +2591,6 @@ async function loadLikesReceived(){
   rows.forEach(row => grid.appendChild(createProfileCard(row, { extraMeta: null })));
 }
 
-// ---------- Visitors (who viewed you) ----------
 async function loadVisitors(){
   const grid = document.getElementById("visitorsGrid");
   const empty = document.getElementById("visitorsEmpty");
@@ -3062,7 +2606,7 @@ async function loadVisitors(){
   if (error){
     console.error("Couldn't load visitors:", error.message);
     empty.style.display = "none";
-    grid.innerHTML = `<div class="msg error" style="grid-column:1/-1;">Couldn't load your visitors right now. Please try again later.</div>`;
+    grid.innerHTML = `<div class="msg error" style="grid-column:1/-1;">Couldn't load visitors right now.</div>`;
     return;
   }
   if (!visits || visits.length === 0){
@@ -3108,10 +2652,6 @@ async function loadVisitors(){
 
 async function recordProfileView(viewedUserId){
   if (!currentUser || viewedUserId === currentUser.id) return;
-  // Goes through a database function rather than a direct upsert: an upsert
-  // fails on any repeat visit because the viewer isn't allowed to read the
-  // existing row (only the person being viewed is). Never block opening
-  // the profile over this, but do log failures so they can be diagnosed.
   try {
     const { error } = await _supabase.rpc("dating_record_profile_view", { p_viewed: viewedUserId });
     if (error) console.warn("Couldn't record profile view:", error.message);
@@ -3120,7 +2660,7 @@ async function recordProfileView(viewedUserId){
   }
 }
 
-// ---------- Tabs ----------
+// ---------- Tabs Navigation ----------
 const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
@@ -3146,7 +2686,7 @@ function switchTab(tab){
   if (tab === "settings") loadSettings();
 }
 
-// ---------- Home feed ----------
+// ---------- Feed & Posts ----------
 let pendingPostImageFile = null;
 
 async function setComposerAvatar(){
@@ -3185,17 +2725,13 @@ async function submitPost(){
   const body = textarea.value.trim();
   const msg = document.getElementById("postMsg");
   const btn = document.getElementById("postSubmitBtn");
-  if (!body){ msg.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
+  if (!body){ msg.innerHTML = `<div class="msg error">Write a post first.</div>`; return; }
 
   btn.disabled = true;
   btn.textContent = "Posting...";
 
   let imageUrl = null;
   if (pendingPostImageFile){
-    // Path starts with the uploader's id (no sub-folder) so it matches
-    // the "name LIKE auth.uid()||'-%'" write policy on this bucket, and
-    // stores as a PATH — not a public URL — since post media visibility
-    // is gated by dating_can_view_post_media() per-post.
     const path = `${currentUser.id}-${Date.now()}-${pendingPostImageFile.name}`;
     const { error: uploadErr } = await _supabase.storage.from(BUCKET_POST_MEDIA).upload(path, pendingPostImageFile);
     if (uploadErr){
@@ -3203,7 +2739,7 @@ async function submitPost(){
       btn.disabled = false; btn.textContent = "Post";
       return;
     }
-    imageUrl = path; // stored as a path now; resolved to a signed URL when the feed renders it
+    imageUrl = path;
   }
 
   const { error } = await _supabase.from("dating_posts").insert({
@@ -3217,10 +2753,7 @@ async function submitPost(){
   btn.textContent = "Post";
 
   if (error){
-    const isRlsBlock = error.code === "42501" || /row-level security/i.test(error.message || "");
-    msg.innerHTML = isRlsBlock
-      ? `<div class="msg error">Post a profile first (see the "Setup Profile" tab) before sharing to the Home feed.</div>`
-      : `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
+    msg.innerHTML = `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
     return;
   }
 
@@ -3230,10 +2763,6 @@ async function submitPost(){
   loadFeed();
 }
 
-// Opens someone's profile. The row is always fetched fresh, and the
-// viewer's own verification/match status is loaded first, so the owner's
-// current privacy settings (e.g. who may see last seen) are applied
-// correctly rather than from a stale copy.
 async function openProfileByUserId(userId, opts = {}){
   if (userId === currentUser.id){
     closeModal();
@@ -3248,11 +2777,10 @@ async function openProfileByUserId(userId, opts = {}){
     .eq("user_id", userId)
     .maybeSingle();
   if (error || !data){
-    alert("This person doesn't have a dating profile to view.");
+    alert("Profile unavailable.");
     return;
   }
   returnThread = opts.returnTo || null;
-  // Otherwise an incoming message would re-render the chat over this profile.
   currentOpenThread = null;
   openModal(data);
 }
@@ -3261,8 +2789,6 @@ async function viewProfileFromFeed(userId){
   return openProfileByUserId(userId);
 }
 
-// Clicking a person in Messages. From inside an open chat, the profile
-// gets a "Back to chat" button.
 async function viewProfileFromThread(userId, fromOpenChat){
   return openProfileByUserId(userId, { returnTo: fromOpenChat ? currentOpenThread : null });
 }
@@ -3320,9 +2846,6 @@ async function loadFeed(){
   const commenterMap = {};
   (commenterProfiles || []).forEach(p => commenterMap[p.user_id] = p);
 
-  // Post images live in the private dating-post-media bucket now, gated
-  // per-post by dating_can_view_post_media() — resolve each to a signed
-  // URL up front so renderFeedPost can stay a plain synchronous template.
   const postPhotoUrls = {};
   await Promise.all(posts.filter(p => p.photo_url).map(async p => {
     postPhotoUrls[p.id] = await resolvePrivateUrl(BUCKET_POST_MEDIA, p.photo_url);
@@ -3455,17 +2978,17 @@ async function deletePost(postId){
 }
 
 async function reportPost(postId){
-  const reason = prompt("What's the issue with this post?");
+  const reason = prompt("What is the issue with this post?");
   if (!reason) return;
   const { error } = await _supabase.from("dating_post_reports").insert({
     post_id: postId,
     reporter_id: currentUser.id,
     reason
   });
-  alert(error ? "Couldn't send report: " + error.message : "Thanks — we'll take a look.");
+  alert(error ? "Couldn't send report: " + error.message : "Thank you, our moderation team will review it.");
 }
 
-// ---------- Load / render profiles ----------
+// ---------- Profiles Rendering & Loading ----------
 async function loadProfiles() {
   await refreshMyMatchedIds();
 
@@ -3485,7 +3008,6 @@ async function loadProfiles() {
   const empty = document.getElementById("emptyState");
   grid.innerHTML = "";
 
-  // 1. Build dynamic Supabase Query (Filtering on Server)
   let query = _supabase
     .from("dating_profiles")
     .select("*")
@@ -3502,7 +3024,6 @@ async function loadProfiles() {
   if (hasKids) query = query.eq("has_kids", hasKids);
   if (wantsKids) query = query.eq("wants_kids", wantsKids);
 
-  // 2. Fetch Filtered Data
   const { data, error } = await query.order("created_at", { ascending: false });
 
   if (error) {
@@ -3512,13 +3033,11 @@ async function loadProfiles() {
     return;
   }
 
-  // 3. Post-process online status & client render limits
   let rows = data || [];
   if (onlineOnly) {
     rows = rows.filter(r => visiblePresence(r).online);
   }
 
-  // Sort online profiles to the top
   rows.sort((a, b) => {
     const aOnline = visiblePresence(a).online;
     const bOnline = visiblePresence(b).online;
@@ -3529,7 +3048,7 @@ async function loadProfiles() {
   const onlineCount = rows.filter(r => visiblePresence(r).online).length;
   document.getElementById("onlineSummary").textContent =
     onlineCount > 0
-      ? `🟢 ${onlineCount} ${onlineCount === 1 ? "person" : "people"} online now`
+      ? `🟢 ${onlineCount} ${onlineCount === 1 ? "member" : "members"} online now`
       : "";
 
   if (rows.length === 0) {
@@ -3552,13 +3071,6 @@ function clearBrowseFilters(){
   loadProfiles();
 }
 
-/**
- * Shared profile card used by Browse, Likes, Visitors, and New Members.
- * @param {object} row - dating_profiles row
- * @param {object} [opts]
- * @param {string|null} [opts.extraMeta] - HTML for the third info line. Pass null to omit presence.
- * @param {boolean} [opts.showOnlineDot=true]
- */
 function createProfileCard(row, opts = {}) {
   const { extraMeta, showOnlineDot = true } = opts;
   const img = (row.photos && row.photos[0]) || row.photo_url || null;
@@ -3650,7 +3162,7 @@ function showMoreProfiles(){
   renderBrowseGrid();
 }
 
-// ---------- Modal ----------
+// ---------- Profile Modal ----------
 async function openModal(row){
   recordProfileView(row.user_id);
   const photos = (row.photos && row.photos.length) ? row.photos : (row.photo_url ? [row.photo_url] : []);
@@ -3672,7 +3184,7 @@ async function openModal(row){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3>${row.display_name ? esc(row.display_name) + ", " : ""}${row.age || "?"}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))}</h3>
-          <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking || "")} · ${esc(row.relationship_type || "")}</div>
+          <div class="meta">${esc(row.city || "")} · Looking for ${esc(row.seeking \vert{}\vert{} "")} · ${esc(row.relationship_type || "")}</div>
           <div class="presence ${presence.online ? "is-online" : ""}" style="margin-bottom:12px; font-weight:600;">${presence.online ? "🟢 " : ""}${presence.text}</div>
           <div class="bio" style="background:#f4f7f6; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">${esc(row.bio || "")}</div>
           <div class="meta" style="margin-top:12px;line-height:1.8;">
@@ -3704,14 +3216,16 @@ async function openModal(row){
     });
   });
 }
+
 function swapModalPhoto(url, thumbEl){
   document.getElementById("modalMainPhoto").style.backgroundImage = `url('${esc(url)}')`;
   thumbEl.parentElement.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
   thumbEl.classList.add("active");
 }
+
 function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; returnThread = null; }
 
-// ---------- Likes / Matches ----------
+// ---------- Likes & Matches ----------
 async function checkMatch(otherUserId){
   const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
   const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
@@ -3725,7 +3239,7 @@ async function checkMatch(otherUserId){
 }
 
 async function unmatchUser(otherUserId, otherName){
-  if (!confirm(`Unmatch with ${otherName}? You'll stop seeing each other in Messages, and they'll need to match with you again before you can message.`)) return;
+  if (!confirm(`Unmatch with ${otherName}? You will no longer see each other in Messages.`)) return;
   const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
   const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
   const { error } = await _supabase
@@ -3751,14 +3265,14 @@ async function likeProfile(profileId, otherUserId){
 
   if (error && error.code !== "23505"){ 
     if (btn){ btn.disabled = false; btn.textContent = "💛 Like Profile"; }
-    alert("Couldn't like right now: " + error.message);
+    alert("Couldn't like profile: " + error.message);
     return;
   }
 
   const matched = await checkMatch(otherUserId);
   const notice = document.getElementById("matchNotice");
   if (matched){
-    if (notice) notice.innerHTML = `<div class="msg success">🎉 It's a match! You can message each other now.</div>`;
+    if (notice) notice.innerHTML = `<div class="msg success">🎉 It's a match! You can now send messages to each other.</div>`;
     if (btn){
       btn.textContent = "💬 Message";
       btn.style.background = "var(--green)";
@@ -3768,7 +3282,7 @@ async function likeProfile(profileId, otherUserId){
     }
     refreshUnreadBadge();
   } else {
-    if (notice) notice.innerHTML = `<div class="msg success">💛 Liked! If they like you back, it's a match.</div>`;
+    if (notice) notice.innerHTML = `<div class="msg success">💛 Profile liked! If they like you back, it will trigger a match.</div>`;
     if (btn){ btn.textContent = "💛 Liked"; }
   }
 }
@@ -3805,7 +3319,7 @@ async function sendMessage(profileId, recipientId){
   if (!(await requireProfile("send messages"))) return;
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
-  if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
+  if (!body){ msgBox.innerHTML = `<div class="msg error">Write a message first.</div>`; return; }
   const { error } = await _supabase.from("dating_messages").insert({
     profile_id: profileId,
     sender_id: currentUser.id,
@@ -3813,9 +3327,9 @@ async function sendMessage(profileId, recipientId){
     body
   });
   if (error){
-    msgBox.innerHTML = `<div class="msg error">Couldn't send: ${esc(error.message)}</div>`;
+    msgBox.innerHTML = `<div class="msg error">Couldn't send message: ${esc(error.message)}</div>`;
   } else {
-    msgBox.innerHTML = `<div class="msg success">Sent!</div>`;
+    msgBox.innerHTML = `<div class="msg success">Message sent!</div>`;
     setTimeout(closeModal, 700);
   }
 }
@@ -3853,7 +3367,7 @@ async function refreshCurrentThreadAfterSend(profileId, other){
   refreshUnreadBadge();
 }
 
-// ---------- Voice calls ----------
+// ---------- Voice Calling (WebRTC) ----------
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
 let personalCallChannel = null;
@@ -3876,24 +3390,21 @@ function setupPersonalCallChannel(){
 }
 
 async function startCall(recipientId, recipientName){
-  if (peerConnection){ alert("You're already in a call."); return; }
-  if (!(await requireProfile("make calls"))) return;
+  if (peerConnection){ alert("You are currently in a call."); return; }
+  if (!(await requireProfile("make voice calls"))) return;
   if (!isPlatinumActive(myProfile)){
-    alert("Voice calls are a Platinum feature. Upgrade to Platinum to start calling your matches.");
+    alert("Voice calling is exclusive to Platinum members. Upgrade your account to call your matches.");
     return;
   }
   currentCallId = (crypto.randomUUID ? crypto.randomUUID() : `${currentUser.id}-${Date.now()}`);
   currentCallPeerId = recipientId;
 
-  // Create (and verify) the call row BEFORE ringing the other person —
-  // previously this rang first and inserted after, with no error check,
-  // so a blocked/failed insert still left the recipient seeing an
-  // incoming call for a call that was never actually logged.
   const { data: callRow, error: callErr } = await _supabase.from("dating_calls").insert({
     caller_id: currentUser.id, recipient_id: recipientId, status: "ringing"
   }).select().single();
+
   if (callErr){
-    alert("Couldn't start the call: " + callErr.message);
+    alert("Couldn't initialize call: " + callErr.message);
     currentCallId = null;
     currentCallPeerId = null;
     return;
@@ -3911,13 +3422,6 @@ async function startCall(recipientId, recipientName){
   await joinCallSignaling(currentCallId, true);
 }
 
-// A "ring" arrives over a broadcast channel, which anyone who knows your
-// user id can publish to — the database call rules (matched, Platinum,
-// not blocked, privacy setting, all enforced by v24/v28's dating_can_call)
-// only guard the dating_calls row, not the ring broadcast itself. So before
-// showing anything we confirm the caller really created a call row aimed
-// at us in the last couple of minutes — that row can only exist if the
-// database's own rules already approved the call.
 async function isLegitimateIncomingCall(callerId){
   if (!callerId || callerId === currentUser.id) return false;
   const since = new Date(Date.now() - 2 * 60 * 1000).toISOString();
@@ -3934,8 +3438,8 @@ async function isLegitimateIncomingCall(callerId){
 }
 
 async function showIncomingCallUI(payload){
-  if (peerConnection){ return; }
-  if (!payload || !(await isLegitimateIncomingCall(payload.callerId))) return; // forged/unapproved ring: ignore silently
+  if (peerConnection) return;
+  if (!payload || !(await isLegitimateIncomingCall(payload.callerId))) return;
   currentCallId = payload.callId;
   currentCallPeerId = payload.callerId;
   document.getElementById("callRoot").innerHTML = `
@@ -3990,9 +3494,6 @@ function showActiveCallUI(name){
 }
 
 async function acceptCall(){
-  // Must match the still-ringing call, not just the most recent row between
-  // these two people — otherwise a stale/ended call from earlier could be
-  // picked up instead of the one actually being answered.
   const { data: callRow } = await _supabase
     .from("dating_calls")
     .select("*")
@@ -4006,7 +3507,7 @@ async function acceptCall(){
   if (!currentCallRow){
     document.getElementById("callRoot").innerHTML = "";
     currentCallId = null; currentCallPeerId = null;
-    alert("This call is no longer available.");
+    alert("Call is no longer active.");
     return;
   }
   await _supabase.from("dating_calls").update({ status: "accepted" }).eq("id", currentCallRow.id);
@@ -4059,7 +3560,7 @@ async function joinCallSignaling(callId, isInitiator){
   try {
     localCallStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch (err){
-    alert("Couldn't access microphone: " + err.message);
+    alert("Microphone permission required: " + err.message);
     endCall(true);
     return;
   }
@@ -4113,7 +3614,7 @@ async function endCall(notifyPeer){
   currentCallId = null; currentCallPeerId = null; currentCallRow = null; callStartedAt = null;
 }
 
-// ---------- Voice messages ----------
+// ---------- Voice Messages ----------
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
@@ -4123,9 +3624,9 @@ async function toggleVoiceRecording(profileId, recipientId){
   const status = document.getElementById("recordStatus");
 
   if (!isRecording){
-    if (!(await requireProfile("send messages"))) return;
+    if (!(await requireProfile("send voice messages"))) return;
     if (!myProfile || (!myProfile.is_verified && !isPlatinumActive(myProfile))){
-      if (status) status.textContent = "Voice messages require a verified profile. Verify your profile to unlock this.";
+      if (status) status.textContent = "Voice messaging requires a verified or Platinum profile.";
       return;
     }
     try {
@@ -4143,7 +3644,7 @@ async function toggleVoiceRecording(profileId, recipientId){
       btn.textContent = "⏹️ Stop";
       btn.style.background = "var(--danger)";
       btn.style.color = "#fff";
-      status.textContent = "Recording... tap Stop to send.";
+      status.textContent = "Recording... tap Stop to finish.";
     } catch (err){
       status.textContent = "Couldn't access microphone: " + err.message;
     }
@@ -4153,25 +3654,23 @@ async function toggleVoiceRecording(profileId, recipientId){
     btn.textContent = "🎤 Voice";
     btn.style.background = "";
     btn.style.color = "";
-    status.textContent = "Sending voice message...";
+    status.textContent = "Sending voice clip...";
   }
 }
 
 async function sendVoiceMessage(profileId, recipientId, blob){
   const status = document.getElementById("recordStatus");
-  // Path starts with the sender's id (no sub-folder) to match the
-  // "name LIKE auth.uid()||'-%'" write policy on this private bucket.
   const path = `${currentUser.id}-${Date.now()}.webm`;
   const { error: uploadErr } = await _supabase.storage.from(BUCKET_VOICE_MESSAGES).upload(path, blob);
   if (uploadErr){
-    if (status) status.textContent = "Voice upload failed: " + uploadErr.message;
+    if (status) status.textContent = "Upload failed: " + uploadErr.message;
     return;
   }
   const { error } = await _supabase.from("dating_messages").insert({
     profile_id: profileId,
     sender_id: currentUser.id,
     recipient_id: recipientId,
-    voice_url: path // stored as a path; resolved to a signed URL when the thread renders it
+    voice_url: path
   });
   if (error){
     if (status) status.textContent = "Couldn't send: " + error.message;
@@ -4181,7 +3680,7 @@ async function sendVoiceMessage(profileId, recipientId, blob){
   await refreshCurrentThreadAfterSend(profileId, recipientId);
 }
 
-// ---------- Messages tab ----------
+// ---------- Messages Tab & Threads ----------
 async function loadThreads(){
   const { data, error } = await _supabase
     .from("dating_messages")
@@ -4208,10 +3707,6 @@ async function loadThreads(){
   });
 
   const otherIds = [...new Set(Object.values(threads).map(t => t.other))];
-
-  // Filter out anyone in a block relationship with the current user (either
-  // direction). Blocking doesn't delete the match/message history, so without
-  // this a blocked conversation would still appear with a broken call button.
   const blockedIds = await fetchBlockedIds();
   const visibleOtherIds = otherIds.filter(id => !blockedIds.has(id));
 
@@ -4267,8 +3762,6 @@ async function openThread(thread){
     reactionsByMsg[r.message_id].push(r);
   });
 
-  // Voice clips live in the private dating-voice-messages bucket —
-  // resolve each to a signed URL up front, same approach as post images.
   const voiceUrls = {};
   await Promise.all(ordered.filter(m => m.voice_url).map(async m => {
     voiceUrls[m.id] = await resolvePrivateUrl(BUCKET_VOICE_MESSAGES, m.voice_url);
@@ -4280,14 +3773,12 @@ async function openThread(thread){
   const callAllowed = thread.profile ? canCall(thread.profile) : true;
   const notPlatinum = !isPlatinumActive(myProfile);
   const callTooltip = notPlatinum
-    ? "Voice calls are a Platinum feature — upgrade to start calling"
-    : (thread.profile && thread.profile.call_privacy === "verified" ? "This person only accepts calls from verified profiles" : "This person isn't accepting calls right now");
+    ? "Voice calls require Platinum membership"
+    : (thread.profile && thread.profile.call_privacy === "verified" ? "Member only accepts calls from verified profiles" : "Calling currently unavailable");
   const callBtnHtml = callAllowed
     ? `<button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call" style="width:34px; height:34px; font-size:0.9rem;">📞</button>`
     : `<button class="call-btn" disabled title="${callTooltip}" style="width:34px; height:34px; font-size:0.9rem;opacity:.4;cursor:not-allowed;">📞</button>`;
 
-  // Read receipts ("Seen") are a Platinum perk — only show if the LAST
-  // message in the thread is mine and has actually been read.
   const lastMsg = ordered[ordered.length - 1];
   const showSeen = lastMsg && lastMsg.sender_id === currentUser.id && lastMsg.read && !lastMsg.deleted_at
     && isPlatinumActive(myProfile);
@@ -4345,7 +3836,7 @@ function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
     return `
       <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;">
         <div class="msg-bubble" style="background:#f1f5f9;padding:10px 14px;border-radius:12px;font-size:.85rem;color:#94a3b8;font-style:italic; border:1px solid #e2e8f0;">
-          🚫 This message was deleted
+          🚫 Message deleted
         </div>
       </div>`;
   }
@@ -4354,8 +3845,8 @@ function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   const content = m.voice_url
     ? (resolvedVoiceUrl
         ? `<audio controls src="${esc(resolvedVoiceUrl)}" style="max-width:220px;height:36px;"></audio>`
-        : `<span style="font-size:.8rem;color:#94a3b8;font-style:italic;">Voice message unavailable</span>`)
-    : `<span id="msgBody-${m.id}">${esc(m.body || "")}</span>${m.edited_at ? ` <span style="font-size:.7rem;color:#94a3b8;">(edited)</span>` : ""}`;
+        : `<span style="font-size:.8rem;color:#94a3b8;font-style:italic;">Voice clip unavailable</span>`)
+    : `<span id="msgBody-${m.id}">${esc(m.body \vert{}\vert{} "")}</span>${m.edited_at ? ` <span style="font-size:.7rem;color:#94a3b8;">(edited)</span>` : ""}`;
 
   const ownControls = mine ? `
     ${canEdit ? `<span class="react-add" style="right:26px;" title="Edit" onclick="startEditMessage('${m.id}')">✏️</span>` : ""}
@@ -4363,10 +3854,9 @@ function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   ` : `<span class="react-add" onclick="showReactionPicker(event,'${m.id}')">＋</span>`;
 
   return `
-    <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;" data-message-id="${m.id}">
+    <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85\%;" data-message-id="${m.id}">
       <div class="msg-bubble" style="background:${mine?"var(--green)":"#f1f5f9"}; color:${mine?"#fff":"#333"}; padding:10px 14px;border-radius:14px;font-size:.9rem;position:relative; line-height:1.4; border: 1px solid ${mine?"var(--green)":"#e2e8f0"};">
-        ${content}
-        ${ownControls}
+        ${content}${ownControls}
       </div>
       ${reactionRow}
     </div>`;
@@ -4395,9 +3885,6 @@ async function saveEditMessage(messageId){
     .update({ body: newBody, edited_at: editedAt })
     .eq("id", messageId);
   if (error){ alert("Couldn't save edit: " + error.message); return; }
-  // openThread() only re-fetches reactions from the DB, not the messages
-  // themselves — without updating the in-memory copy here, the open
-  // thread would keep showing the pre-edit text until reopened.
   if (currentOpenThread){
     const msg = currentOpenThread.messages.find(x => x.id === messageId);
     if (msg){ msg.body = newBody; msg.edited_at = editedAt; }
@@ -4407,13 +3894,13 @@ async function saveEditMessage(messageId){
 }
 
 async function deleteMessage(messageId){
-  if (!confirm("Delete this message for everyone? This can't be undone.")) return;
+  if (!confirm("Delete this message?")) return;
   const deletedAt = new Date().toISOString();
   const { error } = await _supabase
     .from("dating_messages")
     .update({ deleted_at: deletedAt })
     .eq("id", messageId);
-  if (error){ alert("Couldn't delete: " + error.message); return; }
+  if (error){ alert("Couldn't delete message: " + error.message); return; }
   if (currentOpenThread){
     const msg = currentOpenThread.messages.find(x => x.id === messageId);
     if (msg) msg.deleted_at = deletedAt;
@@ -4461,15 +3948,15 @@ async function refreshOpenThreadMessages(){
   if (currentOpenThread) openThread(currentOpenThread);
 }
 
-// ---------- My Profile tab ----------
+// ---------- My Profile Section ----------
 function computeProfileCompleteness(data){
   const checklist = [
     { label: "About you", done: !!(data.bio && data.bio.trim()), focus: "eBio" },
-    { label: "What you're looking for", done: !!data.looking_for, focus: "eLookingFor" },
-    { label: "Age range you're interested in", done: !!(data.age_min && data.age_max), focus: "eAgeMin" },
-    { label: "Your lifestyle", done: !!data.lifestyle, focus: "eLifestyle" },
-    { label: "Whether you have kids", done: !!data.has_kids, focus: "eHasKids" },
-    { label: "Whether you want kids", done: !!data.wants_kids, focus: "eWantsKids" },
+    { label: "What you're seeking", done: !!data.looking_for, focus: "eLookingFor" },
+    { label: "Preferred age range", done: !!(data.age_min && data.age_max), focus: "eAgeMin" },
+    { label: "Lifestyle", done: !!data.lifestyle, focus: "eLifestyle" },
+    { label: "Children status", done: !!data.has_kids, focus: "eHasKids" },
+    { label: "Family plans", done: !!data.wants_kids, focus: "eWantsKids" },
     { label: "Religion", done: !!data.religion, focus: "eReligion" }
   ];
   const done = checklist.filter(c => c.done).length;
@@ -4484,12 +3971,12 @@ function profileCompletenessBanner(data){
     <div style="background:#FFF9EE;border:1px solid #fce3b4;border-radius:12px;padding:16px;margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <strong style="font-size:1rem;color:#8a6d1f;">Your profile is ${percent}% complete</strong>
-        <span style="font-size:.8rem;color:#b89028; font-weight:bold;">${missing.length} thing${missing.length === 1 ? "" : "s"} left</span>
+        <span style="font-size:.8rem;color:#b89028; font-weight:bold;">${missing.length} detail${missing.length === 1 ? "" : "s"} missing</span>
       </div>
       <div style="background:#fce3b4;border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px;">
         <div style="background:var(--gold);height:100%;width:${percent}%;"></div>
       </div>
-      <div style="font-size:.85rem;color:#8a6d1f;margin-bottom:10px;">Complete profiles get 3x more matches! Add:</div>
+      <div style="font-size:.85rem;color:#8a6d1f;margin-bottom:10px;">Complete profiles receive up to 3x more matches:</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
         ${missing.map(m => `<button type="button" onclick="focusProfileField('${m.focus}')" style="font-size:.8rem;padding:6px 12px;border:1px solid var(--gold);background:#fff;color:#8a6d1f;border-radius:999px;cursor:pointer; font-weight:600;">+ ${esc(m.label)}</button>`).join("")}
       </div>
@@ -4519,15 +4006,10 @@ function focusProfileField(id){
   setTimeout(() => { el.style.outline = ""; }, 1500);
 }
 
-// ---------- Verification ----------
 function verifiedBadge(isVerified){
-  return isVerified ? ` <span title="Verified profile" style="color:#1E8E4F;font-weight:700;">✓</span>` : "";
+  return isVerified ? ` <span title="Verified profile" style="color:#0f8a5f;font-weight:700;">✓</span>` : "";
 }
 
-// A Platinum plan can have an end date (platinum_until, v28). The database
-// already stops honouring an expired plan on its own; this makes the UI agree,
-// so a lapsed member doesn't keep the badge, the call button or the
-// "Platinum tier" label. No end date (older grants) means it doesn't expire.
 function isPlatinumActive(p){
   if (!p || !p.is_platinum) return false;
   return !p.platinum_until || new Date(p.platinum_until) > new Date();
@@ -4544,86 +4026,79 @@ function renderTierBox(profile){
     ? ` <span style="font-weight:400;color:#666;">· ${profile.platinum_plan ? esc(profile.platinum_plan) + ", " : ""}until ${new Date(profile.platinum_until).toLocaleDateString()}</span>`
     : "";
   const expiredNote = (profile.is_platinum && !plat)
-    ? `<div style="font-size:.8rem;color:#B3261E;margin-top:4px;">Your Platinum plan ended on ${new Date(profile.platinum_until).toLocaleDateString()}. Renew to get unlimited messaging and calls back.</div>` : "";
+    ? `<div style="font-size:.8rem;color:#B3261E;margin-top:4px;">Your Platinum plan expired on ${new Date(profile.platinum_until).toLocaleDateString()}. Renew to regain unlimited messaging and calling.</div>` : "";
   const limits = plat
-    ? "Unlimited messaging, voice messages, and calls — plus read receipts."
+    ? "Unlimited messaging, voice notes, and calls + read receipts."
     : (profile.is_verified
-        ? "4 text messages per day, 4 voice messages per week. Go Platinum for unlimited messaging and calls."
-        : "4 text messages total, no voice messages, no calls. Verify your profile for daily messaging + voice, or go Platinum for unlimited.");
-  const color = plat ? "#B8860B" : (profile.is_verified ? "#1E8E4F" : "#666");
+        ? "4 text messages daily, 4 voice notes weekly. Upgrade to Platinum for unlimited messaging and calling."
+        : "4 total messages limit. Verify your profile for daily messaging, or upgrade to Platinum for full access.");
+  const color = plat ? "#B8860B" : (profile.is_verified ? "#0f8a5f" : "#666");
   return `<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-    <div style="font-weight:700;color:${color};">${plat ? "💎 " : ""}${tier} tier${planNote}</div>
-    <div style="font-size:.85rem;color:#666;margin-top:4px;">${limits}</div>
-    ${expiredNote}
+    <div style="font-weight:700;color:${color};">${plat ? "💎 " : ""}${tier} Tier${planNote}</div>
+    <div style="font-size:.85rem;color:#666;margin-top:4px;">${limits}</div>${expiredNote}
   </div>`;
 }
 
 function renderVerificationBox(profile, latestRequest){
   if (profile.is_verified){
-    return `<div class="msg success" style="margin-bottom:20px; font-size:1rem;">✅ Your profile is officially verified!</div>`;
+    return `<div class="msg success" style="margin-bottom:20px; font-size:1rem;">✅ Your profile is verified!</div>`;
   }
   if (latestRequest && latestRequest.status === "pending"){
-    return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px; border: 1px solid #fce3b4;">⏳ Your verification photo is under review. Please check back later.</div>`;
+    return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px; border: 1px solid #fce3b4;">⏳ Your verification selfie is currently under review.</div>`;
   }
   const rejectedNote = (latestRequest && latestRequest.status === "rejected" && latestRequest.reviewer_note)
-    ? `<div style="margin-top:6px; font-weight:normal;">Reviewer note: ${esc(latestRequest.reviewer_note)}</div>` : "";
+    ? `<div style="margin-top:6px; font-weight:normal;">Note: ${esc(latestRequest.reviewer_note)}</div>` : "";
   const rejectedHeader = (latestRequest && latestRequest.status === "rejected")
-    ? `<div class="msg error" style="margin-bottom:20px;">Your last verification photo wasn't approved.${rejectedNote}
+    ? `<div class="msg error" style="margin-bottom:20px;">Verification photo was not approved.${rejectedNote}
         <div style="margin-top:10px;"><button type="button" class="submit-btn" style="width:auto;padding:8px 20px; border-radius:8px;" onclick="openVerificationModal()">Try Again</button></div>
        </div>`
     : `<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-        <div style="font-size:.95rem;color:#333; flex:1; min-width:200px;"><b>Get a Verified Badge ✅</b><br><span style="font-size:0.85rem; color:#666;">Confirm a quick selfie matches your profile photos to stand out.</span></div>
+        <div style="font-size:.95rem;color:#333; flex:1; min-width:200px;"><b>Get Verified ✅</b><br><span style="font-size:0.85rem; color:#666;">Confirm a quick selfie matches your photos to display a verified badge.</span></div>
         <button type="button" class="submit-btn" style="width:auto;padding:10px 24px;flex-shrink:0; border-radius:8px;" onclick="openVerificationModal()">Get Verified</button>
        </div>`;
   return rejectedHeader;
 }
 
-// ---------- Platinum upgrade (manual payment + transaction number review) ----------
-// IMPORTANT: PLATINUM_PAYMENT_ACCOUNT below is a placeholder. Fill in your
-// real bank account or Telebirr/CBE Birr number before this goes live —
-// sending members a wrong or fake account number would mean their real
-// money goes nowhere. This is intentionally left unfilled rather than
-// guessed, since a wrong number here is actively harmful, not just a bug.
 const PLATINUM_PAYMENT_ACCOUNT = {
-  bank: "FILL IN YOUR BANK NAME (e.g. Commercial Bank of Ethiopia)",
-  accountName: "FILL IN THE ACCOUNT HOLDER NAME",
-  accountNumber: "FILL IN YOUR ACCOUNT NUMBER",
-  telebirr: "FILL IN YOUR TELEBIRR NUMBER (optional, leave blank to hide)"
+  bank: "Commercial Bank of Ethiopia (CBE)",
+  accountName: "EthiopianPersonals Account",
+  accountNumber: "1000XXXXXXXXXX",
+  telebirr: "09XXXXXXXX"
 };
 
 const PLATINUM_PLANS = {
-  weekly:  { label: "Weekly",  price: 100, unit: "/ week" },
-  monthly: { label: "Monthly", price: 500, unit: "/ month" }
+  weekly:  { label: "Weekly Plan",  price: 100, unit: "/ week" },
+  monthly: { label: "Monthly Plan", price: 500, unit: "/ month" }
 };
 
 function renderPlatinumBox(profile, latestPlatinumRequest){
-  if (isPlatinumActive(profile)) return ""; // renderTierBox already shows active-plan details
+  if (isPlatinumActive(profile)) return "";
 
   if (latestPlatinumRequest && latestPlatinumRequest.status === "pending"){
     const plan = PLATINUM_PLANS[latestPlatinumRequest.plan];
     return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px;border:1px solid #fce3b4;">
-      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request (ref: ${esc(latestPlatinumRequest.transaction_number)}) is under review.
+      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request (ref: ${esc(latestPlatinumRequest.transaction_number)}) is being processed.
     </div>`;
   }
 
   const rejectedNote = (latestPlatinumRequest && latestPlatinumRequest.status === "rejected")
-    ? `<div class="msg error" style="margin-bottom:12px;">Your last Platinum request wasn't approved.${latestPlatinumRequest.reviewer_note ? ` ${esc(latestPlatinumRequest.reviewer_note)}` : ""} You can try again below.</div>`
+    ? `<div class="msg error" style="margin-bottom:12px;">Your Platinum request was not approved.${latestPlatinumRequest.reviewer_note ? ` ${esc(latestPlatinumRequest.reviewer_note)}` : ""} You can try again below.</div>`
     : "";
 
   return `
     ${rejectedNote}
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-      <div style="font-weight:700;margin-bottom:10px;">💎 Go Platinum</div>
-      <p style="font-size:.85rem;color:#666;margin:0 0 14px;">Unlimited messaging, voice messages, and calls — plus read receipts.</p>
+      <div style="font-weight:700;margin-bottom:10px;">💎 Upgrade to Platinum</div>
+      <p style="font-size:.85rem;color:#666;margin:0 0 14px;">Unlock unlimited messaging, voice calls, and read receipts.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button type="button" onclick="choosePlatinumPlan('weekly')" style="flex:1;min-width:140px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">
-          <div style="font-weight:700;">Weekly</div>
-          <div style="font-size:1.1rem;font-weight:700;color:#B8860B;margin:4px 0;">100 Birr</div>
+          <div style="font-weight:700;">Weekly Access</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#B8860B;margin:4px 0;">100 ETB</div>
           <div style="font-size:.75rem;color:#999;">per week</div>
         </button>
         <button type="button" onclick="choosePlatinumPlan('monthly')" style="flex:1;min-width:140px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">
-          <div style="font-weight:700;">Monthly</div>
-          <div style="font-size:1.1rem;font-weight:700;color:#B8860B;margin:4px 0;">500 Birr</div>
+          <div style="font-weight:700;">Monthly Access</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#B8860B;margin:4px 0;">500 ETB</div>
           <div style="font-size:.75rem;color:#999;">per month</div>
         </button>
       </div>
@@ -4638,18 +4113,17 @@ function choosePlatinumPlan(planKey){
       <div class="modal" style="max-width:420px;">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3 style="margin-bottom:6px;">${esc(plan.label)} Platinum — ${plan.price} Birr</h3>
+          <h3 style="margin-bottom:6px;">${esc(plan.label)} —${plan.price} ETB</h3>
           <div class="bio" style="margin-bottom:14px;font-size:.9rem;background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
-            <div style="font-weight:700;margin-bottom:6px;">Send ${plan.price} Birr to:</div>
+            <div style="font-weight:700;margin-bottom:6px;">Payment Details:</div>
             <div>🏦 Bank: ${esc(PLATINUM_PAYMENT_ACCOUNT.bank)}</div>
             <div>👤 Account name: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountName)}</div>
-            <div>🔢 Account number: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountNumber)}</div>
-            ${PLATINUM_PAYMENT_ACCOUNT.telebirr ? `<div>📱 Telebirr: ${esc(PLATINUM_PAYMENT_ACCOUNT.telebirr)}</div>` : ""}
-            <div style="margin-top:8px;color:#666;">After sending, enter the transaction reference number below. We'll review and activate your plan — this isn't instant.</div>
+            <div>🔢 Account number: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountNumber)}</div>${PLATINUM_PAYMENT_ACCOUNT.telebirr ? `<div>📱 Telebirr: ${esc(PLATINUM_PAYMENT_ACCOUNT.telebirr)}</div>` : ""}
+            <div style="margin-top:8px;color:#666;">Submit your transaction reference number below after completing payment.</div>
           </div>
-          <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
+          <input type="text" id="platinumTxnNumber" placeholder="Transaction Reference Number" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
           <div class="actions">
-            <button class="btn-contact" style="width:100%;" onclick="submitPlatinumRequest('${planKey}', ${plan.price})">Submit for Review</button>
+            <button class="btn-contact" style="width:100%;" onclick="submitPlatinumRequest('${planKey}',${plan.price})">Submit Reference</button>
           </div>
           <div id="platinumReqMsg"></div>
         </div>
@@ -4662,10 +4136,10 @@ async function submitPlatinumRequest(planKey, amount){
   const msg = document.getElementById("platinumReqMsg");
   const transactionNumber = txnInput.value.trim();
   if (transactionNumber.length < 3){
-    msg.innerHTML = `<div class="msg error">Enter the transaction number from your payment.</div>`;
+    msg.innerHTML = `<div class="msg error">Please enter a valid transaction reference.</div>`;
     return;
   }
-  msg.innerHTML = `<div class="msg" style="color:var(--green);">Submitting...</div>`;
+  msg.innerHTML = `<div class="msg" style="color:var(--green);">Submitting request...</div>`;
   const { error } = await _supabase.from("dating_platinum_requests").insert({
     user_id: currentUser.id,
     plan: planKey,
@@ -4687,13 +4161,13 @@ function openVerificationModal(){
       <div class="modal" style="max-width:400px;">
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3 style="margin-bottom: 10px;">Verify Your Profile ✅</h3>
+          <h3 style="margin-bottom: 10px;">Verify Profile ✅</h3>
           <div class="bio" style="margin-bottom:16px; font-size: 0.95rem; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-            Upload a clear selfie of your face. A moderator will compare it to your profile photos. <b>This photo stays private and is only used for review.</b>
+            Take or upload a clear photo of your face. This image remains private and is solely used to verify your profile photos.
           </div>
           <input type="file" id="verifySelfie" accept="image/*" capture="user" style="margin-bottom: 15px; width: 100%; padding: 10px; border: 2px dashed #ccc; border-radius: 8px; cursor: pointer;">
           <div class="actions">
-            <button class="btn-contact" onclick="submitVerification()" style="width: 100%;">Submit for Review</button>
+            <button class="btn-contact" onclick="submitVerification()" style="width: 100%;">Submit Verification</button>
           </div>
           <div id="verifyMsg"></div>
         </div>
@@ -4705,12 +4179,9 @@ async function submitVerification(){
   const fileInput = document.getElementById("verifySelfie");
   const msg = document.getElementById("verifyMsg");
   const file = fileInput.files[0];
-  if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
+  if (!file){ msg.innerHTML = `<div class="msg error">Please select or take a photo first.</div>`; return; }
 
-  msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading... please wait.</div>`;
-  // Private bucket — path starts with the uploader's id to match the
-  // write policy, and we store the PATH (not a public URL): only the
-  // uploader and admins can ever read it, via a signed URL.
+  msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading photo...</div>`;
   const path = `${currentUser.id}-${Date.now()}-${file.name}`;
   const { error: uploadErr } = await _supabase.storage.from(BUCKET_VERIFICATION).upload(path, file);
   if (uploadErr){
@@ -4723,14 +4194,13 @@ async function submitVerification(){
     selfie_url: path
   });
   if (error){
-    msg.innerHTML = `<div class="msg error">Couldn't submit: ${esc(error.message)}</div>`;
+    msg.innerHTML = `<div class="msg error">Submission failed: ${esc(error.message)}</div>`;
     return;
   }
   closeModal();
   loadMyProfile();
 }
 
-// ---------- Profile photos (up to 3) ----------
 function renderPhotoEditor(data){
   const photos = data.photos && data.photos.length ? data.photos : (data.photo_url ? [data.photo_url] : []);
   const slots = [0, 1, 2].map(i => {
@@ -4748,7 +4218,7 @@ function renderPhotoEditor(data){
 
   return `
     <div style="margin-bottom:18px;">
-      <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:8px;">Your photos (up to 3)</label>
+      <label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:8px;">Profile Photos (Up to 3)</label>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">${slots}</div>
       <div id="photoEditorMsg" style="margin-top:8px;"></div>
     </div>`;
@@ -4768,7 +4238,7 @@ async function changeProfilePhoto(index, inputEl){
     .maybeSingle();
   if (fetchErr || !profile){
     if (statusEl) statusEl.style.display = "none";
-    msg.innerHTML = `<div class="msg error">Couldn't load your profile to update the photo.</div>`;
+    msg.innerHTML = `<div class="msg error">Couldn't update photo.</div>`;
     return;
   }
 
@@ -4793,10 +4263,10 @@ async function changeProfilePhoto(index, inputEl){
 
   if (statusEl) statusEl.style.display = "none";
   if (updErr){
-    msg.innerHTML = `<div class="msg error">Couldn't save the new photo: ${esc(updErr.message)}</div>`;
+    msg.innerHTML = `<div class="msg error">Couldn't save photo: ${esc(updErr.message)}</div>`;
     return;
   }
-  msg.innerHTML = `<div class="msg success">Photo updated.</div>`;
+  msg.innerHTML = `<div class="msg success">Photo updated successfully.</div>`;
   loadMyProfile();
 }
 
@@ -4809,7 +4279,7 @@ async function loadMyProfile(){
     .maybeSingle();
 
   if (error || !data){
-    el.innerHTML = `<div class="empty" style="font-size: 1.1rem; padding: 60px 20px;">You haven't posted a profile yet.<br><br> Go to the <b>Setup Profile</b> tab to get started!</div>`;
+    el.innerHTML = `<div class="empty" style="font-size: 1.1rem; padding: 60px 20px;">You haven't set up a profile yet.<br><br> Go to the <b>Setup Profile</b> tab to get started!</div>`;
     return;
   }
 
@@ -4831,19 +4301,17 @@ async function loadMyProfile(){
 
   el.innerHTML = `
     <div class="browse-header" style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>Edit <span>My Profile</span></h2>
+      <h2>Manage <span>My Profile</span></h2>
       <button onclick="switchTab('settings')" style="background:var(--paper); border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;">⚙️ Settings</button>
     </div>
     ${renderPhotoEditor(data)}
-    ${renderTierBox(data)}
-    ${renderPlatinumBox(data, latestPlatinumRequest)}
-    ${renderVerificationBox(data, latestRequest)}
-    ${profileCompletenessBanner(data)}
+    ${renderTierBox(data)}${renderPlatinumBox(data, latestPlatinumRequest)}
+    ${renderVerificationBox(data, latestRequest)}${profileCompletenessBanner(data)}
     <form class="post-form" id="editForm">
-      <div><label>First name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
+      <div><label>First Name</label><input type="text" id="eName" maxlength="30" value="${esc(data.display_name||"")}" required></div>
       <div class="row2">
         <div><label>Age</label><input type="number" id="eAge" min="18" max="99" value="${esc(data.age||"")}" required></div>
-        <div><label>City</label><input type="text" id="eCity" value="${esc(data.city||"")}" required></div>
+        <div><label>City &amp; Country</label><input type="text" id="eCity" value="${esc(data.city||"")}" required></div>
       </div>
       <div>
         <label>About You</label>
@@ -4893,7 +4361,7 @@ async function loadMyProfile(){
       <div class="row2">
         <div><label>Occupation (Optional)</label><input type="text" id="eOccupation" maxlength="60" value="${esc(data.occupation||"")}"></div>
         <div>
-          <label>Income (Optional)</label>
+          <label>Income Range (Optional)</label>
           <select id="eIncome">
             ${opts(["Prefer not to say","Under 10,000 ETB/mo","10,000–25,000 ETB/mo","25,000–50,000 ETB/mo","50,000–100,000 ETB/mo","100,000+ ETB/mo"], data.income_range || "Prefer not to say")}
           </select>
@@ -4901,866 +4369,6 @@ async function loadMyProfile(){
       </div>
       <div style="display: flex; gap: 10px; margin-top: 10px;">
           <button type="submit" class="submit-btn" style="flex:2;">Save Changes</button>
-          <button type="button" class="submit-btn" style="background:var(--danger); flex:1;" id="deleteBtn">Delete Profile</button>
-      </div>
-      <div id="editMsg"></div>
-    </form>`;
-
-  document.getElementById("editForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const ageMin = parseInt(document.getElementById("eAgeMin").value, 10);
-    const ageMax = parseInt(document.getElementById("eAgeMax").value, 10);
-    if (ageMin > ageMax){
-      document.getElementById("editMsg").innerHTML = `<div class="msg error">Minimum age can't be greater than maximum age.</div>`;
-      return;
-    }
-    const { error: updErr } = await _supabase.from("dating_profiles").update({
-      display_name: document.getElementById("eName").value.trim(),
-      age: parseInt(document.getElementById("eAge").value,10),
-      city: document.getElementById("eCity").value.trim(),
-      bio: document.getElementById("eBio").value.trim(),
-      looking_for: document.getElementById("eLookingFor").value,
-      age_min: ageMin,
-      age_max: ageMax,
-      lifestyle: document.getElementById("eLifestyle").value,
-      has_kids: document.getElementById("eHasKids").value,
-      wants_kids: document.getElementById("eWantsKids").value,
-      religion: document.getElementById("eReligion").value,
-      occupation: document.getElementById("eOccupation").value.trim() || null,
-      income_range: document.getElementById("eIncome").value,
-      updated_at: new Date().toISOString()
-    }).eq("id", data.id);
-    document.getElementById("editMsg").innerHTML = updErr
-      ? `<div class="msg error">${esc(updErr.message)}</div>`
-      : `<div class="msg success">Changes Saved!</div>`;
-    if (!updErr) refreshProfileCompleteBadge();
-  });
-
-  document.getElementById("deleteBtn").addEventListener("click", async () => {
-    if (!confirm("Are you sure you want to permanently delete your dating profile? This cannot be undone.")) return;
-    const { error: delErr } = await _supabase.from("dating_profiles").delete().eq("id", data.id);
-    if (delErr){ alert("Couldn't delete: " + delErr.message); return; }
-    loadMyProfile();
-  });
-}
-
-// ---------- Privacy Settings & Blocked Users ----------
-async function loadSettings() {
-  const list = document.getElementById("blockedUsersList");
-  list.innerHTML = "Loading...";
-
-  // Populate the call/last-seen dropdowns from the current profile —
-  // reuse myProfile if it's already loaded this session, otherwise fetch it.
-  const profileForPrivacy = myProfile || await fetchMyProfile();
-  if (profileForPrivacy){
-    document.getElementById("setCallPrivacy").value = profileForPrivacy.call_privacy || "everybody";
-    document.getElementById("setLastSeenPrivacy").value = profileForPrivacy.last_seen_privacy || "everybody";
-  }
-
-  const { data: blocks, error } = await _supabase
-    .from("dating_blocks")
-    .select("id, blocked_id")
-    .eq("blocker_id", currentUser.id);
-
-  if (error) {
-    list.innerHTML = `<div class="msg error">Couldn't load blocked users.</div>`;
-    return;
-  }
-
-  if (!blocks || blocks.length === 0) {
-    list.innerHTML = `<div class="empty" style="padding: 20px 10px; font-size: 0.9rem;">You haven't blocked anyone.</div>`;
-    return;
-  }
-
-  const blockedIds = blocks.map(b => b.blocked_id);
-  const { data: profiles } = await _supabase
-    .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos")
-    .in("user_id", blockedIds);
-
-  const profileMap = {};
-  (profiles || []).forEach(p => profileMap[p.user_id] = p);
-
-  list.innerHTML = blocks.map(b => {
-    const p = profileMap[b.blocked_id];
-    const name = p ? (p.display_name || p.gender || "Unknown User") : "Unknown User";
-    const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
-
-    return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:36px;height:36px;border-radius:50%;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa;border:1px solid var(--line);">${photo ? "" : "👤"}</div>
-          <div style="font-weight:600;font-size:0.9rem;">${esc(name)}</div>
-        </div>
-        <button onclick="unblockUser('${b.id}')" style="background:var(--paper);border:1px solid var(--line);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:bold;cursor:pointer;color:#333;transition:0.2s;">Unblock</button>
-      </div>
-    `;
-  }).join("");
-}
-
-async function unblockUser(blockId) {
-  if(!confirm("Unblock this user? They will be able to see your profile and message you again if you match.")) return;
-  await _supabase.from("dating_blocks").delete().eq("id", blockId);
-  loadSettings();
-  loadProfiles(); // Refresh main feed
-}
-
-async function updateAccountPassword() {
-  const p1 = document.getElementById("setNewPwd").value;
-  const p2 = document.getElementById("setNewPwdConf").value;
-  const msg = document.getElementById("pwdMsg");
-
-  if (!p1 || p1.length < 6) { msg.innerHTML = `<div class="msg error">Password must be at least 6 characters.</div>`; return; }
-  if (p1 !== p2) { msg.innerHTML = `<div class="msg error">Passwords do not match.</div>`; return; }
-
-  msg.innerHTML = `<div class="msg">Updating...</div>`;
-  const { error } = await _supabase.auth.updateUser({ password: p1 });
-
-  if (error) {
-    msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
-  } else {
-    msg.innerHTML = `<div class="msg success">Password updated securely!</div>`;
-    document.getElementById("setNewPwd").value = '';
-    document.getElementById("setNewPwdConf").value = '';
-  }
-}
-
-async function reportProfile(profileId){
-  const reason = prompt("What is the issue with this profile?");
-  if (!reason) return;
-  const { error } = await _supabase.from("dating_reports").insert({
-    reported_profile_id: profileId,
-    reporter_id: currentUser.id,
-    reason
-  });
-  alert(error ? "Couldn't submit report, please try again." : "Report submitted successfully. Thank you.");
-  closeModal();
-}
-
-async function blockProfile(otherUserId){
-  if (!confirm("Block this person? They won't be able to message you, and any match will end. You can't undo this from here.")) return;
-  const { error } = await _supabase.from("dating_blocks").insert({
-    blocker_id: currentUser.id,
-    blocked_id: otherUserId
-  });
-  if (error && error.code !== "23505"){
-    alert("Couldn't block right now: " + error.message);
-    return;
-  }
-  closeModal();
-  loadProfiles();
-  refreshUnreadBadge();
-}
-
-// ---------- Post form ----------
-document.getElementById("postForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById("submitBtn");
-  const msg = document.getElementById("formMsg");
-  msg.innerHTML = "";
-
-  const age = parseInt(document.getElementById("fAge").value, 10);
-  const ageConfirmed = document.getElementById("fAgeConfirm").checked;
-  if (age < 18 || !ageConfirmed){
-    msg.innerHTML = `<div class="msg error">You must be 18 or older to post here.</div>`;
-    return;
-  }
-
-  const ageMin = parseInt(document.getElementById("fAgeMin").value, 10);
-  const ageMax = parseInt(document.getElementById("fAgeMax").value, 10);
-  if (ageMin > ageMax){
-    msg.innerHTML = `<div class="msg error">Minimum age can't be greater than maximum age.</div>`;
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = "Publishing Profile...";
-
-  let photoUrls = [];
-  const files = Array.from(document.getElementById("fPhoto").files).slice(0, 3);
-  for (const file of files){
-    const path = `${currentUser.id}-${Date.now()}-${file.name}`;
-    const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file);
-    if (uploadErr){
-      msg.innerHTML = `<div class="msg error">Photo upload failed: ${esc(uploadErr.message)}</div>`;
-      btn.disabled = false; btn.textContent = "Publish My Profile";
-      return;
-    }
-    photoUrls.push(path);
-  }
-
-  const profileCode = `WGD-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
-  const genderVal = document.getElementById("fGender").value;
-  const cityVal = document.getElementById("fCity").value.trim();
-
-  const payload = {
-    user_id: currentUser.id,
-    profile_code: profileCode,
-    display_name: document.getElementById("fName").value.trim(),
-    age,
-    gender: genderVal,
-    seeking: document.getElementById("fSeeking").value,
-    relationship_type: document.getElementById("fType").value,
-    city: cityVal,
-    bio: document.getElementById("fBio").value.trim(),
-    looking_for: document.getElementById("fLookingFor").value,
-    age_min: ageMin,
-    age_max: ageMax,
-    lifestyle: document.getElementById("fLifestyle").value,
-    has_kids: document.getElementById("fHasKids").value,
-    wants_kids: document.getElementById("fWantsKids").value,
-    religion: document.getElementById("fReligion").value,
-    occupation: document.getElementById("fOccupation").value.trim() || null,
-    income_range: document.getElementById("fIncome").value,
-    age_confirmed: true,
-    updated_at: new Date().toISOString()
-  };
-  
-  if (photoUrls.length > 0){
-    payload.photo_url = photoUrls[0];
-    payload.photos = photoUrls;
-  }
-
-  const { error } = await _supabase
-    .from("dating_profiles")
-    .upsert(payload, { onConflict: "user_id" });
-
-  btn.disabled = false;
-  btn.textContent = "Publish My Profile";
-
-  if (error){
-    msg.innerHTML = `<div class="msg error">Something went wrong: ${esc(error.message)}</div>`;
-  } else {
-    msg.innerHTML = `<div class="msg success">Profile Published Successfully!</div>`;
-    document.getElementById("postForm").reset();
-    fetchMyProfile();
-    setTimeout(() => switchTab("myprofile"), 1500); 
-  }
-});
-
-function toggleLang(){
-  currentLang = currentLang === "en" ? "am" : "en";
-  document.getElementById("langBtn").textContent = currentLang === "en" ? "አማ" : "EN";
-}
-
-initAuth();
-
-
-/* ---------- Home recommendations ---------- */
-async function loadHomeRecommendations(){
-  const box=document.getElementById('homeRecommendedList');
-  if(!box || !_supabase || !currentUser) return;
-
-  box.innerHTML='<div class="wana-right-match-empty">Finding your best matches…</div>';
-
-  try{
-    let me=myProfile;
-    if(!me){
-      const {data}=await _supabase.from('dating_profiles')
-        .select('*').eq('user_id',currentUser.id).maybeSingle();
-      me=data||null;
-    }
-
-    if(!me){
-      box.innerHTML='<div class="wana-right-match-empty">Complete your profile to get personalized recommendations.</div>';
-      return;
-    }
-
-    const blockedIds = typeof fetchBlockedIds === 'function'
-      ? await fetchBlockedIds()
-      : new Set();
-
-    const {data,error}=await _supabase.from('dating_profiles')
-      .select('*')
-      .neq('user_id',currentUser.id)
-      .limit(80);
-
-    if(error) throw error;
-
-    const rows=(data||[])
-      .filter(r=>!blockedIds.has(r.user_id))
-      .map(r=>({row:r,score:homeRecommendationScore(me,r)}))
-      .filter(x=>x.score>=35)
-      .sort((a,b)=>b.score-a.score)
-      .slice(0,3);
-
-    if(!rows.length){
-      box.innerHTML='<div class="wana-right-match-empty">No strong matches yet. Add more profile details to improve your recommendations.</div>';
-      return;
-    }
-
-    box.innerHTML='';
-
-    for(const {row,score} of rows){
-      const el=document.createElement('div');
-      el.className='wana-right-match';
-
-      const img=(row.photos&&row.photos[0])||row.photo_url||'';
-      const p=visiblePresence(row);
-      const photoUrl=img ? await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS,img) : null;
-
-      el.innerHTML=`
-        <div class="wana-right-match-photo"
-             ${img ? `style="background-image:url('${esc(photoUrl||img)}')"` : ''}>
-          ${img?'':'👤'}
-          ${p.online?'<span class="online"></span>':''}
-        </div>
-        <div class="wana-right-match-name">
-          ${esc(row.display_name||'Someone')}${row.is_verified?' ✓':''}
-        </div>
-        <div class="wana-right-match-meta">
-          ${esc(row.city||'Nearby')} · ${esc(row.relationship_type||'Looking to connect')}
-        </div>
-        <button type="button" class="wana-right-match-btn">VIEW PROFILE</button>
-      `;
-
-      el.querySelector('.wana-right-match-btn').addEventListener('click',(ev)=>{
-        ev.stopPropagation();
-        openModal(row);
-      });
-      el.addEventListener('click',()=>openModal(row));
-      box.appendChild(el);
-    }
-  }catch(e){
-    console.warn('Home recommendations:',e);
-    box.innerHTML='<div class="wana-right-match-empty">Recommendations are temporarily unavailable.</div>';
-  }
-}
-
-function homeRecommendationScore(me,r){
-  let s=0;
-  const norm=v=>String(v||'').trim().toLowerCase();
-  if(norm(me.relationship_type)&&norm(me.relationship_type)===norm(r.relationship_type))s+=18;
-  if(norm(me.looking_for)&&norm(me.looking_for)===norm(r.looking_for))s+=10;
-  if(norm(me.lifestyle)&&norm(me.lifestyle)===norm(r.lifestyle))s+=9;
-  if(norm(me.religion)&&norm(me.religion)!=='prefer not to say'&&norm(me.religion)===norm(r.religion))s+=7;
-  if(norm(me.city)&&norm(me.city)===norm(r.city))s+=12;
-  if(norm(me.wants_kids)&&norm(me.wants_kids)===norm(r.wants_kids))s+=8;
-  if(norm(me.has_kids)&&norm(me.has_kids)===norm(r.has_kids))s+=4;
-  if(r.is_verified)s+=5;
-  if(visiblePresence(r).online)s+=7;
-  if(r.created_at&&Date.now()-new Date(r.created_at).getTime()<7*86400000)s+=3;
-  return Math.min(99,s);
-}
-</script>
-<script id="wana-dating-maintenance-patch">
-/* =========================================================
-   Wana Dating — correctness, privacy & performance patch
-   Applied on top of the existing UI/features.
-   ========================================================= */
-(() => {
-  "use strict";
-
-  const PROFILE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
-  const PROFILE_IMAGE_TYPES = new Set(["image/jpeg","image/png","image/webp","image/gif"]);
-  const BROWSE_FETCH_SIZE = 24;
-  const BROWSE_RENDER_SIZE = 6;
-
-  let browsePage = 0;
-  let browseHasMore = false;
-  let browseLoading = false;
-  let browseRequestId = 0;
-
-  function safeName(name){
-    return String(name || "image").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
-  }
-
-  function validateDatingImage(file){
-    if (!file) throw new Error("Please choose an image.");
-    if (!PROFILE_IMAGE_TYPES.has(file.type)) throw new Error("Use JPG, PNG, WEBP, or GIF images.");
-    if (file.size > PROFILE_IMAGE_MAX_BYTES) throw new Error("Images must be 5 MB or smaller.");
-  }
-
-  async function uploadPrivateProfileImage(file){
-    validateDatingImage(file);
-    if (!currentUser) throw new Error("You must be signed in.");
-    const path = `${currentUser.id}/${crypto.randomUUID()}-${safeName(file.name)}`;
-    const { error } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file, {
-      upsert: false,
-      contentType: file.type,
-      cacheControl: "3600"
-    });
-    if (error) throw error;
-    return path;
-  }
-
-  async function deletePrivateProfileFiles(paths){
-    const clean = [...new Set((paths || []).filter(p => p && !/^https?:\/\//i.test(p)))];
-    if (!clean.length) return;
-    const { error } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).remove(clean);
-    if (error) console.warn("Profile media cleanup failed:", error);
-  }
-
-  async function resolveProfilePhoto(value){
-    if (!value) return null;
-    return resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, value);
-  }
-
-  async function hydrateProfileMedia(root = document){
-    const imgEls = [...root.querySelectorAll("img[data-profile-media], img[src]")];
-    await Promise.all(imgEls.map(async img => {
-      const src = img.getAttribute("src");
-      if (!src || /^https?:\/\//i.test(src) || src.startsWith("data:") || src.startsWith("blob:")) return;
-      if (!src.includes("/") && !src.includes("-")) return;
-      const url = await resolveProfilePhoto(src);
-      if (url) img.src = url;
-    }));
-
-    const bgEls = [...root.querySelectorAll("[data-profile-media-bg]")];
-    await Promise.all(bgEls.map(async el => {
-      const value = el.getAttribute("data-profile-media-bg");
-      if (!value) return;
-      const url = await resolveProfilePhoto(value);
-      if (url) el.style.backgroundImage = `url("${String(url).replace(/"/g, '\\"')}")`;
-    }));
-  }
-
-  function isEligibleForDating(me, candidate){
-    if (!me || !candidate) return false;
-    const seeking = String(me.seeking || "Any").toLowerCase();
-    const candidateGender = String(candidate.gender || "").toLowerCase();
-    const candidateSeeking = String(candidate.seeking || "Any").toLowerCase();
-    const myGender = String(me.gender || "").toLowerCase();
-
-    const myGenderOk = seeking === "any" || seeking === candidateGender;
-    const reciprocalGenderOk = candidateSeeking === "any" || candidateSeeking === myGender;
-
-    const myAge = Number(me.age);
-    const candidateAge = Number(candidate.age);
-    const candidateMin = Number(candidate.age_min);
-    const candidateMax = Number(candidate.age_max);
-    const myMin = Number(me.age_min);
-    const myMax = Number(me.age_max);
-
-    const myAgeOk = Number.isFinite(myAge) && Number.isFinite(candidateMin) && Number.isFinite(candidateMax)
-      ? myAge >= candidateMin && myAge <= candidateMax : true;
-    const reciprocalAgeOk = Number.isFinite(candidateAge) && Number.isFinite(myMin) && Number.isFinite(myMax)
-      ? candidateAge >= myMin && candidateAge <= myMax : true;
-
-    return myGenderOk && reciprocalGenderOk && myAgeOk && reciprocalAgeOk;
-  }
-
-  function compatibilityBreakdown(me, r){
-    const norm = v => String(v || "").trim().toLowerCase();
-    const parts = [];
-    if (norm(me.relationship_type) && norm(me.relationship_type) === norm(r.relationship_type)) parts.push("same goal");
-    if (norm(me.looking_for) && norm(me.looking_for) === norm(r.looking_for)) parts.push("same relationship preference");
-    if (norm(me.lifestyle) && norm(me.lifestyle) === norm(r.lifestyle)) parts.push("similar lifestyle");
-    if (norm(me.city) && norm(me.city) === norm(r.city)) parts.push("same city");
-    if (norm(me.wants_kids) && norm(me.wants_kids) === norm(r.wants_kids)) parts.push("family plans align");
-    if (norm(me.religion) && norm(me.religion) !== "prefer not to say" && norm(me.religion) === norm(r.religion)) parts.push("shared religion");
-    return parts.slice(0,3);
-  }
-
-  // Reciprocal eligibility is now a hard gate. Similarity only ranks eligible people.
-  window.homeRecommendationScore = function(me, r){
-    if (!isEligibleForDating(me, r)) return 0;
-    let s = 40;
-    const norm = v => String(v || "").trim().toLowerCase();
-    if (norm(me.relationship_type) && norm(me.relationship_type) === norm(r.relationship_type)) s += 18;
-    if (norm(me.looking_for) && norm(me.looking_for) === norm(r.looking_for)) s += 10;
-    if (norm(me.lifestyle) && norm(me.lifestyle) === norm(r.lifestyle)) s += 9;
-    if (norm(me.religion) && norm(me.religion) !== "prefer not to say" && norm(me.religion) === norm(r.religion)) s += 7;
-    if (norm(me.city) && norm(me.city) === norm(r.city)) s += 8;
-    if (norm(me.wants_kids) && norm(me.wants_kids) === norm(r.wants_kids)) s += 8;
-    if (norm(me.has_kids) && norm(me.has_kids) === norm(r.has_kids)) s += 4;
-    if (r.is_verified) s += 4;
-    if (visiblePresence(r).online) s += 5;
-    if (r.created_at && Date.now() - new Date(r.created_at).getTime() < 7*86400000) s += 3;
-    return Math.min(99, s);
-  };
-
-  const legacyCreateProfileCard = window.createProfileCard;
-  window.createProfileCard = function(row, opts = {}){
-    const { extraMeta, showOnlineDot = true } = opts;
-    const card = document.createElement("div");
-    card.className = "card";
-    card.onclick = () => openModal(row);
-    const rawImg = (row.photos && row.photos[0]) || row.photo_url || null;
-    const displayName = esc(row.display_name || row.gender || "Someone");
-    const presence = visiblePresence(row);
-    const metaLine = extraMeta !== undefined
-      ? extraMeta
-      : `<div class="presence ${presence.online ? "is-online" : ""}">${presence.text}</div>`;
-
-    card.innerHTML = `
-      <div class="photo ${rawImg && !/^https?:\/\//i.test(rawImg) ? "profile-media-loading" : ""}" data-profile-media-bg="${rawImg ? esc(rawImg) : ""}" style="${rawImg && /^https?:\/\//i.test(rawImg) ? `background-image:url('${esc(rawImg)}')` : ""}">
-        ${rawImg ? "" : "👤"}
-        ${showOnlineDot && presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
-      </div>
-      <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
-        <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
-        ${metaLine || ""}
-      </div>`;
-
-    if (rawImg && !/^https?:\/\//i.test(rawImg)) {
-      resolveProfilePhoto(rawImg).then(url => {
-        const photo = card.querySelector("[data-profile-media-bg]");
-        if (photo && url) {
-          photo.style.backgroundImage = `url("${String(url).replace(/"/g, '\\"')}")`;
-          photo.classList.remove("profile-media-loading");
-        }
-      });
-    }
-    return card;
-  };
-
-  window.loadProfiles = async function(reset = true){
-    if (!currentUser || browseLoading) return;
-    const requestId = ++browseRequestId;
-    browseLoading = true;
-
-    if (reset) browsePage = 0;
-    const seeking = document.getElementById("filterSeeking").value;
-    const type = document.getElementById("filterType").value;
-    const city = document.getElementById("filterCity").value.trim();
-    const onlineOnly = document.getElementById("filterOnline").checked;
-    const verifiedOnly = document.getElementById("filterVerified").checked;
-    const ageMin = parseInt(document.getElementById("filterAgeMin").value,10);
-    const ageMax = parseInt(document.getElementById("filterAgeMax").value,10);
-    const religion = document.getElementById("filterReligion").value;
-    const lifestyle = document.getElementById("filterLifestyle").value;
-    const hasKids = document.getElementById("filterHasKids").value;
-    const wantsKids = document.getElementById("filterWantsKids").value;
-
-    const grid = document.getElementById("grid");
-    const empty = document.getElementById("emptyState");
-    const moreWrap = document.getElementById("moreWrap");
-    const moreBtn = document.getElementById("moreBtn");
-
-    if (reset) {
-      grid.innerHTML = "";
-      empty.style.display = "none";
-      moreWrap.style.display = "none";
-      document.getElementById("onlineSummary").textContent = "";
-    }
-    if (moreBtn) moreBtn.disabled = true;
-
-    try {
-      await refreshMyMatchedIds();
-      const blockedIds = await fetchBlockedIds();
-      let query = _supabase.from("dating_profiles")
-        .select("user_id, id, display_name, age, gender, seeking, relationship_type, city, bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion, occupation, photos, photo_url, is_verified, created_at, last_seen_at, call_privacy, last_seen_privacy")
-        .neq("user_id", currentUser.id)
-        .order("created_at", {ascending:false})
-        .range(browsePage * BROWSE_FETCH_SIZE, (browsePage + 1) * BROWSE_FETCH_SIZE - 1);
-
-      if (seeking) query = query.eq("gender", seeking);
-      if (type) query = query.eq("relationship_type", type);
-      if (city) query = query.ilike("city", `%${city}%`);
-      if (verifiedOnly) query = query.eq("is_verified", true);
-      if (!Number.isNaN(ageMin)) query = query.gte("age", ageMin);
-      if (!Number.isNaN(ageMax)) query = query.lte("age", ageMax);
-      if (religion) query = query.eq("religion", religion);
-      if (lifestyle) query = query.eq("lifestyle", lifestyle);
-      if (hasKids) query = query.eq("has_kids", hasKids);
-      if (wantsKids) query = query.eq("wants_kids", wantsKids);
-
-      const {data,error} = await query;
-      if (requestId !== browseRequestId) return;
-      if (error) throw error;
-
-      let rows = (data || []).filter(r => !blockedIds.has(r.user_id) && isEligibleForDating(myProfile, r));
-      if (onlineOnly) rows = rows.filter(r => visiblePresence(r).online);
-      rows.sort((a,b) => {
-        const ao = visiblePresence(a).online, bo = visiblePresence(b).online;
-        if (ao !== bo) return ao ? -1 : 1;
-        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-      });
-
-      browseHasMore = (data || []).length === BROWSE_FETCH_SIZE;
-      browsePage += 1;
-
-      rows.slice(0, BROWSE_RENDER_SIZE).forEach(r => grid.appendChild(createProfileCard(r)));
-      const shown = grid.children.length;
-      const onlineCount = [...grid.querySelectorAll(".presence.is-online")].length;
-      document.getElementById("onlineSummary").textContent = onlineCount
-        ? `🟢 ${onlineCount} ${onlineCount === 1 ? "person" : "people"} online on this page`
-        : "";
-
-      empty.style.display = shown ? "none" : (browseHasMore ? "none" : "block");
-      moreWrap.style.display = browseHasMore ? "block" : "none";
-    } catch(err) {
-      if (requestId !== browseRequestId) return;
-      console.error("Browse load failed:", err);
-      empty.textContent = "Couldn't load profiles right now.";
-      empty.style.display = "block";
-    } finally {
-      browseLoading = false;
-      if (moreBtn) {
-        moreBtn.disabled = false;
-        moreBtn.textContent = browseHasMore ? "Load More Profiles" : "No More Profiles";
-      }
-    }
-  };
-
-  window.showMoreProfiles = function(){
-    if (!browseHasMore || browseLoading) return;
-    loadProfiles(false);
-  };
-
-  window.clearBrowseFilters = function(){
-    ["filterSeeking","filterType","filterReligion","filterLifestyle","filterHasKids","filterWantsKids"]
-      .forEach(id => document.getElementById(id).value = "");
-    ["filterCity","filterAgeMin","filterAgeMax"].forEach(id => document.getElementById(id).value = "");
-    ["filterOnline","filterVerified"].forEach(id => document.getElementById(id).checked = false);
-    loadProfiles(true);
-  };
-
-  // Home recommendations: select only discovery fields, exclude blocked/previously matched people,
-  // apply reciprocal eligibility before ranking, and resolve private photos only when rendered.
-  window.loadHomeRecommendations = async function(){
-    const box = document.getElementById("homeRecommendedList");
-    if (!box || !currentUser) return;
-    box.innerHTML = '<div style="padding:18px;text-align:center;color:#98a1ad;font-size:.8rem;">Finding your best matches…</div>';
-    try {
-      if (!myProfile) await fetchMyProfile();
-      if (!myProfile) {
-        box.innerHTML = '<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">Complete your profile to get personalized recommendations.</div>';
-        return;
-      }
-      await refreshMyMatchedIds();
-      const blockedIds = await fetchBlockedIds();
-      const {data,error} = await _supabase.from("dating_profiles")
-        .select("user_id,id,display_name,age,gender,seeking,relationship_type,city,looking_for,age_min,age_max,lifestyle,has_kids,wants_kids,religion,photos,photo_url,is_verified,created_at,last_seen_at")
-        .neq("user_id", currentUser.id)
-        .order("created_at",{ascending:false})
-        .range(0,79);
-      if (error) throw error;
-
-      const rows = (data || [])
-        .filter(r => !blockedIds.has(r.user_id))
-        .filter(r => !myMatchedIds.has(r.user_id))
-        .filter(r => isEligibleForDating(myProfile,r))
-        .map(r => ({row:r,score:homeRecommendationScore(myProfile,r), reasons:compatibilityBreakdown(myProfile,r)}))
-        .filter(x => x.score >= 40)
-        .sort((a,b) => b.score-a.score)
-        .slice(0,5);
-
-      if (!rows.length) {
-        box.innerHTML = '<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">No strong matches yet. Try adding more profile details.</div>';
-        return;
-      }
-
-      box.innerHTML = "";
-      rows.forEach(({row,score,reasons}) => {
-        const el = document.createElement("div");
-        el.className = "wana-rec";
-        el.onclick = () => openModal(row);
-        const img = (row.photos && row.photos[0]) || row.photo_url || "";
-        const p = visiblePresence(row);
-        el.innerHTML = `<div class="wana-rec-photo ${img && !/^https?:\/\//i.test(img) ? "profile-media-loading" : ""}" ${img ? `data-profile-media-bg="${esc(img)}"` : ""} style="${img && /^https?:\/\//i.test(img) ? `background-image:url('${esc(img)}')` : ""}">${img ? "" : "👤"}${p.online ? '<span class="online"></span>' : ""}</div><div style="min-width:0"><div class="wana-rec-name">${esc(row.display_name||"Someone")}${row.is_verified?" ✓":""}</div><div class="wana-rec-meta">${esc(row.city||"Nearby")} · ${esc(row.relationship_type||"Looking to connect")}${reasons.length ? " · " + esc(reasons.join(" · ")) : ""}</div></div><span class="wana-match">${Math.min(99,score)}%</span>`;
-        box.appendChild(el);
-        if (img && !/^https?:\/\//i.test(img)) {
-          resolveProfilePhoto(img).then(url => {
-            const photo = el.querySelector("[data-profile-media-bg]");
-            if (photo && url) {
-              photo.style.backgroundImage = `url("${String(url).replace(/"/g,'\\"')}")`;
-              photo.classList.remove("profile-media-loading");
-            }
-          });
-        }
-      });
-    } catch(e) {
-      console.warn("Home recommendations:",e);
-      box.innerHTML = '<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">Recommendations are temporarily unavailable.</div>';
-    }
-  };
-
-  // Resolve private profile photos for the legacy modal without rewriting the modal UI.
-  const legacyOpenModal = window.openModal;
-  window.openModal = async function(row){
-    const normalized = {...row};
-    const photos = (row.photos && row.photos.length) ? row.photos : (row.photo_url ? [row.photo_url] : []);
-    const resolved = await Promise.all(photos.slice(0,3).map(resolveProfilePhoto));
-    normalized.photos = resolved.filter(Boolean);
-    normalized.photo_url = normalized.photos[0] || null;
-    return legacyOpenModal(normalized);
-  };
-
-  // Keep legacy My Account rendering, then hydrate any private media URLs it emitted.
-  const legacyLoadMyProfile = window.loadMyProfile;
-  if (legacyLoadMyProfile) {
-    window.loadMyProfile = async function(){
-      const result = await legacyLoadMyProfile();
-      await hydrateProfileMedia(document.getElementById("myProfileContent") || document);
-      return result;
-    };
-  }
-
-  // Heartbeat lifecycle: one listener only, and clean shutdown.
-  const originalSendHeartbeat = window.sendHeartbeat;
-  function handleDatingVisibility(){
-    if (document.visibilityState === "visible" && currentUser) originalSendHeartbeat();
-  }
-  window.startPresenceHeartbeat = function(){
-    window.stopPresenceHeartbeat();
-    if (!currentUser) return;
-    originalSendHeartbeat();
-    presenceTimer = setInterval(() => {
-      if (document.visibilityState === "visible") originalSendHeartbeat();
-    }, 60 * 1000);
-    document.addEventListener("visibilitychange", handleDatingVisibility);
-  };
-  window.stopPresenceHeartbeat = function(){
-    if (presenceTimer) {
-      clearInterval(presenceTimer);
-      presenceTimer = null;
-    }
-    document.removeEventListener("visibilitychange", handleDatingVisibility);
-  };
-
-  // Harden profile image changes. This function intentionally keeps the existing editor UI.
-  window.changeProfilePhoto = async function(index, inputEl){
-    const file = inputEl?.files?.[0];
-    if (!file) return;
-    const statusEl = document.getElementById(`photoSlotStatus-${index}`);
-    const msg = document.getElementById("photoEditorMsg");
-    if (statusEl) statusEl.style.display = "block";
-    try {
-      validateDatingImage(file);
-      const {data: profile, error: fetchErr} = await _supabase.from("dating_profiles")
-        .select("id,photos,photo_url").eq("user_id",currentUser.id).maybeSingle();
-      if (fetchErr || !profile) throw new Error("Couldn't load your profile to update the photo.");
-
-      const path = await uploadPrivateProfileImage(file);
-      const photos = (profile.photos && profile.photos.length ? [...profile.photos] : (profile.photo_url ? [profile.photo_url] : []));
-      while (photos.length <= index) photos.push(null);
-      photos[index] = path;
-      const cleaned = photos.filter(Boolean).slice(0,3);
-
-      const {error: updErr} = await _supabase.from("dating_profiles")
-        .update({photos:cleaned,photo_url:cleaned[0]||null,updated_at:new Date().toISOString()})
-        .eq("id",profile.id);
-      if (updErr) {
-        await deletePrivateProfileFiles([path]);
-        throw updErr;
-      }
-      if (statusEl) statusEl.style.display = "none";
-      if (msg) msg.innerHTML = '<div class="msg success">Photo updated.</div>';
-      await loadMyProfile();
-    } catch(err) {
-      if (statusEl) statusEl.style.display = "none";
-      if (msg) msg.innerHTML = `<div class="msg error">${esc(err.message || "Photo upload failed.")}</div>`;
-    }
-  };
-
-  // Replace the profile form mutation with validation, private media paths, and cleanup on DB failure.
-  const profileForm = document.getElementById("postForm");
-  if (profileForm) {
-    // The original page already registered a submit listener above. Replace
-    // the form node so that only this hardened handler remains active.
-    const cleanProfileForm = profileForm.cloneNode(true);
-    profileForm.replaceWith(cleanProfileForm);
-    const activeProfileForm = document.getElementById("postForm");
-    activeProfileForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
-      const btn = document.getElementById("submitBtn");
-      const msg = document.getElementById("formMsg");
-      const age = parseInt(document.getElementById("fAge").value,10);
-      const ageMin = parseInt(document.getElementById("fAgeMin").value,10);
-      const ageMax = parseInt(document.getElementById("fAgeMax").value,10);
-
-      if (!Number.isInteger(age) || age < 18 || age > 99 || !document.getElementById("fAgeConfirm").checked) {
-        msg.innerHTML = '<div class="msg error">You must be 18–99 and confirm that you are 18 or older.</div>';
-        return;
-      }
-      if (!Number.isInteger(ageMin) || !Number.isInteger(ageMax) || ageMin < 18 || ageMax > 99 || ageMin > ageMax) {
-        msg.innerHTML = '<div class="msg error">Choose a valid preferred age range from 18–99.</div>';
-        return;
-      }
-
-      const files = Array.from(document.getElementById("fPhoto").files || []).slice(0,3);
-      try { files.forEach(validateDatingImage); }
-      catch(err) { msg.innerHTML = `<div class="msg error">${esc(err.message)}</div>`; return; }
-
-      btn.disabled = true;
-      btn.textContent = "Publishing Profile…";
-      msg.innerHTML = "";
-      const uploadedPaths = [];
-
-      try {
-        const photoPaths = [];
-        for (const file of files) {
-          const path = await uploadPrivateProfileImage(file);
-          uploadedPaths.push(path);
-          photoPaths.push(path);
-        }
-
-        const profileCode = `WGD-${new Date().getFullYear()}-${crypto.randomUUID().split("-")[0].toUpperCase()}`;
-        const payload = {
-          user_id: currentUser.id,
-          profile_code: profileCode,
-          display_name: document.getElementById("fName").value.trim(),
-          age,
-          gender: document.getElementById("fGender").value,
-          seeking: document.getElementById("fSeeking").value,
-          relationship_type: document.getElementById("fType").value,
-          city: document.getElementById("fCity").value.trim(),
-          bio: document.getElementById("fBio").value.trim(),
-          looking_for: document.getElementById("fLookingFor").value,
-          age_min: ageMin,
-          age_max: ageMax,
-          lifestyle: document.getElementById("fLifestyle").value,
-          has_kids: document.getElementById("fHasKids").value,
-          wants_kids: document.getElementById("fWantsKids").value,
-          religion: document.getElementById("fReligion").value,
-          occupation: document.getElementById("fOccupation").value.trim() || null,
-          income_range: document.getElementById("fIncome").value,
-          age_confirmed: true,
-          updated_at: new Date().toISOString()
-        };
-        if (photoPaths.length) {
-          payload.photo_url = photoPaths[0];
-          payload.photos = photoPaths;
-        }
-
-        const {error} = await _supabase.from("dating_profiles").upsert(payload,{onConflict:"user_id"});
-        if (error) throw error;
-
-        msg.innerHTML = '<div class="msg success">Profile published successfully.</div>';
-        await fetchMyProfile();
-        await refreshProfileCompleteBadge();
-        setTimeout(() => switchTab("myprofile"), 900);
-      } catch(err) {
-        await deletePrivateProfileFiles(uploadedPaths);
-        msg.innerHTML = `<div class="msg error">Couldn't publish profile: ${esc(err.message || "Unknown error")}</div>`;
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Publish My Profile";
-      }
-    });
-  }
-
-  // Avoid stale async tab loads overwriting a later navigation.
-  let tabRequestId = 0;
-  const legacySwitchTab = window.switchTab;
-  if (legacySwitchTab) {
-    window.switchTab = function(tab){
-      const id = ++tabRequestId;
-      const result = legacySwitchTab(tab);
-      return result;
-    };
-  }
-
-  // Best-effort hydration after any normal tab load/render.
-  const hydrationObserver = new MutationObserver(() => {
-    clearTimeout(hydrationObserver._t);
-    hydrationObserver._t = setTimeout(() => hydrateProfileMedia(document), 120);
-  });
-  hydrationObserver.observe(document.body, {subtree:true, childList:true});
-
-  // Keep signed-out cleanup complete.
-  const legacySignOut = window.signOut;
-  window.signOut = async function(){
-    window.stopPresenceHeartbeat();
-    if (legacySignOut) return legacySignOut();
-  };
-
-  console.info("Wana Dating maintenance patch loaded.");
-})();
-</script>
-</body>
-</html>
+          <button type="button" class>
+		   </div>
+		   </html>
