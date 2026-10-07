@@ -1514,6 +1514,86 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 }
 </style>
 
+
+<style id="final-sidebar-main-layout">
+/* FINAL WANA LAYOUT FIX
+   Desktop/tablet: sidebar is permanently column 1 and all tab panels are
+   rendered in main column 2. Mobile only stacks at 600px and below. */
+@media (min-width: 601px) {
+  html, body { width: 100%; min-width: 0; }
+  .app-shell {
+    display: grid !important;
+    grid-template-columns: 248px minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 1480px !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
+  }
+  .app-shell > .sidebar {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 248px !important;
+    min-width: 248px !important;
+    max-width: 248px !important;
+    height: calc(100vh - 68px) !important;
+    min-height: calc(100vh - 68px) !important;
+    position: sticky !important;
+    top: 68px !important;
+    align-self: start !important;
+    overflow-y: auto !important;
+  }
+  .app-shell > main {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 30px 28px 90px !important;
+    box-sizing: border-box !important;
+  }
+  .app-shell > main > .panel,
+  .app-shell > main > #gate {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  .side-nav .tab { width: 100% !important; box-sizing: border-box !important; }
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .app-shell > .sidebar {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    position: sticky !important;
+    top: 68px !important;
+  }
+  .app-shell > main {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 16px 12px 60px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 
