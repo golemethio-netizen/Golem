@@ -1218,7 +1218,7 @@ header{
 .app-shell{
   display:flex!important;
   align-items:flex-start!important;
-  max-width:1240px!important;
+  max-width:1480px!important;
   width:100%!important;
   margin:0 auto!important;
 }
@@ -1235,8 +1235,8 @@ main{
   flex:1 1 auto!important;
   min-width:0!important;
   width:auto!important;
-  max-width:980px!important;
-  margin:0 auto!important;
+  max-width:none!important;
+  margin:0!important;
 }
 
 /* Header: clean, compact and aligned */
@@ -1333,6 +1333,72 @@ header button.lang:hover{
   box-shadow:0 18px 50px rgba(18,20,26,.16)!important;
 }
 
+
+/* ---------- Home recommended photo rail ---------- */
+.home-recommend-rail{
+  flex:0 0 230px;
+  width:230px;
+  padding:28px 12px 28px 0;
+}
+.home-recommend-box{
+  position:sticky;
+  top:calc(var(--header-h) + 18px);
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 8px 28px rgba(18,20,26,.07);
+  padding:14px;
+}
+.home-recommend-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-bottom:12px;
+}
+.home-recommend-title{font-weight:800;color:var(--ink);font-size:.98rem;}
+.home-recommend-subtitle{color:var(--muted);font-size:.76rem;margin-top:2px;}
+.home-recommend-refresh{
+  width:30px;height:30px;border:1px solid var(--line);border-radius:50%;
+  background:var(--paper);color:var(--green-dark);cursor:pointer;font-size:1rem;
+}
+.home-recommend-refresh:hover{background:var(--green-soft);}
+.home-recommended-list{display:flex;flex-direction:column;gap:10px;}
+.home-recommend-card{
+  display:flex;align-items:center;gap:10px;padding:8px;
+  border:1px solid transparent;border-radius:12px;cursor:pointer;
+  transition:background .18s ease,transform .18s ease,border-color .18s ease;
+}
+.home-recommend-card:hover{background:var(--green-soft);border-color:#d7eee5;transform:translateX(2px);}
+.home-recommend-photo{
+  width:58px;height:58px;flex:0 0 58px;border-radius:14px;
+  background:linear-gradient(145deg,#eef1f5,#e2e6ec) center/cover no-repeat;
+  display:flex;align-items:center;justify-content:center;color:#aeb6c1;font-size:1.35rem;
+  position:relative;overflow:hidden;
+}
+.home-recommend-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.home-recommend-online{
+  position:absolute;right:3px;bottom:3px;width:11px;height:11px;border-radius:50%;
+  background:#22c55e;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.08);
+}
+.home-recommend-info{min-width:0;flex:1;}
+.home-recommend-name{font-weight:800;font-size:.84rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-recommend-meta{font-size:.73rem;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-recommend-score{
+  display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;
+  background:var(--green-soft);color:var(--green-dark);font-size:.67rem;font-weight:800;
+}
+.home-recommend-empty{font-size:.78rem;line-height:1.45;color:var(--muted);padding:12px 4px;text-align:center;}
+.home-recommend-more{
+  width:100%;margin-top:10px;border:0;background:transparent;color:var(--green-dark);
+  font-size:.78rem;font-weight:800;cursor:pointer;padding:7px 4px;border-radius:8px;
+}
+.home-recommend-more:hover{background:var(--green-soft);}
+
+@media(max-width:1280px){
+  .home-recommend-rail{flex-basis:210px;width:210px;padding-right:10px;}
+}
+@media(max-width:1050px){
+  .home-recommend-rail{display:none!important;}
+}
+
 /* Keep gate centered within the main content area */
 #gate{
   width:100%;
@@ -1375,45 +1441,6 @@ header button.lang:hover{
   .panel{padding:14px!important}
 }
 
-
-/* ---------- Recommended for You ---------- */
-.recommended-panel{background:linear-gradient(180deg,#ffffff 0%,#f8fbfa 100%)}
-.recommend-hero{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
-  padding:18px 20px;margin-bottom:18px;border:1px solid #dcefe8;
-  border-radius:16px;background:linear-gradient(135deg,#effaf6,#fff);
-}
-.recommend-hero h2{margin:0 0 5px;font-size:1.45rem;font-weight:800;letter-spacing:-.02em}
-.recommend-hero p{margin:0;color:var(--muted);font-size:.9rem;max-width:650px}
-.recommend-refresh{
-  border:1px solid var(--green);background:#fff;color:var(--green-dark);
-  border-radius:999px;padding:9px 15px;font-weight:700;cursor:pointer;white-space:nowrap
-}
-.recommend-refresh:hover{background:var(--green-soft)}
-.recommend-card{position:relative}
-.recommend-score{
-  position:absolute;top:10px;left:10px;z-index:2;
-  background:rgba(255,255,255,.95);color:var(--green-dark);
-  border:1px solid rgba(13,155,108,.25);border-radius:999px;
-  padding:5px 9px;font-size:.76rem;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.08)
-}
-.recommend-reasons{
-  display:flex;flex-wrap:wrap;gap:5px;margin-top:8px
-}
-.recommend-reason{
-  background:var(--green-soft);color:var(--green-dark);border-radius:999px;
-  padding:4px 8px;font-size:.7rem;font-weight:700
-}
-.recommend-empty{
-  padding:45px 18px;text-align:center;color:var(--muted);
-  border:1px dashed var(--line-strong);border-radius:14px;background:#fff
-}
-.recommend-empty strong{display:block;color:var(--ink);font-size:1.05rem;margin-bottom:6px}
-@media(max-width:600px){
-  .recommend-hero{padding:15px;flex-direction:column}
-  .recommend-refresh{width:100%}
-}
-
 </style>
 
 </head>
@@ -1443,7 +1470,6 @@ header button.lang:hover{
     <nav class="side-nav">
       <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
       <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
-      <div class="tab" data-tab="recommended" onclick="switchTab('recommended')"><span class="side-icon">✨</span> Recommended <span id="recommendedBadge"></span></div>
       <div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
       <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
       <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
@@ -1515,22 +1541,6 @@ header button.lang:hover{
     </div>
     <div id="feed"></div>
     <div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something!</div>
-  </div>
-
-  <!-- RECOMMENDED FOR YOU -->
-  <div class="panel recommended-panel" id="recommendedPanel" style="display:none;">
-    <div class="recommend-hero">
-      <div>
-        <h2>✨ Recommended <span style="color:var(--green);">for You</span></h2>
-        <p>Profiles ranked using your preferences, mutual compatibility, shared lifestyle, family goals, location, verification and recent activity.</p>
-      </div>
-      <button class="recommend-refresh" onclick="loadRecommendedProfiles()">↻ Refresh</button>
-    </div>
-    <div class="grid" id="recommendedGrid"></div>
-    <div class="recommend-empty" id="recommendedEmpty" style="display:none;">
-      <strong>No strong recommendations yet</strong>
-      Complete more of your profile or adjust your preferences to discover better matches.
-    </div>
   </div>
 
   <!-- BROWSE MATCHES -->
@@ -1845,6 +1855,22 @@ header button.lang:hover{
   </div>
 
 </main>
+
+<!-- HOME RECOMMENDED PHOTOS -->
+<aside class="home-recommend-rail" id="homeRecommendationsRail" style="display:none;">
+  <div class="home-recommend-box">
+    <div class="home-recommend-head">
+      <div>
+        <div class="home-recommend-title">✨ Recommended</div>
+        <div class="home-recommend-subtitle">People you may like</div>
+      </div>
+      <button class="home-recommend-refresh" type="button" onclick="loadHomeRecommendedPhotos()" title="Refresh recommendations">↻</button>
+    </div>
+    <div id="homeRecommendedPhotos" class="home-recommended-list"></div>
+    <div id="homeRecommendedEmpty" class="home-recommend-empty" style="display:none;">Complete your profile to get better recommendations.</div>
+    <button class="home-recommend-more" type="button" onclick="switchTab('recommended')">See all recommendations →</button>
+  </div>
+</aside>
 </div>
 
 <!-- ROOT CONTAINERS -->
@@ -2696,22 +2722,28 @@ async function recordProfileView(viewedUserId){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","recommendedPanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
+const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
   if (!currentUser){
     document.getElementById("gate").style.display = "flex";
     PANELS.forEach(p => document.getElementById(p).style.display = "none");
+    const rail = document.getElementById("homeRecommendationsRail");
+    if (rail) rail.style.display = "none";
     return;
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", recommended: "recommendedPanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
+  const rail = document.getElementById("homeRecommendationsRail");
+  if (rail) rail.style.display = tab === "home" ? "block" : "none";
+  const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
-  if (tab === "home") loadFeed();
-  if (tab === "recommended") loadRecommendedProfiles();
+  if (tab === "home") {
+    loadFeed();
+    loadHomeRecommendedPhotos();
+  }
   if (tab === "browse") loadProfiles();
   if (tab === "newmembers") loadNewMembers();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
@@ -3038,6 +3070,122 @@ async function reportPost(postId){
     reason
   });
   alert(error ? "Couldn't send report: " + error.message : "Thanks — we'll take a look.");
+}
+
+// ---------- Home recommended photos ----------
+function homeRecommendationScore(me, candidate){
+  let score = 0;
+  const norm = v => String(v || "").trim().toLowerCase();
+  const same = (a,b) => norm(a) && norm(b) && norm(a) === norm(b);
+
+  // Candidate should be someone the current user is looking for.
+  if (norm(me.seeking) && norm(candidate.gender) && norm(me.seeking) !== norm(candidate.gender)) return -1;
+  if (norm(candidate.seeking) && norm(me.gender) && norm(candidate.seeking) !== norm(me.gender)) return -1;
+
+  // Mutual age compatibility.
+  const age = Number(candidate.age);
+  const myAge = Number(me.age);
+  if (Number.isFinite(age)) {
+    const min = Number(me.age_min), max = Number(me.age_max);
+    if (Number.isFinite(min) && age < min) return -1;
+    if (Number.isFinite(max) && age > max) return -1;
+  }
+  if (Number.isFinite(myAge)) {
+    const cmin = Number(candidate.age_min), cmax = Number(candidate.age_max);
+    if (Number.isFinite(cmin) && myAge < cmin) return -1;
+    if (Number.isFinite(cmax) && myAge > cmax) return -1;
+  }
+
+  if (same(me.relationship_type, candidate.relationship_type)) score += 18;
+  if (same(me.looking_for, candidate.looking_for)) score += 8;
+  if (same(me.lifestyle, candidate.lifestyle)) score += 10;
+  if (same(me.wants_kids, candidate.wants_kids)) score += 8;
+  if (same(me.has_kids, candidate.has_kids)) score += 4;
+  if (same(me.religion, candidate.religion) && norm(me.religion) !== "prefer not to say") score += 6;
+  if (same(me.city, candidate.city)) score += 10;
+  if (candidate.is_verified) score += 4;
+
+  const presence = visiblePresence(candidate);
+  if (presence.online) score += 4;
+  if (candidate.created_at && Date.now() - new Date(candidate.created_at).getTime() < 7*24*60*60*1000) score += 2;
+  return Math.min(100, 35 + score);
+}
+
+function renderHomeRecommendedPhotos(rows){
+  const list = document.getElementById("homeRecommendedPhotos");
+  const empty = document.getElementById("homeRecommendedEmpty");
+  if (!list || !empty) return;
+  list.innerHTML = "";
+
+  if (!rows.length){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  rows.slice(0,6).forEach(({row, score}) => {
+    const img = (row.photos && row.photos[0]) || row.photo_url || "";
+    const name = esc(row.display_name || row.gender || "Someone");
+    const presence = visiblePresence(row);
+    const card = document.createElement("div");
+    card.className = "home-recommend-card";
+    card.title = "View profile";
+    card.onclick = () => openModal(row);
+    card.innerHTML = `
+      <div class="home-recommend-photo">
+        ${img ? `<img src="${esc(img)}" alt="${name}" loading="lazy" onerror="this.style.display='none'">` : "👤"}
+        ${presence.online ? '<span class="home-recommend-online" title="Online now"></span>' : ""}
+      </div>
+      <div class="home-recommend-info">
+        <div class="home-recommend-name">${name}${verifiedBadge(row.is_verified)}</div>
+        <div class="home-recommend-meta">${esc(row.age || "?")} yrs · ${esc(row.city || "Ethiopia")}</div>
+        <span class="home-recommend-score">${score}% match</span>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+async function loadHomeRecommendedPhotos(){
+  const list = document.getElementById("homeRecommendedPhotos");
+  const empty = document.getElementById("homeRecommendedEmpty");
+  if (!list || !empty || !currentUser) return;
+
+  list.innerHTML = '<div style="padding:18px 4px;text-align:center;color:var(--muted);font-size:.78rem;">Loading...</div>';
+  empty.style.display = "none";
+
+  try {
+    const me = myProfile || await fetchMyProfile();
+    if (!me){
+      list.innerHTML = "";
+      empty.textContent = "Complete your profile to get better recommendations.";
+      empty.style.display = "block";
+      return;
+    }
+
+    const blocked = await fetchBlockedIds();
+    await refreshMyMatchedIds();
+
+    const { data, error } = await _supabase
+      .from("dating_profiles")
+      .select("*")
+      .neq("user_id", currentUser.id)
+      .limit(100);
+
+    if (error) throw error;
+
+    const ranked = (data || [])
+      .filter(row => !blocked.has(row.user_id) && !myMatchedIds.has(row.user_id))
+      .map(row => ({row, score: homeRecommendationScore(me, row)}))
+      .filter(x => x.score >= 45)
+      .sort((a,b) => b.score - a.score || Number(visiblePresence(b.row).online) - Number(visiblePresence(a.row).online));
+
+    renderHomeRecommendedPhotos(ranked);
+  } catch (err) {
+    console.error("Home recommendations failed:", err);
+    list.innerHTML = "";
+    empty.textContent = "Recommendations are unavailable right now.";
+    empty.style.display = "block";
+  }
 }
 
 // ---------- Load / render profiles ----------
@@ -4720,167 +4868,6 @@ function toggleLang(){
 }
 
 initAuth();
-
-// ---------- Recommended for You ----------
-function recommendationGenderMatch(me, candidate){
-  const mySeeking = (me?.seeking || "").toLowerCase();
-  const theirGender = (candidate?.gender || "").toLowerCase();
-  const theirSeeking = (candidate?.seeking || "").toLowerCase();
-  const myGender = (me?.gender || "").toLowerCase();
-
-  const accepts = (pref, gender) => !pref || pref === "any" || pref === gender;
-  return accepts(mySeeking, theirGender) && accepts(theirSeeking, myGender);
-}
-
-function recommendationAgeMatch(me, candidate){
-  const age = Number(candidate?.age);
-  const min = Number(me?.age_min);
-  const max = Number(me?.age_max);
-  const reciprocalMin = Number(candidate?.age_min);
-  const reciprocalMax = Number(candidate?.age_max);
-  if (!age) return false;
-  const myRangeOk = Number.isFinite(min) && Number.isFinite(max) ? age >= min && age <= max : true;
-  const theirRangeOk = Number.isFinite(reciprocalMin) && Number.isFinite(reciprocalMax)
-    ? Number(me?.age) >= reciprocalMin && Number(me?.age) <= reciprocalMax
-    : true;
-  return myRangeOk && theirRangeOk;
-}
-
-function scoreRecommendation(me, candidate){
-  let score = 0;
-  const reasons = [];
-
-  // Hard compatibility gets the largest weight.
-  if (recommendationGenderMatch(me, candidate)) { score += 24; reasons.push("Mutual preference"); }
-  else return { score: 0, reasons: [] };
-
-  if (recommendationAgeMatch(me, candidate)) { score += 20; reasons.push("Age range fits"); }
-  else return { score: 0, reasons: [] };
-
-  if (me.relationship_type && candidate.relationship_type &&
-      me.relationship_type === candidate.relationship_type) {
-    score += 15; reasons.push(`${candidate.relationship_type} goal`);
-  }
-
-  if (me.looking_for && candidate.looking_for &&
-      me.looking_for === candidate.looking_for) {
-    score += 8; reasons.push("Same relationship style");
-  }
-
-  if (me.lifestyle && candidate.lifestyle && me.lifestyle === candidate.lifestyle) {
-    score += 10; reasons.push("Shared lifestyle");
-  }
-
-  if (me.wants_kids && candidate.wants_kids && me.wants_kids === candidate.wants_kids) {
-    score += 8; reasons.push("Family goals align");
-  }
-
-  if (me.has_kids && candidate.has_kids && me.has_kids === candidate.has_kids) {
-    score += 4; reasons.push("Similar family situation");
-  }
-
-  if (me.religion && candidate.religion &&
-      me.religion !== "Prefer not to say" &&
-      candidate.religion === me.religion) {
-    score += 6; reasons.push("Same religion");
-  }
-
-  if (me.city && candidate.city &&
-      me.city.trim().toLowerCase() === candidate.city.trim().toLowerCase()) {
-    score += 8; reasons.push("Same city");
-  }
-
-  if (candidate.is_verified) { score += 4; reasons.push("Verified"); }
-
-  const presence = visiblePresence(candidate);
-  if (presence.online) { score += 3; reasons.push("Online now"); }
-
-  if (candidate.created_at) {
-    const days = (Date.now() - new Date(candidate.created_at).getTime()) / 86400000;
-    if (days <= 7) { score += 2; reasons.push("New member"); }
-  }
-
-  return { score: Math.min(100, score), reasons: reasons.slice(0, 4) };
-}
-
-function createRecommendationCard(row, match){
-  const card = createProfileCard(row, {
-    showOnlineDot: true,
-    extraMeta: `
-      <div class="recommend-reasons">
-        ${match.reasons.map(r => `<span class="recommend-reason">${esc(r)}</span>`).join("")}
-      </div>`
-  });
-  card.classList.add("recommend-card");
-  const badge = document.createElement("div");
-  badge.className = "recommend-score";
-  badge.textContent = `${match.score}% match`;
-  card.querySelector(".photo").appendChild(badge);
-  return card;
-}
-
-async function loadRecommendedProfiles(){
-  const grid = document.getElementById("recommendedGrid");
-  const empty = document.getElementById("recommendedEmpty");
-  if (!grid || !currentUser) return;
-
-  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:35px;color:var(--muted);">Finding your best matches…</div>`;
-  empty.style.display = "none";
-
-  const me = myProfile || await fetchMyProfile();
-  if (!me){
-    grid.innerHTML = "";
-    empty.style.display = "block";
-    empty.querySelector("strong").textContent = "Complete your profile first";
-    return;
-  }
-
-  const [blockedIds, likesResult] = await Promise.all([
-    fetchBlockedIds(),
-    _supabase.from("dating_likes").select("liked_id").eq("liker_id", currentUser.id)
-  ]);
-
-  const likedIds = new Set((likesResult.data || []).map(x => x.liked_id));
-
-  const { data, error } = await _supabase
-    .from("dating_profiles")
-    .select("*")
-    .neq("user_id", currentUser.id)
-    .limit(100);
-
-  if (error){
-    grid.innerHTML = "";
-    empty.style.display = "block";
-    empty.querySelector("strong").textContent = "Recommendations are temporarily unavailable";
-    console.error("Recommended profiles:", error);
-    return;
-  }
-
-  const candidates = (data || [])
-    .filter(p => !blockedIds.has(p.user_id))
-    .filter(p => !myMatchedIds.has(p.user_id))
-    .filter(p => !likedIds.has(p.user_id))
-    .map(p => ({ profile:p, match:scoreRecommendation(me,p) }))
-    .filter(x => x.match.score >= 45)
-    .sort((a,b) => {
-      if (b.match.score !== a.match.score) return b.match.score - a.match.score;
-      const ao = visiblePresence(a.profile).online ? 1 : 0;
-      const bo = visiblePresence(b.profile).online ? 1 : 0;
-      return bo - ao;
-    })
-    .slice(0, 12);
-
-  grid.innerHTML = "";
-  if (!candidates.length){
-    empty.style.display = "block";
-    return;
-  }
-
-  candidates.forEach(({profile, match}) => {
-    grid.appendChild(createRecommendationCard(profile, match));
-  });
-}
-
 </script>
 </body>
 </html>
