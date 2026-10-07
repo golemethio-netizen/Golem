@@ -30,7 +30,7 @@
   --danger: #e5484d;
   --danger-soft: #fdecec;
   --shadow-sm: 0 1px 2px rgba(18, 20, 26, 0.04);
-  --shadow: 0 4px 16px rgba(18, 20, 26, 0.06);a
+  --shadow: 0 4px 16px rgba(18, 20, 26, 0.06);
   --shadow-lg: 0 12px 40px rgba(18, 20, 26, 0.12);
   --radius: 14px;
   --radius-sm: 10px;
@@ -1446,6 +1446,72 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
   .profile-media-loading::after{content:"";width:18px;height:18px;border:2px solid #cbd5df;border-top-color:var(--green);border-radius:50%;animation:wanaSpin .7s linear infinite;position:absolute;left:50%;top:50%;margin:-9px}
   @keyframes wanaSpin{to{transform:rotate(360deg)}}
   .compatibility-note{margin:10px 0;padding:9px 12px;border-radius:10px;background:var(--green-soft);color:var(--green-dark);font-size:.8rem;font-weight:600}
+</style>
+
+<style id="wana-sidebar-layout-fix">
+/* Keep the dating navigation on the LEFT for desktop/tablet widths.
+   Several older responsive rules in this file changed .app-shell to a
+   vertical layout at 768px. This final layer intentionally wins. */
+@media (min-width: 701px) {
+  .app-shell {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    max-width: 1480px !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
+  }
+
+  .app-shell > .sidebar {
+    display: flex !important;
+    flex: 0 0 248px !important;
+    width: 248px !important;
+    min-width: 248px !important;
+    position: sticky !important;
+    top: 68px !important;
+    height: calc(100vh - 68px) !important;
+    min-height: calc(100vh - 68px) !important;
+    align-self: flex-start !important;
+  }
+
+  .app-shell > main {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 30px 28px 90px !important;
+  }
+
+  .side-nav .tab {
+    width: 100% !important;
+  }
+}
+
+/* Only turn the navigation into a top/mobile bar on genuinely small screens. */
+@media (max-width: 700px) {
+  .app-shell {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .app-shell > .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    position: sticky !important;
+    top: 68px !important;
+  }
+
+  .app-shell > main {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
 </style>
 
 </head>
