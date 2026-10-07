@@ -1670,6 +1670,147 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
   }
 }
 </style>
+
+<style id="wana-new-matches-rail">
+/* Right-side New Matches feature */
+.app-shell > main{
+  min-width:0;
+}
+.wana-right-match-rail{
+  flex:0 0 250px;
+  width:250px;
+  margin:0;
+  padding:22px 12px 70px 0;
+  min-width:0;
+}
+.wana-right-match-card{
+  position:sticky;
+  top:86px;
+  background:#fff;
+  border:1px solid #e5e9ef;
+  border-radius:18px;
+  padding:14px 10px 12px;
+  box-shadow:0 10px 28px rgba(17,24,39,.06);
+}
+.wana-right-match-head{
+  text-align:center;
+  padding:2px 4px 12px;
+}
+.wana-right-match-head h3{
+  margin:0;
+  font-size:.92rem;
+  font-weight:800;
+  color:#4b4f57;
+}
+.wana-right-match-head h3 span{color:#4b8ee8}
+.wana-right-match-list{
+  display:grid;
+  gap:12px;
+}
+.wana-right-match{
+  min-width:0;
+}
+.wana-right-match-photo{
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:8px;
+  background:#edf1f4 center/cover no-repeat;
+  display:grid;
+  place-items:center;
+  color:#aab2bd;
+  font-size:2rem;
+  overflow:hidden;
+  position:relative;
+}
+.wana-right-match-photo .online{
+  position:absolute;
+  right:7px;
+  bottom:7px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#22c55e;
+  border:2px solid #fff;
+}
+.wana-right-match-name{
+  margin-top:7px;
+  font-size:.72rem;
+  font-weight:800;
+  color:#4b4f57;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.wana-right-match-meta{
+  font-size:.68rem;
+  color:#8b94a2;
+  margin-top:1px;
+  min-height:16px;
+}
+.wana-right-match-btn{
+  width:100%;
+  margin-top:7px;
+  border:0;
+  border-radius:999px;
+  padding:6px 8px;
+  background:#6651a6;
+  color:#fff;
+  font-size:.62rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .18s ease,opacity .18s ease;
+}
+.wana-right-match-btn:hover{
+  transform:translateY(-1px);
+  opacity:.92;
+}
+.wana-right-match-footer{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid #eef0f3;
+}
+.wana-right-match-footer button{
+  width:100%;
+  border:0;
+  border-radius:999px;
+  padding:9px 10px;
+  background:#f04458;
+  color:#fff;
+  font-size:.68rem;
+  font-weight:800;
+  cursor:pointer;
+}
+.wana-right-match-footer button:hover{filter:brightness(.96)}
+.wana-right-match-empty{
+  padding:18px 8px;
+  text-align:center;
+  color:#7d8795;
+  font-size:.76rem;
+  line-height:1.45;
+}
+@media(max-width:1050px){
+  .wana-right-match-rail{
+    flex-basis:215px;
+    width:215px;
+  }
+}
+@media(max-width:900px){
+  .wana-right-match-rail{display:none}
+}
+</style>
+
+<style id="wana-right-rail-layout">
+@media (min-width:701px){
+  .app-shell > main{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+}
+@media (max-width:700px){
+  .wana-right-match-rail{display:none!important}
+}
+</style>
 </head>
 <body>
 <header>
@@ -1776,18 +1917,8 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 </div>
 <!-- BROWSE MATCHES -->
 </div>
-<aside class="wana-discover">
-<div class="wana-discover-head">
-<div><h3>✨ Recommended for you</h3><p>People who may be a great match</p></div>
-<button onclick="loadHomeRecommendations()" title="Refresh">↻</button>
 </div>
-<div class="wana-rec-list" id="homeRecommendedList">
-<div style="padding:18px;text-align:center;color:#98a1ad;font-size:.8rem;">Finding your best matches…</div>
-</div>
-<div class="wana-discover-footer"><button onclick="switchTab('browse')">See all matches →</button></div>
-</aside>
-</div>
-<div class="panel" id="browsePanel" style="display:none;">
+<div class="panel" id="browsePanel"  style="display:none;">
 <div class="browse-header">
 <h2>Find Singles <span>Online</span></h2>
 <p>Browse people near you looking for friendship, dating, or marriage. Like a profile to start chatting.</p>
@@ -2072,7 +2203,21 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Users you have blocked cannot see your profile or message you.</p>
 <div id="blockedUsersList">Loading...</div>
 </div>
-</div></main></div>
+</div></main>
+<aside class="wana-right-match-rail" id="rightMatchRail">
+  <div class="wana-right-match-card">
+    <div class="wana-right-match-head">
+      <h3>New matches on <span id="matchRailCountry">Ethiopia</span></h3>
+    </div>
+    <div class="wana-right-match-list" id="homeRecommendedList">
+      <div class="wana-right-match-empty">Finding your best matches…</div>
+    </div>
+    <div class="wana-right-match-footer">
+      <button type="button" onclick="switchTab('browse')">SEE ALL YOUR MATCHES</button>
+    </div>
+  </div>
+</aside>
+</div>
 
 <!-- NEW MEMBERS -->
 
@@ -4966,31 +5111,83 @@ initAuth();
 async function loadHomeRecommendations(){
   const box=document.getElementById('homeRecommendedList');
   if(!box || !_supabase || !currentUser) return;
-  box.innerHTML='<div style="padding:18px;text-align:center;color:#98a1ad;font-size:.8rem;">Finding your best matches…</div>';
+
+  box.innerHTML='<div class="wana-right-match-empty">Finding your best matches…</div>';
+
   try{
     let me=myProfile;
     if(!me){
-      const {data}=await _supabase.from('dating_profiles').select('*').eq('user_id',currentUser.id).maybeSingle();
+      const {data}=await _supabase.from('dating_profiles')
+        .select('*').eq('user_id',currentUser.id).maybeSingle();
       me=data||null;
     }
+
     if(!me){
-      box.innerHTML='<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">Complete your profile to get personalized recommendations.</div>';
+      box.innerHTML='<div class="wana-right-match-empty">Complete your profile to get personalized recommendations.</div>';
       return;
     }
-    const {data,error}=await _supabase.from('dating_profiles').select('*').neq('user_id',currentUser.id).limit(60);
+
+    const blockedIds = typeof fetchBlockedIds === 'function'
+      ? await fetchBlockedIds()
+      : new Set();
+
+    const {data,error}=await _supabase.from('dating_profiles')
+      .select('*')
+      .neq('user_id',currentUser.id)
+      .limit(80);
+
     if(error) throw error;
-    const rows=(data||[]).map(r=>({row:r,score:homeRecommendationScore(me,r)})).filter(x=>x.score>=35).sort((a,b)=>b.score-a.score).slice(0,5);
-    if(!rows.length){box.innerHTML='<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">No strong matches yet. Try adding more profile details.</div>';return;}
+
+    const rows=(data||[])
+      .filter(r=>!blockedIds.has(r.user_id))
+      .map(r=>({row:r,score:homeRecommendationScore(me,r)}))
+      .filter(x=>x.score>=35)
+      .sort((a,b)=>b.score-a.score)
+      .slice(0,3);
+
+    if(!rows.length){
+      box.innerHTML='<div class="wana-right-match-empty">No strong matches yet. Add more profile details to improve your recommendations.</div>';
+      return;
+    }
+
     box.innerHTML='';
-    rows.forEach(({row,score})=>{
-      const el=document.createElement('div'); el.className='wana-rec'; el.onclick=()=>openModal(row);
+
+    for(const {row,score} of rows){
+      const el=document.createElement('div');
+      el.className='wana-right-match';
+
       const img=(row.photos&&row.photos[0])||row.photo_url||'';
       const p=visiblePresence(row);
-      el.innerHTML=`<div class="wana-rec-photo" style="${img?`background-image:url('${esc(img)}')`:''}">${img?'':'👤'}${p.online?'<span class="online"></span>':''}</div><div style="min-width:0"><div class="wana-rec-name">${esc(row.display_name||'Someone')}${row.is_verified?' ✓':''}</div><div class="wana-rec-meta">${esc(row.city||'Nearby')} · ${esc(row.relationship_type||'Looking to connect')}</div></div><span class="wana-match">${Math.min(99,score)}%</span>`;
+      const photoUrl=img ? await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS,img) : null;
+
+      el.innerHTML=`
+        <div class="wana-right-match-photo"
+             ${img ? `style="background-image:url('${esc(photoUrl||img)}')"` : ''}>
+          ${img?'':'👤'}
+          ${p.online?'<span class="online"></span>':''}
+        </div>
+        <div class="wana-right-match-name">
+          ${esc(row.display_name||'Someone')}${row.is_verified?' ✓':''}
+        </div>
+        <div class="wana-right-match-meta">
+          ${esc(row.city||'Nearby')} · ${esc(row.relationship_type||'Looking to connect')}
+        </div>
+        <button type="button" class="wana-right-match-btn">VIEW PROFILE</button>
+      `;
+
+      el.querySelector('.wana-right-match-btn').addEventListener('click',(ev)=>{
+        ev.stopPropagation();
+        openModal(row);
+      });
+      el.addEventListener('click',()=>openModal(row));
       box.appendChild(el);
-    });
-  }catch(e){console.warn('Home recommendations:',e);box.innerHTML='<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">Recommendations are temporarily unavailable.</div>';}
+    }
+  }catch(e){
+    console.warn('Home recommendations:',e);
+    box.innerHTML='<div class="wana-right-match-empty">Recommendations are temporarily unavailable.</div>';
+  }
 }
+
 function homeRecommendationScore(me,r){
   let s=0;
   const norm=v=>String(v||'').trim().toLowerCase();
