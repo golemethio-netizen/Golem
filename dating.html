@@ -1594,6 +1594,90 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 }
 </style>
 
+
+<style id="wana-sidebar-main-final">
+/* =========================================================
+   FINAL SIDEBAR + MAIN CONTENT LAYOUT
+   Sidebar = column 1, selected panel = column 2.
+   Only very small phones stack the navigation.
+   ========================================================= */
+.app-shell {
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
+  grid-template-areas: "sidebar content" !important;
+  align-items: start !important;
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  min-height: calc(100vh - var(--header-h)) !important;
+  gap: 0 !important;
+}
+
+.app-shell > .sidebar {
+  grid-area: sidebar !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: calc(100vh - var(--header-h)) !important;
+  min-height: calc(100vh - var(--header-h)) !important;
+  position: sticky !important;
+  top: var(--header-h) !important;
+  align-self: start !important;
+  overflow-y: auto !important;
+}
+
+.app-shell > main {
+  grid-area: content !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 28px 28px 80px !important;
+  overflow: visible !important;
+}
+
+/* Every selectable panel occupies the main/content column. */
+.app-shell > main > .panel,
+.app-shell > main > #gate {
+  grid-area: content !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.side-nav .tab {
+  width: 100% !important;
+}
+
+/* Phone layout only. */
+@media (max-width: 600px) {
+  .app-shell {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+  .app-shell > .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    position: sticky !important;
+    top: var(--header-h) !important;
+  }
+  .app-shell > main {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 16px 12px 60px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 
