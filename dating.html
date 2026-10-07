@@ -1218,7 +1218,7 @@ header{
 .app-shell{
   display:flex!important;
   align-items:flex-start!important;
-  max-width:1480px!important;
+  max-width:1240px!important;
   width:100%!important;
   margin:0 auto!important;
 }
@@ -1235,8 +1235,8 @@ main{
   flex:1 1 auto!important;
   min-width:0!important;
   width:auto!important;
-  max-width:none!important;
-  margin:0!important;
+  max-width:980px!important;
+  margin:0 auto!important;
 }
 
 /* Header: clean, compact and aligned */
@@ -1333,72 +1333,6 @@ header button.lang:hover{
   box-shadow:0 18px 50px rgba(18,20,26,.16)!important;
 }
 
-
-/* ---------- Home recommended photo rail ---------- */
-.home-recommend-rail{
-  flex:0 0 230px;
-  width:230px;
-  padding:28px 12px 28px 0;
-}
-.home-recommend-box{
-  position:sticky;
-  top:calc(var(--header-h) + 18px);
-  border:1px solid var(--line);
-  border-radius:18px;
-  background:#fff;
-  box-shadow:0 8px 28px rgba(18,20,26,.07);
-  padding:14px;
-}
-.home-recommend-head{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin-bottom:12px;
-}
-.home-recommend-title{font-weight:800;color:var(--ink);font-size:.98rem;}
-.home-recommend-subtitle{color:var(--muted);font-size:.76rem;margin-top:2px;}
-.home-recommend-refresh{
-  width:30px;height:30px;border:1px solid var(--line);border-radius:50%;
-  background:var(--paper);color:var(--green-dark);cursor:pointer;font-size:1rem;
-}
-.home-recommend-refresh:hover{background:var(--green-soft);}
-.home-recommended-list{display:flex;flex-direction:column;gap:10px;}
-.home-recommend-card{
-  display:flex;align-items:center;gap:10px;padding:8px;
-  border:1px solid transparent;border-radius:12px;cursor:pointer;
-  transition:background .18s ease,transform .18s ease,border-color .18s ease;
-}
-.home-recommend-card:hover{background:var(--green-soft);border-color:#d7eee5;transform:translateX(2px);}
-.home-recommend-photo{
-  width:58px;height:58px;flex:0 0 58px;border-radius:14px;
-  background:linear-gradient(145deg,#eef1f5,#e2e6ec) center/cover no-repeat;
-  display:flex;align-items:center;justify-content:center;color:#aeb6c1;font-size:1.35rem;
-  position:relative;overflow:hidden;
-}
-.home-recommend-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-.home-recommend-online{
-  position:absolute;right:3px;bottom:3px;width:11px;height:11px;border-radius:50%;
-  background:#22c55e;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.08);
-}
-.home-recommend-info{min-width:0;flex:1;}
-.home-recommend-name{font-weight:800;font-size:.84rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.home-recommend-meta{font-size:.73rem;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.home-recommend-score{
-  display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;
-  background:var(--green-soft);color:var(--green-dark);font-size:.67rem;font-weight:800;
-}
-.home-recommend-empty{font-size:.78rem;line-height:1.45;color:var(--muted);padding:12px 4px;text-align:center;}
-.home-recommend-more{
-  width:100%;margin-top:10px;border:0;background:transparent;color:var(--green-dark);
-  font-size:.78rem;font-weight:800;cursor:pointer;padding:7px 4px;border-radius:8px;
-}
-.home-recommend-more:hover{background:var(--green-soft);}
-
-@media(max-width:1280px){
-  .home-recommend-rail{flex-basis:210px;width:210px;padding-right:10px;}
-}
-@media(max-width:1050px){
-  .home-recommend-rail{display:none!important;}
-}
-
 /* Keep gate centered within the main content area */
 #gate{
   width:100%;
@@ -1441,6 +1375,69 @@ header button.lang:hover{
   .panel{padding:14px!important}
 }
 
+
+/* =========================================================
+   Wana Dating — 2026 Professional Home Experience
+   ========================================================= */
+:root{
+  --brand:#10a874;
+  --brand-deep:#087a57;
+  --rose:#ef476f;
+  --navy:#111827;
+  --bg:#f5f7fa;
+  --card:#ffffff;
+}
+body{background:linear-gradient(180deg,#f8fafc 0%,#f2f5f8 100%)}
+header{height:68px;padding:0 28px;background:rgba(13,18,28,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+header .brand{font-size:1.32rem;letter-spacing:-.04em}
+header .brand:before{content:'♥';display:inline-grid;place-items:center;width:27px;height:27px;margin-right:8px;border-radius:9px;background:linear-gradient(135deg,#20c997,#0a8f66);font-size:.8rem;color:#fff;vertical-align:middle;box-shadow:0 5px 16px rgba(16,168,116,.28)}
+.app-shell{max-width:1480px;min-height:calc(100vh - 68px);gap:0}
+.sidebar{width:248px;background:rgba(255,255,255,.94);border-right:1px solid #e5e9ef;box-shadow:8px 0 30px rgba(17,24,39,.025)}
+.side-nav{padding:20px 12px}
+.side-nav:before{content:'DISCOVER';display:block;padding:0 13px 10px;color:#9aa3b2;font-size:.68rem;font-weight:800;letter-spacing:.12em}
+.side-nav .tab{position:relative;padding:12px 14px;margin-bottom:4px;border-radius:12px;font-size:.91rem;gap:13px}
+.side-nav .tab:hover{background:#f1f8f5;transform:translateX(2px)}
+.side-nav .tab.active{background:linear-gradient(90deg,#e5f8f1,#effaf6);color:#087a57;box-shadow:inset 3px 0 0 #10a874}
+.side-icon{font-size:1.05rem}
+.sidebar-account{padding:18px;background:#f8fafc}
+main{max-width:none;min-width:0;padding:30px 28px 90px}
+.panel{border:1px solid #e5e9ef;border-radius:20px;box-shadow:0 8px 30px rgba(17,24,39,.045);background:rgba(255,255,255,.96)}
+#homePanel{background:transparent;border:0;box-shadow:none;padding:0;min-height:0}
+.wana-home-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:24px;align-items:start}
+.wana-feed-column{min-width:0}
+.wana-hero{position:relative;overflow:hidden;margin-bottom:20px;padding:28px 30px;border-radius:22px;background:linear-gradient(135deg,#0d7f5b 0%,#10a874 54%,#34c995 100%);color:#fff;box-shadow:0 16px 40px rgba(8,122,87,.18)}
+.wana-hero:after{content:'';position:absolute;width:220px;height:220px;right:-70px;top:-80px;border:42px solid rgba(255,255,255,.08);border-radius:50%}
+.wana-hero .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.82;margin-bottom:7px}
+.wana-hero h1{font-family:var(--font-display);font-size:clamp(1.65rem,3vw,2.15rem);line-height:1.15;margin:0 0 8px;letter-spacing:-.03em;position:relative;z-index:1}
+.wana-hero p{max-width:650px;margin:0;color:rgba(255,255,255,.88);font-size:.93rem;position:relative;z-index:1}
+.wana-quick-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px;position:relative;z-index:2}
+.wana-quick-actions button{border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.13);color:#fff;border-radius:999px;padding:9px 14px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);transition:.2s}
+.wana-quick-actions button:hover{background:#fff;color:#087a57;transform:translateY(-1px)}
+.wana-composer{background:#fff;border:1px solid #e5e9ef;border-radius:20px;padding:18px;margin-bottom:20px;box-shadow:0 8px 26px rgba(17,24,39,.04)}
+.wana-composer textarea{background:#f8fafc!important;border-color:#e8edf2!important;border-radius:15px!important;min-height:78px!important}
+.wana-discover{position:sticky;top:88px;background:#fff;border:1px solid #e5e9ef;border-radius:22px;padding:18px;box-shadow:0 12px 34px rgba(17,24,39,.06)}
+.wana-discover-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}
+.wana-discover-head h3{font-size:1.02rem;margin:0;font-weight:800;color:#111827}
+.wana-discover-head p{font-size:.76rem;color:#8a93a1;margin:3px 0 0}
+.wana-discover-head button{border:0;background:#f1f8f5;color:#087a57;border-radius:9px;padding:7px 9px;cursor:pointer;font-weight:800}
+.wana-rec-list{display:grid;gap:11px}
+.wana-rec{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:11px;align-items:center;padding:8px;border-radius:15px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.wana-rec:hover{background:#f7faf9;border-color:#e2eee9;transform:translateY(-1px)}
+.wana-rec-photo{width:62px;height:72px;border-radius:13px;background:#edf1f4 center/cover no-repeat;display:grid;place-items:center;font-size:1.5rem;color:#aab2bd;position:relative;overflow:hidden}
+.wana-rec-photo:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.15))}
+.wana-rec .online{position:absolute;z-index:2;right:5px;bottom:5px;width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid #fff}
+.wana-rec-name{font-weight:800;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#172033}
+.wana-rec-meta{font-size:.74rem;color:#8993a1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wana-match{font-size:.7rem;font-weight:800;color:#087a57;background:#e9f8f2;padding:5px 7px;border-radius:8px;white-space:nowrap}
+.wana-discover-footer{margin-top:13px;padding-top:13px;border-top:1px solid #eef0f3;text-align:center}
+.wana-discover-footer button{border:0;background:none;color:#087a57;font-size:.82rem;font-weight:800;cursor:pointer}
+.wana-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.wana-stat{background:#fff;border:1px solid #e5e9ef;border-radius:15px;padding:13px 14px}
+.wana-stat strong{display:block;font-size:1.08rem;color:#172033}
+.wana-stat span{font-size:.7rem;color:#8b94a2}
+@media(max-width:1100px){.wana-home-layout{grid-template-columns:minmax(0,1fr) 290px}.sidebar{width:220px}}
+@media(max-width:900px){.wana-home-layout{grid-template-columns:1fr}.wana-discover{position:relative;top:auto}.wana-rec-list{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:22px 18px 70px}}
+@media(max-width:650px){header{padding:0 15px}.sidebar{width:100%;height:auto;min-height:0;position:sticky;top:68px;z-index:150;border-right:0;border-bottom:1px solid #e5e9ef}.app-shell{display:block}.side-nav{display:flex;overflow-x:auto;padding:8px;gap:5px}.side-nav:before{display:none}.side-nav .tab{white-space:nowrap;padding:9px 12px;margin:0}.sidebar-account{display:none!important}main{padding:16px 12px 60px}.wana-hero{padding:22px 20px}.wana-rec-list{grid-template-columns:1fr}.wana-stats{gap:7px}.wana-stat{padding:10px}}
 </style>
 
 </head>
@@ -1512,7 +1509,19 @@ header button.lang:hover{
 
   <!-- HOME FEED -->
   <div class="panel" id="homePanel" style="display:none;">
-    <div style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:22px;box-shadow:0 1px 2px rgba(18,20,26,0.04);">
+    <div class="wana-hero">
+      <div class="eyebrow">Wana Dating</div>
+      <h1>Meet someone who feels right. ❤️</h1>
+      <p>Discover genuine connections based on your preferences, lifestyle and relationship goals.</p>
+      <div class="wana-quick-actions">
+        <button onclick="switchTab('browse')">🔎 Discover matches</button>
+        <button onclick="switchTab('newmembers')">✨ New members</button>
+        <button onclick="switchTab('myprofile')">✦ Improve my profile</button>
+      </div>
+    </div>
+    <div class="wana-home-layout">
+      <div class="wana-feed-column">
+    <div class="wana-composer">
       <div style="display:flex;gap:12px;align-items:flex-start;">
         <div id="composerAvatar" style="width:46px;height:46px;border-radius:50%;flex-shrink:0;background:var(--paper);display:flex;align-items:center;justify-content:center;color:#aaa; font-size: 1.5rem;">👤</div>
         <div style="flex:1;">
@@ -1544,7 +1553,21 @@ header button.lang:hover{
   </div>
 
   <!-- BROWSE MATCHES -->
-  <div class="panel" id="browsePanel" style="display:none;">
+  
+      </div>
+      <aside class="wana-discover">
+        <div class="wana-discover-head">
+          <div><h3>✨ Recommended for you</h3><p>People who may be a great match</p></div>
+          <button onclick="loadHomeRecommendations()" title="Refresh">↻</button>
+        </div>
+        <div class="wana-rec-list" id="homeRecommendedList">
+          <div style="padding:18px;text-align:center;color:#98a1ad;font-size:.8rem;">Finding your best matches…</div>
+        </div>
+        <div class="wana-discover-footer"><button onclick="switchTab('browse')">See all matches →</button></div>
+      </aside>
+    </div>
+  </div>
+<div class="panel" id="browsePanel" style="display:none;">
     <div class="browse-header">
       <h2>Find Singles <span>Online</span></h2>
       <p>Browse people near you looking for friendship, dating, or marriage. Like a profile to start chatting.</p>
@@ -1855,22 +1878,6 @@ header button.lang:hover{
   </div>
 
 </main>
-
-<!-- HOME RECOMMENDED PHOTOS -->
-<aside class="home-recommend-rail" id="homeRecommendationsRail" style="display:none;">
-  <div class="home-recommend-box">
-    <div class="home-recommend-head">
-      <div>
-        <div class="home-recommend-title">✨ Recommended</div>
-        <div class="home-recommend-subtitle">People you may like</div>
-      </div>
-      <button class="home-recommend-refresh" type="button" onclick="loadHomeRecommendedPhotos()" title="Refresh recommendations">↻</button>
-    </div>
-    <div id="homeRecommendedPhotos" class="home-recommended-list"></div>
-    <div id="homeRecommendedEmpty" class="home-recommend-empty" style="display:none;">Complete your profile to get better recommendations.</div>
-    <button class="home-recommend-more" type="button" onclick="switchTab('recommended')">See all recommendations →</button>
-  </div>
-</aside>
 </div>
 
 <!-- ROOT CONTAINERS -->
@@ -2725,25 +2732,19 @@ async function recordProfileView(viewedUserId){
 const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
 
 function switchTab(tab){
+  if(tab==='home' && currentUser) setTimeout(loadHomeRecommendations,80);
   document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
   if (!currentUser){
     document.getElementById("gate").style.display = "flex";
     PANELS.forEach(p => document.getElementById(p).style.display = "none");
-    const rail = document.getElementById("homeRecommendationsRail");
-    if (rail) rail.style.display = "none";
     return;
   }
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const rail = document.getElementById("homeRecommendationsRail");
-  if (rail) rail.style.display = tab === "home" ? "block" : "none";
   const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
   document.getElementById(map[tab]).style.display = "block";
 
-  if (tab === "home") {
-    loadFeed();
-    loadHomeRecommendedPhotos();
-  }
+  if (tab === "home") loadFeed();
   if (tab === "browse") loadProfiles();
   if (tab === "newmembers") loadNewMembers();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
@@ -3070,122 +3071,6 @@ async function reportPost(postId){
     reason
   });
   alert(error ? "Couldn't send report: " + error.message : "Thanks — we'll take a look.");
-}
-
-// ---------- Home recommended photos ----------
-function homeRecommendationScore(me, candidate){
-  let score = 0;
-  const norm = v => String(v || "").trim().toLowerCase();
-  const same = (a,b) => norm(a) && norm(b) && norm(a) === norm(b);
-
-  // Candidate should be someone the current user is looking for.
-  if (norm(me.seeking) && norm(candidate.gender) && norm(me.seeking) !== norm(candidate.gender)) return -1;
-  if (norm(candidate.seeking) && norm(me.gender) && norm(candidate.seeking) !== norm(me.gender)) return -1;
-
-  // Mutual age compatibility.
-  const age = Number(candidate.age);
-  const myAge = Number(me.age);
-  if (Number.isFinite(age)) {
-    const min = Number(me.age_min), max = Number(me.age_max);
-    if (Number.isFinite(min) && age < min) return -1;
-    if (Number.isFinite(max) && age > max) return -1;
-  }
-  if (Number.isFinite(myAge)) {
-    const cmin = Number(candidate.age_min), cmax = Number(candidate.age_max);
-    if (Number.isFinite(cmin) && myAge < cmin) return -1;
-    if (Number.isFinite(cmax) && myAge > cmax) return -1;
-  }
-
-  if (same(me.relationship_type, candidate.relationship_type)) score += 18;
-  if (same(me.looking_for, candidate.looking_for)) score += 8;
-  if (same(me.lifestyle, candidate.lifestyle)) score += 10;
-  if (same(me.wants_kids, candidate.wants_kids)) score += 8;
-  if (same(me.has_kids, candidate.has_kids)) score += 4;
-  if (same(me.religion, candidate.religion) && norm(me.religion) !== "prefer not to say") score += 6;
-  if (same(me.city, candidate.city)) score += 10;
-  if (candidate.is_verified) score += 4;
-
-  const presence = visiblePresence(candidate);
-  if (presence.online) score += 4;
-  if (candidate.created_at && Date.now() - new Date(candidate.created_at).getTime() < 7*24*60*60*1000) score += 2;
-  return Math.min(100, 35 + score);
-}
-
-function renderHomeRecommendedPhotos(rows){
-  const list = document.getElementById("homeRecommendedPhotos");
-  const empty = document.getElementById("homeRecommendedEmpty");
-  if (!list || !empty) return;
-  list.innerHTML = "";
-
-  if (!rows.length){
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
-  rows.slice(0,6).forEach(({row, score}) => {
-    const img = (row.photos && row.photos[0]) || row.photo_url || "";
-    const name = esc(row.display_name || row.gender || "Someone");
-    const presence = visiblePresence(row);
-    const card = document.createElement("div");
-    card.className = "home-recommend-card";
-    card.title = "View profile";
-    card.onclick = () => openModal(row);
-    card.innerHTML = `
-      <div class="home-recommend-photo">
-        ${img ? `<img src="${esc(img)}" alt="${name}" loading="lazy" onerror="this.style.display='none'">` : "👤"}
-        ${presence.online ? '<span class="home-recommend-online" title="Online now"></span>' : ""}
-      </div>
-      <div class="home-recommend-info">
-        <div class="home-recommend-name">${name}${verifiedBadge(row.is_verified)}</div>
-        <div class="home-recommend-meta">${esc(row.age || "?")} yrs · ${esc(row.city || "Ethiopia")}</div>
-        <span class="home-recommend-score">${score}% match</span>
-      </div>`;
-    list.appendChild(card);
-  });
-}
-
-async function loadHomeRecommendedPhotos(){
-  const list = document.getElementById("homeRecommendedPhotos");
-  const empty = document.getElementById("homeRecommendedEmpty");
-  if (!list || !empty || !currentUser) return;
-
-  list.innerHTML = '<div style="padding:18px 4px;text-align:center;color:var(--muted);font-size:.78rem;">Loading...</div>';
-  empty.style.display = "none";
-
-  try {
-    const me = myProfile || await fetchMyProfile();
-    if (!me){
-      list.innerHTML = "";
-      empty.textContent = "Complete your profile to get better recommendations.";
-      empty.style.display = "block";
-      return;
-    }
-
-    const blocked = await fetchBlockedIds();
-    await refreshMyMatchedIds();
-
-    const { data, error } = await _supabase
-      .from("dating_profiles")
-      .select("*")
-      .neq("user_id", currentUser.id)
-      .limit(100);
-
-    if (error) throw error;
-
-    const ranked = (data || [])
-      .filter(row => !blocked.has(row.user_id) && !myMatchedIds.has(row.user_id))
-      .map(row => ({row, score: homeRecommendationScore(me, row)}))
-      .filter(x => x.score >= 45)
-      .sort((a,b) => b.score - a.score || Number(visiblePresence(b.row).online) - Number(visiblePresence(a.row).online));
-
-    renderHomeRecommendedPhotos(ranked);
-  } catch (err) {
-    console.error("Home recommendations failed:", err);
-    list.innerHTML = "";
-    empty.textContent = "Recommendations are unavailable right now.";
-    empty.style.display = "block";
-  }
 }
 
 // ---------- Load / render profiles ----------
@@ -4868,6 +4753,52 @@ function toggleLang(){
 }
 
 initAuth();
+
+
+/* ---------- Home recommendations ---------- */
+async function loadHomeRecommendations(){
+  const box=document.getElementById('homeRecommendedList');
+  if(!box || !_supabase || !currentUser) return;
+  box.innerHTML='<div style="padding:18px;text-align:center;color:#98a1ad;font-size:.8rem;">Finding your best matches…</div>';
+  try{
+    let me=myProfile;
+    if(!me){
+      const {data}=await _supabase.from('dating_profiles').select('*').eq('user_id',currentUser.id).maybeSingle();
+      me=data||null;
+    }
+    if(!me){
+      box.innerHTML='<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">Complete your profile to get personalized recommendations.</div>';
+      return;
+    }
+    const {data,error}=await _supabase.from('dating_profiles').select('*').neq('user_id',currentUser.id).limit(60);
+    if(error) throw error;
+    const rows=(data||[]).map(r=>({row:r,score:homeRecommendationScore(me,r)})).filter(x=>x.score>=35).sort((a,b)=>b.score-a.score).slice(0,5);
+    if(!rows.length){box.innerHTML='<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">No strong matches yet. Try adding more profile details.</div>';return;}
+    box.innerHTML='';
+    rows.forEach(({row,score})=>{
+      const el=document.createElement('div'); el.className='wana-rec'; el.onclick=()=>openModal(row);
+      const img=(row.photos&&row.photos[0])||row.photo_url||'';
+      const p=visiblePresence(row);
+      el.innerHTML=`<div class="wana-rec-photo" style="${img?`background-image:url('${esc(img)}')`:''}">${img?'':'👤'}${p.online?'<span class="online"></span>':''}</div><div style="min-width:0"><div class="wana-rec-name">${esc(row.display_name||'Someone')}${row.is_verified?' ✓':''}</div><div class="wana-rec-meta">${esc(row.city||'Nearby')} · ${esc(row.relationship_type||'Looking to connect')}</div></div><span class="wana-match">${Math.min(99,score)}%</span>`;
+      box.appendChild(el);
+    });
+  }catch(e){console.warn('Home recommendations:',e);box.innerHTML='<div style="padding:18px;text-align:center;color:#7d8795;font-size:.8rem;">Recommendations are temporarily unavailable.</div>';}
+}
+function homeRecommendationScore(me,r){
+  let s=0;
+  const norm=v=>String(v||'').trim().toLowerCase();
+  if(norm(me.relationship_type)&&norm(me.relationship_type)===norm(r.relationship_type))s+=18;
+  if(norm(me.looking_for)&&norm(me.looking_for)===norm(r.looking_for))s+=10;
+  if(norm(me.lifestyle)&&norm(me.lifestyle)===norm(r.lifestyle))s+=9;
+  if(norm(me.religion)&&norm(me.religion)!=='prefer not to say'&&norm(me.religion)===norm(r.religion))s+=7;
+  if(norm(me.city)&&norm(me.city)===norm(r.city))s+=12;
+  if(norm(me.wants_kids)&&norm(me.wants_kids)===norm(r.wants_kids))s+=8;
+  if(norm(me.has_kids)&&norm(me.has_kids)===norm(r.has_kids))s+=4;
+  if(r.is_verified)s+=5;
+  if(visiblePresence(r).online)s+=7;
+  if(r.created_at&&Date.now()-new Date(r.created_at).getTime()<7*86400000)s+=3;
+  return Math.min(99,s);
+}
 </script>
 </body>
 </html>
