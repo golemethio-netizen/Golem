@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Wana Dating 2.0 — Smart Match + Date Planning release -->
 
 <html lang="en">
 <head>
@@ -1445,231 +1446,8 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
   @keyframes wanaSpin{to{transform:rotate(360deg)}}
   .compatibility-note{margin:10px 0;padding:9px 12px;border-radius:10px;background:var(--green-soft);color:var(--green-dark);font-size:.8rem;font-weight:600}
 </style>
-<style id="wana-sidebar-layout-fix">
-/* Keep the dating navigation on the LEFT for desktop/tablet widths.
-   Several older responsive rules in this file changed .app-shell to a
-   vertical layout at 768px. This final layer intentionally wins. */
-@media (min-width: 701px) {
-  .app-shell {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    max-width: 1480px !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
 
-  .app-shell > .sidebar {
-    display: flex !important;
-    flex: 0 0 248px !important;
-    width: 248px !important;
-    min-width: 248px !important;
-    position: sticky !important;
-    top: 68px !important;
-    height: calc(100vh - 68px) !important;
-    min-height: calc(100vh - 68px) !important;
-    align-self: flex-start !important;
-  }
 
-  .app-shell > main {
-    display: block !important;
-    flex: 1 1 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 30px 28px 90px !important;
-  }
-
-  .side-nav .tab {
-    width: 100% !important;
-  }
-}
-
-/* Only turn the navigation into a top/mobile bar on genuinely small screens. */
-@media (max-width: 700px) {
-  .app-shell {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  .app-shell > .sidebar {
-    width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: sticky !important;
-    top: 68px !important;
-  }
-
-  .app-shell > main {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-  }
-}
-</style>
-<style id="final-sidebar-main-layout">
-/* FINAL WANA LAYOUT FIX
-   Desktop/tablet: sidebar is permanently column 1 and all tab panels are
-   rendered in main column 2. Mobile only stacks at 600px and below. */
-@media (min-width: 601px) {
-  html, body { width: 100%; min-width: 0; }
-  .app-shell {
-    display: grid !important;
-    grid-template-columns: 248px minmax(0, 1fr) !important;
-    grid-template-rows: auto !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    max-width: 1480px !important;
-    min-width: 0 !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
-  .app-shell > .sidebar {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    width: 248px !important;
-    min-width: 248px !important;
-    max-width: 248px !important;
-    height: calc(100vh - 68px) !important;
-    min-height: calc(100vh - 68px) !important;
-    position: sticky !important;
-    top: 68px !important;
-    align-self: start !important;
-    overflow-y: auto !important;
-  }
-  .app-shell > main {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 30px 28px 90px !important;
-    box-sizing: border-box !important;
-  }
-  .app-shell > main > .panel,
-  .app-shell > main > #gate {
-    width: 100% !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
-  }
-  .side-nav .tab { width: 100% !important; box-sizing: border-box !important; }
-}
-
-@media (max-width: 600px) {
-  .app-shell {
-    display: block !important;
-    width: 100% !important;
-    max-width: none !important;
-  }
-  .app-shell > .sidebar {
-    display: flex !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: sticky !important;
-    top: 68px !important;
-  }
-  .app-shell > main {
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 16px 12px 60px !important;
-  }
-}
-</style>
-<style id="wana-sidebar-main-final">
-/* =========================================================
-   FINAL SIDEBAR + MAIN CONTENT LAYOUT
-   Sidebar = column 1, selected panel = column 2.
-   Only very small phones stack the navigation.
-   ========================================================= */
-.app-shell {
-  display: grid !important;
-  grid-template-columns: 260px minmax(0, 1fr) !important;
-  grid-template-areas: "sidebar content" !important;
-  align-items: start !important;
-  width: 100% !important;
-  max-width: 1480px !important;
-  margin: 0 auto !important;
-  min-height: calc(100vh - var(--header-h)) !important;
-  gap: 0 !important;
-}
-
-.app-shell > .sidebar {
-  grid-area: sidebar !important;
-  display: flex !important;
-  flex-direction: column !important;
-  width: 260px !important;
-  min-width: 260px !important;
-  max-width: 260px !important;
-  height: calc(100vh - var(--header-h)) !important;
-  min-height: calc(100vh - var(--header-h)) !important;
-  position: sticky !important;
-  top: var(--header-h) !important;
-  align-self: start !important;
-  overflow-y: auto !important;
-}
-
-.app-shell > main {
-  grid-area: content !important;
-  display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 28px 28px 80px !important;
-  overflow: visible !important;
-}
-
-/* Every selectable panel occupies the main/content column. */
-.app-shell > main > .panel,
-.app-shell > main > #gate {
-  grid-area: content !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-.side-nav .tab {
-  width: 100% !important;
-}
-
-/* Phone layout only. */
-@media (max-width: 600px) {
-  .app-shell {
-    display: block !important;
-    width: 100% !important;
-    max-width: none !important;
-    min-height: 0 !important;
-  }
-  .app-shell > .sidebar {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    height: auto !important;
-    min-height: 0 !important;
-    position: sticky !important;
-    top: var(--header-h) !important;
-  }
-  .app-shell > main {
-    width: 100% !important;
-    min-width: 0 !important;
-    padding: 16px 12px 60px !important;
-  }
-}
-</style>
 
 <style id="wana-new-matches-rail">
 /* Right-side New Matches feature */
@@ -1799,84 +1577,23 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 }
 </style>
 
-<style id="wana-right-rail-layout-final">
-/* Final three-column desktop layout: sidebar | selected panel | new matches rail */
-@media (min-width: 601px){
-  .app-shell{
-    display:grid !important;
-    grid-template-columns:260px minmax(0,1fr) 250px !important;
-    grid-template-areas:"sidebar content rail" !important;
-    align-items:start !important;
-    width:100% !important;
-    max-width:1480px !important;
-    margin:0 auto !important;
-    min-height:calc(100vh - var(--header-h)) !important;
-    gap:0 !important;
-  }
-  .app-shell > .sidebar{
-    grid-area:sidebar !important;
-  }
-  .app-shell > main{
-    grid-area:content !important;
-    min-width:0 !important;
-    width:auto !important;
-    max-width:none !important;
-  }
-  .app-shell > #rightMatchRail{
-    grid-area:rail !important;
-    display:block !important;
-    width:250px !important;
-    min-width:250px !important;
-    max-width:250px !important;
-    padding:22px 12px 70px 0 !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
-    align-self:start !important;
-  }
-}
-@media (max-width: 600px){
-  .app-shell > #rightMatchRail{display:none !important;}
-}
-</style>
-<style id="wana-right-rail-layout">
-@media (min-width:701px){
-  .app-shell > main{
-    flex:1 1 auto !important;
-    min-width:0 !important;
-    max-width:none !important;
-  }
-}
-@media (max-width:700px){
-  .wana-right-match-rail{display:none!important}
-}
-</style>
 
-<style id="wana-seven-feature-layer">
-.compat-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 20px}
-.compat-stat{background:linear-gradient(135deg,#f4fbf8,#fff);border:1px solid #dcefe8;border-radius:16px;padding:16px}
-.compat-stat strong{display:block;font-size:1.45rem;color:#087a57}
-.compat-stat span{font-size:.76rem;color:#77808c}
-.compat-card{position:relative}
-.compat-score{position:absolute;top:12px;right:12px;background:#e9f8f2;color:#087a57;border:1px solid #ccecdf;border-radius:999px;padding:6px 9px;font-size:.72rem;font-weight:800;z-index:2}
-.compat-reasons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
-.compat-reason{font-size:.68rem;background:#f5f7fa;color:#586170;border-radius:999px;padding:4px 7px}
-.verified-badge{display:inline-flex;align-items:center;gap:3px;background:#e9f8f2;color:#087a57;border-radius:999px;padding:3px 7px;font-size:.68rem;font-weight:800;margin-left:5px}
-.feature-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.feature-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;box-shadow:0 5px 18px rgba(17,24,39,.04)}
-.feature-card-icon{width:42px;height:42px;border-radius:13px;background:#eff8f5;display:grid;place-items:center;font-size:1.2rem}
-.feature-card h3{font-size:.98rem;margin:0 0 4px}
-.feature-card p{font-size:.78rem;color:#707987;line-height:1.5;margin:0}
-.feature-action{grid-column:1/-1;border:0;border-radius:10px;background:var(--green);color:#fff;padding:10px 14px;font-weight:800;cursor:pointer}
-.feature-action.danger{background:#fff;color:var(--danger);border:1px solid #f2b7ba}
-.feature-status{grid-column:1/-1;font-size:.76rem;color:#68717e}
-.safety-tips{margin-top:16px;background:#fff9ee;border:1px solid #fce3b4;border-radius:14px;padding:14px 16px;display:flex;gap:10px;flex-direction:column;color:#705b28;font-size:.82rem}
-@media(max-width:700px){
-  .compat-summary{grid-template-columns:1fr 1fr}
-  .feature-cards{grid-template-columns:1fr}
-}
-@media(max-width:420px){.compat-summary{grid-template-columns:1fr}.compat-stat{padding:13px}}
-</style>
-</head>
+
+<style id="wana-dating-2-release-css">
+/* WANA DATING 2.0 — single authoritative layout + feature layer */
+.app-shell{display:grid!important;grid-template-columns:260px minmax(0,1fr) 250px!important;grid-template-areas:"sidebar content rail"!important;align-items:start;width:100%;max-width:1480px;margin:0 auto;min-height:calc(100vh - var(--header-h));gap:0}
+.app-shell>.sidebar{grid-area:sidebar!important;display:flex!important;flex-direction:column;width:260px!important;min-width:260px!important;max-width:260px!important;height:calc(100vh - var(--header-h))!important;min-height:calc(100vh - var(--header-h))!important;position:sticky!important;top:var(--header-h)!important;align-self:start;overflow-y:auto}
+.app-shell>main{grid-area:content!important;display:block!important;width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;padding:28px 28px 80px!important;box-sizing:border-box}
+.app-shell>main>.panel,.app-shell>main>#gate{width:100%!important;max-width:none!important;box-sizing:border-box}
+.app-shell>#rightMatchRail{grid-area:rail!important;display:block!important;width:250px!important;min-width:250px!important;max-width:250px!important;padding:22px 12px 70px 0!important;margin:0!important;box-sizing:border-box;align-self:start}
+.side-nav .tab{width:100%!important;box-sizing:border-box}
+.compat-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 20px}.compat-stat{background:linear-gradient(135deg,#f4fbf8,#fff);border:1px solid #dcefe8;border-radius:16px;padding:16px}.compat-stat strong{display:block;font-size:1.45rem;color:#087a57}.compat-stat span{font-size:.76rem;color:#77808c}.compat-card{position:relative}.compat-score{position:absolute;top:12px;right:12px;background:#e9f8f2;color:#087a57;border:1px solid #ccecdf;border-radius:999px;padding:6px 9px;font-size:.72rem;font-weight:800;z-index:2}.compat-reasons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.compat-reason{font-size:.68rem;background:#f5f7fa;color:#586170;border-radius:999px;padding:4px 7px}.verified-badge{display:inline-flex;align-items:center;gap:3px;background:#e9f8f2;color:#087a57;border-radius:999px;padding:3px 7px;font-size:.68rem;font-weight:800;margin-left:5px}.feature-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.feature-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;box-shadow:0 5px 18px rgba(17,24,39,.04)}.feature-card-icon{width:42px;height:42px;border-radius:13px;background:#eff8f5;display:grid;place-items:center;font-size:1.2rem}.feature-card h3{font-size:.98rem;margin:0 0 4px}.feature-card p{font-size:.78rem;color:#707987;line-height:1.5;margin:0}.feature-action{grid-column:1/-1;border:0;border-radius:10px;background:var(--green);color:#fff;padding:10px 14px;font-weight:800;cursor:pointer}.feature-action.danger{background:#fff;color:var(--danger);border:1px solid #f2b7ba}.feature-status{grid-column:1/-1;font-size:.76rem;color:#68717e}.safety-tips{margin-top:16px;background:#fff9ee;border:1px solid #fce3b4;border-radius:14px;padding:14px 16px;display:flex;gap:10px;flex-direction:column;color:#705b28;font-size:.82rem}
+.date-plan-grid{display:grid;gap:14px}.date-plan-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 5px 18px rgba(17,24,39,.04)}.date-plan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.date-plan-title{font-weight:800;color:var(--ink);font-size:1rem}.date-plan-status{border-radius:999px;padding:5px 9px;font-size:.68rem;font-weight:800;text-transform:capitalize;background:#eef2f7;color:#596474}.date-plan-status.pending{background:#fff4d8;color:#8a6500}.date-plan-status.accepted{background:#e9f8f2;color:#087a57}.date-plan-status.declined,.date-plan-status.cancelled{background:#fff0f0;color:#b4232f}.date-plan-status.completed{background:#edf4ff;color:#2f5ea8}.date-plan-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px;color:#5f6977;font-size:.8rem}.date-plan-meta div{background:#f7f9fb;border-radius:10px;padding:9px}.date-plan-notes{margin-top:12px;color:#68717e;font-size:.8rem;line-height:1.5}.date-plan-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.date-plan-actions button{border:0;border-radius:9px;padding:9px 12px;font-weight:800;cursor:pointer}.date-plan-primary{background:var(--green);color:#fff}.date-plan-secondary{background:#f0f3f6;color:#4f5968}.date-plan-danger{background:#fff0f0;color:#b4232f}.date-plan-empty{padding:32px 18px;text-align:center;border:1px dashed #d8dee7;border-radius:16px;color:#7a8491;background:#fbfcfd}.date-plan-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}.date-plan-summary .compat-stat strong{color:#6651a6}.match-explain{margin-top:12px;padding:11px 12px;border-radius:12px;background:#f7faf9;border:1px solid #e0eee8;color:#4d625a;font-size:.78rem;line-height:1.45}.smart-match-controls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}.smart-match-controls button{border:1px solid #dfe5ec;background:#fff;color:#4f5968;border-radius:999px;padding:8px 12px;font-size:.75rem;font-weight:800;cursor:pointer}.smart-match-controls button.active{background:var(--green);border-color:var(--green);color:#fff}
+.wana-right-match-rail{flex:0 0 250px;width:250px;margin:0;padding:22px 12px 70px 0;min-width:0}.wana-right-match-card{position:sticky;top:86px;background:#fff;border:1px solid #e5e9ef;border-radius:18px;padding:14px 10px 12px;box-shadow:0 10px 28px rgba(17,24,39,.06)}.wana-right-match-head{text-align:center;padding:2px 4px 12px}.wana-right-match-head h3{margin:0;font-size:.92rem;font-weight:800;color:#4b4f57}.wana-right-match-head h3 span{color:#4b8ee8}.wana-right-match-list{display:grid;gap:12px}.wana-right-match{min-width:0}.wana-right-match-photo{width:100%;aspect-ratio:1/1;border-radius:8px;background:#edf1f4 center/cover no-repeat;display:grid;place-items:center;color:#aab2bd;font-size:2rem;overflow:hidden;position:relative}.wana-right-match-photo .online{position:absolute;right:7px;bottom:7px;width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid #fff}.wana-right-match-name{margin-top:7px;font-size:.72rem;font-weight:800;color:#4b4f57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wana-right-match-meta{font-size:.68rem;color:#8b94a2;margin-top:1px;min-height:16px}.wana-right-match-btn{width:100%;margin-top:7px;border:0;border-radius:999px;padding:6px 8px;background:#6651a6;color:#fff;font-size:.62rem;font-weight:800;cursor:pointer}.wana-right-match-footer{margin-top:12px;padding-top:10px;border-top:1px solid #eef0f3}.wana-right-match-footer button{width:100%;border:0;border-radius:999px;padding:9px 10px;background:#f04458;color:#fff;font-size:.68rem;font-weight:800;cursor:pointer}.wana-right-match-empty{padding:18px 8px;text-align:center;color:#7d8795;font-size:.76rem;line-height:1.45}
+@media(max-width:1050px){.app-shell{grid-template-columns:240px minmax(0,1fr)!important;grid-template-areas:"sidebar content"!important}.app-shell>#rightMatchRail{display:none!important}.compat-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.app-shell{display:block!important;width:100%;max-width:none;min-height:0}.app-shell>.sidebar{width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;position:sticky!important;top:var(--header-h)!important}.app-shell>main{width:100%!important;padding:16px 12px 60px!important}.app-shell>#rightMatchRail{display:none!important}.feature-cards{grid-template-columns:1fr}.date-plan-meta{grid-template-columns:1fr}.date-plan-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.compat-summary{grid-template-columns:1fr}.compat-stat{padding:13px}.date-plan-summary{grid-template-columns:1fr}.date-plan-head{display:block}.date-plan-status{display:inline-block;margin-top:8px}}
+</style></head>
 <body>
 <header>
 <div class="brand">Wana <span>Dating</span></div>
@@ -1906,7 +1623,7 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
 <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
 <div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
-<div class="tab" data-tab="compatibility" onclick="switchTab('compatibility')"><span class="side-icon">❤️</span> Compatibility</div>
+<div class="tab" data-tab="compatibility" onclick="switchTab('compatibility')"><span class="side-icon">❤️</span> Compatibility</div><div class="tab" data-tab="dateplans" onclick="switchTab('dateplans')"><span class="side-icon">📅</span> Date Plans <span class="tab-badge" id="datePlansBadge"></span></div>
 <div class="tab" data-tab="safety" onclick="switchTab('safety')"><span class="side-icon">🛡️</span> Safety Center</div>
 <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
 <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
@@ -1985,7 +1702,7 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <!-- BROWSE MATCHES -->
 </div>
 </div>
-<div class="panel" id="browsePanel"  style="display:none;">
+<div class="panel" id="browsePanel" style="display:none;">
 <div class="browse-header">
 <h2>Find Singles <span>Online</span></h2>
 <p>Browse people near you looking for friendship, dating, or marriage. Like a profile to start chatting.</p>
@@ -2225,46 +1942,60 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <div class="empty" id="visitorsEmpty" style="display:none;">No one has viewed your profile yet.</div>
 </div>
 <div class="panel" id="compatibilityPanel" style="display:none;">
-  <div class="browse-header">
-    <h2>Your <span>Compatibility</span> ❤️</h2>
-    <p>See why each recommendation may be a good fit based on your relationship goals, lifestyle, family plans and preferences.</p>
-  </div>
-  <div id="compatibilitySummary" class="compat-summary"></div>
-  <div class="grid" id="compatibilityGrid"></div>
-  <div class="empty" id="compatibilityEmpty" style="display:none;">Complete your dating profile to unlock personalized compatibility scores.</div>
+<div class="browse-header">
+<h2>Your <span>Compatibility</span> ❤️</h2>
+<p>See why each recommendation may be a good fit based on your relationship goals, lifestyle, family plans and preferences.</p>
 </div>
+<div class="compat-summary" id="compatibilitySummary"></div>
+<div class="grid" id="compatibilityGrid"></div>
+<div class="empty" id="compatibilityEmpty" style="display:none;">Complete your dating profile to unlock personalized compatibility scores.</div>
+</div>
+<div class="panel" id="dateplansPanel" style="display:none;">
+<div class="browse-header">
+<h2>Your <span>Date Plans</span> 📅</h2>
+<p>Plan a safe meetup with a mutual match, respond to invitations, and keep the details in one place.</p>
+</div>
+<div class="date-plan-summary" id="datePlanSummary"></div>
+<div class="smart-match-controls">
+<button class="active" data-date-filter="upcoming" onclick="filterDatePlans('upcoming',this)" type="button">Upcoming</button>
+<button data-date-filter="pending" onclick="filterDatePlans('pending',this)" type="button">Needs response</button>
+<button data-date-filter="all" onclick="filterDatePlans('all',this)" type="button">All plans</button>
+</div>
+<div class="date-plan-grid" id="datePlansList"></div>
+</div>
+
 <div class="panel" id="safetyPanel" style="display:none;">
-  <div class="browse-header">
-    <h2>Safety & <span>Trust Center</span> 🛡️</h2>
-    <p>Verify your profile, control notifications, report concerns and keep your dating experience safer.</p>
-  </div>
-  <div class="feature-cards">
-    <div class="feature-card">
-      <div class="feature-card-icon">🛡️</div>
-      <div><h3>Profile verification</h3><p>Submit a private selfie for moderator review and show a verified badge on your profile.</p></div>
-      <button class="feature-action" onclick="openVerificationModal()">Verify profile</button>
-    </div>
-    <div class="feature-card">
-      <div class="feature-card-icon">🚩</div>
-      <div><h3>Report & block</h3><p>If someone behaves abusively, scams, harasses or violates community rules, report the profile and block them.</p></div>
-      <button class="feature-action danger" onclick="openSafetyReportGuide()">Report a concern</button>
-    </div>
-    <div class="feature-card">
-      <div class="feature-card-icon">🔔</div>
-      <div><h3>Push notifications</h3><p>Get browser notifications for important dating activity. Permission is always controlled by you.</p></div>
-      <button class="feature-action" id="pushEnableBtn" onclick="enableWanaNotifications()">Enable notifications</button>
-      <div id="pushStatus" class="feature-status"></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-card-icon">🇪🇹</div>
-      <div><h3>Amharic</h3><p>Switch the Wana Dating interface between English and Amharic from the language control above.</p></div>
-      <button class="feature-action" onclick="toggleLang()">አማ / EN</button>
-    </div>
-  </div>
-  <div class="safety-tips">
-    <strong>Dating safety reminders</strong>
-    <span>Never send passwords, verification codes or money to another member. Meet in a public place and tell someone you trust where you are going.</span>
-  </div>
+<div class="browse-header">
+<h2>Safety &amp; <span>Trust Center</span> 🛡️</h2>
+<p>Verify your profile, control notifications, report concerns and keep your dating experience safer.</p>
+</div>
+<div class="feature-cards">
+<div class="feature-card">
+<div class="feature-card-icon">🛡️</div>
+<div><h3>Profile verification</h3><p>Submit a private selfie for moderator review and show a verified badge on your profile.</p></div>
+<button class="feature-action" onclick="openVerificationModal()">Verify profile</button>
+</div>
+<div class="feature-card">
+<div class="feature-card-icon">🚩</div>
+<div><h3>Report &amp; block</h3><p>If someone behaves abusively, scams, harasses or violates community rules, report the profile and block them.</p></div>
+<button class="feature-action danger" onclick="openSafetyReportGuide()">Report a concern</button>
+</div>
+<div class="feature-card">
+<div class="feature-card-icon">🔔</div>
+<div><h3>Push notifications</h3><p>Get browser notifications for important dating activity. Permission is always controlled by you.</p></div>
+<button class="feature-action" id="pushEnableBtn" onclick="enableWanaNotifications()">Enable notifications</button>
+<div class="feature-status" id="pushStatus"></div>
+</div>
+<div class="feature-card">
+<div class="feature-card-icon">🇪🇹</div>
+<div><h3>Amharic</h3><p>Switch the Wana Dating interface between English and Amharic from the language control above.</p></div>
+<button class="feature-action" onclick="toggleLang()">አማ / EN</button>
+</div>
+</div>
+<div class="safety-tips">
+<strong>Dating safety reminders</strong>
+<span>Never send passwords, verification codes or money to another member. Meet in a public place and tell someone you trust where you are going.</span>
+</div>
 </div>
 <div class="panel" id="myProfilePanel" style="display:none;">
 <div id="myProfileContent"></div>
@@ -2315,35 +2046,25 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 </div>
 </div></main>
 <aside class="wana-right-match-rail" id="rightMatchRail">
-  <div class="wana-right-match-card">
-    <div class="wana-right-match-head">
-      <h3>New matches on <span id="matchRailCountry">Ethiopia</span></h3>
-    </div>
-    <div class="wana-right-match-list" id="homeRecommendedList">
-      <div class="wana-right-match-empty">Finding your best matches…</div>
-    </div>
-    <div class="wana-right-match-footer">
-      <button type="button" onclick="switchTab('browse')">SEE ALL YOUR MATCHES</button>
-    </div>
-  </div>
+<div class="wana-right-match-card">
+<div class="wana-right-match-head">
+<h3>New matches on <span id="matchRailCountry">Ethiopia</span></h3>
+</div>
+<div class="wana-right-match-list" id="homeRecommendedList">
+<div class="wana-right-match-empty">Finding your best matches…</div>
+</div>
+<div class="wana-right-match-footer">
+<button onclick="switchTab('browse')" type="button">SEE ALL YOUR MATCHES</button>
+</div>
+</div>
 </aside>
 </div>
-
 <!-- NEW MEMBERS -->
-
 <!-- SETUP PROFILE -->
-
 <!-- MESSAGES -->
-
 <!-- LIKES -->
-
-
 <!-- MY PROFILE -->
-
 <!-- PRIVACY SETTINGS (NEW) -->
-
-
-
 <!-- ROOT CONTAINERS -->
 <div id="modalRoot"></div>
 <div id="callRoot"></div>
@@ -3737,7 +3458,8 @@ async function openModal(row){
   const root = document.getElementById("modalRoot");
   const matched = await checkMatch(row.user_id);
   const actionBtn = matched
-    ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">💬 Message</button>`
+    ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">💬 Message</button>
+       <button class="btn-contact" style="background:#6651a6;color:#fff;" id="planDateBtn">📅 Plan a Date</button>`
     : `<button class="btn-contact" id="likeBtn" style="background:var(--gold); color:var(--ink);" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like Profile</button>`;
   // Same private-path vs. public-URL handling as createProfileCard(): a
   // storage path needs data-profile-media-bg + hydration, not a direct
@@ -3778,6 +3500,8 @@ async function openModal(row){
       </div>
     </div>`;
   
+  const planDateBtn = root.querySelector("#planDateBtn");
+  if (planDateBtn) planDateBtn.addEventListener("click", () => openDatePlanModal(row.user_id, row.display_name || "Match"));
   root.querySelectorAll(".thumb").forEach(el => {
     el.addEventListener("click", (ev) => {
       ev.stopPropagation();
@@ -5853,271 +5577,161 @@ function homeRecommendationScore(me,r){
   console.info("Wana Dating maintenance patch loaded.");
 })();
 </script>
-
-<script id="wana-seven-feature-engine">
+<script id="wana-dating-2-release-engine">
 (function(){
   "use strict";
+  const state={dateFilter:"upcoming",matchMode:"all"};
+  const originalSwitchTab=window.switchTab;
+  const originalToggleLang=window.toggleLang;
+  const extraPanels=["compatibilityPanel","dateplansPanel","safetyPanel"];
+  const norm=v=>String(v||"").trim().toLowerCase();
+  const esc2=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const today=()=>new Date().toISOString().slice(0,10);
 
-  const extraPanels = ["compatibilityPanel","safetyPanel"];
-  const originalSwitchTab = window.switchTab;
-  const originalToggleLang = window.toggleLang;
-
-  function esc7(v){
-    return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function isEligible(me,p){
+    if(!me||!p) return false;
+    const mySeeking=norm(me.seeking||"any"), theirGender=norm(p.gender), theirSeeking=norm(p.seeking||"any"), myGender=norm(me.gender);
+    if(mySeeking!=="any" && mySeeking!==theirGender) return false;
+    if(theirSeeking!=="any" && theirSeeking!==myGender) return false;
+    const age=Number(p.age), myAge=Number(me.age), myMin=Number(me.age_min), myMax=Number(me.age_max), pMin=Number(p.age_min), pMax=Number(p.age_max);
+    if(Number.isFinite(age)&&Number.isFinite(myMin)&&Number.isFinite(myMax)&&!(age>=myMin&&age<=myMax)) return false;
+    if(Number.isFinite(myAge)&&Number.isFinite(pMin)&&Number.isFinite(pMax)&&!(myAge>=pMin&&myAge<=pMax)) return false;
+    return true;
   }
 
-  function norm7(v){ return String(v||"").trim().toLowerCase(); }
-
-  function compatibilityScore(me, p){
-    if(!me || !p) return {score:0,reasons:[]};
-    let score=0, reasons=[];
-    const add=(n,reason)=>{score+=n; if(reason && !reasons.includes(reason)) reasons.push(reason);};
-
-    if(norm7(me.relationship_type) && norm7(me.relationship_type)===norm7(p.relationship_type))
-      add(20,"Same relationship goal");
-    if(norm7(me.looking_for) && norm7(me.looking_for)===norm7(p.looking_for))
-      add(15,"Similar relationship preference");
-    if(norm7(me.lifestyle) && norm7(me.lifestyle)===norm7(p.lifestyle))
-      add(15,"Similar lifestyle");
-    if(norm7(me.religion) && norm7(me.religion)!=="prefer not to say" && norm7(me.religion)===norm7(p.religion))
-      add(10,"Shared faith");
-    if(norm7(me.has_kids) && norm7(me.has_kids)===norm7(p.has_kids))
-      add(7,"Similar family situation");
-    if(norm7(me.wants_kids) && norm7(me.wants_kids)===norm7(p.wants_kids))
-      add(10,"Similar family plans");
-    if(me.city && p.city && norm7(me.city)===norm7(p.city))
-      add(8,"Same city");
-    const min=Number(me.age_min), max=Number(me.age_max), age=Number(p.age);
-    if(Number.isFinite(age) && Number.isFinite(min) && Number.isFinite(max) && age>=min && age<=max)
-      add(8,"Fits your age preference");
-    const pmin=Number(p.age_min), pmax=Number(p.age_max), myAge=Number(me.age);
-    if(Number.isFinite(myAge) && Number.isFinite(pmin) && Number.isFinite(pmax) && myAge>=pmin && myAge<=pmax)
-      add(7,"You fit their age preference");
-
-    return {score:Math.min(99,score),reasons:reasons.slice(0,4)};
+  function scoreMatch(me,p){
+    if(!isEligible(me,p)) return {score:0,reasons:[],mutual:0};
+    let score=30; const reasons=[]; const add=(n,r)=>{score+=n;if(r&&!reasons.includes(r))reasons.push(r)};
+    if(norm(me.relationship_type)&&norm(me.relationship_type)===norm(p.relationship_type)) add(16,"Same relationship goal");
+    if(norm(me.looking_for)&&norm(me.looking_for)===norm(p.looking_for)) add(10,"Similar relationship preference");
+    if(norm(me.lifestyle)&&norm(me.lifestyle)===norm(p.lifestyle)) add(10,"Similar lifestyle");
+    if(norm(me.wants_kids)&&norm(me.wants_kids)===norm(p.wants_kids)) add(9,"Family plans align");
+    if(norm(me.has_kids)&&norm(me.has_kids)===norm(p.has_kids)) add(5,"Similar family situation");
+    if(norm(me.religion)&&norm(me.religion)!=="prefer not to say"&&norm(me.religion)===norm(p.religion)) add(7,"Shared faith");
+    if(norm(me.city)&&norm(me.city)===norm(p.city)) add(6,"Same city");
+    if(p.is_verified) add(3,"Verified profile");
+    if(typeof visiblePresence==="function"&&visiblePresence(p).online) add(2,"Online now");
+    if(p.created_at&&Date.now()-new Date(p.created_at).getTime()<7*86400000) add(2,"New member");
+    const mutual=(Number.isFinite(Number(me.age))&&Number.isFinite(Number(p.age))&&Number.isFinite(Number(me.age_min))&&Number.isFinite(Number(me.age_max))&&Number(p.age)>=Number(me.age_min)&&Number(p.age)<=Number(me.age_max)&&Number.isFinite(Number(p.age_min))&&Number.isFinite(Number(p.age_max))&&Number(me.age)>=Number(p.age_min)&&Number(me.age)<=Number(p.age_max))?10:0;
+    score=Math.min(99,score+mutual);
+    if(mutual) reasons.unshift("Mutual age preference fit");
+    return {score,reasons:reasons.slice(0,4),mutual};
   }
 
-  function verifiedBadge7(p){
-    return p && p.is_verified ? '<span class="verified-badge" title="Profile verified">✓ Verified</span>' : '';
-  }
-
-  function compatibilityCard7(p, result){
-    const photo=(p.photos&&p.photos[0])||p.photo_url||"";
-    const card=document.createElement("div");
-    card.className="card compat-card";
-    card.innerHTML=`
-      <div class="compat-score">❤️ ${result.score}% match</div>
-      <div class="photo">${photo ? `<img src="${esc7(photo)}" alt="" style="width:100%;height:100%;object-fit:cover;">` : "👤"}
-        ${p.is_verified?'<span style="position:absolute;left:10px;bottom:10px" class="verified-badge">✓ Verified</span>':""}
-      </div>
-      <div class="info">
-        <div class="name-age">${esc7(p.display_name||"Someone")} <span class="age">${p.age?esc7(p.age):""}</span>${verifiedBadge7(p)}</div>
-        <div class="meta">${esc7(p.city||"Ethiopia")} · ${esc7(p.relationship_type||"Dating")}</div>
-        <div class="compat-reasons">${result.reasons.map(r=>`<span class="compat-reason">${esc7(r)}</span>`).join("")}</div>
-      </div>`;
-    card.addEventListener("click",()=>window.openModal && window.openModal(p));
-    return card;
+  function matchCard(p,r){
+    const photo=(p.photos&&p.photos[0])||p.photo_url||""; const card=document.createElement("div"); card.className="card compat-card";
+    const presence=typeof visiblePresence==="function"?visiblePresence(p):{online:false};
+    card.innerHTML=`<div class="compat-score">❤️ ${r.score}% match</div><div class="photo ${photo && !/^https?:\/\//i.test(photo) ? "profile-media-loading" : ""}">${photo ? `<img data-smart-match-photo src="${/^https?:\/\//i.test(photo)?esc2(photo):""}" alt="" style="width:100%;height:100%;object-fit:cover;">` : "👤"}${p.is_verified?'<span style="position:absolute;left:10px;bottom:10px" class="verified-badge">✓ Verified</span>':""}</div><div class="info"><div class="name-age">${esc2(p.display_name||"Someone")} <span class="age">${p.age?esc2(p.age):""}</span></div><div class="meta">${esc2(p.city||"Ethiopia")} · ${esc2(p.relationship_type||"Dating")}${presence.online?' · 🟢 Online now':''}</div><div class="compat-reasons">${r.reasons.map(x=>`<span class="compat-reason">${esc2(x)}</span>`).join("")}</div><div class="match-explain">Strongest reason: ${esc2(r.reasons[0]||"Your preferences are compatible.")}</div></div>`;
+    if(photo && !/^https?:\/\//i.test(photo)){resolvePrivateUrl(BUCKET_PROFILE_PHOTOS,photo).then(url=>{const img=card.querySelector("[data-smart-match-photo]");if(img&&url){img.src=url;img.parentElement.classList.remove("profile-media-loading")}})}
+    card.addEventListener("click",()=>window.openModal&&window.openModal(p)); return card;
   }
 
   async function loadCompatibility(){
-    const grid=document.getElementById("compatibilityGrid");
-    const empty=document.getElementById("compatibilityEmpty");
-    const summary=document.getElementById("compatibilitySummary");
-    if(!grid || !currentUser) return;
-    grid.innerHTML='<div class="empty">Finding your strongest matches…</div>';
+    const grid=document.getElementById("compatibilityGrid"), empty=document.getElementById("compatibilityEmpty"), summary=document.getElementById("compatibilitySummary");
+    if(!grid||!currentUser)return; grid.innerHTML='<div class="empty">Finding your strongest mutual matches…</div>'; if(empty)empty.style.display="none";
     try{
-      let me=myProfile;
-      if(!me && _supabase){
-        const r=await _supabase.from("dating_profiles").select("*").eq("user_id",currentUser.id).maybeSingle();
-        me=r.data||null;
-      }
-      if(!me){
-        grid.innerHTML="";
-        empty.style.display="block";
-        summary.innerHTML="";
-        return;
-      }
-      const blocked=typeof window.fetchBlockedIds==="function" ? await window.fetchBlockedIds() : new Set();
-      const r=await _supabase.from("dating_profiles").select("*").neq("user_id",currentUser.id).limit(120);
-      if(r.error) throw r.error;
-      const rows=(r.data||[]).filter(p=>!blocked.has(p.user_id)).map(p=>({p,...compatibilityScore(me,p)}))
-        .filter(x=>x.score>=25).sort((a,b)=>b.score-a.score).slice(0,12);
-      grid.innerHTML="";
-      if(!rows.length){
-        empty.style.display="block";
-        summary.innerHTML="";
-        return;
-      }
-      empty.style.display="none";
-      const avg=Math.round(rows.reduce((a,x)=>a+x.score,0)/rows.length);
-      const verified=rows.filter(x=>x.p.is_verified).length;
-      summary.innerHTML=`
-        <div class="compat-stat"><strong>${avg}%</strong><span>Average compatibility</span></div>
-        <div class="compat-stat"><strong>${rows.length}</strong><span>Strong matches found</span></div>
-        <div class="compat-stat"><strong>${verified}</strong><span>Verified matches</span></div>`;
-      rows.forEach(x=>grid.appendChild(compatibilityCard7(x.p,x)));
-    }catch(err){
-      console.warn("Compatibility:",err);
-      grid.innerHTML='<div class="msg error">Compatibility recommendations are temporarily unavailable.</div>';
-    }
+      let me=myProfile; if(!me){const q=await _supabase.from("dating_profiles").select("*").eq("user_id",currentUser.id).maybeSingle();me=q.data||null}
+      if(!me){grid.innerHTML="";empty.style.display="block";summary.innerHTML="";return}
+      const blocked=typeof fetchBlockedIds==="function"?await fetchBlockedIds():new Set();
+      const {data,error}=await _supabase.from("dating_profiles").select("*").neq("user_id",currentUser.id).limit(160); if(error)throw error;
+      let rows=(data||[]).filter(p=>!blocked.has(p.user_id)).map(p=>({p,r:scoreMatch(me,p)})).filter(x=>x.r.score>=35);
+      if(state.matchMode==="verified")rows=rows.filter(x=>x.p.is_verified); if(state.matchMode==="online")rows=rows.filter(x=>typeof visiblePresence==="function"&&visiblePresence(x.p).online);
+      rows.sort((a,b)=>b.r.score-a.r.score); rows=rows.slice(0,16); grid.innerHTML="";
+      if(!rows.length){empty.style.display="block";summary.innerHTML="";return}
+      const avg=Math.round(rows.reduce((a,x)=>a+x.r.score,0)/rows.length), mutual=rows.filter(x=>x.r.mutual).length, verified=rows.filter(x=>x.p.is_verified).length;
+      summary.innerHTML=`<div class="compat-stat"><strong>${avg}%</strong><span>Average compatibility</span></div><div class="compat-stat"><strong>${rows.length}</strong><span>Strong matches</span></div><div class="compat-stat"><strong>${mutual}</strong><span>Mutual preference fits</span></div><div class="compat-stat"><strong>${verified}</strong><span>Verified matches</span></div>`;
+      rows.forEach(x=>grid.appendChild(matchCard(x.p,x.r)));
+    }catch(e){console.warn("Smart Match 2.0",e);grid.innerHTML='<div class="msg error">Smart matches are temporarily unavailable.</div>'}
   }
 
-  function openSafetyReportGuide(){
-    const root=document.getElementById("modalRoot");
-    if(!root) return;
-    root.innerHTML=`
-      <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
-        <div class="modal" style="max-width:460px">
-          <div class="body">
-            <button class="btn-close" onclick="closeModal()">✕</button>
-            <h3>Report or block safely</h3>
-            <p class="bio" style="margin-top:10px">Open the member's profile, choose <b>Report</b> for a specific concern, or <b>Block</b> if you do not want further contact. Serious threats or emergencies should be reported to the appropriate local authorities.</p>
-            <div class="actions">
-              <button class="btn-contact" onclick="closeModal();switchTab('browse')">Browse profiles</button>
-              <button class="btn-report" onclick="closeModal()">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-  }
-  window.openSafetyReportGuide=openSafetyReportGuide;
+  window.setMatchMode=function(mode,btn){state.matchMode=mode;document.querySelectorAll("[data-match-mode]").forEach(b=>b.classList.toggle("active",b.dataset.matchMode===mode));loadCompatibility()};
 
-  async function enableWanaNotifications(){
-    const status=document.getElementById("pushStatus");
-    const btn=document.getElementById("pushEnableBtn");
-    if(!("Notification" in window)){
-      if(status) status.textContent="This browser does not support notifications.";
-      return;
-    }
-    try{
-      const permission=await Notification.requestPermission();
-      if(permission!=="granted"){
-        if(status) status.textContent="Notifications are blocked or were not allowed.";
-        return;
-      }
-      localStorage.setItem("wana_notifications_enabled","1");
-      if(btn) btn.textContent="✓ Notifications enabled";
-      if(status) status.textContent="Browser notifications are enabled for this device.";
-      new Notification("Wana Dating ❤️",{body:"Notifications are now enabled."});
-      // If a same-origin service worker is available, register it so a later
-      // VAPID push subscription can be added without changing this page.
-      if("serviceWorker" in navigator){
-        try{ await navigator.serviceWorker.register("dating-sw.js",{scope:"./"}); }catch(e){ console.info("Push worker unavailable:",e); }
-      }
-    }catch(e){
-      if(status) status.textContent="Could not enable notifications on this device.";
-    }
-  }
-  window.enableWanaNotifications=enableWanaNotifications;
+  function dateStatusLabel(s){return s||"pending"}
+  function formatDate(d,t){if(!d)return "Date not set"; const dt=new Date(`${d}T${t||"12:00"}`); return isNaN(dt)?`${d}${t?` · ${t}`:""}`:dt.toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric",hour:t?"numeric":undefined,minute:t?"2-digit":undefined})}
+  function escapeAttr(v){return esc2(v).replace(/`/g,"&#96;")}
 
-  function pushState(){
-    const btn=document.getElementById("pushEnableBtn"), status=document.getElementById("pushStatus");
-    if(!btn) return;
-    if(localStorage.getItem("wana_notifications_enabled")==="1" && "Notification" in window && Notification.permission==="granted"){
-      btn.textContent="✓ Notifications enabled";
-      if(status) status.textContent="Browser notifications are enabled for this device.";
-    }
-  }
-
-  const translations={
-    "Home":"መነሻ","Browse Matches":"ተስማሚ ግጥሚያዎች","New Members":"አዲስ አባላት",
-    "Setup Profile":"መገለጫ ያዘጋጁ","Messages":"መልዕክቶች","Likes":"የወደዱዎት",
-    "Visitors":"ጎብኚዎች","My Account":"የእኔ መለያ","Privacy Settings":"የግላዊነት ቅንብሮች",
-    "Compatibility":"ተኳሃኝነት","Safety Center":"የደህንነት ማዕከል",
-    "Find Singles":"ነጠላ ሰዎችን ያግኙ","Online":"በመስመር ላይ","Notifications":"ማሳወቂያዎች",
-    "Mark all read":"ሁሉንም እንደተነበቡ ምልክት ያድርጉ","People Who":"ሰዎች እንደወደዱዎት",
-    "Who":"ማን","Viewed You":"መገለጫዎን የተመለከቱ","Your":"የእርስዎ",
-    "Messages":"መልዕክቶች","Privacy":"ግላዊነት","Settings":"ቅንብሮች",
-    "Safety &":"ደህንነት እና","Trust Center":"የመተማመን ማዕከል",
-    "Profile verification":"የመገለጫ ማረጋገጫ","Report & block":"ሪፖርት እና ማገድ",
-    "Push notifications":"የማሳወቂያ ማስታወቂያዎች","Amharic":"አማርኛ",
-    "Enable notifications":"ማሳወቂያዎችን አንቃ","Report a concern":"ችግር ሪፖርት ያድርጉ",
-    "Verify profile":"መገለጫ አረጋግጥ","Complete your profile":"መገለጫዎን ያጠናቁ",
-    "Filter Results":"ውጤቶችን አጣራ","Clear filters":"ማጣሪያዎችን አጽዳ",
-    "Load More Profiles":"ተጨማሪ መገለጫዎችን ጫን","Edit Profile":"መገለጫ አርትዕ",
-    "Privacy Settings":"የግላዊነት ቅንብሮች","Sign In":"ግባ","Sign Out":"ውጣ",
-    "Back to Shop":"ወደ ሱቅ ተመለስ"
+  window.openDatePlanModal=function(recipientId,recipientName){
+    if(!currentUser){return} const root=document.getElementById("modalRoot"); if(!root)return;
+    root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:520px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>📅 Plan a Date with ${esc2(recipientName||"your match")}</h3><p class="bio">Keep the first meetup simple and public. Your match can accept or suggest a different plan.</p><form id="datePlanForm"><label>Date</label><input id="datePlanDate" type="date" min="${today()}" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Time</label><input id="datePlanTime" type="time" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Place / venue</label><input id="datePlanLocation" maxlength="120" required placeholder="e.g. public café" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>City</label><input id="datePlanCity" maxlength="80" value="${escapeAttr(myProfile?.city||"")}" placeholder="Addis Ababa" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Notes (optional)</label><textarea id="datePlanNotes" maxlength="500" placeholder="Anything your match should know?" style="width:100%;min-height:90px;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"></textarea><div id="datePlanMsg"></div><div class="actions"><button type="button" class="btn-report" onclick="closeModal()">Cancel</button><button class="btn-contact" type="submit" style="background:#6651a6;color:#fff">Send Date Invitation 📅</button></div></form></div></div></div>`;
+    document.getElementById("datePlanForm").addEventListener("submit",e=>createDatePlan(e,recipientId,recipientName));
   };
 
-  function applyAmharic(){
-    document.documentElement.lang="am";
-    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-    let node;
-    while(node=walker.nextNode()){
-      if(node.parentElement && ["SCRIPT","STYLE"].includes(node.parentElement.tagName)) continue;
-      const raw=node.nodeValue.trim();
-      if(!raw) continue;
-      if(translations[raw]) node.nodeValue=node.nodeValue.replace(raw,translations[raw]);
-    }
-    document.querySelectorAll("input[placeholder],textarea[placeholder],button,title").forEach(el=>{
-      const v=el.getAttribute("placeholder")||el.textContent||"";
-      if(translations[v]){
-        if(el.hasAttribute("placeholder")) el.setAttribute("placeholder",translations[v]);
-        else if(el.tagName==="TITLE") el.textContent=translations[v];
-      }
-    });
+  async function createDatePlan(e,recipientId,recipientName){
+    e.preventDefault(); const msg=document.getElementById("datePlanMsg"); const btn=e.currentTarget.querySelector("button[type=submit]");
+    if(!(await requireProfile("plan a date")))return;
+    if(!(await checkMatch(recipientId))){msg.innerHTML='<div class="msg error">Date planning is available after a mutual match.</div>';return}
+    const date_on=document.getElementById("datePlanDate").value, start_time=document.getElementById("datePlanTime").value, location_name=document.getElementById("datePlanLocation").value.trim(), city=document.getElementById("datePlanCity").value.trim(), notes=document.getElementById("datePlanNotes").value.trim();
+    if(!date_on||!start_time||!location_name){msg.innerHTML='<div class="msg error">Choose a date, time and public place.</div>';return}
+    btn.disabled=true;btn.textContent="Sending…";
+    const {data,error}=await _supabase.rpc("dating_create_date_plan",{p_recipient_id:recipientId,p_date_on:date_on,p_start_time:start_time,p_location_name:location_name,p_city:city||null,p_notes:notes||null,p_title:`Date with ${recipientName||"your match"}`});
+    if(error){msg.innerHTML=`<div class="msg error">Could not create the date invitation: ${esc2(error.message)}. If the database migration has not been run, install the Smart Match 2.0 migration.</div>`;btn.disabled=false;btn.textContent="Send Date Invitation 📅";return}
+    closeModal(); switchTab("dateplans"); await loadDatePlans(); refreshDatePlanBadge();
+  }
+  window.createDatePlan=createDatePlan;
+
+  async function loadDatePlans(){
+    const list=document.getElementById("datePlansList"),summary=document.getElementById("datePlanSummary"); if(!list||!currentUser)return;
+    list.innerHTML='<div class="date-plan-empty">Loading your date plans…</div>';
+    try{
+      const {data,error}=await _supabase.from("dating_date_plans").select("*").or(`creator_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`).order("date_on",{ascending:true}).order("start_time",{ascending:true}).limit(100); if(error)throw error;
+      const rows=data||[], upcoming=rows.filter(x=>x.date_on>=today()&&!["declined","cancelled","completed"].includes(x.status)), pending=rows.filter(x=>x.status==="pending"&&x.recipient_id===currentUser.id);
+      summary.innerHTML=`<div class="compat-stat"><strong>${upcoming.length}</strong><span>Upcoming dates</span></div><div class="compat-stat"><strong>${pending.length}</strong><span>Needs your response</span></div><div class="compat-stat"><strong>${rows.filter(x=>x.status==="accepted").length}</strong><span>Confirmed</span></div>`;
+      let visible=rows;
+      if(state.dateFilter==="upcoming")visible=upcoming; else if(state.dateFilter==="pending")visible=pending;
+      if(!visible.length){list.innerHTML='<div class="date-plan-empty">No date plans in this view yet.<br><button type="button" class="date-plan-primary" style="margin-top:12px" onclick="switchTab(\'compatibility\')">Find a match ❤️</button></div>';return}
+      list.innerHTML=""; visible.forEach(plan=>list.appendChild(datePlanCard(plan)));
+    }catch(e){console.warn("Date plans",e);list.innerHTML=`<div class="msg error">Date plans could not be loaded: ${esc2(e.message)}</div>`}
+  }
+  window.loadDatePlans=loadDatePlans;
+
+  function datePlanCard(plan){
+    const card=document.createElement("article");card.className="date-plan-card";
+    const mine=plan.creator_id===currentUser.id; const counterpart=mine?plan.recipient_id:plan.creator_id; const isPending=plan.status==="pending";
+    card.innerHTML=`<div class="date-plan-head"><div><div class="date-plan-title">${esc2(plan.title||"Date invitation")}</div><div style="margin-top:5px;color:#7a8491;font-size:.75rem">${mine?"You sent this invitation":"You received this invitation"}</div></div><span class="date-plan-status ${esc2(plan.status)}">${esc2(dateStatusLabel(plan.status))}</span></div><div class="date-plan-meta"><div>📅 ${esc2(formatDate(plan.date_on,plan.start_time))}</div><div>📍 ${esc2(plan.location_name||"Public place")}</div>${plan.city?`<div>🏙️ ${esc2(plan.city)}</div>`:""}<div>🛡️ First meetings: choose a public place</div></div>${plan.notes?`<div class="date-plan-notes">${esc2(plan.notes)}</div>`:""}`;
+    const actions=document.createElement("div");actions.className="date-plan-actions";
+    if(!mine&&isPending){actions.innerHTML='<button class="date-plan-primary">Accept</button><button class="date-plan-secondary">Decline</button>';} else if(mine&&isPending){actions.innerHTML='<button class="date-plan-danger">Cancel invitation</button>';} else if(plan.status==="accepted"&&plan.date_on>=today()){actions.innerHTML='<button class="date-plan-secondary">Safety checklist</button>';} 
+    card.appendChild(actions);
+    const accept=actions.querySelector(".date-plan-primary"), decline=actions.querySelector(".date-plan-secondary"), cancel=actions.querySelector(".date-plan-danger");
+    if(accept)accept.onclick=()=>respondDatePlan(plan.id,"accepted");
+    if(decline)decline.onclick=()=>respondDatePlan(plan.id,"declined");
+    if(cancel)cancel.onclick=()=>respondDatePlan(plan.id,"cancelled");
+    const safety=actions.querySelector(".date-plan-secondary:not([onclick])"); if(safety&&plan.status==="accepted")safety.onclick=()=>showDateSafety(plan);
+    return card;
   }
 
-  function restoreEnglish(){
-    // Reloading is intentionally avoided; static labels are restored from
-    // data-en labels below. Dynamic content remains English until next render.
-    document.querySelectorAll("[data-en]").forEach(el=>el.textContent=el.dataset.en);
-    document.documentElement.lang="en";
+  async function respondDatePlan(id,status){
+    if(status==="cancelled"&&!confirm("Cancel this date invitation?"))return;
+    const {error}=await _supabase.rpc("dating_respond_date_plan",{p_plan_id:id,p_status:status}); if(error){alert("Could not update the date plan: "+error.message);return} await loadDatePlans();refreshDatePlanBadge();
+  }
+  window.respondDatePlan=respondDatePlan;
+
+  function showDateSafety(plan){
+    const root=document.getElementById("modalRoot"); if(!root)return; root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:480px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🛡️ Date safety checklist</h3><div class="match-explain"><b>Before you go</b><br>Tell someone you trust where you are going and when you expect to return.<br><br><b>At the meetup</b><br>Choose a public place, keep control of your own transport, and avoid sending money or sharing passwords/codes.<br><br><b>If something feels wrong</b><br>Leave, block/report the member in Wana, and contact local emergency services when appropriate.</div><div class="actions"><button class="btn-contact" onclick="closeModal()">Got it</button></div></div></div></div>`;
   }
 
-  function localizeCurrent(){
-    const btn=document.getElementById("langBtn");
-    if(!btn) return;
-    if(currentLang==="am") applyAmharic(); else restoreEnglish();
-  }
+  window.filterDatePlans=function(filter,btn){state.dateFilter=filter;document.querySelectorAll("[data-date-filter]").forEach(b=>b.classList.toggle("active",b.dataset.dateFilter===filter));loadDatePlans()};
+  async function refreshDatePlanBadge(){const b=document.getElementById("datePlansBadge");if(!b||!currentUser)return;const {count}=await _supabase.from("dating_date_plans").select("id",{count:"exact",head:true}).eq("recipient_id",currentUser.id).eq("status","pending");b.textContent=count?`(${count})`:""}
+  window.refreshDatePlanBadge=refreshDatePlanBadge;
 
-  // Preserve the existing language toggle behavior and extend it.
-  window.toggleLang=function(){
-    if(typeof originalToggleLang==="function") originalToggleLang();
-    else window.currentLang = window.currentLang==="am" ? "en" : "am";
-    localizeCurrent();
-  };
+  const translations={"Date Plans":"የቀጠሮ እቅዶች","Compatibility":"ተኳሃኝነት","Safety Center":"የደህንነት ማዕከል","Plan a Date":"ቀጠሮ አዘጋጅ","Upcoming":"ቀጣይ ቀጠሮዎች","Needs response":"ምላሽ ያስፈልጋል","All plans":"ሁሉም እቅዶች","Accept":"ተቀበል","Decline":"እምቢ በል","Cancel invitation":"ግብዣውን ሰርዝ","Send Date Invitation":"የቀጠሮ ግብዣ ላክ","Date invitation":"የቀጠሮ ግብዣ","Verified profile":"የተረጋገጠ መገለጫ","Same relationship goal":"ተመሳሳይ የግንኙነት ግብ","Similar lifestyle":"ተመሳሳይ የአኗኗር ዘይቤ","Family plans align":"የቤተሰብ እቅዶች ይጣጣማሉ","Same city":"ተመሳሳይ ከተማ","Shared faith":"ተመሳሳይ እምነት"};
+  function applyAm(){document.documentElement.lang="am";const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n.parentElement&&/^(SCRIPT|STYLE)$/.test(n.parentElement.tagName))continue;const raw=n.nodeValue.trim();if(translations[raw])n.nodeValue=n.nodeValue.replace(raw,translations[raw])}}
+  window.toggleLang=function(){if(typeof originalToggleLang==="function")originalToggleLang(); if(typeof currentLang!=="undefined"&&currentLang==="am")applyAm()};
 
-  // Existing switchTab handles all original panels. We add the two new main-area panels.
   window.switchTab=function(tab){
-    if(tab==="compatibility" || tab==="safety"){
-      if(!currentUser){
-        const gate=document.getElementById("gate"); if(gate) gate.style.display="flex";
-        return;
-      }
-      document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
-      document.querySelectorAll(".side-nav .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tab));
-      const gate=document.getElementById("gate"); if(gate) gate.style.display="none";
-      const panel=document.getElementById(tab+"Panel"); if(panel) panel.style.display="block";
-      if(tab==="compatibility") loadCompatibility();
-      if(tab==="safety") pushState();
-      return;
+    if(["compatibility","dateplans","safety"].includes(tab)){
+      if(!currentUser){const gate=document.getElementById("gate");if(gate)gate.style.display="flex";return}
+      document.querySelectorAll(".panel").forEach(p=>p.style.display="none");document.querySelectorAll(".side-nav .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tab));const gate=document.getElementById("gate");if(gate)gate.style.display="none";const panel=document.getElementById(tab+"Panel");if(panel)panel.style.display="block";
+      if(tab==="compatibility"){if(!document.querySelector("#compatibilityPanel .smart-match-controls"))document.getElementById("compatibilityGrid")?.insertAdjacentHTML("beforebegin",'<div class="smart-match-controls"><button data-match-mode="all" class="active" onclick="setMatchMode(\'all\',this)">Best matches</button><button data-match-mode="verified" onclick="setMatchMode(\'verified\',this)">🛡️ Verified</button><button data-match-mode="online" onclick="setMatchMode(\'online\',this)">🟢 Online</button></div>');loadCompatibility()}
+      if(tab==="dateplans"){loadDatePlans();refreshDatePlanBadge()}
+      if(tab==="safety")typeof pushState==="function"&&pushState(); return;
     }
-    extraPanels.forEach(id=>{const el=document.getElementById(id); if(el) el.style.display="none";});
-    return originalSwitchTab ? originalSwitchTab(tab) : undefined;
+    extraPanels.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none"}); return originalSwitchTab?originalSwitchTab(tab):undefined;
   };
-
-  // Add verified badges to standard profile-card name rows after each render.
-  const oldCreateProfileCard=window.createProfileCard;
-  if(typeof oldCreateProfileCard==="function"){
-    window.createProfileCard=function(row,opts){
-      const el=oldCreateProfileCard(row,opts);
-      try{
-        const name=el.querySelector(".name-age");
-        if(name && row.is_verified && !name.querySelector(".verified-badge")){
-          name.insertAdjacentHTML("beforeend",verifiedBadge7(row));
-        }
-      }catch(e){}
-      return el;
-    };
-  }
-
-  // Keep the feature layer compatible with the existing auth lifecycle.
-  document.addEventListener("DOMContentLoaded",()=>{ pushState(); });
-  const langObserver=new MutationObserver(()=>{ if(currentLang==="am") applyAmharic(); });
-  langObserver.observe(document.body,{subtree:true,childList:true});
-
-  window._wanaFeatureEngine={loadCompatibility,compatibilityScore,enableWanaNotifications};
+  const oldOpenModal=window.openModal;
+  // Existing modal is the source of truth; the Plan a Date action is inserted there in the HTML.
+  if(oldOpenModal)window.openModal=oldOpenModal;
+  document.addEventListener("DOMContentLoaded",()=>{refreshDatePlanBadge();});
+  window._wanaDating2={scoreMatch,loadCompatibility,loadDatePlans,openDatePlanModal};
 })();
 </script>
 </body>
