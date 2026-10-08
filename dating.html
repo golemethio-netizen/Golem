@@ -3410,19 +3410,37 @@ function joinedAgoText(createdAt){
 
 async function loadNewMembers(){
   await refreshMyMatchedIds();
+  if (!myProfile) await fetchMyProfile();
+
   const grid = document.getElementById("newMembersGrid");
   const empty = document.getElementById("newMembersEmpty");
   grid.innerHTML = "";
+  empty.style.display = "none";
 
   const blockedIds = await fetchBlockedIds();
+  const mySeeking = String(myProfile?.seeking || "").trim().toLowerCase();
+  const myGender = String(myProfile?.gender || "").trim().toLowerCase();
 
-  const { data, error } = await _supabase
+  // New Members is intentionally driven by the member's explicit
+  // "Looking For" gender. Do not show a mixed-gender feed here.
+  if (!myProfile || !["male", "female"].includes(myGender) || !["male", "female", "any"].includes(mySeeking)) {
+    empty.textContent = "Complete your Gender and Looking For selections in Setup Profile to see New Members.";
+    empty.style.display = "block";
+    return;
+  }
+
+  let query = _supabase
     .from("dating_profiles")
     .select("*")
     .neq("user_id", currentUser.id)
     .order("created_at", { ascending: false })
-    .limit(50);
+    .limit(100);
 
+  // Hard server-side gender filter: New Members only contains the gender
+  // selected in the current member's Looking For field. "Any" means both.
+  if (mySeeking !== "any") query = query.eq("gender", mySeeking === "male" ? "Male" : "Female");
+
+  const { data, error } = await query;
   if (error){
     empty.textContent = "Couldn't load new members right now.";
     empty.style.display = "block";
@@ -3430,8 +3448,18 @@ async function loadNewMembers(){
     return;
   }
 
-  const rows = (data || []).filter(r => !blockedIds.has(r.user_id));
+  const rows = (data || []).filter(r => {
+    if (blockedIds.has(r.user_id)) return false;
+    const candidateGender = String(r.gender || "").trim().toLowerCase();
+    // Never display profiles with missing/invalid gender in New Members.
+    if (!["male", "female"].includes(candidateGender)) return false;
+    return mySeeking === "any" || candidateGender === mySeeking;
+  });
+
   if (rows.length === 0){
+    empty.textContent = mySeeking === "any"
+      ? "No new members are available right now."
+      : `No new ${mySeeking === "male" ? "men" : "women"} are available right now.`;
     empty.style.display = "block";
     return;
   }
