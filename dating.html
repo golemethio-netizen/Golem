@@ -1593,7 +1593,36 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 @media(max-width:1050px){.app-shell{grid-template-columns:240px minmax(0,1fr)!important;grid-template-areas:"sidebar content"!important}.app-shell>#rightMatchRail{display:none!important}.compat-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.app-shell{display:block!important;width:100%;max-width:none;min-height:0}.app-shell>.sidebar{width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;position:sticky!important;top:var(--header-h)!important}.app-shell>main{width:100%!important;padding:16px 12px 60px!important}.app-shell>#rightMatchRail{display:none!important}.feature-cards{grid-template-columns:1fr}.date-plan-meta{grid-template-columns:1fr}.date-plan-summary{grid-template-columns:1fr 1fr}}
 @media(max-width:420px){.compat-summary{grid-template-columns:1fr}.compat-stat{padding:13px}.date-plan-summary{grid-template-columns:1fr}.date-plan-head{display:block}.date-plan-status{display:inline-block;margin-top:8px}}
-</style></head>
+</style><style id="wana-home-empty-space-fix">
+/* Wana Dating — Home layout fix
+   The home page already has a dedicated #rightMatchRail outside <main>.
+   The old .wana-home-layout declared a second 330px grid track with no
+   second child, leaving a large empty area. Home content now fills main. */
+#homePanel .wana-home-layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+  gap:0!important;
+}
+#homePanel .wana-feed-column{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+#homePanel .wana-composer,
+#homePanel #feed,
+#homePanel #feedEmpty{
+  width:100%!important;
+  max-width:none!important;
+}
+@media(max-width:900px){
+  #homePanel .wana-home-layout{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
+</style>
+</head>
 <body>
 <header>
 <div class="brand">Wana <span>Dating</span></div>
