@@ -12,7 +12,7 @@
         .tab-btn.active { background: #c2185b; color: white; }
         .admin-badge { background:#ff4757; color:white; padding:2px 8px; border-radius:10px; font-size:12px; }
 
-        /* ================= ADMIN 2.0 ================= */
+        /* ================= ADMIN 2.1 ================= */
         :root{
             --admin-primary:#c2185b;
             --admin-primary-dark:#8e1244;
@@ -87,6 +87,63 @@
         .admin-mini-stat span{display:block;color:#6b7280;font-size:.7rem;}
         .admin-mini-stat strong{display:block;font-size:1.2rem;margin-top:4px;}
         .admin-safety-note{background:#fff8ed;border:1px solid #f5dfb8;border-radius:10px;padding:11px;font-size:.75rem;color:#73500d;margin-bottom:14px;}
+
+        /* ================= ADMIN 2.1 — MEMBER 360 ================= */
+        .admin-member-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+        .member-search{flex:1;min-width:240px;}
+        .member-directory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:12px;}
+        .member-card{background:#fff;border:1px solid var(--admin-border);border-radius:13px;padding:15px;box-shadow:0 2px 8px rgba(15,23,42,.03);}
+        .member-card-head{display:flex;align-items:center;gap:11px;}
+        .member-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#f3f4f6;flex:0 0 52px;}
+        .member-card-name{font-size:.9rem;font-weight:800;line-height:1.25;}
+        .member-card-meta{font-size:.72rem;color:var(--admin-muted);margin-top:3px;}
+        .member-chip-row{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0;}
+        .member-chip{font-size:.64rem;font-weight:800;padding:4px 7px;border-radius:999px;background:#f3f4f6;color:#4b5563;}
+        .member-chip.ok{background:#eaf8f0;color:#167344;}
+        .member-chip.warn{background:#fff3e0;color:#a15c00;}
+        .member-chip.danger{background:#fff0f0;color:#b42318;}
+        .member-card-actions{display:flex;gap:7px;margin-top:12px;}
+        .member-card-actions .admin-btn{flex:1;}
+        .member-360-head{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;margin-bottom:16px;}
+        .member-360-avatar{width:82px;height:82px;border-radius:16px;object-fit:cover;background:#f3f4f6;}
+        .member-360-title{font-size:1.15rem;font-weight:850;margin:0;}
+        .member-360-sub{font-size:.78rem;color:var(--admin-muted);margin-top:4px;}
+        .member-360-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;}
+        .member-360-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+        .member-360-card{background:#fff;border:1px solid var(--admin-border);border-radius:13px;padding:16px;min-width:0;}
+        .member-360-card.full{grid-column:1/-1;}
+        .member-360-card h4{margin:0 0 11px;font-size:.88rem;display:flex;justify-content:space-between;gap:8px;align-items:center;}
+        .member-kv{display:grid;grid-template-columns:135px 1fr;gap:7px 12px;font-size:.75rem;}
+        .member-kv dt{color:#8a93a1;font-weight:700;}
+        .member-kv dd{margin:0;word-break:break-word;}
+        .member-timeline{display:flex;flex-direction:column;gap:8px;}
+        .member-timeline-row{border:1px solid #eef0f3;border-radius:9px;padding:10px;font-size:.73rem;background:#fafbfc;}
+        .member-timeline-row strong{font-size:.75rem;}
+        .member-timeline-meta{font-size:.68rem;color:#9ca3af;margin-top:3px;}
+        .member-alert{border-radius:10px;padding:11px 12px;font-size:.74rem;margin-bottom:14px;}
+        .member-alert.danger{background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;}
+        .member-alert.success{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;}
+        .member-alert.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;}
+        .member-stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+        .member-stat{background:#f8fafc;border-radius:9px;padding:10px;}
+        .member-stat span{display:block;font-size:.64rem;color:#7b8492;text-transform:uppercase;font-weight:700;}
+        .member-stat strong{display:block;font-size:1.1rem;margin-top:3px;}
+        .member-mini-table{width:100%;border-collapse:collapse;font-size:.71rem;}
+        .member-mini-table th{font-size:.62rem;text-transform:uppercase;color:#8b94a2;text-align:left;padding:7px;border-bottom:1px solid #eaecef;}
+        .member-mini-table td{padding:8px 7px;border-bottom:1px solid #f0f1f3;vertical-align:top;}
+        .member-mini-table tr:last-child td{border-bottom:0;}
+        .member-note{font-size:.7rem;color:#8b94a2;line-height:1.45;}
+        .member-photo-strip{display:flex;gap:8px;overflow:auto;}
+        .member-photo-strip img{width:64px;height:64px;object-fit:cover;border-radius:9px;background:#f3f4f6;}
+        @media(max-width:760px){
+            .member-360-head{grid-template-columns:auto 1fr;}
+            .member-360-actions{grid-column:1/-1;justify-content:flex-start;}
+            .member-360-grid{grid-template-columns:1fr;}
+            .member-360-card.full{grid-column:auto;}
+            .member-stat-grid{grid-template-columns:repeat(2,1fr);}
+            .member-kv{grid-template-columns:105px 1fr;}
+        }
+
         @media(max-width:1100px){.admin-kpis{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:760px){
             .admin-kpis{grid-template-columns:repeat(2,1fr)}
@@ -102,7 +159,7 @@
 <body class="admin-v2" style="background: #f5f7fb;">
 
     <header class="golem-header">
-        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.0</span></div>
+        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.1</span></div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
             <button class="signin-btn" onclick="location.href='dating.html'" style="background:#666;">View Dating Site</button>
@@ -116,7 +173,7 @@
         <div class="admin-topline">
             <div>
                 <h1 class="admin-page-title">Dating Operations Center</h1>
-                <p class="admin-page-subtitle">Moderation, member safety, verification, payments and date planning in one place.</p>
+                <p class="admin-page-subtitle">Member 360°, moderation, account controls, verification, payments and date planning in one place.</p>
             </div>
             <div class="admin-health"><span class="admin-dot"></span><span>Admin session active</span><strong id="adminLastRefresh">—</strong></div>
         </div>
@@ -130,6 +187,7 @@
                 <button onclick="switchDatingTab('overview', this)" class="tab-btn active"><i class="fas fa-chart-pie"></i> Overview</button>
                 <button onclick="switchDatingTab('reports', this)" class="tab-btn"><i class="fas fa-flag"></i> Reports <span id="reportsBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('profiles', this)" class="tab-btn"><i class="fas fa-users"></i> Profiles</button>
+                <button onclick="switchDatingTab('members', this)" class="tab-btn"><i class="fas fa-user-shield"></i> Members</button>
                 <button onclick="switchDatingTab('postReports', this)" class="tab-btn"><i class="fas fa-comment-dots"></i> Posts <span id="postReportsBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('verification', this)" class="tab-btn"><i class="fas fa-check-circle"></i> Verification <span id="verificationBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('platinum', this)" class="tab-btn"><i class="fas fa-gem"></i> Platinum <span id="platinumBadge" class="admin-badge" style="display:none;">0</span></button>
@@ -285,6 +343,34 @@
                 <div id="adminDatePlansList"><div class="admin-empty">Select Date Plans to load records.</div></div>
             </section>
 
+
+            <!-- ADMIN 2.1 MEMBER MANAGEMENT CENTER -->
+            <section id="memberManagementSection" class="admin-section" style="display:none;">
+                <div class="admin-member-toolbar">
+                    <div style="flex:1;min-width:220px;">
+                        <h3 style="margin:0;font-size:1.05rem;">Member Management Center</h3>
+                        <p class="admin-card-sub" style="margin-top:4px;">Search members and open one unified Member 360° record.</p>
+                    </div>
+                    <input id="memberDirectorySearch" class="admin-input member-search" placeholder="Search name, email, phone, city or member ID…" oninput="loadMemberDirectory()">
+                    <button class="admin-btn admin-btn-secondary" onclick="loadMemberDirectory(true)"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div class="admin-stat-grid" style="margin-bottom:14px;">
+                    <div class="admin-mini-stat"><span>Loaded members</span><strong id="memberDirectoryCount">—</strong></div>
+                    <div class="admin-mini-stat"><span>Suspended in view</span><strong id="memberDirectorySuspended">—</strong></div>
+                    <div class="admin-mini-stat"><span>Verified</span><strong id="memberDirectoryVerified">—</strong></div>
+                </div>
+                <div id="memberDirectoryList" class="member-directory-grid">
+                    <div class="admin-empty">Loading members…</div>
+                </div>
+            </section>
+
+            <!-- MEMBER 360° -->
+            <section id="member360Section" class="admin-section" style="display:none;">
+                <div id="member360Content">
+                    <div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading Member 360°…</div>
+                </div>
+            </section>
+
             <!-- AUDIT LOG -->
             <section id="auditSection" class="admin-section" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                 <h3 style="margin:0 0 6px;"><i class="fas fa-history" style="color:#c2185b;"></i> Administrator Audit Log</h3>
@@ -309,6 +395,8 @@
             overview: 'adminOverviewSection',
             reports: 'datingReportsSection',
             profiles: 'datingProfilesSection',
+            members: 'memberManagementSection',
+            member360: 'member360Section',
             postReports: 'postReportsSection',
             verification: 'verificationSection',
             platinum: 'platinumSection',
@@ -333,6 +421,8 @@
             if (tab === 'overview') loadAdminOverview();
             if (tab === 'reports') loadDatingReports();
             if (tab === 'profiles') loadDatingProfiles();
+            if (tab === 'members') loadMemberDirectory();
+            if (tab === 'member360') loadMember360();
             if (tab === 'postReports') loadPostReports();
             if (tab === 'verification') loadVerificationRequests();
             if (tab === 'platinum') loadPlatinumRequests();
@@ -352,6 +442,8 @@
             if (tab === 'overview') loadAdminOverview();
             else if (tab === 'reports') loadDatingReports();
             else if (tab === 'profiles') loadDatingProfiles(true);
+            else if (tab === 'members') loadMemberDirectory(true);
+            else if (tab === 'member360') loadMember360(true);
             else if (tab === 'postReports') loadPostReports();
             else if (tab === 'verification') loadVerificationRequests();
             else if (tab === 'platinum') loadPlatinumRequests();
@@ -573,6 +665,7 @@
                             <button onclick="grantPlatinum('${p.user_id}')" style="font-size:0.75rem;padding:5px 10px;border:none;background:#B8860B;color:white;border-radius:5px;cursor:pointer;">${platinumActive(p) ? 'Extend' : 'Grant'}</button>
                         </div>
                         ${p.is_platinum ? `<button onclick="revokePlatinum('${p.user_id}')" style="margin-top:6px;font-size:0.75rem;padding:5px 10px;border:none;background:#888;color:white;border-radius:5px;cursor:pointer;width:100%;">Revoke Platinum</button>` : ''}
+                        <button onclick="openMember360('${p.user_id}')" style="margin-top:6px;font-size:0.75rem;padding:7px 10px;border:1px solid #c2185b;background:#fff;color:#c2185b;border-radius:6px;cursor:pointer;width:100%;font-weight:700;"><i class="fas fa-user-shield"></i> Open Member 360</button>
                         <button onclick="deleteDatingProfile('${p.id}')" style="margin-top:6px; font-size:0.75rem; padding:5px 10px; border:none; background:#ff4757; color:white; border-radius:5px; cursor:pointer; width:100%;">Remove Profile</button>
                     </div>`;
                 }).join('') +
@@ -937,12 +1030,333 @@
                 </tr>`).join('')}</tbody></table></div>`;
         }
 
+
+        // ============================================================
+        // ADMIN 2.1 — MEMBER MANAGEMENT CENTER / MEMBER 360°
+        // ============================================================
+        let _memberDirectoryCache = null;
+        let _member360UserId = null;
+
+        const memberDate = (v) => v ? new Date(v).toLocaleString() : '—';
+        const memberDateOnly = (v) => v ? new Date(v).toLocaleDateString() : '—';
+
+        function memberStatusChip(status) {
+            const s = String(status || 'active').toLowerCase();
+            const cls = s === 'suspended' ? 'danger' : (s === 'active' ? 'ok' : 'warn');
+            return `<span class="member-chip ${cls}">${escapeHtml(s)}</span>`;
+        }
+
+        async function loadMemberDirectory(forceRefresh) {
+            const container = document.getElementById('memberDirectoryList');
+            if (!container) return;
+            if (!_memberDirectoryCache || forceRefresh) {
+                container.innerHTML = '<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading members…</div>';
+                const [{ data: datingProfiles, error: dpError }, { data: contacts, error: cError }] = await Promise.all([
+                    _supabase.from('dating_profiles').select('*').order('created_at', { ascending: false }).limit(500),
+                    _supabase.from('profiles').select('id, full_name, email, phone, phone_number').limit(1000)
+                ]);
+                if (dpError) {
+                    container.innerHTML = `<div class="admin-empty" style="color:#b42318;">Could not load members: ${escapeHtml(dpError.message)}</div>`;
+                    return;
+                }
+                const contactMap = {};
+                (contacts || []).forEach(c => contactMap[c.id] = c);
+                _memberDirectoryCache = (datingProfiles || []).map(p => ({...p, _contact: contactMap[p.user_id] || {}}));
+            }
+
+            const q = (document.getElementById('memberDirectorySearch')?.value || '').trim().toLowerCase();
+            const rows = !q ? _memberDirectoryCache : _memberDirectoryCache.filter(m =>
+                [m.user_id, m.display_name, m.city, m.gender, m.relationship_type,
+                 m._contact?.full_name, m._contact?.email, m._contact?.phone, m._contact?.phone_number]
+                .some(v => String(v || '').toLowerCase().includes(q))
+            );
+
+            const suspended = rows.filter(m => String(m.account_status || m.status || '').toLowerCase() === 'suspended').length;
+            const verified = rows.filter(m => !!m.is_verified).length;
+            const countEl = document.getElementById('memberDirectoryCount');
+            const suspEl = document.getElementById('memberDirectorySuspended');
+            const verEl = document.getElementById('memberDirectoryVerified');
+            if (countEl) countEl.textContent = rows.length;
+            if (suspEl) suspEl.textContent = suspended;
+            if (verEl) verEl.textContent = verified;
+
+            if (!rows.length) {
+                container.innerHTML = `<div class="admin-empty">${q ? 'No members match this search.' : 'No dating profiles found.'}</div>`;
+                return;
+            }
+
+            container.innerHTML = rows.map(m => {
+                const c = m._contact || {};
+                const name = m.display_name || c.full_name || 'Unnamed member';
+                const photo = (m.photos && m.photos[0]) || m.photo_url || '';
+                const activePlatinum = platinumActive(m);
+                const accountStatus = m.account_status || m.status || 'active';
+                return `
+                <article class="member-card">
+                    <div class="member-card-head">
+                        <img class="member-avatar" src="${escapeHtml(photo)}" onerror="this.style.display='none'">
+                        <div style="min-width:0;flex:1;">
+                            <div class="member-card-name">${escapeHtml(name)}</div>
+                            <div class="member-card-meta">${escapeHtml(m.city || 'No city')} · ${escapeHtml(m.gender || '—')}${m.age ? ' · ' + escapeHtml(String(m.age)) : ''}</div>
+                        </div>
+                    </div>
+                    <div class="member-chip-row">
+                        ${memberStatusChip(accountStatus)}
+                        ${m.is_verified ? '<span class="member-chip ok">Verified</span>' : '<span class="member-chip">Unverified</span>'}
+                        ${activePlatinum ? '<span class="member-chip warn">Platinum</span>' : ''}
+                    </div>
+                    <div class="member-note">${escapeHtml(c.email || c.phone || c.phone_number || m.user_id)}</div>
+                    <div class="member-card-actions">
+                        <button class="admin-btn admin-btn-primary" onclick="openMember360('${m.user_id}')"><i class="fas fa-id-card"></i> Member 360°</button>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        async function openMember360(userId) {
+            _member360UserId = userId;
+            const section = document.getElementById('member360Section');
+            const content = document.getElementById('member360Content');
+            if (!section || !content) return;
+
+            // Hide all other sections and activate the Member 360 tab.
+            Object.values(DATING_SECTIONS).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            section.style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            content.innerHTML = '<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading Member 360°…</div>';
+
+            const [
+                profileResult,
+                contactResult,
+                statusResult,
+                verificationResult,
+                platinumResult,
+                blocksResult,
+                matchesResult,
+                datesResult
+            ] = await Promise.all([
+                _supabase.from('dating_profiles').select('*').eq('user_id', userId).maybeSingle(),
+                _supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+                _supabase.from('dating_account_status').select('*').eq('user_id', userId).maybeSingle(),
+                _supabase.from('dating_verification_requests').select('*').eq('user_id', userId).order('created_at', {ascending:false}).limit(100),
+                _supabase.from('dating_platinum_requests').select('*').eq('user_id', userId).order('created_at', {ascending:false}).limit(100),
+                _supabase.from('dating_blocks').select('*').or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`).order('created_at', {ascending:false}).limit(100),
+                _supabase.from('dating_matches').select('*').or(`user_a.eq.${userId},user_b.eq.${userId}`).order('created_at', {ascending:false}).limit(100),
+                _supabase.from('dating_date_plans').select('*').or(`creator_id.eq.${userId},recipient_id.eq.${userId}`).order('date_on',{ascending:false}).limit(100)
+            ]);
+
+            const p = profileResult.data;
+            const c = contactResult.data || {};
+            const account = statusResult.data || { status:'active' };
+            const verifications = verificationResult.data || [];
+            const platinum = platinumResult.data || [];
+            const blocks = blocksResult.data || [];
+            const matches = matchesResult.data || [];
+            const dates = datesResult.data || [];
+
+            if (profileResult.error) {
+                content.innerHTML = `<div class="admin-empty" style="color:#b42318;">Could not load member profile: ${escapeHtml(profileResult.error.message)}</div>`;
+                return;
+            }
+
+            let reports = [];
+            let reportError = null;
+            if (p?.id) {
+                const rr = await _supabase.from('dating_reports').select('*').eq('reported_profile_id', p.id).order('created_at',{ascending:false}).limit(100);
+                reports = rr.data || [];
+                reportError = rr.error;
+            }
+
+            const name = p?.display_name || c.full_name || 'Unnamed member';
+            const photo = (p?.photos && p.photos[0]) || p?.photo_url || '';
+            const suspended = String(account.status || 'active').toLowerCase() === 'suspended';
+            const activePlatinum = platinumActive(p);
+            const openReports = reports.filter(r => r.status === 'open').length;
+            const acceptedDates = dates.filter(d => d.status === 'accepted').length;
+            const mutualMatches = matches.length;
+
+            const statusAlert = suspended
+                ? `<div class="member-alert danger"><strong>Account suspended.</strong> ${escapeHtml(account.reason || 'No reason recorded.')}${account.suspended_until ? ' · Until ' + escapeHtml(memberDate(account.suspended_until)) : ' · Indefinite'}<div class="member-note" style="margin-top:4px;">Suspended ${escapeHtml(memberDate(account.suspended_at))} by ${escapeHtml(account.suspended_by || 'admin')}</div></div>`
+                : `<div class="member-alert success"><strong>Account active.</strong> No current administrative suspension is recorded.</div>`;
+
+            const photos = Array.isArray(p?.photos) ? p.photos : [];
+            const photoStrip = photos.length ? `<div class="member-photo-strip">${photos.slice(0,8).map(x => `<img src="${escapeHtml(x)}" onerror="this.style.display='none'">`).join('')}</div>` : '<div class="member-note">No additional profile photos.</div>';
+
+            const verificationRows = verifications.length ? verifications.map(v => `
+                <tr><td>${escapeHtml(v.status || '—')}</td><td>${escapeHtml(memberDateOnly(v.created_at))}</td><td>${escapeHtml(v.reviewed_at ? memberDateOnly(v.reviewed_at) : '—')}</td><td>${escapeHtml(v.reviewer_note || '—')}</td></tr>
+            `).join('') : '<tr><td colspan="4" class="member-note">No verification history.</td></tr>';
+
+            const platinumRows = platinum.length ? platinum.map(v => `
+                <tr><td>${escapeHtml(v.plan || '—')}</td><td>${escapeHtml(String(v.amount_birr ?? '—'))} Birr</td><td>${escapeHtml(v.status || '—')}</td><td>${escapeHtml(v.transaction_number || '—')}</td><td>${escapeHtml(memberDateOnly(v.created_at))}</td></tr>
+            `).join('') : '<tr><td colspan="5" class="member-note">No Platinum/payment requests.</td></tr>';
+
+            const reportRows = reports.length ? reports.map(r => `
+                <tr><td>${escapeHtml(r.status || '—')}</td><td>${escapeHtml(r.reason || '—')}</td><td>${escapeHtml(memberDateOnly(r.created_at))}</td><td>${escapeHtml(r.reviewed_at ? memberDateOnly(r.reviewed_at) : '—')}</td></tr>
+            `).join('') : '<tr><td colspan="4" class="member-note">No profile reports against this member.</td></tr>';
+
+            const blockRows = blocks.length ? blocks.map(b => `
+                <tr><td>${b.blocker_id === userId ? 'Member blocked' : 'Member was blocked'}</td><td>${escapeHtml(b.blocker_id === userId ? b.blocked_id : b.blocker_id)}</td><td>${escapeHtml(memberDateOnly(b.created_at))}</td></tr>
+            `).join('') : '<tr><td colspan="3" class="member-note">No block records found.</td></tr>';
+
+            const matchRows = matches.length ? matches.map(m => {
+                const other = m.user_a === userId ? m.user_b : m.user_a;
+                return `<tr><td>${escapeHtml(other)}</td><td>${escapeHtml(memberDateOnly(m.created_at))}</td></tr>`;
+            }).join('') : '<tr><td colspan="2" class="member-note">No matches found.</td></tr>';
+
+            const dateRows = dates.length ? dates.map(d => {
+                const other = d.creator_id === userId ? d.recipient_id : d.creator_id;
+                return `<tr><td>${escapeHtml(d.status || '—')}</td><td>${escapeHtml(memberDateOnly(d.date_on))} ${escapeHtml(d.start_time || '')}</td><td>${escapeHtml(d.location_name || '—')}${d.city ? ' · ' + escapeHtml(d.city) : ''}</td><td>${escapeHtml(other)}</td></tr>`;
+            }).join('') : '<tr><td colspan="4" class="member-note">No date-plan history.</td></tr>';
+
+            const canManage = !suspended
+                ? `<button class="admin-btn admin-btn-danger" onclick="suspendMember('${userId}')"><i class="fas fa-user-lock"></i> Suspend Account</button>`
+                : `<button class="admin-btn admin-btn-success" onclick="restoreMember('${userId}')"><i class="fas fa-user-check"></i> Restore Account</button>`;
+
+            content.innerHTML = `
+                <div class="admin-toolbar">
+                    <button class="admin-btn admin-btn-secondary" onclick="switchDatingTabByName('members')"><i class="fas fa-arrow-left"></i> Back to Members</button>
+                    <button class="admin-btn admin-btn-secondary" onclick="openMember360('${userId}')"><i class="fas fa-sync-alt"></i> Refresh Member</button>
+                </div>
+                ${statusAlert}
+                <div class="member-360-head">
+                    <img class="member-360-avatar" src="${escapeHtml(photo)}" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="member-360-title">${escapeHtml(name)} ${p?.is_verified ? '<span class="member-chip ok">Verified</span>' : ''} ${activePlatinum ? '<span class="member-chip warn">Platinum</span>' : ''}</h2>
+                        <div class="member-360-sub">${escapeHtml(p?.city || 'No city')} · ${escapeHtml(p?.gender || '—')}${p?.age ? ' · ' + escapeHtml(String(p.age)) : ''} · ID ${escapeHtml(userId)}</div>
+                    </div>
+                    <div class="member-360-actions">${canManage}</div>
+                </div>
+
+                <div class="member-stat-grid">
+                    <div class="member-stat"><span>Reports</span><strong>${openReports}</strong></div>
+                    <div class="member-stat"><span>Verification</span><strong>${verifications.length}</strong></div>
+                    <div class="member-stat"><span>Payments</span><strong>${platinum.length}</strong></div>
+                    <div class="member-stat"><span>Matches</span><strong>${mutualMatches}</strong></div>
+                    <div class="member-stat"><span>Date plans</span><strong>${dates.length}</strong></div>
+                </div>
+
+                <div class="member-360-grid">
+                    <div class="member-360-card">
+                        <h4>Account & profile</h4>
+                        <dl class="member-kv">
+                            <dt>Full name</dt><dd>${escapeHtml(c.full_name || name)}</dd>
+                            <dt>Email</dt><dd>${escapeHtml(c.email || '—')}</dd>
+                            <dt>Phone</dt><dd>${escapeHtml(c.phone || c.phone_number || '—')}</dd>
+                            <dt>Member since</dt><dd>${escapeHtml(memberDate(p?.created_at || c.created_at))}</dd>
+                            <dt>Relationship</dt><dd>${escapeHtml(p?.relationship_type || '—')}</dd>
+                            <dt>Religion</dt><dd>${escapeHtml(p?.religion || '—')}</dd>
+                            <dt>Location</dt><dd>${escapeHtml([p?.city,p?.country].filter(Boolean).join(', ') || '—')}</dd>
+                        </dl>
+                    </div>
+                    <div class="member-360-card">
+                        <h4>Safety & status</h4>
+                        <dl class="member-kv">
+                            <dt>Account</dt><dd>${memberStatusChip(account.status || 'active')}</dd>
+                            <dt>Verified</dt><dd>${p?.is_verified ? '<span class="member-chip ok">Yes</span>' : '<span class="member-chip">No</span>'}</dd>
+                            <dt>Platinum</dt><dd>${activePlatinum ? '<span class="member-chip warn">Active</span>' : '<span class="member-chip">Not active</span>'}</dd>
+                            <dt>Last seen</dt><dd>${escapeHtml(memberDate(p?.last_seen_at))}</dd>
+                            <dt>Open reports</dt><dd>${openReports}</dd>
+                            <dt>Blocks</dt><dd>${blocks.length}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="member-360-card full">
+                        <h4>About & photos</h4>
+                        <p class="member-note" style="margin:0 0 10px;">${escapeHtml(p?.bio || 'No bio recorded.')}</p>
+                        ${photoStrip}
+                    </div>
+
+                    <div class="member-360-card full">
+                        <h4>Verification history <span class="member-chip">${verifications.length}</span></h4>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Submitted</th><th>Reviewed</th><th>Reviewer note</th></tr></thead><tbody>${verificationRows}</tbody></table></div>
+                    </div>
+
+                    <div class="member-360-card full">
+                        <h4>Reports against member <span class="member-chip ${openReports ? 'danger' : ''}">${reports.length}</span></h4>
+                        ${reportError ? `<p class="member-note">Could not load report history: ${escapeHtml(reportError.message)}</p>` : ''}
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Reason</th><th>Reported</th><th>Reviewed</th></tr></thead><tbody>${reportRows}</tbody></table></div>
+                    </div>
+
+                    <div class="member-360-card full">
+                        <h4>Blocks <span class="member-chip">${blocks.length}</span></h4>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Direction</th><th>Other member ID</th><th>Date</th></tr></thead><tbody>${blockRows}</tbody></table></div>
+                    </div>
+
+                    <div class="member-360-card full">
+                        <h4>Platinum & payment history <span class="member-chip warn">${platinum.length}</span></h4>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Plan</th><th>Amount</th><th>Status</th><th>Transaction</th><th>Submitted</th></tr></thead><tbody>${platinumRows}</tbody></table></div>
+                    </div>
+
+                    <div class="member-360-card">
+                        <h4>Match history <span class="member-chip">${matches.length}</span></h4>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Other member ID</th><th>Date</th></tr></thead><tbody>${matchRows}</tbody></table></div>
+                    </div>
+
+                    <div class="member-360-card">
+                        <h4>Date-plan history <span class="member-chip">${acceptedDates} accepted</span></h4>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Date</th><th>Place</th><th>Other member ID</th></tr></thead><tbody>${dateRows}</tbody></table></div>
+                    </div>
+                </div>`;
+        }
+
+        async function suspendMember(userId) {
+            const reason = prompt('Suspension reason (required):');
+            if (!reason || reason.trim().length < 3) return;
+            const untilRaw = prompt('Optional suspension end date/time (leave blank for indefinite). Example: 2026-10-15T18:00');
+            const until = untilRaw && untilRaw.trim() ? new Date(untilRaw.trim()) : null;
+            if (untilRaw && untilRaw.trim() && Number.isNaN(until?.getTime())) {
+                alert('Invalid suspension date/time.');
+                return;
+            }
+            if (!confirm('Suspend this account? The action will be recorded in the admin audit log.')) return;
+
+            const { error } = await _supabase.rpc('dating_admin_set_account_suspension', {
+                p_user_id: userId,
+                p_suspended: true,
+                p_reason: reason.trim(),
+                p_until: until ? until.toISOString() : null
+            });
+            if (error) {
+                alert('Suspension failed: ' + error.message + '\n\nRun the Admin 2.1 migration if the suspension function is not installed.');
+                return;
+            }
+            await logAction('Member Account Suspended', `User ID: ${userId}; reason: ${reason.trim()}; until: ${until ? until.toISOString() : 'indefinite'}`);
+            await openMember360(userId);
+            refreshDatingBadges();
+        }
+
+        async function restoreMember(userId) {
+            if (!confirm('Restore this member account now?')) return;
+            const { error } = await _supabase.rpc('dating_admin_set_account_suspension', {
+                p_user_id: userId,
+                p_suspended: false,
+                p_reason: null,
+                p_until: null
+            });
+            if (error) {
+                alert('Restore failed: ' + error.message + '\n\nRun the Admin 2.1 migration if the suspension function is not installed.');
+                return;
+            }
+            await logAction('Member Account Restored', `User ID: ${userId}`);
+            await openMember360(userId);
+            refreshDatingBadges();
+        }
+
+        async function loadMember360(forceRefresh) {
+            if (_member360UserId) await openMember360(_member360UserId);
+        }
+
+
         // ---------- INIT ----------
         document.addEventListener('DOMContentLoaded', async () => {
             const ok = await checkAdmin();
             if (!ok) return;
-            loadDatingReports();
+            switchDatingTabByName('overview');
             refreshDatingBadges();
+            setInterval(refreshDatingBadges, 60000);
         });
     </script>
 </body>
