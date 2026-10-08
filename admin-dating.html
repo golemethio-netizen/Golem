@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanaGebya Dating Admin 2.3 — Safety & Moderation Command Center</title>
+    <title>WanaGebya Dating Admin 2.4 — Consolidated Dating Operations Center</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -234,7 +234,7 @@
 <body class="admin-v2" style="background: #f5f7fb;">
 
     <header class="golem-header">
-        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.3</span></div>
+        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.4</span></div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
             <button class="signin-btn" onclick="location.href='dating.html'" style="background:#666;">View Dating Site</button>
@@ -248,7 +248,7 @@
         <div class="admin-topline">
             <div>
                 <h1 class="admin-page-title">Dating Operations Center</h1>
-                <p class="admin-page-subtitle">Safety & Moderation Command Center — triage incidents, prioritize risk, manage cases and keep every action auditable.</p>
+                <p class="admin-page-subtitle">Consolidated database-driven operations — members, safety, verification, Platinum, gifts, matches, dates and audit history.</p>
             </div>
             <div class="admin-health"><span class="admin-dot"></span><span>Admin session active</span><strong id="adminLastRefresh">—</strong></div>
         </div>
@@ -259,6 +259,7 @@
                 <button class="admin-btn admin-btn-secondary" onclick="refreshCurrentAdminView()">↻ Refresh</button>
             </div>
             <div class="admin-tab-scroll">
+                <button onclick="switchDatingTab('database', this)" class="tab-btn"><i class="fas fa-database"></i> Database Health <span id="databaseHealthBadge" class="admin-badge" style="display:none;">!</span></button>
                 <button onclick="switchDatingTab('safety', this)" class="tab-btn"><i class="fas fa-shield-alt"></i> Safety Center <span id="safetyCenterBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('overview', this)" class="tab-btn active"><i class="fas fa-chart-pie"></i> Overview</button>
                 <button onclick="switchDatingTab('reports', this)" class="tab-btn"><i class="fas fa-flag"></i> Reports <span id="reportsBadge" class="admin-badge" style="display:none;">0</span></button>
@@ -273,6 +274,20 @@
         </div>
 
         <main>
+            <!-- ADMIN 2.4 DATABASE HEALTH -->
+            <section id="adminDatabaseSection" class="admin-section" style="display:none; background:white; padding:20px; border-radius:12px; margin-bottom:14px;">
+                <div class="admin-topline" style="margin-bottom:14px;">
+                    <div><h2 class="admin-page-title">Dating Database Health</h2><p class="admin-page-subtitle">Checks the tables and canonical fields used by this admin console and the current Wana Dating database.</p></div>
+                    <button class="admin-btn admin-btn-secondary" onclick="loadDatabaseHealth()">↻ Run checks</button>
+                </div>
+                <div id="databaseHealthSummary" class="admin-safety-note">Checking database alignment…</div>
+                <div id="databaseHealthGrid" class="admin-kpis"></div>
+                <div class="admin-dashboard-grid">
+                    <div class="admin-card"><h4>Canonical dating data</h4><p class="admin-card-sub">The Admin 2.4 console uses the consolidated schema rather than the retired date-plan columns.</p><div id="databaseHealthDetails"></div></div>
+                    <div class="admin-card"><h4>Operational safeguards</h4><div style="font-size:.76rem;color:#4b5563;line-height:1.7;">✓ Gender / Looking For enforced by database eligibility<br>✓ Date plans use creator_id/date_on/start_time<br>✓ Online dates use HTTPS meeting links<br>✓ Platinum gifts are RPC-protected<br>✓ Sensitive admin actions are audited<br>✓ Member suspension is handled by admin RPC</div></div>
+                </div>
+            </section>
+
             <!-- ADMIN 2.0 OVERVIEW -->
             <section id="adminOverviewSection" class="admin-section" style="background:white; padding:20px; border-radius:12px; margin-bottom:14px;">
                 <div class="admin-kpis">
@@ -288,6 +303,7 @@
                         <h4>Moderation Queue</h4>
                         <p class="admin-card-sub">Jump directly to the queues with work waiting.</p>
                         <div class="admin-queue">
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('database')"><div><strong>Database health</strong><span>Verify consolidated schema alignment</span></div><span class="admin-count-pill">DB</span></button>
                             <button class="admin-queue-btn" onclick="switchDatingTabByName('safety')"><div><strong>Safety Command Center</strong><span>Unified risk & incident triage</span></div><span id="queueSafetyCenter" class="admin-count-pill hot">0</span></button>
                             <button class="admin-queue-btn" onclick="switchDatingTabByName('reports')"><div><strong>Profile reports</strong><span>Safety and abuse reports</span></div><span id="queueReports" class="admin-count-pill hot">0</span></button>
                             <button class="admin-queue-btn" onclick="switchDatingTabByName('postReports')"><div><strong>Post reports</strong><span>Home feed moderation</span></div><span id="queuePostReports" class="admin-count-pill hot">0</span></button>
@@ -554,6 +570,7 @@
 
         // ---------- Sub-nav (local to this page; no other admin areas exist here) ----------
         const DATING_SECTIONS = {
+            database: 'adminDatabaseSection',
             overview: 'adminOverviewSection',
             safety: 'safetyCenterSection',
             reports: 'datingReportsSection',
@@ -581,6 +598,7 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
+            if (tab === 'database') loadDatabaseHealth();
             if (tab === 'overview') loadAdminOverview();
             if (tab === 'safety') loadSafetyCenter();
             if (tab === 'reports') loadDatingReports();
@@ -603,7 +621,8 @@
             const active = document.querySelector('.tab-btn.active');
             const match = active?.getAttribute('onclick')?.match(/'([^']+)'/);
             const tab = match?.[1] || 'overview';
-            if (tab === 'overview') loadAdminOverview();
+            if (tab === 'database') loadDatabaseHealth();
+            else if (tab === 'overview') loadAdminOverview();
             else if (tab === 'safety') loadSafetyCenter(true);
             else if (tab === 'reports') loadDatingReports();
             else if (tab === 'profiles') loadDatingProfiles(true);
@@ -615,31 +634,6 @@
             else if (tab === 'dateplans') loadAdminDatePlans(true);
             else if (tab === 'audit') loadAdminAudit(true);
             refreshDatingBadges();
-        }
-
-        // ---------- Private media (signed URLs) ----------
-        // Profile photos, post images and verification selfies live in
-        // private storage buckets (dating-migration-v9-private-storage.sql)
-        // and are saved as object PATHS, not public URLs. Every place below
-        // that renders one of these as <img src="..."> needs to resolve it
-        // through here first — a raw path is not a loadable URL, and
-        // without this an admin reviewing a verification request or a
-        // reported profile just sees a blank/broken image. Mirrors
-        // resolvePrivateUrl() in the public dating.html.
-        const BUCKET_PROFILE_PHOTOS = "dating-profile-photos";
-        const BUCKET_POST_MEDIA = "dating-post-media";
-        const BUCKET_VERIFICATION = "dating-verification";
-        const _adminSignedUrlCache = new Map();
-        async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600) {
-            if (!pathOrUrl) return null;
-            if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl; // legacy public URL, pre-migration
-            const key = `${bucket}:${pathOrUrl}`;
-            const cached = _adminSignedUrlCache.get(key);
-            if (cached && cached.expiresAt > Date.now() + 30000) return cached.url;
-            const { data, error } = await _supabase.storage.from(bucket).createSignedUrl(pathOrUrl, expiresInSeconds);
-            if (error || !data) { console.warn(`Couldn't sign URL for ${key}:`, error && error.message); return null; }
-            _adminSignedUrlCache.set(key, { url: data.signedUrl, expiresAt: Date.now() + expiresInSeconds * 1000 });
-            return data.signedUrl;
         }
 
         // ---------- Auth + logging (same pattern as admin.html) ----------
@@ -680,6 +674,36 @@
         // Lightweight stand-in for the main admin.html's loadStats() — this
         // page only needs the four dating badge counts, not the whole
         // marketplace stats dashboard.
+        async function loadDatabaseHealth() {
+            const checks = [
+                ['dating_profiles','Profiles','user_id,gender,seeking,is_verified,is_platinum,platinum_plan,platinum_until'],
+                ['dating_reports','Reports','id,reported_user_id,status,created_at'],
+                ['dating_post_reports','Post reports','id,post_id,status,created_at'],
+                ['dating_verification_requests','Verification','id,user_id,status,reviewed_at'],
+                ['dating_platinum_requests','Platinum requests','id,user_id,plan,amount_birr,status,transaction_number'],
+                ['dating_matches','Matches','id,user_a,user_b,status'],
+                ['dating_date_plans','Date plans','id,creator_id,recipient_id,date_on,start_time,status,mode,online_platform,meeting_link,timezone'],
+                ['dating_gift_catalog','Gift catalog','id,name,emoji,active,sort_order'],
+                ['dating_gifts','Gift ledger','id,sender_id,recipient_id,gift_id,created_at'],
+                ['dating_moderation_cases','Safety cases','id,subject_user_id,severity,status,created_at'],
+                ['dating_safety_actions','Safety actions','id,case_id,subject_user_id,action_type,created_at'],
+                ['dating_account_status','Account status','user_id,is_suspended,suspended_until,suspension_reason'],
+                ['audit_logs','Audit log','action,details,member_id,created_at']
+            ];
+            const results = await Promise.all(checks.map(async ([table,label,columns]) => {
+                const {error} = await _supabase.from(table).select(columns,{head:true,count:'exact'});
+                return {table,label,columns,ok:!error,error:error?.message||'',count:error?null:0};
+            }));
+            const bad=results.filter(x=>!x.ok);
+            const summary=document.getElementById('databaseHealthSummary');
+            const grid=document.getElementById('databaseHealthGrid');
+            const details=document.getElementById('databaseHealthDetails');
+            if(summary) { summary.className='admin-safety-note'; summary.innerHTML=bad.length ? `<strong>Database alignment needs attention:</strong> ${bad.length} of ${results.length} checks failed. Review the migration before relying on that feature.` : '<strong>Database alignment OK:</strong> all consolidated dating tables and canonical fields are readable by the current admin session.'; }
+            if(grid) grid.innerHTML=results.map(r=>`<div class="admin-kpi"><div class="kpi-label">${escapeHtml(r.label)}</div><div class="kpi-value" style="font-size:1.15rem;">${r.ok?'✓':'!'}</div><div class="kpi-note">${escapeHtml(r.table)}</div></div>`).join('');
+            if(details) details.innerHTML=results.map(r=>`<div class="admin-activity-row"><strong>${r.ok?'✓':'✕'} ${escapeHtml(r.label)}</strong><div class="admin-activity-meta">${escapeHtml(r.table)} · ${escapeHtml(r.columns)}${r.error?' · '+escapeHtml(r.error):''}</div></div>`).join('');
+            const badge=document.getElementById('databaseHealthBadge'); if(badge){badge.style.display=bad.length?'inline-block':'none';badge.textContent=bad.length;}
+        }
+
         async function refreshDatingBadges() {
             const [
                 { count: openReports },
@@ -762,20 +786,13 @@
                 (reporters || []).forEach(r => reporterMap[r.id] = r);
             }
 
-            // photo_url is a private-bucket path, not a public URL — sign it
-            // before rendering, or the reported person's photo just won't load.
-            const reportPhotoUrls = {};
-            await Promise.all(reports.map(async r => {
-                reportPhotoUrls[r.id] = await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, r.dating_profiles?.photo_url);
-            }));
-
             container.innerHTML = reports.map(r => {
                 const reporter = reporterMap[r.reporter_id];
                 const profile = r.dating_profiles;
                 const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
                 return `
                     <div style="display:flex; gap:14px; padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px; align-items:flex-start;">
-                        <img src="${escapeHtml(reportPhotoUrls[r.id] || '')}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#f5f5f5; flex-shrink:0;" onerror="this.style.display='none'">
+                        <img src="${escapeHtml(profile?.photo_url || '')}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#f5f5f5; flex-shrink:0;" onerror="this.style.display='none'">
                         <div style="flex:1; min-width:0;">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
                                 <div>
@@ -938,13 +955,6 @@
                 (reporters || []).forEach(r => reporterMap[r.id] = r);
             }
 
-            // dating_posts.image_url is a private-bucket path — sign it
-            // before rendering, same reason as the profile-report photos.
-            const reportedPostImageUrls = {};
-            await Promise.all(reports.map(async r => {
-                reportedPostImageUrls[r.id] = await resolvePrivateUrl(BUCKET_POST_MEDIA, r.dating_posts?.image_url);
-            }));
-
             container.innerHTML = reports.map(r => {
                 const reporter = reporterMap[r.reporter_id];
                 const post = r.dating_posts;
@@ -956,7 +966,7 @@
                             <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
                         </div>
                         ${post?.body ? `<p style="color:#555; font-size:0.85rem; margin:8px 0; background:#fafafa; padding:8px; border-radius:6px;">${escapeHtml(post.body.slice(0,300))}</p>` : ''}
-                        ${reportedPostImageUrls[r.id] ? `<img src="${escapeHtml(reportedPostImageUrls[r.id])}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
+                        ${post?.image_url ? `<img src="${escapeHtml(post.image_url)}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
                         <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
                         <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
                         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
@@ -1012,27 +1022,9 @@
             const profileMap = {};
             (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
-            // The selfie lives in the PRIVATE dating-verification bucket
-            // (moderators + uploader only) and the profile photo in
-            // dating-profile-photos — both are stored as paths, not public
-            // URLs, so both need signing before an <img> can show them.
-            // This is the actual review step the whole private-storage
-            // migration was for; without it, every request here is
-            // unreviewable.
-            const verificationPhotoUrls = {};
-            await Promise.all(requests.map(async r => {
-                const profile = profileMap[r.user_id];
-                const profilePhotoPath = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
-                const [selfie, profilePhoto] = await Promise.all([
-                    resolvePrivateUrl(BUCKET_VERIFICATION, r.selfie_url),
-                    resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, profilePhotoPath)
-                ]);
-                verificationPhotoUrls[r.id] = { selfie, profilePhoto };
-            }));
-
             container.innerHTML = requests.map(r => {
                 const profile = profileMap[r.user_id];
-                const { selfie, profilePhoto } = verificationPhotoUrls[r.id] || {};
+                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
                 const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
                 return `
                     <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
@@ -1043,9 +1035,7 @@
                         <div style="display:flex; gap:12px; margin:10px 0; flex-wrap:wrap;">
                             <div>
                                 <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Submitted selfie</div>
-                                ${selfie
-                                    ? `<img src="${escapeHtml(selfie)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">`
-                                    : `<div style="width:120px; height:120px; border-radius:8px; border:1px solid #eee; background:#fafafa; display:flex; align-items:center; justify-content:center; color:#bbb; font-size:0.7rem; text-align:center; padding:8px;">Couldn't load selfie</div>`}
+                                <img src="${escapeHtml(r.selfie_url)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
                             </div>
                             ${profilePhoto ? `
                             <div>
@@ -1111,16 +1101,9 @@
 
             const planLabel = { weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly' };
 
-            const platinumPhotoUrls = {};
-            await Promise.all(requests.map(async r => {
-                const profile = profileMap[r.user_id];
-                const path = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
-                platinumPhotoUrls[r.id] = await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, path);
-            }));
-
             container.innerHTML = requests.map(r => {
                 const profile = profileMap[r.user_id];
-                const profilePhoto = platinumPhotoUrls[r.id];
+                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
                 const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
                 return `
                     <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
@@ -1328,19 +1311,10 @@
                 return;
             }
 
-            // Photos are private-bucket paths — resolveSignedUrl caches by
-            // path, so re-filtering (e.g. typing in search) is cheap after
-            // the first render.
-            const memberPhotoUrls = {};
-            await Promise.all(rows.map(async m => {
-                const path = (m.photos && m.photos[0]) || m.photo_url || '';
-                memberPhotoUrls[m.user_id] = await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, path);
-            }));
-
             container.innerHTML = rows.map(m => {
                 const c = m._contact || {};
                 const name = m.display_name || c.full_name || 'Unnamed member';
-                const photo = memberPhotoUrls[m.user_id] || '';
+                const photo = (m.photos && m.photos[0]) || m.photo_url || '';
                 const activePlatinum = platinumActive(m);
                 const accountStatus = m.account_status || m.status || 'active';
                 return `
@@ -1412,8 +1386,7 @@
             }
 
             const name = p?.display_name || c.full_name || 'Unnamed member';
-            const photoPath = (p?.photos && p.photos[0]) || p?.photo_url || '';
-            const photo = await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, photoPath);
+            const photo = (p?.photos && p.photos[0]) || p?.photo_url || '';
             const suspended = String(account.status || 'active').toLowerCase() === 'suspended';
             const activePlatinum = platinumActive(p);
             const openReports = reports.filter(r => String(r.status || '').toLowerCase() === 'open' || String(r.status || '').toLowerCase() === 'pending').length;
@@ -1423,9 +1396,8 @@
                 : `<div class="member-alert success"><strong>Account active.</strong> No current administrative suspension is recorded.</div>`;
 
             const photos = Array.isArray(p?.photos) ? p.photos : [];
-            const resolvedPhotos = await Promise.all(photos.slice(0,8).map(x => resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, x)));
             const photoStrip = photos.length
-                ? `<div class="member-photo-strip">${resolvedPhotos.filter(Boolean).map(x => `<img src="${escapeHtml(x)}" onerror="this.style.display='none'">`).join('')}</div>`
+                ? `<div class="member-photo-strip">${photos.slice(0,8).map(x => `<img src="${escapeHtml(x)}" onerror="this.style.display='none'">`).join('')}</div>`
                 : '<div class="member-note">No additional profile photos.</div>';
 
             const verificationRows = verifications.length ? verifications.map(v => `
@@ -1650,16 +1622,9 @@
             if (!note || note.trim().length < 3) return;
             if (!confirm(`Set this report to ${status}?`)) return;
 
-            // Support common schemas while keeping the action explicit.
-            let result = await _supabase.from('dating_reports').update({
-                status, reviewed_at: new Date().toISOString(), reviewer_note: note.trim()
-            }).eq('id', reportId);
-
-            if (result.error && /reviewer_note/i.test(result.error.message || '')) {
-                result = await _supabase.from('dating_reports').update({
-                    status, reviewed_at: new Date().toISOString()
-                }).eq('id', reportId);
-            }
+            const result = await _supabase.rpc('dating_admin_review_report', {
+                p_report_id: reportId, p_status: status, p_note: note.trim()
+            });
             if (result.error) {
                 alert('Report update failed: ' + result.error.message);
                 return;
@@ -1673,26 +1638,14 @@
             if (!note || note.trim().length < 3) return;
             if (!confirm(`Mark this verification request as ${status}?`)) return;
 
-            let result = await _supabase.from('dating_verification_requests').update({
-                status, reviewed_at: new Date().toISOString(), reviewer_note: note.trim()
-            }).eq('id', requestId);
-
-            if (result.error && /reviewer_note/i.test(result.error.message || '')) {
-                result = await _supabase.from('dating_verification_requests').update({
-                    status, reviewed_at: new Date().toISOString()
-                }).eq('id', requestId);
-            }
+            const result = await _supabase.rpc('dating_admin_review_verification', {
+                p_request_id: requestId, p_status: status, p_note: note.trim()
+            });
             if (result.error) {
                 alert('Verification update failed: ' + result.error.message);
                 return;
             }
 
-            // Keep profile verification state synchronized where the schema supports it.
-            if (_member360UserId) {
-                await _supabase.from('dating_profiles').update({
-                    is_verified: status === 'approved'
-                }).eq('user_id', _member360UserId);
-            }
             await adminAudit(`Verification ${status}`, `Request ID: ${requestId}; note: ${note.trim()}`);
             await openMember360(_member360UserId);
         }
@@ -1728,15 +1681,9 @@
             if (!note || note.trim().length < 3) return;
             if (!confirm(`Mark this Platinum request as ${status}?`)) return;
 
-            let result = await _supabase.from('dating_platinum_requests').update({
-                status, reviewed_at: new Date().toISOString(), reviewer_note: note.trim()
-            }).eq('id', requestId);
-
-            if (result.error && /reviewer_note/i.test(result.error.message || '')) {
-                result = await _supabase.from('dating_platinum_requests').update({
-                    status, reviewed_at: new Date().toISOString()
-                }).eq('id', requestId);
-            }
+            const result = await _supabase.rpc('dating_admin_review_platinum', {
+                p_request_id: requestId, p_status: status, p_note: note.trim()
+            });
             if (result.error) {
                 alert('Platinum review failed: ' + result.error.message);
                 return;
