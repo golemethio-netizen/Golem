@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanaGebya Dating Admin 2.0</title>
+    <title>WanaGebya Dating Admin 2.3 — Safety & Moderation Command Center</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -88,6 +88,60 @@
         .admin-mini-stat strong{display:block;font-size:1.2rem;margin-top:4px;}
         .admin-safety-note{background:#fff8ed;border:1px solid #f5dfb8;border-radius:10px;padding:11px;font-size:.75rem;color:#73500d;margin-bottom:14px;}
 
+
+
+        /* ================= ADMIN 2.3 — SAFETY & MODERATION COMMAND CENTER ================= */
+        .m23-risk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+        .m23-risk-card{background:#fff;border:1px solid var(--admin-border);border-radius:12px;padding:14px;}
+        .m23-risk-card .label{font-size:.67rem;color:#6b7280;text-transform:uppercase;font-weight:800;letter-spacing:.04em;}
+        .m23-risk-card .value{font-size:1.5rem;font-weight:900;margin-top:5px;}
+        .m23-risk-card .hint{font-size:.68rem;color:#9ca3af;margin-top:2px;}
+        .m23-command-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;margin-bottom:14px;}
+        .m23-panel{background:#fff;border:1px solid var(--admin-border);border-radius:13px;padding:16px;box-shadow:0 2px 8px rgba(15,23,42,.03);}
+        .m23-panel h4{margin:0 0 4px;font-size:.92rem;}
+        .m23-sub{font-size:.72rem;color:#6b7280;margin:0 0 12px;}
+        .m23-filters{display:grid;grid-template-columns:1.4fr .7fr .7fr .8fr auto;gap:7px;align-items:center;margin-bottom:12px;}
+        .m23-case{border:1px solid #e5e7eb;border-radius:11px;padding:12px;margin-bottom:8px;background:#fff;}
+        .m23-case:hover{border-color:#d6b0c2;box-shadow:0 3px 10px rgba(15,23,42,.04);}
+        .m23-case-head{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;}
+        .m23-case-title{font-size:.78rem;font-weight:850;}
+        .m23-case-meta{font-size:.66rem;color:#8b94a2;margin-top:3px;}
+        .m23-case-summary{font-size:.7rem;color:#4b5563;margin-top:7px;line-height:1.45;}
+        .m23-case-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;}
+        .m23-severity{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:.61rem;font-weight:900;text-transform:uppercase;}
+        .m23-severity.critical{background:#fde8e8;color:#b42318;}
+        .m23-severity.high{background:#fff0e6;color:#b54708;}
+        .m23-severity.medium{background:#fff8db;color:#8a6200;}
+        .m23-severity.low{background:#eef6ff;color:#2459a6;}
+        .m23-status{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:.61rem;font-weight:900;text-transform:uppercase;background:#f3f4f6;color:#4b5563;}
+        .m23-status.open,.m23-status.investigating{background:#fff3e0;color:#a15c00;}
+        .m23-status.resolved,.m23-status.dismissed{background:#eaf8f0;color:#167344;}
+        .m23-status.escalated{background:#fde8e8;color:#b42318;}
+        .m23-signal{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #f0f1f3;font-size:.71rem;}
+        .m23-signal:last-child{border-bottom:0;}
+        .m23-signal strong{font-size:.72rem;}
+        .m23-signal span{color:#8b94a2;text-align:right;}
+        .m23-action-bar{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+        .m23-timeline{max-height:430px;overflow:auto;display:flex;flex-direction:column;gap:7px;}
+        .m23-timeline-item{border-left:3px solid #d9dde4;background:#fafbfc;border-radius:0 8px 8px 0;padding:8px 10px;}
+        .m23-timeline-item.safety{border-left-color:#d92d20;}
+        .m23-timeline-item.admin{border-left-color:#c2185b;}
+        .m23-timeline-title{font-size:.7rem;font-weight:850;}
+        .m23-timeline-meta{font-size:.61rem;color:#8b94a2;margin-top:2px;}
+        .m23-timeline-detail{font-size:.66rem;color:#4b5563;margin-top:3px;white-space:pre-wrap;}
+        .m23-bulk{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px;margin-bottom:10px;display:none;}
+        .m23-bulk.show{display:block;}
+        .m23-checkbox{width:15px;height:15px;accent-color:#c2185b;}
+        .m23-kicker{font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;font-weight:800;}
+        @media(max-width:900px){
+            .m23-risk-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+            .m23-command-grid{grid-template-columns:1fr;}
+            .m23-filters{grid-template-columns:1fr 1fr;}
+        }
+        @media(max-width:560px){
+            .m23-risk-grid{grid-template-columns:1fr;}
+            .m23-filters{grid-template-columns:1fr;}
+        }
 
         /* ================= ADMIN 2.2 — INLINE MODERATION ================= */
         .m22-action-row{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px;}
@@ -180,7 +234,7 @@
 <body class="admin-v2" style="background: #f5f7fb;">
 
     <header class="golem-header">
-        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.1</span></div>
+        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.3</span></div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
             <button class="signin-btn" onclick="location.href='dating.html'" style="background:#666;">View Dating Site</button>
@@ -194,7 +248,7 @@
         <div class="admin-topline">
             <div>
                 <h1 class="admin-page-title">Dating Operations Center</h1>
-                <p class="admin-page-subtitle">Member 360°, moderation, account controls, verification, payments and date planning in one place.</p>
+                <p class="admin-page-subtitle">Safety & Moderation Command Center — triage incidents, prioritize risk, manage cases and keep every action auditable.</p>
             </div>
             <div class="admin-health"><span class="admin-dot"></span><span>Admin session active</span><strong id="adminLastRefresh">—</strong></div>
         </div>
@@ -205,6 +259,7 @@
                 <button class="admin-btn admin-btn-secondary" onclick="refreshCurrentAdminView()">↻ Refresh</button>
             </div>
             <div class="admin-tab-scroll">
+                <button onclick="switchDatingTab('safety', this)" class="tab-btn"><i class="fas fa-shield-alt"></i> Safety Center <span id="safetyCenterBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('overview', this)" class="tab-btn active"><i class="fas fa-chart-pie"></i> Overview</button>
                 <button onclick="switchDatingTab('reports', this)" class="tab-btn"><i class="fas fa-flag"></i> Reports <span id="reportsBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('profiles', this)" class="tab-btn"><i class="fas fa-users"></i> Profiles</button>
@@ -233,6 +288,7 @@
                         <h4>Moderation Queue</h4>
                         <p class="admin-card-sub">Jump directly to the queues with work waiting.</p>
                         <div class="admin-queue">
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('safety')"><div><strong>Safety Command Center</strong><span>Unified risk & incident triage</span></div><span id="queueSafetyCenter" class="admin-count-pill hot">0</span></button>
                             <button class="admin-queue-btn" onclick="switchDatingTabByName('reports')"><div><strong>Profile reports</strong><span>Safety and abuse reports</span></div><span id="queueReports" class="admin-count-pill hot">0</span></button>
                             <button class="admin-queue-btn" onclick="switchDatingTabByName('postReports')"><div><strong>Post reports</strong><span>Home feed moderation</span></div><span id="queuePostReports" class="admin-count-pill hot">0</span></button>
                             <button class="admin-queue-btn" onclick="switchDatingTabByName('verification')"><div><strong>Verification</strong><span>Review identity selfies</span></div><span id="queueVerification" class="admin-count-pill hot">0</span></button>
@@ -258,6 +314,91 @@
                     <h4>Recent administrator activity</h4>
                     <p class="admin-card-sub">Latest actions recorded in <code>audit_logs</code>.</p>
                     <div id="adminRecentActivity" class="admin-activity"><div class="admin-empty">Loading activity…</div></div>
+                </div>
+            </section>
+
+
+            <!-- ADMIN 2.3 — SAFETY & MODERATION COMMAND CENTER -->
+            <section id="safetyCenterSection" class="admin-section" style="display:none;padding:20px;">
+                <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px;">
+                    <div>
+                        <div class="m23-kicker">Admin 2.3</div>
+                        <h3 style="margin:3px 0 4px;"><i class="fas fa-shield-alt" style="color:#c2185b;"></i> Safety & Moderation Command Center</h3>
+                        <p class="admin-card-sub" style="margin:0;">One operational view for active safety risk, incidents, moderation cases and administrator actions.</p>
+                    </div>
+                    <div class="m23-action-bar" style="margin-top:0;">
+                        <button class="admin-btn admin-btn-secondary" onclick="loadSafetyCenter(true)">↻ Refresh</button>
+                        <button class="admin-btn admin-btn-primary" onclick="createSafetyCasePrompt()">+ New Safety Case</button>
+                    </div>
+                </div>
+
+                <div class="m23-risk-grid">
+                    <div class="m23-risk-card"><div class="label">Critical / high</div><div id="m23CriticalHigh" class="value">—</div><div class="hint">Open safety cases</div></div>
+                    <div class="m23-risk-card"><div class="label">Open reports</div><div id="m23OpenReports" class="value">—</div><div class="hint">Profile + post reports</div></div>
+                    <div class="m23-risk-card"><div class="label">Pending identity</div><div id="m23PendingVerification" class="value">—</div><div class="hint">Verification queue</div></div>
+                    <div class="m23-risk-card"><div class="label">Safety date plans</div><div id="m23DatePlansRisk" class="value">—</div><div class="hint">Pending / upcoming</div></div>
+                </div>
+
+                <div class="m23-command-grid">
+                    <div class="m23-panel">
+                        <h4>Incident & Case Queue</h4>
+                        <p class="m23-sub">Triage the highest-risk work first. Cases are separate from raw reports so an investigation can contain multiple signals.</p>
+                        <div class="m23-filters">
+                            <input id="m23CaseSearch" class="admin-input" placeholder="Search case, member, source…" oninput="renderSafetyCases()">
+                            <select id="m23CaseStatus" class="admin-select" onchange="renderSafetyCases()">
+                                <option value="open">Open</option><option value="investigating">Investigating</option>
+                                <option value="escalated">Escalated</option><option value="resolved">Resolved</option>
+                                <option value="dismissed">Dismissed</option><option value="all">All</option>
+                            </select>
+                            <select id="m23CaseSeverity" class="admin-select" onchange="renderSafetyCases()">
+                                <option value="all">All severity</option><option value="critical">Critical</option>
+                                <option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
+                            </select>
+                            <select id="m23CaseSort" class="admin-select" onchange="renderSafetyCases()">
+                                <option value="risk">Risk first</option><option value="newest">Newest</option>
+                            </select>
+                            <button class="admin-btn admin-btn-secondary" onclick="toggleSafetyBulk()">Bulk</button>
+                        </div>
+                        <div id="m23BulkBar" class="m23-bulk">
+                            <strong style="font-size:.73rem;">Bulk moderation</strong>
+                            <div style="font-size:.67rem;color:#6b7280;margin:3px 0 7px;">Select cases below, then assign a common status. Every bulk operation is logged.</div>
+                            <div class="m23-action-bar">
+                                <select id="m23BulkStatus" class="admin-select">
+                                    <option value="investigating">Investigating</option><option value="escalated">Escalated</option>
+                                    <option value="resolved">Resolved</option><option value="dismissed">Dismissed</option>
+                                </select>
+                                <button class="admin-btn admin-btn-primary" onclick="bulkUpdateSafetyCases()">Apply to selected</button>
+                            </div>
+                        </div>
+                        <div id="m23CaseList"><div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading safety queue…</div></div>
+                    </div>
+
+                    <div class="m23-panel">
+                        <h4>Live Risk Signals</h4>
+                        <p class="m23-sub">Signals are calculated from the existing dating moderation tables. They are prioritization aids, not automatic guilt findings.</p>
+                        <div id="m23Signals"><div class="admin-empty">Loading signals…</div></div>
+                    </div>
+                </div>
+
+                <div class="m23-command-grid">
+                    <div class="m23-panel">
+                        <h4>Safety Actions & Escalations</h4>
+                        <p class="m23-sub">Recent moderator actions recorded against safety cases.</p>
+                        <div id="m23SafetyActions" class="m23-timeline"><div class="admin-empty">Loading safety activity…</div></div>
+                    </div>
+                    <div class="m23-panel">
+                        <h4>Moderator Operating Standard</h4>
+                        <div class="admin-safety-note">
+                            <strong>Risk ≠ guilt.</strong> Use signals to prioritize review, inspect evidence, document the decision, and escalate credible threats.
+                        </div>
+                        <div style="font-size:.72rem;color:#4b5563;line-height:1.7;">
+                            1. Preserve the report/evidence.<br>
+                            2. Review related reports, blocks, verification and interactions.<br>
+                            3. Contact no reporter or subject outside approved workflows.<br>
+                            4. Apply the least restrictive safety action that addresses the risk.<br>
+                            5. Record the reason and resolution in the audit trail.
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -414,6 +555,7 @@
         // ---------- Sub-nav (local to this page; no other admin areas exist here) ----------
         const DATING_SECTIONS = {
             overview: 'adminOverviewSection',
+            safety: 'safetyCenterSection',
             reports: 'datingReportsSection',
             profiles: 'datingProfilesSection',
             members: 'memberManagementSection',
@@ -440,6 +582,7 @@
             if (btn) btn.classList.add('active');
 
             if (tab === 'overview') loadAdminOverview();
+            if (tab === 'safety') loadSafetyCenter();
             if (tab === 'reports') loadDatingReports();
             if (tab === 'profiles') loadDatingProfiles();
             if (tab === 'members') loadMemberDirectory();
@@ -461,6 +604,7 @@
             const match = active?.getAttribute('onclick')?.match(/'([^']+)'/);
             const tab = match?.[1] || 'overview';
             if (tab === 'overview') loadAdminOverview();
+            else if (tab === 'safety') loadSafetyCenter(true);
             else if (tab === 'reports') loadDatingReports();
             else if (tab === 'profiles') loadDatingProfiles(true);
             else if (tab === 'members') loadMemberDirectory(true);
@@ -550,6 +694,18 @@
                     const vals=[openReports,openPostReports,pendingVerifications,pendingPlatinum,pendingDatePlans];
                     const el=document.getElementById(id); if(el) el.textContent=vals[i] ?? 0;
                 });
+            try {
+                const [c,r,p] = await Promise.all([
+                    _supabase.from('dating_moderation_cases').select('severity,status'),
+                    _supabase.from('dating_reports').select('status'),
+                    _supabase.from('dating_post_reports').select('status')
+                ]);
+                const n=(c.data||[]).filter(x=>['critical','high'].includes(String(x.severity||'').toLowerCase()) && ['open','investigating','escalated'].includes(String(x.status||'').toLowerCase())).length
+                    +(r.data||[]).filter(x=>['open','pending','new'].includes(String(x.status||'').toLowerCase())).length
+                    +(p.data||[]).filter(x=>['open','pending','new'].includes(String(x.status||'').toLowerCase())).length;
+                const q=document.getElementById('queueSafetyCenter'); if(q) q.textContent=n;
+                const b=document.getElementById('safetyCenterBadge'); if(b){b.textContent=n;b.style.display=n?'inline-block':'none';}
+            } catch (_) {}
         }
 
         // Every function below calls refreshDatingBadges() wherever the main
@@ -1556,6 +1712,197 @@
             }
             await adminAudit('Date Plan Terminated', `Plan ID: ${planId}; reason: ${reason.trim()}`);
             await openMember360(_member360UserId);
+        }
+
+
+
+        // ============================================================
+        // ADMIN 2.3 — SAFETY & MODERATION COMMAND CENTER
+        // ============================================================
+        let _m23Cases = [];
+        let _m23SafetyActions = [];
+        let _m23BulkMode = false;
+
+        function m23RiskRank(s) {
+            return ({critical:4, high:3, medium:2, low:1})[String(s||'medium').toLowerCase()] || 2;
+        }
+
+        function m23CaseStatusChip(status) {
+            return `<span class="m23-status ${escapeHtml(String(status||'open').toLowerCase())}">${escapeHtml(status||'open')}</span>`;
+        }
+
+        function m23SeverityChip(severity) {
+            const s=String(severity||'medium').toLowerCase();
+            return `<span class="m23-severity ${escapeHtml(s)}">${escapeHtml(s)}</span>`;
+        }
+
+        function toggleSafetyBulk() {
+            _m23BulkMode=!_m23BulkMode;
+            const bar=document.getElementById('m23BulkBar');
+            if(bar) bar.classList.toggle('show',_m23BulkMode);
+            renderSafetyCases();
+        }
+
+        async function loadSafetyCenter(forceRefresh=false) {
+            const caseBox=document.getElementById('m23CaseList');
+            if(!caseBox) return;
+            caseBox.innerHTML='<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading safety command center…</div>';
+
+            const [casesRes, actionsRes, reportsRes, postRes, verRes, datesRes, blocksRes] = await Promise.all([
+                _supabase.from('dating_moderation_cases').select('*').order('created_at',{ascending:false}).limit(500),
+                _supabase.from('dating_safety_actions').select('*').order('created_at',{ascending:false}).limit(120),
+                _supabase.from('dating_reports').select('*').order('created_at',{ascending:false}).limit(1000),
+                _supabase.from('dating_post_reports').select('*').order('created_at',{ascending:false}).limit(1000),
+                _supabase.from('dating_verification_requests').select('*').order('created_at',{ascending:false}).limit(500),
+                _supabase.from('dating_date_plans').select('*').order('date_on',{ascending:true}).limit(500),
+                _supabase.from('dating_blocks').select('*').order('created_at',{ascending:false}).limit(1000)
+            ]);
+
+            if(casesRes.error) {
+                caseBox.innerHTML=`<div class="admin-empty" style="color:#b42318;">
+                    Safety case storage is not installed or is unavailable.<br>
+                    <small>${escapeHtml(casesRes.error.message)}</small><br><br>
+                    <button class="admin-btn admin-btn-primary" onclick="alert('Run wana-dating-admin-2.3-migration.sql in Supabase SQL Editor, then refresh this page.')">Show setup instruction</button>
+                </div>`;
+            } else {
+                _m23Cases=casesRes.data||[];
+            }
+            _m23SafetyActions=actionsRes.error?[]:(actionsRes.data||[]);
+
+            const openCount = (rows) => (rows||[]).filter(r=>['open','pending','submitted','new'].includes(String(r.status||'').toLowerCase())).length;
+            const criticalHigh=_m23Cases.filter(c=>['critical','high'].includes(String(c.severity||'').toLowerCase()) && ['open','investigating','escalated'].includes(String(c.status||'').toLowerCase())).length;
+            const openReports=openCount(reportsRes.data)+openCount(postRes.data);
+            const pendingVer=openCount(verRes.data);
+            const today=new Date().toISOString().slice(0,10);
+            const safetyDates=(datesRes.data||[]).filter(r=>['pending','accepted'].includes(String(r.status||'').toLowerCase()) && String(r.date_on||'')>=today).length;
+
+            const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+            set('m23CriticalHigh',criticalHigh);
+            set('m23OpenReports',openReports);
+            set('m23PendingVerification',pendingVer);
+            set('m23DatePlansRisk',safetyDates);
+            const badge=document.getElementById('safetyCenterBadge');
+            if(badge){badge.textContent=criticalHigh+openReports;badge.style.display=(criticalHigh+openReports)?'inline-block':'none';}
+
+            renderSafetyCases();
+            renderSafetySignals(reportsRes.data||[],postRes.data||[],verRes.data||[],datesRes.data||[],blocksRes.data||[]);
+            renderSafetyActions();
+        }
+
+        function renderSafetyCases() {
+            const box=document.getElementById('m23CaseList');
+            if(!box)return;
+            const q=(document.getElementById('m23CaseSearch')?.value||'').trim().toLowerCase();
+            const status=document.getElementById('m23CaseStatus')?.value||'open';
+            const severity=document.getElementById('m23CaseSeverity')?.value||'all';
+            const sort=document.getElementById('m23CaseSort')?.value||'risk';
+
+            let rows=_m23Cases.filter(c=>{
+                const hay=[c.title,c.summary,c.source_type,c.source_id,c.subject_user_id,c.case_number].some(v=>String(v||'').toLowerCase().includes(q));
+                return (!q||hay) && (status==='all'||String(c.status||'open').toLowerCase()===status) && (severity==='all'||String(c.severity||'medium').toLowerCase()===severity);
+            });
+            rows.sort((a,b)=>{
+                if(sort==='risk') return m23RiskRank(b.severity)-m23RiskRank(a.severity) || new Date(b.created_at||0)-new Date(a.created_at||0);
+                return new Date(b.created_at||0)-new Date(a.created_at||0);
+            });
+            if(!rows.length){box.innerHTML='<div class="admin-empty">No safety cases match the current queue filters.</div>';return;}
+
+            box.innerHTML=rows.map(c=>{
+                const id=escapeHtml(c.id||'');
+                const checked=_m23BulkMode?'':'style="display:none"';
+                const subject=escapeHtml(c.subject_user_id||'Unknown member');
+                return `<article class="m23-case">
+                    <div class="m23-case-head">
+                        <div style="display:flex;gap:7px;align-items:flex-start;">
+                            ${_m23BulkMode?`<input class="m23-checkbox" type="checkbox" data-m23-case="${id}">`:''}
+                            <div>
+                                <div class="m23-case-title">${escapeHtml(c.title||'Safety case')}</div>
+                                <div class="m23-case-meta">Case ${escapeHtml(c.case_number||String(c.id||'').slice(0,8))} · member ${subject} · ${escapeHtml(c.source_type||'manual')}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">${m23SeverityChip(c.severity)} ${m23CaseStatusChip(c.status)}</div>
+                    </div>
+                    <div class="m23-case-summary">${escapeHtml(c.summary||'No case summary recorded.')}</div>
+                    <div class="m23-case-actions">
+                        <button class="m22-btn m22-btn-primary" onclick="openMember360('${escapeHtml(c.subject_user_id||'')}')"><i class="fas fa-id-card"></i> Member 360°</button>
+                        <button class="m22-btn" onclick="updateSafetyCasePrompt('${id}','investigating')">Investigate</button>
+                        <button class="m22-btn m22-btn-danger" onclick="updateSafetyCasePrompt('${id}','escalated')">Escalate</button>
+                        <button class="m22-btn m22-btn-success" onclick="updateSafetyCasePrompt('${id}','resolved')">Resolve</button>
+                        <button class="m22-btn" onclick="updateSafetyCasePrompt('${id}','dismissed')">Dismiss</button>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        function renderSafetySignals(reports,postReports,verification,datePlans,blocks) {
+            const box=document.getElementById('m23Signals'); if(!box)return;
+            const counts={};
+            const add=(label,note,value)=>counts[label]={note,value};
+            add('Open profile reports','Require triage',reports.filter(r=>['open','pending','new'].includes(String(r.status||'').toLowerCase())).length);
+            add('Open post reports','Feed/content safety',postReports.filter(r=>['open','pending','new'].includes(String(r.status||'').toLowerCase())).length);
+            add('Pending verification','Identity evidence',verification.filter(r=>['open','pending','submitted','new'].includes(String(r.status||'').toLowerCase())).length);
+            add('Recent blocks','Last loaded block records',blocks.length);
+            add('Pending / accepted dates','Member meetup monitoring',datePlans.filter(r=>['pending','accepted'].includes(String(r.status||'').toLowerCase()) && String(r.date_on||'')>=new Date().toISOString().slice(0,10)).length);
+            box.innerHTML=Object.entries(counts).map(([k,v])=>`<div class="m23-signal"><strong>${escapeHtml(k)}</strong><span>${escapeHtml(String(v.value))}<br>${escapeHtml(v.note)}</span></div>`).join('');
+        }
+
+        function renderSafetyActions() {
+            const box=document.getElementById('m23SafetyActions'); if(!box)return;
+            if(!_m23SafetyActions.length){box.innerHTML='<div class="admin-empty">No recorded safety actions yet.</div>';return;}
+            box.innerHTML=_m23SafetyActions.slice(0,80).map(a=>`<div class="m23-timeline-item safety">
+                <div class="m23-timeline-title">${escapeHtml(a.action_type||'Safety action')}</div>
+                <div class="m23-timeline-meta">${escapeHtml(a.created_at?new Date(a.created_at).toLocaleString():'—')} · member ${escapeHtml(a.subject_user_id||'—')}</div>
+                <div class="m23-timeline-detail">${escapeHtml(a.reason||'No reason recorded.')}${a.duration_until?' · until '+escapeHtml(new Date(a.duration_until).toLocaleString()):''}</div>
+            </div>`).join('');
+        }
+
+        async function createSafetyCasePrompt() {
+            const subject=prompt('Member UUID (required):');
+            if(!subject||subject.trim().length<10)return;
+            const title=prompt('Case title (required):');
+            if(!title||title.trim().length<3)return;
+            const summary=prompt('Incident summary (required):');
+            if(!summary||summary.trim().length<3)return;
+            const severity=prompt('Severity: critical / high / medium / low','high')||'medium';
+            if(!['critical','high','medium','low'].includes(severity.toLowerCase())){alert('Invalid severity.');return;}
+            const {data,error}=await _supabase.rpc('dating_admin_create_safety_case',{
+                p_subject_user_id:subject.trim(),p_title:title.trim(),p_summary:summary.trim(),p_severity:severity.toLowerCase(),
+                p_source_type:'manual',p_source_id:null
+            });
+            if(error){alert('Could not create safety case: '+error.message);return;}
+            await adminAudit('Safety Case Created',`Case ID: ${data}; severity: ${severity}; title: ${title}`);
+            await loadSafetyCenter(true);
+        }
+
+        async function updateSafetyCasePrompt(caseId,status) {
+            const reason=prompt(`${status.charAt(0).toUpperCase()+status.slice(1)} reason (required):`);
+            if(!reason||reason.trim().length<3)return;
+            let assigned=null;
+            if(status==='investigating'||status==='escalated'){
+                assigned=currentAdminEmail||null;
+            }
+            const {error}=await _supabase.rpc('dating_admin_update_safety_case',{
+                p_case_id:caseId,p_status:status,p_resolution:reason.trim(),p_assigned_admin:assigned
+            });
+            if(error){alert('Case update failed: '+error.message);return;}
+            await loadSafetyCenter(true);
+        }
+
+        async function bulkUpdateSafetyCases() {
+            const ids=[...document.querySelectorAll('[data-m23-case]:checked')].map(e=>e.getAttribute('data-m23-case')).filter(Boolean);
+            const status=document.getElementById('m23BulkStatus')?.value;
+            if(!ids.length){alert('Select at least one case.');return;}
+            const reason=prompt(`Bulk ${status} reason (required):`);
+            if(!reason||reason.trim().length<3)return;
+            if(!confirm(`Apply ${status} to ${ids.length} case(s)?`))return;
+            for(const id of ids){
+                const {error}=await _supabase.rpc('dating_admin_update_safety_case',{
+                    p_case_id:id,p_status:status,p_resolution:reason.trim(),p_assigned_admin:currentAdminEmail||null
+                });
+                if(error){alert('One case failed: '+error.message);break;}
+            }
+            await adminAudit('Bulk Safety Case Update',`Status: ${status}; cases: ${ids.length}; reason: ${reason.trim()}`);
+            await loadSafetyCenter(true);
         }
 
 
