@@ -1850,6 +1850,32 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
   .wana-right-match-rail{display:none!important}
 }
 </style>
+
+<style id="wana-seven-feature-layer">
+.compat-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 20px}
+.compat-stat{background:linear-gradient(135deg,#f4fbf8,#fff);border:1px solid #dcefe8;border-radius:16px;padding:16px}
+.compat-stat strong{display:block;font-size:1.45rem;color:#087a57}
+.compat-stat span{font-size:.76rem;color:#77808c}
+.compat-card{position:relative}
+.compat-score{position:absolute;top:12px;right:12px;background:#e9f8f2;color:#087a57;border:1px solid #ccecdf;border-radius:999px;padding:6px 9px;font-size:.72rem;font-weight:800;z-index:2}
+.compat-reasons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.compat-reason{font-size:.68rem;background:#f5f7fa;color:#586170;border-radius:999px;padding:4px 7px}
+.verified-badge{display:inline-flex;align-items:center;gap:3px;background:#e9f8f2;color:#087a57;border-radius:999px;padding:3px 7px;font-size:.68rem;font-weight:800;margin-left:5px}
+.feature-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.feature-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;box-shadow:0 5px 18px rgba(17,24,39,.04)}
+.feature-card-icon{width:42px;height:42px;border-radius:13px;background:#eff8f5;display:grid;place-items:center;font-size:1.2rem}
+.feature-card h3{font-size:.98rem;margin:0 0 4px}
+.feature-card p{font-size:.78rem;color:#707987;line-height:1.5;margin:0}
+.feature-action{grid-column:1/-1;border:0;border-radius:10px;background:var(--green);color:#fff;padding:10px 14px;font-weight:800;cursor:pointer}
+.feature-action.danger{background:#fff;color:var(--danger);border:1px solid #f2b7ba}
+.feature-status{grid-column:1/-1;font-size:.76rem;color:#68717e}
+.safety-tips{margin-top:16px;background:#fff9ee;border:1px solid #fce3b4;border-radius:14px;padding:14px 16px;display:flex;gap:10px;flex-direction:column;color:#705b28;font-size:.82rem}
+@media(max-width:700px){
+  .compat-summary{grid-template-columns:1fr 1fr}
+  .feature-cards{grid-template-columns:1fr}
+}
+@media(max-width:420px){.compat-summary{grid-template-columns:1fr}.compat-stat{padding:13px}}
+</style>
 </head>
 <body>
 <header>
@@ -1880,6 +1906,8 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
 <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
 <div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
+<div class="tab" data-tab="compatibility" onclick="switchTab('compatibility')"><span class="side-icon">❤️</span> Compatibility</div>
+<div class="tab" data-tab="safety" onclick="switchTab('safety')"><span class="side-icon">🛡️</span> Safety Center</div>
 <div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
 <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
 </nav>
@@ -2195,7 +2223,50 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 </div>
 <div class="grid" id="visitorsGrid"></div>
 <div class="empty" id="visitorsEmpty" style="display:none;">No one has viewed your profile yet.</div>
-</div><div class="panel" id="myProfilePanel" style="display:none;">
+</div>
+<div class="panel" id="compatibilityPanel" style="display:none;">
+  <div class="browse-header">
+    <h2>Your <span>Compatibility</span> ❤️</h2>
+    <p>See why each recommendation may be a good fit based on your relationship goals, lifestyle, family plans and preferences.</p>
+  </div>
+  <div id="compatibilitySummary" class="compat-summary"></div>
+  <div class="grid" id="compatibilityGrid"></div>
+  <div class="empty" id="compatibilityEmpty" style="display:none;">Complete your dating profile to unlock personalized compatibility scores.</div>
+</div>
+<div class="panel" id="safetyPanel" style="display:none;">
+  <div class="browse-header">
+    <h2>Safety & <span>Trust Center</span> 🛡️</h2>
+    <p>Verify your profile, control notifications, report concerns and keep your dating experience safer.</p>
+  </div>
+  <div class="feature-cards">
+    <div class="feature-card">
+      <div class="feature-card-icon">🛡️</div>
+      <div><h3>Profile verification</h3><p>Submit a private selfie for moderator review and show a verified badge on your profile.</p></div>
+      <button class="feature-action" onclick="openVerificationModal()">Verify profile</button>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-icon">🚩</div>
+      <div><h3>Report & block</h3><p>If someone behaves abusively, scams, harasses or violates community rules, report the profile and block them.</p></div>
+      <button class="feature-action danger" onclick="openSafetyReportGuide()">Report a concern</button>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-icon">🔔</div>
+      <div><h3>Push notifications</h3><p>Get browser notifications for important dating activity. Permission is always controlled by you.</p></div>
+      <button class="feature-action" id="pushEnableBtn" onclick="enableWanaNotifications()">Enable notifications</button>
+      <div id="pushStatus" class="feature-status"></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-icon">🇪🇹</div>
+      <div><h3>Amharic</h3><p>Switch the Wana Dating interface between English and Amharic from the language control above.</p></div>
+      <button class="feature-action" onclick="toggleLang()">አማ / EN</button>
+    </div>
+  </div>
+  <div class="safety-tips">
+    <strong>Dating safety reminders</strong>
+    <span>Never send passwords, verification codes or money to another member. Meet in a public place and tell someone you trust where you are going.</span>
+  </div>
+</div>
+<div class="panel" id="myProfilePanel" style="display:none;">
 <div id="myProfileContent"></div>
 </div><div class="panel" id="settingsPanel" style="display:none;">
 <div class="browse-header">
@@ -5780,6 +5851,273 @@ function homeRecommendationScore(me,r){
   };
 
   console.info("Wana Dating maintenance patch loaded.");
+})();
+</script>
+
+<script id="wana-seven-feature-engine">
+(function(){
+  "use strict";
+
+  const extraPanels = ["compatibilityPanel","safetyPanel"];
+  const originalSwitchTab = window.switchTab;
+  const originalToggleLang = window.toggleLang;
+
+  function esc7(v){
+    return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  function norm7(v){ return String(v||"").trim().toLowerCase(); }
+
+  function compatibilityScore(me, p){
+    if(!me || !p) return {score:0,reasons:[]};
+    let score=0, reasons=[];
+    const add=(n,reason)=>{score+=n; if(reason && !reasons.includes(reason)) reasons.push(reason);};
+
+    if(norm7(me.relationship_type) && norm7(me.relationship_type)===norm7(p.relationship_type))
+      add(20,"Same relationship goal");
+    if(norm7(me.looking_for) && norm7(me.looking_for)===norm7(p.looking_for))
+      add(15,"Similar relationship preference");
+    if(norm7(me.lifestyle) && norm7(me.lifestyle)===norm7(p.lifestyle))
+      add(15,"Similar lifestyle");
+    if(norm7(me.religion) && norm7(me.religion)!=="prefer not to say" && norm7(me.religion)===norm7(p.religion))
+      add(10,"Shared faith");
+    if(norm7(me.has_kids) && norm7(me.has_kids)===norm7(p.has_kids))
+      add(7,"Similar family situation");
+    if(norm7(me.wants_kids) && norm7(me.wants_kids)===norm7(p.wants_kids))
+      add(10,"Similar family plans");
+    if(me.city && p.city && norm7(me.city)===norm7(p.city))
+      add(8,"Same city");
+    const min=Number(me.age_min), max=Number(me.age_max), age=Number(p.age);
+    if(Number.isFinite(age) && Number.isFinite(min) && Number.isFinite(max) && age>=min && age<=max)
+      add(8,"Fits your age preference");
+    const pmin=Number(p.age_min), pmax=Number(p.age_max), myAge=Number(me.age);
+    if(Number.isFinite(myAge) && Number.isFinite(pmin) && Number.isFinite(pmax) && myAge>=pmin && myAge<=pmax)
+      add(7,"You fit their age preference");
+
+    return {score:Math.min(99,score),reasons:reasons.slice(0,4)};
+  }
+
+  function verifiedBadge7(p){
+    return p && p.is_verified ? '<span class="verified-badge" title="Profile verified">✓ Verified</span>' : '';
+  }
+
+  function compatibilityCard7(p, result){
+    const photo=(p.photos&&p.photos[0])||p.photo_url||"";
+    const card=document.createElement("div");
+    card.className="card compat-card";
+    card.innerHTML=`
+      <div class="compat-score">❤️ ${result.score}% match</div>
+      <div class="photo">${photo ? `<img src="${esc7(photo)}" alt="" style="width:100%;height:100%;object-fit:cover;">` : "👤"}
+        ${p.is_verified?'<span style="position:absolute;left:10px;bottom:10px" class="verified-badge">✓ Verified</span>':""}
+      </div>
+      <div class="info">
+        <div class="name-age">${esc7(p.display_name||"Someone")} <span class="age">${p.age?esc7(p.age):""}</span>${verifiedBadge7(p)}</div>
+        <div class="meta">${esc7(p.city||"Ethiopia")} · ${esc7(p.relationship_type||"Dating")}</div>
+        <div class="compat-reasons">${result.reasons.map(r=>`<span class="compat-reason">${esc7(r)}</span>`).join("")}</div>
+      </div>`;
+    card.addEventListener("click",()=>window.openModal && window.openModal(p));
+    return card;
+  }
+
+  async function loadCompatibility(){
+    const grid=document.getElementById("compatibilityGrid");
+    const empty=document.getElementById("compatibilityEmpty");
+    const summary=document.getElementById("compatibilitySummary");
+    if(!grid || !currentUser) return;
+    grid.innerHTML='<div class="empty">Finding your strongest matches…</div>';
+    try{
+      let me=myProfile;
+      if(!me && _supabase){
+        const r=await _supabase.from("dating_profiles").select("*").eq("user_id",currentUser.id).maybeSingle();
+        me=r.data||null;
+      }
+      if(!me){
+        grid.innerHTML="";
+        empty.style.display="block";
+        summary.innerHTML="";
+        return;
+      }
+      const blocked=typeof window.fetchBlockedIds==="function" ? await window.fetchBlockedIds() : new Set();
+      const r=await _supabase.from("dating_profiles").select("*").neq("user_id",currentUser.id).limit(120);
+      if(r.error) throw r.error;
+      const rows=(r.data||[]).filter(p=>!blocked.has(p.user_id)).map(p=>({p,...compatibilityScore(me,p)}))
+        .filter(x=>x.score>=25).sort((a,b)=>b.score-a.score).slice(0,12);
+      grid.innerHTML="";
+      if(!rows.length){
+        empty.style.display="block";
+        summary.innerHTML="";
+        return;
+      }
+      empty.style.display="none";
+      const avg=Math.round(rows.reduce((a,x)=>a+x.score,0)/rows.length);
+      const verified=rows.filter(x=>x.p.is_verified).length;
+      summary.innerHTML=`
+        <div class="compat-stat"><strong>${avg}%</strong><span>Average compatibility</span></div>
+        <div class="compat-stat"><strong>${rows.length}</strong><span>Strong matches found</span></div>
+        <div class="compat-stat"><strong>${verified}</strong><span>Verified matches</span></div>`;
+      rows.forEach(x=>grid.appendChild(compatibilityCard7(x.p,x)));
+    }catch(err){
+      console.warn("Compatibility:",err);
+      grid.innerHTML='<div class="msg error">Compatibility recommendations are temporarily unavailable.</div>';
+    }
+  }
+
+  function openSafetyReportGuide(){
+    const root=document.getElementById("modalRoot");
+    if(!root) return;
+    root.innerHTML=`
+      <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+        <div class="modal" style="max-width:460px">
+          <div class="body">
+            <button class="btn-close" onclick="closeModal()">✕</button>
+            <h3>Report or block safely</h3>
+            <p class="bio" style="margin-top:10px">Open the member's profile, choose <b>Report</b> for a specific concern, or <b>Block</b> if you do not want further contact. Serious threats or emergencies should be reported to the appropriate local authorities.</p>
+            <div class="actions">
+              <button class="btn-contact" onclick="closeModal();switchTab('browse')">Browse profiles</button>
+              <button class="btn-report" onclick="closeModal()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+  window.openSafetyReportGuide=openSafetyReportGuide;
+
+  async function enableWanaNotifications(){
+    const status=document.getElementById("pushStatus");
+    const btn=document.getElementById("pushEnableBtn");
+    if(!("Notification" in window)){
+      if(status) status.textContent="This browser does not support notifications.";
+      return;
+    }
+    try{
+      const permission=await Notification.requestPermission();
+      if(permission!=="granted"){
+        if(status) status.textContent="Notifications are blocked or were not allowed.";
+        return;
+      }
+      localStorage.setItem("wana_notifications_enabled","1");
+      if(btn) btn.textContent="✓ Notifications enabled";
+      if(status) status.textContent="Browser notifications are enabled for this device.";
+      new Notification("Wana Dating ❤️",{body:"Notifications are now enabled."});
+      // If a same-origin service worker is available, register it so a later
+      // VAPID push subscription can be added without changing this page.
+      if("serviceWorker" in navigator){
+        try{ await navigator.serviceWorker.register("dating-sw.js",{scope:"./"}); }catch(e){ console.info("Push worker unavailable:",e); }
+      }
+    }catch(e){
+      if(status) status.textContent="Could not enable notifications on this device.";
+    }
+  }
+  window.enableWanaNotifications=enableWanaNotifications;
+
+  function pushState(){
+    const btn=document.getElementById("pushEnableBtn"), status=document.getElementById("pushStatus");
+    if(!btn) return;
+    if(localStorage.getItem("wana_notifications_enabled")==="1" && "Notification" in window && Notification.permission==="granted"){
+      btn.textContent="✓ Notifications enabled";
+      if(status) status.textContent="Browser notifications are enabled for this device.";
+    }
+  }
+
+  const translations={
+    "Home":"መነሻ","Browse Matches":"ተስማሚ ግጥሚያዎች","New Members":"አዲስ አባላት",
+    "Setup Profile":"መገለጫ ያዘጋጁ","Messages":"መልዕክቶች","Likes":"የወደዱዎት",
+    "Visitors":"ጎብኚዎች","My Account":"የእኔ መለያ","Privacy Settings":"የግላዊነት ቅንብሮች",
+    "Compatibility":"ተኳሃኝነት","Safety Center":"የደህንነት ማዕከል",
+    "Find Singles":"ነጠላ ሰዎችን ያግኙ","Online":"በመስመር ላይ","Notifications":"ማሳወቂያዎች",
+    "Mark all read":"ሁሉንም እንደተነበቡ ምልክት ያድርጉ","People Who":"ሰዎች እንደወደዱዎት",
+    "Who":"ማን","Viewed You":"መገለጫዎን የተመለከቱ","Your":"የእርስዎ",
+    "Messages":"መልዕክቶች","Privacy":"ግላዊነት","Settings":"ቅንብሮች",
+    "Safety &":"ደህንነት እና","Trust Center":"የመተማመን ማዕከል",
+    "Profile verification":"የመገለጫ ማረጋገጫ","Report & block":"ሪፖርት እና ማገድ",
+    "Push notifications":"የማሳወቂያ ማስታወቂያዎች","Amharic":"አማርኛ",
+    "Enable notifications":"ማሳወቂያዎችን አንቃ","Report a concern":"ችግር ሪፖርት ያድርጉ",
+    "Verify profile":"መገለጫ አረጋግጥ","Complete your profile":"መገለጫዎን ያጠናቁ",
+    "Filter Results":"ውጤቶችን አጣራ","Clear filters":"ማጣሪያዎችን አጽዳ",
+    "Load More Profiles":"ተጨማሪ መገለጫዎችን ጫን","Edit Profile":"መገለጫ አርትዕ",
+    "Privacy Settings":"የግላዊነት ቅንብሮች","Sign In":"ግባ","Sign Out":"ውጣ",
+    "Back to Shop":"ወደ ሱቅ ተመለስ"
+  };
+
+  function applyAmharic(){
+    document.documentElement.lang="am";
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    let node;
+    while(node=walker.nextNode()){
+      if(node.parentElement && ["SCRIPT","STYLE"].includes(node.parentElement.tagName)) continue;
+      const raw=node.nodeValue.trim();
+      if(!raw) continue;
+      if(translations[raw]) node.nodeValue=node.nodeValue.replace(raw,translations[raw]);
+    }
+    document.querySelectorAll("input[placeholder],textarea[placeholder],button,title").forEach(el=>{
+      const v=el.getAttribute("placeholder")||el.textContent||"";
+      if(translations[v]){
+        if(el.hasAttribute("placeholder")) el.setAttribute("placeholder",translations[v]);
+        else if(el.tagName==="TITLE") el.textContent=translations[v];
+      }
+    });
+  }
+
+  function restoreEnglish(){
+    // Reloading is intentionally avoided; static labels are restored from
+    // data-en labels below. Dynamic content remains English until next render.
+    document.querySelectorAll("[data-en]").forEach(el=>el.textContent=el.dataset.en);
+    document.documentElement.lang="en";
+  }
+
+  function localizeCurrent(){
+    const btn=document.getElementById("langBtn");
+    if(!btn) return;
+    if(currentLang==="am") applyAmharic(); else restoreEnglish();
+  }
+
+  // Preserve the existing language toggle behavior and extend it.
+  window.toggleLang=function(){
+    if(typeof originalToggleLang==="function") originalToggleLang();
+    else window.currentLang = window.currentLang==="am" ? "en" : "am";
+    localizeCurrent();
+  };
+
+  // Existing switchTab handles all original panels. We add the two new main-area panels.
+  window.switchTab=function(tab){
+    if(tab==="compatibility" || tab==="safety"){
+      if(!currentUser){
+        const gate=document.getElementById("gate"); if(gate) gate.style.display="flex";
+        return;
+      }
+      document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
+      document.querySelectorAll(".side-nav .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tab));
+      const gate=document.getElementById("gate"); if(gate) gate.style.display="none";
+      const panel=document.getElementById(tab+"Panel"); if(panel) panel.style.display="block";
+      if(tab==="compatibility") loadCompatibility();
+      if(tab==="safety") pushState();
+      return;
+    }
+    extraPanels.forEach(id=>{const el=document.getElementById(id); if(el) el.style.display="none";});
+    return originalSwitchTab ? originalSwitchTab(tab) : undefined;
+  };
+
+  // Add verified badges to standard profile-card name rows after each render.
+  const oldCreateProfileCard=window.createProfileCard;
+  if(typeof oldCreateProfileCard==="function"){
+    window.createProfileCard=function(row,opts){
+      const el=oldCreateProfileCard(row,opts);
+      try{
+        const name=el.querySelector(".name-age");
+        if(name && row.is_verified && !name.querySelector(".verified-badge")){
+          name.insertAdjacentHTML("beforeend",verifiedBadge7(row));
+        }
+      }catch(e){}
+      return el;
+    };
+  }
+
+  // Keep the feature layer compatible with the existing auth lifecycle.
+  document.addEventListener("DOMContentLoaded",()=>{ pushState(); });
+  const langObserver=new MutationObserver(()=>{ if(currentLang==="am") applyAmharic(); });
+  langObserver.observe(document.body,{subtree:true,childList:true});
+
+  window._wanaFeatureEngine={loadCompatibility,compatibilityScore,enableWanaNotifications};
 })();
 </script>
 </body>
