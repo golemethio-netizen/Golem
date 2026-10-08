@@ -2701,13 +2701,14 @@ function teardownRealtimeChannels(){
 }
 
 function notifIcon(type){
-  return type === "match" ? "✨" : type === "like" ? "💛" : "💬";
+  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : "💬";
 }
 
 function notifText(n){
   const name = n.actor_name || "Someone";
   if (n.type === "match") return `It's a match with ${esc(name)}!`;
   if (n.type === "like") return `${esc(name)} liked your profile`;
+  if (n.type === "date") return `${esc(name)} ${esc(n.body || "sent you a date update")}`;
   return `New message from ${esc(name)}${n.body ? `: "${esc(n.body)}"` : ""}`;
 }
 
@@ -2775,6 +2776,10 @@ async function handleNotifClick(idx){
 
   if (n.type === "message"){
     switchTab("messages");
+    return;
+  }
+  if (n.type === "date"){
+    switchTab("dateplans");
     return;
   }
 
@@ -5161,7 +5166,9 @@ function homeRecommendationScore(me,r){
   async function uploadPrivateProfileImage(file){
     validateDatingImage(file);
     if (!currentUser) throw new Error("You must be signed in.");
-    const path = `${currentUser.id}/${crypto.randomUUID()}-${safeName(file.name)}`;
+    // "<uid>-<random>-<name>" matches the path convention (and the storage write policy,
+    // name LIKE auth.uid()||'-%') used by every other upload in this file.
+    const path = `${currentUser.id}-${crypto.randomUUID()}-${safeName(file.name)}`;
     const { error } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file, {
       upsert: false,
       contentType: file.type,
@@ -5183,12 +5190,18 @@ function homeRecommendationScore(me,r){
     return resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, value);
   }
 
+  // Storage paths we create always start with the uploader's uuid; anything else
+  // (site images, data:/blob: URLs, full http URLs) is left alone, so ordinary
+  // <img src="images/..."> tags never trigger pointless signing requests.
+  const STORAGE_PATH_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-/i;
+  const isStoragePath = v => !!v && !/^(https?:|data:|blob:)/i.test(v) && STORAGE_PATH_RE.test(v);
+
   async function hydrateProfileMedia(root = document){
-    const imgEls = [...root.querySelectorAll("img[data-profile-media], img[src]")];
+    const imgEls = [...root.querySelectorAll("img[src]")];
     await Promise.all(imgEls.map(async img => {
       const src = img.getAttribute("src");
-      if (!src || /^https?:\/\//i.test(src) || src.startsWith("data:") || src.startsWith("blob:")) return;
-      if (!src.includes("/") && !src.includes("-")) return;
+      if (!isStoragePath(src) || img.dataset.mediaTried) return;
+      img.dataset.mediaTried = "1";
       const url = await resolveProfilePhoto(src);
       if (url) img.src = url;
     }));
@@ -5196,9 +5209,23 @@ function homeRecommendationScore(me,r){
     const bgEls = [...root.querySelectorAll("[data-profile-media-bg]")];
     await Promise.all(bgEls.map(async el => {
       const value = el.getAttribute("data-profile-media-bg");
-      if (!value) return;
+      if (!isStoragePath(value)) return;
       const url = await resolveProfilePhoto(value);
       if (url) el.style.backgroundImage = `url("${String(url).replace(/"/g, '\\"')}")`;
+    }));
+
+    // Avatars/thumbnails drawn with an inline style="...url('<path>')..." (feed
+    // authors, thread list, photo editor, ...) never carried a data attribute, so a
+    // private path there rendered as a broken image.
+    const styled = [...root.querySelectorAll('[style*="url("]')];
+    await Promise.all(styled.map(async el => {
+      if (el.dataset.mediaTried) return;
+      const style = el.getAttribute("style") || "";
+      const m = style.match(/url\((['"]?)([^'")]+)\1\)/);
+      if (!m || !isStoragePath(m[2])) return;
+      el.dataset.mediaTried = "1";
+      const url = await resolveProfilePhoto(m[2]);
+      if (url) el.setAttribute("style", style.replace(m[0], `url("${url}")`));
     }));
   }
 
@@ -5217,12 +5244,16 @@ function homeRecommendationScore(me,r){
     const myGenderOk = seeking === "any" || seeking === candidateGender;
     const reciprocalGenderOk = candidateSeeking === "any" || candidateSeeking === myGender;
 
-    const myAge = Number(me.age);
-    const candidateAge = Number(candidate.age);
-    const candidateMin = Number(candidate.age_min);
-    const candidateMax = Number(candidate.age_max);
-    const myMin = Number(me.age_min);
-    const myMax = Number(me.age_max);
+    // A missing value must stay "unknown", not 0: Number(null) is 0, which
+    // turned every profile without an age range (all profiles made before
+    // that field existed) into a "0-0" preference that matched nobody.
+    const num = v => (v === null || v === undefined || v === "") ? NaN : Number(v);
+    const myAge = num(me.age);
+    const candidateAge = num(candidate.age);
+    const candidateMin = num(candidate.age_min);
+    const candidateMax = num(candidate.age_max);
+    const myMin = num(me.age_min);
+    const myMax = num(me.age_max);
 
     const myAgeOk = Number.isFinite(myAge) && Number.isFinite(candidateMin) && Number.isFinite(candidateMax)
       ? myAge >= candidateMin && myAge <= candidateMax : true;
@@ -5353,7 +5384,8 @@ function homeRecommendationScore(me,r){
       if (requestId !== browseRequestId) return;
       if (error) throw error;
 
-      let rows = (data || []).filter(r => !blockedIds.has(r.user_id) && isEligibleForDating(myProfile, r));
+      // Someone who hasn't posted a profile yet can still browse; eligibility needs a profile to compare against.
+      let rows = (data || []).filter(r => !blockedIds.has(r.user_id) && (!myProfile || isEligibleForDating(myProfile, r)));
       if (onlineOnly) rows = rows.filter(r => visiblePresence(r).online);
       rows.sort((a,b) => {
         const ao = visiblePresence(a).online, bo = visiblePresence(b).online;
@@ -5364,7 +5396,7 @@ function homeRecommendationScore(me,r){
       browseHasMore = (data || []).length === BROWSE_FETCH_SIZE;
       browsePage += 1;
 
-      rows.slice(0, BROWSE_RENDER_SIZE).forEach(r => grid.appendChild(createProfileCard(r)));
+      rows.forEach(r => grid.appendChild(createProfileCard(r))); // render every eligible row of the fetched page (slicing here silently dropped the rest)
       const shown = grid.children.length;
       const onlineCount = [...grid.querySelectorAll(".presence.is-online")].length;
       document.getElementById("onlineSummary").textContent = onlineCount
@@ -5663,14 +5695,15 @@ function homeRecommendationScore(me,r){
   const extraPanels=["compatibilityPanel","dateplansPanel","safetyPanel"];
   const norm=v=>String(v||"").trim().toLowerCase();
   const esc2=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const today=()=>new Date().toISOString().slice(0,10);
+  const today=()=>{const d=new Date();const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}; // local calendar date; toISOString() is UTC, which is up to 3h off from Ethiopian local time
 
   function isEligible(me,p){
     if(!me||!p) return false;
     const mySeeking=norm(me.seeking||"any"), theirGender=norm(p.gender), theirSeeking=norm(p.seeking||"any"), myGender=norm(me.gender);
     if(mySeeking!=="any" && mySeeking!==theirGender) return false;
     if(theirSeeking!=="any" && theirSeeking!==myGender) return false;
-    const age=Number(p.age), myAge=Number(me.age), myMin=Number(me.age_min), myMax=Number(me.age_max), pMin=Number(p.age_min), pMax=Number(p.age_max);
+    const n=v=>(v===null||v===undefined||v==="")?NaN:Number(v); // Number(null) is 0 - keep "missing" as NaN
+    const age=n(p.age), myAge=n(me.age), myMin=n(me.age_min), myMax=n(me.age_max), pMin=n(p.age_min), pMax=n(p.age_max);
     if(Number.isFinite(age)&&Number.isFinite(myMin)&&Number.isFinite(myMax)&&!(age>=myMin&&age<=myMax)) return false;
     if(Number.isFinite(myAge)&&Number.isFinite(pMin)&&Number.isFinite(pMax)&&!(myAge>=pMin&&myAge<=pMax)) return false;
     return true;
@@ -5691,7 +5724,8 @@ function homeRecommendationScore(me,r){
     if(p.is_verified) add(3,"Verified profile");
     if(typeof visiblePresence==="function"&&visiblePresence(p).online) add(2,"Online now");
     if(p.created_at&&Date.now()-new Date(p.created_at).getTime()<7*86400000) add(2,"New member");
-    const mutual=(Number.isFinite(Number(me.age))&&Number.isFinite(Number(p.age))&&Number.isFinite(Number(me.age_min))&&Number.isFinite(Number(me.age_max))&&Number(p.age)>=Number(me.age_min)&&Number(p.age)<=Number(me.age_max)&&Number.isFinite(Number(p.age_min))&&Number.isFinite(Number(p.age_max))&&Number(me.age)>=Number(p.age_min)&&Number(me.age)<=Number(p.age_max))?10:0;
+    const nn=v=>(v===null||v===undefined||v==="")?NaN:Number(v);
+    const mutual=(Number.isFinite(nn(me.age))&&Number.isFinite(nn(p.age))&&Number.isFinite(nn(me.age_min))&&Number.isFinite(nn(me.age_max))&&nn(p.age)>=nn(me.age_min)&&nn(p.age)<=nn(me.age_max)&&Number.isFinite(nn(p.age_min))&&Number.isFinite(nn(p.age_max))&&nn(me.age)>=nn(p.age_min)&&nn(me.age)<=nn(p.age_max))?10:0;
     score=Math.min(99,score+mutual);
     if(mutual) reasons.unshift("Mutual age preference fit");
     return {score,reasons:reasons.slice(0,4),mutual};
