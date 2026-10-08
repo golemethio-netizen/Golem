@@ -88,6 +88,27 @@
         .admin-mini-stat strong{display:block;font-size:1.2rem;margin-top:4px;}
         .admin-safety-note{background:#fff8ed;border:1px solid #f5dfb8;border-radius:10px;padding:11px;font-size:.75rem;color:#73500d;margin-bottom:14px;}
 
+
+        /* ================= ADMIN 2.2 — INLINE MODERATION ================= */
+        .m22-action-row{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px;}
+        .m22-inline-form{display:none;border:1px solid #e7e9ee;border-radius:10px;padding:11px;background:#fafbfc;margin:8px 0;}
+        .m22-inline-form.show{display:block;}
+        .m22-inline-form textarea,.m22-inline-form select{width:100%;box-sizing:border-box;border:1px solid #dfe3e8;border-radius:7px;padding:8px;font:inherit;font-size:.74rem;}
+        .m22-inline-form textarea{min-height:72px;resize:vertical;}
+        .m22-history{max-height:330px;overflow:auto;display:flex;flex-direction:column;gap:8px;}
+        .m22-event{border-left:3px solid #d8dde5;padding:8px 10px;background:#fafbfc;border-radius:0 8px 8px 0;}
+        .m22-event.admin{border-left-color:#c2185b;}
+        .m22-event-title{font-size:.74rem;font-weight:800;}
+        .m22-event-meta{font-size:.65rem;color:#8b94a2;margin-top:2px;}
+        .m22-event-detail{font-size:.7rem;color:#4b5563;margin-top:4px;white-space:pre-wrap;}
+        .m22-row-actions{display:flex;gap:5px;flex-wrap:wrap;}
+        .m22-btn{border:1px solid #d9dde4;background:#fff;border-radius:6px;padding:5px 8px;font-size:.66rem;font-weight:750;cursor:pointer;}
+        .m22-btn:hover{background:#f6f7f9;}
+        .m22-btn-danger{border-color:#f1b7bd;color:#b42318;}
+        .m22-btn-success{border-color:#b7dfc7;color:#167344;}
+        .m22-btn-primary{border-color:#d7b0c4;color:#a31750;}
+        .m22-muted{font-size:.68rem;color:#8b94a2;}
+
         /* ================= ADMIN 2.1 — MEMBER 360 ================= */
         .admin-member-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
         .member-search{flex:1;min-width:240px;}
@@ -1119,7 +1140,6 @@
             const content = document.getElementById('member360Content');
             if (!section || !content) return;
 
-            // Hide all other sections and activate the Member 360 tab.
             Object.values(DATING_SECTIONS).forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
@@ -1129,73 +1149,98 @@
             content.innerHTML = '<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading Member 360°…</div>';
 
             const [
-                profileResult,
-                contactResult,
-                statusResult,
-                verificationResult,
-                platinumResult,
-                blocksResult,
-                matchesResult,
-                datesResult
+                profileResult, contactResult, statusResult, verificationResult,
+                platinumResult, blocksResult, matchesResult, datesResult, reportResult, auditResult
             ] = await Promise.all([
                 _supabase.from('dating_profiles').select('*').eq('user_id', userId).maybeSingle(),
                 _supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
                 _supabase.from('dating_account_status').select('*').eq('user_id', userId).maybeSingle(),
-                _supabase.from('dating_verification_requests').select('*').eq('user_id', userId).order('created_at', {ascending:false}).limit(100),
-                _supabase.from('dating_platinum_requests').select('*').eq('user_id', userId).order('created_at', {ascending:false}).limit(100),
-                _supabase.from('dating_blocks').select('*').or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`).order('created_at', {ascending:false}).limit(100),
-                _supabase.from('dating_matches').select('*').or(`user_a.eq.${userId},user_b.eq.${userId}`).order('created_at', {ascending:false}).limit(100),
-                _supabase.from('dating_date_plans').select('*').or(`creator_id.eq.${userId},recipient_id.eq.${userId}`).order('date_on',{ascending:false}).limit(100)
+                _supabase.from('dating_verification_requests').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(100),
+                _supabase.from('dating_platinum_requests').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(100),
+                _supabase.from('dating_blocks').select('*').or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`).order('created_at',{ascending:false}).limit(100),
+                _supabase.from('dating_matches').select('*').or(`user_a.eq.${userId},user_b.eq.${userId}`).order('created_at',{ascending:false}).limit(100),
+                _supabase.from('dating_date_plans').select('*').or(`creator_id.eq.${userId},recipient_id.eq.${userId}`).order('date_on',{ascending:false}).limit(100),
+                _supabase.from('dating_reports').select('*').eq('reported_user_id',userId).order('created_at',{ascending:false}).limit(100),
+                _supabase.from('audit_logs').select('*').ilike('details',`%${userId}%`).order('created_at',{ascending:false}).limit(100)
             ]);
 
             const p = profileResult.data;
             const c = contactResult.data || {};
-            const account = statusResult.data || { status:'active' };
+            const account = statusResult.data || {status:'active'};
             const verifications = verificationResult.data || [];
             const platinum = platinumResult.data || [];
             const blocks = blocksResult.data || [];
             const matches = matchesResult.data || [];
             const dates = datesResult.data || [];
+            const reports = reportResult.data || [];
+            const audit = auditResult.data || [];
 
             if (profileResult.error) {
                 content.innerHTML = `<div class="admin-empty" style="color:#b42318;">Could not load member profile: ${escapeHtml(profileResult.error.message)}</div>`;
                 return;
             }
 
-            let reports = [];
-            let reportError = null;
-            if (p?.id) {
-                const rr = await _supabase.from('dating_reports').select('*').eq('reported_profile_id', p.id).order('created_at',{ascending:false}).limit(100);
-                reports = rr.data || [];
-                reportError = rr.error;
-            }
-
             const name = p?.display_name || c.full_name || 'Unnamed member';
             const photo = (p?.photos && p.photos[0]) || p?.photo_url || '';
             const suspended = String(account.status || 'active').toLowerCase() === 'suspended';
             const activePlatinum = platinumActive(p);
-            const openReports = reports.filter(r => r.status === 'open').length;
-            const acceptedDates = dates.filter(d => d.status === 'accepted').length;
-            const mutualMatches = matches.length;
+            const openReports = reports.filter(r => String(r.status || '').toLowerCase() === 'open' || String(r.status || '').toLowerCase() === 'pending').length;
 
             const statusAlert = suspended
                 ? `<div class="member-alert danger"><strong>Account suspended.</strong> ${escapeHtml(account.reason || 'No reason recorded.')}${account.suspended_until ? ' · Until ' + escapeHtml(memberDate(account.suspended_until)) : ' · Indefinite'}<div class="member-note" style="margin-top:4px;">Suspended ${escapeHtml(memberDate(account.suspended_at))} by ${escapeHtml(account.suspended_by || 'admin')}</div></div>`
                 : `<div class="member-alert success"><strong>Account active.</strong> No current administrative suspension is recorded.</div>`;
 
             const photos = Array.isArray(p?.photos) ? p.photos : [];
-            const photoStrip = photos.length ? `<div class="member-photo-strip">${photos.slice(0,8).map(x => `<img src="${escapeHtml(x)}" onerror="this.style.display='none'">`).join('')}</div>` : '<div class="member-note">No additional profile photos.</div>';
+            const photoStrip = photos.length
+                ? `<div class="member-photo-strip">${photos.slice(0,8).map(x => `<img src="${escapeHtml(x)}" onerror="this.style.display='none'">`).join('')}</div>`
+                : '<div class="member-note">No additional profile photos.</div>';
 
             const verificationRows = verifications.length ? verifications.map(v => `
-                <tr><td>${escapeHtml(v.status || '—')}</td><td>${escapeHtml(memberDateOnly(v.created_at))}</td><td>${escapeHtml(v.reviewed_at ? memberDateOnly(v.reviewed_at) : '—')}</td><td>${escapeHtml(v.reviewer_note || '—')}</td></tr>
-            `).join('') : '<tr><td colspan="4" class="member-note">No verification history.</td></tr>';
+                <tr>
+                    <td>${escapeHtml(v.status || '—')}</td>
+                    <td>${escapeHtml(memberDateOnly(v.created_at))}</td>
+                    <td>${escapeHtml(v.reviewed_at ? memberDateOnly(v.reviewed_at) : '—')}</td>
+                    <td>${escapeHtml(v.reviewer_note || '—')}</td>
+                    <td>
+                      <div class="m22-row-actions">
+                        ${String(v.status).toLowerCase() === 'pending' ? `
+                          <button class="m22-btn m22-btn-success" onclick="reviewVerification('${v.id}','approved')">Approve</button>
+                          <button class="m22-btn m22-btn-danger" onclick="reviewVerification('${v.id}','rejected')">Reject</button>` : ''}
+                      </div>
+                    </td>
+                </tr>`).join('') : '<tr><td colspan="5" class="member-note">No verification history.</td></tr>';
 
             const platinumRows = platinum.length ? platinum.map(v => `
-                <tr><td>${escapeHtml(v.plan || '—')}</td><td>${escapeHtml(String(v.amount_birr ?? '—'))} Birr</td><td>${escapeHtml(v.status || '—')}</td><td>${escapeHtml(v.transaction_number || '—')}</td><td>${escapeHtml(memberDateOnly(v.created_at))}</td></tr>
-            `).join('') : '<tr><td colspan="5" class="member-note">No Platinum/payment requests.</td></tr>';
+                <tr>
+                    <td>${escapeHtml(v.plan || v.package || '—')}</td>
+                    <td>${escapeHtml(String(v.amount_birr ?? v.amount ?? '—'))} ${escapeHtml(v.currency || 'Birr')}</td>
+                    <td>${escapeHtml(v.status || '—')}</td>
+                    <td>${escapeHtml(v.transaction_number || v.transaction_id || '—')}</td>
+                    <td>${escapeHtml(memberDateOnly(v.created_at))}</td>
+                    <td>
+                      <div class="m22-row-actions">
+                        <button class="m22-btn m22-btn-primary" onclick="inspectPlatinumTransaction('${v.id}')">Inspect</button>
+                        ${['pending','submitted'].includes(String(v.status||'').toLowerCase()) ? `
+                          <button class="m22-btn m22-btn-success" onclick="reviewPlatinum('${v.id}','approved')">Approve</button>
+                          <button class="m22-btn m22-btn-danger" onclick="reviewPlatinum('${v.id}','rejected')">Reject</button>` : ''}
+                      </div>
+                    </td>
+                </tr>`).join('') : '<tr><td colspan="6" class="member-note">No Platinum/payment requests.</td></tr>';
 
             const reportRows = reports.length ? reports.map(r => `
-                <tr><td>${escapeHtml(r.status || '—')}</td><td>${escapeHtml(r.reason || '—')}</td><td>${escapeHtml(memberDateOnly(r.created_at))}</td><td>${escapeHtml(r.reviewed_at ? memberDateOnly(r.reviewed_at) : '—')}</td></tr>
-            `).join('') : '<tr><td colspan="4" class="member-note">No profile reports against this member.</td></tr>';
+                <tr>
+                    <td>${escapeHtml(r.status || '—')}</td>
+                    <td>${escapeHtml(r.reason || '—')}</td>
+                    <td>${escapeHtml(memberDateOnly(r.created_at))}</td>
+                    <td>${escapeHtml(r.reviewed_at ? memberDateOnly(r.reviewed_at) : '—')}</td>
+                    <td>
+                      <div class="m22-row-actions">
+                        ${['open','pending'].includes(String(r.status||'').toLowerCase()) ? `
+                          <button class="m22-btn m22-btn-success" onclick="reviewMemberReport('${r.id}','resolved')">Resolve</button>
+                          <button class="m22-btn" onclick="reviewMemberReport('${r.id}','dismissed')">Dismiss</button>` : ''}
+                      </div>
+                    </td>
+                </tr>`).join('') : '<tr><td colspan="5" class="member-note">No reports against this member.</td></tr>';
 
             const blockRows = blocks.length ? blocks.map(b => `
                 <tr><td>${b.blocker_id === userId ? 'Member blocked' : 'Member was blocked'}</td><td>${escapeHtml(b.blocker_id === userId ? b.blocked_id : b.blocker_id)}</td><td>${escapeHtml(memberDateOnly(b.created_at))}</td></tr>
@@ -1203,13 +1248,21 @@
 
             const matchRows = matches.length ? matches.map(m => {
                 const other = m.user_a === userId ? m.user_b : m.user_a;
-                return `<tr><td>${escapeHtml(other)}</td><td>${escapeHtml(memberDateOnly(m.created_at))}</td></tr>`;
-            }).join('') : '<tr><td colspan="2" class="member-note">No matches found.</td></tr>';
+                return `<tr><td>${escapeHtml(other)}</td><td>${escapeHtml(m.status || 'matched')}</td><td>${escapeHtml(memberDateOnly(m.created_at))}</td><td><button class="m22-btn m22-btn-danger" onclick="terminateMatch('${m.id}')">Terminate</button></td></tr>`;
+            }).join('') : '<tr><td colspan="4" class="member-note">No matches found.</td></tr>';
 
             const dateRows = dates.length ? dates.map(d => {
                 const other = d.creator_id === userId ? d.recipient_id : d.creator_id;
-                return `<tr><td>${escapeHtml(d.status || '—')}</td><td>${escapeHtml(memberDateOnly(d.date_on))} ${escapeHtml(d.start_time || '')}</td><td>${escapeHtml(d.location_name || '—')}${d.city ? ' · ' + escapeHtml(d.city) : ''}</td><td>${escapeHtml(other)}</td></tr>`;
-            }).join('') : '<tr><td colspan="4" class="member-note">No date-plan history.</td></tr>';
+                return `<tr><td>${escapeHtml(d.status || '—')}</td><td>${escapeHtml(memberDateOnly(d.date_on))} ${escapeHtml(d.start_time || '')}</td><td>${escapeHtml(d.location_name || d.venue || '—')}${d.city ? ' · ' + escapeHtml(d.city) : ''}</td><td>${escapeHtml(other)}</td><td>${['pending','accepted'].includes(String(d.status||'').toLowerCase()) ? `<button class="m22-btn m22-btn-danger" onclick="terminateDatePlan('${d.id}')">Terminate</button>` : ''}</td></tr>`;
+            }).join('') : '<tr><td colspan="5" class="member-note">No date-plan history.</td></tr>';
+
+            const auditRows = audit.length ? audit.map(a => `
+                <div class="m22-event admin">
+                    <div class="m22-event-title">${escapeHtml(a.action || a.event_type || 'Admin action')}</div>
+                    <div class="m22-event-meta">${escapeHtml(memberDate(a.created_at || a.timestamp))} · ${escapeHtml(a.admin_email || a.admin_id || a.user_id || 'Administrator')}</div>
+                    <div class="m22-event-detail">${escapeHtml(a.details || a.description || '')}</div>
+                </div>
+            `).join('') : '<div class="member-note">No member-specific audit events were found. Audit search depends on the existing audit_logs details containing this member ID.</div>';
 
             const canManage = !suspended
                 ? `<button class="admin-btn admin-btn-danger" onclick="suspendMember('${userId}')"><i class="fas fa-user-lock"></i> Suspend Account</button>`
@@ -1231,10 +1284,10 @@
                 </div>
 
                 <div class="member-stat-grid">
-                    <div class="member-stat"><span>Reports</span><strong>${openReports}</strong></div>
+                    <div class="member-stat"><span>Open reports</span><strong>${openReports}</strong></div>
                     <div class="member-stat"><span>Verification</span><strong>${verifications.length}</strong></div>
                     <div class="member-stat"><span>Payments</span><strong>${platinum.length}</strong></div>
-                    <div class="member-stat"><span>Matches</span><strong>${mutualMatches}</strong></div>
+                    <div class="member-stat"><span>Matches</span><strong>${matches.length}</strong></div>
                     <div class="member-stat"><span>Date plans</span><strong>${dates.length}</strong></div>
                 </div>
 
@@ -1252,52 +1305,51 @@
                         </dl>
                     </div>
                     <div class="member-360-card">
-                        <h4>Safety & status</h4>
+                        <h4>Safety & controls</h4>
                         <dl class="member-kv">
                             <dt>Account</dt><dd>${memberStatusChip(account.status || 'active')}</dd>
                             <dt>Verified</dt><dd>${p?.is_verified ? '<span class="member-chip ok">Yes</span>' : '<span class="member-chip">No</span>'}</dd>
                             <dt>Platinum</dt><dd>${activePlatinum ? '<span class="member-chip warn">Active</span>' : '<span class="member-chip">Not active</span>'}</dd>
                             <dt>Last seen</dt><dd>${escapeHtml(memberDate(p?.last_seen_at))}</dd>
-                            <dt>Open reports</dt><dd>${openReports}</dd>
                             <dt>Blocks</dt><dd>${blocks.length}</dd>
                         </dl>
                     </div>
 
                     <div class="member-360-card full">
                         <h4>About & photos</h4>
-                        <p class="member-note" style="margin:0 0 10px;">${escapeHtml(p?.bio || 'No bio recorded.')}</p>
-                        ${photoStrip}
+                        <p class="member-note" style="margin:0 0 10px;">${escapeHtml(p?.bio || 'No bio recorded.')}</p>${photoStrip}
                     </div>
 
                     <div class="member-360-card full">
                         <h4>Verification history <span class="member-chip">${verifications.length}</span></h4>
-                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Submitted</th><th>Reviewed</th><th>Reviewer note</th></tr></thead><tbody>${verificationRows}</tbody></table></div>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Submitted</th><th>Reviewed</th><th>Reviewer note</th><th>Actions</th></tr></thead><tbody>${verificationRows}</tbody></table></div>
                     </div>
 
                     <div class="member-360-card full">
                         <h4>Reports against member <span class="member-chip ${openReports ? 'danger' : ''}">${reports.length}</span></h4>
-                        ${reportError ? `<p class="member-note">Could not load report history: ${escapeHtml(reportError.message)}</p>` : ''}
-                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Reason</th><th>Reported</th><th>Reviewed</th></tr></thead><tbody>${reportRows}</tbody></table></div>
-                    </div>
-
-                    <div class="member-360-card full">
-                        <h4>Blocks <span class="member-chip">${blocks.length}</span></h4>
-                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Direction</th><th>Other member ID</th><th>Date</th></tr></thead><tbody>${blockRows}</tbody></table></div>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Reason</th><th>Reported</th><th>Reviewed</th><th>Actions</th></tr></thead><tbody>${reportRows}</tbody></table></div>
                     </div>
 
                     <div class="member-360-card full">
                         <h4>Platinum & payment history <span class="member-chip warn">${platinum.length}</span></h4>
-                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Plan</th><th>Amount</th><th>Status</th><th>Transaction</th><th>Submitted</th></tr></thead><tbody>${platinumRows}</tbody></table></div>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Plan</th><th>Amount</th><th>Status</th><th>Transaction</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>${platinumRows}</tbody></table></div>
+                        <div id="m22PaymentInspector" class="m22-inline-form"></div>
                     </div>
 
-                    <div class="member-360-card">
+                    <div class="member-360-card full">
                         <h4>Match history <span class="member-chip">${matches.length}</span></h4>
-                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Other member ID</th><th>Date</th></tr></thead><tbody>${matchRows}</tbody></table></div>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Other member ID</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${matchRows}</tbody></table></div>
                     </div>
 
-                    <div class="member-360-card">
-                        <h4>Date-plan history <span class="member-chip">${acceptedDates} accepted</span></h4>
-                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Date</th><th>Place</th><th>Other member ID</th></tr></thead><tbody>${dateRows}</tbody></table></div>
+                    <div class="member-360-card full">
+                        <h4>Date-plan history <span class="member-chip">${dates.length}</span></h4>
+                        <div class="admin-table-wrap"><table class="member-mini-table"><thead><tr><th>Status</th><th>Date</th><th>Place</th><th>Other member ID</th><th>Actions</th></tr></thead><tbody>${dateRows}</tbody></table></div>
+                    </div>
+
+                    <div class="member-360-card full">
+                        <h4>Complete member audit timeline <span class="member-chip">${audit.length}</span></h4>
+                        <div class="m22-history">${auditRows}</div>
+                        <p class="m22-muted" style="margin-top:9px;">This timeline uses the existing audit log. For guaranteed member-level history, the Admin 2.2 migration adds a dedicated member_id field to future moderation events.</p>
                     </div>
                 </div>`;
         }
@@ -1347,6 +1399,163 @@
 
         async function loadMember360(forceRefresh) {
             if (_member360UserId) await openMember360(_member360UserId);
+        }
+
+
+
+        // ============================================================
+        // ADMIN 2.2 — INLINE MODERATION ACTIONS
+        // ============================================================
+        async function adminAudit(action, details, memberId=_member360UserId) {
+            try {
+                await logAction(action, `${details}${memberId ? `; member_id: ${memberId}` : ''}`);
+            } catch (_) {}
+        }
+
+        async function reviewMemberReport(reportId, status) {
+            const note = prompt(`${status === 'dismissed' ? 'Dismissal' : 'Resolution'} note (required):`);
+            if (!note || note.trim().length < 3) return;
+            if (!confirm(`Set this report to ${status}?`)) return;
+
+            // Support common schemas while keeping the action explicit.
+            let result = await _supabase.from('dating_reports').update({
+                status, reviewed_at: new Date().toISOString(), reviewer_note: note.trim()
+            }).eq('id', reportId);
+
+            if (result.error && /reviewer_note/i.test(result.error.message || '')) {
+                result = await _supabase.from('dating_reports').update({
+                    status, reviewed_at: new Date().toISOString()
+                }).eq('id', reportId);
+            }
+            if (result.error) {
+                alert('Report update failed: ' + result.error.message);
+                return;
+            }
+            await adminAudit(`Report ${status}`, `Report ID: ${reportId}; note: ${note.trim()}`);
+            await openMember360(_member360UserId);
+        }
+
+        async function reviewVerification(requestId, status) {
+            const note = prompt(`${status === 'approved' ? 'Approval' : 'Rejection'} note (required):`);
+            if (!note || note.trim().length < 3) return;
+            if (!confirm(`Mark this verification request as ${status}?`)) return;
+
+            let result = await _supabase.from('dating_verification_requests').update({
+                status, reviewed_at: new Date().toISOString(), reviewer_note: note.trim()
+            }).eq('id', requestId);
+
+            if (result.error && /reviewer_note/i.test(result.error.message || '')) {
+                result = await _supabase.from('dating_verification_requests').update({
+                    status, reviewed_at: new Date().toISOString()
+                }).eq('id', requestId);
+            }
+            if (result.error) {
+                alert('Verification update failed: ' + result.error.message);
+                return;
+            }
+
+            // Keep profile verification state synchronized where the schema supports it.
+            if (_member360UserId) {
+                await _supabase.from('dating_profiles').update({
+                    is_verified: status === 'approved'
+                }).eq('user_id', _member360UserId);
+            }
+            await adminAudit(`Verification ${status}`, `Request ID: ${requestId}; note: ${note.trim()}`);
+            await openMember360(_member360UserId);
+        }
+
+        async function inspectPlatinumTransaction(requestId) {
+            const box = document.getElementById('m22PaymentInspector');
+            if (!box) return;
+            box.classList.add('show');
+            box.innerHTML = '<div class="m22-muted">Loading transaction…</div>';
+            const {data, error} = await _supabase.from('dating_platinum_requests').select('*').eq('id', requestId).maybeSingle();
+            if (error || !data) {
+                box.innerHTML = `<div style="color:#b42318;font-size:.72rem;">Could not inspect transaction: ${escapeHtml(error?.message || 'Not found')}</div>`;
+                return;
+            }
+            const safe = {};
+            Object.keys(data).forEach(k => {
+                const v = data[k];
+                if (['id','user_id','amount_birr','amount','currency','plan','package','status','transaction_number','transaction_id','payment_method','payment_proof_url','created_at','reviewed_at','reviewer_note'].includes(k)) safe[k]=v;
+            });
+            box.innerHTML = `
+                <strong style="font-size:.76rem;">Transaction inspection</strong>
+                <dl class="member-kv" style="margin-top:8px;">${Object.entries(safe).map(([k,v]) =>
+                    `<dt>${escapeHtml(k.replaceAll('_',' '))}</dt><dd>${escapeHtml(typeof v === 'object' ? JSON.stringify(v) : String(v ?? '—'))}</dd>`
+                ).join('')}</dl>
+                <div class="m22-action-row">
+                    <button class="m22-btn" onclick="document.getElementById('m22PaymentInspector').classList.remove('show')">Close</button>
+                </div>`;
+            await adminAudit('Platinum Transaction Inspected', `Request ID: ${requestId}`);
+        }
+
+        async function reviewPlatinum(requestId, status) {
+            const note = prompt(`${status === 'approved' ? 'Approval' : 'Rejection'} note (required):`);
+            if (!note || note.trim().length < 3) return;
+            if (!confirm(`Mark this Platinum request as ${status}?`)) return;
+
+            let result = await _supabase.from('dating_platinum_requests').update({
+                status, reviewed_at: new Date().toISOString(), reviewer_note: note.trim()
+            }).eq('id', requestId);
+
+            if (result.error && /reviewer_note/i.test(result.error.message || '')) {
+                result = await _supabase.from('dating_platinum_requests').update({
+                    status, reviewed_at: new Date().toISOString()
+                }).eq('id', requestId);
+            }
+            if (result.error) {
+                alert('Platinum review failed: ' + result.error.message);
+                return;
+            }
+            await adminAudit(`Platinum ${status}`, `Request ID: ${requestId}; note: ${note.trim()}`);
+            await openMember360(_member360UserId);
+        }
+
+        async function terminateMatch(matchId) {
+            const reason = prompt('Termination reason (required):');
+            if (!reason || reason.trim().length < 3) return;
+            if (!confirm('Terminate this match? This should be used only for a clear safety/moderation reason.')) return;
+
+            // Prefer an explicit moderation RPC when installed.
+            let result = await _supabase.rpc('dating_admin_terminate_match', {
+                p_match_id: matchId, p_reason: reason.trim()
+            });
+
+            if (result.error) {
+                // Fallback for schemas where match rows have a status column.
+                result = await _supabase.from('dating_matches').update({
+                    status: 'terminated'
+                }).eq('id', matchId);
+            }
+            if (result.error) {
+                alert('Match termination failed: ' + result.error.message);
+                return;
+            }
+            await adminAudit('Match Terminated', `Match ID: ${matchId}; reason: ${reason.trim()}`);
+            await openMember360(_member360UserId);
+        }
+
+        async function terminateDatePlan(planId) {
+            const reason = prompt('Date-plan termination reason (required):');
+            if (!reason || reason.trim().length < 3) return;
+            if (!confirm('Terminate this date plan?')) return;
+
+            let result = await _supabase.rpc('dating_admin_terminate_date_plan', {
+                p_plan_id: planId, p_reason: reason.trim()
+            });
+
+            if (result.error) {
+                result = await _supabase.from('dating_date_plans').update({
+                    status: 'cancelled'
+                }).eq('id', planId);
+            }
+            if (result.error) {
+                alert('Date-plan termination failed: ' + result.error.message);
+                return;
+            }
+            await adminAudit('Date Plan Terminated', `Plan ID: ${planId}; reason: ${reason.trim()}`);
+            await openMember360(_member360UserId);
         }
 
 
