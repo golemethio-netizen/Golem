@@ -1944,7 +1944,7 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <div class="panel" id="compatibilityPanel" style="display:none;">
 <div class="browse-header">
 <h2>Your <span>Compatibility</span> ❤️</h2>
-<p>See why each recommendation may be a good fit based on your relationship goals, lifestyle, family plans and preferences.</p>
+<p>Recommendations respect your gender preference and the other member’s preference first, then rank compatible goals, lifestyle, family plans and preferences.</p>
 </div>
 <div class="compat-summary" id="compatibilitySummary"></div>
 <div class="grid" id="compatibilityGrid"></div>
@@ -3459,7 +3459,8 @@ async function openModal(row){
   const matched = await checkMatch(row.user_id);
   const actionBtn = matched
     ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">💬 Message</button>
-       <button class="btn-contact" style="background:#6651a6;color:#fff;" id="planDateBtn">📅 Plan a Date</button>`
+       <button class="btn-contact" style="background:#6651a6;color:#fff;" id="planDateBtn">📅 Plan a Date</button>
+       ${isPlatinumActive(myProfile)?'<button class="btn-contact" style="background:#B8860B;color:#fff;" id="sendGiftBtn">🎁 Send Gift</button>':''}`
     : `<button class="btn-contact" id="likeBtn" style="background:var(--gold); color:var(--ink);" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like Profile</button>`;
   // Same private-path vs. public-URL handling as createProfileCard(): a
   // storage path needs data-profile-media-bg + hydration, not a direct
@@ -3502,6 +3503,8 @@ async function openModal(row){
   
   const planDateBtn = root.querySelector("#planDateBtn");
   if (planDateBtn) planDateBtn.addEventListener("click", () => openDatePlanModal(row.user_id, row.display_name || "Match"));
+  const sendGiftBtn = root.querySelector("#sendGiftBtn");
+  if (sendGiftBtn) sendGiftBtn.addEventListener("click", () => openGiftCenter(row.user_id, row.display_name || "Match"));
   root.querySelectorAll(".thumb").forEach(el => {
     el.addEventListener("click", (ev) => {
       ev.stopPropagation();
@@ -4278,6 +4281,8 @@ async function refreshOpenThreadMessages(){
 // ---------- My Profile tab ----------
 function computeProfileCompleteness(data){
   const checklist = [
+    { label: "Your gender", done: !!data.gender, focus: "eGender" },
+    { label: "Who you're interested in", done: !!data.seeking, focus: "eSeeking" },
     { label: "About you", done: !!(data.bio && data.bio.trim()), focus: "eBio" },
     { label: "What you're looking for", done: !!data.looking_for, focus: "eLookingFor" },
     { label: "Age range you're interested in", done: !!(data.age_min && data.age_max), focus: "eAgeMin" },
@@ -4315,7 +4320,7 @@ async function refreshProfileCompleteBadge(){
   if (!badge || !currentUser) return;
   const { data } = await _supabase
     .from("dating_profiles")
-    .select("bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion")
+    .select("gender, seeking, bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion")
     .eq("user_id", currentUser.id)
     .maybeSingle();
   if (!data){ badge.textContent = ""; return; }
@@ -4428,7 +4433,7 @@ function renderPlatinumBox(profile, latestPlatinumRequest){
     ${rejectedNote}
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
       <div style="font-weight:700;margin-bottom:10px;">💎 Go Platinum</div>
-      <p style="font-size:.85rem;color:#666;margin:0 0 14px;">Unlimited messaging, voice messages, and calls — plus read receipts.</p>
+      <p style="font-size:.85rem;color:#666;margin:0 0 14px;">Unlimited messaging, voice messages, calls, read receipts, <b>and Platinum gifts</b>.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button type="button" onclick="choosePlatinumPlan('weekly')" style="flex:1;min-width:140px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">
           <div style="font-weight:700;">Weekly</div>
@@ -4443,6 +4448,27 @@ function renderPlatinumBox(profile, latestPlatinumRequest){
       </div>
     </div>`;
 }
+
+async function openGiftCenter(recipientId, recipientName){
+  if(!isPlatinumActive(myProfile)){ alert("Gifts are a Platinum feature. Upgrade to Platinum first."); return; }
+  const root=document.getElementById("modalRoot"); if(!root)return;
+  const {data:gifts,error}=await _supabase.from("dating_gift_catalog").select("*").eq("active",true).order("sort_order",{ascending:true});
+  if(error){alert("Gift catalog is unavailable: "+error.message);return;}
+  const items=(gifts||[]).map(g=>`<button type="button" data-gift-id="${escapeAttr(g.id)}" style="text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;cursor:pointer"><div style="font-size:1.35rem">${esc2(g.emoji||"🎁")}</div><b>${esc2(g.name)}</b><div style="font-size:.76rem;color:#777;margin-top:3px">${esc2(g.description||"")} · ${esc2(g.price_birr)} Birr</div></button>`).join("");
+  root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:520px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🎁 Send a Platinum Gift to ${esc2(recipientName||"your match")}</h3><p class="bio">Gifts are visible to the recipient and are available only to active Platinum members.</p><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${items||'<div class="date-plan-empty">No gifts are available right now.</div>'}</div><textarea id="giftMessage" maxlength="240" placeholder="Optional message" style="width:100%;min-height:70px;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:9px"></textarea><div id="giftMsg" style="margin-top:10px"></div></div></div></div>`;
+  root.querySelectorAll("[data-gift-id]").forEach(btn=>btn.addEventListener("click",()=>sendPlatinumGift(btn.dataset.giftId,recipientId,recipientName)));
+}
+
+async function sendPlatinumGift(giftId,recipientId,recipientName){
+  const msg=(document.getElementById("giftMessage")?.value||"").trim();
+  if(!isPlatinumActive(myProfile)){alert("Active Platinum is required.");return;}
+  const {error}=await _supabase.rpc("dating_send_platinum_gift",{p_recipient_id:recipientId,p_gift_id:giftId,p_message:msg||null});
+  if(error){const box=document.getElementById("giftMsg");if(box)box.innerHTML=`<div class="msg error">${esc2(error.message)}</div>`;return;}
+  closeModal();
+  alert(`Gift sent to ${recipientName||"your match"}.`);
+}
+window.openGiftCenter=openGiftCenter;
+window.sendPlatinumGift=sendPlatinumGift;
 
 function choosePlatinumPlan(planKey){
   const plan = PLATINUM_PLANS[planKey];
@@ -4663,6 +4689,22 @@ async function loadMyProfile(){
         <label>About You</label>
         <textarea id="eBio" maxlength="500" required>${esc(data.bio||"")}</textarea>
       </div>
+      <div class="row2">
+        <div>
+          <label>My Gender <span style="color:#b4232f">*</span></label>
+          <select id="eGender" required>
+            <option value="">Select Gender</option>
+            ${opts(["Male","Female"], data.gender)}
+          </select>
+        </div>
+        <div>
+          <label>I'm Interested In <span style="color:#b4232f">*</span></label>
+          <select id="eSeeking" required>
+            <option value="">Select Gender</option>
+            ${opts(["Male","Female","Any"], data.seeking)}
+          </select>
+        </div>
+      </div>
       <div>
         <label>What I'm Looking For</label>
         <select id="eLookingFor" required>
@@ -4732,6 +4774,8 @@ async function loadMyProfile(){
       display_name: document.getElementById("eName").value.trim(),
       age: parseInt(document.getElementById("eAge").value,10),
       city: document.getElementById("eCity").value.trim(),
+      gender: document.getElementById("eGender").value,
+      seeking: document.getElementById("eSeeking").value,
       bio: document.getElementById("eBio").value.trim(),
       looking_for: document.getElementById("eLookingFor").value,
       age_min: ageMin,
@@ -5132,10 +5176,15 @@ function homeRecommendationScore(me,r){
 
   function isEligibleForDating(me, candidate){
     if (!me || !candidate) return false;
-    const seeking = String(me.seeking || "Any").toLowerCase();
+    const seeking = String(me.seeking || "").toLowerCase();
     const candidateGender = String(candidate.gender || "").toLowerCase();
-    const candidateSeeking = String(candidate.seeking || "Any").toLowerCase();
+    const candidateSeeking = String(candidate.seeking || "").toLowerCase();
     const myGender = String(me.gender || "").toLowerCase();
+
+    // Gender and gender preference are mandatory for active discovery.
+    // Never recommend legacy/incomplete profiles by guessing their gender.
+    if (!["male","female"].includes(myGender) || !["male","female"].includes(candidateGender)) return false;
+    if (!["male","female","any"].includes(seeking) || !["male","female","any"].includes(candidateSeeking)) return false;
 
     const myGenderOk = seeking === "any" || seeking === candidateGender;
     const reciprocalGenderOk = candidateSeeking === "any" || candidateSeeking === myGender;
@@ -5602,6 +5651,8 @@ function homeRecommendationScore(me,r){
   function scoreMatch(me,p){
     if(!isEligible(me,p)) return {score:0,reasons:[],mutual:0};
     let score=30; const reasons=[]; const add=(n,r)=>{score+=n;if(r&&!reasons.includes(r))reasons.push(r)};
+    const genderFit = norm(me.seeking)==="any" || norm(me.seeking)===norm(p.gender);
+    if(genderFit) add(12,"Gender preference fit");
     if(norm(me.relationship_type)&&norm(me.relationship_type)===norm(p.relationship_type)) add(16,"Same relationship goal");
     if(norm(me.looking_for)&&norm(me.looking_for)===norm(p.looking_for)) add(10,"Similar relationship preference");
     if(norm(me.lifestyle)&&norm(me.lifestyle)===norm(p.lifestyle)) add(10,"Similar lifestyle");
@@ -5652,7 +5703,9 @@ function homeRecommendationScore(me,r){
 
   window.openDatePlanModal=function(recipientId,recipientName){
     if(!currentUser){return} const root=document.getElementById("modalRoot"); if(!root)return;
-    root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:520px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>📅 Plan a Date with ${esc2(recipientName||"your match")}</h3><p class="bio">Keep the first meetup simple and public. Your match can accept or suggest a different plan.</p><form id="datePlanForm"><label>Date</label><input id="datePlanDate" type="date" min="${today()}" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Time</label><input id="datePlanTime" type="time" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Place / venue</label><input id="datePlanLocation" maxlength="120" required placeholder="e.g. public café" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>City</label><input id="datePlanCity" maxlength="80" value="${escapeAttr(myProfile?.city||"")}" placeholder="Addis Ababa" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Notes (optional)</label><textarea id="datePlanNotes" maxlength="500" placeholder="Anything your match should know?" style="width:100%;min-height:90px;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"></textarea><div id="datePlanMsg"></div><div class="actions"><button type="button" class="btn-report" onclick="closeModal()">Cancel</button><button class="btn-contact" type="submit" style="background:#6651a6;color:#fff">Send Date Invitation 📅</button></div></form></div></div></div>`;
+    root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:540px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>📅 Schedule a Date with ${esc2(recipientName||"your match")}</h3><p class="bio">Choose an in-person meetup or an online date. Online dates are scheduled events; share a meeting link only if you trust the platform and recipient.</p><form id="datePlanForm"><label>Date</label><input id="datePlanDate" type="date" min="${today()}" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Time</label><input id="datePlanTime" type="time" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>Date type</label><select id="datePlanMode" required style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><option value="in_person">In person</option><option value="online">Online date</option></select><div id="onlineDateFields" style="display:none"><label>Online platform</label><select id="datePlanPlatform" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><option value="Wana voice call">Wana voice call</option><option value="Google Meet">Google Meet</option><option value="Zoom">Zoom</option><option value="Telegram">Telegram</option><option value="Other">Other</option></select><label>Meeting link / room (optional)</label><input id="datePlanMeetingLink" maxlength="500" placeholder="Optional meeting link" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"></div><div id="inPersonFields"><label>Place / venue</label><input id="datePlanLocation" maxlength="120" placeholder="e.g. public café" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"><label>City</label><input id="datePlanCity" maxlength="80" value="${escapeAttr(myProfile?.city||"")}" placeholder="Addis Ababa" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"></div><label>Notes (optional)</label><textarea id="datePlanNotes" maxlength="500" placeholder="Anything your match should know?" style="width:100%;min-height:90px;padding:11px;border:1px solid var(--line);border-radius:9px;margin:6px 0 12px"></textarea><div id="datePlanMsg"></div><div class="actions"><button type="button" class="btn-report" onclick="closeModal()">Cancel</button><button class="btn-contact" type="submit" style="background:#6651a6;color:#fff">Send Date Invitation 📅</button></div></form></div></div></div>`;
+    const mode=document.getElementById("datePlanMode");
+    mode.addEventListener("change",()=>{const online=mode.value==="online";document.getElementById("onlineDateFields").style.display=online?"block":"none";document.getElementById("inPersonFields").style.display=online?"none":"block";document.getElementById("datePlanLocation").required=!online;});
     document.getElementById("datePlanForm").addEventListener("submit",e=>createDatePlan(e,recipientId,recipientName));
   };
 
@@ -5660,10 +5713,12 @@ function homeRecommendationScore(me,r){
     e.preventDefault(); const msg=document.getElementById("datePlanMsg"); const btn=e.currentTarget.querySelector("button[type=submit]");
     if(!(await requireProfile("plan a date")))return;
     if(!(await checkMatch(recipientId))){msg.innerHTML='<div class="msg error">Date planning is available after a mutual match.</div>';return}
-    const date_on=document.getElementById("datePlanDate").value, start_time=document.getElementById("datePlanTime").value, location_name=document.getElementById("datePlanLocation").value.trim(), city=document.getElementById("datePlanCity").value.trim(), notes=document.getElementById("datePlanNotes").value.trim();
-    if(!date_on||!start_time||!location_name){msg.innerHTML='<div class="msg error">Choose a date, time and public place.</div>';return}
+    const date_on=document.getElementById("datePlanDate").value, start_time=document.getElementById("datePlanTime").value, mode=document.getElementById("datePlanMode").value, location_name=document.getElementById("datePlanLocation").value.trim(), city=document.getElementById("datePlanCity").value.trim(), platform=document.getElementById("datePlanPlatform")?.value||null, meeting_link=document.getElementById("datePlanMeetingLink")?.value.trim()||null, notes=document.getElementById("datePlanNotes").value.trim();
+    if(!date_on||!start_time){msg.innerHTML='<div class="msg error">Choose a date and time.</div>';return}
+    if(mode==="in_person"&&!location_name){msg.innerHTML='<div class="msg error">Choose a public place for an in-person date.</div>';return}
+    if(meeting_link && !/^https:\/\//i.test(meeting_link)){msg.innerHTML='<div class="msg error">Meeting links must use HTTPS.</div>';return}
     btn.disabled=true;btn.textContent="Sending…";
-    const {data,error}=await _supabase.rpc("dating_create_date_plan",{p_recipient_id:recipientId,p_date_on:date_on,p_start_time:start_time,p_location_name:location_name,p_city:city||null,p_notes:notes||null,p_title:`Date with ${recipientName||"your match"}`});
+    const {data,error}=await _supabase.rpc("dating_create_date_plan_v2",{p_recipient_id:recipientId,p_date_on:date_on,p_start_time:start_time,p_mode:mode,p_location_name:mode==="online"?null:location_name,p_city:city||null,p_online_platform:mode==="online"?platform:null,p_meeting_link:mode==="online"?meeting_link:null,p_notes:notes||null,p_title:`Date with ${recipientName||"your match"}`});
     if(error){msg.innerHTML=`<div class="msg error">Could not create the date invitation: ${esc2(error.message)}. If the database migration has not been run, install the Smart Match 2.0 migration.</div>`;btn.disabled=false;btn.textContent="Send Date Invitation 📅";return}
     closeModal(); switchTab("dateplans"); await loadDatePlans(); refreshDatePlanBadge();
   }
@@ -5687,15 +5742,16 @@ function homeRecommendationScore(me,r){
   function datePlanCard(plan){
     const card=document.createElement("article");card.className="date-plan-card";
     const mine=plan.creator_id===currentUser.id; const counterpart=mine?plan.recipient_id:plan.creator_id; const isPending=plan.status==="pending";
-    card.innerHTML=`<div class="date-plan-head"><div><div class="date-plan-title">${esc2(plan.title||"Date invitation")}</div><div style="margin-top:5px;color:#7a8491;font-size:.75rem">${mine?"You sent this invitation":"You received this invitation"}</div></div><span class="date-plan-status ${esc2(plan.status)}">${esc2(dateStatusLabel(plan.status))}</span></div><div class="date-plan-meta"><div>📅 ${esc2(formatDate(plan.date_on,plan.start_time))}</div><div>📍 ${esc2(plan.location_name||"Public place")}</div>${plan.city?`<div>🏙️ ${esc2(plan.city)}</div>`:""}<div>🛡️ First meetings: choose a public place</div></div>${plan.notes?`<div class="date-plan-notes">${esc2(plan.notes)}</div>`:""}`;
+    card.innerHTML=`<div class="date-plan-head"><div><div class="date-plan-title">${esc2(plan.title||"Date invitation")}</div><div style="margin-top:5px;color:#7a8491;font-size:.75rem">${mine?"You sent this invitation":"You received this invitation"}</div></div><span class="date-plan-status ${esc2(plan.status)}">${esc2(dateStatusLabel(plan.status))}</span></div><div class="date-plan-meta"><div>📅 ${esc2(formatDate(plan.date_on,plan.start_time))}</div>${plan.mode==="online"?`<div>💻 Online · ${esc2(plan.online_platform||"Online date")}</div>${plan.meeting_link?`<div>🔗 <a href="${escapeAttr(plan.meeting_link)}" target="_blank" rel="noopener noreferrer">Open meeting link</a></div>`:""}`:`<div>📍 ${esc2(plan.location_name||"Public place")}</div>${plan.city?`<div>🏙️ ${esc2(plan.city)}</div>`:""}`}<div>${plan.mode==="online"?"🛡️ Keep personal details private and use a trusted platform":"🛡️ First meetings: choose a public place"}</div></div>${plan.notes?`<div class="date-plan-notes">${esc2(plan.notes)}</div>`:""}`;
     const actions=document.createElement("div");actions.className="date-plan-actions";
-    if(!mine&&isPending){actions.innerHTML='<button class="date-plan-primary">Accept</button><button class="date-plan-secondary">Decline</button>';} else if(mine&&isPending){actions.innerHTML='<button class="date-plan-danger">Cancel invitation</button>';} else if(plan.status==="accepted"&&plan.date_on>=today()){actions.innerHTML='<button class="date-plan-secondary">Safety checklist</button>';} 
+    if(!mine&&isPending){actions.innerHTML='<button class="date-plan-primary">Accept</button><button class="date-plan-secondary">Decline</button>';} else if(mine&&isPending){actions.innerHTML='<button class="date-plan-danger">Cancel invitation</button>';} else if(plan.status==="accepted"&&plan.date_on>=today()){actions.innerHTML='<button class="date-plan-secondary">Safety checklist</button>'; if(isPlatinumActive(myProfile)) actions.insertAdjacentHTML("beforeend",'<button class="date-plan-secondary" style="background:#fff8df;color:#8a6500">🎁 Send gift</button>');} 
     card.appendChild(actions);
     const accept=actions.querySelector(".date-plan-primary"), decline=actions.querySelector(".date-plan-secondary"), cancel=actions.querySelector(".date-plan-danger");
     if(accept)accept.onclick=()=>respondDatePlan(plan.id,"accepted");
     if(decline)decline.onclick=()=>respondDatePlan(plan.id,"declined");
     if(cancel)cancel.onclick=()=>respondDatePlan(plan.id,"cancelled");
-    const safety=actions.querySelector(".date-plan-secondary:not([onclick])"); if(safety&&plan.status==="accepted")safety.onclick=()=>showDateSafety(plan);
+    const safety=actions.querySelector(".date-plan-secondary:not([style])"); if(safety&&plan.status==="accepted")safety.onclick=()=>showDateSafety(plan);
+    const gift=actions.querySelector('button[style*="background:#fff8df"]'); if(gift)gift.onclick=()=>openGiftCenter(counterpart,"your date partner");
     return card;
   }
 
