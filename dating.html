@@ -3334,6 +3334,7 @@ async function loadFeed(){
 function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolvedPhotoUrl){
   const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
   const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
+  const photoIsUrl = photo && /^https?:\/\//i.test(photo);
   const isMine = p.user_id === currentUser.id;
   const visBadge = p.visibility === "matches" ? "👥 Matches only" : "🌍 Public";
 
@@ -3358,7 +3359,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolve
   return `
     <div class="feed-post-card" id="post-${p.id}">
       <div style="display:flex;gap:12px;align-items:center;">
-        <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
+        <div onclick="viewProfileFromFeed('${p.user_id}')" ${photo && !photoIsUrl ? `data-profile-media-bg="${esc(photo)}"` : ""} style="cursor:pointer;width:42px;height:42px;border-radius:50%;flex-shrink:0;background:${photoIsUrl ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
         <div style="flex:1;min-width:0;">
           <div onclick="viewProfileFromFeed('${p.user_id}')" style="cursor:pointer;font-weight:700;font-size:.95rem;color:var(--ink);width:fit-content;">${esc(name)}${verifiedBadge(a && a.is_verified)}${platinumBadge(isPlatinumActive(a))}</div>
           <div style="font-size:.8rem;color:#888;">${new Date(p.created_at).toLocaleString()} · ${visBadge}</div>
@@ -3570,8 +3571,14 @@ function createProfileCard(row, opts = {}) {
   const card = document.createElement("div");
   card.className = "card";
   card.onclick = () => openModal(row);
+  // img may be a full https URL (legacy) or a private-bucket storage path
+  // (current uploads) — a raw path isn't a usable background-image url, so
+  // it goes through data-profile-media-bg and gets resolved to a signed
+  // URL by hydrateProfileMedia()/the hydration observer, same as the home
+  // feed's recommended-matches rail does.
+  const imgIsUrl = img && /^https?:\/\//i.test(img);
   card.innerHTML = `
-    <div class="photo" style="${img ? `background-image:url('${esc(img)}')` : ""}">
+    <div class="photo ${img && !imgIsUrl ? "profile-media-loading" : ""}" ${img ? `data-profile-media-bg="${esc(img)}"` : ""} style="${imgIsUrl ? `background-image:url('${esc(img)}')` : ""}">
       ${img ? "" : "👤"}
       ${showOnlineDot && presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
     </div>
@@ -3661,13 +3668,17 @@ async function openModal(row){
   const actionBtn = matched
     ? `<button class="btn-contact" onclick="contactProfile('${row.id}','${row.user_id}')">💬 Message</button>`
     : `<button class="btn-contact" id="likeBtn" style="background:var(--gold); color:var(--ink);" onclick="likeProfile('${row.id}','${row.user_id}')">💛 Like Profile</button>`;
+  // Same private-path vs. public-URL handling as createProfileCard(): a
+  // storage path needs data-profile-media-bg + hydration, not a direct
+  // background-image url (which would just fail to load silently).
+  const isUrl = v => v && /^https?:\/\//i.test(v);
   const thumbs = photos.length > 1
-    ? `<div class="thumb-row">${photos.map((p,i) => `<div class="thumb${i===0?" active":""}" data-idx="${i}" style="background-image:url('${esc(p)}')"></div>`).join("")}</div>`
+    ? `<div class="thumb-row">${photos.map((p,i) => `<div class="thumb${i===0?" active":""} ${p && !isUrl(p) ? "profile-media-loading" : ""}" data-idx="${i}" ${p ? `data-profile-media-bg="${esc(p)}"` : ""} style="${isUrl(p) ? `background-image:url('${esc(p)}')` : ""}"></div>`).join("")}</div>`
     : "";
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
       <div class="modal">
-        <div class="photo" id="modalMainPhoto" style="${mainPhoto ? `background-image:url('${esc(mainPhoto)}')` : ""}"></div>
+        <div class="photo ${mainPhoto && !isUrl(mainPhoto) ? "profile-media-loading" : ""}" id="modalMainPhoto" ${mainPhoto ? `data-profile-media-bg="${esc(mainPhoto)}"` : ""} style="${isUrl(mainPhoto) ? `background-image:url('${esc(mainPhoto)}')` : ""}"></div>
         ${thumbs}
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
@@ -3704,8 +3715,14 @@ async function openModal(row){
     });
   });
 }
-function swapModalPhoto(url, thumbEl){
-  document.getElementById("modalMainPhoto").style.backgroundImage = `url('${esc(url)}')`;
+async function swapModalPhoto(url, thumbEl){
+  const main = document.getElementById("modalMainPhoto");
+  // Same path-vs-URL split as the rest of the modal: a storage path needs
+  // resolvePrivateUrl() (signed URL), not a direct background-image.
+  // (Not resolveProfilePhoto() — that helper is private to a later
+  // IIFE-scoped <script> block and isn't reachable from here.)
+  const resolved = /^https?:\/\//i.test(url) ? url : await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, url);
+  if (main && resolved) main.style.backgroundImage = `url('${esc(resolved)}')`;
   thumbEl.parentElement.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
   thumbEl.classList.add("active");
 }
@@ -4230,6 +4247,7 @@ async function loadThreads(){
     const p = profileMap[thread.other];
     thread.profile = p;
     const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
+    const photoIsUrl = photo && /^https?:\/\//i.test(photo);
     const name = p ? (p.display_name || p.gender || "Someone") : "Someone";
 
     const div = document.createElement("div");
@@ -4237,7 +4255,7 @@ async function loadThreads(){
     div.onmouseover = () => div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
     div.onmouseout = () => div.style.boxShadow = "none";
     div.innerHTML = `
-      <div onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" style="cursor:pointer;width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
+      <div onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" ${photo && !photoIsUrl ? `data-profile-media-bg="${esc(photo)}"` : ""} style="cursor:pointer;width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photoIsUrl ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
       <div style="min-width:0;flex:1;">
         <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(isPlatinumActive(p))}</div>
         <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
@@ -4277,6 +4295,7 @@ async function openThread(thread){
   const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
   const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(isPlatinumActive(thread.profile)) : "";
   const headerPhoto = thread.profile ? ((thread.profile.photos && thread.profile.photos[0]) || thread.profile.photo_url) : null;
+  const headerPhotoIsUrl = headerPhoto && /^https?:\/\//i.test(headerPhoto);
   const callAllowed = thread.profile ? canCall(thread.profile) : true;
   const notPlatinum = !isPlatinumActive(myProfile);
   const callTooltip = notPlatinum
@@ -4301,7 +4320,7 @@ async function openThread(thread){
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px; margin-bottom:15px; border-bottom:1px solid var(--line); padding-bottom:10px;">
             <span onclick="viewProfileFromThread('${thread.other}', true)" title="View profile" style="display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;">
-              <span style="width:36px;height:36px;border-radius:50%;flex-shrink:0;border:1px solid var(--line);background:${headerPhoto ? `url('${esc(headerPhoto)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;font-size:1rem;color:#bbb;">${headerPhoto ? "" : "👤"}</span>
+              <span ${headerPhoto && !headerPhotoIsUrl ? `data-profile-media-bg="${esc(headerPhoto)}"` : ""} style="width:36px;height:36px;border-radius:50%;flex-shrink:0;border:1px solid var(--line);background:${headerPhotoIsUrl ? `url('${esc(headerPhoto)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;font-size:1rem;color:#bbb;">${headerPhoto ? "" : "👤"}</span>
               <span style="font-size: 1.1rem;">${otherName}${otherBadge}</span>
             </span>
             <span style="display:flex;gap:8px;flex-shrink:0;">
@@ -4985,11 +5004,12 @@ async function loadSettings() {
     const p = profileMap[b.blocked_id];
     const name = p ? (p.display_name || p.gender || "Unknown User") : "Unknown User";
     const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
+    const photoIsUrl = photo && /^https?:\/\//i.test(photo);
 
     return `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;">
         <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:36px;height:36px;border-radius:50%;background:${photo ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa;border:1px solid var(--line);">${photo ? "" : "👤"}</div>
+          <div ${photo && !photoIsUrl ? `data-profile-media-bg="${esc(photo)}"` : ""} style="width:36px;height:36px;border-radius:50%;background:${photoIsUrl ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#aaa;border:1px solid var(--line);">${photo ? "" : "👤"}</div>
           <div style="font-weight:600;font-size:0.9rem;">${esc(name)}</div>
         </div>
         <button onclick="unblockUser('${b.id}')" style="background:var(--paper);border:1px solid var(--line);padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:bold;cursor:pointer;color:#333;transition:0.2s;">Unblock</button>
