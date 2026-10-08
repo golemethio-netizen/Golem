@@ -4,19 +4,105 @@
     <meta charset="UTF-8">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9422/9422566.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanaGebya Dating Admin</title>
+    <title>WanaGebya Dating Admin 2.0</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px; font-weight: 600; transition: 0.2s; font-family: inherit; font-size: 0.9rem; }
         .tab-btn.active { background: #c2185b; color: white; }
         .admin-badge { background:#ff4757; color:white; padding:2px 8px; border-radius:10px; font-size:12px; }
+
+        /* ================= ADMIN 2.0 ================= */
+        :root{
+            --admin-primary:#c2185b;
+            --admin-primary-dark:#8e1244;
+            --admin-bg:#f5f7fb;
+            --admin-card:#fff;
+            --admin-text:#1f2937;
+            --admin-muted:#6b7280;
+            --admin-border:#e5e7eb;
+            --admin-success:#168a52;
+            --admin-warning:#b7791f;
+            --admin-danger:#d92d20;
+            --admin-info:#2563eb;
+        }
+        body.admin-v2{background:var(--admin-bg)!important;color:var(--admin-text);}
+        .admin-brand-mark{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:9px;background:rgba(194,24,91,.12);color:var(--admin-primary);}
+        .admin-version{font-size:.62rem;letter-spacing:.08em;background:#111827;color:#fff;padding:4px 7px;border-radius:6px;vertical-align:middle;margin-left:5px;}
+        .admin-shell{max-width:1320px!important;}
+        .admin-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0 18px;flex-wrap:wrap;}
+        .admin-page-title{font-size:1.25rem;font-weight:800;margin:0;}
+        .admin-page-subtitle{margin:4px 0 0;color:var(--admin-muted);font-size:.82rem;}
+        .admin-health{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--admin-border);padding:8px 11px;border-radius:9px;font-size:.78rem;}
+        .admin-dot{width:8px;height:8px;border-radius:50%;background:var(--admin-success);box-shadow:0 0 0 3px rgba(22,138,82,.1);}
+        .admin-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+        .admin-kpi{background:#fff;border:1px solid var(--admin-border);border-radius:13px;padding:15px;box-shadow:0 2px 8px rgba(15,23,42,.03);}
+        .admin-kpi .kpi-label{font-size:.72rem;color:var(--admin-muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+        .admin-kpi .kpi-value{font-size:1.55rem;font-weight:850;margin-top:6px;}
+        .admin-kpi .kpi-note{font-size:.7rem;color:#9ca3af;margin-top:3px;}
+        .admin-dashboard-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:18px;}
+        .admin-card{background:#fff;border:1px solid var(--admin-border);border-radius:13px;padding:18px;box-shadow:0 2px 8px rgba(15,23,42,.03);}
+        .admin-card h4{margin:0 0 4px;font-size:.95rem;}
+        .admin-card p.admin-card-sub{margin:0 0 14px;color:var(--admin-muted);font-size:.76rem;}
+        .admin-queue{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+        .admin-queue-btn{border:1px solid var(--admin-border);background:#fff;border-radius:10px;padding:12px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:.15s;}
+        .admin-queue-btn:hover{border-color:#d8a0b9;transform:translateY(-1px);}
+        .admin-queue-btn strong{display:block;font-size:.8rem;}
+        .admin-queue-btn span{font-size:.7rem;color:var(--admin-muted);}
+        .admin-count-pill{min-width:30px;text-align:center;border-radius:999px;padding:4px 7px;background:#f3f4f6;font-size:.72rem;font-weight:800;}
+        .admin-count-pill.hot{background:#fff0f2;color:var(--admin-danger);}
+        .admin-activity{max-height:245px;overflow:auto;}
+        .admin-activity-row{padding:10px 0;border-bottom:1px solid #f0f1f3;font-size:.76rem;}
+        .admin-activity-row:last-child{border-bottom:0;}
+        .admin-activity-row strong{font-size:.77rem;}
+        .admin-activity-meta{color:#9ca3af;margin-top:3px;}
+        .admin-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+        .admin-input,.admin-select{padding:9px 11px;border:1px solid #dfe3e8;border-radius:8px;background:#fff;font:inherit;font-size:.8rem;outline:none;}
+        .admin-input:focus,.admin-select:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(194,24,91,.08);}
+        .admin-btn{border:0;border-radius:8px;padding:9px 12px;cursor:pointer;font-weight:700;font-size:.78rem;}
+        .admin-btn-primary{background:var(--admin-primary);color:#fff;}
+        .admin-btn-secondary{background:#eef0f3;color:#374151;}
+        .admin-btn-danger{background:var(--admin-danger);color:#fff;}
+        .admin-btn-success{background:var(--admin-success);color:#fff;}
+        .admin-btn:disabled{opacity:.5;cursor:not-allowed;}
+        .admin-table-wrap{overflow:auto;border:1px solid var(--admin-border);border-radius:10px;}
+        .admin-table{width:100%;border-collapse:collapse;min-width:700px;}
+        .admin-table th{background:#f8fafc;color:#6b7280;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px;border-bottom:1px solid var(--admin-border);}
+        .admin-table td{padding:10px;border-bottom:1px solid #f0f1f3;font-size:.77rem;vertical-align:top;}
+        .admin-table tr:last-child td{border-bottom:0;}
+        .admin-status{display:inline-block;padding:3px 7px;border-radius:999px;font-size:.65rem;font-weight:800;text-transform:uppercase;}
+        .admin-status.pending,.admin-status.open{background:#fff3e0;color:#a15c00;}
+        .admin-status.approved,.admin-status.reviewed,.admin-status.accepted{background:#eaf8f0;color:#167344;}
+        .admin-status.rejected,.admin-status.dismissed,.admin-status.declined,.admin-status.cancelled{background:#f4f4f5;color:#666;}
+        .admin-status.completed{background:#eaf2ff;color:#2459a6;}
+        .admin-empty{padding:34px;text-align:center;color:#9ca3af;font-size:.82rem;}
+        .admin-section{background:#fff!important;border:1px solid var(--admin-border);box-shadow:0 2px 8px rgba(15,23,42,.03)!important;}
+        .admin-section h3{font-size:1rem!important;}
+        .admin-tab-wrap{position:sticky;top:0;z-index:20;background:var(--admin-bg);padding:6px 0 10px;}
+        .admin-tab-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;}
+        .admin-tab-scroll .tab-btn{white-space:nowrap;border:1px solid var(--admin-border);background:#fff;}
+        .admin-tab-scroll .tab-btn.active{background:var(--admin-primary);border-color:var(--admin-primary);}
+        .admin-date-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+        .admin-mini-stat{background:#f8fafc;border-radius:10px;padding:12px;}
+        .admin-mini-stat span{display:block;color:#6b7280;font-size:.7rem;}
+        .admin-mini-stat strong{display:block;font-size:1.2rem;margin-top:4px;}
+        .admin-safety-note{background:#fff8ed;border:1px solid #f5dfb8;border-radius:10px;padding:11px;font-size:.75rem;color:#73500d;margin-bottom:14px;}
+        @media(max-width:1100px){.admin-kpis{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:760px){
+            .admin-kpis{grid-template-columns:repeat(2,1fr)}
+            .admin-dashboard-grid{grid-template-columns:1fr}
+            .admin-queue{grid-template-columns:1fr}
+            .admin-date-grid{grid-template-columns:1fr}
+            .admin-shell{padding:12px!important}
+            .golem-header{gap:10px;flex-wrap:wrap}
+            .golem-header>div:last-child{width:100%;justify-content:flex-start;flex-wrap:wrap}
+        }
     </style>
 </head>
-<body style="background: #f7f8f6;">
+<body class="admin-v2" style="background: #f5f7fb;">
 
     <header class="golem-header">
-        <div class="logo">WanaGebya Dating Admin</div>
+        <div class="logo"><span class="admin-brand-mark">❤</span> WanaGebya Dating <span class="admin-version">ADMIN 2.0</span></div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <span id="adminIdentifier" style="color:#555; font-weight:600; font-size:0.9rem;"></span>
             <button class="signin-btn" onclick="location.href='dating.html'" style="background:#666;">View Dating Site</button>
@@ -25,28 +111,77 @@
         </div>
     </header>
 
-    <div class="container" style="padding: 20px; max-width: 1100px; margin: 0 auto;">
+    <div class="container admin-shell" style="padding: 20px; max-width: 1320px; margin: 0 auto;">
 
-        <!-- SUB-NAV: five dating admin sections, one page, no other admin areas -->
-        <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-            <button onclick="switchDatingTab('reports', this)" class="tab-btn active">
-                <i class="fas fa-flag"></i> Profile Reports <span id="reportsBadge" class="admin-badge" style="display:none;">0</span>
-            </button>
-            <button onclick="switchDatingTab('profiles', this)" class="tab-btn">
-                <i class="fas fa-users"></i> All Profiles
-            </button>
-            <button onclick="switchDatingTab('postReports', this)" class="tab-btn">
-                <i class="fas fa-comment-dots"></i> Post Reports <span id="postReportsBadge" class="admin-badge" style="display:none;">0</span>
-            </button>
-            <button onclick="switchDatingTab('verification', this)" class="tab-btn">
-                <i class="fas fa-check-circle"></i> Verification <span id="verificationBadge" class="admin-badge" style="display:none;">0</span>
-            </button>
-            <button onclick="switchDatingTab('platinum', this)" class="tab-btn">
-                <i class="fas fa-gem"></i> Platinum Requests <span id="platinumBadge" class="admin-badge" style="display:none;">0</span>
-            </button>
+        <div class="admin-topline">
+            <div>
+                <h1 class="admin-page-title">Dating Operations Center</h1>
+                <p class="admin-page-subtitle">Moderation, member safety, verification, payments and date planning in one place.</p>
+            </div>
+            <div class="admin-health"><span class="admin-dot"></span><span>Admin session active</span><strong id="adminLastRefresh">—</strong></div>
+        </div>
+
+        <div class="admin-tab-wrap">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;">
+                <strong style="font-size:.75rem;color:#6b7280;">ADMIN NAVIGATION</strong>
+                <button class="admin-btn admin-btn-secondary" onclick="refreshCurrentAdminView()">↻ Refresh</button>
+            </div>
+            <div class="admin-tab-scroll">
+                <button onclick="switchDatingTab('overview', this)" class="tab-btn active"><i class="fas fa-chart-pie"></i> Overview</button>
+                <button onclick="switchDatingTab('reports', this)" class="tab-btn"><i class="fas fa-flag"></i> Reports <span id="reportsBadge" class="admin-badge" style="display:none;">0</span></button>
+                <button onclick="switchDatingTab('profiles', this)" class="tab-btn"><i class="fas fa-users"></i> Profiles</button>
+                <button onclick="switchDatingTab('postReports', this)" class="tab-btn"><i class="fas fa-comment-dots"></i> Posts <span id="postReportsBadge" class="admin-badge" style="display:none;">0</span></button>
+                <button onclick="switchDatingTab('verification', this)" class="tab-btn"><i class="fas fa-check-circle"></i> Verification <span id="verificationBadge" class="admin-badge" style="display:none;">0</span></button>
+                <button onclick="switchDatingTab('platinum', this)" class="tab-btn"><i class="fas fa-gem"></i> Platinum <span id="platinumBadge" class="admin-badge" style="display:none;">0</span></button>
+                <button onclick="switchDatingTab('dateplans', this)" class="tab-btn"><i class="fas fa-calendar-check"></i> Date Plans <span id="datePlansAdminBadge" class="admin-badge" style="display:none;">0</span></button>
+                <button onclick="switchDatingTab('audit', this)" class="tab-btn"><i class="fas fa-history"></i> Audit Log</button>
+            </div>
         </div>
 
         <main>
+            <!-- ADMIN 2.0 OVERVIEW -->
+            <section id="adminOverviewSection" class="admin-section" style="background:white; padding:20px; border-radius:12px; margin-bottom:14px;">
+                <div class="admin-kpis">
+                    <div class="admin-kpi"><div class="kpi-label">Open profile reports</div><div id="kpiOpenReports" class="kpi-value">—</div><div class="kpi-note">Needs moderation</div></div>
+                    <div class="admin-kpi"><div class="kpi-label">Open post reports</div><div id="kpiOpenPostReports" class="kpi-value">—</div><div class="kpi-note">Feed moderation</div></div>
+                    <div class="admin-kpi"><div class="kpi-label">Pending verification</div><div id="kpiPendingVerification" class="kpi-value">—</div><div class="kpi-note">Identity review</div></div>
+                    <div class="admin-kpi"><div class="kpi-label">Pending platinum</div><div id="kpiPendingPlatinum" class="kpi-value">—</div><div class="kpi-note">Payment review</div></div>
+                    <div class="admin-kpi"><div class="kpi-label">Active profiles</div><div id="kpiProfiles" class="kpi-value">—</div><div class="kpi-note">Dating members</div></div>
+                    <div class="admin-kpi"><div class="kpi-label">Pending dates</div><div id="kpiPendingDates" class="kpi-value">—</div><div class="kpi-note">Member invitations</div></div>
+                </div>
+                <div class="admin-dashboard-grid">
+                    <div class="admin-card">
+                        <h4>Moderation Queue</h4>
+                        <p class="admin-card-sub">Jump directly to the queues with work waiting.</p>
+                        <div class="admin-queue">
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('reports')"><div><strong>Profile reports</strong><span>Safety and abuse reports</span></div><span id="queueReports" class="admin-count-pill hot">0</span></button>
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('postReports')"><div><strong>Post reports</strong><span>Home feed moderation</span></div><span id="queuePostReports" class="admin-count-pill hot">0</span></button>
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('verification')"><div><strong>Verification</strong><span>Review identity selfies</span></div><span id="queueVerification" class="admin-count-pill hot">0</span></button>
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('platinum')"><div><strong>Platinum payments</strong><span>Verify payment evidence</span></div><span id="queuePlatinum" class="admin-count-pill hot">0</span></button>
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('dateplans')"><div><strong>Date plans</strong><span>Monitor member meetups</span></div><span id="queueDatePlans" class="admin-count-pill">0</span></button>
+                            <button class="admin-queue-btn" onclick="switchDatingTabByName('audit')"><div><strong>Audit history</strong><span>Review administrator actions</span></div><span class="admin-count-pill">→</span></button>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <h4>Safety Standard</h4>
+                        <p class="admin-card-sub">Recommended operational checks for a dating platform.</p>
+                        <div class="admin-safety-note"><strong>Never approve identity or payment evidence from appearance alone.</strong> Verify against the submitted evidence and your trusted payment/account records.</div>
+                        <div style="font-size:.76rem;color:#4b5563;line-height:1.65;">
+                            ✓ Resolve open reports promptly<br>
+                            ✓ Review verification requests before granting badges<br>
+                            ✓ Confirm Platinum payments before activation<br>
+                            ✓ Treat date planning as member safety data<br>
+                            ✓ Keep administrator actions auditable
+                        </div>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <h4>Recent administrator activity</h4>
+                    <p class="admin-card-sub">Latest actions recorded in <code>audit_logs</code>.</p>
+                    <div id="adminRecentActivity" class="admin-activity"><div class="admin-empty">Loading activity…</div></div>
+                </div>
+            </section>
+
             <!-- PROFILE REPORTS -->
             <section id="datingReportsSection" style="background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                 <h3 style="margin:0 0 6px;"><i class="fas fa-heart" style="color:#c2185b;"></i> Dating — Reports</h3>
@@ -125,6 +260,42 @@
                     <p style="text-align:center; color:#bbb; padding:30px;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
                 </div>
             </section>
+
+            <!-- DATE PLANS -->
+            <section id="datePlansAdminSection" class="admin-section" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-calendar-check" style="color:#c2185b;"></i> Dating — Date Plans</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 16px;">Safety oversight for planned meetups. This page does not expose private chat content.</p>
+                <div class="admin-toolbar">
+                    <select id="adminDatePlanStatus" class="admin-select" onchange="loadAdminDatePlans()">
+                        <option value="pending">Pending</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="declined">Declined</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="completed">Completed</option>
+                        <option value="all">All</option>
+                    </select>
+                    <input id="adminDatePlanSearch" class="admin-input" placeholder="Search member, city or venue…" oninput="renderAdminDatePlans()">
+                    <button class="admin-btn admin-btn-secondary" onclick="loadAdminDatePlans(true)">↻ Refresh</button>
+                </div>
+                <div class="admin-date-grid">
+                    <div class="admin-mini-stat"><span>Pending invitations</span><strong id="datePlanPendingCount">—</strong></div>
+                    <div class="admin-mini-stat"><span>Accepted upcoming</span><strong id="datePlanAcceptedCount">—</strong></div>
+                    <div class="admin-mini-stat"><span>Total loaded</span><strong id="datePlanTotalCount">—</strong></div>
+                </div>
+                <div id="adminDatePlansList"><div class="admin-empty">Select Date Plans to load records.</div></div>
+            </section>
+
+            <!-- AUDIT LOG -->
+            <section id="auditSection" class="admin-section" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-history" style="color:#c2185b;"></i> Administrator Audit Log</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 16px;">Operational history for administrator actions. Keep this data restricted to authorized administrators.</p>
+                <div class="admin-toolbar">
+                    <input id="auditSearch" class="admin-input" placeholder="Search action, admin or details…" oninput="renderAdminAudit()">
+                    <button class="admin-btn admin-btn-secondary" onclick="loadAdminAudit(true)">↻ Refresh</button>
+                </div>
+                <div id="adminAuditList"><div class="admin-empty">Select Audit Log to load records.</div></div>
+            </section>
+
         </main>
     </div>
 
@@ -135,23 +306,58 @@
 
         // ---------- Sub-nav (local to this page; no other admin areas exist here) ----------
         const DATING_SECTIONS = {
+            overview: 'adminOverviewSection',
             reports: 'datingReportsSection',
             profiles: 'datingProfilesSection',
             postReports: 'postReportsSection',
             verification: 'verificationSection',
-            platinum: 'platinumSection'
+            platinum: 'platinumSection',
+            dateplans: 'datePlansAdminSection',
+            audit: 'auditSection'
         };
+
+        let _adminDatePlans = [];
+        let _adminAuditRows = [];
+
         function switchDatingTab(tab, btn) {
-            Object.values(DATING_SECTIONS).forEach(id => document.getElementById(id).style.display = 'none');
-            document.getElementById(DATING_SECTIONS[tab]).style.display = 'block';
+            Object.values(DATING_SECTIONS).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            const target = document.getElementById(DATING_SECTIONS[tab]);
+            if (target) target.style.display = 'block';
+
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
+            if (tab === 'overview') loadAdminOverview();
             if (tab === 'reports') loadDatingReports();
             if (tab === 'profiles') loadDatingProfiles();
             if (tab === 'postReports') loadPostReports();
             if (tab === 'verification') loadVerificationRequests();
             if (tab === 'platinum') loadPlatinumRequests();
+            if (tab === 'dateplans') loadAdminDatePlans();
+            if (tab === 'audit') loadAdminAudit();
+        }
+
+        function switchDatingTabByName(tab) {
+            const btn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'" + tab + "'"));
+            switchDatingTab(tab, btn);
+        }
+
+        function refreshCurrentAdminView() {
+            const active = document.querySelector('.tab-btn.active');
+            const match = active?.getAttribute('onclick')?.match(/'([^']+)'/);
+            const tab = match?.[1] || 'overview';
+            if (tab === 'overview') loadAdminOverview();
+            else if (tab === 'reports') loadDatingReports();
+            else if (tab === 'profiles') loadDatingProfiles(true);
+            else if (tab === 'postReports') loadPostReports();
+            else if (tab === 'verification') loadVerificationRequests();
+            else if (tab === 'platinum') loadPlatinumRequests();
+            else if (tab === 'dateplans') loadAdminDatePlans(true);
+            else if (tab === 'audit') loadAdminAudit(true);
+            refreshDatingBadges();
         }
 
         // ---------- Auth + logging (same pattern as admin.html) ----------
@@ -197,12 +403,16 @@
                 { count: openReports },
                 { count: openPostReports },
                 { count: pendingVerifications },
-                { count: pendingPlatinum }
+                { count: pendingPlatinum },
+                { count: pendingDatePlans },
+                { count: profileCount }
             ] = await Promise.all([
                 _supabase.from('dating_reports').select('*', { count: 'exact', head: true }).eq('status', 'open'),
                 _supabase.from('dating_post_reports').select('*', { count: 'exact', head: true }).eq('status', 'open'),
                 _supabase.from('dating_verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-                _supabase.from('dating_platinum_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+                _supabase.from('dating_platinum_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                _supabase.from('dating_date_plans').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                _supabase.from('dating_profiles').select('*', { count: 'exact', head: true })
             ]);
             const setBadge = (id, n) => {
                 const el = document.getElementById(id);
@@ -214,6 +424,19 @@
             setBadge('postReportsBadge', openPostReports);
             setBadge('verificationBadge', pendingVerifications);
             setBadge('platinumBadge', pendingPlatinum);
+            setBadge('datePlansAdminBadge', pendingDatePlans);
+            const setKpi = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = (n ?? '—'); };
+            setKpi('kpiOpenReports', openReports);
+            setKpi('kpiOpenPostReports', openPostReports);
+            setKpi('kpiPendingVerification', pendingVerifications);
+            setKpi('kpiPendingPlatinum', pendingPlatinum);
+            setKpi('kpiPendingDates', pendingDatePlans);
+            setKpi('kpiProfiles', profileCount);
+            ['queueReports','queuePostReports','queueVerification','queuePlatinum','queueDatePlans']
+                .forEach((id,i) => {
+                    const vals=[openReports,openPostReports,pendingVerifications,pendingPlatinum,pendingDatePlans];
+                    const el=document.getElementById(id); if(el) el.textContent=vals[i] ?? 0;
+                });
         }
 
         // Every function below calls refreshDatingBadges() wherever the main
@@ -278,8 +501,9 @@
             const { error } = await _supabase.from('dating_reports').update({ status: newStatus }).eq('id', reportId);
             if (error) { alert('Failed: ' + error.message); return; }
             logAction(newStatus === 'dismissed' ? 'Dating Report Dismissed' : 'Dating Report Reviewed', `Report ID: ${reportId}`);
-            loadDatingReports();
+            switchDatingTab('overview', document.querySelector('.tab-btn'));
             refreshDatingBadges();
+            setInterval(refreshDatingBadges, 60000);
         }
 
         // ---------- ALL PROFILES ----------
@@ -601,6 +825,116 @@
             const note = prompt('Optional note for the user on why this was rejected (shown to them):');
             if (note === null) return;
             resolvePlatinumRequest(requestId, 'rejected', note.trim() || null);
+        }
+
+
+        // ---------- ADMIN 2.0 OVERVIEW ----------
+        async function loadAdminOverview() {
+            await refreshDatingBadges();
+            await loadAdminRecentActivity();
+            const stamp = document.getElementById('adminLastRefresh');
+            if (stamp) stamp.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
+
+        async function loadAdminRecentActivity() {
+            const box = document.getElementById('adminRecentActivity');
+            if (!box) return;
+            const { data, error } = await _supabase.from('audit_logs')
+                .select('*').order('created_at', {ascending:false}).limit(8);
+            if (error) {
+                box.innerHTML = '<div class="admin-empty">Audit activity unavailable.</div>';
+                return;
+            }
+            box.innerHTML = (data || []).length ? data.map(r => `
+                <div class="admin-activity-row">
+                    <strong>${escapeHtml(r.action || 'Administrator action')}</strong>
+                    <div>${escapeHtml(r.details || '')}</div>
+                    <div class="admin-activity-meta">${escapeHtml(r.admin_email || 'Admin')} · ${r.created_at ? new Date(r.created_at).toLocaleString() : ''}</div>
+                </div>`).join('') : '<div class="admin-empty">No audit activity recorded.</div>';
+        }
+
+        // ---------- DATE PLAN OVERSIGHT ----------
+        async function loadAdminDatePlans(forceRefresh) {
+            const box=document.getElementById('adminDatePlansList');
+            if (!box) return;
+            box.innerHTML='<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading date plans…</div>';
+
+            const status=document.getElementById('adminDatePlanStatus')?.value || 'pending';
+            let q=_supabase.from('dating_date_plans').select('*').order('date_on',{ascending:true}).order('start_time',{ascending:true}).limit(500);
+            if(status!=='all') q=q.eq('status',status);
+            const {data,error}=await q;
+            if(error){
+                box.innerHTML=`<div class="admin-empty">Date-plan data unavailable: ${escapeHtml(error.message)}<br><small>Run the Wana Dating 2.0 date-plan migration first.</small></div>`;
+                return;
+            }
+            _adminDatePlans=data||[];
+            renderAdminDatePlans();
+        }
+
+        async function renderAdminDatePlans() {
+            const box=document.getElementById('adminDatePlansList');
+            if(!box) return;
+            const q=(document.getElementById('adminDatePlanSearch')?.value||'').trim().toLowerCase();
+
+            const rows=_adminDatePlans.filter(r => !q || [
+                r.city,r.location_name,r.title,r.creator_id,r.recipient_id
+            ].some(v=>String(v||'').toLowerCase().includes(q)));
+
+            const pending=_adminDatePlans.filter(r=>r.status==='pending').length;
+            const accepted=_adminDatePlans.filter(r=>r.status==='accepted' && r.date_on >= new Date().toISOString().slice(0,10)).length;
+            document.getElementById('datePlanPendingCount').textContent=pending;
+            document.getElementById('datePlanAcceptedCount').textContent=accepted;
+            document.getElementById('datePlanTotalCount').textContent=rows.length;
+
+            if(!rows.length){box.innerHTML='<div class="admin-empty">No date plans match this filter.</div>';return;}
+
+            const ids=[...new Set(rows.flatMap(r=>[r.creator_id,r.recipient_id]).filter(Boolean))];
+            let people={};
+            if(ids.length){
+                const {data}=await _supabase.from('dating_profiles').select('user_id,display_name,city').in('user_id',ids);
+                (data||[]).forEach(p=>people[p.user_id]=p);
+            }
+
+            box.innerHTML=`<div class="admin-table-wrap"><table class="admin-table">
+                <thead><tr><th>Date</th><th>Members</th><th>Place</th><th>Status</th><th>Notes</th></tr></thead>
+                <tbody>${rows.map(r=>{
+                    const a=people[r.creator_id]?.display_name||String(r.creator_id||'').slice(0,8)+'…';
+                    const b=people[r.recipient_id]?.display_name||String(r.recipient_id||'').slice(0,8)+'…';
+                    return `<tr>
+                        <td><strong>${escapeHtml(r.date_on||'—')}</strong><br><span style="color:#9ca3af">${escapeHtml(r.start_time||'')}</span></td>
+                        <td>${escapeHtml(a)}<br><span style="color:#9ca3af">with ${escapeHtml(b)}</span></td>
+                        <td><strong>${escapeHtml(r.location_name||'—')}</strong><br><span style="color:#9ca3af">${escapeHtml(r.city||'')}</span></td>
+                        <td><span class="admin-status ${escapeHtml(r.status||'')}">${escapeHtml(r.status||'')}</span></td>
+                        <td>${escapeHtml(r.notes||'—')}</td>
+                    </tr>`;
+                }).join('')}</tbody></table></div>`;
+        }
+
+        // ---------- AUDIT LOG ----------
+        async function loadAdminAudit(forceRefresh) {
+            const box=document.getElementById('adminAuditList');
+            if(!box) return;
+            box.innerHTML='<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading audit history…</div>';
+            const {data,error}=await _supabase.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(500);
+            if(error){box.innerHTML=`<div class="admin-empty">Audit log unavailable: ${escapeHtml(error.message)}</div>`;return;}
+            _adminAuditRows=data||[];
+            renderAdminAudit();
+        }
+
+        function renderAdminAudit() {
+            const box=document.getElementById('adminAuditList');
+            if(!box)return;
+            const q=(document.getElementById('auditSearch')?.value||'').trim().toLowerCase();
+            const rows=_adminAuditRows.filter(r=>!q||[r.action,r.admin_email,r.details].some(v=>String(v||'').toLowerCase().includes(q)));
+            if(!rows.length){box.innerHTML='<div class="admin-empty">No audit entries match your search.</div>';return;}
+            box.innerHTML=`<div class="admin-table-wrap"><table class="admin-table">
+                <thead><tr><th>Time</th><th>Administrator</th><th>Action</th><th>Details</th></tr></thead>
+                <tbody>${rows.map(r=>`<tr>
+                    <td>${r.created_at?escapeHtml(new Date(r.created_at).toLocaleString()):'—'}</td>
+                    <td>${escapeHtml(r.admin_email||'—')}</td>
+                    <td><strong>${escapeHtml(r.action||'—')}</strong></td>
+                    <td>${escapeHtml(r.details||'—')}</td>
+                </tr>`).join('')}</tbody></table></div>`;
         }
 
         // ---------- INIT ----------
