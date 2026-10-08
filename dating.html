@@ -2233,14 +2233,13 @@ async function fetchBlockedIds(){
 // profile.last_seen_privacy governs whether the CURRENT viewer may see
 // profile's online/last-active status. "matches"/"verified" checks look
 // at the viewer's own relationship to profile, not profile's own status.
-function canSeeLastSeen(profile){
-  if (!profile || !currentUser) return false;
-  if (profile.user_id === currentUser.id) return true;
-  const pref = profile.last_seen_privacy || "everybody";
-  if (pref === "everybody") return true;
-  if (pref === "nobody") return false;
-  if (pref === "verified") return !!(myProfile && myProfile.is_verified);
-  if (pref === "matches") return myMatchedIds.has(profile.user_id);
+function canSeeLastSeen(profile) {
+  if (!profile || !profile.last_seen_privacy) return true;
+  const setting = profile.last_seen_privacy;
+  if (setting === 'everybody') return true;
+  if (setting === 'nobody') return false;
+  if (setting === 'matches') return myMatchedIds.has(profile.user_id);
+  if (setting === 'verified') return !!(myProfile && myProfile.is_verified);
   return true;
 }
 
@@ -2958,16 +2957,17 @@ async function setComposerAvatar(){
   el.innerHTML = photo ? `<img src="${esc(photo)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : "👤";
 }
 
-function previewPostImage(){
-  const file = document.getElementById("postImage").files[0];
-  pendingPostImageFile = file || null;
-  const preview = document.getElementById("postImagePreview");
-  if (!file){ preview.innerHTML = ""; return; }
-  const url = URL.createObjectURL(file);
-  preview.innerHTML = `<div style="position:relative;display:inline-block;">
-    <img src="${url}" style="max-height:140px;border-radius:8px;">
-    <button onclick="clearPostImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold;">✕</button>
-  </div>`;
+function previewPostImage() {
+  const input = document.getElementById('postImage');
+  const preview = document.getElementById('postImagePreview');
+  preview.innerHTML = '';
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 12px; margin-top: 8px;">`;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
 
 function clearPostImage(){
@@ -2976,55 +2976,52 @@ function clearPostImage(){
   document.getElementById("postImagePreview").innerHTML = "";
 }
 
-async function submitPost(){
-  if (!(await requireProfile("post to the Home feed"))) return;
-  const textarea = document.getElementById("postBody");
-  const body = textarea.value.trim();
-  const msg = document.getElementById("postMsg");
-  const btn = document.getElementById("postSubmitBtn");
-  if (!body){ msg.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
 
-  btn.disabled = true;
-  btn.textContent = "Posting...";
+async function submitPost() {
+  if (!currentUser) return;
+  const bodyText = document.getElementById('postBody').value.trim();
+  const fileInput = document.getElementById('postImage');
+  const visibility = document.getElementById('postVisibility').value;
+  const msgEl = document.getElementById('postMsg');
 
-  let imageUrl = null;
-  if (pendingPostImageFile){
-    // Path starts with the uploader's id (no sub-folder) so it matches
-    // the "name LIKE auth.uid()||'-%'" write policy on this bucket, and
-    // stores as a PATH — not a public URL — since post media visibility
-    // is gated by dating_can_view_post_media() per-post.
-    const path = `${currentUser.id}-${Date.now()}-${pendingPostImageFile.name}`;
-    const { error: uploadErr } = await _supabase.storage.from(BUCKET_POST_MEDIA).upload(path, pendingPostImageFile);
-    if (uploadErr){
-      msg.innerHTML = `<div class="msg error">Image upload failed: ${esc(uploadErr.message)}</div>`;
-      btn.disabled = false; btn.textContent = "Post";
-      return;
-    }
-    imageUrl = path; // stored as a path now; resolved to a signed URL when the feed renders it
-  }
-
-  const { error } = await _supabase.from("dating_posts").insert({
-    user_id: currentUser.id,
-    body,
-    image_url: imageUrl,
-    visibility: document.getElementById("postVisibility").value
-  });
-
-  btn.disabled = false;
-  btn.textContent = "Post";
-
-  if (error){
-    const isRlsBlock = error.code === "42501" || /row-level security/i.test(error.message || "");
-    msg.innerHTML = isRlsBlock
-      ? `<div class="msg error">Post a profile first (see the "Setup Profile" tab) before sharing to the Home feed.</div>`
-      : `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
+  if (!bodyText && (!fileInput.files || fileInput.files.length === 0)) {
+    msgEl.innerHTML = '<div class="msg error">Please enter text or attach an image.</div>';
     return;
   }
 
-  textarea.value = "";
-  clearPostImage();
-  msg.innerHTML = "";
-  loadFeed();
+  let photoPath = null;
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+    const { data, error: uploadErr } = await _supabase.storage
+      .from(BUCKET_POST_MEDIA)
+      .upload(filePath, file);
+
+    if (uploadErr) {
+      msgEl.innerHTML = `<div class="msg error">Image upload failed: ${uploadErr.message}</div>`;
+      return;
+    }
+    photoPath = filePath;
+  }
+
+  const { error: insertErr } = await _supabase.from('dating_posts').insert([{
+    user_id: currentUser.id,
+    content: bodyText,
+    image_url: photoPath,
+    visibility: visibility
+  }]);
+
+  if (insertErr) {
+    msgEl.innerHTML = `<div class="msg error">Failed to create post: ${insertErr.message}</div>`;
+  } else {
+    msgEl.innerHTML = '<div class="msg success">Post shared successfully!</div>';
+    document.getElementById('postBody').value = '';
+    fileInput.value = '';
+    document.getElementById('postImagePreview').innerHTML = '';
+    loadFeed(); // Refresh post feed
+  }
 }
 
 // Opens someone's profile. The row is always fetched fresh, and the
