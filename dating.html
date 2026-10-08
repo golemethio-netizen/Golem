@@ -2979,11 +2979,13 @@ function clearPostImage(){
 
 async function submitPost() {
   if (!currentUser) return;
+
   const bodyText = document.getElementById('postBody').value.trim();
   const fileInput = document.getElementById('postImage');
   const visibility = document.getElementById('postVisibility').value;
   const msgEl = document.getElementById('postMsg');
 
+  // Check that at least text or an image is provided
   if (!bodyText && (!fileInput.files || fileInput.files.length === 0)) {
     msgEl.innerHTML = '<div class="msg error">Please enter text or attach an image.</div>';
     return;
@@ -3006,9 +3008,11 @@ async function submitPost() {
     photoPath = filePath;
   }
 
+  // Column mapping fix: changed `content` to `body`
+  // Added a fallback string so `body` is never null if only an image is posted
   const { error: insertErr } = await _supabase.from('dating_posts').insert([{
     user_id: currentUser.id,
-    content: bodyText,
+    body: bodyText || '', 
     image_url: photoPath,
     visibility: visibility
   }]);
