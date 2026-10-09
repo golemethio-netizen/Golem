@@ -671,6 +671,29 @@
             return div.innerHTML;
         }
 
+        // ---------- Private-bucket photo resolution ----------
+        // Photos live in private Storage buckets as of the dating-storage
+        // migration, so every stored value is a PATH (e.g. "user123/photo.jpg"),
+        // not a public URL. Rendering that path directly in <img src> gives a
+        // broken image. This resolves a path (or passes through a legacy
+        // public URL) to a short-lived signed URL, with a small in-memory
+        // cache so re-rendering the same list doesn't re-sign every photo.
+        const BUCKET_PROFILE_PHOTOS = "dating-profile-photos";
+        const BUCKET_POST_MEDIA = "dating-post-media";
+        const BUCKET_VERIFICATION = "dating-verification";
+        const _adminSignedUrlCache = new Map();
+        async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600) {
+            if (!pathOrUrl) return null;
+            if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
+            const key = `${bucket}:${pathOrUrl}`;
+            const cached = _adminSignedUrlCache.get(key);
+            if (cached && cached.expiresAt > Date.now() + 30000) return cached.url;
+            const { data, error } = await _supabase.storage.from(bucket).createSignedUrl(pathOrUrl, expiresInSeconds);
+            if (error || !data) { console.warn(`Couldn't sign URL for ${key}:`, error && error.message); return null; }
+            _adminSignedUrlCache.set(key, { url: data.signedUrl, expiresAt: Date.now() + expiresInSeconds * 1000 });
+            return data.signedUrl;
+        }
+
         // Lightweight stand-in for the main admin.html's loadStats() — this
         // page only needs the four dating badge counts, not the whole
         // marketplace stats dashboard.
@@ -786,13 +809,15 @@
                 (reporters || []).forEach(r => reporterMap[r.id] = r);
             }
 
-            container.innerHTML = reports.map(r => {
+            const photoUrls = await Promise.all(reports.map(r => resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, r.dating_profiles?.photo_url)));
+
+            container.innerHTML = reports.map((r, i) => {
                 const reporter = reporterMap[r.reporter_id];
                 const profile = r.dating_profiles;
                 const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
                 return `
                     <div style="display:flex; gap:14px; padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px; align-items:flex-start;">
-                        <img src="${escapeHtml(profile?.photo_url || '')}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#f5f5f5; flex-shrink:0;" onerror="this.style.display='none'">
+                        <img src="${escapeHtml(photoUrls[i] || '')}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#f5f5f5; flex-shrink:0;" onerror="this.style.display='none'">
                         <div style="flex:1; min-width:0;">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
                                 <div>
@@ -936,7 +961,7 @@
 
             const filter = document.getElementById('postReportsFilterStatus').value;
             let query = _supabase.from('dating_post_reports')
-                .select('*, dating_posts(id, user_id, body, image_url)')
+                .select('*, dating_posts(*)') // * so it works whether the photo column is photo_url or image_url
                 .order('created_at', { ascending: false });
             if (filter !== 'all') query = query.eq('status', filter);
 
@@ -955,7 +980,9 @@
                 (reporters || []).forEach(r => reporterMap[r.id] = r);
             }
 
-            container.innerHTML = reports.map(r => {
+            const postPhotoUrls = await Promise.all(reports.map(r => resolvePrivateUrl(BUCKET_POST_MEDIA, r.dating_posts?.photo_url || r.dating_posts?.image_url)));
+
+            container.innerHTML = reports.map((r, i) => {
                 const reporter = reporterMap[r.reporter_id];
                 const post = r.dating_posts;
                 const statusColor = r.status === 'open' ? '#ff4757' : r.status === 'reviewed' ? '#2ed573' : '#999';
@@ -966,7 +993,7 @@
                             <span style="color:${statusColor}; font-size:0.72rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
                         </div>
                         ${post?.body ? `<p style="color:#555; font-size:0.85rem; margin:8px 0; background:#fafafa; padding:8px; border-radius:6px;">${escapeHtml(post.body.slice(0,300))}</p>` : ''}
-                        ${post?.image_url ? `<img src="${escapeHtml(post.image_url)}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
+                        ${postPhotoUrls[i] ? `<img src="${escapeHtml(postPhotoUrls[i])}" style="max-width:160px; border-radius:6px; margin-bottom:8px;">` : ''}
                         <p style="color:#666; font-size:0.85rem; margin:6px 0;">Reason: "${escapeHtml(r.reason)}"</p>
                         <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Reported by ${escapeHtml(reporter?.full_name || 'Unknown')}${reporter?.phone ? ' · ' + escapeHtml(reporter.phone) : ''} · ${new Date(r.created_at).toLocaleDateString()}</p>
                         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
@@ -1022,9 +1049,19 @@
             const profileMap = {};
             (profiles || []).forEach(p => profileMap[p.user_id] = p);
 
-            container.innerHTML = requests.map(r => {
+            const verificationPhotoUrls = await Promise.all(requests.map(async r => {
                 const profile = profileMap[r.user_id];
-                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const rawProfilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const [selfie, profilePhoto] = await Promise.all([
+                    resolvePrivateUrl(BUCKET_VERIFICATION, r.selfie_url),
+                    resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, rawProfilePhoto)
+                ]);
+                return { selfie, profilePhoto };
+            }));
+
+            container.innerHTML = requests.map((r, i) => {
+                const profile = profileMap[r.user_id];
+                const { selfie, profilePhoto } = verificationPhotoUrls[i];
                 const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
                 return `
                     <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
@@ -1035,7 +1072,7 @@
                         <div style="display:flex; gap:12px; margin:10px 0; flex-wrap:wrap;">
                             <div>
                                 <div style="font-size:0.7rem; color:#999; margin-bottom:4px;">Submitted selfie</div>
-                                <img src="${escapeHtml(r.selfie_url)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                                ${selfie ? `<img src="${escapeHtml(selfie)}" style="width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #eee;">` : `<div style="width:120px;height:120px;border-radius:8px;border:1px solid #eee;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:0.7rem;text-align:center;">Couldn't load selfie</div>`}
                             </div>
                             ${profilePhoto ? `
                             <div>
@@ -1101,9 +1138,15 @@
 
             const planLabel = { weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly' };
 
-            container.innerHTML = requests.map(r => {
+            const platinumPhotoUrls = await Promise.all(requests.map(r => {
                 const profile = profileMap[r.user_id];
-                const profilePhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                const rawPhoto = profile ? ((profile.photos && profile.photos[0]) || profile.photo_url) : null;
+                return resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, rawPhoto);
+            }));
+
+            container.innerHTML = requests.map((r, i) => {
+                const profile = profileMap[r.user_id];
+                const profilePhoto = platinumPhotoUrls[i];
                 const statusColor = r.status === 'pending' ? '#ff4757' : r.status === 'approved' ? '#2ed573' : '#999';
                 return `
                     <div style="padding:16px; border:1px solid #eee; border-radius:10px; margin-bottom:12px;">
@@ -1311,10 +1354,12 @@
                 return;
             }
 
-            container.innerHTML = rows.map(m => {
+            const memberPhotoUrls = await Promise.all(rows.map(m => resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, (m.photos && m.photos[0]) || m.photo_url)));
+
+            container.innerHTML = rows.map((m, i) => {
                 const c = m._contact || {};
                 const name = m.display_name || c.full_name || 'Unnamed member';
-                const photo = (m.photos && m.photos[0]) || m.photo_url || '';
+                const photo = memberPhotoUrls[i] || '';
                 const activePlatinum = platinumActive(m);
                 const accountStatus = m.account_status || m.status || 'active';
                 return `
@@ -1386,7 +1431,8 @@
             }
 
             const name = p?.display_name || c.full_name || 'Unnamed member';
-            const photo = (p?.photos && p.photos[0]) || p?.photo_url || '';
+            const rawPhoto = (p?.photos && p.photos[0]) || p?.photo_url || '';
+            const photo = await resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, rawPhoto) || '';
             const suspended = String(account.status || 'active').toLowerCase() === 'suspended';
             const activePlatinum = platinumActive(p);
             const openReports = reports.filter(r => String(r.status || '').toLowerCase() === 'open' || String(r.status || '').toLowerCase() === 'pending').length;
@@ -1396,8 +1442,9 @@
                 : `<div class="member-alert success"><strong>Account active.</strong> No current administrative suspension is recorded.</div>`;
 
             const photos = Array.isArray(p?.photos) ? p.photos : [];
-            const photoStrip = photos.length
-                ? `<div class="member-photo-strip">${photos.slice(0,8).map(x => `<img src="${escapeHtml(x)}" onerror="this.style.display='none'">`).join('')}</div>`
+            const stripUrls = await Promise.all(photos.slice(0,8).map(x => resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, x)));
+            const photoStrip = stripUrls.length
+                ? `<div class="member-photo-strip">${stripUrls.map(x => `<img src="${escapeHtml(x || '')}" onerror="this.style.display='none'">`).join('')}</div>`
                 : '<div class="member-note">No additional profile photos.</div>';
 
             const verificationRows = verifications.length ? verifications.map(v => `
