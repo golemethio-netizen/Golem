@@ -2263,6 +2263,7 @@ async function fetchBlockedIds(){
 // profile's online/last-active status. "matches"/"verified" checks look
 // at the viewer's own relationship to profile, not profile's own status.
 function canSeeLastSeen(profile) {
+  if (profile && currentUser && profile.user_id === currentUser.id) return true; // always your own
   if (!profile || !profile.last_seen_privacy) return true;
   const setting = profile.last_seen_privacy;
   if (setting === 'everybody') return true;
@@ -2986,17 +2987,21 @@ async function setComposerAvatar(){
   el.innerHTML = photo ? `<img src="${esc(photo)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : "👤";
 }
 
-function previewPostImage() {
-  const input = document.getElementById('postImage');
-  const preview = document.getElementById('postImagePreview');
-  preview.innerHTML = '';
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 12px; margin-top: 8px;">`;
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
+function previewPostImage(){
+  const input = document.getElementById("postImage");
+  const preview = document.getElementById("postImagePreview");
+  const file = input.files && input.files[0];
+  pendingPostImageFile = file || null;
+  preview.innerHTML = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    preview.innerHTML = `<div style="position:relative;display:inline-block;margin-top:8px;">
+      <img src="${e.target.result}" style="max-width:100%;max-height:200px;border-radius:12px;display:block;">
+      <button type="button" onclick="clearPostImage()" aria-label="Remove photo" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;">✕</button>
+    </div>`;
+  };
+  reader.readAsDataURL(file);
 }
 
 function clearPostImage(){
@@ -3005,55 +3010,83 @@ function clearPostImage(){
   document.getElementById("postImagePreview").innerHTML = "";
 }
 
+const POST_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const POST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+let postSubmitting = false;
+// Which column holds the post's photo. The newer private-storage schema calls it
+// photo_url; an older database still calls it image_url. We try photo_url first
+// and, if the database says that column doesn't exist, switch to image_url for
+// the rest of the session instead of failing every post.
+let postMediaColumn = "photo_url";
 
-async function submitPost() {
-  if (!currentUser) return;
+async function submitPost(){
+  if (postSubmitting) return;
+  if (!(await requireProfile("post to the Home feed"))) return;
 
-  const bodyText = document.getElementById('postBody').value.trim();
-  const fileInput = document.getElementById('postImage');
-  const visibility = document.getElementById('postVisibility').value;
-  const msgEl = document.getElementById('postMsg');
+  const msgEl = document.getElementById("postMsg");
+  const btn = document.getElementById("postSubmitBtn");
+  const bodyText = document.getElementById("postBody").value.trim();
+  const visibility = document.getElementById("postVisibility").value;
+  const file = pendingPostImageFile || (document.getElementById("postImage").files || [])[0] || null;
 
-  // Check that at least text or an image is provided
-  if (!bodyText && (!fileInput.files || fileInput.files.length === 0)) {
-    msgEl.innerHTML = '<div class="msg error">Please enter text or attach an image.</div>';
+  if (!bodyText && !file){
+    msgEl.innerHTML = `<div class="msg error">Please enter text or attach an image.</div>`;
+    return;
+  }
+  if (file && !POST_IMAGE_TYPES.has(file.type)){
+    msgEl.innerHTML = `<div class="msg error">Use a JPG, PNG, WEBP, or GIF image.</div>`;
+    return;
+  }
+  if (file && file.size > POST_IMAGE_MAX_BYTES){
+    msgEl.innerHTML = `<div class="msg error">Images must be 5 MB or smaller.</div>`;
     return;
   }
 
-  let photoPath = null;
-  if (fileInput.files && fileInput.files[0]) {
-    const file = fileInput.files[0];
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${currentUser.id}/${Date.now()}.${fileExt}`;
+  postSubmitting = true;
+  if (btn){ btn.disabled = true; btn.textContent = "Posting..."; }
+  try {
+    let mediaPath = null;
+    if (file){
+      // "<uid>-<time>-<name>" with NO sub-folder: this bucket's write policy is
+      // name LIKE auth.uid()||'-%', so a "<uid>/<file>" path is rejected. The name
+      // is sanitised so a crafted filename can't alter the path.
+      const safe = String(file.name || "image").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
+      mediaPath = `${currentUser.id}-${Date.now()}-${safe}`;
+      const { error: uploadErr } = await _supabase.storage.from(BUCKET_POST_MEDIA)
+        .upload(mediaPath, file, { contentType: file.type, upsert: false });
+      if (uploadErr){
+        msgEl.innerHTML = `<div class="msg error">Image upload failed: ${esc(uploadErr.message)}</div>`;
+        return;
+      }
+    }
 
-    const { data, error: uploadErr } = await _supabase.storage
-      .from(BUCKET_POST_MEDIA)
-      .upload(filePath, file);
+    // body is never null/empty: an image-only post gets a camera emoji so it
+    // satisfies a NOT NULL / minimum-length constraint on the column.
+    const row = { user_id: currentUser.id, body: bodyText || "📷", visibility };
+    const insertRow = () => _supabase.from("dating_posts").insert({ ...row, [postMediaColumn]: mediaPath });
 
-    if (uploadErr) {
-      msgEl.innerHTML = `<div class="msg error">Image upload failed: ${uploadErr.message}</div>`;
+    let { error } = await insertRow();
+    if (error && postMediaColumn === "photo_url" && /photo_url/i.test(error.message || "") && /column|schema cache/i.test(error.message || "")){
+      postMediaColumn = "image_url";
+      ({ error } = await insertRow());
+    }
+
+    if (error){
+      const isRlsBlock = error.code === "42501" || /row-level security/i.test(error.message || "");
+      msgEl.innerHTML = isRlsBlock
+        ? `<div class="msg error">Post a profile first (see the "Setup Profile" tab) before sharing to the Home feed.</div>`
+        : `<div class="msg error">Couldn't post: ${esc(error.message)}</div>`;
       return;
     }
-    photoPath = filePath;
-  }
 
-  // Column mapping fix: changed `content` to `body`
-  // Added a fallback string so `body` is never null if only an image is posted
-  const { error: insertErr } = await _supabase.from('dating_posts').insert([{
-    user_id: currentUser.id,
-    body: bodyText || '', 
-    image_url: photoPath,
-    visibility: visibility
-  }]);
-
-  if (insertErr) {
-    msgEl.innerHTML = `<div class="msg error">Failed to create post: ${insertErr.message}</div>`;
-  } else {
-    msgEl.innerHTML = '<div class="msg success">Post shared successfully!</div>';
-    document.getElementById('postBody').value = '';
-    fileInput.value = '';
-    document.getElementById('postImagePreview').innerHTML = '';
-    loadFeed(); // Refresh post feed
+    document.getElementById("postBody").value = "";
+    clearPostImage();
+    msgEl.innerHTML = `<div class="msg success">Post shared!</div>`;
+    setTimeout(() => { if (msgEl.textContent.includes("Post shared")) msgEl.innerHTML = ""; }, 2500);
+    loadFeed();
+  } finally {
+    postSubmitting = false;
+    if (btn){ btn.disabled = false; btn.textContent = "Post"; }
   }
 }
 
@@ -3151,8 +3184,9 @@ async function loadFeed(){
   // per-post by dating_can_view_post_media() — resolve each to a signed
   // URL up front so renderFeedPost can stay a plain synchronous template.
   const postPhotoUrls = {};
-  await Promise.all(posts.filter(p => p.image_url).map(async p => {
-    postPhotoUrls[p.id] = await resolvePrivateUrl(BUCKET_POST_MEDIA, p.image_url);
+  const postMediaPath = p => p.photo_url || p.image_url; // either schema
+  await Promise.all(posts.filter(p => postMediaPath(p)).map(async p => {
+    postPhotoUrls[p.id] = await resolvePrivateUrl(BUCKET_POST_MEDIA, postMediaPath(p));
   }));
 
   feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap, postPhotoUrls[p.id])).join("");
