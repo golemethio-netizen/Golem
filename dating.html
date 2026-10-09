@@ -2139,12 +2139,36 @@ const BUCKET_VERIFICATION = "dating-verification";
 const _signedUrlCache = new Map(); // key: `${bucket}:${path}` -> { url, expiresAt }
 async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600){
   if (!pathOrUrl) return null;
-  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl; // pre-migration full URL
-  const key = `${bucket}:${pathOrUrl}`;
+
+  // Rows may contain either an object path or a complete Supabase Storage URL.
+  // A full signed URL can expire, so don't return Supabase signed URLs unchanged:
+  // extract their bucket/object path and mint a fresh URL instead.
+  let targetBucket = bucket;
+  let objectPath = String(pathOrUrl).trim();
+  if (/^https?:\/\//i.test(objectPath)){
+    try {
+      const parsed = new URL(objectPath);
+      const match = parsed.pathname.match(/\/storage\/v1\/object\/(sign|public|authenticated)\/([^/]+)\/(.+)$/i);
+      if (!match) return objectPath; // external or legacy non-Storage URL
+      targetBucket = decodeURIComponent(match[2]);
+      objectPath = match[3].split("/").map(part => {
+        try { return decodeURIComponent(part); } catch (_) { return part; }
+      }).join("/");
+      // Public objects don't need a signed URL. Keep their stable public URL.
+      if (match[1].toLowerCase() === "public" && !parsed.searchParams.has("token")) return objectPath ? parsed.href : null;
+    } catch (_) {
+      return objectPath;
+    }
+  }
+
+  const key = `${targetBucket}:${objectPath}`;
   const cached = _signedUrlCache.get(key);
   if (cached && cached.expiresAt > Date.now() + 30000) return cached.url;
-  const { data, error } = await _supabase.storage.from(bucket).createSignedUrl(pathOrUrl, expiresInSeconds);
-  if (error || !data) { console.warn(`Couldn't sign URL for ${key}:`, error && error.message); return null; }
+  const { data, error } = await _supabase.storage.from(targetBucket).createSignedUrl(objectPath, expiresInSeconds);
+  if (error || !data || !data.signedUrl) {
+    console.warn(`Couldn't sign URL for ${key}:`, error && error.message);
+    return null;
+  }
   _signedUrlCache.set(key, { url: data.signedUrl, expiresAt: Date.now() + expiresInSeconds * 1000 });
   return data.signedUrl;
 }
@@ -3229,7 +3253,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolve
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
       <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
-      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
+      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" alt="Photo attached to post" loading="lazy" style="display:block;margin-top:12px;width:100%;max-width:100%;height:auto;max-height:640px;object-fit:contain;border-radius:10px;background:var(--paper);" onerror="this.style.display='none';console.warn('Post image could not be loaded for post ${String(p.id).replace(/[^a-zA-Z0-9_-]/g, '')}');">` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
