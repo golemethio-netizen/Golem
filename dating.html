@@ -5891,6 +5891,51 @@ function homeRecommendationScore(me,r){
     const root=document.getElementById("modalRoot"); if(!root)return; root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:480px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🛡️ Date safety checklist</h3><div class="match-explain"><b>Before you go</b><br>Tell someone you trust where you are going and when you expect to return.<br><br><b>At the meetup</b><br>Choose a public place, keep control of your own transport, and avoid sending money or sharing passwords/codes.<br><br><b>If something feels wrong</b><br>Leave, block/report the member in Wana, and contact local emergency services when appropriate.</div><div class="actions"><button class="btn-contact" onclick="closeModal()">Got it</button></div></div></div></div>`;
   }
 
+  // Safety Center's "Report a concern" button has no specific profile in
+  // context (it's a standalone card, not opened from a profile modal), so it
+  // can't call reportProfile(id)/blockProfile(id) directly. This shows how to
+  // report/block from where those actions actually live.
+  window.openSafetyReportGuide=function(){
+    const root=document.getElementById("modalRoot"); if(!root)return;
+    root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:480px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🚩 Report or block a member</h3><div class="match-explain">Reporting and blocking are done from that member's profile, not from here:<br><br>1. Open their profile (tap their card in Browse, Home or a conversation).<br>2. Use the <b>Report</b> or <b>Block</b> button in their profile view.<br><br>Reporting sends the profile to our moderators for review. Blocking immediately stops them from messaging you and ends any match — it can't be undone from your side.<br><br>If you're ever in immediate danger, contact local emergency services first.</div><div class="actions"><button class="btn-contact" onclick="closeModal()">Got it</button></div></div></div></div>`;
+  };
+
+  // Browser (Web Notifications API) permission toggle for the Safety Center's
+  // "Push notifications" card. This is local browser permission only — no
+  // push server/VAPID wiring exists here, so it can't deliver notifications
+  // while the tab is closed, just let the page show them while open.
+  function refreshPushStatus(){
+    const btn=document.getElementById("pushEnableBtn"), status=document.getElementById("pushStatus");
+    if(!status) return;
+    if(typeof Notification==="undefined"){
+      status.textContent="Notifications aren't supported in this browser.";
+      if(btn){btn.disabled=true;}
+      return;
+    }
+    if(Notification.permission==="granted"){
+      status.textContent="Notifications are enabled.";
+      if(btn){btn.textContent="Enabled ✓";btn.disabled=true;}
+    } else if(Notification.permission==="denied"){
+      status.textContent="Notifications are blocked. Enable them in your browser's site settings to turn this on.";
+      if(btn){btn.disabled=true;}
+    } else if(btn){
+      btn.disabled=false;btn.textContent="Enable notifications";
+      status.textContent="";
+    }
+  }
+  window.enableWanaNotifications=async function(){
+    const status=document.getElementById("pushStatus");
+    if(typeof Notification==="undefined"){
+      if(status)status.textContent="Notifications aren't supported in this browser.";
+      return;
+    }
+    try{
+      await Notification.requestPermission();
+    }catch(e){console.warn("Notification permission request failed",e);}
+    refreshPushStatus();
+  };
+  document.addEventListener("DOMContentLoaded",refreshPushStatus);
+
   window.filterDatePlans=function(filter,btn){state.dateFilter=filter;document.querySelectorAll("[data-date-filter]").forEach(b=>b.classList.toggle("active",b.dataset.dateFilter===filter));loadDatePlans()};
   async function refreshDatePlanBadge(){const b=document.getElementById("datePlansBadge");if(!b||!currentUser)return;const {count}=await _supabase.from("dating_date_plans").select("id",{count:"exact",head:true}).eq("recipient_id",currentUser.id).eq("status","pending");b.textContent=count?`(${count})`:""}
   window.refreshDatePlanBadge=refreshDatePlanBadge;
