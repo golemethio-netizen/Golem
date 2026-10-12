@@ -226,14 +226,6 @@ header button.lang:hover {
   position: relative;
   transition: background var(--transition);
 }
-
-
-.post-body-text, .post-content, .feed-post p {
-  word-break: break-word;
-  overflow-wrap: break-word;
-  max-width: 100%;
-}
-   
 .notif-bell:hover { background: rgba(255, 255, 255, 0.16); }
 .notif-count {
   position: absolute;
@@ -1012,6 +1004,8 @@ form.post-form textarea {
   margin-bottom: 16px;
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .feed-post-card:hover { box-shadow: var(--shadow); }
 
@@ -2725,12 +2719,109 @@ function setupRealtimeNotifications(){
     .on("postgres_changes", {
       event: "INSERT", schema: "public", table: "dating_notifications",
       filter: `user_id=eq.${currentUser.id}`
-    }, () => {
+    }, (payload) => {
       refreshNotifCount();
       if (document.getElementById("notifPanel")?.classList.contains("open")) loadNotifications();
+      showBrowserNotification(payload && payload.new);
     })
     .subscribe();
 }
+
+// ---------- Browser notifications (Safety & Trust Center) ----------
+// These are ordinary browser notifications raised by the realtime channel, so they
+// work while Wana Dating is open in a tab (including a background tab). Without a
+// service worker + push server they cannot wake a closed browser; the panel says so.
+const BROWSER_NOTIF_KEY = "wana_browser_notifications";
+function _notifPrefGet(){ try { return localStorage.getItem(BROWSER_NOTIF_KEY) === "1"; } catch(e){ return false; } }
+function _notifPrefSet(on){ try { on ? localStorage.setItem(BROWSER_NOTIF_KEY, "1") : localStorage.removeItem(BROWSER_NOTIF_KEY); } catch(e){} }
+
+function browserNotificationsEnabled(){
+  return ("Notification" in window) && Notification.permission === "granted" && _notifPrefGet();
+}
+
+// Deliberately generic text: it shows on lock screens, so it never includes
+// message content or names.
+function showBrowserNotification(n){
+  if (!n || !browserNotificationsEnabled() || !document.hidden) return;
+  const text = {
+    message: "You have a new message",
+    like: "Someone liked your profile",
+    match: "It's a match! ✨",
+    date: "There's an update on a date plan"
+  }[n.type] || "You have new activity";
+  try {
+    const note = new Notification("Wana Dating", { body: text, tag: "wana-" + (n.id || Date.now()) });
+    note.onclick = () => { window.focus(); note.close(); };
+  } catch(e){ /* some mobile browsers only allow notifications via a service worker */ }
+}
+
+function refreshPushStatus(){
+  const status = document.getElementById("pushStatus");
+  const btn = document.getElementById("pushEnableBtn");
+  if (!status || !btn) return;
+  if (!("Notification" in window)){
+    btn.disabled = true;
+    status.textContent = "Not supported in this browser.";
+    return;
+  }
+  if (Notification.permission === "denied"){
+    btn.disabled = true;
+    status.textContent = "Blocked for this site. Allow notifications in your browser's site settings, then reload.";
+    return;
+  }
+  btn.disabled = false;
+  if (browserNotificationsEnabled()){
+    btn.textContent = "Turn off notifications";
+    status.textContent = "On. You'll get an alert for new activity while Wana Dating is open in a background tab.";
+  } else {
+    btn.textContent = "Enable notifications";
+    status.textContent = "Off. These alerts work while the site is open in a tab; they can't reach a closed browser.";
+  }
+}
+
+async function enableWanaNotifications(){
+  const status = document.getElementById("pushStatus");
+  if (!("Notification" in window)){ refreshPushStatus(); return; }
+  if (browserNotificationsEnabled()){ _notifPrefSet(false); refreshPushStatus(); return; } // toggle off
+  let permission = Notification.permission;
+  if (permission === "default") permission = await Notification.requestPermission();
+  if (permission !== "granted"){
+    if (status) status.textContent = permission === "denied"
+      ? "Blocked for this site. Allow notifications in your browser's site settings, then reload."
+      : "Permission wasn't granted, so notifications stay off.";
+    refreshPushStatus();
+    return;
+  }
+  _notifPrefSet(true);
+  try { new Notification("Wana Dating", { body: "Notifications are on." }); } catch(e){}
+  refreshPushStatus();
+}
+
+// ---------- Safety: how to report ----------
+function openSafetyReportGuide(){
+  document.getElementById("modalRoot").innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3 style="margin-top:0;">Report a concern</h3>
+          <p style="font-size:.9rem;color:#555;">Reports go to our moderators, who can remove profiles and posts. The other person is never told who reported them.</p>
+          <ol style="font-size:.9rem;color:#444;line-height:1.7;padding-left:20px;">
+            <li><b>A profile:</b> open their profile card (Browse, New Members, Likes or Visitors) and choose <b>Report</b>. Choose <b>Block</b> as well to stop all contact.</li>
+            <li><b>A post:</b> use <b>Report</b> on the post in the Home feed.</li>
+            <li><b>Never</b> send money, passwords or verification codes to another member.</li>
+          </ol>
+          <p style="font-size:.8rem;color:#b3261e;">If you are in immediate danger, contact your local emergency services. Moderators can't respond to emergencies.</p>
+          <div class="actions">
+            <button class="btn-contact" onclick="closeModal();switchTab('browse')">Go to Browse</button>
+            <button class="btn-contact" style="background:var(--paper);color:var(--green);" onclick="closeModal();switchTab('home')">Go to Home feed</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+refreshPushStatus(); // set the button label/state as soon as the page loads
 
 function teardownRealtimeChannels(){
   if (messageRealtimeChannel){ _supabase.removeChannel(messageRealtimeChannel); messageRealtimeChannel = null; }
@@ -3197,10 +3288,10 @@ async function loadFeed(){
     postPhotoUrls[p.id] = await resolvePrivateUrl(BUCKET_POST_MEDIA, postMediaPath(p));
   }));
 
-  feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap, postPhotoUrls[p.id])).join("");
+  feed.innerHTML = posts.map(p => renderFeedPost(p, authorMap[p.user_id], reactionsByPost[p.id] || [], commentsByPost[p.id] || [], commenterMap, postPhotoUrls[p.id], !!postMediaPath(p))).join("");
 }
 
-function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolvedPhotoUrl){
+function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolvedPhotoUrl, hadMedia){
   const name = a ? (a.display_name || a.gender || "Someone") : "Someone";
   const photo = a ? ((a.photos && a.photos[0]) || a.photo_url) : null;
   const photoIsUrl = photo && /^https?:\/\//i.test(photo);
@@ -3237,7 +3328,8 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolve
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
       <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
-      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" style="margin-top:12px;max-width:100%;border-radius:10px;">` : ""}
+      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" style="margin-top:12px;max-width:100%;border-radius:10px;">`
+        : hadMedia ? `<div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:10px;color:#999;font-size:.8rem;text-align:center;">📷 Photo couldn't be loaded</div>` : ""}
 
       <div class="post-actions">
         <button onclick="showPostReactionPicker(event,'${p.id}')">😀 React</button>
@@ -5898,51 +5990,6 @@ function homeRecommendationScore(me,r){
   function showDateSafety(plan){
     const root=document.getElementById("modalRoot"); if(!root)return; root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:480px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🛡️ Date safety checklist</h3><div class="match-explain"><b>Before you go</b><br>Tell someone you trust where you are going and when you expect to return.<br><br><b>At the meetup</b><br>Choose a public place, keep control of your own transport, and avoid sending money or sharing passwords/codes.<br><br><b>If something feels wrong</b><br>Leave, block/report the member in Wana, and contact local emergency services when appropriate.</div><div class="actions"><button class="btn-contact" onclick="closeModal()">Got it</button></div></div></div></div>`;
   }
-
-  // Safety Center's "Report a concern" button has no specific profile in
-  // context (it's a standalone card, not opened from a profile modal), so it
-  // can't call reportProfile(id)/blockProfile(id) directly. This shows how to
-  // report/block from where those actions actually live.
-  window.openSafetyReportGuide=function(){
-    const root=document.getElementById("modalRoot"); if(!root)return;
-    root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:480px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🚩 Report or block a member</h3><div class="match-explain">Reporting and blocking are done from that member's profile, not from here:<br><br>1. Open their profile (tap their card in Browse, Home or a conversation).<br>2. Use the <b>Report</b> or <b>Block</b> button in their profile view.<br><br>Reporting sends the profile to our moderators for review. Blocking immediately stops them from messaging you and ends any match — it can't be undone from your side.<br><br>If you're ever in immediate danger, contact local emergency services first.</div><div class="actions"><button class="btn-contact" onclick="closeModal()">Got it</button></div></div></div></div>`;
-  };
-
-  // Browser (Web Notifications API) permission toggle for the Safety Center's
-  // "Push notifications" card. This is local browser permission only — no
-  // push server/VAPID wiring exists here, so it can't deliver notifications
-  // while the tab is closed, just let the page show them while open.
-  function refreshPushStatus(){
-    const btn=document.getElementById("pushEnableBtn"), status=document.getElementById("pushStatus");
-    if(!status) return;
-    if(typeof Notification==="undefined"){
-      status.textContent="Notifications aren't supported in this browser.";
-      if(btn){btn.disabled=true;}
-      return;
-    }
-    if(Notification.permission==="granted"){
-      status.textContent="Notifications are enabled.";
-      if(btn){btn.textContent="Enabled ✓";btn.disabled=true;}
-    } else if(Notification.permission==="denied"){
-      status.textContent="Notifications are blocked. Enable them in your browser's site settings to turn this on.";
-      if(btn){btn.disabled=true;}
-    } else if(btn){
-      btn.disabled=false;btn.textContent="Enable notifications";
-      status.textContent="";
-    }
-  }
-  window.enableWanaNotifications=async function(){
-    const status=document.getElementById("pushStatus");
-    if(typeof Notification==="undefined"){
-      if(status)status.textContent="Notifications aren't supported in this browser.";
-      return;
-    }
-    try{
-      await Notification.requestPermission();
-    }catch(e){console.warn("Notification permission request failed",e);}
-    refreshPushStatus();
-  };
-  document.addEventListener("DOMContentLoaded",refreshPushStatus);
 
   window.filterDatePlans=function(filter,btn){state.dateFilter=filter;document.querySelectorAll("[data-date-filter]").forEach(b=>b.classList.toggle("active",b.dataset.dateFilter===filter));loadDatePlans()};
   async function refreshDatePlanBadge(){const b=document.getElementById("datePlansBadge");if(!b||!currentUser)return;const {count}=await _supabase.from("dating_date_plans").select("id",{count:"exact",head:true}).eq("recipient_id",currentUser.id).eq("status","pending");b.textContent=count?`(${count})`:""}
