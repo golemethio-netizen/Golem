@@ -1083,7 +1083,7 @@
                         <p style="color:#aaa; font-size:0.75rem; margin:4px 0;">Submitted ${new Date(r.created_at).toLocaleDateString()}${r.reviewed_at ? ' · reviewed ' + new Date(r.reviewed_at).toLocaleDateString() : ''}</p>
                         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
                             ${r.status === 'pending' ? `
-                                <button onclick="resolveVerification('${r.id}', 'approved')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve</button>
+                                <button onclick="resolveVerification('${r.id}', 'approved')" style="font-size:0.75rem; padding:5px 10px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve · +1 day free Platinum</button>
                                 <button onclick="promptRejectVerification('${r.id}')" style="font-size:0.75rem; padding:5px 10px; border:1px solid #ff4757; color:#ff4757; background:white; border-radius:5px; cursor:pointer;">Reject</button>
                             ` : ''}
                         </div>
@@ -1092,12 +1092,27 @@
         }
 
         async function resolveVerification(requestId, newStatus, note) {
+            if (newStatus === 'approved') {
+                // Approving marks the profile verified AND grants a 1-day free
+                // Platinum trial (unlimited messaging/calls for that day) as a
+                // reward, in one atomic server-side step. See
+                // dating_approve_verification() in the verification-bonus migration.
+                const { error } = await _supabase.rpc('dating_approve_verification', {
+                    p_request_id: requestId,
+                    p_bonus_days: 1
+                });
+                if (error) { alert('Failed: ' + error.message + '\n\n(If this says the function does not exist, run the verification-bonus migration.)'); return; }
+                logAction('Verification Approved (+1 day free Platinum)', `Request ID: ${requestId}`);
+                loadVerificationRequests();
+                refreshDatingBadges();
+                return;
+            }
             const { data: { user } } = await _supabase.auth.getUser();
             const update = { status: newStatus, reviewed_by: user?.id || null };
             if (note) update.reviewer_note = note;
             const { error } = await _supabase.from('dating_verification_requests').update(update).eq('id', requestId);
             if (error) { alert('Failed: ' + error.message); return; }
-            logAction(newStatus === 'approved' ? 'Verification Approved' : 'Verification Rejected', `Request ID: ${requestId}`);
+            logAction('Verification Rejected', `Request ID: ${requestId}`);
             loadVerificationRequests();
             refreshDatingBadges();
         }
@@ -1691,15 +1706,19 @@
             if (!note || note.trim().length < 3) return;
             if (!confirm(`Mark this verification request as ${status}?`)) return;
 
-            const result = await _supabase.rpc('dating_admin_review_verification', {
-                p_request_id: requestId, p_status: status, p_note: note.trim()
-            });
+            // Approving also marks the profile verified and grants a 1-day free
+            // Platinum trial (unlimited messaging/calls) — see
+            // dating_approve_verification() in the verification-bonus migration.
+            // Rejecting keeps using the existing review RPC (no profile change).
+            const result = status === 'approved'
+                ? await _supabase.rpc('dating_approve_verification', { p_request_id: requestId, p_note: note.trim(), p_bonus_days: 1 })
+                : await _supabase.rpc('dating_admin_review_verification', { p_request_id: requestId, p_status: status, p_note: note.trim() });
             if (result.error) {
-                alert('Verification update failed: ' + result.error.message);
+                alert('Verification update failed: ' + result.error.message + (status === 'approved' ? '\n\n(If this says the function does not exist, run the verification-bonus migration.)' : ''));
                 return;
             }
 
-            await adminAudit(`Verification ${status}`, `Request ID: ${requestId}; note: ${note.trim()}`);
+            await adminAudit(`Verification ${status}${status === 'approved' ? ' (+1 day free Platinum)' : ''}`, `Request ID: ${requestId}; note: ${note.trim()}`);
             await openMember360(_member360UserId);
         }
 
