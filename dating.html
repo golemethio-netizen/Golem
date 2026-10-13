@@ -2131,6 +2131,7 @@ const BUCKET_PROFILE_PHOTOS = "dating-profile-photos";
 const BUCKET_POST_MEDIA = "dating-post-media";
 const BUCKET_VOICE_MESSAGES = "dating-voice-messages";
 const BUCKET_VERIFICATION = "dating-verification";
+const BUCKET_PLATINUM_RECEIPTS = "dating-platinum-receipts";
 
 // Resolves a stored photo/voice/selfie value to something <img>/<audio>
 // can load. New rows store a bare object PATH in a private bucket and
@@ -4685,6 +4686,8 @@ function choosePlatinumPlan(planKey){
             <div style="margin-top:8px;color:#666;">After sending, enter the transaction reference number below. We'll review and activate your plan — this isn't instant.</div>
           </div>
           <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
+          <label style="display:block;font-size:.8rem;font-weight:600;color:#333;margin-bottom:6px;">Attach payment receipt or screenshot (optional)</label>
+          <input type="file" id="platinumReceiptFile" accept="image/*,.pdf" style="margin-bottom:14px;width:100%;padding:10px;border:2px dashed #ccc;border-radius:8px;cursor:pointer;">
           <div class="actions">
             <button class="btn-contact" style="width:100%;" onclick="submitPlatinumRequest('${planKey}', ${plan.price})">Submit for Review</button>
           </div>
@@ -4696,18 +4699,36 @@ function choosePlatinumPlan(planKey){
 
 async function submitPlatinumRequest(planKey, amount){
   const txnInput = document.getElementById("platinumTxnNumber");
+  const receiptInput = document.getElementById("platinumReceiptFile");
   const msg = document.getElementById("platinumReqMsg");
   const transactionNumber = txnInput.value.trim();
   if (transactionNumber.length < 3){
     msg.innerHTML = `<div class="msg error">Enter the transaction number from your payment.</div>`;
     return;
   }
+
+  const receiptFile = receiptInput && receiptInput.files[0];
+  let receiptPath = null;
+  if (receiptFile){
+    msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading receipt...</div>`;
+    // Private bucket — path starts with the uploader's id to match the
+    // write policy, and we store the PATH (not a public URL): only the
+    // uploader and admins can ever read it, via a signed URL.
+    receiptPath = `${currentUser.id}-${Date.now()}-${receiptFile.name}`;
+    const { error: uploadErr } = await _supabase.storage.from(BUCKET_PLATINUM_RECEIPTS).upload(receiptPath, receiptFile);
+    if (uploadErr){
+      msg.innerHTML = `<div class="msg error">Receipt upload failed: ${esc(uploadErr.message)}</div>`;
+      return;
+    }
+  }
+
   msg.innerHTML = `<div class="msg" style="color:var(--green);">Submitting...</div>`;
   const { error } = await _supabase.from("dating_platinum_requests").insert({
     user_id: currentUser.id,
     plan: planKey,
     amount_birr: amount,
-    transaction_number: transactionNumber
+    transaction_number: transactionNumber,
+    receipt_url: receiptPath
   });
   if (error){
     msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`;
