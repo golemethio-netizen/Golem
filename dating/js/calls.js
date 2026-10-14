@@ -1,1 +1,1 @@
-/* Reserved module boundary. Existing implementation remains in app.js to preserve shared lexical state and inline event handlers during this lossless extraction. */
+/* Reserved for a future dependency-safe extraction. Existing functionality remains in app.js. */

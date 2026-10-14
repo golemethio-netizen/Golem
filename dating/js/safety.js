@@ -1,3 +1,4 @@
+/* Original script block 4 */
 
 /* =========================================================
    Wana Dating — correctness, privacy & performance patch
@@ -548,3 +549,4 @@
 
   console.info("Wana Dating maintenance patch loaded.");
 })();
+

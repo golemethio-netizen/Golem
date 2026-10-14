@@ -1,3 +1,4 @@
+/* Original script block 3 */
 
 // ============================================================
 // Wana Dating Engine
@@ -3214,3 +3215,4 @@ function homeRecommendationScore(me,r){
   if(r.created_at&&Date.now()-new Date(r.created_at).getTime()<7*86400000)s+=3;
   return Math.min(99,s);
 }
+
