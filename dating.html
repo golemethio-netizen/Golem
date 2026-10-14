@@ -8,7 +8,7 @@
 <title>Dating — WanaGebya</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@600;700&amp;family=Dancing+Script:wght@600;700&amp;family=Noto+Sans+Ethiopic:wght@500;700&amp;display=swap" rel="stylesheet"/>
 <style>
 
 /* =========================================================
@@ -78,41 +78,93 @@ button, input, select, textarea {
 .gate-hero {
   position: relative;
   flex-shrink: 0;
-  min-height: 560px;
-  background-color: #0a1f16;
-  background-image:
-    linear-gradient(160deg, rgba(8, 28, 20, 0.82) 0%, rgba(13, 50, 36, 0.72) 50%, rgba(8, 28, 20, 0.88) 100%),
-    url("wanaagar.png");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  min-height: auto;
+  background:
+    radial-gradient(ellipse at 85% 100%, rgba(10, 10, 10, 0.22), transparent 60%),
+    linear-gradient(180deg, #fdf0cf 0%, #fbd989 30%, #f4a95f 62%, #e8875a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 20px 60px;
+}
+
+.gate-logo-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 16px;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 30% 20%, rgba(13, 155, 108, 0.12), transparent 55%);
-  z-index: 1;
-  pointer-events: none;
+.gate-heart-logo { flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(40, 20, 0, 0.18)); }
+
+.gate-logo-text { text-align: left; }
+
+.gate-logo-title {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #1a1410;
+  line-height: 1.05;
+}
+.gate-logo-title .dating-script {
+  font-family: "Dancing Script", cursive;
+  color: #c8102e;
+  font-size: 1.2em;
+  font-weight: 700;
+  margin-left: 4px;
+}
+.gate-logo-amharic {
+  font-family: "Noto Sans Ethiopic", sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #078930;
+  margin-top: 2px;
+}
+.gate-logo-sub {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  color: #0a6b3c;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
 }
 
-.welcome-card {
-  position: relative;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 2.75rem 2.25rem;
-  border-radius: 24px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  text-align: center;
-  max-width: 440px;
-  width: 92%;
-  margin: auto;
+.gate-tagline {
+  font-family: "Dancing Script", cursive;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #5c2e0a;
+  margin-top: 20px;
+}
+.gate-tagline .tagline-heart { color: #c8102e; }
+
+.gate-hero-desc {
+  max-width: 480px;
+  margin: 16px auto 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #4a2f16;
+}
+
+.gate-hero-cta {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.gate-hero-cta .btn-signin { max-width: 320px; }
+.gate-hero-cta a { text-decoration: none; font-weight: 600; }
+
+@media (max-width: 560px) {
+  .gate-logo-row { flex-direction: column; text-align: center; }
+  .gate-logo-text { text-align: center; }
+  .gate-logo-title { font-size: 2.1rem; }
+  .gate-logo-amharic { font-size: 1.2rem; }
+  .gate-tagline { font-size: 1.1rem; }
 }
 
 /* ---------- Gate: marketing sections below the hero ---------- */
@@ -304,16 +356,6 @@ button, input, select, textarea {
   box-shadow: 0 10px 28px rgba(13, 155, 108, 0.35);
 }
 .btn-signin:active { transform: translateY(0); }
-
-@media (max-width: 600px) {
-  .welcome-card {
-    width: 92%;
-    padding: 2rem 1.35rem;
-    border-radius: 20px;
-  }
-  .welcome-title { font-size: 1.5rem; }
-  .welcome-description { font-size: 0.92rem; margin-bottom: 1.35rem; }
-}
 
 /* ---------- Header ---------- */
 header {
@@ -1833,18 +1875,24 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <!-- GATEKEEPER -->
 <div class="welcome-container" id="gate" style="display:none;">
 <div class="gate-hero">
-<div class="overlay"></div>
-<div class="welcome-card">
-<h1 class="welcome-title">
-        Find real connections in Ethiopia <span class="heart-icon">❤️</span>
-</h1>
-<p class="welcome-description">
-        Wana Dating connects singles looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely. Sign in to start browsing.
-      </p>
+<div class="gate-logo-row">
+<svg aria-hidden="true" class="gate-heart-logo" fill="none" height="60" viewBox="0 0 64 64" width="60" xmlns="http://www.w3.org/2000/svg">
+<path d="M26 46C12 36 5 27 5 18 C5 10 11 4 18 4 C22 4 25 6 26 9 C27 6 30 4 34 4 C41 4 47 10 47 18 C47 27 40 36 26 46 Z" fill="#078930"></path>
+<path d="M38 46C24 36 17 27 17 18 C17 10 23 4 30 4 C34 4 37 6 38 9 C39 6 42 4 46 4 C53 4 59 10 59 18 C59 27 52 36 38 46 Z" fill="#DA121A"></path>
+<path d="M32 24C27 20 24 16 24 12 C24 8.5 27 6 30 6 C31.2 6 32.1 6.7 32 7.8 C31.9 6.7 32.8 6 34 6 C37 6 40 8.5 40 12 C40 16 37 20 32 24 Z" fill="#FCDD09"></path>
+</svg>
+<div class="gate-logo-text">
+<div class="gate-logo-title">Wana <span class="dating-script">Dating</span></div>
+<div class="gate-logo-amharic">ፍቅር አጋር</div>
+<div class="gate-logo-sub">Ethiopian</div>
+</div>
+</div>
+<div class="gate-tagline">Real People <span class="tagline-heart">❤</span> Genuine Connections <span class="tagline-heart">❤</span> A Better Tomorrow</div>
+<p class="gate-hero-desc">Connect with singles across Ethiopia looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.</p>
+<div class="gate-hero-cta">
 <button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
-<a href="#gateAbout" style="display:inline-block;margin-top:16px;font-size:.85rem;color:#6b7280;text-decoration:none;font-weight:500;transition:color .2s;">Learn more about Wana Dating ↓</a>
-<br/>
-<a href="index.html" style="display:inline-block;margin-top:10px;font-size:.82rem;color:#9ca3af;text-decoration:none;font-weight:500;transition:color .2s;">← Back to marketplace</a>
+<a href="#gateAbout" style="font-size:.85rem;color:#5c2e0a;">Learn more about Wana Dating ↓</a>
+<a href="index.html" style="font-size:.82rem;color:#7a4a1f;">← Back to marketplace</a>
 </div>
 </div>
 
