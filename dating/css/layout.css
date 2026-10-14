@@ -1,0 +1,5 @@
+
+  .profile-media-loading{background:#eef2f5!important;position:relative}
+  .profile-media-loading::after{content:"";width:18px;height:18px;border:2px solid #cbd5df;border-top-color:var(--green);border-radius:50%;animation:wanaSpin .7s linear infinite;position:absolute;left:50%;top:50%;margin:-9px}
+  @keyframes wanaSpin{to{transform:rotate(360deg)}}
+  .compatibility-note{margin:10px 0;padding:9px 12px;border-radius:10px;background:var(--green-soft);color:var(--green-dark);font-size:.8rem;font-weight:600}
