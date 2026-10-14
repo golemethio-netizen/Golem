@@ -68,7 +68,17 @@ button, input, select, textarea {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--surface);
+}
+
+.gate-hero {
+  position: relative;
+  flex-shrink: 0;
+  min-height: 560px;
   background-color: #0a1f16;
   background-image:
     linear-gradient(160deg, rgba(8, 28, 20, 0.82) 0%, rgba(13, 50, 36, 0.72) 50%, rgba(8, 28, 20, 0.88) 100%),
@@ -76,11 +86,10 @@ button, input, select, textarea {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: scroll;
   display: flex;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 28px 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
 }
 
 .overlay {
@@ -104,6 +113,155 @@ button, input, select, textarea {
   max-width: 440px;
   width: 92%;
   margin: auto;
+}
+
+/* ---------- Gate: marketing sections below the hero ---------- */
+.gate-section {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 56px 24px;
+}
+
+.gate-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-dark);
+  background: var(--green-soft);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 14px;
+}
+
+.gate-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  color: var(--ink);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.gate-section p.gate-lede {
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  max-width: 640px;
+  line-height: 1.65;
+  margin-bottom: 36px;
+}
+
+.gate-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.gate-feature-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.gate-feature-card .icon { font-size: 1.6rem; margin-bottom: 10px; display: block; }
+.gate-feature-card h3 { font-size: 1.02rem; margin-bottom: 6px; color: var(--ink); }
+.gate-feature-card p { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.55; }
+
+.gate-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+  counter-reset: gatestep;
+}
+
+.gate-step { position: relative; padding-left: 52px; }
+.gate-step::before {
+  counter-increment: gatestep;
+  content: counter(gatestep);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+}
+.gate-step h3 { font-size: 1rem; margin-bottom: 4px; }
+.gate-step p { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.55; }
+
+.gate-about { background: var(--paper); }
+.gate-about-inner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+.gate-about-copy p { color: var(--ink-soft); font-size: 0.97rem; line-height: 1.7; margin-bottom: 14px; }
+.gate-about-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.gate-about-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  background: var(--green-soft);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+}
+.gate-about-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  box-shadow: var(--shadow);
+}
+.gate-about-panel .stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.gate-about-panel .stat:last-child { border-bottom: none; }
+.gate-about-panel .stat strong { color: var(--ink); text-align: right; }
+
+.gate-cta-band {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 52px 24px;
+}
+.gate-cta-band h2 { font-family: var(--font-display); font-size: 1.7rem; margin-bottom: 10px; }
+.gate-cta-band p { opacity: 0.92; margin-bottom: 22px; font-size: 0.95rem; }
+.gate-cta-band .btn-signin {
+  max-width: 320px;
+  margin: 0 auto;
+  background: #fff;
+  color: var(--green-dark);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
+.gate-cta-band .btn-signin:hover { box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28); }
+
+.gate-footer {
+  text-align: center;
+  padding: 24px 16px 40px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.gate-footer a { color: var(--green-dark); text-decoration: none; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .gate-about-inner { grid-template-columns: 1fr; }
+  .gate-section { padding: 44px 20px; }
 }
 
 .welcome-title {
@@ -1674,16 +1832,79 @@ main{max-width:none;min-width:0;padding:30px 28px 90px}
 <main>
 <!-- GATEKEEPER -->
 <div class="welcome-container" id="gate" style="display:none;">
+<div class="gate-hero">
 <div class="overlay"></div>
 <div class="welcome-card">
 <h1 class="welcome-title">
-        Welcome to Wana Dating <span class="heart-icon">❤️</span>
+        Find real connections in Ethiopia <span class="heart-icon">❤️</span>
 </h1>
 <p class="welcome-description">
-        Connect with singles in Ethiopia looking for friendship, dating, or marriage. You must be signed in to browse or match.
+        Wana Dating connects singles looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely. Sign in to start browsing.
       </p>
 <button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
-<a href="index.html" style="display:inline-block;margin-top:16px;font-size:.85rem;color:#6b7280;text-decoration:none;font-weight:500;transition:color .2s;">← Back to marketplace</a>
+<a href="#gateAbout" style="display:inline-block;margin-top:16px;font-size:.85rem;color:#6b7280;text-decoration:none;font-weight:500;transition:color .2s;">Learn more about Wana Dating ↓</a>
+<br/>
+<a href="index.html" style="display:inline-block;margin-top:10px;font-size:.82rem;color:#9ca3af;text-decoration:none;font-weight:500;transition:color .2s;">← Back to marketplace</a>
+</div>
+</div>
+
+<section class="gate-section">
+<span class="gate-eyebrow">Why Wana Dating</span>
+<h2>Built for genuine connections, not endless swiping</h2>
+<p class="gate-lede">Every part of Wana Dating is designed around one goal: helping you meet someone real, safely, and at your own pace.</p>
+<div class="gate-features-grid">
+<div class="gate-feature-card"><span class="icon">🛡️</span><h3>Verified profiles</h3><p>Members can submit a selfie for review and earn a verified badge, so you know who you're really talking to.</p></div>
+<div class="gate-feature-card"><span class="icon">❤️</span><h3>Smart compatibility</h3><p>Matching that looks at your preferences, lifestyle and relationship goals — not just a photo.</p></div>
+<div class="gate-feature-card"><span class="icon">📅</span><h3>Guided date planning</h3><p>Plan a real-world meetup with built-in details and reminders, right inside the app.</p></div>
+<div class="gate-feature-card"><span class="icon">🔒</span><h3>Privacy on your terms</h3><p>Choose who sees your posts and photos — everyone, or only your matches.</p></div>
+<div class="gate-feature-card"><span class="icon">🚩</span><h3>Report &amp; block tools</h3><p>Our safety team reviews every report, so problem behavior doesn't stay on the platform.</p></div>
+<div class="gate-feature-card"><span class="icon">🌍</span><h3>English &amp; Amharic</h3><p>Use Wana Dating in the language you're most comfortable with.</p></div>
+</div>
+</section>
+
+<section class="gate-section" style="padding-top:0;">
+<span class="gate-eyebrow">How it works</span>
+<h2>Three steps to your first conversation</h2>
+<p class="gate-lede">No gimmicks — just a straightforward path from creating a profile to meeting someone in person, when you're ready.</p>
+<div class="gate-steps">
+<div class="gate-step"><h3>Create your profile</h3><p>Add photos, write a short bio, and tell us what you're looking for — friendship, dating or marriage.</p></div>
+<div class="gate-step"><h3>Get matched</h3><p>Browse singles near you, or let compatibility scoring highlight the people most worth saying hello to.</p></div>
+<div class="gate-step"><h3>Meet safely</h3><p>Chat, then plan a date using our built-in tools — on your terms, when you're ready.</p></div>
+</div>
+</section>
+
+<section class="gate-section gate-about" id="gateAbout">
+<div class="gate-about-inner">
+<div class="gate-about-copy">
+<span class="gate-eyebrow">About us</span>
+<h2>Part of the WanaGebya platform</h2>
+<p>Wana Dating is the dating space inside WanaGebya, built for people in Ethiopia looking for a genuine connection. We believe good matchmaking starts with trust — which is why profile verification, flexible privacy controls and a dedicated safety team are built into the product, not bolted on afterward.</p>
+<p>Whether you're here to make a new friend, find someone to date, or look for a life partner, Wana Dating is built to help you do it on your own terms — at your own pace, with your privacy respected throughout.</p>
+<div class="gate-about-badges">
+<span class="gate-about-badge">🇪🇹 Made for Ethiopia</span>
+<span class="gate-about-badge">🛡️ Safety-first design</span>
+<span class="gate-about-badge">🔒 Privacy controls</span>
+<span class="gate-about-badge">💬 English &amp; Amharic</span>
+</div>
+</div>
+<div class="gate-about-panel">
+<div class="stat"><span>Profile verification</span><strong>Selfie review</strong></div>
+<div class="stat"><span>Who sees your posts</span><strong>Your choice</strong></div>
+<div class="stat"><span>Reports &amp; blocks</span><strong>Team-reviewed</strong></div>
+<div class="stat"><span>Date planning</span><strong>Built-in</strong></div>
+<div class="stat"><span>Languages</span><strong>English, Amharic</strong></div>
+</div>
+</div>
+</section>
+
+<div class="gate-cta-band">
+<h2>Ready to meet someone real?</h2>
+<p>It takes a minute to create your profile — and you control what you share.</p>
+<button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
+</div>
+
+<div class="gate-footer">
+Part of <a href="index.html">WanaGebya</a> · <a href="index.html">← Back to marketplace</a>
 </div>
 </div>
 <!-- HOME FEED -->
