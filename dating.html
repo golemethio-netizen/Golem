@@ -3679,11 +3679,45 @@ async function togglePostReaction(postId, emoji){
   loadFeed();
 }
 
-async function deletePost(postId){
-  if (!confirm("Delete this post?")) return;
-  const { error } = await _supabase.from("dating_posts").delete().eq("id", postId);
-  if (error){ alert("Couldn't delete: " + error.message); return; }
-  loadFeed();
+async function deletePost(postId) {
+  if (!currentUser?.id) {
+    alert("Please sign in first.");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to permanently delete this post?")) {
+    return;
+  }
+
+  try {
+    const { data, error } = await _supabase
+      .from("dating_posts")
+      .delete()
+      .eq("id", postId)
+      .eq("user_id", currentUser.id)
+      .select("id");
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      alert(
+        "Post was not deleted. Check your Supabase DELETE and SELECT RLS policies."
+      );
+      return;
+    }
+
+    // Remove the successfully deleted post immediately.
+    document.getElementById(`post-${postId}`)?.remove();
+
+    // Refresh post counts and the feed.
+    await loadFeed();
+
+    alert("Post deleted successfully.");
+
+  } catch (err) {
+    console.error("Delete post failed:", err);
+    alert("Unable to delete post: " + (err.message || "Unknown error"));
+  }
 }
 
 async function reportPost(postId){
