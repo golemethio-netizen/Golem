@@ -606,8 +606,7 @@ function handleIncomingMessage(m){
   const messagesTabVisible = document.getElementById("messagesPanel")?.style.display !== "none";
   if (messagesTabVisible) loadThreads();
 
-  if (currentOpenThread &&
-      currentOpenThread.profileId === m.profile_id &&
+ if (currentOpenThread &&
       currentOpenThread.other === m.sender_id){
     currentOpenThread.messages.unshift(m);
     openThread(currentOpenThread);
@@ -728,7 +727,10 @@ refreshPushStatus(); // set the button label/state as soon as the page loads
 function teardownRealtimeChannels(){
   if (messageRealtimeChannel){ _supabase.removeChannel(messageRealtimeChannel); messageRealtimeChannel = null; }
   if (notifRealtimeChannel){ _supabase.removeChannel(notifRealtimeChannel); notifRealtimeChannel = null; }
+
+    if (personalCallChannel){ _supabase.removeChannel(personalCallChannel); personalCallChannel = null; }
 }
+
 
 function notifIcon(type){
   return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : "💬";
@@ -1740,17 +1742,17 @@ async function sendReply(profileId, recipientId){
   const body = textarea.value.trim();
   if (!body) return;
   const { error } = await _supabase.from("dating_messages").insert({
-    profile_id: profileId,
-    sender_id: currentUser.id,
-    recipient_id: recipientId,
-    body
-  });
-  if (error){
-    alert("Couldn't send: " + error.message);
-    return;
+  let pid = profileId;
+  if (!pid){
+    const { data } = await _supabase.from("dating_profiles")
+      .select("id").eq("user_id", recipientId).maybeSingle();
+    pid = (data && data.id) || (currentOpenThread && currentOpenThread.messages[0].profile_id);
+    if (currentOpenThread) currentOpenThread.profileId = pid;
   }
-  textarea.value = "";
-  await refreshCurrentThreadAfterSend(profileId, recipientId);
+  if (!pid){ alert("Couldn't send: recipient profile unavailable."); return; }
+  const { error } = await _supabase.from("dating_messages").insert({
+    profile_id: pid,
+    sender_id: currentUser.id,
 }
 
 async function refreshCurrentThreadAfterSend(profileId, other){
@@ -2113,11 +2115,11 @@ async function loadThreads(){
   }
   empty.style.display = "none";
 
-  const threads = {};
+ const threads = {};
   data.forEach(m => {
     const other = m.sender_id === currentUser.id ? m.recipient_id : m.sender_id;
-    const key = `${m.profile_id}__${other}`;
-    if (!threads[key]) threads[key] = { other, profileId: m.profile_id, messages: [] };
+    const key = other;
+    if (!threads[key]) threads[key] = { other, profileId: null, messages: [] };
     threads[key].messages.push(m);
   });
 
@@ -2131,7 +2133,7 @@ async function loadThreads(){
 
   const { data: profiles } = await _supabase
     .from("dating_profiles")
-    .select("user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, platinum_until, call_privacy")
+        .select("id, user_id, display_name, gender, photo_url, photos, is_verified, is_platinum, platinum_until, call_privacy")
     .in("user_id", visibleOtherIds.length ? visibleOtherIds : ["00000000-0000-0000-0000-000000000000"]);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
@@ -2141,12 +2143,13 @@ async function loadThreads(){
     .forEach(thread => {
     const last = thread.messages[0];
     const unreadCount = thread.messages.filter(m => !m.read && m.recipient_id === currentUser.id).length;
-    const p = profileMap[thread.other];
+      const p = profileMap[thread.other];
     thread.profile = p;
     const photo = p ? ((p.photos && p.photos[0]) || p.photo_url) : null;
     const photoIsUrl = photo && /^https?:\/\//i.test(photo);
     const name = p ? (p.display_name || p.gender || "Someone") : "Someone";
-
+  thread.profileId = (p && p.id) || thread.messages[0].profile_id;
+      
     const div = document.createElement("div");
     div.style.cssText = "padding:16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor:pointer; display:flex; gap:14px; align-items:center; margin-bottom: 10px; transition: 0.2s;";
     div.onmouseover = () => div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
