@@ -42,6 +42,32 @@
 }
 </style>
 </head>
+  <!-- Mobile bottom navigation (only visible ≤ 768px) -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Main navigation">
+  <button class="mnav-item active" data-tab="home" onclick="switchTab('home')">
+    <span class="mnav-icon">🏠</span>
+    <span class="mnav-label">Home</span>
+  </button>
+  <button class="mnav-item" data-tab="browse" onclick="switchTab('browse')">
+    <span class="mnav-icon">🔍</span>
+    <span class="mnav-label">Browse</span>
+  </button>
+  <button class="mnav-item" data-tab="messages" onclick="switchTab('messages')">
+    <span class="mnav-icon">💬</span>
+    <span class="mnav-label">Messages</span>
+    <span class="mnav-badge" id="mnavUnreadBadge" style="display:none;"></span>
+  </button>
+  <button class="mnav-item" data-tab="likes" onclick="switchTab('likes')">
+    <span class="mnav-icon">💛</span>
+    <span class="mnav-label">Likes</span>
+    <span class="mnav-badge" id="mnavLikesBadge" style="display:none;"></span>
+  </button>
+  <button class="mnav-item" data-tab="myprofile" onclick="switchTab('myprofile')">
+    <span class="mnav-icon">👤</span>
+    <span class="mnav-label">Me</span>
+    <span class="mnav-badge" id="mnavProfileBadge" style="display:none;"></span>
+  </button>
+</nav>
 <body>
 <header>
 <div class="brand">Wana <span>Dating</span></div>
