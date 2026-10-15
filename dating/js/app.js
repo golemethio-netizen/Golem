@@ -960,6 +960,10 @@ function switchTab(tab){
     PANELS.forEach(p => document.getElementById(p).style.display = "none");
     return;
   }
+  // Sync mobile bottom nav active state
+document.querySelectorAll('.mnav-item').forEach(btn => {
+  btn.classList.toggle('active', btn.dataset.tab === tabName);
+});
   document.getElementById("gate").style.display = "none";
   PANELS.forEach(p => document.getElementById(p).style.display = "none");
   const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
