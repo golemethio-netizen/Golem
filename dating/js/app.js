@@ -950,24 +950,61 @@ async function recordProfileView(viewedUserId){
 }
 
 // ---------- Tabs ----------
-const PANELS = ["homePanel","browsePanel","newMembersPanel","postPanel","messagesPanel","likesPanel","visitorsPanel","myProfilePanel","settingsPanel"];
+const PANELS = [
+  "homePanel", "browsePanel", "newMembersPanel", "postPanel",
+  "messagesPanel", "likesPanel", "visitorsPanel",
+  "compatibilityPanel", "dateplansPanel", "safetyPanel",
+  "myProfilePanel", "settingsPanel"
+];
 
 function switchTab(tab){
-  if(tab==='home' && currentUser) setTimeout(loadHomeRecommendations,80);
-  document.querySelectorAll(".side-nav .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+  if (tab === 'home' && currentUser) setTimeout(loadHomeRecommendations, 80);
+
+  // Desktop sidebar tabs
+  document.querySelectorAll(".side-nav .tab").forEach(t =>
+    t.classList.toggle("active", t.dataset.tab === tab)
+  );
+
+  // Mobile bottom nav
+  document.querySelectorAll('.mnav-item').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.tab === tab)
+  );
+
   if (!currentUser){
     document.getElementById("gate").style.display = "flex";
-    PANELS.forEach(p => document.getElementById(p).style.display = "none");
+    PANELS.forEach(p => {
+      const el = document.getElementById(p);
+      if (el) el.style.display = "none";
+    });
     return;
   }
-  // Sync mobile bottom nav active state
-document.querySelectorAll('.mnav-item').forEach(btn => {
-  btn.classList.toggle('active', btn.dataset.tab === tabName);
-});
+
   document.getElementById("gate").style.display = "none";
-  PANELS.forEach(p => document.getElementById(p).style.display = "none");
-  const map = { home: "homePanel", browse: "browsePanel", newmembers: "newMembersPanel", post: "postPanel", messages: "messagesPanel", likes: "likesPanel", visitors: "visitorsPanel", myprofile: "myProfilePanel", settings: "settingsPanel" };
-  document.getElementById(map[tab]).style.display = "block";
+  PANELS.forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.style.display = "none";
+  });
+
+  const map = {
+    home: "homePanel",
+    browse: "browsePanel",
+    newmembers: "newMembersPanel",
+    post: "postPanel",
+    messages: "messagesPanel",
+    likes: "likesPanel",
+    visitors: "visitorsPanel",
+    compatibility: "compatibilityPanel",
+    dateplans: "dateplansPanel",
+    safety: "safetyPanel",
+    myprofile: "myProfilePanel",
+    settings: "settingsPanel"
+  };
+
+  const panelId = map[tab];
+  if (panelId) {
+    const panel = document.getElementById(panelId);
+    if (panel) panel.style.display = "block";
+  }
 
   if (tab === "home") loadFeed();
   if (tab === "browse") loadProfiles();
@@ -977,6 +1014,7 @@ document.querySelectorAll('.mnav-item').forEach(btn => {
   if (tab === "visitors") loadVisitors();
   if (tab === "myprofile") loadMyProfile();
   if (tab === "settings") loadSettings();
+  // Add handlers for compatibility / dateplans / safety if you have them
 }
 
 // ---------- Home feed ----------
@@ -1742,21 +1780,41 @@ async function sendMessage(profileId, recipientId){
 
 async function sendReply(profileId, recipientId){
   if (!(await requireProfile("send messages"))) return;
+
   const textarea = document.getElementById("replyBody");
   const body = textarea.value.trim();
   if (!body) return;
-  const { error } = await _supabase.from("dating_messages").insert({
+
   let pid = profileId;
   if (!pid){
-    const { data } = await _supabase.from("dating_profiles")
-      .select("id").eq("user_id", recipientId).maybeSingle();
-    pid = (data && data.id) || (currentOpenThread && currentOpenThread.messages[0].profile_id);
+    const { data } = await _supabase
+      .from("dating_profiles")
+      .select("id")
+      .eq("user_id", recipientId)
+      .maybeSingle();
+    pid = (data && data.id) || (currentOpenThread && currentOpenThread.messages[0]?.profile_id);
     if (currentOpenThread) currentOpenThread.profileId = pid;
   }
-  if (!pid){ alert("Couldn't send: recipient profile unavailable."); return; }
+
+  if (!pid){
+    alert("Couldn't send: recipient profile unavailable.");
+    return;
+  }
+
   const { error } = await _supabase.from("dating_messages").insert({
     profile_id: pid,
     sender_id: currentUser.id,
+    recipient_id: recipientId,
+    body
+  });
+
+  if (error){
+    alert("Couldn't send: " + error.message);
+    return;
+  }
+
+  textarea.value = "";
+  await refreshCurrentThreadAfterSend(pid, recipientId);
 }
 
 async function refreshCurrentThreadAfterSend(profileId, other){
