@@ -213,8 +213,13 @@ async function updateContactPrivacy(){
 // ---------- Auth gate ----------
 async function initAuth(){
   try {
-    const { data: { user } } = await _supabase.auth.getUser();
-    currentUser = user;
+    // Never let a hung/blocked auth call leave the page blank: give up after 8s
+    // and fall back to the signed-out gate.
+    const res = await Promise.race([
+      _supabase.auth.getUser(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("Auth check timed out")), 8000))
+    ]);
+    currentUser = res && res.data ? res.data.user : null;
   } catch (err) {
     console.error("Auth check failed:", err);
     currentUser = null;
@@ -3215,3 +3220,4 @@ function homeRecommendationScore(me,r){
   if(r.created_at&&Date.now()-new Date(r.created_at).getTime()<7*86400000)s+=3;
   return Math.min(99,s);
 }
+
