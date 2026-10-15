@@ -13,6 +13,43 @@
 <link rel="stylesheet" href="css/layout.css">
 
 
+            <style>
+/* Mobile horizontal scroll / wrap navigation fix */
+@media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100% !important;
+    order: -1;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    padding: 8px;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+  }
+  .side-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: max-content;
+  }
+  .side-nav .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    background: var(--paper, #f5f5f5);
+    border: 1px solid var(--line, #e0e0e0);
+    margin-bottom: 0;
+  }
+  .sidebar-account {
+    display: none !important; /* Hide account box in top bar on mobile if redundant */
+  }
+}
 
 
 
