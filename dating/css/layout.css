@@ -134,3 +134,129 @@
   .wana-right-match-rail{display:none}
 }
 
+/* 1. Prevent unwanted horizontal overflow */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 2. Make common containers flexible */
+.container,
+.main-content,
+.content,
+.page-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: clamp(12px, 3vw, 28px);
+}
+
+/* 3. Keep images inside their containers */
+img,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+.profile-card img,
+.profile-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+/* 4. Flexible profile grid */
+.profile-grid,
+.profiles-grid,
+.matches-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+/* 5. Tablet screens */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .main-content,
+  .content {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* 6. Mobile phones */
+@media (max-width: 600px) {
+  .container,
+  .main-content,
+  .content,
+  .page-wrapper {
+    padding-inline: 12px;
+  }
+
+  .profile-grid,
+  .profiles-grid,
+  .matches-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+    min-width: 0;
+    font: inherit;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+  }
+
+  .modal,
+  .dialog,
+  .popup {
+    width: calc(100% - 24px);
+    max-width: 100%;
+    margin-inline: auto;
+  }
+}
+
+/* 7. Very narrow phones */
+@media (max-width: 360px) {
+  .profile-grid,
+  .profiles-grid,
+  .matches-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
