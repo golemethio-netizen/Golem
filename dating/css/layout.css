@@ -197,66 +197,86 @@ img {
   min-width: 0;
 }
 
-/* 5. Tablet screens */
+/* Tablet and phone */
 @media (max-width: 900px) {
-  .sidebar {
-    width: 100%;
-    max-width: 100%;
+  .wana-right-match-rail {
+    display: none;
   }
 
-  .main-content,
-  .content {
-    width: 100%;
+  .app-shell,
+  .app-shell > main {
     min-width: 0;
+    max-width: 100%;
   }
 }
 
-/* 6. Mobile phones */
+/* Phone */
 @media (max-width: 600px) {
-  .container,
-  .main-content,
-  .content,
-  .page-wrapper {
+  .app-shell > main {
+    width: 100%;
     padding-inline: 12px;
   }
 
-  .profile-grid,
-  .profiles-grid,
-  .matches-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+  .wana-right-match-card {
+    position: static;
   }
 
-  button,
-  input,
-  select,
-  textarea {
-    max-width: 100%;
-    min-width: 0;
-    font: inherit;
-  }
-
-  input,
-  select,
-  textarea {
-    width: 100%;
-  }
-
-  .modal,
-  .dialog,
-  .popup {
-    width: calc(100% - 24px);
-    max-width: 100%;
-    margin-inline: auto;
+  .wana-right-match-btn,
+  .wana-right-match-footer button {
+    min-height: 40px;
   }
 }
 
-/* 7. Very narrow phones */
+/* Very narrow phone */
 @media (max-width: 360px) {
-  .profile-grid,
-  .profiles-grid,
-  .matches-grid {
-    grid-template-columns: minmax(0, 1fr);
+  .app-shell > main {
+    padding-inline: 8px;
   }
 }
 
+/* Responsive safeguards for Wana dating */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Prevent children from forcing the main layout wider */
+.app-shell,
+.app-shell > main,
+.app-shell > *,
+.wana-right-match-rail {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+/* Let the main profile area shrink beside the matches rail */
+.app-shell > main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Right-side matches panel */
+.wana-right-match-rail {
+  flex: 0 0 250px;
+  width: 250px;
+  max-width: 100%;
+}
+
+@media (max-width: 1050px) {
+  .wana-right-match-rail {
+    flex-basis: 215px;
+    width: 215px;
+  }
+}
