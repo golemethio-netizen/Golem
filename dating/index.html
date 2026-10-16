@@ -5,11 +5,9 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="robots" content="index, follow, max-image-preview:large">
-
 <title>Dating — WanaGebya</title>
 <meta name="description" content="Wana Dating by WanaGebya: meet genuine singles across Ethiopia for friendship, dating or marriage, with profile verification, privacy controls and safety tools.">
-<meta name="theme-color" content="#2a1033">
+<meta name="theme-color" content="#078930">
 <link rel="canonical" href="https://www.wanagebya.com/dating/index.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="WanaGebya">
@@ -54,50 +52,6 @@
   .signout-pill,.signin-pill{margin-left:6px;padding:6px 11px;font-size:.76rem}
 }
 </style>
-
-<style id="wana-ethiopian-romantic-background">
-/* Ethiopian romantic photography for the public welcome hero */
-.gate-hero {
-  background-image:
-    linear-gradient(90deg,
-      rgba(255,255,255,.96) 0%,
-      rgba(255,255,255,.88) 38%,
-      rgba(255,255,255,.30) 72%,
-      rgba(255,255,255,.12) 100%),
-    url("images/ethiopian-dating-bg.png");
-  background-size: cover;
-  background-position: center 45%;
-  background-repeat: no-repeat;
-  border-radius: 24px;
-  overflow: hidden;
-}
-/* Keep the signed-in home banner visually consistent */
-.wana-hero {
-  background-image:
-    linear-gradient(90deg,
-      rgba(255,255,255,.94) 0%,
-      rgba(255,255,255,.82) 42%,
-      rgba(255,255,255,.22) 100%),
-    url("images/ethiopian-dating-bg.png");
-  background-size: cover;
-  background-position: center 45%;
-  background-repeat: no-repeat;
-}
-/* Readable text on the photo banner: dark plum on the light overlay, rose action chips */
-.wana-hero { color: #2a1033; box-shadow: 0 16px 40px rgba(184,41,79,.16); }
-.wana-hero .eyebrow { color: #b8294f; opacity: 1; }
-.wana-hero h1 { color: #2a1033; }
-.wana-hero p { color: #4a2a55; }
-.wana-hero:after { border-color: rgba(224,66,111,.10); }
-.wana-quick-actions button { background: #e0426f !important; color: #fff !important; border: 0 !important; box-shadow: 0 6px 16px rgba(224,66,111,.28); }
-.wana-quick-actions button:hover { background: #b8294f !important; }
-@media (max-width: 700px) {
-  .gate-hero, .wana-hero {
-    background-position: 58% center;
-  }
-}
-</style>
-
 </head>
 <body>
 <!-- Mobile bottom navigation (phones only, signed-in only) -->
@@ -144,6 +98,7 @@
 <button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')">👤 Sign In</button>
 <button class="signout-pill" id="headerSignOutBtn" onclick="signOut()" style="display:none;" type="button">Sign out</button>
 <div class="notif-wrap" id="notifWrap" style="display:none;">
+<button class="notif-bell" id="giftBellBtn" type="button" onclick="openReceivedGifts()" title="Gifts you've received" aria-label="Gifts you've received">🎁<span class="notif-count" id="giftCount" style="display:none;"></span></button>
 <button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
 <div class="notif-panel" id="notifPanel">
 <div class="head">
@@ -692,6 +647,3 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <script src="js/date-planning.js"></script>
 </body>
 </html>
-
-
-
