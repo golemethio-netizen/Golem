@@ -365,13 +365,57 @@ function renderAuthModal(){
   document.getElementById("authForm").addEventListener("submit", submitAuthForm);
 }
 
-async function signInWithGoogle(){
+function signInWithGoogle(){
+  // Popup flow. window.open must run synchronously inside the click handler,
+  // otherwise browsers block it.
+  const w = 500, h = 650;
+  const left = Math.max(0, window.screenX + (window.outerWidth - w) / 2);
+  const top = Math.max(0, window.screenY + (window.outerHeight - h) / 2);
+  const popup = window.open("", "wana-google-auth",
+    `width=${w},height=${h},left=${left},top=${top}`);
+
+  // Popup blocked (common on phones / in-app browsers): normal redirect instead
+  if (!popup) return signInWithGoogleRedirect();
+
+  try {
+    popup.document.write('<p style="font-family:sans-serif;padding:24px">Opening Google…</p>');
+  } catch (_) {}
+
+  _supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin + "/dating/auth-callback.html",
+      skipBrowserRedirect: true,
+      queryParams: { prompt: "select_account" }
+    }
+  }).then(({ data, error }) => {
+    if (error || !data?.url){
+      popup.close();
+      return alert("Sign-in failed: " + (error ? error.message : "no URL returned"));
+    }
+    popup.location.href = data.url;
+  });
+}
+
+async function signInWithGoogleRedirect(){
   const { error } = await _supabase.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: window.location.origin + "/dating.html" }
   });
   if (error) alert("Sign-in failed: " + error.message);
 }
+
+// The popup (auth-callback.html) sends the finished session back here.
+// setSession fires SIGNED_IN, so the existing onAuthStateChange handler
+// updates the UI, loads the profile and so on.
+window.addEventListener("message", async (e) => {
+  if (e.origin !== window.location.origin || e.data?.type !== "wana-auth-done") return;
+  const { access_token, refresh_token } = e.data;
+  if (!access_token || !refresh_token) return;
+  const { error } = await _supabase.auth.setSession({ access_token, refresh_token });
+  if (error) return alert("Sign-in failed: " + error.message);
+  closeModal();
+});
 
 async function submitAuthForm(e){
   e.preventDefault();
@@ -3329,45 +3373,3 @@ function homeRecommendationScore(me,r){
   if(r.created_at&&Date.now()-new Date(r.created_at).getTime()<7*86400000)s+=3;
   return Math.min(99,s);
 }
-
-function signInWithGooglePopup() {
-  // Open the popup synchronously on click, or browsers will block it
-  const w = 500, h = 650;
-  const left = window.screenX + (window.outerWidth - w) / 2;
-  const top = window.screenY + (window.outerHeight - h) / 2;
-  const popup = window.open('', 'wana-google-auth',
-    `width=${w},height=${h},left=${left},top=${top}`);
-
-  // Popup blocked (common on mobile): fall back to a normal redirect
-  if (!popup) return signInWithGoogleRedirect();
-
-  popup.document.write('<p style="font-family:sans-serif;padding:20px">Opening Google…</p>');
-
-  sb.auth.signInWithOAuth({            // `sb` = your Supabase client
-    provider: 'google',
-    options: {
-      redirectTo: location.origin + '/dating/auth-callback.html',
-      skipBrowserRedirect: true,
-      queryParams: { prompt: 'select_account' }
-    }
-  }).then(({ data, error }) => {
-    if (error) { popup.close(); return alert(error.message); }
-    popup.location.href = data.url;
-  });
-}
-
-function signInWithGoogleRedirect() {
-  sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: location.origin + '/dating/index.html' }
-  });
-}
-
-window.addEventListener('message', async (e) => {
-  if (e.origin !== location.origin || e.data?.type !== 'wana-auth-done') return;
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    closeAuthModal?.();        // your existing modal close
-    // call whatever you already run after login, e.g. initAfterLogin();
-  }
-});
