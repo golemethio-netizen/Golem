@@ -670,7 +670,7 @@ function handleIncomingMessage(m){
 
  if (currentOpenThread &&
       currentOpenThread.other === m.sender_id){
-    currentOpenThread.messages.unshift(m);
+    if (!currentOpenThread.messages.some(x => x.id === m.id)) currentOpenThread.messages.unshift(m);
     openThread(currentOpenThread);
   }
 }
@@ -1852,7 +1852,7 @@ function contactProfile(profileId, recipientId){
         <div class="body">
           <button class="btn-close" onclick="closeModal()">✕</button>
           <h3 style="margin-bottom: 15px;">Send a message</h3>
-          <textarea id="composeBody" placeholder="Say hello..." style="width:100%;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem; outline:none;"></textarea>
+          <textarea id="composeBody" maxlength="1000" placeholder="Say hello..." style="width:100%;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem; outline:none;"></textarea>
           <div class="actions">
             <button class="btn-contact" onclick="sendMessage('${profileId}','${recipientId}')" style="width: 100%;">Send Message 🚀</button>
           </div>
@@ -1872,62 +1872,108 @@ function opts(list, current){
   return list.map(v => `<option ${v===current?"selected":""}>${esc(v)}</option>`).join("");
 }
 
+// ---------- Sending: shared guard ----------
+// One send at a time, a length cap, and a soft per-minute limit so a stuck
+// key or double-tap can't flood someone. (Real rate limiting must also exist
+// on the server; this only protects against accidents and casual spam.)
+let _sendingMessage = false;
+let _recentSendTimes = [];
+const MSG_MAX_LEN = 1000;
+const MSG_MAX_PER_MINUTE = 20;
+
+function sendGuard(body){
+  if (body.length > MSG_MAX_LEN) return `Messages can be up to ${MSG_MAX_LEN} characters.`;
+  const now = Date.now();
+  _recentSendTimes = _recentSendTimes.filter(t => now - t < 60000);
+  if (_recentSendTimes.length >= MSG_MAX_PER_MINUTE) return "You're sending messages very quickly. Please wait a moment.";
+  return null;
+}
+
+function friendlySendError(error){
+  const text = String((error && (error.message || error.details)) || "");
+  if ((error && error.code === "42501") || /row-level security|permission denied/i.test(text)){
+    return "This message couldn't be sent. You may no longer be matched with this person, or they may have blocked you.";
+  }
+  return "Couldn't send: " + text;
+}
+
 async function sendMessage(profileId, recipientId){
+  if (_sendingMessage) return;
   if (!(await requireProfile("send messages"))) return;
   const body = document.getElementById("composeBody").value.trim();
   const msgBox = document.getElementById("composeMsg");
   if (!body){ msgBox.innerHTML = `<div class="msg error">Write something first.</div>`; return; }
-  const { error } = await _supabase.from("dating_messages").insert({
-    profile_id: profileId,
-    sender_id: currentUser.id,
-    recipient_id: recipientId,
-    body
-  });
-  if (error){
-    msgBox.innerHTML = `<div class="msg error">Couldn't send: ${esc(error.message)}</div>`;
-  } else {
-    msgBox.innerHTML = `<div class="msg success">Sent!</div>`;
-    setTimeout(closeModal, 700);
+  const blocked = sendGuard(body);
+  if (blocked){ msgBox.innerHTML = `<div class="msg error">${esc(blocked)}</div>`; return; }
+
+  _sendingMessage = true;
+  try {
+    const { error } = await _supabase.from("dating_messages").insert({
+      profile_id: profileId,
+      sender_id: currentUser.id,
+      recipient_id: recipientId,
+      body
+    });
+    if (error){
+      msgBox.innerHTML = `<div class="msg error">${esc(friendlySendError(error))}</div>`;
+    } else {
+      _recentSendTimes.push(Date.now());
+      msgBox.innerHTML = `<div class="msg success">Sent!</div>`;
+      setTimeout(closeModal, 700);
+    }
+  } finally {
+    _sendingMessage = false;
   }
 }
 
 async function sendReply(profileId, recipientId){
+  if (_sendingMessage) return;
   if (!(await requireProfile("send messages"))) return;
 
   const textarea = document.getElementById("replyBody");
+  if (!textarea) return;
   const body = textarea.value.trim();
   if (!body) return;
+  const setErr = (t) => { const el = document.getElementById("replyError"); if (el) el.textContent = t || ""; };
+  setErr("");
 
-  let pid = profileId;
-  if (!pid){
-    const { data } = await _supabase
-      .from("dating_profiles")
-      .select("id")
-      .eq("user_id", recipientId)
-      .maybeSingle();
-    pid = (data && data.id) || (currentOpenThread && currentOpenThread.messages[0]?.profile_id);
-    if (currentOpenThread) currentOpenThread.profileId = pid;
+  const blocked = sendGuard(body);
+  if (blocked){ setErr(blocked); return; }
+
+  _sendingMessage = true;
+  const sendBtn = document.getElementById("sendReplyBtn");
+  if (sendBtn){ sendBtn.disabled = true; sendBtn.textContent = "Sending…"; }
+  try {
+    // The thread template passes the profile id as text, so a missing id can
+    // arrive as the string "undefined"; treat that as missing.
+    let pid = (profileId && profileId !== "undefined" && profileId !== "null") ? profileId : null;
+    if (!pid){
+      const { data } = await _supabase
+        .from("dating_profiles")
+        .select("id")
+        .eq("user_id", recipientId)
+        .maybeSingle();
+      pid = (data && data.id) || (currentOpenThread && currentOpenThread.messages[0]?.profile_id);
+      if (currentOpenThread) currentOpenThread.profileId = pid;
+    }
+    if (!pid){ setErr("Couldn't send: recipient profile unavailable."); return; }
+
+    const { error } = await _supabase.from("dating_messages").insert({
+      profile_id: pid,
+      sender_id: currentUser.id,
+      recipient_id: recipientId,
+      body
+    });
+    if (error){ setErr(friendlySendError(error)); return; }  // text stays in the box
+
+    _recentSendTimes.push(Date.now());
+    textarea.value = "";
+    await refreshCurrentThreadAfterSend(pid, recipientId);
+  } finally {
+    _sendingMessage = false;
+    const btn = document.getElementById("sendReplyBtn"); // thread re-renders, so look it up again
+    if (btn){ btn.disabled = false; btn.textContent = "Send Message"; }
   }
-
-  if (!pid){
-    alert("Couldn't send: recipient profile unavailable.");
-    return;
-  }
-
-  const { error } = await _supabase.from("dating_messages").insert({
-    profile_id: pid,
-    sender_id: currentUser.id,
-    recipient_id: recipientId,
-    body
-  });
-
-  if (error){
-    alert("Couldn't send: " + error.message);
-    return;
-  }
-
-  textarea.value = "";
-  await refreshCurrentThreadAfterSend(pid, recipientId);
 }
 
 async function refreshCurrentThreadAfterSend(profileId, other){
@@ -2394,6 +2440,16 @@ async function openThread(thread){
     && isPlatinumActive(myProfile);
   const seenHtml = showSeen ? `<div style="text-align:right;font-size:.72rem;color:#999;margin-top:-6px;">Seen</div>` : "";
 
+  // Every new message / reaction re-renders this whole modal. Remember the
+  // half-typed reply, focus and scroll position so the re-render doesn't wipe them.
+  const oldReply = document.getElementById("replyBody");
+  const oldBox = document.getElementById("threadMessages");
+  const sameThread = !!oldReply && window._lastRenderedThread === thread.other;
+  const draft = sameThread ? oldReply.value : "";
+  const hadFocus = sameThread && document.activeElement === oldReply;
+  const wasNearBottom = !oldBox || (oldBox.scrollHeight - oldBox.scrollTop - oldBox.clientHeight < 80);
+  const oldScrollTop = oldBox ? oldBox.scrollTop : 0;
+
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -2411,26 +2467,65 @@ async function openThread(thread){
             </span>
           </h3>
           <div id="threadMessages" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin:10px 0; padding-right:5px;">
-            ${ordered.map(m => renderMessageBubble(m, reactionsByMsg[m.id] || [], voiceUrls[m.id])).join("")}
+            ${renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls)}
             ${seenHtml}
           </div>
           <div style="background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 15px;">
               <textarea id="replyBody" maxlength="1000" placeholder="Type a message..." style="width:100%;min-height:50px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit; outline:none; resize:none;"></textarea>
               <div class="actions" style="align-items:center; margin-top:8px; gap:8px;">
                 <button class="btn-report" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message" style="flex:0 0 50px; border:1px solid #ddd !important; color:#555;">🎤</button>
-                <button class="btn-contact" onclick="sendReply('${thread.profileId}','${thread.other}');" style="border-radius: 8px;">Send Message</button>
+                <button class="btn-contact" id="sendReplyBtn" onclick="sendReply('${thread.profileId}','${thread.other}');" style="border-radius: 8px;">Send Message</button>
               </div>
+              <div id="replyError" role="alert" style="font-size:.8rem;color:var(--danger);margin-top:6px;text-align:center;"></div>
               <div id="recordStatus" style="font-size:.8rem;color:#e67e22;margin-top:6px; font-weight:bold; text-align:center;"></div>
           </div>
         </div>
       </div>
     </div>`;
     
+    window._lastRenderedThread = thread.other;
     const chatBox = document.getElementById("threadMessages");
-    if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    if (chatBox) chatBox.scrollTop = (!sameThread || wasNearBottom) ? chatBox.scrollHeight : oldScrollTop;
+
+    const replyBox = document.getElementById("replyBody");
+    if (replyBox){
+      if (draft) replyBox.value = draft;
+      if (hadFocus) { replyBox.focus(); replyBox.setSelectionRange(replyBox.value.length, replyBox.value.length); }
+      // Enter sends, Shift+Enter adds a new line. Not on phones, where Enter should stay a new line.
+      if (!window.matchMedia("(pointer: coarse)").matches){
+        replyBox.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey && !e.isComposing){
+            e.preventDefault();
+            sendReply(thread.profileId, thread.other);
+          }
+        });
+      }
+    }
 }
 
 const EDIT_WINDOW_MS = 15 * 60 * 1000; 
+
+function msgDayLabel(d){
+  const now = new Date();
+  const yest = new Date(); yest.setDate(now.getDate() - 1);
+  if (d.toDateString() === now.toDateString()) return "Today";
+  if (d.toDateString() === yest.toDateString()) return "Yesterday";
+  return d.toLocaleDateString([], { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
+}
+
+function renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls){
+  let lastDay = "";
+  return ordered.map(m => {
+    const d = new Date(m.created_at);
+    const day = d.toDateString();
+    let divider = "";
+    if (day !== lastDay){
+      lastDay = day;
+      divider = `<div style="align-self:center;font-size:.72rem;color:#94a3b8;background:#f1f5f9;border-radius:999px;padding:3px 10px;">${esc(msgDayLabel(d))}</div>`;
+    }
+    return divider + renderMessageBubble(m, reactionsByMsg[m.id] || [], voiceUrls[m.id]);
+  }).join("");
+}
 
 function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   const mine = m.sender_id === currentUser.id;
@@ -2469,6 +2564,7 @@ function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
         ${content}
         ${ownControls}
       </div>
+      <div style="font-size:.66rem;color:#94a3b8;margin-top:2px;text-align:${mine?"right":"left"};">${esc(new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</div>
       ${reactionRow}
     </div>`;
 }
