@@ -42,33 +42,43 @@
 }
 </style>
 </head>
-  <!-- Mobile bottom navigation (only visible ≤ 768px) -->
+<body>
+<!-- Mobile bottom navigation (phones only, signed-in only) -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Main navigation">
-  <button class="mnav-item active" data-tab="home" onclick="switchTab('home')">
-    <span class="mnav-icon">🏠</span>
-    <span class="mnav-label">Home</span>
+  <button class="mnav-item active" data-tab="home" onclick="switchTab('home')" type="button">
+    <span class="mnav-icon">🏠</span><span class="mnav-label">Home</span>
   </button>
-  <button class="mnav-item" data-tab="browse" onclick="switchTab('browse')">
-    <span class="mnav-icon">🔍</span>
-    <span class="mnav-label">Browse</span>
+  <button class="mnav-item" data-tab="browse" onclick="switchTab('browse')" type="button">
+    <span class="mnav-icon">🔍</span><span class="mnav-label">Browse</span>
   </button>
-  <button class="mnav-item" data-tab="messages" onclick="switchTab('messages')">
-    <span class="mnav-icon">💬</span>
-    <span class="mnav-label">Messages</span>
+  <button class="mnav-item" data-tab="messages" onclick="switchTab('messages')" type="button">
+    <span class="mnav-icon">💬</span><span class="mnav-label">Messages</span>
     <span class="mnav-badge" id="mnavUnreadBadge" style="display:none;"></span>
   </button>
-  <button class="mnav-item" data-tab="likes" onclick="switchTab('likes')">
-    <span class="mnav-icon">💛</span>
-    <span class="mnav-label">Likes</span>
+  <button class="mnav-item" data-tab="likes" onclick="switchTab('likes')" type="button">
+    <span class="mnav-icon">💛</span><span class="mnav-label">Likes</span>
     <span class="mnav-badge" id="mnavLikesBadge" style="display:none;"></span>
   </button>
-  <button class="mnav-item" data-tab="myprofile" onclick="switchTab('myprofile')">
-    <span class="mnav-icon">👤</span>
-    <span class="mnav-label">Me</span>
-    <span class="mnav-badge" id="mnavProfileBadge" style="display:none;"></span>
+  <button class="mnav-item" data-tab="myprofile" onclick="switchTab('myprofile')" type="button">
+    <span class="mnav-icon">👤</span><span class="mnav-label">Me</span>
+  </button>
+  <button class="mnav-item" id="mnavMore" onclick="openMoreSheet()" type="button" aria-haspopup="dialog">
+    <span class="mnav-icon">☰</span><span class="mnav-label">More</span>
+    <span class="mnav-badge" id="mnavMoreBadge" style="display:none;"></span>
   </button>
 </nav>
-<body>
+<div class="more-sheet-backdrop" id="moreSheetBackdrop" onclick="closeMoreSheet()"></div>
+<div class="more-sheet" id="moreSheet" role="dialog" aria-label="More">
+  <div class="more-sheet-grip"></div>
+  <button class="more-item" onclick="switchTab('newmembers')" type="button"><span>🆕</span> New Members</button>
+  <button class="more-item" onclick="switchTab('post')" type="button"><span>✍️</span> Setup Profile</button>
+  <button class="more-item" onclick="switchTab('visitors')" type="button"><span>👣</span> Visitors</button>
+  <button class="more-item" onclick="switchTab('compatibility')" type="button"><span>❤️</span> Compatibility</button>
+  <button class="more-item" onclick="switchTab('dateplans')" type="button"><span>📅</span> Date Plans</button>
+  <button class="more-item" onclick="switchTab('safety')" type="button"><span>🛡️</span> Safety Center</button>
+  <button class="more-item" onclick="switchTab('settings')" type="button"><span>⚙️</span> Privacy Settings</button>
+  <button class="more-item danger" onclick="closeMoreSheet();signOut()" type="button"><span>🚪</span> Sign out</button>
+</div>
 <header>
 <div class="brand">Wana <span>Dating</span></div>
 <nav style="display: flex; align-items: center;">
@@ -619,25 +629,5 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <script src="js/app.js"></script>
 <script src="js/safety.js"></script>
 <script src="js/date-planning.js"></script>
-<script>
-/* Show the header "Sign out" button whenever a member is signed in.
-   Wraps updateHeaderAuthUI() from app.js (same approach as the patch files) and syncs once on load,
-   in case the header was already refreshed before this script ran. */
-(function(){
-  function syncSignOutButton(){
-    var btn = document.getElementById("headerSignOutBtn");
-    if (btn) btn.style.display = (typeof currentUser !== "undefined" && currentUser) ? "" : "none";
-  }
-  var base = window.updateHeaderAuthUI;
-  if (typeof base === "function") {
-    window.updateHeaderAuthUI = function(){
-      var result = base.apply(this, arguments);
-      syncSignOutButton();
-      return result;
-    };
-  }
-  syncSignOutButton();
-})();
-</script>
 </body>
 </html>
