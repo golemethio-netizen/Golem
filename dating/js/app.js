@@ -639,6 +639,7 @@ function startNotifPolling(){
 }
 
 async function refreshNotifCount(){
+  refreshGiftBadge();   // fire and forget; has its own error handling
   const { count } = await _supabase
     .from("dating_notifications")
     .select("*", { count: "exact", head: true })
@@ -649,6 +650,101 @@ async function refreshNotifCount(){
   badge.textContent = count > 9 ? "9+" : (count || "");
   badge.style.display = count ? "inline-block" : "none";
 }
+
+// ---------- Received gifts ----------
+// Gifts a member has been sent live in dating_gifts (sender_id, recipient_id,
+// gift_id -> dating_gift_catalog). RLS already lets recipients read their rows.
+function giftSeenKey(){ return `wana_gifts_seen_${currentUser.id}`; }
+function getGiftsSeenAt(){ try { return localStorage.getItem(giftSeenKey()) || ""; } catch (_) { return ""; } }
+function setGiftsSeenAt(iso){ try { localStorage.setItem(giftSeenKey(), iso); } catch (_) {} }
+
+async function refreshGiftBadge(){
+  if (!currentUser) return;
+  const badge = document.getElementById("giftCount");
+  if (!badge) return;
+  let q = _supabase.from("dating_gifts")
+    .select("*", { count: "exact", head: true })
+    .eq("recipient_id", currentUser.id);
+  const seen = getGiftsSeenAt();
+  if (seen) q = q.gt("created_at", seen);
+  const { count, error } = await q;
+  if (error){ console.warn("Gift badge:", error.message); return; }
+  badge.textContent = count > 9 ? "9+" : (count || "");
+  badge.style.display = count ? "inline-block" : "none";
+}
+
+async function openReceivedGifts(){
+  if (!currentUser){ openAuthModal("signin"); return; }
+  const root = document.getElementById("modalRoot");
+  const shell = (inner) => `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal"><div class="body">
+        <button class="btn-close" onclick="closeModal()">✕</button>
+        <h3 style="margin-bottom:14px;">🎁 Gifts you've received</h3>
+        ${inner}
+      </div></div>
+    </div>`;
+  root.innerHTML = shell(`<p style="color:#777;">Loading…</p>`);
+
+  try {
+    let res = await _supabase.from("dating_gifts").select("*")
+      .eq("recipient_id", currentUser.id)
+      .order("created_at", { ascending: false }).limit(100);
+    if (res.error) {   // e.g. no created_at column: retry unordered
+      res = await _supabase.from("dating_gifts").select("*").eq("recipient_id", currentUser.id).limit(100);
+    }
+    if (res.error){
+      console.error("Received gifts error:", res.error);
+      root.innerHTML = shell(`<div class="msg error">Couldn't load your gifts: ${esc(res.error.message)}</div>`);
+      return;
+    }
+    const gifts = res.data || [];
+
+    // Gift details from the catalog, and sender names from profiles
+    const catalog = {}, names = {};
+    const giftIds = [...new Set(gifts.map(g => g.gift_id).filter(Boolean))];
+    if (giftIds.length){
+      const { data } = await _supabase.from("dating_gift_catalog").select("*").in("id", giftIds);
+      (data || []).forEach(c => { catalog[c.id] = c; });
+    }
+    const senderIds = [...new Set(gifts.map(g => g.sender_id).filter(Boolean))];
+    if (senderIds.length){
+      const { data } = await _supabase.from("dating_profiles").select("user_id, display_name").in("user_id", senderIds);
+      (data || []).forEach(p => { names[p.user_id] = p.display_name; });
+    }
+
+    const seen = getGiftsSeenAt();
+    const cards = gifts.map(g => {
+      const c = catalog[g.gift_id] || {};
+      const emoji = c.emoji || g.emoji || "🎁";
+      const gname = c.name || g.gift_name || "Gift";
+      const sender = names[g.sender_id] || "Someone";
+      const isNew = g.created_at && (!seen || g.created_at > seen);
+      const when = g.created_at ? new Date(g.created_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "";
+      return `
+        <div style="display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:${isNew ? "#fffaf0" : "#fff"};">
+          <div style="font-size:2rem;line-height:1;">${esc(emoji)}</div>
+          <div style="flex:1;min-width:0;">
+            <div><b>${esc(gname)}</b>${isNew ? ` <span style="font-size:.7rem;background:#B8860B;color:#fff;border-radius:999px;padding:2px 8px;margin-left:6px;">New</span>` : ""}</div>
+            <div style="font-size:.88rem;color:#555;">from ${esc(sender)}</div>
+            ${g.message ? `<div style="margin-top:6px;font-size:.92rem;white-space:pre-wrap;word-break:break-word;">“${esc(g.message)}”</div>` : ""}
+            ${when ? `<div style="margin-top:6px;font-size:.74rem;color:#94a3b8;">${esc(when)}</div>` : ""}
+          </div>
+        </div>`;
+    }).join("");
+
+    root.innerHTML = shell(cards || `<p style="color:#777;">No gifts yet. Platinum members can send you a gift once you're matched.</p>`);
+
+    // Mark everything up to the newest gift as seen and clear the badge
+    const newest = gifts.map(g => g.created_at).filter(Boolean).sort().pop();
+    setGiftsSeenAt(newest || new Date().toISOString());
+    refreshGiftBadge();
+  } catch (err){
+    console.error("openReceivedGifts failed:", err);
+    root.innerHTML = shell(`<div class="msg error">Couldn't load your gifts: ${esc((err && err.message) || String(err))}</div>`);
+  }
+}
+window.openReceivedGifts = openReceivedGifts;
 
 // ---------- Realtime: messages & notifications ----------
 function setupRealtimeMessaging(){
@@ -795,7 +891,7 @@ function teardownRealtimeChannels(){
 
 
 function notifIcon(type){
-  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : "💬";
+  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : "💬";
 }
 
 function notifText(n){
@@ -803,6 +899,8 @@ function notifText(n){
   if (n.type === "match") return `It's a match with ${esc(name)}!`;
   if (n.type === "like") return `${esc(name)} liked your profile`;
   if (n.type === "date") return `${esc(name)} ${esc(n.body || "sent you a date update")}`;
+  // The database already writes a full sentence ("You received a Platinum gift: Rose")
+  if (n.type === "gift") return `${esc(n.body || "You received a gift")}${n.actor_name ? ` from ${esc(name)}` : ""}`;
   return `New message from ${esc(name)}${n.body ? `: "${esc(n.body)}"` : ""}`;
 }
 
@@ -874,6 +972,10 @@ async function handleNotifClick(idx){
   }
   if (n.type === "date"){
     switchTab("dateplans");
+    return;
+  }
+  if (n.type === "gift"){
+    openReceivedGifts();
     return;
   }
 
