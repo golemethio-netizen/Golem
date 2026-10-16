@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Signing in…</title></head>
+<body style="font-family:sans-serif;padding:24px">
+<p>Signing you in…</p>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config.js"></script>
+<script>
+  // Create the client exactly as you do in app.js (same URL and anon key)
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  (async () => {
+    // Supabase picks up the tokens/code from the URL and saves the session
+    // to localStorage, which the opener window shares (same origin)
+    const { data: { session } } = await sb.auth.getSession();
+    if (window.opener && session) {
+      window.opener.postMessage({ type: 'wana-auth-done' }, location.origin);
+      window.close();
+    } else if (session) {
+      location.replace('index.html');   // opened as a normal tab
+    } else {
+      document.body.innerHTML = '<p>Sign-in failed. You can close this window.</p>';
+    }
+  })();
+</script>
+</body></html>
