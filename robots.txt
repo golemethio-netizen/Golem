@@ -8,3 +8,20 @@ Disallow: /my-items.html
 
 # Direct crawlers to your XML sitemap
 Sitemap: https://www.wanagebya.com/sitemap.xml
+
+
+# Allow all crawlers to access the entire site and dating section
+User-agent: *
+Allow: /
+Allow: /dating/
+Allow: /dating/index.html
+
+# Allow AI search crawlers (Google Gemini, OpenAI Search, etc.)
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+# Location of XML Sitemap
+Sitemap: https://www.wanagebya.com/sitemap.xml
