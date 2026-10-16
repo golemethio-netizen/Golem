@@ -1145,6 +1145,29 @@ function clearPostImage(){
 
 const POST_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const POST_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+
+// Shared upload hardening (profile photos, selfies, receipts).
+// SVG is deliberately not allowed: it can carry scripts.
+const UPLOAD_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const UPLOAD_MAX_BYTES = 10 * 1024 * 1024;
+
+// Returns an error message, or null if the file is OK.
+function checkUploadFile(file, { allowPdf = false } = {}){
+  if (!file) return "Choose a file first.";
+  const okType = UPLOAD_IMAGE_TYPES.has(file.type) || (allowPdf && file.type === "application/pdf");
+  if (!okType) return allowPdf ? "Use a JPG, PNG, WEBP, GIF or PDF file." : "Use a JPG, PNG, WEBP or GIF image.";
+  if (file.size > UPLOAD_MAX_BYTES) return "File must be 10 MB or smaller.";
+  return null;
+}
+
+// Storage path: keeps the "<userId>-" prefix the bucket write policies expect,
+// strips unsafe characters (spaces, slashes, Amharic etc. in file names) and
+// adds a random part so two files can never collide.
+function makeUploadPath(file){
+  const safe = String(file.name || "file").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80);
+  const rand = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)).slice(0, 8);
+  return `${currentUser.id}-${Date.now()}-${rand}-${safe}`;
+}
 let postSubmitting = false;
 // Which column holds the post's photo. The newer private-storage schema calls it
 // photo_url; an older database still calls it image_url. We try photo_url first
@@ -1771,6 +1794,7 @@ async function checkMatch(otherUserId){
 }
 
 async function unmatchUser(otherUserId, otherName){
+  otherName = otherName ?? (window._threadNames && window._threadNames[otherUserId]) ?? "this person";
   if (!confirm(`Unmatch with ${otherName}? You'll stop seeing each other in Messages, and they'll need to match with you again before you can message.`)) return;
   const a = currentUser.id < otherUserId ? currentUser.id : otherUserId;
   const b = currentUser.id < otherUserId ? otherUserId : currentUser.id;
@@ -1942,6 +1966,7 @@ function setupPersonalCallChannel(){
 }
 
 async function startCall(recipientId, recipientName){
+  recipientName = recipientName ?? (window._threadNames && window._threadNames[recipientId]) ?? "Conversation";
   if (peerConnection){ alert("You're already in a call."); return; }
   if (!(await requireProfile("make calls"))) return;
   if (!isPlatinumActive(myProfile)){
@@ -2342,7 +2367,13 @@ async function openThread(thread){
     voiceUrls[m.id] = await resolvePrivateUrl(BUCKET_VOICE_MESSAGES, m.voice_url);
   }));
 
-  const otherName = thread.profile ? esc(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
+  const otherNameRaw = thread.profile ? String(thread.profile.display_name || thread.profile.gender || "Conversation") : "Conversation";
+  // Names are looked up by id from this map. They are never placed inside an
+  // inline onclick="" attribute (HTML-decoding turns &#39; back into ' and
+  // lets a crafted name break out of the JS string).
+  window._threadNames = window._threadNames || {};
+  window._threadNames[thread.other] = otherNameRaw;
+  const otherName = esc(otherNameRaw);
   const otherBadge = thread.profile ? verifiedBadge(thread.profile.is_verified) + platinumBadge(isPlatinumActive(thread.profile)) : "";
   const headerPhoto = thread.profile ? ((thread.profile.photos && thread.profile.photos[0]) || thread.profile.photo_url) : null;
   const headerPhotoIsUrl = headerPhoto && /^https?:\/\//i.test(headerPhoto);
@@ -2352,7 +2383,7 @@ async function openThread(thread){
     ? "Voice calls are a Platinum feature — upgrade to start calling"
     : (thread.profile && thread.profile.call_privacy === "verified" ? "This person only accepts calls from verified profiles" : "This person isn't accepting calls right now");
   const callBtnHtml = callAllowed
-    ? `<button class="call-btn" onclick="startCall('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Voice call" style="width:34px; height:34px; font-size:0.9rem;">📞</button>`
+    ? `<button class="call-btn" onclick="startCall('${thread.other}')" title="Voice call" style="width:34px; height:34px; font-size:0.9rem;">📞</button>`
     : `<button class="call-btn" disabled title="${callTooltip}" style="width:34px; height:34px; font-size:0.9rem;opacity:.4;cursor:not-allowed;">📞</button>`;
 
   // Read receipts ("Seen") are a Platinum perk — only show if the LAST
@@ -2375,7 +2406,7 @@ async function openThread(thread){
             </span>
             <span style="display:flex;gap:8px;flex-shrink:0;">
               ${callBtnHtml}
-              <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);width:34px; height:34px; font-size:0.9rem;" onclick="unmatchUser('${thread.other}','${otherName.replace(/'/g,"&#39;")}')" title="Unmatch">✕</button>
+              <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);width:34px; height:34px; font-size:0.9rem;" onclick="unmatchUser('${thread.other}')" title="Unmatch">✕</button>
             </span>
           </h3>
           <div id="threadMessages" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin:10px 0; padding-right:5px;">
@@ -2764,11 +2795,13 @@ async function submitPlatinumRequest(planKey, amount){
   const receiptFile = receiptInput && receiptInput.files[0];
   let receiptPath = null;
   if (receiptFile){
+    const receiptErr = checkUploadFile(receiptFile, { allowPdf: true });
+    if (receiptErr){ msg.innerHTML = `<div class="msg error">${esc(receiptErr)}</div>`; return; }
     msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading receipt...</div>`;
     // Private bucket — path starts with the uploader's id to match the
     // write policy, and we store the PATH (not a public URL): only the
     // uploader and admins can ever read it, via a signed URL.
-    receiptPath = `${currentUser.id}-${Date.now()}-${receiptFile.name}`;
+    receiptPath = makeUploadPath(receiptFile);
     const { error: uploadErr } = await _supabase.storage.from(BUCKET_PLATINUM_RECEIPTS).upload(receiptPath, receiptFile);
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Receipt upload failed: ${esc(uploadErr.message)}</div>`;
@@ -2818,13 +2851,15 @@ async function submitVerification(){
   const msg = document.getElementById("verifyMsg");
   const file = fileInput.files[0];
   if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
+  const selfieErr = checkUploadFile(file);
+  if (selfieErr){ msg.innerHTML = `<div class="msg error">${esc(selfieErr)}</div>`; return; }
 
   msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading... please wait.</div>`;
   // Private bucket — path starts with the uploader's id to match the
   // write policy, and we store the PATH (not a public URL): only the
   // uploader and admins can ever read it, via a signed URL.
-  const path = `${currentUser.id}-${Date.now()}-${file.name}`;
-  const { error: uploadErr } = await _supabase.storage.from(BUCKET_VERIFICATION).upload(path, file);
+  const path = makeUploadPath(file);
+  const { error: uploadErr } = await _supabase.storage.from(BUCKET_VERIFICATION).upload(path, file, { contentType: file.type });
   if (uploadErr){
     msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
     return;
@@ -2871,6 +2906,8 @@ async function changeProfilePhoto(index, inputEl){
   if (!file) return;
   const statusEl = document.getElementById(`photoSlotStatus-${index}`);
   const msg = document.getElementById("photoEditorMsg");
+  const photoErr = checkUploadFile(file);
+  if (photoErr){ msg.innerHTML = `<div class="msg error">${esc(photoErr)}</div>`; inputEl.value = ""; return; }
   if (statusEl) statusEl.style.display = "block";
 
   const { data: profile, error: fetchErr } = await _supabase
@@ -2884,8 +2921,8 @@ async function changeProfilePhoto(index, inputEl){
     return;
   }
 
-  const path = `${currentUser.id}-${Date.now()}-${file.name}`;
-  const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file);
+  const path = makeUploadPath(file);
+  const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file, { contentType: file.type });
   if (uploadErr){
     if (statusEl) statusEl.style.display = "none";
     msg.innerHTML = `<div class="msg error">Upload failed: ${esc(uploadErr.message)}</div>`;
@@ -3209,9 +3246,17 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
 
   let photoUrls = [];
   const files = Array.from(document.getElementById("fPhoto").files).slice(0, 3);
+  for (const f of files){
+    const fileErr = checkUploadFile(f);
+    if (fileErr){
+      msg.innerHTML = `<div class="msg error">${esc(fileErr)}</div>`;
+      btn.disabled = false; btn.textContent = "Publish My Profile";
+      return;
+    }
+  }
   for (const file of files){
-    const path = `${currentUser.id}-${Date.now()}-${file.name}`;
-    const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file);
+    const path = makeUploadPath(file);
+    const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file, { contentType: file.type });
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Photo upload failed: ${esc(uploadErr.message)}</div>`;
       btn.disabled = false; btn.textContent = "Publish My Profile";
