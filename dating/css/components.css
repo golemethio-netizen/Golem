@@ -14,23 +14,26 @@
 @media(max-width:700px){.app-shell{display:block!important;width:100%;max-width:none;min-height:0}.app-shell>.sidebar{width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;position:sticky!important;top:var(--header-h)!important}.app-shell>main{width:100%!important;padding:16px 12px 60px!important}.app-shell>#rightMatchRail{display:none!important}.feature-cards{grid-template-columns:1fr}.date-plan-meta{grid-template-columns:1fr}.date-plan-summary{grid-template-columns:1fr 1fr}}
 @media(max-width:420px){.compat-summary{grid-template-columns:1fr}.compat-stat{padding:13px}.date-plan-summary{grid-template-columns:1fr}.date-plan-head{display:block}.date-plan-status{display:inline-block;margin-top:8px}}
 
-/* ========== Mobile Bottom Navigation ========== */
+/* ========== Mobile Bottom Navigation (phones, signed-in only) ========== */
+.mobile-bottom-nav,
+.more-sheet,
+.more-sheet-backdrop { display: none; }
+
 .mobile-bottom-nav {
-  display: none; /* hidden on desktop */
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 300;
-  height: 64px;
-  padding: 0 4px;
-  padding-bottom: env(safe-area-inset-bottom, 0);
-  background: rgba(255, 255, 255, 0.96);
+  height: calc(62px + env(safe-area-inset-bottom, 0px));
+  padding: 0 2px env(safe-area-inset-bottom, 0px);
+  background: rgba(255, 255, 255, 0.97);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--line);
   box-shadow: 0 -4px 24px rgba(17, 24, 39, 0.06);
-  grid-template-columns: repeat(5, 1fr);
-  align-items: center;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: stretch;
 }
 
 .mnav-item {
@@ -39,72 +42,100 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  height: 100%;
+  min-width: 0;
   background: none;
   border: none;
   color: #6b7280;
   font-family: inherit;
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 600;
   cursor: pointer;
   position: relative;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.18s ease;
 }
-
-.mnav-item .mnav-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.mnav-item.active {
-  color: var(--green-dark, #087a57);
-}
-
-.mnav-item.active .mnav-icon {
-  transform: scale(1.08);
-}
+.mnav-item .mnav-icon { font-size: 1.2rem; line-height: 1; }
+.mnav-item .mnav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mnav-item.active { color: var(--green-dark, #087a57); }
+.mnav-item.active .mnav-icon { transform: scale(1.08); }
 
 .mnav-badge {
   position: absolute;
-  top: 6px;
-  right: calc(50% - 18px);
+  top: 5px;
+  right: calc(50% - 20px);
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
+  box-sizing: border-box;
   background: var(--danger, #e5484d);
   color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
   border-radius: 999px;
-  display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
 }
 
-/* Show bottom nav + hide old sidebar tabs on phones */
+/* "More" bottom sheet */
+.more-sheet-backdrop {
+  position: fixed; inset: 0; z-index: 310;
+  background: rgba(17, 24, 39, 0.45);
+  opacity: 0; pointer-events: none; transition: opacity .2s ease;
+}
+.more-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 320;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 8px 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -10px 40px rgba(17, 24, 39, 0.18);
+  max-height: 80vh; overflow-y: auto;
+  transform: translateY(105%); transition: transform .25s ease;
+}
+.more-sheet.open { transform: translateY(0); }
+.more-sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+.more-sheet-grip { width: 40px; height: 4px; border-radius: 4px; background: #d1d5db; margin: 4px auto 10px; }
+.more-item {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  min-height: 48px; padding: 10px 12px;
+  background: none; border: 0; border-radius: 12px;
+  font: inherit; font-size: 1rem; font-weight: 600; color: var(--ink, #111827);
+  text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.more-item span { font-size: 1.25rem; width: 28px; text-align: center; }
+.more-item:active { background: #f3f4f6; }
+.more-item.danger { color: #b42318; margin-top: 6px; border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; }
+
 @media (max-width: 768px) {
-  .mobile-bottom-nav {
-    display: grid;
+  body.is-signed-in .mobile-bottom-nav { display: grid; }
+  body.is-signed-in .more-sheet,
+  body.is-signed-in .more-sheet-backdrop { display: block; }
+
+  /* The bottom nav replaces the sidebar on phones (higher specificity than the desktop rule above) */
+  .app-shell > .sidebar { display: none !important; }
+
+  /* Room so content isn't covered by the bottom bar */
+  body.is-signed-in .app-shell > main {
+    padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Hide the old horizontal scroll tab bar */
-  .sidebar {
-    display: none !important;
-  }
+  /* One-line, slimmer header */
+  header { height: 56px; padding: 0 12px; }
+  header .brand { font-size: 1.05rem; white-space: nowrap; line-height: 1; }
+}
 
-  /* Give content room so it isn’t covered by the bottom bar */
-  main {
-    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0)) !important;
-  }
-
-  /* Slimmer header */
-  header {
-    height: 56px;
-    padding: 0 14px;
-  }
-  header .brand {
-    font-size: 1.1rem;
-  }
+@media (max-width: 400px) {
+  .mnav-item { font-size: 0.6rem; }
+  header { padding: 0 8px; }
+  header .brand { font-size: .92rem; gap: 6px; }
+  header nav { min-width: 0; }
+  header nav .lang { padding: 4px 6px !important; margin: 0 !important; }
+  header nav a { margin-left: 2px !important; padding: 6px !important; }
+  header .signout-pill, header .signin-pill { margin-left: 4px !important; padding: 5px 9px !important; font-size: .72rem !important; min-height: 32px; }
+  header .notif-wrap { margin-left: 4px !important; }
+  header .notif-bell { width: 34px !important; height: 34px !important; }
+}
+@media (max-width: 340px) {
+  header .brand span:not(:last-child) { display: none; }
+  header nav a { display: none !important; }
 }
