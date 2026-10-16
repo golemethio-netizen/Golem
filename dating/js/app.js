@@ -458,7 +458,15 @@ async function sendPasswordReset(){
 
 async function signOut(){
   teardownRealtimeChannels();
-  await _supabase.auth.signOut();
+  closeMoreSheet();
+  try { await _supabase.auth.signOut(); } catch (e) { console.warn("signOut:", e); }
+  // onAuthStateChange normally refreshes the UI; do it here too so Sign out
+  // always visibly works (even if the auth event is delayed or blocked).
+  if (currentUser){
+    currentUser = null;
+    updateHeaderAuthUI();
+    switchTab("home");
+  }
 }
 
 function updateHeaderAuthUI(){
@@ -466,6 +474,12 @@ function updateHeaderAuthUI(){
   const accountBox = document.getElementById("accountBox");
   const notifWrap = document.getElementById("notifWrap");
   const sidebar = document.querySelector(".sidebar");
+  const signOutBtn = document.getElementById("headerSignOutBtn");
+
+  // Drives the phone bottom nav / header Sign out (CSS shows them only while signed in)
+  document.body.classList.toggle("is-signed-in", !!currentUser);
+  if (signOutBtn) signOutBtn.style.display = currentUser ? "" : "none";
+  if (!currentUser) closeMoreSheet();
 
   if (currentUser){
     pillBtn.style.display = "none";
@@ -544,6 +558,7 @@ async function refreshUnreadBadge(){
     .eq("read", false);
   const badge = document.getElementById("unreadBadge");
   badge.textContent = count ? `(${count})` : "";
+  setMnavBadge("mnavUnreadBadge", count);
 }
 
 async function refreshLikesBadge(){
@@ -554,6 +569,7 @@ async function refreshLikesBadge(){
     .eq("seen", false);
   const badge = document.getElementById("likesBadge");
   badge.textContent = count ? `(${count})` : "";
+  setMnavBadge("mnavLikesBadge", count);
 }
 
 async function refreshVisitorsBadge(){
@@ -564,6 +580,7 @@ async function refreshVisitorsBadge(){
     .eq("seen", false);
   const badge = document.getElementById("visitorsBadge");
   if (badge) badge.textContent = count ? `(${count})` : "";
+  setMnavBadge("mnavMoreBadge", count);
 }
 
 // ---------- Notifications ----------
@@ -854,6 +871,7 @@ async function loadLikesReceived(){
     await _supabase.from("dating_likes").update({ seen: true }).in("id", unseenIds);
   }
   document.getElementById("likesBadge").textContent = "";
+  setMnavBadge("mnavLikesBadge", 0);
 
   const likerIds = likes.map(l => l.liker_id);
   const { data: profiles } = await _supabase
@@ -905,6 +923,7 @@ async function loadVisitors(){
   }
   const badge = document.getElementById("visitorsBadge");
   if (badge) badge.textContent = "";
+  setMnavBadge("mnavMoreBadge", 0);
 
   const viewerIds = visits.map(v => v.viewer_id);
   const { data: profiles } = await _supabase
@@ -957,7 +976,29 @@ const PANELS = [
   "myProfilePanel", "settingsPanel"
 ];
 
+// ---------- Phone bottom nav helpers ----------
+function setMnavBadge(id, count){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = count > 99 ? "99+" : (count || "");
+  el.style.display = count ? "flex" : "none";
+}
+
+function openMoreSheet(){
+  const sheet = document.getElementById("moreSheet");
+  if (sheet) sheet.classList.add("open");
+  document.getElementById("moreSheetBackdrop")?.classList.add("open");
+}
+
+function closeMoreSheet(){
+  document.getElementById("moreSheet")?.classList.remove("open");
+  document.getElementById("moreSheetBackdrop")?.classList.remove("open");
+}
+
+const MNAV_PRIMARY_TABS = ["home", "browse", "messages", "likes", "myprofile"];
+
 function switchTab(tab){
+  closeMoreSheet();
   if (tab === 'home' && currentUser) setTimeout(loadHomeRecommendations, 80);
 
   // Desktop sidebar tabs
@@ -966,9 +1007,12 @@ function switchTab(tab){
   );
 
   // Mobile bottom nav
-  document.querySelectorAll('.mnav-item').forEach(btn =>
+  document.querySelectorAll('.mnav-item[data-tab]').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.tab === tab)
   );
+  const moreBtn = document.getElementById("mnavMore");
+  if (moreBtn) moreBtn.classList.toggle("active", !MNAV_PRIMARY_TABS.includes(tab));
+  window.scrollTo({ top: 0 });
 
   if (!currentUser){
     document.getElementById("gate").style.display = "flex";
