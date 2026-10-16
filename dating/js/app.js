@@ -3378,8 +3378,8 @@ async function loadHomeRecommendations(){
 
       el.innerHTML=`
         <div class="wana-right-match-photo"
-             ${img ? `style="background-image:url('${esc(photoUrl||img)}')"` : ''}>
-          ${img?'':'👤'}
+             ${photoUrl ? `style="background-image:url('${esc(photoUrl)}')"` : ''}>
+          ${photoUrl?'':'👤'}
           ${p.online?'<span class="online"></span>':''}
         </div>
         <div class="wana-right-match-name">
