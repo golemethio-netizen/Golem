@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
   <url>
-    <loc>https://wanagebya.com/</loc>
-    <lastmod>2026-07-09</lastmod>
+    <loc>https://www.wanagebya.com/</loc>
+    <lastmod>2026-10-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Wana Dating Page -->
   <url>
-    https://www.wanagebya.com/
-    1.00
-  
-  
-    https://www.wanagebya.com/dating.html
-    0.90
-    <loc>https://wanagebya.com/sell.html</loc>
-    <lastmod>2026-07-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://www.wanagebya.com/dating/index.html</loc>
+    <lastmod>2026-10-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>
