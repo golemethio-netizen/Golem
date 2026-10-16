@@ -1,25 +1,47 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Signing in…</title></head>
-<body style="font-family:sans-serif;padding:24px">
-<p>Signing you in…</p>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signing in… — Wana Dating</title>
+</head>
+<body style="font-family:sans-serif;padding:24px;text-align:center">
+<p id="status">Signing you in…</p>
+<script src="js/vendor/supabase.js"></script>
 <script src="../config.js"></script>
 <script>
-  // Create the client exactly as you do in app.js (same URL and anon key)
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+  // config.js creates the global `_supabase` client. It reads the OAuth
+  // tokens/code from this page's URL and stores the session.
   (async () => {
-    // Supabase picks up the tokens/code from the URL and saves the session
-    // to localStorage, which the opener window shares (same origin)
-    const { data: { session } } = await sb.auth.getSession();
-    if (window.opener && session) {
-      window.opener.postMessage({ type: 'wana-auth-done' }, location.origin);
-      window.close();
-    } else if (session) {
-      location.replace('index.html');   // opened as a normal tab
-    } else {
-      document.body.innerHTML = '<p>Sign-in failed. You can close this window.</p>';
+    const status = document.getElementById("status");
+    try {
+      let { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        // give the client a moment to finish exchanging the URL tokens/code
+        session = await new Promise((resolve) => {
+          const t = setTimeout(() => resolve(null), 4000);
+          _supabase.auth.onAuthStateChange((_e, s) => {
+            if (s) { clearTimeout(t); resolve(s); }
+          });
+        });
+      }
+      if (!session) throw new Error("No session");
+
+      if (window.opener) {
+        window.opener.postMessage({
+          type: "wana-auth-done",
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        }, window.location.origin);
+        window.close();
+      } else {
+        // opened as a normal tab (popup fallback): go to the dating app
+        window.location.replace("index.html");
+      }
+    } catch (err) {
+      status.textContent = "Sign-in failed. You can close this window and try again.";
     }
   })();
 </script>
-</body></html>
+</body>
+</html>
