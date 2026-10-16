@@ -358,6 +358,7 @@ function renderAuthModal(){
             <button class="${authMethod === "phone" ? "active" : ""}" onclick="switchAuthMethod('phone')">📱 Phone</button>
           </div>
           ${form}
+          <p style="font-size:.78rem;color:#777;margin:12px 0 0;line-height:1.4;">By continuing you confirm you are 18 or older and agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:var(--green);">Terms of Use</a> and <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--green);">Privacy Policy</a>.</p>
         </div>
       </div>
     </div>`;
