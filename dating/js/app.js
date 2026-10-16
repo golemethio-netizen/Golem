@@ -400,7 +400,7 @@ function signInWithGoogle(){
 async function signInWithGoogleRedirect(){
   const { error } = await _supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: window.location.origin + "/dating.html" }
+    options: { redirectTo: window.location.origin + "/dating/index.html" }
   });
   if (error) alert("Sign-in failed: " + error.message);
 }
@@ -472,7 +472,7 @@ async function submitAuthForm(e){
       ...identifier, password,
       options: {
         data: { full_name: fullName, phone_number: phoneNumber, location },
-        ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating.html" })
+        ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating/index.html" })
       }
     });
     submitBtn.disabled = false;
@@ -493,7 +493,7 @@ async function sendPasswordReset(){
   const msg = document.getElementById("authMsg");
   if (!email){ msg.innerHTML = `<div class="msg error">Enter your email above first.</div>`; return; }
   const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/dating.html"
+    redirectTo: window.location.origin + "/dating/index.html"
   });
   msg.innerHTML = error
     ? `<div class="msg error">${esc(error.message)}</div>`
