@@ -2829,21 +2829,62 @@ function renderPlatinumBox(profile, latestPlatinumRequest){
     </div>`;
 }
 
+// The gift code calls esc2() and escapeAttr(), which app.js never defined.
+// If no other script provides them, opening the gift picker threw a
+// ReferenceError (silently, inside a click handler), so nothing happened.
+// Window-property fallbacks: a later script that defines its own wins.
+if (typeof window.esc2 !== "function") window.esc2 = (v) => esc(v == null ? "" : String(v));
+if (typeof window.escapeAttr !== "function") window.escapeAttr = (v) => esc(v == null ? "" : String(v));
+
+function giftErrorText(error){
+  const t = String((error && (error.message || error.details)) || "");
+  if ((error && (error.code === "PGRST202" || error.code === "42P01")) ||
+      /could not find the function|does not exist|schema cache/i.test(t)){
+    return "Gifts aren't set up on the server yet. Please try again later.";
+  }
+  return t || "Something went wrong.";
+}
+
 async function openGiftCenter(recipientId, recipientName){
+  try { await _openGiftCenterInner(recipientId, recipientName); }
+  catch (err){
+    console.error("openGiftCenter failed:", err);
+    alert("Couldn't open the gift picker: " + ((err && err.message) || err));
+  }
+}
+
+async function _openGiftCenterInner(recipientId, recipientName){
   if(!isPlatinumActive(myProfile)){ alert("Gifts are a Platinum feature. Upgrade to Platinum first."); return; }
   const root=document.getElementById("modalRoot"); if(!root)return;
   const {data:gifts,error}=await _supabase.from("dating_gift_catalog").select("*").eq("active",true).order("sort_order",{ascending:true});
-  if(error){alert("Gift catalog is unavailable: "+error.message);return;}
+  if(error){console.error("Gift catalog error:",error);alert("Gift catalog is unavailable: "+giftErrorText(error));return;}
   const items=(gifts||[]).map(g=>`<button type="button" data-gift-id="${escapeAttr(g.id)}" style="text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;cursor:pointer"><div style="font-size:1.35rem">${esc2(g.emoji||"🎁")}</div><b>${esc2(g.name)}</b><div style="font-size:.76rem;color:#777;margin-top:3px">${esc2(g.description||"")} · ${esc2(g.price_birr)} Birr</div></button>`).join("");
   root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:520px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🎁 Send a Platinum Gift to ${esc2(recipientName||"your match")}</h3><p class="bio">Gifts are visible to the recipient and are available only to active Platinum members.</p><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${items||'<div class="date-plan-empty">No gifts are available right now.</div>'}</div><textarea id="giftMessage" maxlength="240" placeholder="Optional message" style="width:100%;min-height:70px;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:9px"></textarea><div id="giftMsg" style="margin-top:10px"></div></div></div></div>`;
   root.querySelectorAll("[data-gift-id]").forEach(btn=>btn.addEventListener("click",()=>sendPlatinumGift(btn.dataset.giftId,recipientId,recipientName)));
 }
 
+let _sendingGift = false;
 async function sendPlatinumGift(giftId,recipientId,recipientName){
+  if (_sendingGift) return;   // one gift at a time; a double-tap must not send twice
+  _sendingGift = true;
+  const btns = [...document.querySelectorAll("[data-gift-id]")];
+  btns.forEach(b => b.disabled = true);
+  try { await _sendPlatinumGiftInner(giftId,recipientId,recipientName); }
+  catch (err){
+    console.error("sendPlatinumGift failed:", err);
+    const box = document.getElementById("giftMsg");
+    if (box) box.innerHTML = `<div class="msg error">${esc(giftErrorText(err))}</div>`;
+  } finally {
+    _sendingGift = false;
+    btns.forEach(b => { if (b.isConnected) b.disabled = false; });
+  }
+}
+
+async function _sendPlatinumGiftInner(giftId,recipientId,recipientName){
   const msg=(document.getElementById("giftMessage")?.value||"").trim();
   if(!isPlatinumActive(myProfile)){alert("Active Platinum is required.");return;}
   const {error}=await _supabase.rpc("dating_send_platinum_gift",{p_recipient_id:recipientId,p_gift_id:giftId,p_message:msg||null});
-  if(error){const box=document.getElementById("giftMsg");if(box)box.innerHTML=`<div class="msg error">${esc2(error.message)}</div>`;return;}
+  if(error){console.error("Gift RPC error:",error);const box=document.getElementById("giftMsg");if(box)box.innerHTML=`<div class="msg error">${esc(giftErrorText(error))}</div>`;return;}
   closeModal();
   alert(`Gift sent to ${recipientName||"your match"}.`);
 }
