@@ -465,7 +465,8 @@
       catch(err) { msg.innerHTML = `<div class="msg error">${esc(err.message)}</div>`; return; }
 
       btn.disabled = true;
-      btn.textContent = "Publishing Profile…";
+      btn.textContent = myProfile ? "Saving…" : "Publishing Profile…";
+      const wasEditing = !!myProfile;
       msg.innerHTML = "";
       const uploadedPaths = [];
 
@@ -477,7 +478,8 @@
           photoPaths.push(path);
         }
 
-        const profileCode = `WGD-${new Date().getFullYear()}-${crypto.randomUUID().split("-")[0].toUpperCase()}`;
+        // Editing keeps the existing profile code; only a brand-new profile gets one.
+        const profileCode = (myProfile && myProfile.profile_code) || `WGD-${new Date().getFullYear()}-${crypto.randomUUID().split("-")[0].toUpperCase()}`;
         const payload = {
           user_id: currentUser.id,
           profile_code: profileCode,
@@ -508,16 +510,19 @@
         const {error} = await _supabase.from("dating_profiles").upsert(payload,{onConflict:"user_id"});
         if (error) throw error;
 
-        msg.innerHTML = '<div class="msg success">Profile published successfully.</div>';
+        msg.innerHTML = `<div class="msg success">${wasEditing ? "Profile updated successfully." : "Profile published successfully."}</div>`;
+        const photoInput = document.getElementById("fPhoto");
+        if (photoInput) photoInput.value = "";
         await fetchMyProfile();
+        if (typeof fillPostForm === "function") { postFormDirty = false; fillPostForm(true); }
         await refreshProfileCompleteBadge();
         setTimeout(() => switchTab("myprofile"), 900);
       } catch(err) {
         await deletePrivateProfileFiles(uploadedPaths);
-        msg.innerHTML = `<div class="msg error">Couldn't publish profile: ${esc(err.message || "Unknown error")}</div>`;
+        msg.innerHTML = `<div class="msg error">Couldn't ${myProfile ? "save" : "publish"} profile: ${esc(err.message || "Unknown error")}</div>`;
       } finally {
         btn.disabled = false;
-        btn.textContent = "Publish My Profile";
+        btn.textContent = (typeof postSubmitLabel === "function") ? postSubmitLabel() : "Publish My Profile";
       }
     });
   }
