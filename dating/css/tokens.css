@@ -989,7 +989,7 @@ form.post-form textarea {
   border: 1px solid #f5c6cb;
 }
 .msg.success {
-  background: var(--green-soft);
+  background: #e8f7ee;
   color: #0f7a4f;
   border: 1px solid #b8e6d4;
 }
