@@ -1459,7 +1459,10 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolve
   const visBadge = p.visibility === "matches" ? "👥 Matches only" : "🌍 Public";
 
   const reactionCounts = {};
-  postReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
+  postReactions.forEach(r => {
+    if (!REACTION_EMOJIS.includes(r.emoji)) return; // value is used inside an onclick attribute
+    reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1;
+  });
   const myReaction = postReactions.find(r => r.user_id === currentUser.id);
   const reactionRow = Object.keys(reactionCounts).length
     ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
@@ -2632,8 +2635,13 @@ function renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls){
 function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   const mine = m.sender_id === currentUser.id;
   const reactionCounts = {};
-  msgReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
-  const myReaction = msgReactions.find(r => r.user_id === currentUser.id);
+  // Only the known reaction emojis are rendered: the value is placed inside an
+  // onclick attribute, so anything else stored in the database is ignored.
+  msgReactions.forEach(r => {
+    if (!REACTION_EMOJIS.includes(r.emoji)) return;
+    reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1;
+  });
+  const myReaction = msgReactions.find(r => r.user_id === currentUser.id && REACTION_EMOJIS.includes(r.emoji));
   const reactionRow = Object.keys(reactionCounts).length
     ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
         `<span class="reaction-pill${myReaction && myReaction.emoji===e ? " mine" : ""}" onclick="toggleReaction('${m.id}','${e}')">${e} ${c}</span>`).join("")}</div>`
