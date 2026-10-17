@@ -128,7 +128,7 @@
 <div class="more-sheet" id="moreSheet" role="dialog" aria-label="More">
   <div class="more-sheet-grip"></div>
   <button class="more-item" onclick="switchTab('newmembers')" type="button"><span>🆕</span> New Members</button>
-  <button class="more-item" onclick="switchTab('post')" type="button"><span>✍️</span> Setup Profile</button>
+  <button class="more-item" onclick="switchTab('post')" type="button"><span>✍️</span> <span class="post-tab-label">Setup Profile</span></button>
   <button class="more-item" onclick="switchTab('visitors')" type="button"><span>👣</span> Visitors</button>
   <button class="more-item" onclick="switchTab('compatibility')" type="button"><span>❤️</span> Compatibility</button>
   <button class="more-item" onclick="switchTab('dateplans')" type="button"><span>📅</span> Date Plans</button>
@@ -162,7 +162,7 @@
 <div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
 <div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
 <div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
-<div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> Setup Profile</div>
+<div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> <span class="post-tab-label">Setup Profile</span></div>
 <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
 <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
 <div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
@@ -389,8 +389,8 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <div class="empty" id="newMembersEmpty" style="display:none;">No new members to show right now.</div>
 </div><div class="panel" id="postPanel" style="display:none;">
 <div class="browse-header">
-<h2>Create Your <span>Dating Profile</span></h2>
-<p>Fill out the details below to start matching with people.</p>
+<h2 id="postHeading">Create Your <span>Dating Profile</span></h2>
+<p id="postSubheading">Fill out the details below to start matching with people.</p>
 </div>
 <form class="post-form" id="postForm">
 <div>
@@ -523,7 +523,8 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <textarea id="fBio" maxlength="500" placeholder="Tell people a bit about your hobbies, interests, and what makes you unique..." required=""></textarea>
 </div>
 <div>
-<label>Upload Photos (Up to 3)</label>
+<label id="fPhotoLabel">Upload Photos (Up to 3)</label>
+<div id="postPhotoNote" style="display:none;font-size:.82rem;color:var(--muted);margin:2px 0 6px;"></div>
 <input accept="image/*" id="fPhoto" multiple="" style="padding: 6px; background: #fff;" type="file"/>
 </div>
 <div class="checkbox-line" style="background: #fff9ee; padding: 12px; border-radius: 8px; border: 1px solid #fce3b4;">
