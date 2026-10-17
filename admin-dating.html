@@ -225,10 +225,16 @@
             .admin-dashboard-grid{grid-template-columns:1fr}
             .admin-queue{grid-template-columns:1fr}
             .admin-date-grid{grid-template-columns:1fr}
-            .admin-shell{padding:12px!important}
+            .admin-shell{padding:12px!important;max-width:100%;overflow-x:hidden}
+            .admin-card,.admin-activity-row{min-width:0}
+            .admin-activity-row,.admin-activity-meta,.admin-card p,.admin-card div{overflow-wrap:anywhere}
             .golem-header{gap:10px;flex-wrap:wrap}
             .golem-header>div:last-child{width:100%;justify-content:flex-start;flex-wrap:wrap}
         }
+    </style>
+    <style id="admin-gate">
+        /* Dashboard stays hidden until the admin check passes (data is protected by the database too) */
+        body.admin-v2:not(.admin-ready){visibility:hidden}
     </style>
 </head>
 <body class="admin-v2" style="background: #f5f7fb;">
@@ -563,7 +569,9 @@
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Same-origin copy first (not blocked by tracking-prevention); CDN only as a fallback -->
+    <script src="dating/js/vendor/supabase.js"></script>
+    <script>if (!window.supabase) document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');</script>
     <script src="config.js"></script>
     <script>
         let currentAdminEmail = 'System';
@@ -638,28 +646,56 @@
 
         // ---------- Auth + logging (same pattern as admin.html) ----------
         async function checkAdmin() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) { window.location.href = 'index.html'; return false; }
-            const { data: profile } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single();
+            let user, profile;
+            try {
+                ({ data: { user } } = await _supabase.auth.getUser());
+                if (!user) { window.location.href = 'index.html'; return false; }
+                ({ data: profile } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single());
+            } catch (e) {
+                console.error('Admin check failed:', e);
+                window.location.href = 'index.html';
+                return false;
+            }
             if (!profile?.is_admin) {
                 alert("Restricted Access: Admin Only.");
                 window.location.href = 'index.html';
                 return false;
             }
+            document.body.classList.add('admin-ready');
             currentAdminEmail = user.email || profile.email || 'Admin';
             document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
             return true;
         }
 
+        function showAuditWarning(actionName, msg) {
+            let bar = document.getElementById('auditWarnBar');
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.id = 'auditWarnBar';
+                bar.setAttribute('role', 'alert');
+                bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;max-width:560px;margin:0 auto;background:#fff4e5;border:1px solid #f5b971;color:#7a4b00;padding:10px 14px;border-radius:10px;font-size:.82rem;box-shadow:0 6px 24px rgba(0,0,0,.15);cursor:pointer';
+                bar.onclick = () => bar.remove();
+                document.body.appendChild(bar);
+            }
+            bar.textContent = `⚠ The action "${actionName}" went through, but its audit-log entry could not be saved${msg ? ' (' + msg + ')' : ''}. Tap to dismiss.`;
+            clearTimeout(bar._t); bar._t = setTimeout(() => bar.remove(), 12000);
+        }
+
         async function logAction(actionName, details) {
+            // supabase-js returns { error } instead of throwing, so check it:
+            // a failed audit entry must be noticed, not silently dropped.
             try {
-                await _supabase.from('audit_logs').insert([{
+                const { error } = await _supabase.from('audit_logs').insert([{
                     admin_email: currentAdminEmail,
                     action: `[ADMIN] ${actionName}`,
                     details: details
                 }]);
+                if (error) throw error;
+                return true;
             } catch (err) {
                 console.error("Audit log failed:", err);
+                showAuditWarning(actionName, err && err.message);
+                return false;
             }
         }
 
@@ -1689,9 +1725,7 @@
         // ADMIN 2.2 — INLINE MODERATION ACTIONS
         // ============================================================
         async function adminAudit(action, details, memberId=_member360UserId) {
-            try {
-                await logAction(action, `${details}${memberId ? `; member_id: ${memberId}` : ''}`);
-            } catch (_) {}
+            return logAction(action, `${details}${memberId ? `; member_id: ${memberId}` : ''}`);
         }
 
         async function reviewMemberReport(reportId, status) {
