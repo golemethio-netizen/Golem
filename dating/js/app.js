@@ -111,6 +111,7 @@ async function fetchMyProfile(){
     .maybeSingle();
   myProfile = data || null;
   applyProfileGates();
+  if (typeof fillPostForm === "function") fillPostForm();
   return myProfile;
 }
 
@@ -592,6 +593,11 @@ _supabase.auth.onAuthStateChange(async (_event, session) => {
     myProfile = null;
     myMatchedIds = new Set();
     applyProfileGates();
+    // Don't leave the previous member's details sitting in the form.
+    const pf = document.getElementById("postForm");
+    if (pf) pf.reset();
+    postFormDirty = false; postFormFilledFor = null;
+    setPostFormMode();
   }
 });
 
@@ -1204,6 +1210,7 @@ function switchTab(tab){
   if (tab === "likes") loadLikesReceived();
   if (tab === "visitors") loadVisitors();
   if (tab === "myprofile") loadMyProfile();
+  if (tab === "post") fetchMyProfile();   // refreshes + prefills the form with the saved profile
   if (tab === "settings") loadSettings();
   // Add handlers for compatibility / dateplans / safety if you have them
 }
@@ -3468,6 +3475,92 @@ async function blockProfile(otherUserId){
   refreshUnreadBadge();
 }
 
+// ---------- Setup/Edit profile form: prefill from the saved profile ----------
+let postFormDirty = false;
+let postFormFilledFor = null;
+
+function setFieldValue(id, value){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const v = value == null ? "" : String(value);
+  if (el.tagName === "SELECT" && v && ![...el.options].some(o => o.value === v)){
+    // keep legacy / custom values selectable instead of silently dropping them
+    const o = document.createElement("option");
+    o.textContent = v; o.value = v;
+    el.appendChild(o);
+  }
+  el.value = v;
+}
+
+function postSubmitLabel(){
+  return myProfile ? "Save Changes" : "Publish My Profile";
+}
+
+function setPostFormMode(){
+  const editing = !!myProfile;
+  const h = document.getElementById("postHeading");
+  const sub = document.getElementById("postSubheading");
+  if (h) h.innerHTML = editing ? "Edit <span>My Profile</span>" : "Create Your <span>Dating Profile</span>";
+  if (sub) sub.textContent = editing
+    ? "Your saved details are filled in below. Change anything you like, then save."
+    : "Fill out the details below to start matching with people.";
+  const btn = document.getElementById("submitBtn");
+  if (btn && !btn.disabled) btn.textContent = postSubmitLabel();
+  document.querySelectorAll(".post-tab-label").forEach(el => { el.textContent = editing ? "Edit Profile" : "Setup Profile"; });
+  const note = document.getElementById("postPhotoNote");
+  const lbl = document.getElementById("fPhotoLabel");
+  if (note && lbl){
+    const n = myProfile && Array.isArray(myProfile.photos) ? myProfile.photos.length : (myProfile && myProfile.photo_url ? 1 : 0);
+    if (editing && n){
+      note.style.display = "block";
+      note.textContent = `You have ${n} photo${n > 1 ? "s" : ""} saved. Leave this empty to keep ${n > 1 ? "them" : "it"}, or choose new photos to replace ${n > 1 ? "them" : "it"}. (Manage photos in My Account.)`;
+      lbl.textContent = "Replace Photos (Optional, up to 3)";
+    } else {
+      note.style.display = "none";
+      lbl.textContent = "Upload Photos (Up to 3)";
+    }
+  }
+}
+
+function fillPostForm(force){
+  setPostFormMode();
+  if (!currentUser) return;
+  const key = myProfile ? `p:${myProfile.updated_at || myProfile.id || "x"}` : `new:${currentUser.id}`;
+  // Don't wipe edits the member is in the middle of making.
+  if (!force && postFormDirty && postFormFilledFor === key) return;
+  if (myProfile){
+    const p = myProfile;
+    setFieldValue("fName", p.display_name);
+    setFieldValue("fAge", p.age);
+    setFieldValue("fCity", p.city);
+    setFieldValue("fGender", p.gender);
+    setFieldValue("fSeeking", p.seeking);
+    setFieldValue("fType", p.relationship_type);
+    setFieldValue("fLookingFor", p.looking_for);
+    setFieldValue("fAgeMin", p.age_min);
+    setFieldValue("fAgeMax", p.age_max);
+    setFieldValue("fLifestyle", p.lifestyle);
+    setFieldValue("fHasKids", p.has_kids);
+    setFieldValue("fWantsKids", p.wants_kids);
+    setFieldValue("fReligion", p.religion);
+    setFieldValue("fOccupation", p.occupation);
+    setFieldValue("fIncome", p.income_range || "Prefer not to say");
+    setFieldValue("fBio", p.bio);
+    const c = document.getElementById("fAgeConfirm");
+    if (c) c.checked = p.age_confirmed !== false; // already confirmed when the profile was created
+  } else {
+    // New member: start from what their account already knows.
+    const full = (currentUser.user_metadata && (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) || "";
+    const nameEl = document.getElementById("fName");
+    if (nameEl && !nameEl.value && full) nameEl.value = String(full).trim().split(/\s+/)[0].slice(0, 30);
+  }
+  postFormDirty = false;
+  postFormFilledFor = key;
+}
+
+// Document-level so it survives safety.js replacing the form node.
+document.addEventListener("input", (e) => { if (e.target && e.target.closest && e.target.closest("#postForm")) postFormDirty = true; });
+
 // ---------- Post form ----------
 document.getElementById("postForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -3490,7 +3583,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   }
 
   btn.disabled = true;
-  btn.textContent = "Publishing Profile...";
+  btn.textContent = myProfile ? "Saving..." : "Publishing Profile...";
 
   let photoUrls = [];
   const files = Array.from(document.getElementById("fPhoto").files).slice(0, 3);
@@ -3498,7 +3591,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     const fileErr = checkUploadFile(f);
     if (fileErr){
       msg.innerHTML = `<div class="msg error">${esc(fileErr)}</div>`;
-      btn.disabled = false; btn.textContent = "Publish My Profile";
+      btn.disabled = false; btn.textContent = postSubmitLabel();
       return;
     }
   }
@@ -3507,13 +3600,15 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file, { contentType: file.type });
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Photo upload failed: ${esc(uploadErr.message)}</div>`;
-      btn.disabled = false; btn.textContent = "Publish My Profile";
+      btn.disabled = false; btn.textContent = postSubmitLabel();
       return;
     }
     photoUrls.push(path);
   }
 
-  const profileCode = `WGD-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  // Editing keeps the member's existing profile code; only a brand-new profile gets one.
+  const profileCode = (myProfile && myProfile.profile_code) || `WGD-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  const wasEditing = !!myProfile;
   const genderVal = document.getElementById("fGender").value;
   const cityVal = document.getElementById("fCity").value.trim();
 
@@ -3550,14 +3645,17 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     .upsert(payload, { onConflict: "user_id" });
 
   btn.disabled = false;
-  btn.textContent = "Publish My Profile";
 
   if (error){
+    btn.textContent = postSubmitLabel();
     msg.innerHTML = `<div class="msg error">Something went wrong: ${esc(error.message)}</div>`;
   } else {
-    msg.innerHTML = `<div class="msg success">Profile Published Successfully!</div>`;
-    document.getElementById("postForm").reset();
-    fetchMyProfile();
+    msg.innerHTML = `<div class="msg success">${wasEditing ? "Profile updated successfully!" : "Profile Published Successfully!"}</div>`;
+    const photoInput = document.getElementById("fPhoto");
+    if (photoInput) photoInput.value = "";
+    await fetchMyProfile();
+    postFormDirty = false;
+    fillPostForm(true);
     setTimeout(() => switchTab("myprofile"), 1500); 
   }
 });
