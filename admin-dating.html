@@ -685,11 +685,19 @@
             // supabase-js returns { error } instead of throwing, so check it:
             // a failed audit entry must be noticed, not silently dropped.
             try {
-                const { error } = await _supabase.from('audit_logs').insert([{
-                    admin_email: currentAdminEmail,
-                    action: `[ADMIN] ${actionName}`,
-                    details: details
-                }]);
+                // Preferred: server-side logger (admin-checked, can't be forged by other users).
+                let { error } = await _supabase.rpc('dating_admin_log', {
+                    p_action: `[ADMIN] ${actionName}`,
+                    p_details: String(details || '').slice(0, 1000)
+                });
+                if (error && (error.code === 'PGRST202' || error.code === '42883' || /could not find|does not exist/i.test(error.message || ''))) {
+                    // dating-migration-v39 not installed yet: fall back to the old direct insert.
+                    ({ error } = await _supabase.from('audit_logs').insert([{
+                        admin_email: currentAdminEmail,
+                        action: `[ADMIN] ${actionName}`,
+                        details: details
+                    }]));
+                }
                 if (error) throw error;
                 return true;
             } catch (err) {
@@ -982,10 +990,12 @@
 
         async function deleteDatingProfile(profileId, reportId) {
             if (!confirm('Remove this dating profile? This cannot be undone.')) return;
-            const { error } = await _supabase.from('dating_profiles').delete().eq('id', profileId);
-            if (error) { alert('Failed: ' + error.message); return; }
+            // Server function: deletes AND verifies a row was removed (a plain delete under RLS
+            // can "succeed" with 0 rows and no error).
+            const { error } = await _supabase.rpc('dating_admin_delete_profile', { p_profile_id: profileId });
+            if (error) { alert('Failed: ' + error.message + '\n\n(If this says the function does not exist, run dating-migration-v39-admin-hardening.sql.)'); return; }
             if (reportId) await _supabase.from('dating_reports').update({ status: 'reviewed' }).eq('id', reportId);
-            logAction('Dating Profile Removed', `Profile ID: ${profileId}`);
+            // (the server function writes the audit entry)
             loadDatingReports();
             loadDatingProfiles(true);
             refreshDatingBadges();
@@ -1234,11 +1244,14 @@
 
         async function resolvePlatinumRequest(requestId, newStatus, note) {
             if (newStatus === 'approved' && !confirm('Confirm you have verified this transaction number against your real bank/Telebirr account before approving?')) return;
-            const update = { status: newStatus };
-            if (note) update.reviewer_note = note;
-            const { error } = await _supabase.from('dating_platinum_requests').update(update).eq('id', requestId);
+            // Same server function as Member 360: admin-checked, grants Platinum through the
+            // approval trigger, and writes its own audit entry (a note of 3+ characters is required).
+            const reviewNote = (note && note.trim().length >= 3) ? note.trim()
+                : (newStatus === 'approved' ? 'Transaction verified' : 'Rejected');
+            const { error } = await _supabase.rpc('dating_admin_review_platinum', {
+                p_request_id: requestId, p_status: newStatus, p_note: reviewNote
+            });
             if (error) { alert('Failed: ' + error.message); return; }
-            logAction(newStatus === 'approved' ? 'Platinum Request Approved' : 'Platinum Request Rejected', `Request ID: ${requestId}`);
             loadPlatinumRequests();
             refreshDatingBadges();
         }
@@ -1819,12 +1832,8 @@
                 p_match_id: matchId, p_reason: reason.trim()
             });
 
-            if (result.error) {
-                // Fallback for schemas where match rows have a status column.
-                result = await _supabase.from('dating_matches').update({
-                    status: 'terminated'
-                }).eq('id', matchId);
-            }
+            // No direct-update fallback: under RLS it can change 0 rows without an error and
+            // look successful. Show the real RPC error instead.
             if (result.error) {
                 alert('Match termination failed: ' + result.error.message);
                 return;
@@ -1842,11 +1851,7 @@
                 p_plan_id: planId, p_reason: reason.trim()
             });
 
-            if (result.error) {
-                result = await _supabase.from('dating_date_plans').update({
-                    status: 'cancelled'
-                }).eq('id', planId);
-            }
+            // No direct-update fallback (see terminateMatch): report the real RPC error.
             if (result.error) {
                 alert('Date-plan termination failed: ' + result.error.message);
                 return;
