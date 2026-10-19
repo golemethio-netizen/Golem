@@ -1223,7 +1223,7 @@
                         </div>
                         <div style="margin:10px 0; background:#fffbee; border:1px solid #fce3b4; border-radius:8px; padding:10px 12px; font-size:0.82rem;">
                             <div><strong>${escapeHtml(planLabel[r.plan] || r.plan)}</strong> plan · ${r.amount_birr} Birr</div>
-                            <div style="margin-top:4px;">Transaction #: <code style="background:#fff;padding:2px 6px;border-radius:4px;">${escapeHtml(r.transaction_number)}</code></div>
+                            <div style="margin-top:4px;">Transaction #: ${r.transaction_number ? `<code style="background:#fff;padding:2px 6px;border-radius:4px;">${escapeHtml(r.transaction_number)}</code>` : `<em style="color:#8A6D1F;">not provided — verify using the attached receipt</em>`}</div>
                             ${r.receipt_url ? (receiptUrl
                                 ? (/\.pdf($|\?)/i.test(r.receipt_url)
                                     ? `<div style="margin-top:8px;"><a href="${escapeHtml(receiptUrl)}" target="_blank" rel="noopener" style="font-size:0.78rem;">📄 View attached receipt (PDF)</a></div>`
