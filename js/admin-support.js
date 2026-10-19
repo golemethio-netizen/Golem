@@ -90,7 +90,7 @@
   /* ---------- list ---------- */
   function loadList(force) {
     var c = db(); if (!c) return;
-    var q = c.from('support_tickets').select('*').order('last_message_at', { ascending: false }).limit(200);
+    var q = c.from('dating_support_tickets').select('*').order('last_message_at', { ascending: false }).limit(200);
     if (filter !== 'all') q = q.eq('status', filter);
     q.then(function (res) {
       if (res.error) { $('saList').replaceChildren(h('div', { class: 'sa-err' }, res.error.message)); return; }
@@ -157,12 +157,12 @@
     if (!cur) return;
     msgs = new Map();
     renderChat(); renderList();
-    c.from('support_messages').select('id,ticket_id,sender_role,body,created_at')
+    c.from('dating_support_messages').select('id,ticket_id,sender_role,body,created_at')
       .eq('ticket_id', id).order('created_at').limit(500).then(function (res) {
         if (res.error) { $('saErr').textContent = res.error.message; return; }
         res.data.forEach(function (m) { msgs.set(m.id, m); });
         paint();
-        c.rpc('support_mark_read', { p_ticket: id }).then(function () { cur.admin_unread = false; renderList(); refreshBadge(); });
+        c.rpc('dating_support_mark_read', { p_ticket: id }).then(function () { cur.admin_unread = false; renderList(); refreshBadge(); });
       });
   }
 
@@ -173,7 +173,7 @@
     btn.disabled = true; $('saErr').textContent = '';
     var ticketId = cur.id;
     c.auth.getUser().then(function (u) {
-      return c.from('support_messages')
+      return c.from('dating_support_messages')
         .insert({ ticket_id: ticketId, sender_id: u.data.user.id, sender_role: 'admin', body: text })
         .select('id,ticket_id,sender_role,body,created_at').single();
     }).then(function (res) {
@@ -189,7 +189,7 @@
   function toggleStatus() {
     var c = db(); if (!c || !cur) return;
     var next = cur.status === 'closed' ? 'open' : 'closed';
-    c.from('support_tickets').update({ status: next }).eq('id', cur.id).select().single().then(function (res) {
+    c.from('dating_support_tickets').update({ status: next }).eq('id', cur.id).select().single().then(function (res) {
       if (res.error) { $('saErr').textContent = res.error.message; return; }
       cur = res.data;
       if (typeof logAction === 'function') logAction(next === 'closed' ? 'Support Request Closed' : 'Support Request Reopened', 'Ticket ID: ' + cur.id);
@@ -200,7 +200,7 @@
   /* ---------- badge + realtime ---------- */
   function refreshBadge() {
     var c = db(), b = $('supportAdminBadge'); if (!c || !b) return;
-    c.from('support_tickets').select('id', { count: 'exact', head: true }).eq('admin_unread', true).then(function (res) {
+    c.from('dating_support_tickets').select('id', { count: 'exact', head: true }).eq('admin_unread', true).then(function (res) {
       var n = res.count || 0;
       b.textContent = n; b.style.display = n > 0 ? 'inline-block' : 'none';
     });
@@ -209,11 +209,11 @@
     var c = db(); if (!c || subscribed) return;
     subscribed = true;
     c.channel('support-admin-inbox')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, function (p) {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dating_support_messages' }, function (p) {
         var m = p.new; if (!m) return;
         if (cur && m.ticket_id === cur.id && !msgs.has(m.id)) {
           msgs.set(m.id, m); paint();
-          if (m.sender_role === 'user') c.rpc('support_mark_read', { p_ticket: cur.id });
+          if (m.sender_role === 'user') c.rpc('dating_support_mark_read', { p_ticket: cur.id });
         }
         clearTimeout(listTimer);
         listTimer = setTimeout(function () { loadList(); }, 400);
