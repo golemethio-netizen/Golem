@@ -111,6 +111,7 @@ async function fetchMyProfile(){
     .maybeSingle();
   myProfile = data || null;
   applyProfileGates();
+  if (typeof fillPostForm === "function") fillPostForm();
   return myProfile;
 }
 
@@ -592,6 +593,11 @@ _supabase.auth.onAuthStateChange(async (_event, session) => {
     myProfile = null;
     myMatchedIds = new Set();
     applyProfileGates();
+    // Don't leave the previous member's details sitting in the form.
+    const pf = document.getElementById("postForm");
+    if (pf) pf.reset();
+    postFormDirty = false; postFormFilledFor = null;
+    setPostFormMode();
   }
 });
 
@@ -639,6 +645,7 @@ function startNotifPolling(){
 }
 
 async function refreshNotifCount(){
+  refreshGiftBadge();   // fire and forget; has its own error handling
   const { count } = await _supabase
     .from("dating_notifications")
     .select("*", { count: "exact", head: true })
@@ -649,6 +656,101 @@ async function refreshNotifCount(){
   badge.textContent = count > 9 ? "9+" : (count || "");
   badge.style.display = count ? "inline-block" : "none";
 }
+
+// ---------- Received gifts ----------
+// Gifts a member has been sent live in dating_gifts (sender_id, recipient_id,
+// gift_id -> dating_gift_catalog). RLS already lets recipients read their rows.
+function giftSeenKey(){ return `wana_gifts_seen_${currentUser.id}`; }
+function getGiftsSeenAt(){ try { return localStorage.getItem(giftSeenKey()) || ""; } catch (_) { return ""; } }
+function setGiftsSeenAt(iso){ try { localStorage.setItem(giftSeenKey(), iso); } catch (_) {} }
+
+async function refreshGiftBadge(){
+  if (!currentUser) return;
+  const badge = document.getElementById("giftCount");
+  if (!badge) return;
+  let q = _supabase.from("dating_gifts")
+    .select("*", { count: "exact", head: true })
+    .eq("recipient_id", currentUser.id);
+  const seen = getGiftsSeenAt();
+  if (seen) q = q.gt("created_at", seen);
+  const { count, error } = await q;
+  if (error){ console.warn("Gift badge:", error.message); return; }
+  badge.textContent = count > 9 ? "9+" : (count || "");
+  badge.style.display = count ? "inline-block" : "none";
+}
+
+async function openReceivedGifts(){
+  if (!currentUser){ openAuthModal("signin"); return; }
+  const root = document.getElementById("modalRoot");
+  const shell = (inner) => `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal"><div class="body">
+        <button class="btn-close" onclick="closeModal()">✕</button>
+        <h3 style="margin-bottom:14px;">🎁 Gifts you've received</h3>
+        ${inner}
+      </div></div>
+    </div>`;
+  root.innerHTML = shell(`<p style="color:#777;">Loading…</p>`);
+
+  try {
+    let res = await _supabase.from("dating_gifts").select("*")
+      .eq("recipient_id", currentUser.id)
+      .order("created_at", { ascending: false }).limit(100);
+    if (res.error) {   // e.g. no created_at column: retry unordered
+      res = await _supabase.from("dating_gifts").select("*").eq("recipient_id", currentUser.id).limit(100);
+    }
+    if (res.error){
+      console.error("Received gifts error:", res.error);
+      root.innerHTML = shell(`<div class="msg error">Couldn't load your gifts: ${esc(res.error.message)}</div>`);
+      return;
+    }
+    const gifts = res.data || [];
+
+    // Gift details from the catalog, and sender names from profiles
+    const catalog = {}, names = {};
+    const giftIds = [...new Set(gifts.map(g => g.gift_id).filter(Boolean))];
+    if (giftIds.length){
+      const { data } = await _supabase.from("dating_gift_catalog").select("*").in("id", giftIds);
+      (data || []).forEach(c => { catalog[c.id] = c; });
+    }
+    const senderIds = [...new Set(gifts.map(g => g.sender_id).filter(Boolean))];
+    if (senderIds.length){
+      const { data } = await _supabase.from("dating_profiles").select("user_id, display_name").in("user_id", senderIds);
+      (data || []).forEach(p => { names[p.user_id] = p.display_name; });
+    }
+
+    const seen = getGiftsSeenAt();
+    const cards = gifts.map(g => {
+      const c = catalog[g.gift_id] || {};
+      const emoji = c.emoji || g.emoji || "🎁";
+      const gname = c.name || g.gift_name || "Gift";
+      const sender = names[g.sender_id] || "Someone";
+      const isNew = g.created_at && (!seen || g.created_at > seen);
+      const when = g.created_at ? new Date(g.created_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "";
+      return `
+        <div style="display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:${isNew ? "#fffaf0" : "#fff"};">
+          <div style="font-size:2rem;line-height:1;">${esc(emoji)}</div>
+          <div style="flex:1;min-width:0;">
+            <div><b>${esc(gname)}</b>${isNew ? ` <span style="font-size:.7rem;background:#B8860B;color:#fff;border-radius:999px;padding:2px 8px;margin-left:6px;">New</span>` : ""}</div>
+            <div style="font-size:.88rem;color:#555;">from ${esc(sender)}</div>
+            ${g.message ? `<div style="margin-top:6px;font-size:.92rem;white-space:pre-wrap;word-break:break-word;">“${esc(g.message)}”</div>` : ""}
+            ${when ? `<div style="margin-top:6px;font-size:.74rem;color:#94a3b8;">${esc(when)}</div>` : ""}
+          </div>
+        </div>`;
+    }).join("");
+
+    root.innerHTML = shell(cards || `<p style="color:#777;">No gifts yet. Platinum members can send you a gift once you're matched.</p>`);
+
+    // Mark everything up to the newest gift as seen and clear the badge
+    const newest = gifts.map(g => g.created_at).filter(Boolean).sort().pop();
+    setGiftsSeenAt(newest || new Date().toISOString());
+    refreshGiftBadge();
+  } catch (err){
+    console.error("openReceivedGifts failed:", err);
+    root.innerHTML = shell(`<div class="msg error">Couldn't load your gifts: ${esc((err && err.message) || String(err))}</div>`);
+  }
+}
+window.openReceivedGifts = openReceivedGifts;
 
 // ---------- Realtime: messages & notifications ----------
 function setupRealtimeMessaging(){
@@ -795,7 +897,7 @@ function teardownRealtimeChannels(){
 
 
 function notifIcon(type){
-  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : "💬";
+  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : "💬";
 }
 
 function notifText(n){
@@ -803,6 +905,8 @@ function notifText(n){
   if (n.type === "match") return `It's a match with ${esc(name)}!`;
   if (n.type === "like") return `${esc(name)} liked your profile`;
   if (n.type === "date") return `${esc(name)} ${esc(n.body || "sent you a date update")}`;
+  // The database already writes a full sentence ("You received a Platinum gift: Rose")
+  if (n.type === "gift") return `${esc(n.body || "You received a gift")}${n.actor_name ? ` from ${esc(name)}` : ""}`;
   return `New message from ${esc(name)}${n.body ? `: "${esc(n.body)}"` : ""}`;
 }
 
@@ -874,6 +978,10 @@ async function handleNotifClick(idx){
   }
   if (n.type === "date"){
     switchTab("dateplans");
+    return;
+  }
+  if (n.type === "gift"){
+    openReceivedGifts();
     return;
   }
 
@@ -1102,6 +1210,7 @@ function switchTab(tab){
   if (tab === "likes") loadLikesReceived();
   if (tab === "visitors") loadVisitors();
   if (tab === "myprofile") loadMyProfile();
+  if (tab === "post") fetchMyProfile();   // refreshes + prefills the form with the saved profile
   if (tab === "settings") loadSettings();
   // Add handlers for compatibility / dateplans / safety if you have them
 }
@@ -1357,7 +1466,10 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolve
   const visBadge = p.visibility === "matches" ? "👥 Matches only" : "🌍 Public";
 
   const reactionCounts = {};
-  postReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
+  postReactions.forEach(r => {
+    if (!REACTION_EMOJIS.includes(r.emoji)) return; // value is used inside an onclick attribute
+    reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1;
+  });
   const myReaction = postReactions.find(r => r.user_id === currentUser.id);
   const reactionRow = Object.keys(reactionCounts).length
     ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
@@ -2530,8 +2642,13 @@ function renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls){
 function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   const mine = m.sender_id === currentUser.id;
   const reactionCounts = {};
-  msgReactions.forEach(r => { reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1; });
-  const myReaction = msgReactions.find(r => r.user_id === currentUser.id);
+  // Only the known reaction emojis are rendered: the value is placed inside an
+  // onclick attribute, so anything else stored in the database is ignored.
+  msgReactions.forEach(r => {
+    if (!REACTION_EMOJIS.includes(r.emoji)) return;
+    reactionCounts[r.emoji] = (reactionCounts[r.emoji]||0) + 1;
+  });
+  const myReaction = msgReactions.find(r => r.user_id === currentUser.id && REACTION_EMOJIS.includes(r.emoji));
   const reactionRow = Object.keys(reactionCounts).length
     ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
         `<span class="reaction-pill${myReaction && myReaction.emoji===e ? " mine" : ""}" onclick="toggleReaction('${m.id}','${e}')">${e} ${c}</span>`).join("")}</div>`
@@ -2801,7 +2918,7 @@ function renderPlatinumBox(profile, latestPlatinumRequest){
   if (latestPlatinumRequest && latestPlatinumRequest.status === "pending"){
     const plan = PLATINUM_PLANS[latestPlatinumRequest.plan];
     return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px;border:1px solid #fce3b4;">
-      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request (ref: ${esc(latestPlatinumRequest.transaction_number)}) is under review.
+      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request${latestPlatinumRequest.transaction_number ? ` (ref: ${esc(latestPlatinumRequest.transaction_number)})` : ""} is under review.
     </div>`;
   }
 
@@ -2829,21 +2946,62 @@ function renderPlatinumBox(profile, latestPlatinumRequest){
     </div>`;
 }
 
+// The gift code calls esc2() and escapeAttr(), which app.js never defined.
+// If no other script provides them, opening the gift picker threw a
+// ReferenceError (silently, inside a click handler), so nothing happened.
+// Window-property fallbacks: a later script that defines its own wins.
+if (typeof window.esc2 !== "function") window.esc2 = (v) => esc(v == null ? "" : String(v));
+if (typeof window.escapeAttr !== "function") window.escapeAttr = (v) => esc(v == null ? "" : String(v));
+
+function giftErrorText(error){
+  const t = String((error && (error.message || error.details)) || "");
+  if ((error && (error.code === "PGRST202" || error.code === "42P01")) ||
+      /could not find the function|does not exist|schema cache/i.test(t)){
+    return "Gifts aren't set up on the server yet. Please try again later.";
+  }
+  return t || "Something went wrong.";
+}
+
 async function openGiftCenter(recipientId, recipientName){
+  try { await _openGiftCenterInner(recipientId, recipientName); }
+  catch (err){
+    console.error("openGiftCenter failed:", err);
+    alert("Couldn't open the gift picker: " + ((err && err.message) || err));
+  }
+}
+
+async function _openGiftCenterInner(recipientId, recipientName){
   if(!isPlatinumActive(myProfile)){ alert("Gifts are a Platinum feature. Upgrade to Platinum first."); return; }
   const root=document.getElementById("modalRoot"); if(!root)return;
   const {data:gifts,error}=await _supabase.from("dating_gift_catalog").select("*").eq("active",true).order("sort_order",{ascending:true});
-  if(error){alert("Gift catalog is unavailable: "+error.message);return;}
+  if(error){console.error("Gift catalog error:",error);alert("Gift catalog is unavailable: "+giftErrorText(error));return;}
   const items=(gifts||[]).map(g=>`<button type="button" data-gift-id="${escapeAttr(g.id)}" style="text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;cursor:pointer"><div style="font-size:1.35rem">${esc2(g.emoji||"🎁")}</div><b>${esc2(g.name)}</b><div style="font-size:.76rem;color:#777;margin-top:3px">${esc2(g.description||"")} · ${esc2(g.price_birr)} Birr</div></button>`).join("");
   root.innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:520px"><div class="body"><button class="btn-close" onclick="closeModal()">✕</button><h3>🎁 Send a Platinum Gift to ${esc2(recipientName||"your match")}</h3><p class="bio">Gifts are visible to the recipient and are available only to active Platinum members.</p><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${items||'<div class="date-plan-empty">No gifts are available right now.</div>'}</div><textarea id="giftMessage" maxlength="240" placeholder="Optional message" style="width:100%;min-height:70px;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:9px"></textarea><div id="giftMsg" style="margin-top:10px"></div></div></div></div>`;
   root.querySelectorAll("[data-gift-id]").forEach(btn=>btn.addEventListener("click",()=>sendPlatinumGift(btn.dataset.giftId,recipientId,recipientName)));
 }
 
+let _sendingGift = false;
 async function sendPlatinumGift(giftId,recipientId,recipientName){
+  if (_sendingGift) return;   // one gift at a time; a double-tap must not send twice
+  _sendingGift = true;
+  const btns = [...document.querySelectorAll("[data-gift-id]")];
+  btns.forEach(b => b.disabled = true);
+  try { await _sendPlatinumGiftInner(giftId,recipientId,recipientName); }
+  catch (err){
+    console.error("sendPlatinumGift failed:", err);
+    const box = document.getElementById("giftMsg");
+    if (box) box.innerHTML = `<div class="msg error">${esc(giftErrorText(err))}</div>`;
+  } finally {
+    _sendingGift = false;
+    btns.forEach(b => { if (b.isConnected) b.disabled = false; });
+  }
+}
+
+async function _sendPlatinumGiftInner(giftId,recipientId,recipientName){
   const msg=(document.getElementById("giftMessage")?.value||"").trim();
   if(!isPlatinumActive(myProfile)){alert("Active Platinum is required.");return;}
   const {error}=await _supabase.rpc("dating_send_platinum_gift",{p_recipient_id:recipientId,p_gift_id:giftId,p_message:msg||null});
-  if(error){const box=document.getElementById("giftMsg");if(box)box.innerHTML=`<div class="msg error">${esc2(error.message)}</div>`;return;}
+  if(error){console.error("Gift RPC error:",error);const box=document.getElementById("giftMsg");if(box)box.innerHTML=`<div class="msg error">${esc(giftErrorText(error))}</div>`;return;}
   closeModal();
   alert(`Gift sent to ${recipientName||"your match"}.`);
 }
@@ -2865,10 +3023,10 @@ function choosePlatinumPlan(planKey){
             <div>👤 Account name: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountName)}</div>
             <div>🔢 Account number: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountNumber)}</div>
             ${PLATINUM_PAYMENT_ACCOUNT.telebirr ? `<div>📱 Telebirr: ${esc(PLATINUM_PAYMENT_ACCOUNT.telebirr)}</div>` : ""}
-            <div style="margin-top:8px;color:#666;">After sending, enter the transaction reference number below. We'll review and activate your plan — this isn't instant.</div>
+            <div style="margin-top:8px;color:#666;">After sending, enter the transaction reference number and/or attach your payment receipt below — one of the two is enough. We'll review and activate your plan — this isn't instant.</div>
           </div>
-          <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
-          <label style="display:block;font-size:.8rem;font-weight:600;color:#333;margin-bottom:6px;">Attach payment receipt or screenshot (optional)</label>
+          <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference (optional if you attach a receipt)" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
+          <label style="display:block;font-size:.8rem;font-weight:600;color:#333;margin-bottom:6px;">Attach payment receipt or screenshot (optional if you enter a transaction number)</label>
           <input type="file" id="platinumReceiptFile" accept="image/*,.pdf" style="margin-bottom:14px;width:100%;padding:10px;border:2px dashed #ccc;border-radius:8px;cursor:pointer;">
           <div class="actions">
             <button class="btn-contact" style="width:100%;" onclick="submitPlatinumRequest('${planKey}', ${plan.price})">Submit for Review</button>
@@ -2884,12 +3042,16 @@ async function submitPlatinumRequest(planKey, amount){
   const receiptInput = document.getElementById("platinumReceiptFile");
   const msg = document.getElementById("platinumReqMsg");
   const transactionNumber = txnInput.value.trim();
-  if (transactionNumber.length < 3){
-    msg.innerHTML = `<div class="msg error">Enter the transaction number from your payment.</div>`;
+  const receiptFile = receiptInput && receiptInput.files[0];
+  // The transaction number is only required when no receipt is attached.
+  if (!receiptFile && transactionNumber.length < 3){
+    msg.innerHTML = `<div class="msg error">Enter the transaction number or attach your payment receipt.</div>`;
     return;
   }
-
-  const receiptFile = receiptInput && receiptInput.files[0];
+  if (transactionNumber && transactionNumber.length < 3){
+    msg.innerHTML = `<div class="msg error">That transaction number looks too short. Fix it, or clear it and rely on the receipt.</div>`;
+    return;
+  }
   let receiptPath = null;
   if (receiptFile){
     const receiptErr = checkUploadFile(receiptFile, { allowPdf: true });
@@ -2911,7 +3073,7 @@ async function submitPlatinumRequest(planKey, amount){
     user_id: currentUser.id,
     plan: planKey,
     amount_birr: amount,
-    transaction_number: transactionNumber,
+    transaction_number: transactionNumber || null,
     receipt_url: receiptPath
   });
   if (error){
@@ -3317,6 +3479,92 @@ async function blockProfile(otherUserId){
   refreshUnreadBadge();
 }
 
+// ---------- Setup/Edit profile form: prefill from the saved profile ----------
+let postFormDirty = false;
+let postFormFilledFor = null;
+
+function setFieldValue(id, value){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const v = value == null ? "" : String(value);
+  if (el.tagName === "SELECT" && v && ![...el.options].some(o => o.value === v)){
+    // keep legacy / custom values selectable instead of silently dropping them
+    const o = document.createElement("option");
+    o.textContent = v; o.value = v;
+    el.appendChild(o);
+  }
+  el.value = v;
+}
+
+function postSubmitLabel(){
+  return myProfile ? "Save Changes" : "Publish My Profile";
+}
+
+function setPostFormMode(){
+  const editing = !!myProfile;
+  const h = document.getElementById("postHeading");
+  const sub = document.getElementById("postSubheading");
+  if (h) h.innerHTML = editing ? "Edit <span>My Profile</span>" : "Create Your <span>Dating Profile</span>";
+  if (sub) sub.textContent = editing
+    ? "Your saved details are filled in below. Change anything you like, then save."
+    : "Fill out the details below to start matching with people.";
+  const btn = document.getElementById("submitBtn");
+  if (btn && !btn.disabled) btn.textContent = postSubmitLabel();
+  document.querySelectorAll(".post-tab-label").forEach(el => { el.textContent = editing ? "Edit Profile" : "Setup Profile"; });
+  const note = document.getElementById("postPhotoNote");
+  const lbl = document.getElementById("fPhotoLabel");
+  if (note && lbl){
+    const n = myProfile && Array.isArray(myProfile.photos) ? myProfile.photos.length : (myProfile && myProfile.photo_url ? 1 : 0);
+    if (editing && n){
+      note.style.display = "block";
+      note.textContent = `You have ${n} photo${n > 1 ? "s" : ""} saved. Leave this empty to keep ${n > 1 ? "them" : "it"}, or choose new photos to replace ${n > 1 ? "them" : "it"}. (Manage photos in My Account.)`;
+      lbl.textContent = "Replace Photos (Optional, up to 3)";
+    } else {
+      note.style.display = "none";
+      lbl.textContent = "Upload Photos (Up to 3)";
+    }
+  }
+}
+
+function fillPostForm(force){
+  setPostFormMode();
+  if (!currentUser) return;
+  const key = myProfile ? `p:${myProfile.updated_at || myProfile.id || "x"}` : `new:${currentUser.id}`;
+  // Don't wipe edits the member is in the middle of making.
+  if (!force && postFormDirty && postFormFilledFor === key) return;
+  if (myProfile){
+    const p = myProfile;
+    setFieldValue("fName", p.display_name);
+    setFieldValue("fAge", p.age);
+    setFieldValue("fCity", p.city);
+    setFieldValue("fGender", p.gender);
+    setFieldValue("fSeeking", p.seeking);
+    setFieldValue("fType", p.relationship_type);
+    setFieldValue("fLookingFor", p.looking_for);
+    setFieldValue("fAgeMin", p.age_min);
+    setFieldValue("fAgeMax", p.age_max);
+    setFieldValue("fLifestyle", p.lifestyle);
+    setFieldValue("fHasKids", p.has_kids);
+    setFieldValue("fWantsKids", p.wants_kids);
+    setFieldValue("fReligion", p.religion);
+    setFieldValue("fOccupation", p.occupation);
+    setFieldValue("fIncome", p.income_range || "Prefer not to say");
+    setFieldValue("fBio", p.bio);
+    const c = document.getElementById("fAgeConfirm");
+    if (c) c.checked = p.age_confirmed !== false; // already confirmed when the profile was created
+  } else {
+    // New member: start from what their account already knows.
+    const full = (currentUser.user_metadata && (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) || "";
+    const nameEl = document.getElementById("fName");
+    if (nameEl && !nameEl.value && full) nameEl.value = String(full).trim().split(/\s+/)[0].slice(0, 30);
+  }
+  postFormDirty = false;
+  postFormFilledFor = key;
+}
+
+// Document-level so it survives safety.js replacing the form node.
+document.addEventListener("input", (e) => { if (e.target && e.target.closest && e.target.closest("#postForm")) postFormDirty = true; });
+
 // ---------- Post form ----------
 document.getElementById("postForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -3339,7 +3587,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
   }
 
   btn.disabled = true;
-  btn.textContent = "Publishing Profile...";
+  btn.textContent = myProfile ? "Saving..." : "Publishing Profile...";
 
   let photoUrls = [];
   const files = Array.from(document.getElementById("fPhoto").files).slice(0, 3);
@@ -3347,7 +3595,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     const fileErr = checkUploadFile(f);
     if (fileErr){
       msg.innerHTML = `<div class="msg error">${esc(fileErr)}</div>`;
-      btn.disabled = false; btn.textContent = "Publish My Profile";
+      btn.disabled = false; btn.textContent = postSubmitLabel();
       return;
     }
   }
@@ -3356,13 +3604,15 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     const { error: uploadErr } = await _supabase.storage.from(BUCKET_PROFILE_PHOTOS).upload(path, file, { contentType: file.type });
     if (uploadErr){
       msg.innerHTML = `<div class="msg error">Photo upload failed: ${esc(uploadErr.message)}</div>`;
-      btn.disabled = false; btn.textContent = "Publish My Profile";
+      btn.disabled = false; btn.textContent = postSubmitLabel();
       return;
     }
     photoUrls.push(path);
   }
 
-  const profileCode = `WGD-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  // Editing keeps the member's existing profile code; only a brand-new profile gets one.
+  const profileCode = (myProfile && myProfile.profile_code) || `WGD-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  const wasEditing = !!myProfile;
   const genderVal = document.getElementById("fGender").value;
   const cityVal = document.getElementById("fCity").value.trim();
 
@@ -3399,14 +3649,17 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     .upsert(payload, { onConflict: "user_id" });
 
   btn.disabled = false;
-  btn.textContent = "Publish My Profile";
 
   if (error){
+    btn.textContent = postSubmitLabel();
     msg.innerHTML = `<div class="msg error">Something went wrong: ${esc(error.message)}</div>`;
   } else {
-    msg.innerHTML = `<div class="msg success">Profile Published Successfully!</div>`;
-    document.getElementById("postForm").reset();
-    fetchMyProfile();
+    msg.innerHTML = `<div class="msg success">${wasEditing ? "Profile updated successfully!" : "Profile Published Successfully!"}</div>`;
+    const photoInput = document.getElementById("fPhoto");
+    if (photoInput) photoInput.value = "";
+    await fetchMyProfile();
+    postFormDirty = false;
+    fillPostForm(true);
     setTimeout(() => switchTab("myprofile"), 1500); 
   }
 });
