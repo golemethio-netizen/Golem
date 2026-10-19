@@ -328,6 +328,69 @@
     setTimeout(function () { d.remove(); }, 4000);
   }
 
+  // ---------------- microphone permission ----------------
+  var pendingMicStream = null;
+
+  function micProblemText(err) {
+    var n = err && err.name;
+    if (n === "NotFoundError" || n === "OverconstrainedError") {
+      return { title: "No microphone found", body: "This device has no working microphone. Connect one (or try another device) and try again." };
+    }
+    if (n === "NotReadableError" || n === "AbortError") {
+      return { title: "Microphone is busy", body: "Another app is using the microphone. Close other call or recording apps, then tap Try again." };
+    }
+    return {
+      title: "Microphone permission needed",
+      body: "Your phone didn't allow the microphone. If Android said \"This site can't ask for your permission\", another app is drawing over the screen " +
+        "(chat bubbles, a floating button, a screen filter or dimmer). Close it, then tap Try again.",
+      tip: "To fix it for good: in Chrome tap ⋮ → Settings → Site settings → Microphone → wanagebya.com → Allow."
+    };
+  }
+
+  // Resolves to a microphone stream, or null if the person gives up. Loops on "Try again".
+  function askMicrophone() {
+    return new Promise(function (resolve) {
+      function attempt() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showMicDialog({ title: "Calls aren't supported here", body: "This browser can't use the microphone. Open the site in Chrome or Safari over https." }, false, function () { resolve(null); });
+          return;
+        }
+        navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+        }).then(function (stream) {
+          closeMicDialog(); resolve(stream);
+        }).catch(function (err) {
+          console.warn("Microphone request failed:", err && err.name, err && err.message);
+          showMicDialog(micProblemText(err), true, function (again) { if (again) attempt(); else resolve(null); });
+        });
+      }
+      attempt();
+    });
+  }
+
+  function closeMicDialog() { var d = document.getElementById("micDialog"); if (d) d.remove(); }
+
+  function showMicDialog(info, canRetry, done) {
+    closeMicDialog();
+    var d = document.createElement("div");
+    d.id = "micDialog";
+    d.setAttribute("role", "alertdialog");
+    d.style.cssText = "position:fixed;inset:0;z-index:9800;background:rgba(17,24,39,.72);display:flex;align-items:center;justify-content:center;padding:18px;";
+    d.innerHTML = '<div style="background:#fff;color:#1f2937;border-radius:18px;max-width:380px;width:100%;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);">' +
+      '<div style="font-size:2rem;margin-bottom:6px;">🎙️</div>' +
+      '<h3 style="margin:0 0 8px;font-size:1.15rem;">' + esc(info.title) + "</h3>" +
+      '<p style="margin:0 0 10px;font-size:.92rem;line-height:1.5;">' + esc(info.body) + "</p>" +
+      (info.tip ? '<p style="margin:0 0 14px;font-size:.82rem;line-height:1.45;color:#6b7280;">' + esc(info.tip) + "</p>" : "") +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+      '<button type="button" id="micCancelBtn" style="border:1px solid #d1d5db;background:#fff;border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer;">Cancel</button>' +
+      (canRetry ? '<button type="button" id="micRetryBtn" style="border:0;background:#e0426f;color:#fff;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;">Try again</button>' : "") +
+      "</div></div>";
+    document.body.appendChild(d);
+    document.getElementById("micCancelBtn").onclick = function () { closeMicDialog(); done(false); };
+    var r = document.getElementById("micRetryBtn");
+    if (r) r.onclick = function () { closeMicDialog(); done(true); };
+  }
+
   window.startCall = async function (recipientId, recipientName) {
     recipientName = recipientName != null ? recipientName : ((window._threadNames && window._threadNames[recipientId]) || "Conversation");
     if (peerConnection || callStartedAt || document.querySelector("#callRoot .call-overlay")) { alert("You're already in a call."); return; }
@@ -337,6 +400,10 @@
       return;
     }
     getCtx(); // unlock audio inside this click so tones and remote sound are allowed
+    // Ask for the microphone FIRST, while the tap is fresh. If it's blocked, the other
+    // person's phone never rings for a call that can't have sound.
+    pendingMicStream = await askMicrophone();
+    if (!pendingMicStream) return;
     resetCallState();
     iAmInitiator = true;
     currentCallId = (crypto.randomUUID ? crypto.randomUUID() : currentUser.id + "-" + Date.now());
@@ -347,6 +414,7 @@
       caller_id: currentUser.id, recipient_id: recipientId, status: "ringing"
     }).select().single();
     if (ins.error) {
+      if (pendingMicStream) { pendingMicStream.getTracks().forEach(function (t) { t.stop(); }); pendingMicStream = null; }
       alert("Couldn't start the call: " + ins.error.message);
       currentCallId = null; currentCallPeerId = null;
       return;
@@ -400,6 +468,9 @@
 
   window.acceptCall = async function () {
     getCtx();
+    // Microphone first. If it's blocked the call keeps ringing (they can retry or decline).
+    var micStream = await askMicrophone();
+    if (!micStream) return;
     stopTones();
     clearTimeout(incomingTimeout);
     var r = await _supabase.from("dating_calls").select("*")
@@ -407,11 +478,13 @@
       .order("started_at", { ascending: false }).limit(1).maybeSingle();
     currentCallRow = r.data;
     if (!currentCallRow) {
+      micStream.getTracks().forEach(function (t) { t.stop(); });
       document.getElementById("callRoot").innerHTML = "";
       currentCallId = null; currentCallPeerId = null;
       alert("This call is no longer available.");
       return;
     }
+    pendingMicStream = micStream;
     await _supabase.from("dating_calls").update({ status: "accepted" }).eq("id", currentCallRow.id);
     window.showActiveCallUI(callPeerName);
     setStatus("Connecting…");
@@ -488,16 +561,9 @@
     });
     await new Promise(function (res) { activeCallChannel.subscribe(function (s) { if (s === "SUBSCRIBED") res(); }); });
 
-    try {
-      localCallStream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-      });
-    } catch (err) {
-      alert("Couldn't access the microphone: " + (err && err.message ? err.message : err) +
-        "\n\nAllow microphone access for this site in your browser settings and try again.");
-      window.endCall(true);
-      return;
-    }
+    localCallStream = pendingMicStream || (await askMicrophone());
+    pendingMicStream = null;
+    if (!localCallStream) { window.endCall(true); return; }
 
     peerConnection = new RTCPeerConnection({ iceServers: iceServers() });
     localCallStream.getTracks().forEach(function (t) { peerConnection.addTrack(t, localCallStream); });
@@ -567,6 +633,8 @@
       setTimeout(function () { try { _supabase.removeChannel(nc); } catch (e) {} }, 600);
     }
     stopTones();
+    closeMicDialog();
+    if (pendingMicStream) { pendingMicStream.getTracks().forEach(function (t) { t.stop(); }); pendingMicStream = null; }
     if (!wasRinging) chime("end");
     stopMeters();
     if (callTimer) { clearInterval(callTimer); callTimer = null; }
