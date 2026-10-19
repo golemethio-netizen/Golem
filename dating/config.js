@@ -2,33 +2,21 @@
 const supabaseUrl = 'https://ryeylhawdmykbbmnfrrh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5ZXlsaGF3ZG15a2JibW5mcnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MzU4NjcsImV4cCI6MjA4NjIxMTg2N30.6FpidGEaunpf8AwBIpjKwcC3a53iWmvaRxctj2ZYrSY';
 
-// Browsers with strict tracking prevention can throw when localStorage is touched.
-// Fall back to an in-memory store instead of crashing the whole site.
-function _safeAuthStorage() {
-  try {
-    const k = '__wg_test__';
-    window.localStorage.setItem(k, '1');
-    window.localStorage.removeItem(k);
-    return window.localStorage;
-  } catch (e) {
-    const mem = {};
-    return {
-      getItem: (key) => (key in mem ? mem[key] : null),
-      setItem: (key, v) => { mem[key] = String(v); },
-      removeItem: (key) => { delete mem[key]; }
-    };
-  }
-}
-
+// Initialize with a fallback for storage
 const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storage: _safeAuthStorage()
+    // This helper checks if localStorage is available; if not, it stays in memory
+    storage: window.localStorage 
   }
 });
 const GolemConfig = {
+    // Voice calls: add a TURN relay so calls connect on mobile networks that block direct audio.
+    // Get free/paid credentials from a TURN provider (e.g. Metered, Twilio, Cloudflare), then fill in:
+    //   iceServers: [{ urls: "turn:YOUR_TURN_HOST:443?transport=tcp", username: "USER", credential: "PASSWORD" }],
+    iceServers: [],
     myPhone: "251707022845", // Replace with your actual number
     myTelegram: "@allInOneEthiopia1"
     // botToken / chatId intentionally removed — these now live ONLY as
