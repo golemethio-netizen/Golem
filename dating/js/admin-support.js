@@ -246,3 +246,4 @@
   if (document.querySelector('.admin-tab-scroll') && document.querySelector('main')) init();
   else document.addEventListener('DOMContentLoaded', init);
 })();
+
