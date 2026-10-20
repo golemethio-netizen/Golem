@@ -2904,7 +2904,7 @@ const PLATINUM_PAYMENT_ACCOUNT = {
   bank: "FILL IN YOUR BANK NAME (e.g. Commercial Bank of Ethiopia)",
   accountName: "FILL IN THE ACCOUNT HOLDER NAME",
   accountNumber: "FILL IN YOUR ACCOUNT NUMBER",
-  telebirr: "FILL IN YOUR TELEBIRR NUMBER (optional, leave blank to hide)"
+  telebirr: "" // optional Telebirr number; leave "" to hide
 };
 
 const PLATINUM_PLANS = {
@@ -2918,7 +2918,7 @@ function renderPlatinumBox(profile, latestPlatinumRequest){
   if (latestPlatinumRequest && latestPlatinumRequest.status === "pending"){
     const plan = PLATINUM_PLANS[latestPlatinumRequest.plan];
     return `<div class="msg" style="background:#FFF9EE;color:#8A6D1F;margin-bottom:20px;border:1px solid #fce3b4;">
-      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request (ref: ${esc(latestPlatinumRequest.transaction_number)}) is under review.
+      ⏳ Your ${plan ? esc(plan.label) : esc(latestPlatinumRequest.plan)} Platinum request${latestPlatinumRequest.transaction_number ? ` (ref: ${esc(latestPlatinumRequest.transaction_number)})` : ""} is under review.
     </div>`;
   }
 
@@ -3011,6 +3011,22 @@ window.sendPlatinumGift=sendPlatinumGift;
 function choosePlatinumPlan(planKey){
   const plan = PLATINUM_PLANS[planKey];
   const root = document.getElementById("modalRoot");
+  // Safety: never show members placeholder bank details. Until the real
+  // account is filled in above, tell them payment isn't open yet.
+  const payConfigured = [PLATINUM_PAYMENT_ACCOUNT.bank, PLATINUM_PAYMENT_ACCOUNT.accountName, PLATINUM_PAYMENT_ACCOUNT.accountNumber]
+    .every(v => v && !/^FILL IN/i.test(String(v)));
+  if (!payConfigured){
+    root.innerHTML = `
+      <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+        <div class="modal" style="max-width:420px;"><div class="body">
+          <button class="btn-close" onclick="closeModal()">✕</button>
+          <h3 style="margin-bottom:8px;">Platinum payment isn't open yet</h3>
+          <p style="color:#666;font-size:.92rem;">We're finishing our payment details. Please contact Support and we'll help you upgrade.</p>
+          <div class="actions"><button class="btn-contact" style="width:100%;" onclick="closeModal();if(window.WanaSupport)WanaSupport.openNew()">Contact Support</button></div>
+        </div></div>
+      </div>`;
+    return;
+  }
   root.innerHTML = `
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
       <div class="modal" style="max-width:420px;">
@@ -3023,10 +3039,10 @@ function choosePlatinumPlan(planKey){
             <div>👤 Account name: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountName)}</div>
             <div>🔢 Account number: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountNumber)}</div>
             ${PLATINUM_PAYMENT_ACCOUNT.telebirr ? `<div>📱 Telebirr: ${esc(PLATINUM_PAYMENT_ACCOUNT.telebirr)}</div>` : ""}
-            <div style="margin-top:8px;color:#666;">After sending, enter the transaction reference number below. We'll review and activate your plan — this isn't instant.</div>
+            <div style="margin-top:8px;color:#666;">After sending, attach your receipt below, or enter the transaction reference number (either one is enough). We'll review and activate your plan — this isn't instant.</div>
           </div>
-          <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
-          <label style="display:block;font-size:.8rem;font-weight:600;color:#333;margin-bottom:6px;">Attach payment receipt or screenshot (optional)</label>
+          <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference (optional if you attach a receipt)" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
+          <label style="display:block;font-size:.8rem;font-weight:600;color:#333;margin-bottom:6px;">Attach payment receipt or screenshot (or enter the transaction number above)</label>
           <input type="file" id="platinumReceiptFile" accept="image/*,.pdf" style="margin-bottom:14px;width:100%;padding:10px;border:2px dashed #ccc;border-radius:8px;cursor:pointer;">
           <div class="actions">
             <button class="btn-contact" style="width:100%;" onclick="submitPlatinumRequest('${planKey}', ${plan.price})">Submit for Review</button>
@@ -3042,12 +3058,18 @@ async function submitPlatinumRequest(planKey, amount){
   const receiptInput = document.getElementById("platinumReceiptFile");
   const msg = document.getElementById("platinumReqMsg");
   const transactionNumber = txnInput.value.trim();
-  if (transactionNumber.length < 3){
-    msg.innerHTML = `<div class="msg error">Enter the transaction number from your payment.</div>`;
+  const receiptFile = receiptInput && receiptInput.files[0];
+  // Proof of payment is required, but either one is enough: a receipt/
+  // screenshot OR a transaction number. The number is optional when a
+  // receipt is attached.
+  if (!receiptFile && transactionNumber.length < 3){
+    msg.innerHTML = `<div class="msg error">Attach your payment receipt, or enter the transaction number.</div>`;
     return;
   }
-
-  const receiptFile = receiptInput && receiptInput.files[0];
+  if (transactionNumber && transactionNumber.length < 3){
+    msg.innerHTML = `<div class="msg error">The transaction number looks too short. Fix it, or leave it empty if you attached a receipt.</div>`;
+    return;
+  }
   let receiptPath = null;
   if (receiptFile){
     const receiptErr = checkUploadFile(receiptFile, { allowPdf: true });
@@ -3069,7 +3091,7 @@ async function submitPlatinumRequest(planKey, amount){
     user_id: currentUser.id,
     plan: planKey,
     amount_birr: amount,
-    transaction_number: transactionNumber,
+    transaction_number: transactionNumber || null,
     receipt_url: receiptPath
   });
   if (error){
