@@ -230,6 +230,7 @@
       let query = _supabase.from("dating_profiles")
         .select("user_id, id, display_name, age, gender, seeking, relationship_type, city, bio, looking_for, age_min, age_max, lifestyle, has_kids, wants_kids, religion, occupation, photos, photo_url, is_verified, created_at, last_seen_at, call_privacy, last_seen_privacy")
         .neq("user_id", currentUser.id)
+        .order("last_seen_at", {ascending:false, nullsFirst:false})
         .order("created_at", {ascending:false})
         .range(browsePage * BROWSE_FETCH_SIZE, (browsePage + 1) * BROWSE_FETCH_SIZE - 1);
 
@@ -237,6 +238,8 @@
       if (type) query = query.eq("relationship_type", type);
       if (city) query = query.ilike("city", `%${city}%`);
       if (verifiedOnly) query = query.eq("is_verified", true);
+      // "Online now" is filtered on the server so every page is full of online people
+      if (onlineOnly) query = query.gte("last_seen_at", new Date(Date.now() - ONLINE_THRESHOLD_MS).toISOString());
       if (!Number.isNaN(ageMin)) query = query.gte("age", ageMin);
       if (!Number.isNaN(ageMax)) query = query.lte("age", ageMax);
       if (religion) query = query.eq("religion", religion);
@@ -254,7 +257,7 @@
       rows.sort((a,b) => {
         const ao = visiblePresence(a).online, bo = visiblePresence(b).online;
         if (ao !== bo) return ao ? -1 : 1;
-        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        return new Date(b.last_seen_at || b.created_at || 0) - new Date(a.last_seen_at || a.created_at || 0);
       });
 
       browseHasMore = (data || []).length === BROWSE_FETCH_SIZE;
