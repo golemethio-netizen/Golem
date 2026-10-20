@@ -133,7 +133,9 @@
       t.classList.toggle('active', t.getAttribute('data-tab') === 'support');
     });
     if (rail && !active) { rail.dataset.sup = rail.style.display; rail.style.display = 'none'; }
+    document.querySelectorAll('.mnav-item').forEach(function (t) { t.classList.toggle('active', t.id === 'mnavMore'); });
     panel.style.display = 'block';
+    window.scrollTo(0, 0);
     active = true;
   }
   function leave() {
@@ -290,7 +292,11 @@
     if (!b || !uid || !client()) return;
     client().from('dating_support_tickets').select('id', { count: 'exact', head: true })
       .eq('user_id', uid).eq('user_unread', true)
-      .then(function (res) { b.textContent = res.count ? String(res.count) : ''; });
+      .then(function (res) {
+        var n = res.count ? String(res.count) : '';
+        b.textContent = n;
+        var mb = document.getElementById('supportMoreBadge'); if (mb) mb.textContent = n;
+      });
   }
 
   function onInsert(payload) {
