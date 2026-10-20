@@ -21,3 +21,11 @@
 [[edge_functions]]
   path = "/product.html"
   function = "product-meta"
+
+# Old single-file dating site was removed; keep old bookmarks, shared links
+# and old confirmation emails working.
+[[redirects]]
+  from = "/dating.html"
+  to = "/dating/index.html"
+  status = 301
+  force = true
