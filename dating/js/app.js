@@ -112,7 +112,29 @@ async function fetchMyProfile(){
   myProfile = data || null;
   applyProfileGates();
   if (typeof fillPostForm === "function") fillPostForm();
+  showSuspensionBanner();
   return myProfile;
+}
+
+// Tell a suspended member why nothing works (the database enforces the
+// suspension; this just explains it). Requires dating-migration-v43.
+async function showSuspensionBanner(){
+  let el = document.getElementById("suspensionBanner");
+  try {
+    const { data } = await _supabase.from("dating_account_status")
+      .select("is_suspended, suspended_until, suspension_reason")
+      .eq("user_id", currentUser.id).maybeSingle();
+    const active = data && data.is_suspended && (!data.suspended_until || new Date(data.suspended_until) > new Date());
+    if (!active){ if (el) el.remove(); return; }
+    if (!el){
+      el = document.createElement("div");
+      el.id = "suspensionBanner";
+      el.style.cssText = "background:#b3261e;color:#fff;padding:10px 16px;text-align:center;font-size:.9rem;position:relative;z-index:50;";
+      document.body.insertBefore(el, document.body.firstChild);
+    }
+    el.textContent = "Your account is suspended" + (data.suspension_reason ? ": " + data.suspension_reason : ".") +
+      " You can't message, like or call. Please contact Support.";
+  } catch (e) { /* table not available: ignore */ }
 }
 
 // Posting and messaging need a dating profile. The database enforces this
