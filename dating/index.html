@@ -334,7 +334,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <option value="Dating">Dating</option>
 <option value="Marriage">Marriage</option>
 </select>
-<input id="filterCity" placeholder="Filter by City..." type="text"/>
+<select id="filterCity" aria-label="City"><option value="">All cities</option><option value="Addis Ababa">Addis Ababa</option><option value="Adama">Adama</option><option value="Bahir Dar">Bahir Dar</option><option value="Hawassa">Hawassa</option><option value="Dire Dawa">Dire Dawa</option><option value="Mekelle">Mekelle</option><option value="Gondar">Gondar</option><option value="Jimma">Jimma</option><option value="Dessie">Dessie</option><option value="Bishoftu">Bishoftu</option><option value="Harar">Harar</option><option value="Shashemene">Shashemene</option><option value="Arba Minch">Arba Minch</option><option value="Debre Birhan">Debre Birhan</option><option value="Debre Markos">Debre Markos</option><option value="Jijiga">Jijiga</option><option value="Hosaena">Hosaena</option><option value="Nekemte">Nekemte</option><option value="Dilla">Dilla</option><option value="Sodo">Sodo</option><option value="Kombolcha">Kombolcha</option><option value="Woldia">Woldia</option><option value="Adigrat">Adigrat</option><option value="Axum">Axum</option><option value="Gambela">Gambela</option><option value="Asosa">Asosa</option><option value="Semera">Semera</option><option value="Welkite">Welkite</option><option value="Ambo">Ambo</option><option value="Assela">Assela</option></select>
 <input id="filterAgeMin" max="99" min="18" placeholder="Min age" style="width:90px;" type="number"/>
 <input id="filterAgeMax" max="99" min="18" placeholder="Max age" style="width:90px;" type="number"/>
 <select id="filterReligion">
@@ -406,7 +406,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 </div>
 <div>
 <label>City</label>
-<input id="fCity" placeholder="e.g. Addis Ababa" required="" type="text"/>
+<input id="fCity" list="cityList" placeholder="e.g. Addis Ababa" required="" type="text" autocomplete="off"/><datalist id="cityList"><option value="Addis Ababa"><option value="Adama"><option value="Bahir Dar"><option value="Hawassa"><option value="Dire Dawa"><option value="Mekelle"><option value="Gondar"><option value="Jimma"><option value="Dessie"><option value="Bishoftu"><option value="Harar"><option value="Shashemene"><option value="Arba Minch"><option value="Debre Birhan"><option value="Debre Markos"><option value="Jijiga"><option value="Hosaena"><option value="Nekemte"><option value="Dilla"><option value="Sodo"><option value="Kombolcha"><option value="Woldia"><option value="Adigrat"><option value="Axum"><option value="Gambela"><option value="Asosa"><option value="Semera"><option value="Welkite"><option value="Ambo"><option value="Assela"></datalist>
 </div>
 </div>
 <div class="row2">
@@ -696,5 +696,6 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <script src="js/date-planning.js"></script>
 <script src="js/calls.js"></script>
   <script src="js/support.js"></script>
+  <script src="js/account.js"></script>
 </body>
 </html>
