@@ -253,6 +253,7 @@ async function initAuth(){
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
+    ensureConsentAndAge();
     maybeShowSafetyNotice();
     fetchMyProfile();
     refreshMyMatchedIds();
@@ -300,6 +301,180 @@ function maybeShowSafetyNotice(){
 function dismissSafetyNotice(){
   try { localStorage.setItem("wg_dating_safety_seen", "1"); } catch(e){}
   closeModal();
+}
+
+// ---------- Age (18+), terms acceptance and bot protection ----------
+// Bump TERMS_VERSION whenever terms.html / privacy.html change: every member is then
+// asked to accept again. Keep it equal to the "Last updated" date on those pages.
+const TERMS_VERSION = "2026-10-16";
+const UNDERAGE_FLAG = "wg_underage_block";
+
+function ageFromDob(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+  if (!m) return NaN;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  const dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return NaN;
+  const t = new Date();
+  let a = t.getFullYear() - y;
+  if (t.getMonth() < mo - 1 || (t.getMonth() === mo - 1 && t.getDate() < d)) a--;
+  return a;
+}
+function latestAdultDob(){
+  const t = new Date(); t.setFullYear(t.getFullYear() - 18);
+  return t.toLocaleDateString("en-CA"); // YYYY-MM-DD in the member's own timezone
+}
+
+// Cloudflare Turnstile. Set GolemConfig.turnstileSiteKey in config.js to switch it on;
+// with no key the widget is simply not shown (nothing breaks).
+let _tsWidgetId = null, _tsToken = null, _tsScriptPromise = null;
+function turnstileSiteKey(){
+  return (typeof GolemConfig !== "undefined" && GolemConfig.turnstileSiteKey) || "";
+}
+function loadTurnstile(){
+  if (window.turnstile) return Promise.resolve();
+  if (_tsScriptPromise) return _tsScriptPromise;
+  _tsScriptPromise = new Promise((resolve, reject) => {
+    const el = document.createElement("script");
+    el.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    el.async = true; el.defer = true;
+    el.onload = resolve;
+    el.onerror = () => { _tsScriptPromise = null; reject(new Error("captcha script failed")); };
+    document.head.appendChild(el);
+  });
+  return _tsScriptPromise;
+}
+function mountTurnstile(){
+  try { if (_tsWidgetId !== null && window.turnstile) window.turnstile.remove(_tsWidgetId); } catch (_) {}
+  _tsWidgetId = null; _tsToken = null;
+  const key = turnstileSiteKey();
+  const box = document.getElementById("authCaptcha");
+  if (!key || !box) return;
+  loadTurnstile().then(() => {
+    const target = document.getElementById("authCaptcha");
+    if (!target) return; // modal was closed meanwhile
+    _tsWidgetId = window.turnstile.render(target, {
+      sitekey: key,
+      callback: (t) => { _tsToken = t; },
+      "expired-callback": () => { _tsToken = null; },
+      "error-callback": () => { _tsToken = null; }
+    });
+  }).catch(() => {
+    box.textContent = "Couldn't load the security check. Check your connection and reload the page.";
+  });
+}
+// A Turnstile token works once, so get a fresh one after every attempt.
+function resetTurnstile(){
+  _tsToken = null;
+  try { if (window.turnstile && _tsWidgetId !== null) window.turnstile.reset(_tsWidgetId); } catch (_) {}
+}
+
+// What is still missing for the signed-in member? (birth date on file, current terms accepted)
+let consentCheckedFor = null, myServerAge = null;
+
+async function getConsentStatus(){
+  const { data, error } = await _supabase.rpc("dating_my_consent_status", { p_version: TERMS_VERSION });
+  if (error) { console.warn("consent status:", error.message); return null; }
+  return data;
+}
+function applyServerAge(st){
+  const el = document.getElementById("fAge");
+  if (!el) return;
+  el.readOnly = true;                                  // age comes from the date of birth, never typed
+  el.title = "Calculated from your date of birth";
+  if (st && st.age != null){ myServerAge = st.age; el.value = st.age; }
+}
+async function ensureConsentAndAge(){
+  if (!currentUser || consentCheckedFor === currentUser.id) return;
+  consentCheckedFor = currentUser.id;
+  let st = await getConsentStatus();
+  if (!st) return;                                     // database part not installed yet: never lock members out
+  if (st.blocked){ showUnderageNotice(); return; }
+  if (st.has_dob && st.terms_accepted){ applyServerAge(st); return; }   // nothing missing: one call per page load
+  const meta = currentUser.user_metadata || {};
+  try {
+    // Values the member entered on the Register form are saved the first time they are signed in.
+    if (!st.has_dob && meta.date_of_birth){
+      const { data } = await _supabase.rpc("dating_set_dob", { p_dob: meta.date_of_birth });
+      if (data && data.ok === false && data.code === "underage"){ showUnderageNotice(); return; }
+    }
+    if (!st.terms_accepted && meta.terms_version === TERMS_VERSION){
+      await _supabase.rpc("dating_accept_terms", { p_version: TERMS_VERSION, p_method: "signup" });
+    }
+  } catch (e) { console.warn("consent sync:", e); }
+  st = await getConsentStatus();
+  if (st && (!st.has_dob || !st.terms_accepted)) showConsentModal(st);
+  else applyServerAge(st);
+}
+
+function showUnderageNotice(){
+  const old = document.getElementById("consentGate"); if (old) old.remove();
+  try { localStorage.setItem(UNDERAGE_FLAG, "1"); } catch (_) {}
+  const el = document.createElement("div");
+  el.id = "consentGate";
+  el.style.cssText = "position:fixed;inset:0;z-index:100000;background:rgba(20,10,28,.82);display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.innerHTML = `<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:24px;text-align:center;">
+    <h3 style="margin:0 0 8px;">We can't open this account</h3>
+    <p style="margin:0 0 16px;font-size:.9rem;color:#555;line-height:1.5;">Wana Dating is only for people aged 18 and over.</p>
+    <button type="button" class="submit-btn" id="cgOk" style="width:100%;">OK</button></div>`;
+  document.body.appendChild(el);
+  el.querySelector("#cgOk").onclick = () => { el.remove(); signOut(); };
+}
+
+function showConsentModal(st){
+  const old = document.getElementById("consentGate"); if (old) old.remove();
+  const needDob = !st.has_dob, needTerms = !st.terms_accepted;
+  const el = document.createElement("div");
+  el.id = "consentGate";
+  el.style.cssText = "position:fixed;inset:0;z-index:100000;background:rgba(20,10,28,.78);display:flex;align-items:center;justify-content:center;padding:16px;";
+  el.innerHTML = `
+    <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.4);max-height:92vh;overflow:auto;">
+      <h3 style="margin:0 0 6px;">Before you continue</h3>
+      <p style="margin:0 0 14px;font-size:.88rem;color:#555;line-height:1.5;">Wana Dating is only for adults. Please confirm your age${needTerms ? " and our rules" : ""}.</p>
+      ${needDob ? `
+        <label for="cgDob" style="display:block;font-size:.85rem;font-weight:600;margin-bottom:4px;">Date of birth</label>
+        <input type="date" id="cgDob" min="1900-01-01" max="${latestAdultDob()}" class="modal-input" style="width:100%;">
+        <div style="font-size:.75rem;color:#777;margin:4px 0 14px;line-height:1.4;">Others only see your age, never your birth date. It can't be changed later without contacting support.</div>` : ""}
+      ${needTerms ? `
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:.85rem;line-height:1.45;margin:6px 0 14px;">
+          <input type="checkbox" id="cgTerms" style="margin-top:3px;">
+          <span>I am 18 or older and I agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of Use</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>` : ""}
+      <div id="cgMsg"></div>
+      <button type="button" id="cgSubmit" class="submit-btn" style="width:100%;">Continue</button>
+      <div style="text-align:center;margin-top:10px;"><button type="button" id="cgSignOut" style="background:none;border:none;color:#777;cursor:pointer;font-size:.82rem;text-decoration:underline;">Sign out</button></div>
+    </div>`;
+  document.body.appendChild(el);
+  const msg = el.querySelector("#cgMsg");
+  const fail = (t) => { msg.innerHTML = `<div class="msg error">${esc(t)}</div>`; };
+  el.querySelector("#cgSignOut").onclick = () => { el.remove(); signOut(); };
+  el.querySelector("#cgSubmit").onclick = async (ev) => {
+    const btn = ev.currentTarget;
+    msg.innerHTML = "";
+    let dob = null;
+    if (needDob){
+      dob = el.querySelector("#cgDob").value;
+      if (!Number.isFinite(ageFromDob(dob))) return fail("Enter your date of birth.");
+    }
+    if (needTerms && !el.querySelector("#cgTerms").checked) return fail("Please tick the box to continue.");
+    btn.disabled = true;
+    try {
+      if (needDob){
+        const { data, error } = await _supabase.rpc("dating_set_dob", { p_dob: dob });
+        if (data && data.ok === false && data.code === "underage"){ showUnderageNotice(); return; }
+        if (error || !data || data.ok === false){
+          btn.disabled = false;
+          return fail((data && data.message) || (error && error.message) || "Couldn't save your date of birth.");
+        }
+      }
+      if (needTerms){
+        const { error } = await _supabase.rpc("dating_accept_terms", { p_version: TERMS_VERSION, p_method: "modal" });
+        if (error){ btn.disabled = false; return fail(error.message); }
+      }
+    } catch (e) { btn.disabled = false; return fail("Something went wrong. Please try again."); }
+    el.remove();
+    applyServerAge(await getConsentStatus());
+  };
 }
 
 // ---------- Sign in / Register modal ----------
@@ -351,6 +526,8 @@ function renderAuthModal(){
     <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required class="modal-input"></div>
     <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required class="modal-input"></div>
     ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="09..." class="modal-input"></div>` : ""}
+    <div><label>Date of birth</label><input type="date" id="authDob" min="1900-01-01" max="${latestAdultDob()}" required class="modal-input"><div style="font-size:.75rem;color:#777;margin-top:4px;">You must be 18 or older. Others only see your age.</div></div>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:.82rem;line-height:1.45;margin:2px 0 0;font-weight:500;"><input type="checkbox" id="authTerms" style="margin-top:3px;" required><span>I am 18 or older and I agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:var(--green);">Terms of Use</a> and <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--green);">Privacy Policy</a>.</span></label>
   ` : "";
 
   const form = `
@@ -359,6 +536,7 @@ function renderAuthModal(){
       <div><label>Password</label><input type="password" id="authPassword" minlength="6" required class="modal-input"></div>
       ${!isSignin ? `<div><label>Confirm password</label><input type="password" id="authPasswordConfirm" minlength="6" required class="modal-input"></div>` : ""}
       ${registerExtraFields}
+      ${turnstileSiteKey() ? '<div id="authCaptcha" style="margin:12px 0 2px;min-height:65px;"></div>' : ""}
       <button type="submit" class="submit-btn" style="width:100%; margin-top: 10px;">${isSignin ? "Sign In" : "Create Account"}</button>
       ${(isSignin && !isPhone) ? `<div style="text-align:right; margin-top: 8px;"><button type="button" onclick="sendPasswordReset()" style="background:none;border:none;color:var(--green);font-size:.85rem;cursor:pointer;padding:0;font-weight:600;">Forgot password?</button></div>` : ""}
       <div id="authMsg"></div>
@@ -389,6 +567,7 @@ function renderAuthModal(){
     </div>`;
 
   document.getElementById("authForm").addEventListener("submit", submitAuthForm);
+  mountTurnstile();
 }
 
 function signInWithGoogle(){
@@ -473,11 +652,38 @@ async function submitAuthForm(e){
     }
   }
 
+  if (turnstileSiteKey() && !_tsToken){
+    msg.innerHTML = `<div class="msg error">Please complete the security check first.</div>`;
+    return;
+  }
+
+  let dobValue = null;
+  if (authTab === "register"){
+    let blockedBefore = false;
+    try { blockedBefore = localStorage.getItem(UNDERAGE_FLAG) === "1"; } catch (_) {}
+    dobValue = (document.getElementById("authDob").value || "").trim();
+    const a = ageFromDob(dobValue);
+    if (blockedBefore || (Number.isFinite(a) && a < 18)){
+      try { localStorage.setItem(UNDERAGE_FLAG, "1"); } catch (_) {}
+      msg.innerHTML = `<div class="msg error">Wana Dating is only for people aged 18 and over.</div>`;
+      return;
+    }
+    if (!Number.isFinite(a) || a > 120){
+      msg.innerHTML = `<div class="msg error">Enter your date of birth.</div>`;
+      return;
+    }
+    if (!document.getElementById("authTerms").checked){
+      msg.innerHTML = `<div class="msg error">Please confirm you are 18 or older and accept the Terms and Privacy Policy.</div>`;
+      return;
+    }
+  }
+
   submitBtn.disabled = true;
   submitBtn.textContent = authTab === "signin" ? "Signing in..." : "Creating account...";
 
   if (authTab === "signin"){
-    const { error } = await _supabase.auth.signInWithPassword({ ...identifier, password });
+    const { error } = await _supabase.auth.signInWithPassword({ ...identifier, password, options: { captchaToken: _tsToken || undefined } });
+    resetTurnstile();
     submitBtn.disabled = false;
     submitBtn.textContent = "Sign In";
     if (error){
@@ -497,12 +703,14 @@ async function submitAuthForm(e){
     const { data, error } = await _supabase.auth.signUp({
       ...identifier, password,
       options: {
-        data: { full_name: fullName, phone_number: phoneNumber, location },
+        data: { full_name: fullName, phone_number: phoneNumber, location, date_of_birth: dobValue, terms_version: TERMS_VERSION, terms_accepted_at: new Date().toISOString() },
+        captchaToken: _tsToken || undefined,
         ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating/index.html" })
       }
     });
     submitBtn.disabled = false;
     submitBtn.textContent = "Create Account";
+    resetTurnstile();
     if (error){ msg.innerHTML = `<div class="msg error">${esc(error.message)}</div>`; return; }
     if (data.user && !data.session){
       msg.innerHTML = isPhone
@@ -518,9 +726,15 @@ async function sendPasswordReset(){
   const email = document.getElementById("authEmail").value.trim();
   const msg = document.getElementById("authMsg");
   if (!email){ msg.innerHTML = `<div class="msg error">Enter your email above first.</div>`; return; }
+  if (turnstileSiteKey() && !_tsToken){
+    msg.innerHTML = `<div class="msg error">Please complete the security check first.</div>`;
+    return;
+  }
   const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/dating/index.html"
+    redirectTo: window.location.origin + "/dating/index.html",
+    captchaToken: _tsToken || undefined
   });
+  resetTurnstile();
   msg.innerHTML = error
     ? `<div class="msg error">${esc(error.message)}</div>`
     : `<div class="msg success">Password reset email sent.</div>`;
@@ -593,6 +807,7 @@ _supabase.auth.onAuthStateChange(async (_event, session) => {
   document.getElementById("homePanel").style.display = currentUser ? "block" : "none";
   updateHeaderAuthUI();
   if (currentUser){
+    ensureConsentAndAge();
     await fetchMyProfile();
     refreshMyMatchedIds();
     // Signed in (Google, email or phone) but no dating profile yet:
@@ -613,6 +828,8 @@ _supabase.auth.onAuthStateChange(async (_event, session) => {
     setupRealtimeMessaging();
     setupRealtimeNotifications();
   } else if (wasSignedIn){
+    consentCheckedFor = null; myServerAge = null;
+    const cg = document.getElementById("consentGate"); if (cg) cg.remove();
     teardownRealtimeChannels();
     myProfile = null;
     myMatchedIds = new Set();
@@ -3628,7 +3845,7 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
 
   const age = parseInt(document.getElementById("fAge").value, 10);
   const ageConfirmed = document.getElementById("fAgeConfirm").checked;
-  if (age < 18 || !ageConfirmed){
+  if (!Number.isFinite(age) || age < 18 || !ageConfirmed){
     msg.innerHTML = `<div class="msg error">You must be 18 or older to post here.</div>`;
     return;
   }
