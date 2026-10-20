@@ -122,9 +122,11 @@ async function showSuspensionBanner(){
   let el = document.getElementById("suspensionBanner");
   try {
     const { data } = await _supabase.from("dating_account_status")
-      .select("is_suspended, suspended_until, suspension_reason")
+      .select("*")
       .eq("user_id", currentUser.id).maybeSingle();
-    const active = data && data.is_suspended && (!data.suspended_until || new Date(data.suspended_until) > new Date());
+    const active = data && (String(data.status || "").toLowerCase() === "suspended" || data.is_suspended === true) &&
+      (!data.suspended_until || new Date(data.suspended_until) > new Date());
+    const reasonText = data && (data.reason || data.suspension_reason);
     if (!active){ if (el) el.remove(); return; }
     if (!el){
       el = document.createElement("div");
@@ -132,7 +134,7 @@ async function showSuspensionBanner(){
       el.style.cssText = "background:#b3261e;color:#fff;padding:10px 16px;text-align:center;font-size:.9rem;position:relative;z-index:50;";
       document.body.insertBefore(el, document.body.firstChild);
     }
-    el.textContent = "Your account is suspended" + (data.suspension_reason ? ": " + data.suspension_reason : ".") +
+    el.textContent = "Your account is suspended" + (reasonText ? ": " + reasonText : ".") +
       " You can't message, like or call. Please contact Support.";
   } catch (e) { /* table not available: ignore */ }
 }
