@@ -3445,7 +3445,8 @@ async function loadSettings() {
 
 async function unblockUser(blockId) {
   if(!confirm("Unblock this user? They will be able to see your profile and message you again if you match.")) return;
-  await _supabase.from("dating_blocks").delete().eq("id", blockId);
+  const { error } = await _supabase.from("dating_blocks").delete().eq("id", blockId);
+  if (error){ alert("Couldn't unblock right now: " + error.message); return; }
   loadSettings();
   loadProfiles(); // Refresh main feed
 }
@@ -3471,19 +3472,30 @@ async function updateAccountPassword() {
 }
 
 async function reportProfile(profileId){
-  const reason = prompt("What is the issue with this profile?");
+  if (!currentUser){ alert("Please sign in to report a profile."); return; }
+  const reason = (prompt("What is the issue with this profile? (e.g. fake photos, harassment, scam)") || "").trim();
   if (!reason) return;
-  const { error } = await _supabase.from("dating_reports").insert({
-    reported_profile_id: profileId,
-    reporter_id: currentUser.id,
-    reason
+  if (reason.length < 3){ alert("Please describe the problem in a few words."); return; }
+  // Server function resolves the reported member, blocks self-reports and
+  // duplicate/spam reports (run dating-migration-v41-report-fix.sql).
+  const { error } = await _supabase.rpc("dating_report_profile", {
+    p_profile_id: profileId,
+    p_reason: reason.slice(0, 200),
+    p_details: null
   });
-  alert(error ? "Couldn't submit report, please try again." : "Report submitted successfully. Thank you.");
+  if (error){
+    console.error("Report failed:", error);
+    alert(/does not exist|schema cache/i.test(error.message || "")
+      ? "Reporting isn't available yet. Please contact Support."
+      : "Couldn't submit report: " + error.message);
+    return;
+  }
+  alert("Report submitted. Thank you — our team will review it.");
   closeModal();
 }
 
 async function blockProfile(otherUserId){
-  if (!confirm("Block this person? They won't be able to message you, and any match will end. You can't undo this from here.")) return;
+  if (!confirm("Block this person? They won't be able to message you, and any match will end. You can unblock later in Privacy Settings.")) return;
   const { error } = await _supabase.from("dating_blocks").insert({
     blocker_id: currentUser.id,
     blocked_id: otherUserId
