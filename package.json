@@ -1,0 +1,8 @@
+{
+  "name": "wanagebya-site",
+  "private": true,
+  "description": "Static site; dependencies are only for Netlify functions.",
+  "dependencies": {
+    "web-push": "3.6.7"
+  }
+}
