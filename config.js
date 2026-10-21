@@ -17,6 +17,7 @@ const GolemConfig = {
     // Get free/paid credentials from a TURN provider (e.g. Metered, Twilio, Cloudflare), then fill in:
     //   iceServers: [{ urls: "turn:YOUR_TURN_HOST:443?transport=tcp", username: "USER", credential: "PASSWORD" }],
     iceServers: [],
+   vapidPublicKey: "BHXS1_V59gJMcKuDymSA5lIe-D9ZtBuVj1NzUz9-bVsrw_MRLzYn5_TZEeXzRzgHceeTZXTzltAQ-B5392JULEo",
     myPhone: "251707022845", // Replace with your actual number
     myTelegram: "@allInOneEthiopia1"
     // botToken / chatId intentionally removed — these now live ONLY as
