@@ -165,4 +165,3 @@
   window._wanaDating2={scoreMatch,loadCompatibility,loadDatePlans,openDatePlanModal};
 })();
 
-<script src="js/i18n.js"></script>
