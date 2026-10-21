@@ -558,4 +558,4 @@
   console.info("Wana Dating maintenance patch loaded.");
 })();
 
-<script src="js/i18n.js"></script>
+
