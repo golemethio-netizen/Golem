@@ -5,11 +5,11 @@
 //
 // Netlify environment variables (Site settings > Environment variables):
 //   NOTIFY_SECRET              long random text, same value as in dating_notify_settings
-  SUPABASE_URL               https:https://ryeylhawdmykbbmnfrrh.supabase.co
+//   SUPABASE_URL               https:https://ryeylhawdmykbbmnfrrh.supabase.co
 // SUPABASE_SERVICE_ROLE_KEY  Supabase > Project Settings > API > service_role (SECRET: never put it in the website code)
 //   VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY   from:  npx web-push generate-vapid-keys
- VAPID_SUBJECT              mailto:wanagebya@gmail.com
-  SITE_URL                   https://www.wanagebya.com
+//  VAPID_SUBJECT              mailto:wanagebya@gmail.com
+//   SITE_URL                   https://www.wanagebya.com
 // Optional, for email:
   RESEND_API_KEY, EMAIL_FROM  (e.g. "Wana Dating <notify@wanagebya.com>", domain verified in Resend)
 //
