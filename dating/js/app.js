@@ -2132,7 +2132,7 @@ async function swapModalPhoto(url, thumbEl){
   thumbEl.parentElement.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
   thumbEl.classList.add("active");
 }
-function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; returnThread = null; }
+function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; returnThread = null; document.body.classList.remove("chat-open"); }
 
 // ---------- Likes / Matches ----------
 async function checkMatch(otherUserId){
@@ -2325,7 +2325,7 @@ async function sendReply(profileId, recipientId){
   } finally {
     _sendingMessage = false;
     const btn = document.getElementById("sendReplyBtn"); // thread re-renders, so look it up again
-    if (btn){ btn.disabled = false; btn.textContent = "Send Message"; }
+    if (btn){ btn.disabled = false; btn.textContent = "Send"; }
   }
 }
 
@@ -2641,7 +2641,7 @@ async function toggleVoiceRecording(profileId, recipientId){
   } else {
     mediaRecorder.stop();
     isRecording = false;
-    btn.textContent = "🎤 Voice";
+    btn.textContent = "🎤";
     btn.style.background = "";
     btn.style.color = "";
     status.textContent = "Sending voice message...";
@@ -2673,6 +2673,16 @@ async function sendVoiceMessage(profileId, recipientId, blob){
 }
 
 // ---------- Messages tab ----------
+// Short, readable time for the conversation list: time today, "Yesterday", weekday this week, else date.
+function threadTimeLabel(iso){
+  const d = new Date(iso), now = new Date();
+  if (isNaN(d)) return "";
+  if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const days = Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+  if (days === 1) return "Yesterday";
+  if (days < 7) return d.toLocaleDateString([], { weekday: "short" });
+  return d.toLocaleDateString([], { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "2-digit" });
+}
 async function loadThreads(){
   const { data, error } = await _supabase
     .from("dating_messages")
@@ -2726,17 +2736,24 @@ async function loadThreads(){
   thread.profileId = (p && p.id) || thread.messages[0].profile_id;
       
     const div = document.createElement("div");
-    div.style.cssText = "padding:16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor:pointer; display:flex; gap:14px; align-items:center; margin-bottom: 10px; transition: 0.2s;";
-    div.onmouseover = () => div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
-    div.onmouseout = () => div.style.boxShadow = "none";
+    div.className = "thread-row" + (unreadCount ? " unread" : "");
+    div.setAttribute("role", "button");
+    div.tabIndex = 0;
+    div.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openThread(thread); } };
+    const preview = last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)));
+    const youPrefix = last.sender_id === currentUser.id && !last.deleted_at ? "You: " : "";
     div.innerHTML = `
-      <div onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" ${photo && !photoIsUrl ? `data-profile-media-bg="${esc(photo)}"` : ""} style="cursor:pointer;width:48px;height:48px;border-radius:50%;flex-shrink:0;background:${photoIsUrl ? `url('${esc(photo)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;color:#ccc; border: 1px solid var(--line);">${photo ? "" : "👤"}</div>
-      <div style="min-width:0;flex:1;">
-        <div style="font-weight:700;font-size:1rem;color:#1a1a2e;">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(isPlatinumActive(p))}</div>
-        <div style="font-weight:${unreadCount?"600":"400"}; color:${unreadCount?"var(--green)":"#666"}; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-size: 0.9rem;">${last.deleted_at ? "🚫 Message deleted" : (last.voice_url ? "🎤 Voice message" : esc((last.body||"").slice(0,80)))}</div>
-        <div class="meta" style="font-size:.78rem;color:#999; margin-top: 4px;">${new Date(last.created_at).toLocaleString()}</div>
-      </div>
-      ${unreadCount ? `<span style="background:var(--green);color:#fff;font-weight:700;font-size:.8rem;border-radius:999px;min-width:24px;height:24px;padding:0 6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${unreadCount > 9 ? "9+" : unreadCount}</span>` : ""}`;
+      <div class="thread-avatar" onclick="event.stopPropagation(); viewProfileFromThread('${thread.other}')" title="View profile" ${photo && !photoIsUrl ? `data-profile-media-bg="${esc(photo)}"` : ""} style="${photoIsUrl ? `background-image:url('${esc(photo)}')` : ""}">${photo ? "" : "👤"}</div>
+      <div class="thread-main">
+        <div class="thread-top">
+          <span class="thread-name">${esc(name)}${verifiedBadge(p && p.is_verified)}${platinumBadge(isPlatinumActive(p))}</span>
+          <span class="thread-time">${esc(threadTimeLabel(last.created_at))}</span>
+        </div>
+        <div class="thread-bottom">
+          <span class="thread-preview">${youPrefix}${preview}</span>
+          ${unreadCount ? `<span class="thread-unread">${unreadCount > 9 ? "9+" : unreadCount}</span>` : ""}
+        </div>
+      </div>`;
     div.onclick = () => openThread(thread);
     list.appendChild(div);
   });
@@ -2791,7 +2808,7 @@ async function openThread(thread){
   const lastMsg = ordered[ordered.length - 1];
   const showSeen = lastMsg && lastMsg.sender_id === currentUser.id && lastMsg.read && !lastMsg.deleted_at
     && isPlatinumActive(myProfile);
-  const seenHtml = showSeen ? `<div style="text-align:right;font-size:.72rem;color:#999;margin-top:-6px;">Seen</div>` : "";
+  const seenHtml = showSeen ? `<div class="cmsg-seen">Seen ✓</div>` : "";
 
   // Every new message / reaction re-renders this whole modal. Remember the
   // half-typed reply, focus and scroll position so the re-render doesn't wipe them.
@@ -2805,44 +2822,53 @@ async function openThread(thread){
 
   const root = document.getElementById("modalRoot");
   root.innerHTML = `
-    <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
-      <div class="modal">
-        <div class="body">
-          <button class="btn-close" onclick="closeModal()">✕</button>
-          <h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px; margin-bottom:15px; border-bottom:1px solid var(--line); padding-bottom:10px;">
-            <span onclick="viewProfileFromThread('${thread.other}', true)" title="View profile" style="display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;">
-              <span ${headerPhoto && !headerPhotoIsUrl ? `data-profile-media-bg="${esc(headerPhoto)}"` : ""} style="width:36px;height:36px;border-radius:50%;flex-shrink:0;border:1px solid var(--line);background:${headerPhotoIsUrl ? `url('${esc(headerPhoto)}') center/cover` : "var(--paper)"};display:flex;align-items:center;justify-content:center;font-size:1rem;color:#bbb;">${headerPhoto ? "" : "👤"}</span>
-              <span style="font-size: 1.1rem;">${otherName}${otherBadge}</span>
-            </span>
-            <span style="display:flex;gap:8px;flex-shrink:0;">
-              ${callBtnHtml}
-              <button class="call-btn" style="background:#fff;color:var(--danger);border:1px solid var(--danger);width:34px; height:34px; font-size:0.9rem;" onclick="unmatchUser('${thread.other}')" title="Unmatch">✕</button>
-            </span>
-          </h3>
-          <div id="threadMessages" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin:10px 0; padding-right:5px;">
-            ${renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls)}
-            ${seenHtml}
-          </div>
-          <div style="background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 15px;">
-              <textarea id="replyBody" maxlength="1000" placeholder="Type a message..." style="width:100%;min-height:50px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit; outline:none; resize:none;"></textarea>
-              <div class="actions" style="align-items:center; margin-top:8px; gap:8px;">
-                <button class="btn-report" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message" style="flex:0 0 50px; border:1px solid #ddd !important; color:#555;">🎤</button>
-                <button class="btn-contact" id="sendReplyBtn" onclick="sendReply('${thread.profileId}','${thread.other}');" style="border-radius: 8px;">Send Message</button>
-              </div>
-              <div id="replyError" role="alert" style="font-size:.8rem;color:var(--danger);margin-top:6px;text-align:center;"></div>
-              <div id="recordStatus" style="font-size:.8rem;color:#e67e22;margin-top:6px; font-weight:bold; text-align:center;"></div>
-          </div>
+    <div class="modal-backdrop chat-backdrop" onclick="if(event.target===this) closeModal()">
+      <div class="modal chat-modal" role="dialog" aria-label="Conversation with ${otherName}">
+        <header class="chat-head">
+          <button class="chat-back" onclick="closeModal()" aria-label="Back to messages" type="button">‹</button>
+          <span class="chat-who" onclick="viewProfileFromThread('${thread.other}', true)" title="View profile">
+            <span class="chat-avatar" ${headerPhoto && !headerPhotoIsUrl ? `data-profile-media-bg="${esc(headerPhoto)}"` : ""} style="${headerPhotoIsUrl ? `background-image:url('${esc(headerPhoto)}')` : ""}">${headerPhoto ? "" : "👤"}</span>
+            <span class="chat-name">${otherName}${otherBadge}</span>
+          </span>
+          <span class="chat-tools">
+            ${callBtnHtml}
+            <button class="chat-icon-btn danger" onclick="unmatchUser('${thread.other}')" title="Unmatch" aria-label="Unmatch" type="button">✕</button>
+            <button class="chat-close" onclick="closeModal()" aria-label="Close" type="button">✕</button>
+          </span>
+        </header>
+        <div id="threadMessages" class="chat-scroll" aria-live="polite">
+          ${renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls)}
+          ${seenHtml}
         </div>
+        <footer class="chat-composer">
+          <div id="replyError" role="alert" class="chat-error"></div>
+          <div id="recordStatus" class="chat-record"></div>
+          <div class="chat-input-row">
+            <button class="chat-mic" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message" aria-label="Record voice message" type="button">🎤</button>
+            <textarea id="replyBody" rows="1" maxlength="1000" placeholder="Type a message…" aria-label="Message"></textarea>
+            <button class="chat-send" id="sendReplyBtn" onclick="sendReply('${thread.profileId}','${thread.other}');" aria-label="Send message" type="button">Send</button>
+          </div>
+        </footer>
       </div>
     </div>`;
-    
+    document.body.classList.add("chat-open");
+
     window._lastRenderedThread = thread.other;
     const chatBox = document.getElementById("threadMessages");
+    if (chatBox) chatBox.addEventListener("click", (e) => {
+      // Touch screens: tap a message to show / hide its action buttons.
+      if (e.target.closest(".react-add, audio, textarea, button, .reaction-pill")) return;
+      const msg = e.target.closest(".cmsg");
+      chatBox.querySelectorAll(".cmsg.show-actions").forEach(x => { if (x !== msg) x.classList.remove("show-actions"); });
+      if (msg) msg.classList.toggle("show-actions");
+    });
     if (chatBox) chatBox.scrollTop = (!sameThread || wasNearBottom) ? chatBox.scrollHeight : oldScrollTop;
 
     const replyBox = document.getElementById("replyBody");
     if (replyBox){
-      if (draft) replyBox.value = draft;
+      const grow = () => { replyBox.style.height = "auto"; replyBox.style.height = Math.min(replyBox.scrollHeight, 140) + "px"; };
+      replyBox.addEventListener("input", grow);
+      if (draft) { replyBox.value = draft; grow(); }
       if (hadFocus) { replyBox.focus(); replyBox.setSelectionRange(replyBox.value.length, replyBox.value.length); }
       // Enter sends, Shift+Enter adds a new line. Not on phones, where Enter should stay a new line.
       if (!window.matchMedia("(pointer: coarse)").matches){
@@ -2868,19 +2894,25 @@ function msgDayLabel(d){
 
 function renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls){
   let lastDay = "";
-  return ordered.map(m => {
+  return ordered.map((m, i) => {
     const d = new Date(m.created_at);
     const day = d.toDateString();
     let divider = "";
     if (day !== lastDay){
       lastDay = day;
-      divider = `<div style="align-self:center;font-size:.72rem;color:#94a3b8;background:#f1f5f9;border-radius:999px;padding:3px 10px;">${esc(msgDayLabel(d))}</div>`;
+      divider = `<div class="chat-day"><span>${esc(msgDayLabel(d))}</span></div>`;
     }
-    return divider + renderMessageBubble(m, reactionsByMsg[m.id] || [], voiceUrls[m.id]);
+    // Group runs of messages from the same person within 5 minutes: tight spacing, time only on the last one.
+    const prev = ordered[i - 1], next = ordered[i + 1];
+    const near = (a, b) => a && b && a.sender_id === b.sender_id && new Date(a.created_at).toDateString() === new Date(b.created_at).toDateString()
+      && Math.abs(new Date(b.created_at) - new Date(a.created_at)) < 5 * 60 * 1000;
+    const joinedPrev = near(prev, m) && !divider;
+    const joinedNext = near(m, next);
+    return divider + renderMessageBubble(m, reactionsByMsg[m.id] || [], voiceUrls[m.id], joinedPrev, joinedNext);
   }).join("");
 }
 
-function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
+function renderMessageBubble(m, msgReactions, resolvedVoiceUrl, joinedPrev, joinedNext){
   const mine = m.sender_id === currentUser.id;
   const reactionCounts = {};
   // Only the known reaction emojis are rendered: the value is placed inside an
@@ -2894,22 +2926,21 @@ function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
     ? `<div class="reaction-row">${Object.entries(reactionCounts).map(([e,c]) =>
         `<span class="reaction-pill${myReaction && myReaction.emoji===e ? " mine" : ""}" onclick="toggleReaction('${m.id}','${e}')">${e} ${c}</span>`).join("")}</div>`
     : "";
+  const cls = "cmsg " + (mine ? "mine" : "theirs") + (joinedPrev ? " joined-prev" : "") + (joinedNext ? " joined-next" : "");
 
   if (m.deleted_at){
     return `
-      <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;">
-        <div class="msg-bubble" style="background:#f1f5f9;padding:10px 14px;border-radius:12px;font-size:.85rem;color:#94a3b8;font-style:italic; border:1px solid #e2e8f0;">
-          🚫 This message was deleted
-        </div>
+      <div class="${cls}">
+        <div class="msg-bubble deleted">🚫 This message was deleted</div>
       </div>`;
   }
 
   const canEdit = mine && !m.voice_url && (Date.now() - new Date(m.created_at).getTime() < EDIT_WINDOW_MS);
   const content = m.voice_url
     ? (resolvedVoiceUrl
-        ? `<audio controls src="${esc(resolvedVoiceUrl)}" style="max-width:220px;height:36px;"></audio>`
-        : `<span style="font-size:.8rem;color:#94a3b8;font-style:italic;">Voice message unavailable</span>`)
-    : `<span id="msgBody-${m.id}">${esc(m.body || "")}</span>${m.edited_at ? ` <span style="font-size:.7rem;color:#94a3b8;">(edited)</span>` : ""}`;
+        ? `<audio controls src="${esc(resolvedVoiceUrl)}"></audio>`
+        : `<span class="cmsg-unavailable">Voice message unavailable</span>`)
+    : `<span id="msgBody-${m.id}">${esc(m.body || "")}</span>${m.edited_at ? ` <span class="cmsg-edited">(edited)</span>` : ""}`;
 
   const ownControls = mine ? `
     ${canEdit ? `<span class="react-add" style="right:26px;" title="Edit" onclick="startEditMessage('${m.id}')">✏️</span>` : ""}
@@ -2917,12 +2948,12 @@ function renderMessageBubble(m, msgReactions, resolvedVoiceUrl){
   ` : `<span class="react-add" onclick="showReactionPicker(event,'${m.id}')">＋</span>`;
 
   return `
-    <div style="align-self:${mine?"flex-end":"flex-start"};max-width:85%;" data-message-id="${m.id}">
-      <div class="msg-bubble" style="background:${mine?"var(--green)":"#f1f5f9"}; color:${mine?"#fff":"#333"}; padding:10px 14px;border-radius:14px;font-size:.9rem;position:relative; line-height:1.4; border: 1px solid ${mine?"var(--green)":"#e2e8f0"};">
+    <div class="${cls}" data-message-id="${m.id}">
+      <div class="msg-bubble">
         ${content}
         ${ownControls}
       </div>
-      <div style="font-size:.66rem;color:#94a3b8;margin-top:2px;text-align:${mine?"right":"left"};">${esc(new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</div>
+      ${joinedNext ? "" : `<div class="cmsg-time">${esc(new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</div>`}
       ${reactionRow}
     </div>`;
 }
@@ -2933,10 +2964,10 @@ function startEditMessage(messageId){
   const currentText = span.textContent;
   const wrapper = span.parentElement;
   wrapper.innerHTML = `
-    <textarea id="editBody-${messageId}" maxlength="1000" style="width:100%;min-height:60px;font-family:inherit;font-size:.9rem;padding:8px;border-radius:8px;border:1px solid #fff; color:#333; outline:none;">${esc(currentText)}</textarea>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button onclick="saveEditMessage('${messageId}')" style="font-size:.8rem;padding:6px 12px;border:none;background:#fff;color:var(--green);border-radius:6px;cursor:pointer; font-weight:bold;">Save</button>
-      <button onclick="refreshOpenThreadMessages()" style="font-size:.8rem;padding:6px 12px;border:1px solid #fff;background:transparent; color:#fff;border-radius:6px;cursor:pointer;">Cancel</button>
+    <textarea id="editBody-${messageId}" class="cmsg-edit" maxlength="1000">${esc(currentText)}</textarea>
+    <div class="cmsg-edit-actions">
+      <button type="button" class="save" onclick="saveEditMessage('${messageId}')">Save</button>
+      <button type="button" class="cancel" onclick="refreshOpenThreadMessages()">Cancel</button>
     </div>`;
 }
 
