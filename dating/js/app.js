@@ -3167,17 +3167,17 @@ function renderVerificationBox(profile, latestRequest){
 }
 
 // ---------- Platinum upgrade (manual payment + transaction number review) ----------
-// IMPORTANT: PLATINUM_PAYMENT_ACCOUNT below is a placeholder. Fill in your
-// real bank account or Telebirr/CBE Birr number before this goes live —
-// sending members a wrong or fake account number would mean their real
-// money goes nowhere. This is intentionally left unfilled rather than
-// guessed, since a wrong number here is actively harmful, not just a bug.
-const PLATINUM_PAYMENT_ACCOUNT = {
-  bank: "FILL IN YOUR BANK NAME (e.g. Commercial Bank of Ethiopia)",
-  accountName: "FILL IN THE ACCOUNT HOLDER NAME",
-  accountNumber: "FILL IN YOUR ACCOUNT NUMBER",
-  telebirr: "" // optional Telebirr number; leave "" to hide
-};
+// Where members send Platinum payments. Only methods with a complete, real number are shown:
+// a number that still contains "*" or "FILL IN" is hidden, so members are never sent to an
+// unusable account. Edit this list to add, change or remove a method.
+const PLATINUM_PAYMENT_METHODS = [
+  { icon: "🏦", method: "Commercial Bank of Ethiopia (CBE)", accountName: "Abebe", number: "1000******1212" /* put the FULL account number here */ },
+  { icon: "📱", method: "Telebirr", accountName: "Kebede", number: "0942317229" },
+  { icon: "📱", method: "M-Pesa", accountName: "Aster", number: "0707022845" }
+];
+function platinumPaymentMethodsReady(){
+  return PLATINUM_PAYMENT_METHODS.filter(m => m.number && m.accountName && !/[*]|FILL IN/i.test(String(m.number)));
+}
 
 const PLATINUM_PLANS = {
   weekly:  { label: "Weekly",  price: 100, unit: "/ week" },
@@ -3285,8 +3285,8 @@ function choosePlatinumPlan(planKey){
   const root = document.getElementById("modalRoot");
   // Safety: never show members placeholder bank details. Until the real
   // account is filled in above, tell them payment isn't open yet.
-  const payConfigured = [PLATINUM_PAYMENT_ACCOUNT.bank, PLATINUM_PAYMENT_ACCOUNT.accountName, PLATINUM_PAYMENT_ACCOUNT.accountNumber]
-    .every(v => v && !/^FILL IN/i.test(String(v)));
+  const payMethods = platinumPaymentMethodsReady();
+  const payConfigured = payMethods.length > 0;
   if (!payConfigured){
     root.innerHTML = `
       <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -3307,10 +3307,15 @@ function choosePlatinumPlan(planKey){
           <h3 style="margin-bottom:6px;">${esc(plan.label)} Platinum — ${plan.price} Birr</h3>
           <div class="bio" style="margin-bottom:14px;font-size:.9rem;background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
             <div style="font-weight:700;margin-bottom:6px;">Send ${plan.price} Birr to:</div>
-            <div>🏦 Bank: ${esc(PLATINUM_PAYMENT_ACCOUNT.bank)}</div>
-            <div>👤 Account name: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountName)}</div>
-            <div>🔢 Account number: ${esc(PLATINUM_PAYMENT_ACCOUNT.accountNumber)}</div>
-            ${PLATINUM_PAYMENT_ACCOUNT.telebirr ? `<div>📱 Telebirr: ${esc(PLATINUM_PAYMENT_ACCOUNT.telebirr)}</div>` : ""}
+            ${payMethods.map(m => `
+              <div style="padding:8px 0;border-top:1px solid #e2e8f0;">
+                <div style="font-weight:700;">${m.icon} ${esc(m.method)}</div>
+                <div>👤 Account name: <strong>${esc(m.accountName)}</strong></div>
+                <div>🔢 Number: <strong style="letter-spacing:.3px;user-select:all;">${esc(m.number)}</strong></div>
+              </div>`).join("")}
+            <div style="margin-top:8px;padding:9px 10px;background:#fff4e5;border:1px solid #f5c37a;border-radius:8px;color:#8a4b00;font-size:.85rem;">
+              ⚠️ <strong>Warning:</strong> pay only to the account${payMethods.length > 1 ? "s" : ""} shown here. Do not send money to any other number or account, even if someone claims to be from WanaGebya.
+            </div>
             <div style="margin-top:8px;color:#666;">After sending, attach your receipt below, or enter the transaction reference number (either one is enough). We'll review and activate your plan — this isn't instant.</div>
           </div>
           <input type="text" id="platinumTxnNumber" placeholder="Transaction number / reference (optional if you attach a receipt)" maxlength="100" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;margin-bottom:14px;">
