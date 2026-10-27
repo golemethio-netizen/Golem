@@ -26,7 +26,7 @@
 <link rel="stylesheet" href="css/layout.css">
 
 
-<link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/responsive.css"><link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/responsive.css"><link rel="stylesheet" href="css/chat.css"><link rel="stylesheet" href="css/calls.css">
 <style id="wana-mobile-account">
 /* Header "Sign out" button: shown only while signed in. Works on phones, where the sidebar account box is hidden. */
 .signout-pill{display:inline-flex;align-items:center;justify-content:center;min-height:36px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;margin-left:10px;white-space:nowrap;-webkit-tap-highlight-color:transparent}
@@ -129,6 +129,7 @@
   <div class="more-sheet-grip"></div>
   <button class="more-item" onclick="switchTab('newmembers')" type="button"><span>🆕</span> New Members</button>
   <button class="more-item" onclick="switchTab('post')" type="button"><span>✍️</span> <span class="post-tab-label">Setup Profile</span></button>
+  <button class="more-item" onclick="switchTab('calls')" type="button"><span>📞</span> Calls <span id="callsMoreBadge"></span></button>
   <button class="more-item" onclick="switchTab('visitors')" type="button"><span>👣</span> Visitors</button>
   <button class="more-item" onclick="switchTab('compatibility')" type="button"><span>❤️</span> Compatibility</button>
   <button class="more-item" onclick="switchTab('dateplans')" type="button"><span>📅</span> Date Plans</button>
@@ -166,6 +167,7 @@
 <div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
 <div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> <span class="post-tab-label">Setup Profile</span></div>
 <div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
+<div class="tab" data-tab="calls" onclick="switchTab('calls')"><span class="side-icon">📞</span> Calls <span id="callsBadge"></span></div>
 <div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
 <div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
 <div class="tab" data-tab="compatibility" onclick="switchTab('compatibility')"><span class="side-icon">❤️</span> Compatibility</div><div class="tab" data-tab="dateplans" onclick="switchTab('dateplans')"><span class="side-icon">📅</span> Date Plans <span class="tab-badge" id="datePlansBadge"></span></div>
@@ -542,6 +544,17 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 </div>
 <div id="threadList"></div>
 <div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Match with someone from Browse to start a conversation!</div>
+</div><div class="panel" id="callsPanel" style="display:none;">
+<div class="browse-header">
+<h2>Call <span>History</span> 📞</h2>
+<p>Calls you made, received and missed. Tap the phone to call back.</p>
+</div>
+<div class="calls-toolbar">
+<button class="calls-chip active" data-f="all" onclick="setCallsFilter('all')" type="button">All</button>
+<button class="calls-chip" data-f="missed" onclick="setCallsFilter('missed')" type="button">Missed</button>
+</div>
+<div class="calls-list" id="callsList"></div>
+<p class="calls-note">Only you and the other person can see a call. Voice calls are a Platinum feature.</p>
 </div><div class="panel" id="likesPanel" style="display:none;">
 <div class="browse-header">
 <h2>People Who <span>Liked You</span></h2>
@@ -698,6 +711,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
   <script src="js/support.js"></script>
   <script src="js/account.js"></script>
   <script src="js/notify.js"></script>
+  <script src="js/call-history.js"></script>
   <script src="js/i18n.js"></script>
 </body>
 </html>
