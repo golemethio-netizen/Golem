@@ -957,6 +957,10 @@
                                 <option value="weekly">Weekly</option>
                                 <option value="monthly" selected>Monthly</option>
                                 <option value="yearly">Yearly</option>
+                                <option disabled>── Free gift ──</option>
+                                <option value="free3">Free: 3 days</option>
+                                <option value="free7">Free: 7 days</option>
+                                <option value="freecustom">Free: custom days…</option>
                             </select>
                             <button onclick="grantPlatinum('${p.user_id}')" style="font-size:0.75rem;padding:5px 10px;border:none;background:#B8860B;color:white;border-radius:5px;cursor:pointer;">${platinumActive(p) ? 'Extend' : 'Grant'}</button>
                         </div>
@@ -974,6 +978,19 @@
 
         async function grantPlatinum(userId) {
             const plan = document.getElementById('plan-' + userId).value;
+            // Free gift: 3 days, 7 days or a custom number of days, with an optional reason.
+            if (plan.indexOf('free') === 0) {
+                let days = plan === 'free3' ? 3 : plan === 'free7' ? 7 : parseInt(prompt('How many free Platinum days? (1 to 365)', '14'), 10);
+                if (!days || days < 1 || days > 365) { if (plan === 'freecustom') alert('Enter a whole number from 1 to 365.'); return; }
+                const reason = prompt('Reason for this free gift (optional, saved in the audit log):', 'gift');
+                if (reason === null) return;
+                if (!confirm('Give this member ' + days + ' free Platinum day(s)?')) return;
+                const r = await _supabase.rpc('dating_admin_grant_free_days', { p_user: userId, p_days: days, p_reason: reason });
+                if (r.error) { alert('Failed: ' + r.error.message + '\n\n(If this says the function does not exist, run dating-migration-v51-free-platinum-days.sql.)'); return; }
+                // The database function writes the audit-log entry itself.
+                loadDatingProfiles(true);
+                return;
+            }
             const { data, error } = await _supabase.rpc('dating_grant_platinum', { p_user: userId, p_plan: plan });
             if (error) { alert('Failed: ' + error.message + '\n\n(If this says the function does not exist, run the v28 platinum-plans migration.)'); return; }
             logAction('Platinum Granted', `User ID: ${userId}, plan: ${plan}, until: ${data}`);
