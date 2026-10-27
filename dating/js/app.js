@@ -1370,7 +1370,7 @@ async function recordProfileView(viewedUserId){
 // ---------- Tabs ----------
 const PANELS = [
   "homePanel", "browsePanel", "newMembersPanel", "postPanel",
-  "messagesPanel", "likesPanel", "visitorsPanel",
+  "messagesPanel", "callsPanel", "likesPanel", "visitorsPanel",
   "compatibilityPanel", "dateplansPanel", "safetyPanel",
   "myProfilePanel", "settingsPanel"
 ];
@@ -1434,6 +1434,7 @@ function switchTab(tab){
     newmembers: "newMembersPanel",
     post: "postPanel",
     messages: "messagesPanel",
+    calls: "callsPanel",
     likes: "likesPanel",
     visitors: "visitorsPanel",
     compatibility: "compatibilityPanel",
@@ -1453,6 +1454,7 @@ function switchTab(tab){
   if (tab === "browse") loadProfiles();
   if (tab === "newmembers") loadNewMembers();
   if (tab === "messages"){ loadThreads(); refreshUnreadBadge(); }
+  if (tab === "calls" && window.loadCallHistory) window.loadCallHistory();
   if (tab === "likes") loadLikesReceived();
   if (tab === "visitors") loadVisitors();
   if (tab === "myprofile") loadMyProfile();
