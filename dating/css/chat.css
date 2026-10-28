@@ -58,6 +58,7 @@
 }
 
 .chat-head {
+  position: relative;
   display: flex; align-items: center; gap: 10px;
   padding: 10px 14px;
   border-bottom: 1px solid var(--line);
@@ -211,8 +212,6 @@
     animation: none;
   }
   .chat-head { padding: 8px 10px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
-  .chat-back { display: flex; }
-  .chat-close { display: none; }
   .chat-scroll { padding: 12px 10px; }
   .cmsg { max-width: 86%; }
   #threadList { max-width: none; }
@@ -231,3 +230,24 @@
 
 /* Dim the page behind the chat; stop the page scrolling under it */
 body.chat-open { overflow: hidden; }
+
+/* Close (✕) is always visible; the old back arrow is no longer used */
+.chat-back { display: none !important; }
+.chat-close { width: 40px; height: 40px; font-size: 1.05rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong); }
+.chat-close:hover { background: var(--line); }
+.chat-more { font-size: 1.3rem; line-height: 1; padding-bottom: 5px; }
+
+/* "⋯" menu */
+.chat-menu {
+  position: absolute; right: 12px; top: calc(100% - 4px); z-index: 20; min-width: 190px;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px;
+  box-shadow: 0 12px 32px rgba(18, 20, 26, .18);
+}
+.chat-menu[hidden] { display: none; }
+.chat-menu button {
+  display: block; width: 100%; text-align: left; border: 0; background: transparent; cursor: pointer;
+  font: inherit; font-size: .95rem; padding: 11px 12px; border-radius: 8px; color: var(--ink);
+}
+.chat-menu button:hover { background: var(--paper); }
+.chat-menu button.danger { color: var(--danger); }
+.chat-menu button.danger:hover { background: var(--danger-soft); }
