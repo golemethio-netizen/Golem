@@ -18,6 +18,10 @@
     "Edit Profile": "መገለጫ አርትዕ", "Sign out": "ውጣ",
 
     // gate / landing
+    "Part of": "አካል የሆነው፦", "Terms": "ደንቦች",
+    "Continue with Google": "በጉግል ቀጥል",
+    "👤 View profile": "👤 መገለጫ ይመልከቱ", "🚫 Unmatch": "🚫 ተዛማጅነት አቋርጥ", "More options": "ተጨማሪ አማራጮች",
+    "Close conversation": "ውይይቱን ዝጋ", "Back to messages": "ወደ መልዕክቶች ተመለስ",
     "Ethiopian": "ኢትዮጵያዊ", "Real People": "እውነተኛ ሰዎች", "Genuine Connections": "ትክክለኛ ግንኙነቶች", "A Better Tomorrow": "የተሻለ ነገ",
     "Connect with singles across Ethiopia looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.":
       "ጓደኝነት፣ ፍቅር ወይም ጋብቻ በሚፈልጉ በመላው ኢትዮጵያ ካሉ ነጠላዎች ጋር ይገናኙ — በተረጋገጡ መገለጫዎች፣ በብልህ የተኳሃኝነት ማዛመጃ እና በደህና ለመገናኘት በሚረዱ መሣሪያዎች።",
@@ -229,7 +233,7 @@
     "Something went wrong.": "የሆነ ችግር ተፈጥሯል።", "Something went wrong. Please try again.": "የሆነ ችግር ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።",
     "Stay Safe While Dating 🛡️": "በፍቅር ጉዞዎ ደህንነትዎን ይጠብቁ 🛡️", "Submit for Review": "ለግምገማ አስገባ", "Submitting...": "በማስገባት ላይ...",
     "Try Again": "እንደገና ሞክር", "Turn off notifications": "ማሳወቂያዎችን አጥፋ", "Type a message...": "መልዕክት ይጻፉ...", "Unblock": "አገዳ አንሳ",
-    "Unmatch": "ተዛማጅነት አቋርጥ", "Unknown User": "ያልታወቀ ተጠቃሚ", "Updating...": "በማዘመን ላይ...", "Uploading... please wait.": "በመስቀል ላይ... እባክዎ ይጠብቁ።",
+    "Close": "ዝጋ", "Unmatch": "ተዛማጅነት አቋርጥ", "Unknown User": "ያልታወቀ ተጠቃሚ", "Updating...": "በማዘመን ላይ...", "Uploading... please wait.": "በመስቀል ላይ... እባክዎ ይጠብቁ።",
     "VIEW PROFILE": "መገለጫ ይመልከቱ", "View profile": "መገለጫ ይመልከቱ", "Verified": "የተረጋገጠ", "Verified profile": "የተረጋገጠ መገለጫ",
     "Verify Your Profile ✅": "መገለጫዎን ያረጋግጡ ✅", "Viewed": "ተጎብኝቷል", "Voice call": "የድምፅ ጥሪ",
     "Wana Dating is only for people aged 18 and over.": "Wana Dating ዕድሜያቸው 18 እና ከዚያ በላይ ለሆኑ ሰዎች ብቻ ነው።",
@@ -414,7 +418,7 @@
 
   var KEY = "wana_lang";
   var SKIP = "script,style,textarea,.brand,.gate-logo-title,.dating-script,[data-no-i18n]";
-  var ATTRS = ["placeholder", "title"];
+  var ATTRS = ["placeholder", "title", "aria-label"];
   var lang = "en";
   try { lang = localStorage.getItem(KEY) === "am" ? "am" : "en"; } catch (e) {}
 
@@ -461,7 +465,7 @@
     while ((n = w.nextNode())) list.push(n);
     list.forEach(toAm);
     toAmAttrs(root);
-    root.querySelectorAll("[placeholder],[title]").forEach(toAmAttrs);
+    root.querySelectorAll("[placeholder],[title],[aria-label]").forEach(toAmAttrs);
   }
 
   function restoreAll() {
@@ -472,7 +476,7 @@
       if (r && node.nodeValue === r.am) node.nodeValue = r.en;
       textRec.delete(node);
     });
-    document.querySelectorAll("[placeholder],[title]").forEach(function (el) {
+    document.querySelectorAll("[placeholder],[title],[aria-label]").forEach(function (el) {
       var rec = attrRec.get(el);
       if (!rec) return;
       Object.keys(rec).forEach(function (a) {
@@ -509,7 +513,36 @@
     var btn = document.getElementById("langBtn");
     if (btn) btn.textContent = lang === "am" ? "EN" : "አማ";
     try { currentLang = lang; } catch (e) {}
+    syncPill();
     observe();
+  }
+
+  // Visible language switcher on the pre-login hero (header button keeps working too)
+  function syncPill() {
+    var hero = document.querySelector("#gate .gate-hero");
+    if (!hero) return;
+    var wrap = document.getElementById("gateLangPill");
+    if (!wrap) {
+      var css = document.createElement("style");
+      css.textContent =
+        "#gateLangPill{display:flex;gap:6px;justify-content:center;margin-bottom:14px}" +
+        "#gateLangPill button{border:1px solid rgba(90,46,10,.35);background:rgba(255,255,255,.7);color:#5c2e0a;border-radius:999px;padding:5px 14px;font-size:.82rem;cursor:pointer;font-family:inherit}" +
+        "#gateLangPill button.active{background:#5c2e0a;color:#fff;border-color:#5c2e0a}";
+      document.head.appendChild(css);
+      wrap = document.createElement("div");
+      wrap.id = "gateLangPill";
+      wrap.setAttribute("data-no-i18n", "");
+      wrap.setAttribute("role", "group");
+      wrap.setAttribute("aria-label", "Language");
+      wrap.innerHTML = '<button type="button" data-lang="en">English</button><button type="button" data-lang="am">አማርኛ</button>';
+      wrap.addEventListener("click", function (e) {
+        var b = e.target.closest && e.target.closest("button[data-lang]");
+        if (b && b.getAttribute("data-lang") !== lang) setLang(b.getAttribute("data-lang"));
+      });
+      hero.insertBefore(wrap, hero.firstChild);
+    }
+    var bs = wrap.querySelectorAll("button");
+    for (var i = 0; i < bs.length; i++) bs[i].classList.toggle("active", bs[i].getAttribute("data-lang") === lang);
   }
 
   // alert / confirm / prompt are not in the DOM, so translate them at call time
