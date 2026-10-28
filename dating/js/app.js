@@ -2832,16 +2832,19 @@ async function openThread(thread){
     <div class="modal-backdrop chat-backdrop" onclick="if(event.target===this) closeModal()">
       <div class="modal chat-modal" role="dialog" aria-label="Conversation with ${otherName}">
         <header class="chat-head">
-          <button class="chat-back" onclick="closeModal()" aria-label="Back to messages" type="button">‹</button>
           <span class="chat-who" onclick="viewProfileFromThread('${thread.other}', true)" title="View profile">
             <span class="chat-avatar" ${headerPhoto && !headerPhotoIsUrl ? `data-profile-media-bg="${esc(headerPhoto)}"` : ""} style="${headerPhotoIsUrl ? `background-image:url('${esc(headerPhoto)}')` : ""}">${headerPhoto ? "" : "👤"}</span>
             <span class="chat-name">${otherName}${otherBadge}</span>
           </span>
           <span class="chat-tools">
             ${callBtnHtml}
-            <button class="chat-icon-btn danger" onclick="unmatchUser('${thread.other}')" title="Unmatch" aria-label="Unmatch" type="button">✕</button>
-            <button class="chat-close" onclick="closeModal()" aria-label="Close" type="button">✕</button>
+            <button class="chat-icon-btn chat-more" onclick="toggleChatMenu(event)" aria-label="More options" aria-haspopup="true" type="button">⋯</button>
+            <button class="chat-close" onclick="closeModal()" aria-label="Close conversation" title="Close" type="button">✕</button>
           </span>
+          <div class="chat-menu" id="chatMenu" hidden>
+            <button type="button" onclick="toggleChatMenu();viewProfileFromThread('${thread.other}', true)">👤 View profile</button>
+            <button type="button" class="danger" onclick="toggleChatMenu();unmatchUser('${thread.other}')">🚫 Unmatch</button>
+          </div>
         </header>
         <div id="threadMessages" class="chat-scroll" aria-live="polite">
           ${renderBubblesWithDays(ordered, reactionsByMsg, voiceUrls)}
@@ -2888,6 +2891,23 @@ async function openThread(thread){
       }
     }
 }
+
+// "⋯" menu in the chat header (View profile / Unmatch). Click anywhere else to close it.
+function toggleChatMenu(e){
+  if (e) e.stopPropagation();
+  const m = document.getElementById("chatMenu");
+  if (m) m.hidden = !m.hidden;
+}
+document.addEventListener("click", (e) => {
+  const m = document.getElementById("chatMenu");
+  if (m && !m.hidden && !e.target.closest(".chat-menu, .chat-more")) m.hidden = true;
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const m = document.getElementById("chatMenu");
+  if (m && !m.hidden) { m.hidden = true; return; }
+  if (document.querySelector(".chat-modal") && typeof closeModal === "function") closeModal();
+});
 
 const EDIT_WINDOW_MS = 15 * 60 * 1000; 
 
