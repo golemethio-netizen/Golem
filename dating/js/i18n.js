@@ -514,6 +514,7 @@
     if (btn) btn.textContent = lang === "am" ? "EN" : "አማ";
     try { currentLang = lang; } catch (e) {}
     syncPill();
+    syncAuthPill();
     observe();
   }
 
@@ -545,6 +546,37 @@
     for (var i = 0; i < bs.length; i++) bs[i].classList.toggle("active", bs[i].getAttribute("data-lang") === lang);
   }
 
+  // Language switcher inside the Sign In / Register popup (the popup covers the header + hero buttons)
+  function syncAuthPill() {
+    var tabs = document.querySelector("#modalRoot .auth-tabs");
+    var wrap = document.getElementById("authLangPill");
+    if (!tabs) return;
+    if (!wrap) {
+      if (!document.getElementById("authLangPillCss")) {
+        var css = document.createElement("style");
+        css.id = "authLangPillCss";
+        css.textContent =
+          "#authLangPill{display:flex;gap:6px;justify-content:flex-end;margin:0 34px 10px 0}" +
+          "#authLangPill button{border:1px solid rgba(90,46,10,.35);background:#fff;color:#5c2e0a;border-radius:999px;padding:3px 11px;font-size:.78rem;cursor:pointer;font-family:inherit}" +
+          "#authLangPill button.active{background:#5c2e0a;color:#fff;border-color:#5c2e0a}";
+        document.head.appendChild(css);
+      }
+      wrap = document.createElement("div");
+      wrap.id = "authLangPill";
+      wrap.setAttribute("data-no-i18n", "");
+      wrap.setAttribute("role", "group");
+      wrap.setAttribute("aria-label", "Language");
+      wrap.innerHTML = '<button type="button" data-lang="en">English</button><button type="button" data-lang="am">አማርኛ</button>';
+      wrap.addEventListener("click", function (e) {
+        var b = e.target.closest && e.target.closest("button[data-lang]");
+        if (b && b.getAttribute("data-lang") !== lang) setLang(b.getAttribute("data-lang"));
+      });
+      tabs.parentNode.insertBefore(wrap, tabs);
+    }
+    var bs = wrap.querySelectorAll("button");
+    for (var i = 0; i < bs.length; i++) bs[i].classList.toggle("active", bs[i].getAttribute("data-lang") === lang);
+  }
+
   // alert / confirm / prompt are not in the DOM, so translate them at call time
   ["alert", "confirm", "prompt"].forEach(function (fn) {
     var orig = window[fn];
@@ -565,6 +597,16 @@
     add: function (obj) { Object.keys(obj).forEach(function (k) { AM[k] = obj[k]; }); if (lang === "am") setLang("am"); },
     get lang() { return lang; }
   };
+
+  // renderAuthModal() (app.js) rebuilds the popup on every tab switch: re-add the switcher each time
+  if (typeof window.renderAuthModal === "function") {
+    var origRender = window.renderAuthModal;
+    window.renderAuthModal = function () {
+      var r = origRender.apply(this, arguments);
+      syncAuthPill();
+      return r;
+    };
+  }
 
   setLang(lang);
 })();
