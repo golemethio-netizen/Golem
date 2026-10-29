@@ -3,7 +3,7 @@
  * Adds a "Notifications" card to Settings, and a small "Turn on notifications" bar.
  * Does nothing until GolemConfig.vapidPublicKey is set in config.js, so it is safe to
  * ship before the server side is ready.
- * Needs: dating-migration-v48 + v49, dating/sw.js, the dating-notify Netlify function.
+ * Needs: dating-migration-v48 + v49, dating/sw.js, the dating-notify Supabase Edge Function.
  * Uses globals from app.js: _supabase, currentUser, signOut.  All text via textContent.
  */
 (function () {
@@ -44,7 +44,27 @@
     (kids || []).forEach(function (c) { e.appendChild(c); });
     return e;
   }
-  function say(t, ok) { if (msgEl) { msgEl.textContent = t || ""; msgEl.style.color = ok ? "#1b7f3b" : "#b3261e"; } }
+  var barMsg = null;
+  function say(t, ok) {
+    if (msgEl) { msgEl.textContent = t || ""; msgEl.style.color = ok ? "#1b7f3b" : "#b3261e"; }
+    // The slim "Turn on" bar has its own message line, so the member always sees what happened.
+    if (barMsg) { barMsg.textContent = t || ""; barMsg.style.color = ok ? "#1b7f3b" : "#b3261e"; barMsg.style.display = t ? "block" : "none"; }
+  }
+  function withTimeout(promise, ms, text) {
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(function () { reject(new Error(text)); }, ms);
+      promise.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
+    });
+  }
+  function inAppBrowser() { return /FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger|; wv\)/i.test(navigator.userAgent); }
+  function friendlyError(e) {
+    var n = e && e.name, m = (e && e.message) || String(e || "");
+    if (n === "NotAllowedError") return "Notifications are blocked. Allow them in your browser's site settings, then try again.";
+    if (n === "AbortError" || /push service|registration failed/i.test(m))
+      return "Your browser couldn't reach its push service. Try again on mobile data or Wi-Fi, and use Chrome (Android) or Safari from the Home Screen (iPhone).";
+    if (n === "SecurityError") return "Notifications need a secure (https) page.";
+    return "Couldn't turn on notifications: " + m;
+  }
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   async function registration() {
@@ -59,15 +79,29 @@
   }
 
   async function turnOn() {
-    if (!currentUser) return;
-    if (!supported()) { say("This browser can't receive notifications.", false); return; }
-    enableBtn.disabled = true; say("");
+    if (!currentUser) { say("Please sign in first.", false); return; }
+    if (!supported()) {
+      say(inAppBrowser()
+        ? "This in-app browser can't show notifications. Open wanagebya.com in Chrome (Android) or Safari (iPhone) and try again."
+        : (isIOS() && !standalone()
+            ? "On iPhone, first add Wana Dating to your Home Screen (Share → Add to Home Screen), then open it from there."
+            : "This browser can't receive notifications."), false);
+      return;
+    }
+    if (inAppBrowser()) { say("Open wanagebya.com in Chrome (Android) or Safari (iPhone) to turn on notifications; this in-app browser can't ask for permission.", false); return; }
+    if (enableBtn) enableBtn.disabled = true;
+    say("Turning on notifications…", true);
     try {
       var perm = Notification.permission === "default" ? await Notification.requestPermission() : Notification.permission;
-      if (perm !== "granted") { say("Notifications are blocked. Allow them in your browser's site settings, then try again.", false); return; }
-      var reg = await registration();
+      if (perm !== "granted") {
+        say(perm === "denied"
+          ? "Notifications are blocked. Tap the padlock next to the address bar, set Notifications to Allow, then try again."
+          : "You didn't allow notifications. Tap Turn on again and choose Allow.", false);
+        return;
+      }
+      var reg = await withTimeout(registration(), 10000, "The notification service didn't start. Reload the page and try again.");
       var sub = (await reg.pushManager.getSubscription()) ||
-        await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(KEY) });
+        await withTimeout(reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(KEY) }), 15000, "Your browser took too long to register for notifications. Try again.");
       var res = await _supabase.rpc("dating_save_push_subscription", {
         p_endpoint: sub.endpoint,
         p_p256dh: bytesToB64Url(sub.getKey("p256dh")),
@@ -76,12 +110,13 @@
       });
       if (res.error) { say("Couldn't turn on notifications: " + res.error.message, false); return; }
       await savePrefs(true);
-      say("Notifications are on for this device.", true);
-      hideBar();
+      say("✅ Notifications are on for this device.", true);
+      setTimeout(hideBar, 2500);
     } catch (e) {
-      say("Couldn't turn on notifications: " + (e && e.message ? e.message : e), false);
+      say(friendlyError(e), false);
     } finally {
-      enableBtn.disabled = false; paint();
+      if (enableBtn) enableBtn.disabled = false;
+      paint();
     }
   }
 
@@ -174,7 +209,7 @@
   }
 
   // ---- slim "turn on" bar ----
-  function hideBar() { if (bar) { bar.remove(); bar = null; } }
+  function hideBar() { if (bar) { bar.remove(); bar = null; barMsg = null; } }
   async function maybeBar() {
     if (!currentUser || bar || !supported()) return;
     if (Notification.permission !== "default" || store("wg_notify_bar_dismissed")) return;
@@ -182,9 +217,14 @@
     if (!main) return;
     bar = el("div", { style: "background:#fdecf1;border:1px solid #f4c3d1;color:#7a1c3a;border-radius:10px;padding:10px 14px;margin:0 0 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.9rem;" }, [
       el("span", { style: "flex:1;min-width:180px;", text: "🔔 Get a phone alert for new matches and messages." }),
-      el("button", { type: "button", style: "background:#e0426f;color:#fff;border:0;border-radius:18px;padding:7px 16px;font-weight:600;cursor:pointer;", text: "Turn on", onclick: function () { mountCard(); turnOn(); } }),
+      el("button", { type: "button", id: "notifyBarBtn", style: "background:#e0426f;color:#fff;border:0;border-radius:18px;padding:7px 16px;font-weight:600;cursor:pointer;", text: "Turn on", onclick: function (ev) {
+        var b = ev.currentTarget; mountCard(); b.disabled = true;
+        Promise.resolve(turnOn()).then(function () { b.disabled = false; });
+      } }),
       el("button", { type: "button", "aria-label": "Dismiss", style: "background:none;border:0;font-size:1.1rem;cursor:pointer;color:#7a1c3a;", text: "✕", onclick: function () { store("wg_notify_bar_dismissed", "1"); hideBar(); } })
     ]);
+    barMsg = el("div", { role: "status", style: "flex-basis:100%;display:none;font-size:.85rem;font-weight:600;" });
+    bar.appendChild(barMsg);
     main.insertBefore(bar, main.firstChild);
   }
 
