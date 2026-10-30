@@ -273,6 +273,7 @@
                 <button onclick="switchDatingTab('members', this)" class="tab-btn"><i class="fas fa-user-shield"></i> Members</button>
                 <button onclick="switchDatingTab('postReports', this)" class="tab-btn"><i class="fas fa-comment-dots"></i> Posts <span id="postReportsBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('verification', this)" class="tab-btn"><i class="fas fa-check-circle"></i> Verification <span id="verificationBadge" class="admin-badge" style="display:none;">0</span></button>
+                <button onclick="switchDatingTab('photos', this)" class="tab-btn"><i class="fas fa-images"></i> Photos <span id="photoReviewBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('platinum', this)" class="tab-btn"><i class="fas fa-gem"></i> Platinum <span id="platinumBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('dateplans', this)" class="tab-btn"><i class="fas fa-calendar-check"></i> Date Plans <span id="datePlansAdminBadge" class="admin-badge" style="display:none;">0</span></button>
                 <button onclick="switchDatingTab('audit', this)" class="tab-btn"><i class="fas fa-history"></i> Audit Log</button>
@@ -486,6 +487,25 @@
                 </div>
             </section>
 
+            <!-- PHOTO REVIEW -->
+            <section id="photoReviewSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin:0 0 6px;"><i class="fas fa-images" style="color:#c2185b;"></i> Dating — Photo Review</h3>
+                <p style="color:#888; font-size:0.85rem; margin:0 0 20px;">Every profile photo a member adds appears here. Photos stay visible until you reject them; a rejected photo is removed from the profile and the member is told why. Approve the ones that are fine.</p>
+                <div style="display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center;">
+                    <select id="photoReviewFilter" onchange="loadPhotoReviews()" style="padding:8px 12px; border-radius:6px; border:1px solid #ddd; font-size:0.85rem;">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All</option>
+                    </select>
+                    <button id="photoApproveAllBtn" onclick="approveAllShownPhotos()" style="display:none; font-size:0.8rem; padding:8px 14px; border:none; background:#2ed573; color:white; border-radius:6px; cursor:pointer;">✓ Approve all shown</button>
+                    <span id="photoReviewCount" style="color:#888; font-size:0.8rem;"></span>
+                </div>
+                <div id="photoReviewList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;">
+                    <p style="text-align:center; color:#bbb; padding:30px; grid-column:1/-1;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>
+                </div>
+            </section>
+
             <!-- PLATINUM REQUESTS -->
             <section id="platinumSection" style="display:none; background:white; padding:28px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                 <h3 style="margin:0 0 6px;"><i class="fas fa-gem" style="color:#B8860B;"></i> Dating — Platinum Requests</h3>
@@ -587,6 +607,7 @@
             member360: 'member360Section',
             postReports: 'postReportsSection',
             verification: 'verificationSection',
+            photos: 'photoReviewSection',
             platinum: 'platinumSection',
             dateplans: 'datePlansAdminSection',
             audit: 'auditSection'
@@ -615,6 +636,7 @@
             if (tab === 'member360') loadMember360();
             if (tab === 'postReports') loadPostReports();
             if (tab === 'verification') loadVerificationRequests();
+            if (tab === 'photos') loadPhotoReviews();
             if (tab === 'platinum') loadPlatinumRequests();
             if (tab === 'dateplans') loadAdminDatePlans();
             if (tab === 'audit') loadAdminAudit();
@@ -638,6 +660,7 @@
             else if (tab === 'member360') loadMember360(true);
             else if (tab === 'postReports') loadPostReports();
             else if (tab === 'verification') loadVerificationRequests();
+            else if (tab === 'photos') loadPhotoReviews();
             else if (tab === 'platinum') loadPlatinumRequests();
             else if (tab === 'dateplans') loadAdminDatePlans(true);
             else if (tab === 'audit') loadAdminAudit(true);
@@ -799,6 +822,8 @@
             setBadge('verificationBadge', pendingVerifications);
             setBadge('platinumBadge', pendingPlatinum);
             setBadge('datePlansAdminBadge', pendingDatePlans);
+            _supabase.from('dating_photo_reviews').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+                .then(r => { if (!r.error) setBadge('photoReviewBadge', r.count); });
             const setKpi = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = (n ?? '—'); };
             setKpi('kpiOpenReports', openReports);
             setKpi('kpiOpenPostReports', openPostReports);
@@ -1279,6 +1304,91 @@
             resolvePlatinumRequest(requestId, 'rejected', note.trim() || null);
         }
 
+
+        // ---------- PHOTO REVIEW ----------
+        const PHOTO_REJECT_REASONS = [
+            'Not a clear photo of you',
+            'Shows another person',
+            'Nudity or sexual content',
+            'Contains contact details or advertising',
+            'Photo does not follow our photo rules',
+            'Other…'
+        ];
+        let _photoRows = [];
+
+        async function loadPhotoReviews() {
+            const list = document.getElementById('photoReviewList');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px; grid-column:1/-1;"><i class="fas fa-circle-notch fa-spin"></i> Loading…</p>';
+            const status = document.getElementById('photoReviewFilter').value;
+            const { data, error } = await _supabase.rpc('dating_admin_photo_queue', { p_status: status, p_limit: 60 });
+            if (error) {
+                list.innerHTML = `<p style="color:#b42318; grid-column:1/-1;">Couldn't load photos: ${escapeHtml(error.message)}${/does not exist/i.test(error.message) ? '<br><small>Run dating-migration-v55-photo-review.sql first.</small>' : ''}</p>`;
+                return;
+            }
+            _photoRows = data || [];
+            document.getElementById('photoReviewCount').textContent = _photoRows.length ? `${_photoRows.length} shown` : '';
+            document.getElementById('photoApproveAllBtn').style.display = (status === 'pending' && _photoRows.length) ? '' : 'none';
+            if (!_photoRows.length) {
+                list.innerHTML = '<p style="text-align:center; color:#bbb; padding:30px; grid-column:1/-1;">' + (status === 'pending' ? 'No photos waiting for review. 🎉' : 'Nothing here.') + '</p>';
+                return;
+            }
+            const urls = await Promise.all(_photoRows.map(r => resolvePrivateUrl(BUCKET_PROFILE_PHOTOS, r.photo)));
+            const color = { pending: '#b7791f', approved: '#1b7f3b', rejected: '#b42318' };
+            list.innerHTML = _photoRows.map((r, i) => `
+                <div style="border:1px solid #eee; border-radius:10px; overflow:hidden; background:#fff;">
+                    ${urls[i]
+                        ? `<a href="${escapeHtml(urls[i])}" target="_blank" rel="noopener"><img src="${escapeHtml(urls[i])}" loading="lazy" style="width:100%; height:220px; object-fit:cover; display:block;"></a>`
+                        : `<div style="height:220px; display:flex; align-items:center; justify-content:center; background:#f6f7f9; color:#b42318; font-size:0.78rem; padding:10px; text-align:center;">Couldn't load this photo (deleted file or bucket policy).</div>`}
+                    <div style="padding:10px 12px; font-size:0.82rem;">
+                        <div style="display:flex; justify-content:space-between; gap:6px; align-items:center;">
+                            <strong>${escapeHtml(r.display_name || 'Member')}${r.age ? ', ' + escapeHtml(String(r.age)) : ''}</strong>
+                            <span style="color:${color[r.status] || '#888'}; font-size:0.68rem; font-weight:700; text-transform:uppercase;">${escapeHtml(r.status)}</span>
+                        </div>
+                        <div style="color:#999; font-size:0.74rem; margin:2px 0 8px;">${r.city ? escapeHtml(r.city) + ' · ' : ''}${r.is_main ? 'main photo · ' : ''}${new Date(r.created_at).toLocaleDateString()}</div>
+                        ${r.status === 'rejected' && r.reason ? `<div style="color:#b42318; font-size:0.74rem; margin-bottom:6px;">${escapeHtml(r.reason)}</div>` : ''}
+                        ${r.status === 'pending' ? `
+                            <select id="photoReason-${r.id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:5px; font-size:0.74rem; margin-bottom:6px;">
+                                ${PHOTO_REJECT_REASONS.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}
+                            </select>
+                            <div style="display:flex; gap:6px;">
+                                <button onclick="reviewPhoto('${r.id}', 'approved')" style="flex:1; font-size:0.76rem; padding:6px; border:none; background:#2ed573; color:white; border-radius:5px; cursor:pointer;">Approve</button>
+                                <button onclick="reviewPhoto('${r.id}', 'rejected')" style="flex:1; font-size:0.76rem; padding:6px; border:1px solid #ff4757; color:#ff4757; background:white; border-radius:5px; cursor:pointer;">Reject</button>
+                            </div>` : ''}
+                    </div>
+                </div>`).join('');
+        }
+
+        async function reviewPhoto(id, decision) {
+            let reason = null;
+            if (decision === 'rejected') {
+                reason = (document.getElementById('photoReason-' + id) || {}).value || null;
+                if (!reason || reason === 'Other…') {
+                    reason = prompt('Reason for removing this photo (the member will see it):', '');
+                    if (reason === null) return;
+                    reason = reason.trim() || null;
+                }
+                if (!confirm('Remove this photo from the profile and tell the member?\n\nReason: ' + (reason || 'Photo does not follow our photo rules'))) return;
+            }
+            const { error } = await _supabase.rpc('dating_admin_review_photo', { p_review: id, p_decision: decision, p_reason: reason });
+            if (error) { alert('Failed: ' + error.message); return; }
+            loadPhotoReviews();
+            refreshDatingBadges();
+        }
+
+        async function approveAllShownPhotos() {
+            const pending = _photoRows.filter(r => r.status === 'pending');
+            if (!pending.length) return;
+            if (!confirm('Approve all ' + pending.length + ' photos shown? Only do this after you have looked at them.')) return;
+            let failed = 0;
+            for (const r of pending) {
+                const { error } = await _supabase.rpc('dating_admin_review_photo', { p_review: r.id, p_decision: 'approved', p_reason: null });
+                if (error) failed++;
+            }
+            if (failed) alert(failed + ' photo(s) could not be approved.');
+            loadPhotoReviews();
+            refreshDatingBadges();
+        }
 
         // ---------- ADMIN 2.0 OVERVIEW ----------
         async function loadAdminOverview() {
