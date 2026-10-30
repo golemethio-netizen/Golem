@@ -3204,8 +3204,8 @@ function renderVerificationBox(profile, latestRequest){
 // unusable account. Edit this list to add, change or remove a method.
 const PLATINUM_PAYMENT_METHODS = [
   { icon: "🏦", method: "Commercial Bank of Ethiopia (CBE)", accountName: "Abebe", number: "1000******1212" /* put the FULL account number here */ },
-  { icon: "📱", method: "Telebirr", accountName: "Kebede", number: "0942317229" },
-  { icon: "📱", method: "M-Pesa", accountName: "Aster", number: "0707022845" }
+  { icon: "📱", method: "Telebirr", accountName: "Kebede", number: "094++++7532" },
+  { icon: "📱", method: "M-Pesa", accountName: "Aster", number: "07090""""" }
 ];
 function platinumPaymentMethodsReady(){
   return PLATINUM_PAYMENT_METHODS.filter(m => m.number && m.accountName && !/[*]|FILL IN/i.test(String(m.number)));
