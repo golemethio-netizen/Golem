@@ -2403,7 +2403,7 @@ async function startCall(recipientId, recipientName){
   }
   currentCallRow = callRow;
 
-  const myName = currentUser.user_metadata?.full_name || "Someone";
+  const myName = (myProfile && myProfile.display_name) || "Someone"; // dating profile name, never the sign-in/email name
   const notifyChan = _supabase.channel(`call:${recipientId}`);
   await new Promise(res => notifyChan.subscribe(status => { if (status === "SUBSCRIBED") res(); }));
   notifyChan.send({ type: "broadcast", event: "ring",
@@ -4110,4 +4110,3 @@ function homeRecommendationScore(me,r){
   if(r.created_at&&Date.now()-new Date(r.created_at).getTime()<7*86400000)s+=3;
   return Math.min(99,s);
 }
-
