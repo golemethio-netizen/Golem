@@ -424,7 +424,7 @@
     window.showOutgoingCallUI(recipientName);
     startRingback();
 
-    var myName = (currentUser.user_metadata && currentUser.user_metadata.full_name) || "Someone";
+    var myName = (typeof myProfile !== "undefined" && myProfile && myProfile.display_name) || "Someone"; // dating profile name, never the sign-in/email name
     var notifyChan = _supabase.channel("call:" + recipientId);
     await new Promise(function (res) { notifyChan.subscribe(function (s) { if (s === "SUBSCRIBED") res(); }); });
     notifyChan.send({ type: "broadcast", event: "ring",
