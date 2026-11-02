@@ -1403,6 +1403,8 @@ const MNAV_PRIMARY_TABS = ["home", "browse", "messages", "likes", "myprofile"];
 
 function switchTab(tab){
   closeMoreSheet();
+  document.body.classList.toggle("on-messages", tab === "messages");
+  if (tab !== "messages"){ const pane = document.getElementById("chatPane"); if (pane && pane.innerHTML) closeModal(); }
   if (tab === 'home' && currentUser) setTimeout(loadHomeRecommendations, 80);
 
   // Desktop sidebar tabs
@@ -2144,7 +2146,17 @@ async function swapModalPhoto(url, thumbEl){
   thumbEl.parentElement.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
   thumbEl.classList.add("active");
 }
-function closeModal(){ document.getElementById("modalRoot").innerHTML = ""; currentOpenThread = null; returnThread = null; document.body.classList.remove("chat-open"); }
+function closeModal(){
+  document.getElementById("modalRoot").innerHTML = "";
+  const pane = document.getElementById("chatPane"); if (pane) pane.innerHTML = "";
+  document.querySelectorAll(".thread-row.active").forEach(r => r.classList.remove("active"));
+  currentOpenThread = null; returnThread = null; document.body.classList.remove("chat-open");
+}
+// Wide screens (laptop / desktop): the conversation opens beside the list, like Facebook / Telegram Web.
+function chatSplitMode(){
+  const panel = document.getElementById("messagesPanel");
+  return window.matchMedia("(min-width: 900px)").matches && !!panel && panel.style.display !== "none" && !!document.getElementById("chatPane");
+}
 
 // ---------- Likes / Matches ----------
 async function checkMatch(otherUserId){
@@ -2748,7 +2760,8 @@ async function loadThreads(){
   thread.profileId = (p && p.id) || thread.messages[0].profile_id;
       
     const div = document.createElement("div");
-    div.className = "thread-row" + (unreadCount ? " unread" : "");
+    div.className = "thread-row" + (unreadCount ? " unread" : "") + (currentOpenThread && currentOpenThread.other === thread.other && chatSplitMode() ? " active" : "");
+    div.dataset.other = thread.other;
     div.setAttribute("role", "button");
     div.tabIndex = 0;
     div.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openThread(thread); } };
@@ -2832,10 +2845,12 @@ async function openThread(thread){
   const wasNearBottom = !oldBox || (oldBox.scrollHeight - oldBox.scrollTop - oldBox.clientHeight < 80);
   const oldScrollTop = oldBox ? oldBox.scrollTop : 0;
 
-  const root = document.getElementById("modalRoot");
+  const split = chatSplitMode();
+  const root = document.getElementById(split ? "chatPane" : "modalRoot");
+  if (split) document.getElementById("modalRoot").innerHTML = "";
   root.innerHTML = `
-    <div class="modal-backdrop chat-backdrop" onclick="if(event.target===this) closeModal()">
-      <div class="modal chat-modal" role="dialog" aria-label="Conversation with ${otherName}">
+    <div class="${split ? "chat-inline-wrap" : "modal-backdrop chat-backdrop"}" ${split ? "" : `onclick="if(event.target===this) closeModal()"`}>
+      <div class="modal chat-modal${split ? " chat-inline" : ""}" role="${split ? "region" : "dialog"}" aria-label="Conversation with ${otherName}">
         <header class="chat-head">
           <span class="chat-who" onclick="viewProfileFromThread('${thread.other}', true)" title="View profile">
             <span class="chat-avatar" ${headerPhoto && !headerPhotoIsUrl ? `data-profile-media-bg="${esc(headerPhoto)}"` : ""} style="${headerPhotoIsUrl ? `background-image:url('${esc(headerPhoto)}')` : ""}">${headerPhoto ? "" : "👤"}</span>
@@ -2860,13 +2875,19 @@ async function openThread(thread){
           <div id="recordStatus" class="chat-record"></div>
           <div class="chat-input-row">
             <button class="chat-mic" id="micBtn" onclick="toggleVoiceRecording('${thread.profileId}','${thread.other}')" title="Record voice message" aria-label="Record voice message" type="button">🎤</button>
-            <textarea id="replyBody" rows="1" maxlength="1000" placeholder="Type a message…" aria-label="Message"></textarea>
+            <button class="chat-geez" id="geezBtn" type="button" aria-pressed="false" aria-label="Amharic typing">አ</button>
+            <textarea id="replyBody" rows="1" maxlength="1000" placeholder="Type a message…" aria-label="Message" lang="am"></textarea>
             <button class="chat-send" id="sendReplyBtn" onclick="sendReply('${thread.profileId}','${thread.other}');" aria-label="Send message" type="button">Send</button>
           </div>
         </footer>
       </div>
     </div>`;
-    document.body.classList.add("chat-open");
+    document.body.classList.toggle("chat-open", !split);
+    document.querySelectorAll(".thread-row").forEach(r => {
+      const on = r.dataset.other === thread.other;
+      r.classList.toggle("active", split && on);
+      if (on){ r.classList.remove("unread"); const u = r.querySelector(".thread-unread"); if (u) u.remove(); }
+    });
 
     window._lastRenderedThread = thread.other;
     const chatBox = document.getElementById("threadMessages");
@@ -2880,11 +2901,12 @@ async function openThread(thread){
     if (chatBox) chatBox.scrollTop = (!sameThread || wasNearBottom) ? chatBox.scrollHeight : oldScrollTop;
 
     const replyBox = document.getElementById("replyBody");
+    if (replyBox && window.GeezInput) window.GeezInput.attach(replyBox, document.getElementById("geezBtn"));
     if (replyBox){
       const grow = () => { replyBox.style.height = "auto"; replyBox.style.height = Math.min(replyBox.scrollHeight, 140) + "px"; };
       replyBox.addEventListener("input", grow);
       if (draft) { replyBox.value = draft; grow(); }
-      if (hadFocus) { replyBox.focus(); replyBox.setSelectionRange(replyBox.value.length, replyBox.value.length); }
+      if (hadFocus || (split && !sameThread)) { replyBox.focus(); replyBox.setSelectionRange(replyBox.value.length, replyBox.value.length); }
       // Enter sends, Shift+Enter adds a new line. Not on phones, where Enter should stay a new line.
       if (!window.matchMedia("(pointer: coarse)").matches){
         replyBox.addEventListener("keydown", (e) => {
