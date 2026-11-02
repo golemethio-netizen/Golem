@@ -251,3 +251,79 @@ body.chat-open { overflow: hidden; }
 .chat-menu button:hover { background: var(--paper); }
 .chat-menu button.danger { color: var(--danger); }
 .chat-menu button.danger:hover { background: var(--danger-soft); }
+
+
+/* ---------- Ethiopic text: fonts that actually contain Amharic glyphs ---------- */
+.cmsg .msg-bubble, .chat-input-row textarea, .thread-preview, .thread-name, .chat-name {
+  font-family: inherit, "Noto Sans Ethiopic", "Nyala", "Abyssinica SIL", "Ebrima", sans-serif;
+}
+/* Amharic typing toggle (the "አ" button next to the message box) */
+.chat-geez {
+  width: 44px; height: 44px; flex: 0 0 auto; border-radius: 22px; cursor: pointer;
+  border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink-soft);
+  font: inherit; font-weight: 800; font-size: 1.05rem; font-family: "Noto Sans Ethiopic", "Nyala", "Abyssinica SIL", "Ebrima", sans-serif;
+}
+.chat-geez:hover { background: #fff; }
+.chat-geez.on { background: var(--green-soft, #fde8ef); color: var(--green-dark, #b8294f); border-color: var(--green, #e0426f); box-shadow: 0 0 0 3px var(--green-glow, rgba(224,66,111,.18)); }
+
+/* ---------- Laptop / desktop: list on the left, conversation on the right (Facebook / Telegram Web style) ---------- */
+#chatPane:empty { display: none; }
+@media (min-width: 900px) {
+  #messagesPanel .msg-split {
+    display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    height: calc(100vh - 270px); min-height: 460px; max-height: 820px;
+    border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface, #fff);
+  }
+  #messagesPanel .msg-list-col { overflow-y: auto; border-right: 1px solid var(--line); min-height: 0; background: var(--surface, #fff); }
+  #messagesPanel #threadList { max-width: none; gap: 0; }
+  #messagesPanel .thread-row { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none; padding: 12px 14px; }
+  #messagesPanel .thread-row:hover { background: var(--paper); }
+  #messagesPanel .thread-row.unread { background: var(--green-soft); }
+  #messagesPanel .thread-row.active { background: var(--green-soft); box-shadow: inset 3px 0 0 var(--green); }
+  #messagesPanel #messagesEmpty { padding: 28px 16px; }
+
+  #messagesPanel .msg-chat-col { min-width: 0; min-height: 0; display: flex; background: var(--paper); }
+  #messagesPanel #chatPane:empty { display: flex; align-items: center; justify-content: center; }
+  #messagesPanel #chatPane:empty::before {
+    content: "💬  Select a conversation to start chatting";
+    color: var(--muted); font-weight: 600; font-size: 1rem;
+  }
+  .chat-inline-wrap { display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; width: 100%; }
+  .modal.chat-modal.chat-inline {
+    position: static; transform: none; animation: none;
+    width: 100%; max-width: none; height: 100%; max-height: none;
+    border-radius: 0 !important; box-shadow: none !important; border: 0;
+  }
+  .chat-inline .chat-close { display: none; }
+  .chat-inline .cmsg { max-width: min(68%, 520px); }
+  .chat-inline .chat-scroll { padding: 18px 22px; }
+  .chat-inline .chat-composer { padding: 12px 16px; }
+}
+
+/* Messages tab on a wide screen: give the chat the room of the right-hand "new matches" rail */
+@media (min-width: 900px) {
+  body.on-messages .app-shell { grid-template-columns: 260px minmax(0, 1fr) !important; grid-template-areas: "sidebar content" !important; }
+  body.on-messages .app-shell > #rightMatchRail { display: none !important; }
+  .chat-input-row textarea { min-width: 140px; }
+  #messagesPanel #chatPane:empty { text-align: center; padding: 0 24px; }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+  #messagesPanel .msg-split { grid-template-columns: 270px minmax(0, 1fr); }
+  .chat-inline .chat-input-row { gap: 6px; }
+  .chat-inline .chat-input-row textarea { min-width: 0; padding-left: 12px; padding-right: 12px; }
+  .chat-inline .chat-mic, .chat-inline .chat-geez { width: 40px; }
+  .chat-inline .chat-send { padding: 0 14px; }
+  .chat-inline .chat-composer { padding: 10px 10px; }
+}
+
+/* Floating "አ" switch that appears above the text box you are typing in */
+.geez-pill {
+  position: fixed; z-index: 9999; height: 30px; min-width: 38px; padding: 0 10px; border-radius: 15px;
+  border: 1px solid var(--line-strong, #ccd); background: #fff; color: var(--ink-soft, #445);
+  font: 800 .9rem "Noto Sans Ethiopic", "Nyala", "Abyssinica SIL", "Ebrima", sans-serif; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(18, 20, 26, .16);
+}
+.geez-pill[hidden] { display: none; }
+.geez-pill.on { background: var(--green, #e0426f); border-color: var(--green-dark, #b8294f); color: #fff; }
+input, textarea { font-family: inherit, "Noto Sans Ethiopic", "Nyala", "Abyssinica SIL", "Ebrima", sans-serif; }
