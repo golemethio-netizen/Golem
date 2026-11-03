@@ -93,7 +93,7 @@
     if(mode==="in_person"&&!location_name){msg.innerHTML='<div class="msg error">Choose a public place for an in-person date.</div>';return}
     if(meeting_link && !/^https:\/\//i.test(meeting_link)){msg.innerHTML='<div class="msg error">Meeting links must use HTTPS.</div>';return}
     btn.disabled=true;btn.textContent="Sending…";
-    const {data,error}=await _supabase.rpc("dating_create_date_plan_v2",{p_recipient_id:recipientId,p_date_on:date_on,p_start_time:start_time,p_mode:mode,p_location_name:mode==="online"?null:location_name,p_city:city||null,p_online_platform:mode==="online"?platform:null,p_meeting_link:mode==="online"?meeting_link:null,p_notes:notes||null,p_title:`Date with ${recipientName||"your match"}`});
+    const {data,error}=await _supabase.rpc("dating_create_date_plan_v2",{p_recipient_id:recipientId,p_date_on:date_on,p_start_time:start_time,p_mode:mode,p_location_name:mode==="online"?("Online"+(platform?" · "+platform:"")):location_name,p_city:city||null,p_online_platform:mode==="online"?platform:null,p_meeting_link:mode==="online"?meeting_link:null,p_notes:notes||null,p_title:`Date with ${recipientName||"your match"}`});
     if(error){msg.innerHTML=`<div class="msg error">Could not create the date invitation: ${esc2(error.message)}. If the database migration has not been run, install the Smart Match 2.0 migration.</div>`;btn.disabled=false;btn.textContent="Send Date Invitation 📅";return}
     closeModal(); switchTab("dateplans"); await loadDatePlans(); refreshDatePlanBadge();
   }
