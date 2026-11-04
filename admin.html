@@ -984,7 +984,25 @@
             const { data: users, error } = await query.order('created_at', { ascending: false });
             if (error) { list.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
             
+            // Where did each person register — marketplace or dating? (needs the v58 SQL; column just shows "—" without it)
+            window._userOrigins = window._userOrigins || {};
+            try {
+                const { data: og, error: ogErr } = await _supabase.rpc('admin_user_origins');
+                if (!ogErr && Array.isArray(og)) { window._userOrigins = {}; og.forEach(r => { window._userOrigins[r.user_id] = r; }); }
+            } catch (_) {}
             renderUserTable(users, filter);
+        }
+
+        function originBadge(userId) {
+            const r = (window._userOrigins || {})[userId];
+            if (!r) return '<span style="color:#bbb;">—</span>';
+            const dating = r.origin === 'dating';
+            const base = dating
+                ? '<span style="background:#fde8ef;color:#b8294f;padding:3px 8px;border-radius:12px;font-weight:600;font-size:0.75rem;">💞 Dating</span>'
+                : '<span style="background:#e8f5ee;color:#0A291A;padding:3px 8px;border-radius:12px;font-weight:600;font-size:0.75rem;">🛒 Marketplace</span>';
+            const also = (!dating && r.uses_dating) ? '<div style="font-size:0.68rem;color:#b8294f;margin-top:3px;">also has a dating profile</div>' : '';
+            const guess = r.origin_certain ? '' : '<div style="font-size:0.65rem;color:#999;margin-top:2px;">best guess</div>';
+            return base + also + guess;
         }
 
         // Accounts created via the Phone tab get an internal placeholder email
@@ -1012,6 +1030,7 @@
                         <tr style="border-bottom: 2px solid #eee; text-align:left; color: #666; font-size: 0.9rem;">
                             <th style="padding:12px;">User Info</th>
                             <th>Location</th>
+                            <th>Registered on</th>
                             <th>Source (UTM)</th>
                             <th>Joined</th>
                             <th>Admin</th>
@@ -1036,6 +1055,7 @@
                                     </div>
                                 </td>
                                 <td style="font-size:0.85rem; color:#555;">${escapeHtml(u.location || 'Unknown')}</td>
+                                <td style="font-size:0.85rem;">${originBadge(u.id)}</td>
                                 <td style="font-size:0.85rem; color:#555;">
                                     ${u.utm_source ? `<span style="background:#e1f5fe; color:#0288d1; padding:3px 8px; border-radius:12px; font-weight:600; font-size:0.75rem;">${escapeHtml(u.utm_source)}</span>` : 'Organic'}
                                 </td>
