@@ -1,0 +1,115 @@
+/* Wana Dating — visual polish. Loaded LAST, so it only restyles; no markup or logic depends on it.
+ * Direction: deep plum + rose from the brand, warm blush-white paper, and one signature detail taken from
+ * the embroidered tilet band on Ethiopian dress: a thin woven border of green, gold and red diamonds. */
+
+:root {
+  --paper: #faf6f6;
+  --line: #efe4e8;
+  --line-strong: #e2d3d9;
+  --plum: #2a1033;
+  --tibeb: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='8' viewBox='0 0 36 8'%3E%3Cpath d='M6 0l6 4-6 4-6-4z' fill='%23078930'/%3E%3Cpath d='M18 0l6 4-6 4-6-4z' fill='%23FCDD09'/%3E%3Cpath d='M30 0l6 4-6 4-6-4z' fill='%23DA121A'/%3E%3C/svg%3E");
+}
+html body { background: var(--paper); }
+
+/* ---------- Signature detail: the woven band ---------- */
+header::after, .gate-hero::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px;
+  background: var(--tibeb) repeat-x left bottom / 36px 8px; pointer-events: none;
+}
+
+/* ---------- Public landing hero ---------- */
+body .gate-hero {
+  min-height: 560px; padding: 72px 8vw 80px;
+  align-items: flex-start; justify-content: center; text-align: left;
+  border-radius: 0 0 32px 32px;
+  background-color: #fffaf8;
+  background-image:
+    linear-gradient(90deg, #fffaf8 0%, rgba(255,250,248,.97) 36%, rgba(255,250,248,.5) 55%, rgba(255,250,248,0) 72%),
+    url("../images/ethiopian-dating-bg.webp");
+  background-size: 100% 100%, cover;
+  background-position: 0 0, 78% 38%;
+  background-repeat: no-repeat;
+}
+.gate-hero > * { max-width: 540px; }
+.gate-logo-row { justify-content: flex-start; }
+.gate-logo-title { color: var(--plum); font-size: 3rem; letter-spacing: -.02em; }
+.gate-logo-title .dating-script { color: #d12f5f; }
+.gate-logo-amharic { color: #0a7a35; font-size: 1.3rem; }
+.gate-logo-sub { color: #6b5a63; font-size: .95rem; font-weight: 500; }
+.gate-tagline { color: #4a1a4f; font-size: 1.55rem; line-height: 1.3; margin-top: 22px; }
+.gate-tagline .tagline-heart { color: #d12f5f; }
+.gate-hero-desc { margin-left: 0; max-width: 460px; font-size: 1.02rem; line-height: 1.65; color: #4a3a50; }
+.gate-hero-cta { align-items: flex-start; }
+.gate-hero-cta a { color: #6b3a5e !important; font-size: .9rem !important; }
+.gate-hero-cta a:hover { color: #b8294f !important; text-decoration: underline; }
+.gate-hero-cta .btn-signin { box-shadow: 0 10px 26px rgba(184,41,79,.28); }
+
+@media (max-width: 700px) {
+  body .gate-hero {
+    padding: 372px 22px 44px; min-height: 0; border-radius: 0 0 26px 26px;
+    background-image:
+      linear-gradient(180deg, rgba(255,250,248,0) 0, rgba(255,250,248,0) 250px, #fffaf8 372px),
+      url("../images/ethiopian-dating-bg.webp");
+    background-size: 100% 100%, auto 380px;
+    background-position: 0 0, 60% 0;
+  }
+  .gate-hero > * { max-width: none; }
+  .gate-logo-row { flex-direction: row; align-items: center; text-align: left; gap: 14px; }
+  .gate-logo-text { text-align: left; }
+  .gate-logo-title { font-size: 2.3rem; }
+  .gate-tagline { font-size: 1.25rem; }
+  .gate-hero-cta .btn-signin { max-width: none; width: 100%; }
+}
+
+/* Landing sections: quieter labels, calmer cards */
+.gate-eyebrow { text-transform: none; letter-spacing: 0; font-size: .95rem; background: none; padding: 0; color: var(--green-dark); }
+.gate-section h2, .gate-cta-band h2 { color: var(--plum); }
+.gate-feature-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: none; padding: 22px; }
+.gate-feature-card .icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: var(--green-soft); font-size: 1.35rem; margin-bottom: 14px; }
+.gate-feature-card h3 { color: var(--plum); }
+
+/* ---------- Signed-in app ---------- */
+.panel { border-color: var(--line); box-shadow: 0 8px 28px rgba(42,16,51,.05); }
+.browse-header h2 { font-family: var(--font-display); color: var(--plum); letter-spacing: -.01em; }
+.browse-header h2 span { color: var(--green); }
+.browse-header p { color: #6b5a63; }
+
+.side-nav .tab.active, .sidebar .tab.active { background: var(--green-soft); color: var(--green-dark); }
+#matchRailCountry { color: var(--green); }
+.wana-right-match-card .wana-right-match-footer button { background: linear-gradient(135deg, var(--green), var(--green-dark)); text-transform: none; letter-spacing: 0; font-size: .88rem; font-weight: 700; padding: 11px 10px; }
+
+/* ---------- Member cards: the photo carries the card, the name sits on it ---------- */
+.card { position: relative; border: 0 !important; border-radius: 20px !important; background: var(--plum); box-shadow: 0 8px 24px rgba(42,16,51,.12) !important; }
+.card:hover { transform: translateY(-4px) !important; box-shadow: 0 16px 36px rgba(42,16,51,.2) !important; }
+.card .photo {
+  aspect-ratio: 4 / 5 !important; font-size: 3.4rem; color: rgba(255,255,255,.45);
+  background: linear-gradient(160deg, #4a1a4f 0%, #b8294f 100%) center / cover no-repeat;
+}
+.card .info {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 56px 16px 14px;
+  background: linear-gradient(180deg, rgba(42,16,51,0) 0%, rgba(42,16,51,.78) 55%, rgba(42,16,51,.92) 100%);
+  color: #fff;
+}
+.card .info .name-age { color: #fff; font-size: 1.12rem; font-weight: 700; letter-spacing: -.01em; }
+.card .info .name-age .age { color: rgba(255,255,255,.82); font-weight: 500; font-size: .95rem; }
+.card .info .meta { color: rgba(255,255,255,.8); font-size: .85rem; }
+.card .info .presence { color: rgba(255,255,255,.7); margin-top: 3px; }
+.card .info .presence.is-online { color: #86efac; }
+.online-dot { top: 14px; right: 14px; }
+
+/* ---------- Small details ---------- */
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+::selection { background: rgba(224,66,111,.22); }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none !important; } }
+
+/* Tablets: keep the text clear of the faces */
+@media (min-width: 701px) and (max-width: 960px) {
+  body .gate-hero {
+    background-image:
+      linear-gradient(90deg, #fffaf8 0%, rgba(255,250,248,.97) 46%, rgba(255,250,248,.55) 66%, rgba(255,250,248,0) 86%),
+      url("../images/ethiopian-dating-bg.webp");
+    background-position: 0 0, 88% 38%;
+  }
+  .gate-hero > * { max-width: 400px; }
+  .gate-tagline { font-size: 1.35rem; }
+}
