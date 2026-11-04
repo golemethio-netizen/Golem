@@ -73,9 +73,22 @@ function logSiteVisit() {
     }
 }
 
+// Brand-new accounts (created in the last 10 minutes) that have no "signup_source" yet get tagged with the
+// site they are on. Old accounts are never re-tagged.
+async function tagSignupSource(source) {
+    try {
+        const { data } = await _supabase.auth.getUser();
+        const u = data && data.user;
+        if (!u || (u.user_metadata && u.user_metadata.signup_source)) return;
+        if (Date.now() - new Date(u.created_at).getTime() > 10 * 60 * 1000) return;
+        await _supabase.auth.updateUser({ data: { signup_source: source } });
+    } catch (e) {}
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 WanaGebya System Initializing...");
     logSiteVisit(); // fire-and-forget, never blocks page load
+    tagSignupSource('market'); // marks brand-new accounts (e.g. Google sign-ups) with where they registered
     await window.updateUIForUser();
     window.updateCartBadge();
     window.fetchProducts();
@@ -1560,7 +1573,7 @@ window.handleAuth = async function(e) {
 
         const { data, error } = await _supabase.auth.signUp({
             email, password,
-            options: { data: { full_name: fullName, phone_number: phone, location, bio } }
+            options: { data: { full_name: fullName, phone_number: phone, location, bio, signup_source: 'market' } }
         });
         if (error) { authToast(error.message, 'error'); }
         else if (data && data.session) {
