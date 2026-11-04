@@ -176,8 +176,8 @@
         ${showOnlineDot && presence.online ? `<span class="online-dot" title="Online now"></span>` : ""}
       </div>
       <div class="info">
-        <div class="name-age">${displayName.toUpperCase()}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
-        <div class="meta">${esc(row.city || "")} · ${esc(row.relationship_type || "")}</div>
+        <div class="name-age">${displayName}${verifiedBadge(row.is_verified)}${platinumBadge(isPlatinumActive(row))} <span class="age">${row.age || "?"} yrs</span></div>
+        <div class="meta">${[row.city, row.relationship_type].filter(Boolean).map(esc).join(" · ")}</div>
         ${metaLine || ""}
       </div>`;
 
