@@ -228,15 +228,15 @@
                 </div>
                 <div class="stat-card" style="border-left:5px solid #8e44ad;">
                     <i class="fas fa-user-clock" style="color:#8e44ad;opacity:1;"></i>
-                    <div><h4 id="vKpiVisitorsToday">—</h4><p>Unique Visitors Today</p></div>
+                    <div><h4 id="vKpiVisitorsToday">—</h4><p>Unique Visitors Today</p><p id="vKpiVisitorsTodaySplit" style="font-size:.72rem;margin-top:2px;opacity:.85;"></p></div>
                 </div>
                 <div class="stat-card" style="border-left:5px solid #8e44ad;">
                     <i class="fas fa-calendar-week" style="color:#8e44ad;opacity:1;"></i>
-                    <div><h4 id="vKpiVisitorsWeek">—</h4><p>Unique Visitors (Last 7 Days)</p></div>
+                    <div><h4 id="vKpiVisitorsWeek">—</h4><p>Unique Visitors (Last 7 Days)</p><p id="vKpiVisitorsWeekSplit" style="font-size:.72rem;margin-top:2px;opacity:.85;"></p></div>
                 </div>
                 <div class="stat-card" style="border-left:5px solid #8e44ad;">
                     <i class="fas fa-users" style="color:#8e44ad;opacity:1;"></i>
-                    <div><h4 id="vKpiUniqueVisitors">—</h4><p>Site Reach (All-Time)</p></div>
+                    <div><h4 id="vKpiUniqueVisitors">—</h4><p>Site Reach (All-Time)</p><p id="vKpiUniqueVisitorsSplit" style="font-size:.72rem;margin-top:2px;opacity:.85;"></p></div>
                 </div>
             </div>
 
@@ -1642,6 +1642,16 @@ function renderCategoryIcon(iconString) {
                 if (week.error) throw week.error;
                 if (all.error) throw all.error;
 
+                // Marketplace vs dating split (needs the v57 SQL; silently skipped if it isn't installed yet)
+                try {
+                    const parts = await Promise.all([todayStart.toISOString(), weekStart.toISOString(), null].map(since =>
+                        _supabase.rpc('get_visitor_breakdown', { since })));
+                    ['vKpiVisitorsToday', 'vKpiVisitorsWeek', 'vKpiUniqueVisitors'].forEach((id, i) => {
+                        const d = parts[i].data;
+                        const el = document.getElementById(id + 'Split');
+                        if (el && d && !parts[i].error) el.textContent = `🛒 Marketplace ${Number(d.market || 0).toLocaleString()} · 💞 Dating ${Number(d.dating || 0).toLocaleString()}`;
+                    });
+                } catch (_) {}
                 elToday.innerText = (today.data ?? 0).toLocaleString();
                 elWeek.innerText  = (week.data ?? 0).toLocaleString();
                 elAll.innerText   = (all.data ?? 0).toLocaleString();
