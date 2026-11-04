@@ -703,7 +703,7 @@ async function submitAuthForm(e){
     const { data, error } = await _supabase.auth.signUp({
       ...identifier, password,
       options: {
-        data: { full_name: fullName, phone_number: phoneNumber, location, date_of_birth: dobValue, terms_version: TERMS_VERSION, terms_accepted_at: new Date().toISOString() },
+        data: { full_name: fullName, phone_number: phoneNumber, location, date_of_birth: dobValue, terms_version: TERMS_VERSION, terms_accepted_at: new Date().toISOString(), signup_source: 'dating' },
         captchaToken: _tsToken || undefined,
         ...(isPhone ? {} : { emailRedirectTo: window.location.origin + "/dating/index.html" })
       }
