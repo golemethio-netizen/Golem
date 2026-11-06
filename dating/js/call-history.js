@@ -8,6 +8,7 @@
   var filter = "all";          // all | missed
   var cache = [];              // [{call, peerId, peer, kind, dur}]
   var LIMIT = 100;
+  var loadSeq = 0;            // newest load wins; older ones must not render
 
   function seenKey() { return "wg_calls_seen_" + (currentUser && currentUser.id); }
   function getSeen() { try { return localStorage.getItem(seenKey()) || ""; } catch (e) { return ""; } }
@@ -133,9 +134,11 @@
   window.loadCallHistory = async function () {
     var box = document.getElementById("callsList");
     if (!box || !currentUser) return;
+    var tok = ++loadSeq;
     box.innerHTML = "";
     box.appendChild(el("div", "calls-empty", "Loading…"));
     var res = await fetchCalls();
+    if (tok !== loadSeq) return;
     if (res.error) {
       box.innerHTML = "";
       box.appendChild(el("div", "calls-empty", /answered_at|does not exist|schema cache/i.test(res.error.message || "")
