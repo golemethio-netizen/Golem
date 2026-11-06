@@ -24,11 +24,17 @@
   function validateDatingImage(file){
     if (!file) throw new Error("Please choose an image.");
     if (!PROFILE_IMAGE_TYPES.has(file.type)) throw new Error("Use JPG, PNG, WEBP, or GIF images.");
-    if (file.size > PROFILE_IMAGE_MAX_BYTES) throw new Error("Images must be 5 MB or smaller.");
+    // JPG/PNG/WEBP are shrunk before upload, so large phone photos are accepted here and the
+    // 5 MB cap is enforced on the shrunk copy (see uploadPrivateProfileImage). GIFs keep 5 MB.
+    const shrinkable = /^image\/(jpeg|png|webp)$/.test(file.type) && !file.__wanaPrepared;
+    const cap = shrinkable ? 30 * 1024 * 1024 : PROFILE_IMAGE_MAX_BYTES;
+    if (file.size > cap) throw new Error(shrinkable ? "This image is too large. Choose one under 30 MB." : "Images must be 5 MB or smaller.");
   }
 
   async function uploadPrivateProfileImage(file){
     validateDatingImage(file);
+    file = await wanaPrepareImage(file);   // shrink + strip EXIF/GPS; no-op for GIFs
+    validateDatingImage(file);             // 5 MB cap now applies to the shrunk copy
     if (!currentUser) throw new Error("You must be signed in.");
     // "<uid>-<random>-<name>" matches the path convention (and the storage write policy,
     // name LIKE auth.uid()||'-%') used by every other upload in this file.
