@@ -60,12 +60,27 @@
   const STORAGE_PATH_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-/i;
   const isStoragePath = v => !!v && !/^(https?:|data:|blob:)/i.test(v) && STORAGE_PATH_RE.test(v);
 
+  const bgLazyObserver = ("IntersectionObserver" in window) ? new IntersectionObserver(entries => {
+    entries.forEach(async entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      bgLazyObserver.unobserve(el);
+      const value = el.getAttribute("data-profile-media-bg");
+      if (!value) return;
+      try {
+        const url = await resolveProfilePhoto(value);
+        if (url) el.style.backgroundImage = `url("${String(url).replace(/"/g, '\\"')}")`;
+      } catch (e) { console.warn("Lazy photo failed:", e); }
+    });
+  }, { rootMargin: "300px 0px" }) : null;
+
   async function hydrateProfileMedia(root = document){
     const imgEls = [...root.querySelectorAll("img[src]")];
     await Promise.all(imgEls.map(async img => {
       const src = img.getAttribute("src");
       if (!isStoragePath(src) || img.dataset.mediaTried) return;
       img.dataset.mediaTried = "1";
+      img.loading = "lazy"; img.decoding = "async";
       const url = await resolveProfilePhoto(src);
       if (url) img.src = url;
     }));
@@ -74,6 +89,14 @@
     await Promise.all(bgEls.map(async el => {
       const value = el.getAttribute("data-profile-media-bg");
       if (!isStoragePath(value)) return;
+      // Lazy: sign + load the photo only once the card is near the viewport
+      // (saves one signing request and one download per off-screen profile).
+      if (bgLazyObserver) {
+        if (el.dataset.mediaObs === value) return;
+        el.dataset.mediaObs = value;
+        bgLazyObserver.observe(el);
+        return;
+      }
       const url = await resolveProfilePhoto(value);
       if (url) el.style.backgroundImage = `url("${String(url).replace(/"/g, '\\"')}")`;
     }));
