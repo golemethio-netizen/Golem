@@ -10,8 +10,8 @@ self.addEventListener("push", (event) => {
   const title = String(data.title || "Wana Dating").slice(0, 80);
   const options = {
     body: String(data.body || "You have a new notification").slice(0, 160),
-    icon: "/logo.png",
-    badge: "/logo.png",
+    icon: "/dating/images/icon-192.png",
+    badge: "/dating/images/favicon-48.png",
     tag: data.tag || "wana",          // same tag = newer replaces older, so a chat doesn't pile up
     renotify: true,
     data: { url: data.url || "/dating/index.html" },
