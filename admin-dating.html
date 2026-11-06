@@ -232,6 +232,22 @@
             .golem-header>div:last-child{width:100%;justify-content:flex-start;flex-wrap:wrap}
         }
     </style>
+    <style id="admin-patch">
+        /* Admin 2.4.1 patch: layout + mobile fixes */
+        .admin-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+        .admin-tab-wrap{top:var(--admin-hdr-h,0px)}
+        @media(max-width:760px){
+            .admin-stat-grid{grid-template-columns:1fr}
+            body.admin-v2{padding-bottom:20px}
+            /* 16px stops iOS Safari from zooming the page when a field is focused */
+            body.admin-v2 input:not([type=checkbox]):not([type=radio]),
+            body.admin-v2 select,
+            body.admin-v2 textarea{font-size:16px!important}
+            /* comfortable touch targets */
+            body.admin-v2 button,.m22-btn,.admin-btn,.tab-btn,.admin-queue-btn{min-height:40px}
+            .m23-checkbox{width:20px;height:20px}
+        }
+    </style>
     <style id="admin-gate">
         /* Dashboard stays hidden until the admin check passes (data is protected by the database too) */
         body.admin-v2:not(.admin-ready){visibility:hidden}
@@ -613,10 +629,12 @@
             audit: 'auditSection'
         };
 
+        let _currentTab = 'overview';
         let _adminDatePlans = [];
         let _adminAuditRows = [];
 
         function switchDatingTab(tab, btn) {
+            _currentTab = tab;
             Object.values(DATING_SECTIONS).forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
@@ -648,9 +666,7 @@
         }
 
         function refreshCurrentAdminView() {
-            const active = document.querySelector('.tab-btn.active');
-            const match = active?.getAttribute('onclick')?.match(/'([^']+)'/);
-            const tab = match?.[1] || 'overview';
+            const tab = _currentTab || 'overview';
             if (tab === 'database') loadDatabaseHealth();
             else if (tab === 'overview') loadAdminOverview();
             else if (tab === 'safety') loadSafetyCenter(true);
@@ -668,15 +684,35 @@
         }
 
         // ---------- Auth + logging (same pattern as admin.html) ----------
+        function showAdminLoadError(msg) {
+            if (document.getElementById('adminLoadError')) return;
+            const d = document.createElement('div');
+            d.id = 'adminLoadError';
+            d.setAttribute('role', 'alert');
+            d.style.cssText = 'visibility:visible;position:fixed;inset:0;z-index:10000;background:#f5f7fb;display:flex;align-items:center;justify-content:center;padding:20px;';
+            d.innerHTML = '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:26px;max-width:380px;text-align:center;font-family:inherit;">'
+                + '<div style="font-size:2rem;">📡</div>'
+                + '<h3 style="margin:8px 0 6px;">Couldn\u2019t reach the server</h3>'
+                + '<p style="color:#6b7280;font-size:.85rem;margin:0 0 16px;">Check your connection and try again. You have not been signed out.</p>'
+                + '<button id="adminRetryBtn" style="background:#c2185b;color:#fff;border:0;border-radius:8px;padding:12px 20px;font-weight:700;cursor:pointer;min-height:44px;">Retry</button>'
+                + '</div>';
+            document.body.appendChild(d);
+            document.getElementById('adminRetryBtn').onclick = () => location.reload();
+            console.error('Admin check failed:', msg);
+        }
+
         async function checkAdmin() {
-            let user, profile;
+            let user, profile, uErr, pErr;
             try {
-                ({ data: { user } } = await _supabase.auth.getUser());
-                if (!user) { window.location.href = 'index.html'; return false; }
-                ({ data: profile } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single());
+                ({ data: { user }, error: uErr } = await _supabase.auth.getUser());
+                if (!user) {
+                    if (uErr && (uErr.name === 'AuthRetryableFetchError' || !uErr.status || uErr.status >= 500)) { showAdminLoadError(uErr.message); return false; }
+                    window.location.href = 'index.html'; return false;
+                }
+                ({ data: profile, error: pErr } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single());
+                if (pErr && !profile && pErr.code !== 'PGRST116') { showAdminLoadError(pErr.message); return false; }
             } catch (e) {
-                console.error('Admin check failed:', e);
-                window.location.href = 'index.html';
+                showAdminLoadError(e && e.message);
                 return false;
             }
             if (!profile?.is_admin) {
@@ -936,9 +972,8 @@
             const { error } = await _supabase.from('dating_reports').update({ status: newStatus }).eq('id', reportId);
             if (error) { alert('Failed: ' + error.message); return; }
             logAction(newStatus === 'dismissed' ? 'Dating Report Dismissed' : 'Dating Report Reviewed', `Report ID: ${reportId}`);
-            switchDatingTab('overview', document.querySelector('.tab-btn'));
+            loadDatingReports();
             refreshDatingBadges();
-            setInterval(refreshDatingBadges, 60000);
         }
 
         // ---------- ALL PROFILES ----------
@@ -1621,7 +1656,9 @@
                 if (el) el.style.display = 'none';
             });
             section.style.display = 'block';
+            _currentTab = 'member360';
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(".tab-btn[onclick*=\"'members'\"]")?.classList.add('active');
             content.innerHTML = '<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading Member 360°…</div>';
 
             const [
@@ -2199,10 +2236,41 @@
         }
 
 
+        // ---------- Double-tap protection ----------
+        // A second tap on the same action while the first is still running is ignored
+        // (prevents double Platinum grants, double approvals, duplicate bans, etc.).
+        ['grantPlatinum','revokePlatinum','deleteDatingProfile','deleteReportedPost',
+         'resolveDatingReport','resolvePostReport','resolveVerification','resolvePlatinumRequest',
+         'reviewVerification','reviewPlatinum','reviewPhoto','reviewMemberReport',
+         'promptRejectVerification','promptRejectPlatinumRequest','approveAllShownPhotos',
+         'terminateMatch','terminateDatePlan','suspendMember','restoreMember',
+         'createSafetyCasePrompt','updateSafetyCasePrompt','bulkUpdateSafetyCases'
+        ].forEach(name => {
+            const fn = window[name];
+            if (typeof fn !== 'function') return;
+            let busy = false;
+            window[name] = async function (...args) {
+                if (busy) return;
+                busy = true;
+                try { return await fn.apply(this, args); }
+                finally { busy = false; }
+            };
+        });
+
+        // ---------- Keep the sticky tab bar below the sticky header ----------
+        function syncAdminHeaderHeight() {
+            const h = document.querySelector('.golem-header');
+            if (h) document.documentElement.style.setProperty('--admin-hdr-h', h.offsetHeight + 'px');
+        }
+        window.addEventListener('resize', syncAdminHeaderHeight);
+        window.addEventListener('load', syncAdminHeaderHeight);
+
         // ---------- INIT ----------
         document.addEventListener('DOMContentLoaded', async () => {
+            syncAdminHeaderHeight();
             const ok = await checkAdmin();
             if (!ok) return;
+            syncAdminHeaderHeight();
             switchDatingTabByName('overview');
             refreshDatingBadges();
             setInterval(refreshDatingBadges, 60000);
