@@ -1,0 +1,19 @@
+{
+  "name": "Wana Dating",
+  "short_name": "Wana Dating",
+  "description": "Meet genuine singles across Ethiopia. Verified profiles, privacy controls and safety tools.",
+  "id": "/dating/",
+  "start_url": "/dating/index.html?source=pwa",
+  "scope": "/dating/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2a1033",
+  "theme_color": "#2a1033",
+  "lang": "en",
+  "categories": ["social", "lifestyle"],
+  "icons": [
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
