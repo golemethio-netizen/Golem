@@ -140,5 +140,9 @@
   header nav a { display: none !important; }
 }
 
-
-
+/* Fix: between 701px and 768px the sidebar is hidden (bottom nav takes over) but the 2-column
+   grid from the <=1050px rule stayed, leaving an empty 240px column on the left. */
+@media (max-width: 768px) {
+  .app-shell { display: block !important; width: 100%; max-width: none; min-height: 0; }
+  .app-shell > main { width: 100% !important; }
+}
