@@ -1,4 +1,64 @@
 // ============================================================
+// wanaPrepareImage(file, opts) -> Promise<File>
+// Shrinks phone photos before upload: re-encodes JPEG/PNG/WEBP as JPEG, longest side
+// <= opts.maxDim (default 1280px), quality opts.quality (default 0.82). A 4-8 MB phone
+// photo typically becomes ~200-500 KB, which matters on slow/metered mobile data.
+// Re-encoding also strips EXIF metadata (including GPS location) from the uploaded copy.
+// GIFs, PDFs and anything that can't be decoded are returned untouched.
+// ============================================================
+window.wanaPrepareImage = async function (file, opts) {
+  opts = opts || {};
+  var maxDim = opts.maxDim || 1280;
+  var quality = opts.quality || 0.82;
+  try {
+    if (!file || file.__wanaPrepared || !/^image\/(jpeg|png|webp)$/i.test(file.type || '')) return file;
+
+    var src = null, w = 0, h = 0, objUrl = null, bmp = null;
+    if (window.createImageBitmap) {
+      try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { bmp = null; }
+    }
+    if (bmp) { src = bmp; w = bmp.width; h = bmp.height; }
+    else {
+      objUrl = URL.createObjectURL(file);
+      src = await new Promise(function (res, rej) {
+        var im = new Image();
+        im.onload = function () { res(im); };
+        im.onerror = rej;
+        im.src = objUrl;
+      });
+      w = src.naturalWidth; h = src.naturalHeight;
+    }
+
+    try {
+      if (!w || !h) return file;
+      var scale = Math.min(1, maxDim / Math.max(w, h));
+      var tw = Math.max(1, Math.round(w * scale));
+      var th = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement('canvas');
+      canvas.width = tw; canvas.height = th;
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return file;
+      ctx.fillStyle = '#fff';            // PNG transparency -> white instead of black
+      ctx.fillRect(0, 0, tw, th);
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(src, 0, 0, tw, th);
+      var blob = await new Promise(function (res) { canvas.toBlob(res, 'image/jpeg', quality); });
+      if (!blob) return file;
+      var base = String(file.name || 'image').replace(/\.[^.]+$/, '') || 'image';
+      var out = new File([blob], base + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+      out.__wanaPrepared = true;
+      return out;
+    } finally {
+      if (bmp && bmp.close) { try { bmp.close(); } catch (e) {} }
+      if (objUrl) URL.revokeObjectURL(objUrl);
+    }
+  } catch (e) {
+    console.warn('Image preparation skipped:', e);
+    return file;
+  }
+};
+
+// ============================================================
 // In-page dialogs: wanaAlert / wanaConfirm / wanaPrompt
 // Native alert/confirm/prompt are blocked or auto-dismissed in many in-app
 // browsers (Telegram, Facebook, ...) and after iOS "prevent repeat dialogs",
@@ -1720,7 +1780,15 @@ async function submitPost(){
   const btn = document.getElementById("postSubmitBtn");
   const bodyText = document.getElementById("postBody").value.trim();
   const visibility = document.getElementById("postVisibility").value;
-  const file = pendingPostImageFile || (document.getElementById("postImage").files || [])[0] || null;
+  let file = pendingPostImageFile || (document.getElementById("postImage").files || [])[0] || null;
+  if (file && /^image\//.test(file.type || "")){
+    // Shrink big phone photos first: faster upload on mobile data, and GPS/EXIF is stripped.
+    const idleLabel = btn ? btn.textContent : "";
+    postSubmitting = true;
+    if (btn){ btn.disabled = true; btn.textContent = "Preparing photo..."; }
+    try { file = await wanaPrepareImage(file); }
+    finally { postSubmitting = false; if (btn){ btn.disabled = false; btn.textContent = idleLabel; } }
+  }
 
   if (!bodyText && !file){
     msgEl.innerHTML = `<div class="msg error">Please enter text or attach an image.</div>`;
@@ -3573,7 +3641,7 @@ async function submitPlatinumRequest(planKey, amount){
   const receiptInput = document.getElementById("platinumReceiptFile");
   const msg = document.getElementById("platinumReqMsg");
   const transactionNumber = txnInput.value.trim();
-  const receiptFile = receiptInput && receiptInput.files[0];
+  let receiptFile = receiptInput && receiptInput.files[0];
   // Proof of payment is required, but either one is enough: a receipt/
   // screenshot OR a transaction number. The number is optional when a
   // receipt is attached.
@@ -3587,6 +3655,8 @@ async function submitPlatinumRequest(planKey, amount){
   }
   let receiptPath = null;
   if (receiptFile){
+    msg.innerHTML = `<div class="msg" style="color:var(--green);">Preparing receipt...</div>`;
+    receiptFile = await wanaPrepareImage(receiptFile, { maxDim: 1600, quality: 0.85 }); // PDFs pass through untouched
     const receiptErr = checkUploadFile(receiptFile, { allowPdf: true });
     if (receiptErr){ msg.innerHTML = `<div class="msg error">${esc(receiptErr)}</div>`; return; }
     msg.innerHTML = `<div class="msg" style="color:var(--green);">Uploading receipt...</div>`;
@@ -3641,8 +3711,10 @@ function openVerificationModal(){
 async function submitVerification(){
   const fileInput = document.getElementById("verifySelfie");
   const msg = document.getElementById("verifyMsg");
-  const file = fileInput.files[0];
+  let file = fileInput.files[0];
   if (!file){ msg.innerHTML = `<div class="msg error">Choose or take a selfie first.</div>`; return; }
+  msg.innerHTML = `<div class="msg" style="color:var(--green);">Preparing photo...</div>`;
+  file = await wanaPrepareImage(file, { maxDim: 1280, quality: 0.85 });
   const selfieErr = checkUploadFile(file);
   if (selfieErr){ msg.innerHTML = `<div class="msg error">${esc(selfieErr)}</div>`; return; }
 
