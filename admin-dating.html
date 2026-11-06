@@ -749,6 +749,28 @@
         const BUCKET_POST_MEDIA = "dating-post-media";
         const BUCKET_VERIFICATION = "dating-verification";
         const BUCKET_PLATINUM_RECEIPTS = "dating-platinum-receipts";
+        // Read every row of a table, 1000 at a time (Supabase returns at most 1000 per request).
+        // makeQuery(from, to) must return a query already ordered, e.g. q => q.select('*').order('created_at').range(from, to).
+        async function adminFetchAll(makeQuery, maxRows = 20000) {
+            const all = [];
+            for (let from = 0; from < maxRows; from += 1000) {
+                const { data, error } = await makeQuery(from, from + 999);
+                if (error) return { data: all, error };
+                all.push(...(data || []));
+                if (!data || data.length < 1000) break;
+            }
+            return { data: all, error: null };
+        }
+        // Look up marketplace contact rows for a list of user ids, 150 at a time.
+        async function adminFetchContacts(ids) {
+            const out = [];
+            for (let i = 0; i < ids.length; i += 150) {
+                const { data } = await _supabase.from('profiles').select('id, full_name, email, phone, phone_number').in('id', ids.slice(i, i + 150));
+                out.push(...(data || []));
+            }
+            return out;
+        }
+
         const _adminSignedUrlCache = new Map();
         async function resolvePrivateUrl(bucket, pathOrUrl, expiresInSeconds = 3600) {
             if (!pathOrUrl) return null;
@@ -941,10 +963,7 @@
                 const userIds = _datingProfilesCache.map(p => p.user_id);
                 _datingProfilesContactMap = {};
                 if (userIds.length) {
-                    const { data: contacts } = await _supabase
-                        .from('profiles')
-                        .select('id, full_name, email, phone_number')
-                        .in('id', userIds);
+                    const contacts = await adminFetchContacts(userIds);
                     (contacts || []).forEach(c => _datingProfilesContactMap[c.id] = c);
                 }
             }
@@ -1520,11 +1539,12 @@
             if (!container) return;
             if (!_memberDirectoryCache || forceRefresh) {
                 container.innerHTML = '<div class="admin-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading members…</div>';
-                const [{ data: datingProfiles, error: dpError }, { data: contacts, error: cError }, { data: statuses }] = await Promise.all([
-                    _supabase.from('dating_profiles').select('*').order('created_at', { ascending: false }).limit(500),
-                    _supabase.from('profiles').select('id, full_name, email, phone, phone_number').limit(1000),
-                    _supabase.from('dating_account_status').select('user_id, status').limit(2000)
+                // Every member is loaded (not just the newest 500), and contact details are looked up for exactly those members.
+                const [{ data: datingProfiles, error: dpError }, { data: statuses }] = await Promise.all([
+                    adminFetchAll((a, b) => _supabase.from('dating_profiles').select('*').order('created_at', { ascending: false }).range(a, b)),
+                    adminFetchAll((a, b) => _supabase.from('dating_account_status').select('user_id, status').order('user_id').range(a, b))
                 ]);
+                const contacts = dpError ? [] : await adminFetchContacts([...new Set((datingProfiles || []).map(p => p.user_id).filter(Boolean))]);
                 if (dpError) {
                     container.innerHTML = `<div class="admin-empty" style="color:#b42318;">Could not load members: ${escapeHtml(dpError.message)}</div>`;
                     return;
