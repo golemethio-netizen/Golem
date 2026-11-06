@@ -97,9 +97,10 @@
 
   async function deleteAccount() {
     if (!currentUser) return;
-    var typed = prompt(
+    var typed = await wanaPrompt(
       "This permanently deletes your dating profile, photos, messages, likes, matches and posts. " +
-      "Your WanaGebya login stays active.\n\nThis cannot be undone. Type DELETE to confirm.");
+      "Your WanaGebya login stays active.\n\nThis cannot be undone. Type DELETE to confirm.",
+      { title: "Delete dating account", okText: "Delete forever", danger: true, placeholder: "Type DELETE" });
     if (typed === null) return;
     if (String(typed).trim() !== "DELETE") { say("Not deleted: you must type DELETE exactly.", false); return; }
     say("Deleting… please wait.", true);
@@ -111,7 +112,7 @@
         : "Couldn't delete: " + res.error.message, false);
       return;
     }
-    alert("Your dating account was deleted.");
+    await wanaAlert("Your dating account was deleted.");
     try { if (typeof signOut === "function") await signOut(); } catch (e) {}
     location.reload();
   }
