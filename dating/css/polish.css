@@ -113,3 +113,113 @@ body .gate-hero {
   .gate-hero > * { max-width: 400px; }
   .gate-tagline { font-size: 1.35rem; }
 }
+
+
+/* =====================================================================
+ * Type: a warm, soft serif for headings (Fraunces), a friendly geometric sans for everything else
+ * (Plus Jakarta Sans), Noto for Amharic so Ge'ez letters match the Latin ones in weight and rhythm.
+ * ===================================================================== */
+:root {
+  --font: "Plus Jakarta Sans", "Inter", "Noto Sans Ethiopic", -apple-system, BlinkMacSystemFont, "Segoe UI", "Nyala", sans-serif;
+  --font-display: "Fraunces", "Playfair Display", "Noto Serif Ethiopic", Georgia, "Nyala", serif;
+}
+body { font-size: 15.5px; line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3, .gate-logo-title, .gate-tagline, .wana-hero h1 { font-optical-sizing: auto; letter-spacing: -.015em; }
+h1, h2 { font-weight: 700; line-height: 1.12; }
+h3 { font-weight: 700; letter-spacing: -.01em; }
+:lang(am) h1, :lang(am) h2, :lang(am) h3 { letter-spacing: 0; line-height: 1.3; }
+button, .btn-signin, .tab, .mnav-label { font-weight: 600; letter-spacing: -.005em; }
+.card .info .name-age { font-family: var(--font-display); font-weight: 700; font-size: 1.18rem; }
+
+/* =====================================================================
+ * Motion. Short, soft, and always in answer to something: the page arriving, a screen opening,
+ * a tap. Everything is switched off for people who ask their device for less motion.
+ * ===================================================================== */
+@keyframes wgRise  { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes wgPanel { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes wgPop   { 0% { transform: scale(.7); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes wgDrift { from { background-position: 0 100%; } to { background-position: -400px 100%; } }
+@keyframes wgPing  { 0% { box-shadow: 0 0 0 0 rgba(34,197,94,.55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(34,197,94,0); } }
+@keyframes wgSweep { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(260%) skewX(-18deg); } }
+@keyframes wgBell  { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(14deg); } 30% { transform: rotate(-12deg); } 45% { transform: rotate(8deg); } 60% { transform: rotate(-5deg); } 75% { transform: rotate(0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the flower band slowly drifts: the one ambient movement on the page */
+  header::after, .gate-hero::after { animation: wgDrift 40s linear infinite; }
+
+  /* landing hero: one staged arrival, top to bottom */
+  body .gate-hero > * { animation: wgRise .8s cubic-bezier(.2,.7,.2,1) both; }
+  body .gate-hero > :nth-child(1) { animation-delay: .05s; }
+  body .gate-hero > :nth-child(2) { animation-delay: .14s; }
+  body .gate-hero > :nth-child(3) { animation-delay: .24s; }
+  body .gate-hero > :nth-child(4) { animation-delay: .34s; }
+  body .gate-hero > :nth-child(5) { animation-delay: .44s; }
+  body .gate-hero > :nth-child(n+6) { animation-delay: .52s; }
+
+  /* call-to-action: a soft light sweep on hover */
+  .gate-hero-cta .btn-signin { position: relative; overflow: hidden; }
+  .gate-hero-cta .btn-signin::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transform: translateX(-120%) skewX(-18deg); }
+  .gate-hero-cta .btn-signin:hover::after { animation: wgSweep .9s ease; }
+
+  /* opening a screen */
+  .panel { animation: wgPanel .34s cubic-bezier(.2,.7,.2,1); }
+
+  /* member cards arrive one after another, then respond to touch */
+  .card { animation: wgRise .5s cubic-bezier(.2,.7,.2,1) both; transition: transform .25s ease, box-shadow .25s ease; }
+  .card:nth-child(1) { animation-delay: .02s; } .card:nth-child(2) { animation-delay: .07s; }
+  .card:nth-child(3) { animation-delay: .12s; } .card:nth-child(4) { animation-delay: .17s; }
+  .card:nth-child(5) { animation-delay: .22s; } .card:nth-child(6) { animation-delay: .27s; }
+  .card:nth-child(n+7) { animation-delay: .3s; }
+  .card .photo { transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+  .card:hover .photo { transform: scale(1.06); }
+
+  /* taps feel physical */
+  button:not(:disabled), .tab, .mnav-item, .thread-row { transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease; }
+  button:not(:disabled):active, .mnav-item:active { transform: scale(.96); }
+  #likeBtn:active { animation: wgPop .35s ease; }
+
+  /* mobile bottom bar: the icon you chose pops */
+  .mnav-item.active .mnav-icon { animation: wgPop .38s ease; }
+
+  /* life signals */
+  .online-dot { animation: wgPing 2.2s ease-out infinite; }
+  .mnav-badge, .tab .badge { animation: wgPop .4s ease; }
+  .bell-btn.has-unread, .icon-btn.has-unread { animation: wgBell 1.2s ease 1s 2; transform-origin: 50% 10%; }
+}
+
+/* =====================================================================
+ * Layout refinements
+ * ===================================================================== */
+/* sidebar: clear active marker, calmer spacing */
+.side-nav .tab { border-radius: 12px; padding: 11px 14px; margin: 2px 0; }
+.side-nav .tab.active { box-shadow: inset 3px 0 0 var(--green); font-weight: 700; }
+.side-nav .tab .side-icon { display: inline-grid; place-items: center; width: 28px; }
+
+/* mobile bottom bar: floating, rounded, with a clear active state */
+@media (max-width: 860px) {
+  body.is-signed-in .mobile-bottom-nav {
+    left: 10px; right: 10px; bottom: 10px; width: auto; border-radius: 22px; border: 1px solid var(--line);
+    background: rgba(255,255,255,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(42,16,51,.16); padding-bottom: 4px;
+  }
+  .mnav-item { border-radius: 16px; }
+  .mnav-item.active { background: var(--green-soft); }
+  .mnav-item.active .mnav-label { color: var(--green-dark); font-weight: 700; }
+  .app-shell > main { padding-bottom: 96px !important; }
+}
+
+/* buttons: confident, consistent */
+.btn-signin, .btn-contact, .btn-primary, button.primary { border-radius: 14px; box-shadow: 0 8px 20px rgba(184,41,79,.22); }
+.btn-signin:hover, .btn-contact:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(184,41,79,.3); }
+
+/* inputs: softer, with a clear focus ring */
+input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea { border-radius: 12px; border-color: var(--line-strong); transition: border-color .2s ease, box-shadow .2s ease; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 4px rgba(224,66,111,.14); }
+
+/* home banner: slightly deeper type and a soft lift */
+.wana-hero h1 { font-weight: 800; }
+.wana-hero { box-shadow: 0 14px 40px rgba(42,16,51,.10); }
+
+/* thread rows, panels: breathing room */
+.thread-row { border-radius: 14px; }
+.panel { border-radius: 22px; }
