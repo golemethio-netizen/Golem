@@ -393,10 +393,10 @@
 
   window.startCall = async function (recipientId, recipientName) {
     recipientName = recipientName != null ? recipientName : ((window._threadNames && window._threadNames[recipientId]) || "Conversation");
-    if (peerConnection || callStartedAt || document.querySelector("#callRoot .call-overlay")) { alert("You're already in a call."); return; }
+    if (peerConnection || callStartedAt || document.querySelector("#callRoot .call-overlay")) { wanaAlert("You're already in a call."); return; }
     if (!(await requireProfile("make calls"))) return;
     if (!isPlatinumActive(myProfile)) {
-      alert("Voice calls are a Platinum feature. Upgrade to Platinum to start calling your matches.");
+      wanaAlert("Voice calls are a Platinum feature. Upgrade to Platinum to start calling your matches.");
       return;
     }
     getCtx(); // unlock audio inside this click so tones and remote sound are allowed
@@ -415,7 +415,7 @@
     }).select().single();
     if (ins.error) {
       if (pendingMicStream) { pendingMicStream.getTracks().forEach(function (t) { t.stop(); }); pendingMicStream = null; }
-      alert("Couldn't start the call: " + ins.error.message);
+      wanaAlert("Couldn't start the call: " + ins.error.message);
       currentCallId = null; currentCallPeerId = null;
       return;
     }
@@ -481,7 +481,7 @@
       micStream.getTracks().forEach(function (t) { t.stop(); });
       document.getElementById("callRoot").innerHTML = "";
       currentCallId = null; currentCallPeerId = null;
-      alert("This call is no longer available.");
+      wanaAlert("This call is no longer available.");
       return;
     }
     pendingMicStream = micStream;
