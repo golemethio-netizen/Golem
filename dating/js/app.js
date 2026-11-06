@@ -1413,7 +1413,14 @@ async function markAllNotificationsRead(){
   refreshNotifCount();
 }
 
+// Guards against overlapping loads: a newer call makes older ones bail out before rendering,
+// so rapid clicks / realtime refreshes can't append the same list twice.
+const _loadSeq = {};
+function beginLoad(key){ return (_loadSeq[key] = (_loadSeq[key] || 0) + 1); }
+function isStaleLoad(key, tok){ return _loadSeq[key] !== tok; }
+
 async function loadLikesReceived(){
+  const _tok = beginLoad("likes");
   await refreshMyMatchedIds();
   const grid = document.getElementById("likesGrid");
   const empty = document.getElementById("likesEmpty");
@@ -1454,11 +1461,14 @@ async function loadLikesReceived(){
   }
   empty.style.display = "none";
 
+  if (isStaleLoad("likes", _tok)) return;
+  grid.innerHTML = "";
   rows.forEach(row => grid.appendChild(createProfileCard(row, { extraMeta: null })));
 }
 
 // ---------- Visitors (who viewed you) ----------
 async function loadVisitors(){
+  const _tok = beginLoad("visitors");
   const grid = document.getElementById("visitorsGrid");
   const empty = document.getElementById("visitorsEmpty");
   grid.innerHTML = "";
@@ -1509,6 +1519,8 @@ async function loadVisitors(){
   }
   empty.style.display = "none";
 
+  if (isStaleLoad("visitors", _tok)) return;
+  grid.innerHTML = "";
   rows.forEach(row => {
     const viewedText = joinedAgoText(visitMap[row.user_id]).replace("Joined", "Viewed");
     grid.appendChild(createProfileCard(row, {
@@ -2014,6 +2026,7 @@ async function reportPost(postId){
 
 // ---------- Load / render profiles ----------
 async function loadProfiles() {
+  const _tok = beginLoad("browse");
   await refreshMyMatchedIds();
 
   const seeking = document.getElementById("filterSeeking").value;
@@ -2051,6 +2064,7 @@ async function loadProfiles() {
 
   // 2. Fetch Filtered Data
   const { data, error } = await query.order("created_at", { ascending: false });
+  if (isStaleLoad("browse", _tok)) return;
 
   if (error) {
     empty.textContent = "Couldn't load profiles right now.";
@@ -2163,6 +2177,7 @@ function joinedAgoText(createdAt){
 }
 
 async function loadNewMembers(){
+  const _tok = beginLoad("newmembers");
   await refreshMyMatchedIds();
   if (!myProfile) await fetchMyProfile();
 
@@ -2219,6 +2234,8 @@ async function loadNewMembers(){
   }
 
   empty.style.display = "none";
+  if (isStaleLoad("newmembers", _tok)) return;
+  grid.innerHTML = "";
   rows.forEach(row => {
     grid.appendChild(createProfileCard(row, {
       extraMeta: `<div class="presence" style="color:var(--gold);font-weight:600;">${joinedAgoText(row.created_at)}</div>`
@@ -2868,6 +2885,7 @@ function threadTimeLabel(iso){
   return d.toLocaleDateString([], { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "2-digit" });
 }
 async function loadThreads(){
+  const _tok = beginLoad("threads");
   const { data, error } = await _supabase
     .from("dating_messages")
     .select("*")
@@ -2906,6 +2924,9 @@ async function loadThreads(){
     .in("user_id", visibleOtherIds.length ? visibleOtherIds : ["00000000-0000-0000-0000-000000000000"]);
   const profileMap = {};
   (profiles || []).forEach(p => profileMap[p.user_id] = p);
+
+  if (isStaleLoad("threads", _tok)) return;
+  list.innerHTML = "";
 
   Object.values(threads)
     .filter(thread => !blockedIds.has(thread.other))
