@@ -1753,7 +1753,7 @@ function renderFeedPost(p, a, postReactions, postComments, commenterMap, resolve
                  : `<button onclick="reportPost('${p.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:.8rem; font-weight:bold;">Report</button>`}
       </div>
       <div style="margin-top:12px;font-size:1rem;color:var(--ink);white-space:pre-wrap; line-height: 1.5;">${esc(p.body)}</div>
-      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" style="margin-top:12px;max-width:100%;border-radius:10px;">`
+      ${resolvedPhotoUrl ? `<img src="${esc(resolvedPhotoUrl)}" alt="" loading="lazy" decoding="async" style="margin-top:12px;max-width:100%;border-radius:10px;">`
         : hadMedia ? `<div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:10px;color:#999;font-size:.8rem;text-align:center;">📷 Photo couldn't be loaded</div>` : ""}
 
       <div class="post-actions">
