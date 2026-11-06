@@ -332,7 +332,7 @@
   /* ---------- public entry points ---------- */
   function open() {
     var c = client();
-    if (!c) { alert('Support is not available right now.'); return; }
+    if (!c) { wanaAlert('Support is not available right now.'); return; }
     c.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
       if (!s) { if (typeof openAuthModal === 'function') openAuthModal('signin'); return; }
