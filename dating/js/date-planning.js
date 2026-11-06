@@ -131,8 +131,8 @@
   }
 
   async function respondDatePlan(id,status){
-    if(status==="cancelled"&&!confirm("Cancel this date invitation?"))return;
-    const {error}=await _supabase.rpc("dating_respond_date_plan",{p_plan_id:id,p_status:status}); if(error){alert("Could not update the date plan: "+error.message);return} await loadDatePlans();refreshDatePlanBadge();
+    if(status==="cancelled"&&!(await wanaConfirm("Cancel this date invitation?",{title:"Cancel date",okText:"Cancel invitation",cancelText:"Keep it",danger:true})))return;
+    const {error}=await _supabase.rpc("dating_respond_date_plan",{p_plan_id:id,p_status:status}); if(error){wanaAlert("Could not update the date plan: "+error.message);return} await loadDatePlans();refreshDatePlanBadge();
   }
   window.respondDatePlan=respondDatePlan;
 
