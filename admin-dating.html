@@ -709,7 +709,7 @@
                     if (uErr && (uErr.name === 'AuthRetryableFetchError' || !uErr.status || uErr.status >= 500)) { showAdminLoadError(uErr.message); return false; }
                     window.location.href = 'index.html'; return false;
                 }
-                ({ data: profile, error: pErr } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single());
+                ({ data: profile, error: pErr } = await _supabase.from('profiles').select('is_admin').eq('id', user.id).single());
                 if (pErr && !profile && pErr.code !== 'PGRST116') { showAdminLoadError(pErr.message); return false; }
             } catch (e) {
                 showAdminLoadError(e && e.message);
@@ -801,7 +801,7 @@
         async function adminFetchContacts(ids) {
             const out = [];
             for (let i = 0; i < ids.length; i += 150) {
-                const { data } = await _supabase.from('profiles').select('id, full_name, email, phone, phone_number').in('id', ids.slice(i, i + 150));
+                const { data } = await _supabase.rpc('admin_profile_contacts', { ids: ids.slice(i, i + 150) });
                 out.push(...(data || []));
             }
             return out;
@@ -1666,7 +1666,7 @@
                 platinumResult, blocksResult, matchesResult, datesResult, reportResult, auditResult
             ] = await Promise.all([
                 _supabase.from('dating_profiles').select('*').eq('user_id', userId).maybeSingle(),
-                _supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+                _supabase.rpc('admin_profile_contacts', { ids: [userId] }).then(r => ({ data: (r.data || [])[0] || null, error: r.error })),
                 _supabase.from('dating_account_status').select('*').eq('user_id', userId).maybeSingle(),
                 _supabase.from('dating_verification_requests').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(100),
                 _supabase.from('dating_platinum_requests').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(100),
