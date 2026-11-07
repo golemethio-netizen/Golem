@@ -43,12 +43,41 @@
     card.querySelector(".wg-install-x").onclick = function () { lsSet("wg_install_dismissed", String(Date.now())); card.remove(); card = null; };
     var go = card.querySelector(".wg-install-go");
     if (go) go.onclick = async function () {
-      try { deferred.prompt(); await deferred.userChoice; } catch (e) {}
+      var choice = null;
+      try { deferred.prompt(); choice = await deferred.userChoice; } catch (e) {}
       deferred = null; if (card) { card.remove(); card = null; }
+      if (choice && choice.outcome === "accepted") installProgress();
     };
   }
+  /* Progress panel: browsers give no real percentage, so the bar is an honest "working" animation until the browser says it's installed. */
+  var prog = null, progTimer = null, done = false;
+  function installProgress() {
+    done = false; if (prog) prog.remove();
+    prog = document.createElement("div"); prog.className = "wg-instprog"; prog.setAttribute("role", "status"); prog.setAttribute("aria-live", "polite");
+    prog.innerHTML = '<img src="images/icon-192.png" alt="" width="52" height="52"><div class="wg-ip-text"><strong class="wg-ip-title"></strong><span class="wg-ip-sub"></span><div class="wg-ip-bar"><i></i></div></div>';
+    prog.querySelector(".wg-ip-title").textContent = amharic() ? "ዋና ዳቲንግ በመጫን ላይ…" : "Installing Wana Dating…";
+    prog.querySelector(".wg-ip-sub").textContent = amharic() ? "እባክዎ ይጠብቁ" : "Hang on, this takes a few seconds.";
+    document.body.appendChild(prog);
+    clearTimeout(progTimer); progTimer = setTimeout(function () { if (!done) installDone(); }, 25000);
+  }
+  function installDone() {
+    if (done) return; done = true; clearTimeout(progTimer);
+    var msg = amharic() ? "ዋና ዳቲንግ ተጭኗል!" : "Wana Dating is installed!";
+    var sub = amharic() ? "ከመነሻ ማያ ገጽዎ ወይም ከዴስክቶፕዎ ይክፈቱት።" : "Open it from your home screen, app list or desktop.";
+    if (!prog) { prog = document.createElement("div"); prog.className = "wg-instprog"; prog.innerHTML = '<img src="images/icon-192.png" alt="" width="52" height="52"><div class="wg-ip-text"><strong class="wg-ip-title"></strong><span class="wg-ip-sub"></span><div class="wg-ip-bar"><i></i></div></div>'; document.body.appendChild(prog); }
+    prog.classList.add("done");
+    prog.querySelector(".wg-ip-title").textContent = "✓ " + msg;
+    prog.querySelector(".wg-ip-sub").textContent = sub;
+    try { if (navigator.vibrate) navigator.vibrate([60, 40, 60]); } catch (e) {}
+    try {
+      if ("Notification" in window && Notification.permission === "granted" && navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then(function (reg) { reg.showNotification(msg, { body: sub, icon: "/dating/images/icon-192.png", badge: "/dating/images/favicon-48.png", tag: "wg-installed" }); });
+      }
+    } catch (e) {}
+    var el = prog; setTimeout(function () { el.classList.add("out"); setTimeout(function () { el.remove(); if (prog === el) prog = null; }, 400); }, 5000);
+  }
   window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; setTimeout(function () { showInstall("native"); }, 25000); });
-  window.addEventListener("appinstalled", function () { if (card) { card.remove(); card = null; } });
+  window.addEventListener("appinstalled", function () { if (card) { card.remove(); card = null; } installDone(); });
   if (isIOS && !standalone) setTimeout(function () { showInstall("ios"); }, 40000);
 
   /* ---------- 3. Conversation starters (shown only in an empty chat) ---------- */
