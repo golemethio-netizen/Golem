@@ -110,6 +110,7 @@
       });
       if (res.error) { say("Couldn't turn on notifications: " + res.error.message, false); return; }
       await savePrefs(true);
+      store("wg_notify_off", "");
       say("✅ Notifications are on for this device.", true);
       setTimeout(hideBar, 2500);
     } catch (e) {
@@ -121,6 +122,7 @@
   }
 
   async function turnOff() {
+    store("wg_notify_off", "1");   /* they chose off: never auto-enable again on this device */
     enableBtn.disabled = true;
     try {
       var sub = await currentSub();
@@ -228,6 +230,25 @@
     main.insertBefore(bar, main.firstChild);
   }
 
+  var autoBusy = false;
+  async function autoOn(fromTap) {
+    if (autoBusy || !currentUser || !supported() || inAppBrowser() || store("wg_notify_off")) return;
+    var perm = Notification.permission;
+    if (perm === "denied") return;
+    if (perm === "default" && (!fromTap || store("wg_notify_autoasked"))) return;   /* asking needs a tap, and only once */
+    autoBusy = true;
+    try {
+      if (perm === "default") { store("wg_notify_autoasked", "1"); perm = await Notification.requestPermission(); }
+      if (perm !== "granted") return;
+      var reg = await withTimeout(registration(), 10000, "sw");
+      var sub = (await reg.pushManager.getSubscription()) ||
+        await withTimeout(reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(KEY) }), 15000, "sub");
+      var res = await _supabase.rpc("dating_save_push_subscription", { p_endpoint: sub.endpoint, p_p256dh: bytesToB64Url(sub.getKey("p256dh")), p_auth: bytesToB64Url(sub.getKey("auth")), p_ua: navigator.userAgent });
+      if (!res.error) { hideBar(); paint(); }
+    } catch (e) { /* quiet: the Settings switch still works */ }
+    finally { autoBusy = false; }
+  }
+
   // a shared phone must not keep notifying the previous account after sign-out
   function wrapSignOut() {
     if (typeof window.signOut !== "function" || window.signOut.__notify) return;
@@ -259,6 +280,14 @@
     // show the bar a few seconds after sign-in is known
     setTimeout(maybeBar, 4000);
     setInterval(function () { if (!currentUser) hideBar(); }, 5000);
+    /* On by default: re-register quietly when allowed, and ask for permission at the first tap after sign-in. */
+    setTimeout(autoOn, 5000);
+    var firstTap = function () {
+      if (!currentUser) return;                         /* wait until signed in */
+      document.removeEventListener("click", firstTap, true); document.removeEventListener("touchend", firstTap, true);
+      autoOn(true);
+    };
+    document.addEventListener("click", firstTap, true); document.addEventListener("touchend", firstTap, true);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
