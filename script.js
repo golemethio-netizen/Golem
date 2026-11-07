@@ -1632,7 +1632,7 @@ window.ensureProfileExists = async function(user) {
             phone_number: meta.phone_number || meta.phone || null,
             location: meta.location || null,
             bio: meta.bio || null
-        }, { onConflict: 'id' });
+        }, { onConflict: 'id', ignoreDuplicates: true });
     } catch (err) {
         console.warn('ensureProfileExists failed:', err);
     }
@@ -1776,10 +1776,7 @@ window.loadUsers = async function() {
     if (!list) return;
     list.innerHTML = "<div class='loading-spinner'><i class='fas fa-sync fa-spin'></i> Syncing...</div>";
 
-    const { data: users, error } = await _supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const { data: users, error } = await _supabase.rpc('admin_list_profiles');
 
     if (error || !users) {
         list.innerHTML = `<p style="color:#ff4757; padding:20px;">Error: ${error?.message || 'Unauthorized'}</p>`;
@@ -1841,7 +1838,7 @@ window.toggleVerification = async (userId, currentStatus) => {
 window.loadUserProfile = async function() {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) return;
-    const { data: profile } = await _supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    const { data: profile } = await _supabase.from('profiles').select('id, full_name, is_admin, created_at, last_seen, bio, avatar_url, location, is_owner, phone_number, is_verified, updated_at, phone, role').eq('id', user.id).maybeSingle();
     if (profile) {
         const nameElem = document.getElementById('profileName');
         const emailElem = document.getElementById('profileEmail');
