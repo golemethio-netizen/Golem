@@ -162,4 +162,63 @@
     if (c._html !== html) { c.innerHTML = html; c._html = html; }
   }
   setInterval(paintStrength, 2000);
+  /* ---------- 5. Update to the latest version when the app is opened ---------- */
+  /* Compares the "fingerprint" (ETag / Last-Modified) of the main files with the one saved last time.
+   * A different fingerprint means you published a new version, so we offer "Update now". No version number to maintain. */
+  var upBanner = null, upBusy = false, lastUpCheck = 0;
+  function assetUrls() {
+    var u = [location.pathname];
+    [].forEach.call(document.querySelectorAll("script[src],link[rel=stylesheet][href]"), function (el) {
+      var h = el.getAttribute("src") || el.getAttribute("href");
+      try { var a = new URL(h, location.href); if (a.origin === location.origin && a.pathname.indexOf("/dating/") === 0) u.push(a.pathname); } catch (e) {}
+    });
+    return u.filter(function (x, i, arr) { return arr.indexOf(x) === i; });
+  }
+  async function fingerprint() {
+    var urls = assetUrls(), parts = [];
+    var res = await Promise.all(urls.map(function (u) {
+      return fetch(u, { method: "HEAD", cache: "no-store" }).then(function (r) { return r.ok ? (r.headers.get("etag") || r.headers.get("last-modified") || r.headers.get("content-length") || "") : ""; }).catch(function () { return ""; });
+    }));
+    for (var i = 0; i < urls.length; i++) parts.push(urls[i] + "=" + res[i]);
+    return res.some(Boolean) ? parts.join("|") : "";
+  }
+  function upText() { return amharic() ? { t: "አዲስ ስሪት አለ", s: "ወደ አዲሱ ስሪት ያዘምኑ።", b: "አዘምን", u: "በማዘመን ላይ…", ok: "ወደ አዲሱ ስሪት ተዘምኗል ✓" } : { t: "A new version is available", s: "Update to get the latest features and fixes.", b: "Update now", u: "Updating…", ok: "Updated to the latest version ✓" }; }
+  function showUpdate(sig) {
+    if (upBanner) return; var T = upText();
+    upBanner = document.createElement("div"); upBanner.className = "wg-instprog wg-update"; upBanner.setAttribute("role", "alert");
+    upBanner.innerHTML = '<img src="images/icon-192.png" alt="" width="52" height="52"><div class="wg-ip-text"><strong class="wg-ip-title"></strong><span class="wg-ip-sub"></span><div class="wg-ip-bar" hidden><i></i></div></div><button type="button" class="wg-install-go"></button><button type="button" class="wg-install-x" aria-label="Later">✕</button>';
+    upBanner.querySelector(".wg-ip-title").textContent = T.t; upBanner.querySelector(".wg-ip-sub").textContent = T.s; upBanner.querySelector(".wg-install-go").textContent = T.b;
+    document.body.appendChild(upBanner);
+    upBanner.querySelector(".wg-install-x").onclick = function () { upBanner.remove(); upBanner = null; };
+    upBanner.querySelector(".wg-install-go").onclick = function () { applyUpdate(sig); };
+  }
+  async function applyUpdate(sig) {
+    if (upBusy) return; upBusy = true; var T = upText();
+    if (upBanner) { upBanner.querySelector(".wg-ip-title").textContent = T.u; upBanner.querySelector(".wg-ip-bar").hidden = false; upBanner.querySelector(".wg-install-go").remove(); upBanner.querySelector(".wg-install-x").remove(); }
+    try {
+      if (window.caches) { var keys = await caches.keys(); await Promise.all(keys.map(function (k) { return caches.delete(k); })); }
+      if (navigator.serviceWorker) { var reg = await navigator.serviceWorker.getRegistration("/dating/"); if (reg) await reg.update(); }
+      await Promise.all(assetUrls().map(function (u) { return fetch(u, { cache: "reload" }).catch(function () {}); })); /* refresh the browser's copy of every file */
+    } catch (e) {}
+    lsSet("wg_build", sig); lsSet("wg_just_updated", "1");
+    setTimeout(function () { location.reload(); }, 600);
+  }
+  async function checkUpdate() {
+    if (upBusy || !navigator.onLine || Date.now() - lastUpCheck < 20 * 60 * 1000) return;
+    lastUpCheck = Date.now();
+    var sig = await fingerprint(); if (!sig) return;
+    var saved = lsGet("wg_build");
+    if (!saved) { lsSet("wg_build", sig); return; }      /* first run on this device: just remember it */
+    if (saved !== sig) showUpdate(sig);
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    if (lsGet("wg_just_updated")) {
+      lsSet("wg_just_updated", "");
+      var t = document.createElement("div"); t.className = "wg-instprog done wg-toast-up"; t.innerHTML = '<div class="wg-ip-text"><strong></strong></div>'; t.querySelector("strong").textContent = upText().ok;
+      document.body.appendChild(t); setTimeout(function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 400); }, 3500);
+    }
+    setTimeout(checkUpdate, 3000);
+  });
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") checkUpdate(); });
+  window.addEventListener("online", checkUpdate);
 })();
