@@ -30,9 +30,9 @@
   var deferred = null, card = null;
   var standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-  function dismissed() { var t = parseInt(lsGet("wg_install_dismissed") || "0", 10); return t && Date.now() - t < 14 * 864e5; }
+  function dismissed() { var t = parseInt(lsGet("wg_install_dismissed") || "0", 10); return t && Date.now() - t < 2 * 864e5; }
   function showInstall(kind) {
-    if (card || standalone || dismissed() || !document.body.classList.contains("is-signed-in")) return;
+    if (card || standalone || dismissed()) return;
     card = document.createElement("div"); card.className = "wg-install"; card.setAttribute("role", "dialog"); card.setAttribute("aria-label", "Install Wana Dating");
     card.innerHTML = '<img src="images/icon-192.png" alt="" width="44" height="44">' +
       '<div class="wg-install-text"><strong>' + (amharic() ? "ዋና ዳቲንግን ይጫኑ" : "Add Wana Dating to your home screen") + '</strong>' +
@@ -76,9 +76,31 @@
     } catch (e) {}
     var el = prog; setTimeout(function () { el.classList.add("out"); setTimeout(function () { el.remove(); if (prog === el) prog = null; }, 400); }, 5000);
   }
-  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; setTimeout(function () { showInstall("native"); }, 25000); });
-  window.addEventListener("appinstalled", function () { if (card) { card.remove(); card = null; } installDone(); });
-  if (isIOS && !standalone) setTimeout(function () { showInstall("ios"); }, 40000);
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; setTimeout(function () { showInstall("native"); }, 4000); });
+  window.addEventListener("appinstalled", function () { if (card) { card.remove(); card = null; } if (pill) pill.remove(); installDone(); });
+
+  /* A small always-available "Install app" button, so it can be found even after the card was dismissed or if the browser gave no prompt. */
+  var pill = null;
+  function help() {
+    var ua = navigator.userAgent, m;
+    if (isIOS) m = amharic() ? "በSafari «አጋራ» ን ነክተው «ወደ መነሻ ማያ ገጽ አክል» ይምረጡ።" : "In Safari tap Share, then “Add to Home Screen”.";
+    else if (/android/i.test(ua)) m = amharic() ? "በChrome ሜኑ (⋮) «መተግበሪያ ጫን» ወይም «ወደ መነሻ ማያ ገጽ አክል» ይምረጡ።" : "Open the Chrome menu (⋮) and choose “Install app” or “Add to Home screen”. Use Chrome, not an in-app browser.";
+    else if (/firefox/i.test(ua)) m = amharic() ? "Firefox ኮምፒውተር ላይ መጫንን አይደግፍም። Chrome ወይም Edge ይጠቀሙ።" : "Firefox on computers can’t install web apps. Open this page in Chrome or Edge.";
+    else m = amharic() ? "በChrome ወይም Edge አድራሻ መስመር ውስጥ ያለውን የመጫን አዶ ይንኩ፣ ወይም ሜኑ ▸ «ጫን»።" : "In Chrome or Edge, click the install icon at the right of the address bar, or open the menu and choose “Install Wana Dating”.";
+    alert(m);
+  }
+  function showPill() {
+    if (pill || standalone) return;
+    pill = document.createElement("button"); pill.type = "button"; pill.className = "wg-install-pill";
+    pill.textContent = "📲 " + (amharic() ? "መተግበሪያ ጫን" : "Install app");
+    pill.onclick = async function () {
+      if (deferred) { var d = deferred, choice = null; try { d.prompt(); choice = await d.userChoice; } catch (e) {} deferred = null; if (choice && choice.outcome === "accepted") { if (card) { card.remove(); card = null; } installProgress(); } }
+      else help();
+    };
+    document.body.appendChild(pill);
+  }
+  setTimeout(showPill, 8000);
+  if (isIOS && !standalone) setTimeout(function () { showInstall("ios"); }, 6000);
 
   /* ---------- 3. Conversation starters (shown only in an empty chat) ---------- */
   var STARTERS = {
