@@ -580,7 +580,7 @@
             if (!user) { window.location.href = 'index.html'; return; }
 
             const { data: profile } = await _supabase
-                .from('profiles').select('*').eq('id', user.id).maybeSingle();
+                .from('profiles').select('id, full_name, is_admin, created_at, last_seen, bio, avatar_url, location, is_owner, phone_number, is_verified, updated_at, phone, role').eq('id', user.id).maybeSingle();
 
             if (!profile) return;
 
