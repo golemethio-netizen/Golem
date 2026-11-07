@@ -523,13 +523,13 @@
                 window.location.href = 'index.html';
                 return;
             }
-            const { data: profile } = await _supabase.from('profiles').select('is_admin, email').eq('id', user.id).single();
+            const { data: profile } = await _supabase.from('profiles').select('is_admin').eq('id', user.id).single();
             if (!profile?.is_admin) {
                 alert("Restricted Access: Admin Only.");
                 window.location.href = 'index.html';
                 return;
             } else {
-                currentAdminEmail = user.email || profile.email || 'Admin';
+                currentAdminEmail = user.email || 'Admin';
                 document.getElementById('adminIdentifier').innerText = `👤 ${currentAdminEmail}`;
             }
         }
@@ -618,7 +618,7 @@
             const { count: sponsors } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_sponsored', true).gt('sponsored_until', new Date().toISOString());
             const { data: priceData } = await _supabase.from('products').select('price').eq('status', 'approved');
             const { count: tickets } = await _supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('is_resolved', false);
-            const { count: userCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: userCount } = await _supabase.from('profiles').select('id', { count: 'exact', head: true });
             const { count: pendingCount } = await _supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending');
             const { count: openReports } = await _supabase.from('product_reports').select('*', { count: 'exact', head: true }).eq('status', 'open');
 
@@ -977,11 +977,12 @@
             const list = document.getElementById('userList');
             list.innerHTML = "<p>Loading users...</p>";
 
-            let query = _supabase.from('profiles').select('*');
-            if (filter === 'verified') query = query.eq('is_verified', true);
-            if (filter === 'guest') query = query.eq('is_verified', false);
-
-            const { data: users, error } = await query.order('created_at', { ascending: false });
+            // Email is hidden from the public table, so the admin list comes from an admin-only function (needs the v60 SQL).
+            let { data: users, error } = await _supabase.rpc('admin_list_profiles');
+            if (!error && users) {
+                if (filter === 'verified') users = users.filter(u => u.is_verified === true);
+                if (filter === 'guest') users = users.filter(u => !u.is_verified);
+            }
             if (error) { list.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
             
             // Where did each person register — marketplace or dating? (needs the v58 SQL; column just shows "—" without it)
