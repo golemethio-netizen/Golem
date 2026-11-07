@@ -161,3 +161,8 @@ body .gate-hero {
 @keyframes wgIpPop { 0% { transform: scale(1); } 45% { transform: scale(1.18); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .wg-ip-bar i { animation: none; width: 100%; } .wg-instprog, .wg-instprog img { animation: none; } }
 @media (min-width: 900px) { .wg-instprog { bottom: 24px; left: auto; right: 24px; margin: 0; } }
+
+.wg-install-pill { position: fixed; z-index: 9980; left: 12px; bottom: 96px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 99px; background: #fff; color: var(--plum); font: 600 .8rem/1 inherit; box-shadow: 0 6px 18px rgba(42,16,51,.18); cursor: pointer; }
+@media (min-width: 900px) { .wg-install-pill { bottom: 20px; left: 20px; } }
+
+body:has(.wg-install) .wg-install-pill, body:has(.wg-instprog) .wg-install-pill { display: none; }
