@@ -121,6 +121,10 @@
         .nav-item-box.nav-dating { background: #fdecf1; color: #c2185b; }
         .nav-item-box.nav-dating:hover { background: #fbdbe6; }
         .mobile-bottom-nav .dating-tab { color: #c2185b; }
+        /* Admin switch (admin.html > Dating Promo): hidden until the setting is known, then shown/hidden */
+        body:not(.dp-ready) .dating-promo-section, body:not(.dp-ready) .nav-dating, body:not(.dp-ready) .dating-tab { display: none !important; }
+        body.dp-no-banner .dating-promo-section { display: none !important; }
+        body.dp-no-menu .nav-dating, body.dp-no-menu .dating-tab { display: none !important; }
         .dating-promo { display: grid; grid-template-columns: 1.05fr 1fr; align-items: stretch; margin: 18px 0 8px; border-radius: 22px; overflow: hidden; text-decoration: none; color: #2a1033; background: linear-gradient(135deg, #fff1f5, #fde4ec); border: 1px solid #f6c9d8; box-shadow: 0 10px 30px rgba(194,24,91,.12); transition: transform .2s, box-shadow .2s; }
         .dating-promo:hover { transform: translateY(-2px); box-shadow: 0 16px 38px rgba(194,24,91,.2); }
         .dating-promo .dp-text { padding: 26px 28px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
@@ -1398,7 +1402,7 @@
             </section>
 
     <!-- ======================= WANA DATING PROMO ======================= -->
-    <section class="container" aria-label="Wana Dating">
+    <section class="container dating-promo-section" aria-label="Wana Dating">
         <a href="dating/index.html" class="dating-promo">
             <div class="dp-text">
                 <span class="dp-tag"><i class="fas fa-heart"></i> <span data-am="አዲስ">New</span> · Wana Dating</span>
@@ -2509,6 +2513,26 @@
         <div id="subcatDropdownInner"></div>
     </div>
 
+<script>
+/* Show/hide the Wana Dating banner and menu link as set in the admin dashboard (table site_settings, key dating_promo). Default = visible. */
+(function () {
+    var done = false;
+    function ready(v) {
+        if (done) return; done = true;
+        var b = document.body;
+        if (v && v.banner === false) b.classList.add('dp-no-banner');
+        if (v && v.menu === false) b.classList.add('dp-no-menu');
+        b.classList.add('dp-ready');
+    }
+    setTimeout(function () { ready(null); }, 4000);   /* if the setting can't be fetched, keep today's behaviour (visible) */
+    function fetchIt() {
+        if (typeof _supabase === 'undefined') return setTimeout(fetchIt, 200);
+        _supabase.from('site_settings').select('value').eq('key', 'dating_promo').maybeSingle()
+            .then(function (r) { ready(r && r.data ? r.data.value : null); }, function () { ready(null); });
+    }
+    fetchIt();
+})();
+</script>
 </body>
 </html>
 
