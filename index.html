@@ -121,6 +121,26 @@
         .nav-item-box.nav-dating { background: #fdecf1; color: #c2185b; }
         .nav-item-box.nav-dating:hover { background: #fbdbe6; }
         .mobile-bottom-nav .dating-tab { color: #c2185b; }
+        .dating-promo { display: grid; grid-template-columns: 1.05fr 1fr; align-items: stretch; margin: 18px 0 8px; border-radius: 22px; overflow: hidden; text-decoration: none; color: #2a1033; background: linear-gradient(135deg, #fff1f5, #fde4ec); border: 1px solid #f6c9d8; box-shadow: 0 10px 30px rgba(194,24,91,.12); transition: transform .2s, box-shadow .2s; }
+        .dating-promo:hover { transform: translateY(-2px); box-shadow: 0 16px 38px rgba(194,24,91,.2); }
+        .dating-promo .dp-text { padding: 26px 28px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+        .dating-promo .dp-tag { align-self: flex-start; background: #fff; color: #c2185b; font-weight: 700; font-size: .78rem; padding: 5px 12px; border-radius: 99px; }
+        .dating-promo h2 { margin: 2px 0 0; font-size: 1.7rem; line-height: 1.15; color: #2a1033; }
+        .dating-promo p { margin: 0; color: #5d4a57; font-size: .95rem; line-height: 1.5; }
+        .dating-promo ul { list-style: none; margin: 4px 0 6px; padding: 0; display: grid; gap: 5px; font-size: .9rem; color: #3d2a39; }
+        .dating-promo li i { color: #c2185b; margin-right: 6px; }
+        .dating-promo .dp-btn { align-self: flex-start; background: linear-gradient(135deg, #c2185b, #e8688e); color: #fff; font-weight: 700; padding: 11px 20px; border-radius: 99px; font-size: .95rem; }
+        .dating-promo .dp-btn i { margin-left: 6px; transition: transform .2s; }
+        .dating-promo:hover .dp-btn i { transform: translateX(4px); }
+        .dating-promo .dp-photo { position: relative; min-height: 240px; }
+        .dating-promo .dp-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+        @media (max-width: 720px) {
+            .dating-promo { grid-template-columns: 1fr; }
+            .dating-promo .dp-photo { order: -1; min-height: 190px; }
+            .dating-promo .dp-text { padding: 18px 18px 22px; }
+            .dating-promo h2 { font-size: 1.4rem; }
+        }
+        @media (prefers-reduced-motion: reduce) { .dating-promo, .dating-promo .dp-btn i { transition: none; } }
         .nav-item-box i { font-size: 1.1rem; }
 
         .cart-badge {
@@ -1376,6 +1396,24 @@
 
                 </div>
             </section>
+
+    <!-- ======================= WANA DATING PROMO ======================= -->
+    <section class="container" aria-label="Wana Dating">
+        <a href="dating/index.html" class="dating-promo">
+            <div class="dp-text">
+                <span class="dp-tag"><i class="fas fa-heart"></i> <span data-am="አዲስ">New</span> · Wana Dating</span>
+                <h2 data-am="ልዩ የሆነውን ሰው ያግኙ">Meet someone special</h2>
+                <p data-am="የዋና ገበያ ቤተሰብ የሆነው ዋና ዳቲንግ፤ ለትክክለኛ ግንኙነት የተዘጋጀ ደህንነቱ የተጠበቀ የፍቅር ጓደኝነት ማህበረሰብ።">From the WanaGebya family: a safe, respectful place in Ethiopia to find real connections, friendship and love.</p>
+                <ul>
+                    <li><i class="fas fa-circle-check"></i> <span data-am="ነጻ መመዝገብ">Free to join</span></li>
+                    <li><i class="fas fa-circle-check"></i> <span data-am="የተረጋገጡ መገለጫዎች">Verified profiles</span></li>
+                    <li><i class="fas fa-circle-check"></i> <span data-am="ግላዊ መልዕክት እና የድምጽ ጥሪ">Private chat &amp; voice calls</span></li>
+                </ul>
+                <span class="dp-btn"><span data-am="ዳቲንግን ይጎብኙ">Join Wana Dating</span> <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="dp-photo"><img src="dating/images/ethiopian-dating-bg.webp" alt="A smiling Ethiopian couple overlooking Addis Ababa at sunset" loading="lazy" width="1672" height="941"></div>
+        </a>
+    </section>
 
     <!-- ======================= MAIN GRID ======================= -->
     <main class="container">
