@@ -166,3 +166,12 @@ body .gate-hero {
 @media (min-width: 900px) { .wg-install-pill { bottom: 20px; left: 20px; } }
 
 body:has(.wg-install) .wg-install-pill, body:has(.wg-instprog) .wg-install-pill { display: none; }
+
+/* Browse loading placeholders */
+.wg-skel { border-radius: 20px; background: #fff; border: 1px solid var(--line); padding: 0 0 14px; overflow: hidden; }
+.wg-skel-photo { aspect-ratio: 3 / 3.4; background: #f1e6ec; }
+.wg-skel-line { height: 12px; margin: 12px 14px 0; border-radius: 8px; background: #f1e6ec; }
+.wg-skel-line.short { width: 55%; }
+.wg-skel-photo, .wg-skel-line { background-image: linear-gradient(90deg, #f1e6ec 0%, #fbf4f7 50%, #f1e6ec 100%); background-size: 220% 100%; animation: wgShimmer 1.3s linear infinite; }
+@keyframes wgShimmer { from { background-position: 110% 0; } to { background-position: -110% 0; } }
+@media (prefers-reduced-motion: reduce) { .wg-skel-photo, .wg-skel-line { animation: none; } }
