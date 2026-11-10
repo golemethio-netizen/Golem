@@ -175,3 +175,38 @@ body:has(.wg-install) .wg-install-pill, body:has(.wg-instprog) .wg-install-pill 
 .wg-skel-photo, .wg-skel-line { background-image: linear-gradient(90deg, #f1e6ec 0%, #fbf4f7 50%, #f1e6ec 100%); background-size: 220% 100%; animation: wgShimmer 1.3s linear infinite; }
 @keyframes wgShimmer { from { background-position: 110% 0; } to { background-position: -110% 0; } }
 @media (prefers-reduced-motion: reduce) { .wg-skel-photo, .wg-skel-line { animation: none; } }
+
+/* Profile prompts */
+.wg-prompts { display: grid; gap: 10px; margin-top: 12px; }
+.wg-prompt { background: linear-gradient(135deg, #fff7fa, #fdeef4); border: 1px solid #f6c9d8; border-radius: 14px; padding: 12px 14px; }
+.wg-prompt-q { font-size: .76rem; font-weight: 700; color: #c2185b; letter-spacing: .02em; }
+.wg-prompt-a { margin-top: 4px; font-family: "Fraunces", Georgia, serif; font-size: 1.05rem; line-height: 1.4; color: #2a1033; overflow-wrap: anywhere; }
+.wg-prompt-reply { margin-top: 8px; border: 1px solid #f0b6ca; background: #fff; color: #c2185b; border-radius: 99px; padding: 5px 12px; font-size: .8rem; font-weight: 600; cursor: pointer; }
+.wg-prompt-editor { display: grid; gap: 8px; margin: 14px 0; }
+.wg-prompt-editor > label { font-weight: 700; }
+.wg-pe-hint { color: #7a6672; }
+.wg-pe-row { display: grid; gap: 6px; padding: 10px; border: 1px solid #efe0e7; border-radius: 12px; background: #fffafc; }
+.wg-pe-row select, .wg-pe-row textarea { width: 100%; box-sizing: border-box; }
+.wg-pe-msg { color: #b4232f; font-size: .85rem; }
+
+/* Profile prompts */
+.wg-prompts { display: grid; gap: 10px; margin: 12px 0; }
+.wg-prompt { background: #fff7fa; border: 1px solid #f6c9d8; border-radius: 14px; padding: 12px 14px; }
+.wg-prompt small { display: block; color: #c2185b; font-weight: 700; font-size: .72rem; letter-spacing: .03em; text-transform: uppercase; margin-bottom: 4px; }
+.wg-prompt p { margin: 0; color: #2a1033; font-family: var(--font-display, inherit); font-size: 1.02rem; line-height: 1.4; overflow-wrap: anywhere; }
+.wg-prompts-edit { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.wg-pe-title { font-weight: 700; }
+.wg-pe-help { margin: 2px 0 10px; color: #6b5a63; font-size: .82rem; }
+.wg-pe-slot { display: grid; gap: 6px; margin-bottom: 12px; }
+.wg-pe-slot select, .wg-pe-slot textarea { width: 100%; box-sizing: border-box; }
+.wg-pe-count { justify-self: end; color: #9a8791; font-size: .72rem; }
+
+/* Safety tips */
+.wg-tips { margin: 14px 0 18px; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: 18px; }
+.wg-tips h3 { margin: 0 0 10px; color: var(--plum); }
+.wg-tips ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.wg-tips li { display: flex; gap: 12px; align-items: flex-start; }
+.wg-tips li > span { flex: 0 0 auto; font-size: 1.4rem; line-height: 1.2; }
+.wg-tips strong { display: block; color: #2a1033; }
+.wg-tips p { margin: 2px 0 0; color: #5d4a57; font-size: .88rem; line-height: 1.45; }
+@media (min-width: 900px) { .wg-tips ul { grid-template-columns: 1fr 1fr; gap: 14px 22px; } }
