@@ -1,7 +1,7 @@
 {
   "name": "Wana Dating",
   "short_name": "Wana Dating",
-  "description": "Meet genuine singles across Ethiopia. Verified profiles, privacy controls and safety tools.",
+  "description": "Meet genuine singles around the world. Verified profiles, privacy controls and safety tools.",
   "id": "/dating/",
   "start_url": "/dating/index.html?source=pwa",
   "scope": "/dating/",
