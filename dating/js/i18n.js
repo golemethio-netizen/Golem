@@ -22,9 +22,9 @@
     "Continue with Google": "በጉግል ቀጥል",
     "👤 View profile": "👤 መገለጫ ይመልከቱ", "🚫 Unmatch": "🚫 ተዛማጅነት አቋርጥ", "More options": "ተጨማሪ አማራጮች",
     "Close conversation": "ውይይቱን ዝጋ", "Back to messages": "ወደ መልዕክቶች ተመለስ",
-    "Ethiopian": "ኢትዮጵያዊ", "Real People": "እውነተኛ ሰዎች", "Genuine Connections": "ትክክለኛ ግንኙነቶች", "A Better Tomorrow": "የተሻለ ነገ",
-    "Connect with singles across Ethiopia looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.":
-      "ጓደኝነት፣ ፍቅር ወይም ጋብቻ በሚፈልጉ በመላው ኢትዮጵያ ካሉ ነጠላዎች ጋር ይገናኙ — በተረጋገጡ መገለጫዎች፣ በብልህ የተኳሃኝነት ማዛመጃ እና በደህና ለመገናኘት በሚረዱ መሣሪያዎች።",
+    "Ethiopian": "ኢትዮጵያዊ", "Worldwide": "ዓለም አቀፍ", "Real People": "እውነተኛ ሰዎች", "Genuine Connections": "ትክክለኛ ግንኙነቶች", "A Better Tomorrow": "የተሻለ ነገ",
+    "Connect with singles around the world looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.":
+      "ጓደኝነት፣ ፍቅር ወይም ጋብቻ በሚፈልጉ በመላው ዓለም ካሉ ነጠላዎች ጋር ይገናኙ — በተረጋገጡ መገለጫዎች፣ በብልህ የተኳሃኝነት ማዛመጃ እና በደህና ለመገናኘት በሚረዱ መሣሪያዎች።",
     "Sign In / Register Now": "አሁን ግባ / ተመዝገብ",
     "Learn more about Wana Dating ↓": "ስለ Wana Dating ተጨማሪ ይወቁ ↓",
     "← Back to marketplace": "← ወደ ገበያ ተመለስ",
@@ -63,11 +63,11 @@
     "Chat, then plan a date using our built-in tools — on your terms, when you're ready.":
       "ይወያዩ፣ ከዚያ በመተግበሪያው መሣሪያዎች ቀጠሮ ያቅዱ — በራስዎ ውሳኔ፣ ዝግጁ ሲሆኑ።",
     "About us": "ስለ እኛ", "Part of the WanaGebya platform": "የ WanaGebya መድረክ አካል",
-    "Wana Dating is the dating space inside WanaGebya, built for people in Ethiopia looking for a genuine connection. We believe good matchmaking starts with trust — which is why profile verification, flexible privacy controls and a dedicated safety team are built into the product, not bolted on afterward.":
-      "Wana Dating በ WanaGebya ውስጥ ያለ የፍቅር ግንኙነት ቦታ ሲሆን እውነተኛ ግንኙነት ለሚፈልጉ በኢትዮጵያ ላሉ ሰዎች የተሰራ ነው። ጥሩ ማዛመድ የሚጀምረው በእምነት ነው ብለን እናምናለን — ለዚህም ነው የመገለጫ ማረጋገጫ፣ ተለዋዋጭ የግላዊነት ቁጥጥሮች እና ራሱን የቻለ የደህንነት ቡድን ከኋላ የተጨመሩ ሳይሆኑ በምርቱ ውስጥ የተካተቱት።",
+    "Wana Dating is the dating space inside WanaGebya, built for people everywhere looking for a genuine connection. We believe good matchmaking starts with trust — which is why profile verification, flexible privacy controls and a dedicated safety team are built into the product, not bolted on afterward.":
+      "Wana Dating በ WanaGebya ውስጥ ያለ የፍቅር ግንኙነት ቦታ ሲሆን እውነተኛ ግንኙነት ለሚፈልጉ በየትኛውም ቦታ ላሉ ሰዎች የተሰራ ነው። ጥሩ ማዛመድ የሚጀምረው በእምነት ነው ብለን እናምናለን — ለዚህም ነው የመገለጫ ማረጋገጫ፣ ተለዋዋጭ የግላዊነት ቁጥጥሮች እና ራሱን የቻለ የደህንነት ቡድን ከኋላ የተጨመሩ ሳይሆኑ በምርቱ ውስጥ የተካተቱት።",
     "Whether you're here to make a new friend, find someone to date, or look for a life partner, Wana Dating is built to help you do it on your own terms — at your own pace, with your privacy respected throughout.":
       "አዲስ ጓደኛ ለማፍራት፣ የሚወዱትን ሰው ለማግኘት ወይም የሕይወት አጋር ለመፈለግ የመጡ ቢሆኑም፣ Wana Dating በራስዎ ውሳኔ፣ በራስዎ ፍጥነት እና ግላዊነትዎ ተከብሮ እንዲያደርጉት ለመርዳት የተሰራ ነው።",
-    "🇪🇹 Made for Ethiopia": "🇪🇹 ለኢትዮጵያ የተሰራ", "🛡️ Safety-first design": "🛡️ ደህንነትን የሚያስቀድም ንድፍ",
+    "🌍 Open to the world": "🌍 ለዓለም ክፍት", "🛡️ Safety-first design": "🛡️ ደህንነትን የሚያስቀድም ንድፍ",
     "🔒 Privacy controls": "🔒 የግላዊነት ቁጥጥሮች", "💬 English & Amharic": "💬 እንግሊዝኛ እና አማርኛ",
     "Profile verification": "የመገለጫ ማረጋገጫ", "Selfie review": "የሰልፊ ግምገማ",
     "Who sees your posts": "ልጥፎችዎን ማን ያያል", "Your choice": "የእርስዎ ምርጫ",
