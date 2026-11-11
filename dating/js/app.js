@@ -6,6 +6,23 @@
 // Re-encoding also strips EXIF metadata (including GPS location) from the uploaded copy.
 // GIFs, PDFs and anything that can't be decoded are returned untouched.
 // ============================================================
+// Adds cities from loaded profiles to the city suggestions (<datalist id="cityList">) so people
+// anywhere in the world get suggestions for the cities that actually have members.
+window.wanaRememberCities = function (rows) {
+  try {
+    var dl = document.getElementById('cityList');
+    if (!dl || !rows) return;
+    var have = new Set(Array.prototype.map.call(dl.options, function (o) { return o.value.toLowerCase(); }));
+    rows.forEach(function (r) {
+      var c = String((r && r.city) || '').trim();
+      if (c && c.length <= 60 && !have.has(c.toLowerCase())) {
+        have.add(c.toLowerCase());
+        var o = document.createElement('option'); o.value = c; dl.appendChild(o);
+      }
+    });
+  } catch (e) {}
+};
+
 window.wanaPrepareImage = async function (file, opts) {
   opts = opts || {};
   var maxDim = opts.maxDim || 1280;
@@ -713,6 +730,18 @@ function isValidEthiopianPhone(p){
   return /^251[79]\d{8}$/.test(p);
 }
 
+// Accepts international numbers (+ or 00 then country code) and the Ethiopian local shortcuts
+// (09..., 07..., 9...). Returns the digits incl. country code (e.g. "447700900123"), or "" if invalid.
+function parsePhone(raw){
+  const s = String(raw || "").trim();
+  if (/^(\+|00)/.test(s)){
+    const d = s.replace(/\D/g, "").replace(/^00/, s.startsWith("+") ? "00" : "");
+    return /^[1-9]\d{7,14}$/.test(d) ? d : "";
+  }
+  const eth = normalizeEthiopianPhone(s);
+  return isValidEthiopianPhone(eth) ? eth : "";
+}
+
 function phoneToPseudoEmail(p){
   return p + "@phone.wanagebya.com";
 }
@@ -739,13 +768,13 @@ function renderAuthModal(){
   const isPhone = authMethod === "phone";
 
   const identifierField = isPhone
-    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="09..." required class="modal-input"></div>`
+    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="e.g. +44 7700 900123" required class="modal-input"><small style="display:block;color:#6b7280;margin-top:4px;">Include your country code. Ethiopian numbers can start with 09 or 07.</small></div>`
     : `<div><label>Email</label><input type="email" id="authEmail" placeholder="you@email.com" required class="modal-input"></div>`;
 
   const registerExtraFields = !isSignin ? `
     <div><label>Full name</label><input type="text" id="authFullName" maxlength="60" required class="modal-input"></div>
     <div><label>Address / Location</label><input type="text" id="authLocation" maxlength="80" required class="modal-input"></div>
-    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="09..." class="modal-input"></div>` : ""}
+    ${!isPhone ? `<div><label>Phone number (optional)</label><input type="tel" id="authRegPhone" placeholder="e.g. +44 7700 900123" class="modal-input"></div>` : ""}
     <div><label>Date of birth</label><input type="date" id="authDob" min="1900-01-01" max="${latestAdultDob()}" required class="modal-input"><div style="font-size:.75rem;color:#777;margin-top:4px;">You must be 18 or older. Others only see your age.</div></div>
     <label style="display:flex;gap:8px;align-items:flex-start;font-size:.82rem;line-height:1.45;margin:2px 0 0;font-weight:500;"><input type="checkbox" id="authTerms" style="margin-top:3px;" required><span>I am 18 or older and I agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:var(--green);">Terms of Use</a> and <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--green);">Privacy Policy</a>.</span></label>
   ` : "";
@@ -853,9 +882,9 @@ async function submitAuthForm(e){
   let realPhone = null;
   if (isPhone){
     const raw = document.getElementById("authPhone").value.trim();
-    const normalized = normalizeEthiopianPhone(raw);
-    if (!isValidEthiopianPhone(normalized)){
-      msg.innerHTML = `<div class="msg error">Enter a valid Ethio Telecom (09...) or Safaricom (07...) number.</div>`;
+    const normalized = parsePhone(raw);
+    if (!normalized){
+      msg.innerHTML = `<div class="msg error">Enter your phone number with the country code, e.g. +44 7700 900123. Ethiopian numbers can also start with 09 or 07.</div>`;
       return;
     }
     realPhone = "+" + normalized;
@@ -1273,8 +1302,7 @@ function showBrowserNotification(n){
     message: "You have a new message",
     like: "Someone liked your profile",
     match: "It's a match! ✨",
-    date: "There's an update on a date plan",
-    visit: "Someone viewed your profile"
+    date: "There's an update on a date plan"
   }[n.type] || "You have new activity";
   try {
     const note = new Notification("Wana Dating", { body: text, tag: "wana-" + (n.id || Date.now()) });
@@ -1359,14 +1387,13 @@ function teardownRealtimeChannels(){
 
 
 function notifIcon(type){
-  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : type === "platinum" ? "💎" : type === "photo" ? "📷" : type === "visit" ? "👣" : "💬";
+  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : type === "platinum" ? "💎" : type === "photo" ? "📷" : "💬";
 }
 
 function notifText(n){
   const name = n.actor_name || "Someone";
   if (n.type === "match") return `It's a match with ${esc(name)}!`;
   if (n.type === "like") return `${esc(name)} liked your profile`;
-  if (n.type === "visit") return `${esc(name)} viewed your profile`;
   if (n.type === "date") return `${esc(name)} ${esc(n.body || "sent you a date update")}`;
   if (n.type === "platinum") return esc(n.body || "Your Platinum is active");
   if (n.type === "photo") return esc(n.body || "One of your photos was removed");
@@ -1455,10 +1482,6 @@ async function handleNotifClick(idx){
   }
   if (n.type === "photo"){
     switchTab("post");      // Edit Profile: upload a replacement photo
-    return;
-  }
-  if (n.type === "visit"){
-    switchTab("visitors");
     return;
   }
 
@@ -3922,12 +3945,12 @@ async function loadMyProfile(){
         <label>Religion</label>
         <select id="eReligion" required>
           <option value="">Select</option>
-          ${opts(["Orthodox Christian","Protestant","Muslim","Catholic","Traditional","Other","Prefer not to say"], data.religion)}
+          ${opts(["Orthodox Christian","Protestant","Muslim","Catholic","Hindu","Buddhist","Jewish","Sikh","No religion","Traditional","Other","Prefer not to say"], data.religion)}
         </select>
       </div>
       <div class="row2">
         <div><label>Occupation (Optional)</label><input type="text" id="eOccupation" maxlength="60" value="${esc(data.occupation||"")}"></div>
-        <div>
+        <div style="display:none">
           <label>Income (Optional)</label>
           <select id="eIncome">
             ${opts(["Prefer not to say","Under 10,000 ETB/mo","10,000–25,000 ETB/mo","25,000–50,000 ETB/mo","50,000–100,000 ETB/mo","100,000+ ETB/mo"], data.income_range || "Prefer not to say")}
