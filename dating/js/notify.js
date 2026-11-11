@@ -164,6 +164,7 @@
     boxes.notify_matches.checked = p.notify_matches !== false;
     boxes.notify_likes.checked = p.notify_likes !== false;
     boxes.notify_dates.checked = p.notify_dates !== false;
+    boxes.notify_visitors.checked = p.notify_visitors !== false;
     boxes.email_enabled.checked = p.email_enabled === true;
   }
 
@@ -199,8 +200,9 @@
         row("notify_matches", "New matches"),
         row("notify_likes", "Likes"),
         row("notify_dates", "Date invitations"),
+        row("notify_visitors", "Profile visitors"),
         el("div", { style: "font-weight:600;font-size:.9rem;margin:10px 0 2px;", text: "Email" }),
-        row("email_enabled", "Also email me", "messages, matches and dates (at most one per hour; not available for phone-number accounts)")
+        row("email_enabled", "Also email me", "messages, matches, dates, likes and visitors (at most one per hour per type; not available for phone-number accounts)")
       ]),
       el("button", { type: "button", class: "submit-btn", style: "width:auto;padding:10px 22px;margin-top:8px;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;", onclick: function () { savePrefs(false); }, text: "Save notification choices" }),
       msgEl
