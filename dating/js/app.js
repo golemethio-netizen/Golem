@@ -1273,7 +1273,8 @@ function showBrowserNotification(n){
     message: "You have a new message",
     like: "Someone liked your profile",
     match: "It's a match! ✨",
-    date: "There's an update on a date plan"
+    date: "There's an update on a date plan",
+    visit: "Someone viewed your profile"
   }[n.type] || "You have new activity";
   try {
     const note = new Notification("Wana Dating", { body: text, tag: "wana-" + (n.id || Date.now()) });
@@ -1358,13 +1359,14 @@ function teardownRealtimeChannels(){
 
 
 function notifIcon(type){
-  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : type === "platinum" ? "💎" : type === "photo" ? "📷" : "💬";
+  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : type === "platinum" ? "💎" : type === "photo" ? "📷" : type === "visit" ? "👣" : "💬";
 }
 
 function notifText(n){
   const name = n.actor_name || "Someone";
   if (n.type === "match") return `It's a match with ${esc(name)}!`;
   if (n.type === "like") return `${esc(name)} liked your profile`;
+  if (n.type === "visit") return `${esc(name)} viewed your profile`;
   if (n.type === "date") return `${esc(name)} ${esc(n.body || "sent you a date update")}`;
   if (n.type === "platinum") return esc(n.body || "Your Platinum is active");
   if (n.type === "photo") return esc(n.body || "One of your photos was removed");
@@ -1453,6 +1455,10 @@ async function handleNotifClick(idx){
   }
   if (n.type === "photo"){
     switchTab("post");      // Edit Profile: upload a replacement photo
+    return;
+  }
+  if (n.type === "visit"){
+    switchTab("visitors");
     return;
   }
 
