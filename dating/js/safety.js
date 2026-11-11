@@ -279,6 +279,7 @@
       const {data,error} = await query;
       if (requestId !== browseRequestId) return;
       if (error) throw error;
+      if (window.wanaRememberCities) window.wanaRememberCities(data);
 
       // Someone who hasn't posted a profile yet can still browse; eligibility needs a profile to compare against.
       let rows = (data || []).filter(r => !blockedIds.has(r.user_id) && (!myProfile || isEligibleForDating(myProfile, r)));
