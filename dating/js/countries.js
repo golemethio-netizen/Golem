@@ -10,7 +10,7 @@
     return h;
   };
   function fill(){
-    var f = document.getElementById('fCountry'); if (f && !f.options.length) f.innerHTML = wanaCountryOptions('', 'Select country');
+    var f = document.getElementById('fCountry'); if (f && f.options.length < 2) f.innerHTML = wanaCountryOptions('', 'Select country');
     var q = document.getElementById('filterCountry'); if (q && q.options.length < 2) q.innerHTML = wanaCountryOptions('', 'All countries');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill); else fill();
