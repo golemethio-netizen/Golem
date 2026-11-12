@@ -213,7 +213,7 @@
 </div>
 </div>
 <div class="gate-tagline">Real People <span class="tagline-heart">❤</span> Genuine Connections <span class="tagline-heart">❤</span> A Better Tomorrow</div>
-<p class="gate-hero-desc">Connect with singles around the world looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.</p>
+<p class="gate-hero-desc">Connect with singles anywhere in the world looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.</p>
 <div class="gate-hero-cta">
 <button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
   
@@ -252,10 +252,10 @@
 <div class="gate-about-copy">
 <span class="gate-eyebrow">About us</span>
 <h2>Part of the WanaGebya platform</h2>
-<p>Wana Dating is the dating space inside WanaGebya, built for people everywhere looking for a genuine connection. We believe good matchmaking starts with trust — which is why profile verification, flexible privacy controls and a dedicated safety team are built into the product, not bolted on afterward.</p>
+<p>Wana Dating is the dating space inside WanaGebya, built for people anywhere in the world looking for a genuine connection. We believe good matchmaking starts with trust — which is why profile verification, flexible privacy controls and a dedicated safety team are built into the product, not bolted on afterward.</p>
 <p>Whether you're here to make a new friend, find someone to date, or look for a life partner, Wana Dating is built to help you do it on your own terms — at your own pace, with your privacy respected throughout.</p>
 <div class="gate-about-badges">
-<span class="gate-about-badge">🌍 Open to the world</span>
+<span class="gate-about-badge">🌍 Open to singles worldwide</span>
 <span class="gate-about-badge">🛡️ Safety-first design</span>
 <span class="gate-about-badge">🔒 Privacy controls</span>
 <span class="gate-about-badge">💬 English &amp; Amharic</span>
@@ -345,7 +345,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <option value="Dating">Dating</option>
 <option value="Marriage">Marriage</option>
 </select>
-<input id="filterCity" list="cityList" type="text" autocomplete="off" placeholder="City (e.g. London)" aria-label="City" style="min-width:150px;"/>
+<select id="filterCountry" aria-label="Country"><option value="">All countries</option></select><input id="filterCity" list="cityList" aria-label="City" placeholder="Any city" type="text" autocomplete="off"/>
 <input id="filterAgeMin" max="99" min="18" placeholder="Min age" style="width:90px;" type="number"/>
 <input id="filterAgeMax" max="99" min="18" placeholder="Max age" style="width:90px;" type="number"/>
 <select id="filterReligion">
@@ -354,11 +354,6 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <option>Protestant</option>
 <option>Muslim</option>
 <option>Catholic</option>
-<option>Hindu</option>
-<option>Buddhist</option>
-<option>Jewish</option>
-<option>Sikh</option>
-<option>No religion</option>
 <option>Traditional</option>
 <option>Other</option>
 </select>
@@ -422,8 +417,12 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 </div>
 <div>
 <label>City</label>
-<input id="fCity" list="cityList" placeholder="Your city" required="" type="text" autocomplete="off"/><datalist id="cityList"><option value="Addis Ababa"><option value="Adama"><option value="Bahir Dar"><option value="Hawassa"><option value="Dire Dawa"><option value="Mekelle"><option value="Gondar"><option value="Jimma"><option value="Dessie"><option value="Bishoftu"><option value="Harar"><option value="Shashemene"><option value="Arba Minch"><option value="Debre Birhan"><option value="Debre Markos"><option value="Jijiga"><option value="Hosaena"><option value="Nekemte"><option value="Dilla"><option value="Sodo"><option value="Kombolcha"><option value="Woldia"><option value="Adigrat"><option value="Axum"><option value="Gambela"><option value="Asosa"><option value="Semera"><option value="Welkite"><option value="Ambo"><option value="Assela"></datalist>
+<input id="fCity" list="cityList" placeholder="Your city" required="" type="text" autocomplete="off"/><datalist id="cityList"><option value="Addis Ababa"><option value="Nairobi"><option value="Lagos"><option value="Accra"><option value="Johannesburg"><option value="Cairo"><option value="London"><option value="Paris"><option value="Berlin"><option value="New York"><option value="Los Angeles"><option value="Toronto"><option value="Dubai"><option value="Riyadh"><option value="Istanbul"><option value="Mumbai"><option value="Delhi"><option value="Manila"><option value="Singapore"><option value="Sydney"><option value="São Paulo"><option value="Mexico City"><option value="Washington, DC"><option value="Minneapolis"><option value="Seattle"><option value="Stockholm"><option value="Amsterdam"><option value="Rome"></datalist>
 </div>
+</div>
+<div>
+<label>Country</label>
+<select id="fCountry" required=""><option value="">Select country</option></select>
 </div>
 <div class="row2">
 <div>
@@ -514,11 +513,6 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <option>Protestant</option>
 <option>Muslim</option>
 <option>Catholic</option>
-<option>Hindu</option>
-<option>Buddhist</option>
-<option>Jewish</option>
-<option>Sikh</option>
-<option>No religion</option>
 <option>Traditional</option>
 <option>Other</option>
 <option>Prefer not to say</option>
@@ -529,15 +523,14 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <label>Occupation (Optional)</label>
 <input id="fOccupation" maxlength="60" placeholder="e.g. Engineer" type="text"/>
 </div>
-<div style="display:none">
+<div>
 <label>Income (Optional)</label>
 <select id="fIncome">
 <option selected="">Prefer not to say</option>
-<option>Under 10,000 ETB/mo</option>
-<option>10,000–25,000 ETB/mo</option>
-<option>25,000–50,000 ETB/mo</option>
-<option>50,000–100,000 ETB/mo</option>
-<option>100,000+ ETB/mo</option>
+<option>Lower income</option>
+<option>Middle income</option>
+<option>Upper-middle income</option>
+<option>High income</option>
 </select>
 </div>
 </div>
@@ -640,7 +633,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <div class="feature-status" id="pushStatus"></div>
 </div>
 <div class="feature-card">
-<div class="feature-card-icon">🇪🇹</div>
+<div class="feature-card-icon">🌍</div>
 <div><h3>Amharic</h3><p>Switch the Wana Dating interface between English and Amharic from the language control above.</p></div>
 <button class="feature-action" onclick="toggleLang()">አማ / EN</button>
 </div>
@@ -701,7 +694,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <aside class="wana-right-match-rail" id="rightMatchRail">
 <div class="wana-right-match-card">
 <div class="wana-right-match-head">
-<h3>New matches on <span id="matchRailCountry">Wana Dating</span></h3>
+<h3>New matches <span id="matchRailCountry"></span></h3>
 </div>
 <div class="wana-right-match-list" id="homeRecommendedList">
 <div class="wana-right-match-empty">Finding your best matches…</div>
@@ -728,6 +721,7 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
 <!-- SCRIPTS -->
 <script src="js/vendor/supabase.js"></script>
 <script src="../config.js"></script>
+<script src="js/countries.js"></script>
 <script src="js/app.js"></script>
 <script src="js/visit-log.js"></script>
 <script src="js/pro.js"></script>
@@ -739,6 +733,10 @@ Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Bac
   <script src="js/notify.js"></script>
   <script src="js/geez-input.js"></script>
   <script src="js/call-history.js"></script>
+  <script src="js/chat-live.js"></script>
+  <script src="js/skeleton.js"></script>
+  <script src="js/prompts.js"></script>
+  <script src="js/safety-tips.js"></script>
   <script src="js/one-tap.js"></script>
   <script src="js/i18n.js"></script>
 </body>
