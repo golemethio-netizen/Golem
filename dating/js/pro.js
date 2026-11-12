@@ -104,7 +104,7 @@
 
   /* ---------- 3. Conversation starters (shown only in an empty chat) ---------- */
   var STARTERS = {
-    en: ["Hi! How's your day going? 😊", "What do you enjoy doing on weekends?", "What's your favourite place in Ethiopia?", "Coffee or tea? Tell me everything ☕"],
+    en: ["Hi! How's your day going? 😊", "What do you enjoy doing on weekends?", "What's your favourite place you've travelled to?", "Coffee or tea? Tell me everything ☕"],
     am: ["ሰላም! ቀንዎ እንዴት ነው? 😊", "ቅዳሜና እሁድ ምን ማድረግ ይወዳሉ?", "በኢትዮጵያ ውስጥ የሚወዱት ቦታ የት ነው?", "ቡና ወይስ ሻይ? ☕"]
   };
   function addStarters() {
