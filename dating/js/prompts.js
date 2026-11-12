@@ -6,7 +6,7 @@
     ["My perfect Sunday is…", "እሁድ ለእኔ ምርጥ የሚሆነው…"],
     ["I'm happiest when…", "ደስተኛ የምሆነው…"],
     ["The way to my heart is…", "ወደ ልቤ የሚደርሰው መንገድ…"],
-    ["My favourite Ethiopian dish is…", "የምወደው የኢትዮጵያ ምግብ…"],
+    ["My favourite dish is…", "የምወደው ምግብ…"],
     ["A dream I'm working on…", "እየሠራሁበት ያለ ሕልም…"],
     ["Best trip I ever took…", "የሄድኩበት ምርጥ ጉዞ…"],
     ["On a first date I'd love to…", "በመጀመሪያ ቀጠሮ ማድረግ የምወደው…"],
