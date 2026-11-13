@@ -168,10 +168,12 @@
     boxes.email_enabled.checked = p.email_enabled === true;
   }
 
+  var pendingPrefs = null;   /* choices made in the welcome pop-up */
   async function savePrefs(quiet) {
     if (!currentUser) return;
     var row = { user_id: currentUser.id, push_enabled: true, updated_at: new Date().toISOString() };
     Object.keys(boxes).forEach(function (k) { row[k] = boxes[k].checked; });
+    if (pendingPrefs) { Object.keys(pendingPrefs).forEach(function (k) { row[k] = pendingPrefs[k]; if (boxes[k]) boxes[k].checked = pendingPrefs[k]; }); pendingPrefs = null; }
     var r = await _supabase.from("dating_notification_prefs").upsert(row, { onConflict: "user_id" });
     if (r.error) { if (!quiet) say("Couldn't save: " + r.error.message, false); return; }
     if (!quiet) say("Saved.", true);
@@ -232,6 +234,107 @@
     main.insertBefore(bar, main.firstChild);
   }
 
+
+  // ---- "Never miss a signal" pop-up: shown once, 30 seconds after sign-in ----
+  var popupShown = false, popupTimer = null, popupEl = null;
+  function greeting() {
+    var h = new Date().getHours();
+    return h < 12 ? "Good morning!" : (h < 18 ? "Good afternoon!" : "Good evening!");
+  }
+  function popupEligible() {
+    return !!currentUser && !popupShown && supported() && !inAppBrowser() &&
+      Notification.permission === "default" && !store("wg_notify_off") &&
+      !(parseInt(store("wg_notify_popup_snooze") || "0", 10) > Date.now());
+  }
+  function closePopup(snoozeDays) {
+    if (snoozeDays) store("wg_notify_popup_snooze", String(Date.now() + snoozeDays * 864e5));
+    if (popupEl) { popupEl.remove(); popupEl = null; }
+  }
+  function addPopupStyles() {
+    if (document.getElementById("notifyPopupCss")) return;
+    var st = document.createElement("style");
+    st.id = "notifyPopupCss";
+    st.textContent =
+      "#notifyPopup{position:fixed;inset:0;z-index:9999;background:rgba(42,16,51,.45);display:flex;align-items:center;justify-content:center;padding:16px;animation:npFade .25s ease}" +
+      "#notifyPopup .np-card{position:relative;background:var(--surface,#fff);width:100%;max-width:380px;border-radius:20px;padding:28px 26px 24px;box-shadow:0 24px 60px rgba(42,16,51,.35);font-family:var(--font,Inter,sans-serif);color:var(--ink,#12141a);animation:npRise .3s cubic-bezier(.2,.8,.2,1)}" +
+      "#notifyPopup .np-face{position:absolute;left:-14px;top:22px;width:46px;height:46px;border-radius:50%;background:var(--green-soft,#fdecf1);border:3px solid #fff;box-shadow:0 4px 12px rgba(224,66,111,.25);display:flex;align-items:center;justify-content:center;font-size:1.3rem}" +
+      "#notifyPopup .np-x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:1.5rem;line-height:1;color:var(--muted,#6b7280);cursor:pointer;padding:6px}" +
+      "#notifyPopup h2{font-family:var(--font-display,Georgia,serif);font-size:1.45rem;margin:6px 0 20px 34px;color:var(--plum,#2a1033)}" +
+      "#notifyPopup .np-title{display:flex;align-items:center;gap:10px;font-family:var(--font-display,Georgia,serif);font-size:1.25rem;font-weight:700;margin:0 0 10px;color:var(--ink,#12141a)}" +
+      "#notifyPopup .np-bell{position:relative;width:34px;height:34px;border-radius:50%;background:var(--green-soft,#fdecf1);color:var(--green,#e0426f);display:flex;align-items:center;justify-content:center}" +
+      "#notifyPopup .np-bell b{position:absolute;right:-3px;top:-3px;background:var(--green,#e0426f);color:#fff;font-size:.65rem;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}" +
+      "#notifyPopup p.np-sub{margin:0 0 18px;color:var(--ink-soft,#3d4450);font-size:.95rem;line-height:1.5}" +
+      "#notifyPopup .np-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;font-weight:700;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:var(--plum,#2a1033)}" +
+      "#notifyPopup .np-sw{position:relative;width:48px;height:28px;flex:none}" +
+      "#notifyPopup .np-sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%;z-index:1}" +
+      "#notifyPopup .np-sw span{position:absolute;inset:0;border-radius:14px;background:var(--line-strong,#d5d9e2);transition:background .2s}" +
+      "#notifyPopup .np-sw span:after{content:'';position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .2s}" +
+      "#notifyPopup .np-sw input:checked+span{background:var(--green,#e0426f)}" +
+      "#notifyPopup .np-sw input:checked+span:after{transform:translateX(20px)}" +
+      "#notifyPopup .np-sw input:focus-visible+span{outline:3px solid var(--green-glow,rgba(224,66,111,.3));outline-offset:2px}" +
+      "#notifyPopup .np-btns{display:flex;gap:12px;margin-top:20px}" +
+      "#notifyPopup .np-btns button{flex:1;border:0;border-radius:999px;padding:13px 10px;font-weight:800;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}" +
+      "#notifyPopup .np-no{background:var(--gold-soft,#fbf3e0);color:#8a6a12}" +
+      "#notifyPopup .np-yes{background:var(--green,#e0426f);color:#fff;box-shadow:0 6px 16px var(--green-glow,rgba(224,66,111,.3))}" +
+      "#notifyPopup .np-yes:disabled{opacity:.6;cursor:default}" +
+      "#notifyPopup .np-msg{min-height:1.2em;margin-top:12px;font-size:.85rem;font-weight:600;text-align:center}" +
+      "@keyframes npFade{from{opacity:0}to{opacity:1}}@keyframes npRise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}" +
+      "@media (prefers-reduced-motion:reduce){#notifyPopup,#notifyPopup .np-card{animation:none}}";
+    document.head.appendChild(st);
+  }
+  function showPopup() {
+    if (!popupEligible() || popupEl) return;
+    popupShown = true;
+    addPopupStyles();
+    var choices = {};
+    function sw(key, label) {
+      var cb = el("input", { type: "checkbox", "aria-label": label });
+      cb.checked = true; choices[key] = cb;
+      return el("div", { class: "np-row" }, [el("span", { text: label }), el("label", { class: "np-sw" }, [cb, el("span")])]);
+    }
+    var msg = el("div", { class: "np-msg", role: "status" });
+    var yes = el("button", { type: "button", class: "np-yes", text: "Allow" });
+    var no = el("button", { type: "button", class: "np-no", text: "Not now", onclick: function () { closePopup(3); } });
+    var bellBadge = el("b", { text: "1" });
+    var bell = el("span", { class: "np-bell", "aria-hidden": "true", text: "🔔" }, [bellBadge]);
+    var card = el("div", { class: "np-card", role: "dialog", "aria-modal": "true", "aria-labelledby": "npHeading" }, [
+      el("div", { class: "np-face", "aria-hidden": "true", text: "❤️" }),
+      el("button", { type: "button", class: "np-x", "aria-label": "Close", text: "×", onclick: function () { closePopup(3); } }),
+      el("h2", { id: "npHeading", text: greeting() }),
+      el("div", { class: "np-title" }, [bell, el("span", { text: "Never miss a notification" })]),
+      el("p", { class: "np-sub", text: "Get notified in real-time when someone is interested." }),
+      sw("notify_messages", "New Messages"),
+      sw("notify_likes", "New Likes"),
+      sw("notify_matches", "New Connections"),
+      sw("notify_visitors", "Viewed You"),
+      el("div", { class: "np-btns" }, [no, yes]),
+      msg
+    ]);
+    popupEl = el("div", { id: "notifyPopup" }, [card]);
+    popupEl.addEventListener("click", function (ev) { if (ev.target === popupEl) closePopup(3); });
+    document.addEventListener("keydown", function esc(ev) { if (ev.key === "Escape" && popupEl) { closePopup(3); document.removeEventListener("keydown", esc); } });
+    yes.addEventListener("click", async function () {
+      yes.disabled = true; no.disabled = true;
+      pendingPrefs = {};
+      Object.keys(choices).forEach(function (k) { pendingPrefs[k] = choices[k].checked; });
+      barMsg = msg; msgEl = msgEl || null;
+      msg.textContent = "Turning on notifications…"; msg.style.color = "var(--ink-soft,#3d4450)";
+      await turnOn();
+      var ok = Notification.permission === "granted" && !!(await currentSub().catch(function () { return null; }));
+      if (ok) { msg.textContent = "✅ You're all set!"; msg.style.color = "#1b7f3b"; setTimeout(function () { closePopup(0); }, 1400); }
+      else { yes.disabled = false; no.disabled = false; }
+    });
+    document.body.appendChild(popupEl);
+    yes.focus();
+  }
+  function armPopup() {
+    var poll = setInterval(function () {
+      if (!currentUser) return;
+      clearInterval(poll);
+      popupTimer = setTimeout(showPopup, 30000);   /* 30 seconds after sign-in */
+    }, 1000);
+  }
+
   var autoBusy = false;
   async function autoOn(fromTap) {
     if (autoBusy || !currentUser || !supported() || inAppBrowser() || store("wg_notify_off")) return;
@@ -279,17 +382,9 @@
   function init() {
     mountCard(); wrapSettings(); wrapSignOut();
     if (supported()) registration().catch(function () {});
-    // show the bar a few seconds after sign-in is known
-    setTimeout(maybeBar, 4000);
-    setInterval(function () { if (!currentUser) hideBar(); }, 5000);
-    /* On by default: re-register quietly when allowed, and ask for permission at the first tap after sign-in. */
+    /* Already allowed? Re-register quietly. Not asked yet? Show the friendly pop-up 30 seconds after sign-in. */
     setTimeout(autoOn, 5000);
-    var firstTap = function () {
-      if (!currentUser) return;                         /* wait until signed in */
-      document.removeEventListener("click", firstTap, true); document.removeEventListener("touchend", firstTap, true);
-      autoOn(true);
-    };
-    document.addEventListener("click", firstTap, true); document.addEventListener("touchend", firstTap, true);
+    armPopup();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
