@@ -235,13 +235,15 @@
   }
 
 
-  // ---- "Never miss a signal" pop-up: shown once, 30 seconds after sign-in ----
+  // ---- "Never miss a signal" pop-up: shown once, 10 seconds after sign-in ----
   var popupShown = false, popupTimer = null, popupEl = null;
   function greeting() {
     var h = new Date().getHours();
     return h < 12 ? "Good morning!" : (h < 18 ? "Good afternoon!" : "Good evening!");
   }
   function popupEligible() {
+    /* Testing: open /dating/?notifypopup=1 to see the pop-up even if alerts are already on or it was dismissed. */
+    if (/[?&]notifypopup=1/.test(location.search)) return !!currentUser && !popupShown && supported();
     return !!currentUser && !popupShown && supported() && !inAppBrowser() &&
       Notification.permission === "default" && !store("wg_notify_off") &&
       !(parseInt(store("wg_notify_popup_snooze") || "0", 10) > Date.now());
@@ -331,7 +333,7 @@
     var poll = setInterval(function () {
       if (!currentUser) return;
       clearInterval(poll);
-      popupTimer = setTimeout(showPopup, 30000);   /* 30 seconds after sign-in */
+      popupTimer = setTimeout(showPopup, 10000);   /* 10 seconds after sign-in */
     }, 1000);
   }
 
@@ -382,7 +384,7 @@
   function init() {
     mountCard(); wrapSettings(); wrapSignOut();
     if (supported()) registration().catch(function () {});
-    /* Already allowed? Re-register quietly. Not asked yet? Show the friendly pop-up 30 seconds after sign-in. */
+    /* Already allowed? Re-register quietly. Not asked yet? Show the friendly pop-up 10 seconds after sign-in. */
     setTimeout(autoOn, 5000);
     armPopup();
   }
