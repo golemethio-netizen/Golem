@@ -718,6 +718,13 @@ function isValidEthiopianPhone(p){
   return /^[1-9]\d{7,14}$/.test(p) && (!p.startsWith("251") || /^251[79]\d{8}$/.test(p));
 }
 
+function wanaPhoneOtherCountry(ev){
+  if (ev) ev.preventDefault();
+  const i = document.getElementById("authPhone"), h = document.getElementById("authPhoneHint");
+  if (i){ i.placeholder = "+1 415 555 0123"; i.focus(); }
+  if (h) h.textContent = "Start with + and your country code, for example +44 or +1.";
+}
+
 function phoneToPseudoEmail(p){
   return p + "@phone.wanagebya.com";
 }
@@ -744,7 +751,7 @@ function renderAuthModal(){
   const isPhone = authMethod === "phone";
 
   const identifierField = isPhone
-    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="+country code, e.g. +1 415 555 0123" required class="modal-input"></div>`
+    ? `<div><label>Phone number</label><input type="tel" id="authPhone" placeholder="09 12 34 56 78" required class="modal-input" autocomplete="tel"><div id="authPhoneHint" style="font-size:.75rem;color:#777;margin-top:4px;">Ethio telecom (09…) or Safaricom Ethiopia (07…). <a href="#" onclick="wanaPhoneOtherCountry(event)" style="color:var(--green-dark,#b8294f);font-weight:600;">Number from another country?</a></div></div>`
     : `<div><label>Email</label><input type="email" id="authEmail" placeholder="you@email.com" required class="modal-input"></div>`;
 
   const registerExtraFields = !isSignin ? `
@@ -860,7 +867,7 @@ async function submitAuthForm(e){
     const raw = document.getElementById("authPhone").value.trim();
     const normalized = normalizeEthiopianPhone(raw);
     if (!isValidEthiopianPhone(normalized)){
-      msg.innerHTML = `<div class="msg error">Enter your number with the country code, e.g. +1 415 555 0123 (Ethiopian 09... numbers also work).</div>`;
+      msg.innerHTML = `<div class="msg error">Enter a valid Ethio telecom (09…) or Safaricom (07…) number. From another country? Tap "Number from another country?" and start with + and your country code.</div>`;
       return;
     }
     realPhone = "+" + normalized;
@@ -4272,15 +4279,25 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
     age_confirmed: true,
     updated_at: new Date().toISOString()
   };
+  if (!wasEditing){
+    try { const r = localStorage.getItem("wg_ref"); if (r && /^WGD-\d{4}-[A-Z0-9]{6}$/.test(r)) payload.referred_by = r; } catch(e){}
+  }
   
   if (photoUrls.length > 0){
     payload.photo_url = photoUrls[0];
     payload.photos = photoUrls;
   }
 
-  const { error } = await _supabase
+  let { error } = await _supabase
     .from("dating_profiles")
     .upsert(payload, { onConflict: "user_id" });
+  // If a newer database column isn't installed yet (country / referred_by), save without it instead of failing.
+  for (const col of ["referred_by", "country"]){
+    if (error && new RegExp(col, "i").test(error.message || "") && col in payload){
+      delete payload[col];
+      ({ error } = await _supabase.from("dating_profiles").upsert(payload, { onConflict: "user_id" }));
+    }
+  }
 
   btn.disabled = false;
 
