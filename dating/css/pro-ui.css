@@ -1,0 +1,46 @@
+/* Wana Dating — professional layout pass (menu, greeting, filters). Loaded after polish.css. */
+
+/* ---- Sidebar: grouped sections + consistent line icons ---- */
+.side-nav:before { display: none !important; }
+.side-group { padding: 14px 14px 6px; color: #9aa3b2; font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.side-group:first-child { padding-top: 4px; }
+.side-nav .tab .side-icon { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0; opacity: 1; }
+.side-nav .tab .side-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.side-nav .tab { gap: 12px; }
+.side-nav .tab.active .side-icon svg { stroke-width: 2.1; }
+
+/* ---- Home: greeting + live counts ---- */
+.pro-greet { margin: 0 0 16px; background: none !important; box-shadow: none !important; border: 0 !important; padding: 2px 2px 0 !important; }
+.pro-greet h2 { font-family: var(--font-display, Georgia, serif); font-size: clamp(1.35rem, 2.4vw, 1.75rem); margin: 0 0 4px; color: var(--plum, #2a1033); letter-spacing: -.02em; }
+.pro-greet p { margin: 0 0 12px; color: var(--muted, #6b7280); font-size: .95rem; }
+.pro-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pro-chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line, #e8eaef); background: var(--surface, #fff); border-radius: 999px; padding: 8px 14px 8px 10px; font-size: .85rem; font-weight: 700; color: var(--ink, #12141a); cursor: pointer; font-family: inherit; transition: box-shadow .15s, transform .15s; }
+.pro-chip:hover { box-shadow: 0 6px 16px rgba(42,16,51,.12); transform: translateY(-1px); }
+.pro-chip svg { width: 18px; height: 18px; stroke: var(--green, #e0426f); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pro-chip b { background: var(--green, #e0426f); color: #fff; border-radius: 999px; min-width: 20px; height: 20px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; }
+.pro-chip.is-quiet { color: var(--ink-soft, #3d4450); font-weight: 600; }
+.pro-chip.is-quiet b { background: var(--line, #e8eaef); color: var(--muted, #6b7280); }
+/* compact hero so the greeting and content come first */
+#homePanel .wana-hero { padding: 20px 24px; margin-bottom: 16px; }
+#homePanel .wana-hero h1 { font-size: clamp(1.35rem, 2.6vw, 1.8rem); }
+@media (max-width: 700px) { #homePanel .wana-hero p { display: none; } #homePanel .wana-quick-actions { margin-top: 10px; } }
+#inviteCard { margin: 0 0 14px !important; }
+
+/* ---- Browse: compact filter bar ---- */
+#browsePanel .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px; border-radius: 16px; }
+#browsePanel .filters select, #browsePanel .filters input[type=text], #browsePanel .filters input[type=number], #browsePanel .filters input:not([type=checkbox]) { height: 40px; border-radius: 10px; box-sizing: border-box; }
+#browsePanel .filters label { display: inline-flex; align-items: center; gap: 6px; }
+#advFilters { display: none; flex: 1 1 100%; flex-wrap: wrap; gap: 10px; padding-top: 4px; border-top: 1px dashed var(--line, #e8eaef); }
+.filters.adv-open #advFilters { display: flex; }
+.adv-toggle { display: inline-flex; align-items: center; gap: 6px; height: 40px; border: 1px solid var(--line, #e8eaef); background: var(--surface, #fff); color: var(--ink-soft, #3d4450); border-radius: 10px; padding: 0 14px; font-weight: 700; font-size: .85rem; cursor: pointer; font-family: inherit; }
+.adv-toggle .adv-count { background: var(--green, #e0426f); color: #fff; border-radius: 999px; min-width: 18px; height: 18px; display: none; align-items: center; justify-content: center; font-size: .7rem; padding: 0 5px; }
+.adv-toggle.has-count .adv-count { display: inline-flex; }
+.adv-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.filters.adv-open .adv-toggle svg { transform: rotate(180deg); }
+#browsePanel .filters > button { height: 40px; }
+@media (max-width: 700px) {
+  #browsePanel .filters select, #browsePanel .filters input:not([type=checkbox]) { flex: 1 1 calc(50% - 10px); min-width: 0; width: auto !important; }
+  #browsePanel .filters #filterCity { flex-basis: 100%; }
+}
+
+#browsePanel .filters > label { height: 40px; padding: 0 6px; }
