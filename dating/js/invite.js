@@ -91,7 +91,8 @@
       ]),
       countEl, msgEl
     ]);
-    panel.insertBefore(card, panel.firstChild);
+    var composer = panel.querySelector(".wana-composer");
+    if (composer && composer.parentNode) composer.parentNode.insertBefore(card, composer); else panel.insertBefore(card, panel.firstChild);
     paint();
   }
 
