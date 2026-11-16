@@ -91,8 +91,9 @@
       ]),
       countEl, msgEl
     ]);
-    var composer = panel.querySelector(".wana-composer");
-    if (composer && composer.parentNode) composer.parentNode.insertBefore(card, composer); else panel.insertBefore(card, panel.firstChild);
+    // Never insert inside the collapsed "Community posts" block (home-discover.js moves the composer there).
+    var anchor = panel.querySelector("#communityPosts") || panel.querySelector(".wana-composer");
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(card, anchor); else panel.insertBefore(card, panel.firstChild);
     paint();
   }
 
