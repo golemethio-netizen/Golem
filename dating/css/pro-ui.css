@@ -44,26 +44,3 @@
 }
 
 #browsePanel .filters > label { height: 40px; padding: 0 6px; }
-
-/* ---- Home discovery rows ---- */
-.hd-wrap { margin: 0 0 8px; }
-.hd-section { margin: 0 0 22px; }
-.hd-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 2px 10px; }
-.hd-head h3 { margin: 0; font-family: var(--font-display, Georgia, serif); font-size: 1.2rem; color: var(--plum, #2a1033); letter-spacing: -.01em; }
-.hd-head p { margin: 2px 0 0; color: var(--muted, #6b7280); font-size: .82rem; }
-.hd-all { border: 0; background: none; color: var(--green-dark, #b8294f); font-weight: 700; font-size: .85rem; cursor: pointer; padding: 6px 4px; font-family: inherit; }
-.hd-all:hover { text-decoration: underline; }
-.hd-row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; padding: 2px 2px 10px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-.hd-row .card { flex: 0 0 176px; width: 176px; scroll-snap-align: start; }
-.hd-row .card .photo { aspect-ratio: 3 / 4 !important; height: auto !important; }
-.hd-empty { color: var(--muted, #6b7280); font-size: .9rem; background: var(--paper, #f6f7f9); border-radius: 12px; padding: 16px; width: 100%; }
-@media (max-width: 700px) { .hd-row .card { flex-basis: 148px; width: 148px; } }
-.hd-community { background: var(--surface, #fff); border: 1px solid var(--line, #e8eaef); border-radius: 16px; margin: 6px 0 18px; padding: 0; }
-.hd-community > summary { cursor: pointer; list-style: none; padding: 16px 18px; font-weight: 800; font-size: 1rem; color: var(--plum, #2a1033); display: flex; flex-direction: column; gap: 2px; }
-.hd-community > summary::-webkit-details-marker { display: none; }
-.hd-community > summary:after { content: "Show"; position: absolute; right: 18px; font-size: .8rem; font-weight: 700; color: var(--green-dark, #b8294f); }
-.hd-community { position: relative; }
-.hd-community[open] > summary:after { content: "Hide"; }
-.hd-hint { font-weight: 500; font-size: .82rem; color: var(--muted, #6b7280); }
-.hd-community > .wana-composer { margin: 0 14px 14px; box-shadow: none; }
-.hd-community > #feed { padding: 0 14px 14px; }
