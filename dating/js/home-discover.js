@@ -90,10 +90,15 @@
     loading = false;
   }
 
+  var wasVisible = false;
   function tick() {
     if (typeof currentUser === "undefined" || !currentUser) return;
     build();
-    if (built && homeVisible() && Date.now() - lastLoad > 60000) load();
+    var vis = homeVisible();
+    // Reload right away when Home is opened or the tab comes back; otherwise every 30s (presence = last 3 min).
+    if (vis && !wasVisible) lastLoad = 0;
+    wasVisible = vis;
+    if (built && vis && Date.now() - lastLoad > 30000) load();
   }
   function init() { tick(); setInterval(tick, 3000); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
