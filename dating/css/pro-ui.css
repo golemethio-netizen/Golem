@@ -67,3 +67,6 @@
 .hd-hint { font-weight: 500; font-size: .82rem; color: var(--muted, #6b7280); }
 .hd-community > .wana-composer { margin: 0 14px 14px; box-shadow: none; }
 .hd-community > #feed { padding: 0 14px 14px; }
+
+/* Sidebar account box (avatar, name, links) removed: Edit Profile / Privacy Settings are already in the menu and Sign out is in the header. */
+#accountBox, .sidebar-account { display: none !important; }
