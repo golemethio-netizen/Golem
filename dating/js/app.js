@@ -862,14 +862,17 @@ async function signInWithGoogleRedirect(){
 // The popup (auth-callback.html) sends the finished session back here.
 // setSession fires SIGNED_IN, so the existing onAuthStateChange handler
 // updates the UI, loads the profile and so on.
-window.addEventListener("message", async (e) => {
-  if (e.origin !== window.location.origin || e.data?.type !== "wana-auth-done") return;
-  const { access_token, refresh_token } = e.data;
-  if (!access_token || !refresh_token) return;
-  const { error } = await _supabase.auth.setSession({ access_token, refresh_token });
+async function acceptPopupSession(d){
+  if (!d || d.type !== "wana-auth-done" || !d.access_token || !d.refresh_token) return;
+  const { error } = await _supabase.auth.setSession({ access_token: d.access_token, refresh_token: d.refresh_token });
   if (error) return wanaAlert("Sign-in failed: " + error.message);
   closeModal();
+}
+window.addEventListener("message", (e) => {
+  if (e.origin !== window.location.origin) return;
+  acceptPopupSession(e.data);
 });
+try { new BroadcastChannel("wana-auth").onmessage = (e) => acceptPopupSession(e.data); } catch (_) {}
 
 async function submitAuthForm(e){
   e.preventDefault();
