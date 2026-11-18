@@ -291,22 +291,39 @@ let returnThread = null;      // conversation to go back to after viewing a prof
 const ONLINE_THRESHOLD_MS = 3 * 60 * 1000; // "online" = active in the last 3 minutes
 let presenceTimer = null;
 
+let lastActivityAt = Date.now();
+let lastHeartbeatAt = 0;
+let presenceBound = false;
+const ACTIVE_WINDOW_MS = 5 * 60 * 1000; // a tab you used in the last 5 minutes still counts as "online"
+
 function startPresenceHeartbeat(){
   sendHeartbeat();
   if (presenceTimer) clearInterval(presenceTimer);
+  // Beat every minute while the tab is in front OR was used recently (e.g. several windows open side by side).
   presenceTimer = setInterval(() => {
-    if (document.visibilityState === "visible") sendHeartbeat();
+    if (document.visibilityState === "visible" || Date.now() - lastActivityAt < ACTIVE_WINDOW_MS) sendHeartbeat();
   }, 60 * 1000);
+  if (presenceBound) return;
+  presenceBound = true;
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && currentUser) sendHeartbeat();
   });
+  // Any use of the page counts as activity; beat at most every 45 seconds.
+  const onActivity = () => {
+    lastActivityAt = Date.now();
+    if (currentUser && Date.now() - lastHeartbeatAt > 45 * 1000) sendHeartbeat();
+  };
+  ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach(ev =>
+    window.addEventListener(ev, onActivity, { passive: true }));
 }
 
 async function sendHeartbeat(){
   if (!currentUser) return;
-  await _supabase.from("dating_profiles")
+  lastHeartbeatAt = Date.now();
+  const { error } = await _supabase.from("dating_profiles")
     .update({ last_seen_at: new Date().toISOString() })
     .eq("user_id", currentUser.id);
+  if (error) console.warn("Presence update failed:", error.message);
 }
 
 function presenceInfo(lastSeenAt){
@@ -1003,7 +1020,7 @@ function updateHeaderAuthUI(){
     notifWrap.style.display = "inline-block";
     if (sidebar) sidebar.style.display = "";
 
-    const fullName = currentUser.user_metadata?.full_name || currentUser.email || "Account";
+    const fullName = currentUser.user_metadata?.full_name || "Account";
     const photoUrl = currentUser.user_metadata?.avatar_url || null;
     const initial = fullName.charAt(0).toUpperCase();
 
