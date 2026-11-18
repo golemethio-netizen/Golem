@@ -27,15 +27,21 @@
       }
       if (!session) throw new Error("No session");
 
-      if (window.opener) {
-        window.opener.postMessage({
-          type: "wana-auth-done",
-          access_token: session.access_token,
-          refresh_token: session.refresh_token
-        }, window.location.origin);
-        window.close();
+      const payload = {
+        type: "wana-auth-done",
+        access_token: session.access_token,
+        refresh_token: session.refresh_token
+      };
+      let sent = false;
+      // Google's sign-in page can cut the link to the opener window, so send through two routes.
+      try { if (window.opener && !window.opener.closed) { window.opener.postMessage(payload, window.location.origin); sent = true; } } catch (_) {}
+      try { const bc = new BroadcastChannel("wana-auth"); bc.postMessage(payload); sent = true; setTimeout(() => bc.close(), 1500); } catch (_) {}
+      if (sent) {
+        status.textContent = "Signed in. Returning to Wana Dating…";
+        setTimeout(() => { try { window.close(); } catch (_) {} }, 400);
+        // If this window could not close itself (opened as a normal tab), continue in it.
+        setTimeout(() => { window.location.replace("index.html"); }, 1500);
       } else {
-        // opened as a normal tab (popup fallback): go to the dating app
         window.location.replace("index.html");
       }
     } catch (err) {
