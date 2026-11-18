@@ -35,7 +35,7 @@
   async function onCredential(response) {
     try {
       var res = await _supabase.auth.signInWithIdToken({ provider: "google", token: response.credential, nonce: nonceRaw });
-      if (res.error) { console.warn("Google One Tap sign-in failed:", res.error.message); return; }
+      if (res.error) { console.warn("Google One Tap sign-in failed:", res.error.message); if (typeof wanaAlert === "function") wanaAlert("Google sign-in failed: " + res.error.message + ". Please use the Continue with Google button instead."); return; }
       if (typeof closeModal === "function") closeModal();   // close the sign-in dialog if it was open
     } catch (e) {
       console.warn("Google One Tap error:", e);
