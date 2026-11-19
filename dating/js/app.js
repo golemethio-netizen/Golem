@@ -1391,7 +1391,7 @@ function teardownRealtimeChannels(){
 
 
 function notifIcon(type){
-  return type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : type === "platinum" ? "💎" : type === "photo" ? "📷" : type === "visit" ? "👣" : "💬";
+  return type === "call" ? "📞" : type === "match" ? "✨" : type === "like" ? "💛" : type === "date" ? "📅" : type === "gift" ? "🎁" : type === "platinum" ? "💎" : type === "photo" ? "📷" : type === "visit" ? "👣" : "💬";
 }
 
 function notifText(n){
@@ -1399,6 +1399,7 @@ function notifText(n){
   if (n.type === "match") return `It's a match with ${esc(name)}!`;
   if (n.type === "like") return `${esc(name)} liked your profile`;
   if (n.type === "visit") return `${esc(name)} viewed your profile`;
+  if (n.type === "call") return `${esc(name)} called you`;
   if (n.type === "date") return `${esc(name)} ${esc(n.body || "sent you a date update")}`;
   if (n.type === "platinum") return esc(n.body || "Your Platinum is active");
   if (n.type === "photo") return esc(n.body || "One of your photos was removed");
