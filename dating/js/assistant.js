@@ -2,7 +2,7 @@
    Answers come from the FAQ in assistant-faq.js (no AI service, no cost). All text is added with textContent (no innerHTML). */
 (function () {
   "use strict";
-  var btn, panel, list, input, sendBtn, busy = false, history = [], built = false;
+  var btn, panel, list, input, sendBtn, busy = false, history = [], built = false, loadedFaq = false;
 
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
 
@@ -25,6 +25,7 @@
       ".wa-foot{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line,#e8eaef);background:#fff}" +
       ".wa-foot input{flex:1;min-width:0;border:1px solid var(--line-strong,#d5d9e2);border-radius:999px;padding:9px 14px;font:.9rem var(--font,sans-serif)}" +
       ".wa-foot button{border:0;border-radius:999px;padding:0 16px;background:var(--green,#e0426f);color:#fff;font-weight:600;cursor:pointer}.wa-foot button:disabled{opacity:.5;cursor:default}" +
+      ".wa-fb{align-self:flex-start;font-size:.72rem;color:var(--muted,#6b7280)}.wa-fbtn{border:0;background:none;color:var(--muted,#6b7280);text-decoration:underline;font-size:.72rem;cursor:pointer;padding:0}" +
       ".wa-note{padding:6px 12px 8px;font-size:.7rem;color:var(--muted,#6b7280);background:#fff;text-align:center}" +
       "@media(max-width:820px){.wa-btn{bottom:78px}.wa-panel{bottom:78px;right:12px}}";
     document.head.appendChild(s);
@@ -77,6 +78,31 @@
     list.appendChild(chips); list.scrollTop = list.scrollHeight;
   }
 
+  function loadAdminAnswers() {
+    if (loadedFaq || typeof _supabase === "undefined" || !window.WanaFAQ) return;
+    loadedFaq = true;
+    try {
+      _supabase.from("dating_faq").select("*").then(function (r) {
+        if (r && r.data && r.data.length) window.WanaFAQ.setCustom(r.data);
+      }, function () {});
+    } catch (e) {}
+  }
+
+  // Tell the team which questions were not answered or not helpful, so they can add answers (no personal data is sent).
+  function logQuestion(q, matched, kind) {
+    try { if (typeof _supabase !== "undefined") _supabase.rpc("dating_log_question", { p_question: q, p_matched: matched || null, p_kind: kind }).then(function () {}, function () {}); } catch (e) {}
+  }
+
+  function addFeedback(q, matched) {
+    var row = el("div", "wa-fb");
+    var b = el("button", "wa-fbtn", "Not helpful"); b.type = "button";
+    b.addEventListener("click", function () {
+      logQuestion(q, matched, "unhelpful");
+      row.textContent = "Thanks — we will improve this answer. You can also open Support from the menu.";
+    });
+    row.appendChild(b); list.appendChild(row); list.scrollTop = list.scrollHeight;
+  }
+
   function send() {
     var q = (input.value || "").trim();
     if (!q || busy) return;
@@ -87,6 +113,8 @@
     setTimeout(function () {
       var r = window.WanaFAQ.answer(q);
       wait.textContent = r.text;
+      if (r.fallback) logQuestion(q, null, "unanswered");
+      else if (r.id) addFeedback(q, r.id);
       if (r.more && r.more.length) addChips(r.more);
       list.scrollTop = list.scrollHeight;
     }, 350);
@@ -94,7 +122,7 @@
 
   function tick() {
     var signedIn = typeof currentUser !== "undefined" && currentUser;
-    if (signedIn) build();
+    if (signedIn) { build(); loadAdminAnswers(); }
     if (built) { btn.style.display = signedIn && !panel.classList.contains("open") ? "flex" : "none"; if (!signedIn) panel.classList.remove("open"); }
   }
   function init() { tick(); setInterval(tick, 2000); }

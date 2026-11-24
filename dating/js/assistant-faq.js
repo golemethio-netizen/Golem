@@ -142,7 +142,7 @@
     if (GREET.test(String(text).trim()) && String(text).trim().length < 20) return { text: am ? "ሰላም! ስለ መልእክት፣ ማረጋገጫ፣ ፕላቲነም፣ ደህንነት እና ስለ ጣቢያው አጠቃቀም ልረዳዎ እችላለሁ። ምን ማወቅ ይፈልጋሉ?" : "Hello! I can help with messages, verification, Platinum, safety and how the site works. What would you like to know?" };
     var r = best(text);
     if (r.length && r[0].s >= 4) {
-      var out = { text: r[0].f.a[L] };
+      var out = { text: r[0].f.a[L], id: r[0].f.id };
       if (r.length > 1 && r[1].s >= 4 && r[1].s >= r[0].s * 0.8) out.more = [r[1].f.q[L]];
       return out;
     }
@@ -154,7 +154,30 @@
     };
   }
 
-  var api = { FAQ: FAQ, answer: answer, best: best, isAmharic: isAmharic };
+  /* Answers added or changed by admins (table dating_faq). A row with the same slug as a built-in answer replaces it;
+     a row with active = false switches the built-in answer off; any other row is a new answer. */
+  var BASE = FAQ.map(function (f) { return { id: f.id, q: f.q, a: f.a, kw: f.kw }; });
+  function splitKw(v) { return String(v || "").split(",").map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean); }
+  function setCustom(rows) {
+    FAQ.length = 0;
+    BASE.forEach(function (b) { FAQ.push({ id: b.id, q: b.q, a: b.a, kw: b.kw }); });
+    (rows || []).forEach(function (r) {
+      var idx = -1;
+      for (var i = 0; i < FAQ.length; i++) if (FAQ[i].id === r.slug) { idx = i; break; }
+      if (r.active === false) { if (idx > -1) FAQ.splice(idx, 1); return; }
+      var kw = splitKw(r.keywords);
+      var entry = {
+        id: r.slug || ("c" + r.id),
+        q: { en: r.q_en || r.q_am || "", am: r.q_am || r.q_en || "" },
+        a: { en: r.a_en || r.a_am || "", am: r.a_am || r.a_en || "" },
+        kw: kw.length ? kw : (idx > -1 ? FAQ[idx].kw : [])
+      };
+      if (!entry.a.en && !entry.a.am) return;
+      if (idx > -1) FAQ[idx] = entry; else FAQ.push(entry);
+    });
+  }
+
+  var api = { FAQ: FAQ, BASE: BASE, answer: answer, best: best, isAmharic: isAmharic, setCustom: setCustom, splitKw: splitKw };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window !== "undefined") window.WanaFAQ = api;
 })();
