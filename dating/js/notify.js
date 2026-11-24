@@ -60,8 +60,10 @@
   function friendlyError(e) {
     var n = e && e.name, m = (e && e.message) || String(e || "");
     if (n === "NotAllowedError") return "Notifications are blocked. Allow them in your browser's site settings, then try again.";
-    if (n === "AbortError" || /push service|registration failed/i.test(m))
+    if (n === "AbortError" || /push service|registration failed/i.test(m)) {
+      if (navigator.brave) return "Brave blocks push notifications by default. Open brave://settings/privacy, turn on \"Use Google services for push messaging\", restart Brave, then tap Allow again.";
       return "Your browser couldn't reach its push service. Try again on mobile data or Wi-Fi, and use Chrome (Android) or Safari from the Home Screen (iPhone).";
+    }
     if (n === "SecurityError") return "Notifications need a secure (https) page.";
     return "Couldn't turn on notifications: " + m;
   }
