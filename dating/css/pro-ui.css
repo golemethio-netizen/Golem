@@ -70,3 +70,20 @@
 
 /* Sidebar account box (avatar, name, links) removed: Edit Profile / Privacy Settings are already in the menu and Sign out is in the header. */
 #accountBox, .sidebar-account { display: none !important; }
+
+/* Site background photo: fixed behind everything, with a light layer so text stays readable. */
+html { background: #f6f7f9; }
+body { background: transparent !important; }
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(250,248,250,.80) 0%, rgba(248,246,250,.74) 100%),
+    url("../images/site-bg.webp") center / cover no-repeat;
+}
+@media (max-width: 820px) {
+  body::before {
+    background:
+      linear-gradient(180deg, rgba(250,248,250,.82) 0%, rgba(248,246,250,.78) 100%),
+      url("../images/site-bg-mobile.webp") 40% 30% / cover no-repeat;
+  }
+}
