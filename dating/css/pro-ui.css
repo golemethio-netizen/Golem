@@ -87,3 +87,6 @@ body::before {
       url("../images/site-bg-mobile.webp") 40% 30% / cover no-repeat;
   }
 }
+
+/* Wide screens: use the full width. The menu sits at the left edge instead of leaving a big empty strip. */
+.app-shell { max-width: 1840px !important; margin-left: auto !important; margin-right: auto !important; }
