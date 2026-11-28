@@ -1,749 +1,2538 @@
 <!DOCTYPE html>
-<!-- Wana Dating 2.0 — Smart Match + Date Planning release -->
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="google-site-verification" content="FV_qv5h-jFv367oqAVvozedAw0QWle70n0uPOed4Tmc" />
+    <meta property="og:title" content="WanaGebya | ዋና ገበያ - Ethiopia's Premium Marketplace">
+    <meta property="og:description" content="Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <meta property="og:image" content="https://wanagebya.com/logo.png">
+    <meta property="og:url" content="https://wanagebya.com/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://wanagebya.com/">
+    <meta name="geo.region" content="ET" />
+    <meta name="geo.placename" content="Addis Ababa" />
+    <meta name="description" content="WanaGebya (ዋና ገበያ) - The leading online marketplace in Ethiopia. Buy and sell electronics, furniture, fashion, and vehicles in Addis Ababa and across Ethiopia.">
+    <title>WanaGebya Marketplace | ዋና ገበያ - Buy & Sell</title>
+    <link rel="icon" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 
-<title>Dating — WanaGebya</title>
-<meta name="description" content="Wana Dating by WanaGebya: meet genuine singles around the world for friendship, dating or marriage, with profile verification, privacy controls and safety tools.">
-<meta name="theme-color" content="#2a1033">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
-<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Wana Dating">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="canonical" href="https://www.wanagebya.com/dating/index.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="WanaGebya">
-<meta property="og:title" content="Wana Dating — Real People, Genuine Connections">
-<meta property="og:description" content="Meet genuine singles around the world for friendship, dating or marriage. Verified profiles, privacy controls and safety tools.">
-<meta property="og:url" content="https://www.wanagebya.com/dating/index.html">
-<meta property="og:image" content="https://www.wanagebya.com/dating/images/wana-dating-hero.webp">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://www.wanagebya.com/dating/images/wana-dating-hero.webp">
-<meta name="twitter:title" content="Wana Dating — Real People, Genuine Connections">
-<meta name="twitter:description" content="Meet genuine singles around the world for friendship, dating or marriage.">
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;family=Dancing+Script:wght@600;700&amp;family=Noto+Sans+Ethiopic:wght@400;500;700&amp;family=Noto+Serif+Ethiopic:wght@600;700&amp;display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/layout.css">
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           LAYOUT FOUNDATION
+        ═══════════════════════════════════════════════════════ */
 
+        /* Desktop nav is visible; mobile bottom nav is hidden by default */
+        .mobile-bottom-nav { display: none; }
+        .desktop-nav { display: flex; }
 
-<link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/responsive.css"><link rel="stylesheet" href="css/chat.css"><link rel="stylesheet" href="css/calls.css"><link rel="stylesheet" href="css/polish.css?v=2">
-  <link rel="stylesheet" href="css/pro-ui.css">
-<style id="wana-mobile-account">
-/* Header "Sign out" button: shown only while signed in. Works on phones, where the sidebar account box is hidden. */
-.signout-pill{display:inline-flex;align-items:center;justify-content:center;min-height:36px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;margin-left:10px;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.signout-pill:hover,.signout-pill:focus-visible{background:rgba(255,255,255,.24)}
-/* Keep the header on one line on phones */
-@media (max-width:650px){
-  header nav a{margin-left:10px!important;font-size:.8rem;white-space:nowrap}
-  header nav .lang{padding:5px 8px!important}
-  .signout-pill,.signin-pill{margin-left:8px;padding:7px 12px;font-size:.78rem}
+       /* ═══════════════════════════════════════════════════════
+           PREMIUM HEADER LAYOUT
+        ═══════════════════════════════════════════════════════ */
+        .golem-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            padding: 10px 0;
+        }
+
+        .header-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Top Row: Logo & Quick Actions */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Premium Scalable Logo */
+        .logo-block {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+        }
+        .logo-block svg {
+            width: 42px; height: 42px; flex-shrink: 0;
+        }
+        .logo-title {
+            font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; color: #1a1a1a; line-height: 1; display: flex; align-items: baseline;
+        }
+        .logo-title span { color: #F5A623; }
+        .logo-subtitle {
+            font-family: 'Poppins', sans-serif; font-size: 0.75rem; color: #F5A623; font-weight: 700; letter-spacing: 1px; margin-top: 2px;
+        }
+
+        /* Top Right Actions */
+        .header-top-right {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .help-link {
+            color: #6b7280; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.3s;
+        }
+        .help-link:hover { color: #F5A623; }
+        
+        .lang-btn {
+            background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #6b7280; display: flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .lang-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+
+        .sign-in-btn {
+            background: #1a1a1a; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 2px 8px rgba(26,26,46,0.2);
+        }
+        .sign-in-btn:hover { background: #F5A623; box-shadow: 0 2px 10px rgba(0,184,148,0.3); }
+
+        #googleSignInBtn:hover:not(:disabled) { background: #f8fafc !important; box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important; border-color: #cbd5e1 !important; }
+        #googleSignInBtn:active:not(:disabled) { transform: scale(0.98); }
+
+        /* Bottom Row: Nav & Search */
+        .header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* Desktop Nav */
+        .desktop-main-nav {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-item-box {
+            display: flex; align-items: center; gap: 6px; text-decoration: none; color: #6b7280; font-weight: 600; font-size: 0.85rem; padding: 8px 14px; border-radius: 12px; transition: background 0.2s;
+        }
+        .nav-item-box:hover { background: #f1f5f9; color: #1a1a1a; }
+        .nav-item-box.bg-sell { background: #e8fdf5; color: #F5A623; }
+        .nav-item-box.bg-sell:hover { background: #fff8ec; }
+        .nav-item-box.nav-dating { background: #fdecf1; color: #c2185b; }
+        .nav-item-box.nav-dating:hover { background: #fbdbe6; }
+        .mobile-bottom-nav .dating-tab { color: #c2185b; }
+        /* Admin switch (admin.html > Dating Promo): hidden until the setting is known, then shown/hidden */
+        body:not(.dp-ready) .dating-promo-section, body:not(.dp-ready) .nav-dating, body:not(.dp-ready) .dating-tab { display: none !important; }
+        body.dp-no-banner .dating-promo-section { display: none !important; }
+        body.dp-no-menu .nav-dating, body.dp-no-menu .dating-tab { display: none !important; }
+        .dating-promo { display: grid; grid-template-columns: 1.05fr 1fr; align-items: stretch; margin: 18px 0 8px; border-radius: 22px; overflow: hidden; text-decoration: none; color: #2a1033; background: linear-gradient(135deg, #fff1f5, #fde4ec); border: 1px solid #f6c9d8; box-shadow: 0 10px 30px rgba(194,24,91,.12); transition: transform .2s, box-shadow .2s; }
+        .dating-promo:hover { transform: translateY(-2px); box-shadow: 0 16px 38px rgba(194,24,91,.2); }
+        .dating-promo .dp-text { padding: 26px 28px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+        .dating-promo .dp-tag { align-self: flex-start; background: #fff; color: #c2185b; font-weight: 700; font-size: .78rem; padding: 5px 12px; border-radius: 99px; }
+        .dating-promo h2 { margin: 2px 0 0; font-size: 1.7rem; line-height: 1.15; color: #2a1033; }
+        .dating-promo p { margin: 0; color: #5d4a57; font-size: .95rem; line-height: 1.5; }
+        .dating-promo ul { list-style: none; margin: 4px 0 6px; padding: 0; display: grid; gap: 5px; font-size: .9rem; color: #3d2a39; }
+        .dating-promo li i { color: #c2185b; margin-right: 6px; }
+        .dating-promo .dp-btn { align-self: flex-start; background: linear-gradient(135deg, #c2185b, #e8688e); color: #fff; font-weight: 700; padding: 11px 20px; border-radius: 99px; font-size: .95rem; }
+        .dating-promo .dp-btn i { margin-left: 6px; transition: transform .2s; }
+        .dating-promo:hover .dp-btn i { transform: translateX(4px); }
+        .dating-promo .dp-photo { position: relative; min-height: 240px; }
+        .dating-promo .dp-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+        @media (max-width: 720px) {
+            .dating-promo { grid-template-columns: 1fr; }
+            .dating-promo .dp-photo { order: -1; min-height: 190px; }
+            .dating-promo .dp-text { padding: 18px 18px 22px; }
+            .dating-promo h2 { font-size: 1.4rem; }
+        }
+        @media (prefers-reduced-motion: reduce) { .dating-promo, .dating-promo .dp-btn i { transition: none; } }
+        .nav-item-box i { font-size: 1.1rem; }
+
+        .cart-badge {
+            position: absolute; top: -4px; right: -4px; background: #ff4757; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.65rem; font-weight: 700; border: 2px solid #fff; display: none;
+        }
+
+        /* Search & Filters */
+        .header-search-row {
+            display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end;
+        }
+        .search-input-group {
+            display: flex; align-items: center; background: #f4f6f8; border: 1px solid #e2e8f0; border-radius: 24px; padding: 8px 16px; gap: 8px; flex: 1; max-width: 450px; transition: all 0.3s;
+        }
+        .search-input-group:focus-within {
+            border-color: #F5A623; box-shadow: 0 0 0 3px rgba(0,184,148,0.1); background: #fff;
+        }
+        .search-input-group input {
+            border: none; background: transparent; outline: none; font-size: 0.85rem; width: 100%; color: #333; font-family: inherit;
+        }
+        
+        .header-filters {
+            display: flex; gap: 8px;
+        }
+        .header-select {
+            border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 14px; border-radius: 24px; font-size: 0.8rem; font-weight: 500; font-family: inherit; outline: none; cursor: pointer; color: #6b7280; transition: 0.2s;
+        }
+        .header-select:hover { border-color: #cbd5e1; }
+
+        /* Mobile overrides */
+        .mobile-bottom-nav { display: none; }
+        
+        @media (max-width: 991px) {
+            .header-bottom { flex-direction: column; gap: 12px; align-items: stretch; }
+            .desktop-main-nav { display: none; }
+            .header-search-row { max-width: 100%; flex-direction: column; align-items: stretch; }
+            .search-input-group { max-width: 100%; padding: 10px 16px; }
+            .header-filters { display: flex; width: 100%; gap: 8px; }
+            .header-select { flex: 1; padding: 10px 12px; }
+            
+            .hide-mobile { display: none !important; }
+            
+            .logo-title { font-size: 1.25rem; }
+            .logo-block svg { width: 36px; height: 36px; }
+            
+            .sign-in-btn { padding: 0; width: 38px; height: 38px; justify-content: center; border-radius: 50%; }
+            .sign-in-btn span { display: none; }
+
+            /* Show mobile bottom nav */
+         /* Locate this rule block inside your code and ensure it matches below */
+.mobile-bottom-nav {
+    display: flex !important;
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%;
+    background: white; 
+    border-top: 1px solid #e2e8f0;
+    justify-content: space-around; 
+    align-items: center;
+    padding: 10px 0 12px; 
+    
+    /* FIX: Boost this value higher than the subcatDropdown layers */
+    z-index: 10000 !important; 
+    
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
 }
-/* Phones and small tablets: the menu is a swipeable row of compact tabs (not one full-width tab per screen) */
-@media (max-width:768px){
-  .side-nav .tab{width:auto!important;flex:0 0 auto}
-}
-/* Home composer: let the text box and the Public/Post row shrink and wrap instead of pushing the page sideways */
-@media (max-width:480px){
-  .composer-body{min-width:0}
-  .composer-actions{flex-wrap:wrap;justify-content:flex-end;max-width:100%}
-  .composer-actions select{min-width:0;max-width:100%}
-}
-/* Small phones: the "Back to Shop" link shows as an arrow only (label stays available to screen readers and on long-press) */
-@media (max-width:480px){
-  header nav a{font-size:0!important;margin-left:6px!important;padding:8px 8px;line-height:1}
-  header nav a::before{content:"\2190";font-size:1.25rem;line-height:1}
-  .signout-pill,.signin-pill{margin-left:6px;padding:6px 11px;font-size:.76rem}
-}
+            .mobile-bottom-nav a {
+                display: flex; flex-direction: column; align-items: center; gap: 4px;
+                text-decoration: none; color: #6b7280; flex: 1;
+                font-size: 0.65rem; font-weight: 600; position: relative; transition: color 0.2s;
+            }
+            .mobile-bottom-nav a:hover { color: #1a1a1a; }
+            .mobile-bottom-nav a i { font-size: 1.3rem; color: #94a3b8; transition: color 0.2s; }
+            .mobile-bottom-nav a.active-tab i, .mobile-bottom-nav a:hover i { color: #F5A623; }
+            .mobile-bottom-nav a.sell-tab i { color: #2ed573; }
+            .mobile-bottom-nav a.admin-tab i { color: #ff4757; }
+        }
+        /* ═══════════════════════════════════════════════════════
+           JOB CARD — Dark blue theme
+        ═══════════════════════════════════════════════════════ */
+        .job-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #f0f7f4;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .job-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+        .job-type-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #f0f7f4; color: #0A291A;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+        }
+        .job-title { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin: 4px 28px 2px 0; line-height: 1.3; }
+        .job-company { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; }
+        .job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .job-tag {
+            font-size: 11px; padding: 3px 9px; border-radius: 6px;
+            display: inline-flex; align-items: center; gap: 4px; font-weight: 600;
+        }
+        .job-tag.blue   { background: #eef2ff; color: #4f46e5; }
+        .job-tag.green  { background: #ecfdf5; color: #2ed573; }
+        .job-tag.purple { background: #f0f7f4; color: #0A291A; }
+        .job-tag.orange { background: #fff7ed; color: #ea580c; }
+        .job-tag.red    { background: #fff1f2; color: #e11d48; }
+
+        .job-meta-row {
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 8px;
+        }
+        .job-salary { font-size: 1rem; font-weight: 700; color: #2ed573; }
+        .job-location {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11.5px; color: #888;
+        }
+        .deadline-badge {
+            font-size: 11px; color: #e74c3c;
+            display: inline-flex; align-items: center; gap: 4px; margin-top: 2px;
+        }
+        .job-snippet {
+            font-size: 12px; color: #888; line-height: 1.55; margin: 0;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .job-actions {
+            display: grid;
+            grid-template-columns: 1fr 42px 42px;
+            gap: 8px; margin-top: 4px;
+        }
+        .job-btn {
+            height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; text-decoration: none; font-size: 13px;
+            font-weight: 600; transition: opacity 0.2s, transform 0.1s;
+            border: none; cursor: pointer; font-family: inherit;
+        }
+        .job-btn:hover { opacity: 0.88; transform: scale(1.01); }
+        .job-btn-primary { background: #1a1a1a; color: white; }
+        .job-btn-tg      { background: #0088cc; color: white; }
+        .job-btn-wa      { background: #25d366; color: white; }
+        .job-wishlist-btn {
+            position: absolute; top: 14px; right: 14px;
+            border: none; background: none; font-size: 17px;
+            color: #ccc; cursor: pointer; transition: color 0.15s;
+            padding: 4px;
+        }
+        .job-wishlist-btn.active, .job-wishlist-btn:hover { color: #0A291A; }
+
+        /* ═══════════════════════════════════════════════════════
+           SERVICE CARD — Purple theme
+        ═══════════════════════════════════════════════════════ */
+        .service-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #f0ebff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
+
+        .service-banner {
+            width: 100%; height: 130px;
+            overflow: hidden; position: relative;
+            background: linear-gradient(135deg, #f0f7f4 0%, #ede9fe 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .service-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .service-banner-fallback { font-size: 44px; opacity: 0.45; }
+        .service-type-badge {
+            position: absolute; top: 10px; left: 12px;
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            padding: 3px 9px; border-radius: 20px; letter-spacing: 0.07em;
+            background: rgba(124,58,237,0.12); color: #0A291A;
+            border: 1px solid rgba(124,58,237,0.2);
+            backdrop-filter: blur(4px);
+        }
+        .service-rating {
+            position: absolute; top: 10px; right: 12px;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; color: #F5A623;
+            background: rgba(255,255,255,0.85); padding: 3px 7px;
+            border-radius: 6px;
+        }
+        .service-wishlist-btn {
+            position: absolute; bottom: 10px; right: 12px;
+            background: rgba(255,255,255,0.85); border: none;
+            border-radius: 50%; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #aaa; font-size: 12px; transition: color 0.15s;
+        }
+        .service-wishlist-btn.active, .service-wishlist-btn:hover { color: #0A291A; }
+
+        .service-body { padding: 14px 15px 0; }
+        .service-name { font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; line-height: 1.3; }
+        .service-provider {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: #888; margin-bottom: 10px;
+        }
+        .service-highlights { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+        .svc-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 600; padding: 3px 8px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .svc-tag.purple { background: #f0f7f4; color: #0A291A; }
+        .svc-tag.pink   { background: #fff0f6; color: #d6336c; }
+        .svc-tag.teal   { background: #e6fffb; color: #0d9488; }
+        .svc-tag.amber  { background: #fffbeb; color: #F5A623; }
+        .svc-tag.green  { background: #ecfdf5; color: #2ed573; }
+        .service-snippet {
+            font-size: 12px; color: #888; line-height: 1.55; margin: 0 0 10px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .service-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 15px 14px;
+            border-top: 1px solid #f0f7f4;
+            margin-top: 4px;
+        }
+        .service-price { font-size: 1.05rem; font-weight: 700; color: #e53935; }
+        .service-price-label { font-size: 10px; color: #aaa; margin-top: 1px; }
+        .service-actions { display: flex; gap: 7px; }
+        .svc-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; padding: 8px 14px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; font-family: inherit;
+            transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+        }
+        .svc-btn:hover { opacity: 0.85; transform: scale(1.02); }
+        .svc-btn-primary { background:#F5A623; color:#1a1a1a; }
+        .svc-btn-outline {
+            background: #f0f7f4; color: #0A291A;
+            border: 1px solid rgba(124,58,237,0.3);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           CATEGORY SECTION DIVIDERS
+        ═══════════════════════════════════════════════════════ */
+        .category-section-header {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 0 4px;
+        }
+        .category-section-header h3 { font-size: 13px; font-weight: 700; color: #333; white-space: nowrap; }
+        .category-section-header .line { flex: 1; height: 1px; background: #eee; }
+
+        /* ═══════════════════════════════════════════════════════
+           DESKTOP  (≥ 769px)
+        ═══════════════════════════════════════════════════════ */
+        @media (min-width: 769px) {
+            .mobile-bottom-nav { display: none !important; }
+            .desktop-nav { display: flex !important; }
+
+            /* header nav stays inline */
+            .nav-container-horizontal {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 6px;
+                align-items: center;
+            }
+            .nav-item-box {
+                flex-direction: row;
+                gap: 6px;
+                padding: 8px 14px;
+            }
+            .nav-item-box p { font-size: 0.85rem; font-weight: 600; }
+
+            /* desktop grid: 3-4 columns */
+            .masonry-wrapper {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 18px;
+            }
+
+            /* job/service cards span 1 col on desktop */
+            .job-card, .service-card { grid-column: span 1; }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           MOBILE  (≤ 768px)
+        ═══════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            /* Give bottom nav breathing room */
+            body { padding-bottom: 72px; }
+
+            /* ── Header ── */
+            .golem-header { padding: 12px 14px 10px; }
+            .header-top-row { flex-wrap: nowrap; }
+            .logo { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+            .header-actions { gap: 8px; }
+            .hide-text-mobile { display: none !important; }
+            .help-link i { font-size: 1.25rem !important; }
+            .sign-in-btn {
+                padding: 0 !important; border-radius: 50% !important;
+                width: 36px; height: 36px;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .sign-in-btn i { margin: 0 !important; font-size: 1rem; }
+            .sign-in-btn span { display: none; }
+
+            /* Search stays full-width below logo row */
+            .search-wrapper { width: 100%; margin-top: 10px; }
+
+            /* ── Desktop nav hidden on mobile ── */
+            .desktop-nav { display: none !important; }
+
+            /* ── Mobile bottom tab bar ── */
+            .mobile-bottom-nav {
+                display: flex !important;
+                position: fixed; bottom: 0; left: 0; width: 100%;
+                background: white; border-top: 1px solid #eee;
+                justify-content: space-around; align-items: center;
+                padding: 8px 0 10px; z-index: 1000;
+                box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+            }
+            .mobile-bottom-nav a {
+                display: flex; flex-direction: column; align-items: center; gap: 3px;
+                text-decoration: none; color: #666; flex: 1;
+                font-size: 0.6rem; font-weight: 600; position: relative;
+            }
+            .mobile-bottom-nav a i { font-size: 1.25rem; color: #0088cc; }
+            .mobile-bottom-nav a.sell-tab i { color: #2ed573; }
+            .mobile-bottom-nav a.admin-tab i { color: #e74c3c; }
+            .mobile-bottom-nav a#mobileCartBadge { /* handled below */ }
+
+            /* ── Filter bar ── */
+            .filter-controls {
+                width: 100% !important;
+                left: 0 !important;
+                transform: none !important;
+                padding: 0 8px !important;
+            }
+            .filter-bar {
+                display: flex; flex-wrap: nowrap; overflow-x: auto;
+                -webkit-overflow-scrolling: touch; padding: 10px 0;
+                gap: 8px; width: 100%;
+            }
+            .filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { flex: 0 0 auto; font-size: 0.82rem; padding: 7px 14px; }
+
+            /* ── Product grid ── */
+            .masonry-wrapper {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 11px;
+            }
+
+            /* Jobs / Services span full width on mobile */
+            .job-card, .service-card { grid-column: 1 / -1; }
+
+            /* ── Modal ── */
+            #productModal { align-items: flex-end !important; padding: 0 !important; }
+            #productModal .modal-content {
+                width: 100% !important;
+                margin: 0 !important;
+                border-radius: 20px 20px 0 0 !important;
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+                position: relative;
+                padding-bottom: 72px; /* clear mobile bottom nav */
+            }
+            /* Electronics dark card: top corners match sheet, no overflow clip */
+            #productModal .modal-content > div {
+                border-radius: 20px 20px 0 0 !important;
+                overflow: visible !important;
+            }
+            /* Image header inside electronics card */
+            #productModal .modal-content > div > div:first-child {
+                border-radius: 20px 20px 0 0 !important;
+                overflow: hidden;
+            }
+            .modal-content { width: 96%; margin: 4% auto; max-height: 92vh; overflow-y: auto; }
+            .modal-footer-actions { flex-direction: column; }
+            .modal-flex-actions .contact-btn { flex: 1 1 100%; }
+
+            /* ── Floating chat ── */
+            .floating-chat { bottom: 82px; right: 14px; }
+            #chatMenu { bottom: 68px; right: 0; }
+
+            /* ── Sponsor ── */
+            .sponsor-content { flex-direction: column; text-align: center; }
+            .sponsor-image img { height: 180px; width: 100%; object-fit: cover; border-radius: 10px; }
+            .sponsor-actions { flex-direction: column; gap: 10px; }
+            .sponsor-actions a { margin-left: 0 !important; }
+
+            /* ── Back-to-top stays above bottom nav ── */
+            #backToTop { bottom: 82px !important; }
+
+            /* ── Controls row ── */
+            .controls-row { flex-direction: row; }
+        }
+
+        /* ── Very small phones ── */
+        @media (max-width: 360px) {
+            .masonry-wrapper { grid-template-columns: 1fr; }
+            .logo { font-size: 0.95rem; }
+        }
+    
+        /* Amharic font support */
+        :lang(am), [lang="am"] * {
+            font-family: 'Noto Sans Ethiopic', 'Poppins', sans-serif;
+        }
+        .lang-am-active {
+            font-family: 'Noto Sans Ethiopic', 'Poppins', sans-serif !important;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           FEATURED PARTNER — Promotional Animations
+        ═══════════════════════════════════════════════════════ */
+
+        /* Keyframes */
+        @keyframes fp-pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); }
+            50%       { box-shadow: 0 0 0 12px rgba(245,166,35,0.18); }
+        }
+        @keyframes fp-img-breathe {
+            0%, 100% { transform: scale(1);    filter: brightness(1); }
+            50%       { transform: scale(1.04); filter: brightness(1.06); }
+        }
+        @keyframes fp-badge-spin {
+            0%   { transform: rotateY(0deg); }
+            45%  { transform: rotateY(180deg); }
+            55%  { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        @keyframes fp-shimmer {
+            0%   { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        @keyframes fp-title-pop {
+            0%, 100% { transform: scale(1);    color: #1a1a1a; }
+            50%       { transform: scale(1.03); color: #0A291A; }
+        }
+        @keyframes fp-btn-bounce {
+            0%, 100% { transform: translateY(0); }
+            40%       { transform: translateY(-4px); }
+            60%       { transform: translateY(-2px); }
+        }
+        @keyframes fp-live-dot {
+            0%, 100% { opacity: 1;   transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
+        }
+        @keyframes fp-border-rotate {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Card — animated glowing border */
+        .sponsor-card {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            animation: fp-pulse-glow 3s ease-in-out infinite;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        .sponsor-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #F5A623, #0A291A, #F5A623, #0A291A);
+            background-size: 300% 300%;
+            animation: fp-border-rotate 4s linear infinite;
+            z-index: 0;
+        }
+        .sponsor-content {
+            position: relative;
+            z-index: 1;
+            background: white;
+            border-radius: 16px;
+        }
+
+        /* Image — slow breathe zoom */
+        .sponsor-image img {
+            animation: fp-img-breathe 4s ease-in-out infinite;
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        /* Badge — flip every 5 seconds */
+        .sponsor-badge {
+            display: inline-block;
+            animation: fp-badge-spin 5s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        /* Shimmer overlay on image */
+        .sponsor-image {
+            position: relative;
+            overflow: hidden;
+        }
+        .sponsor-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                transparent 40%,
+                rgba(255,255,255,0.35) 50%,
+                transparent 60%
+            );
+            background-size: 400px 100%;
+            animation: fp-shimmer 2.8s linear infinite;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        /* Title — subtle scale pulse */
+        #sponsorTitle1, #sponsorTitle2 {
+            animation: fp-title-pop 4s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* CTA button — gentle bounce */
+        .sponsor-actions .buy-btn {
+            animation: fp-btn-bounce 2.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* LIVE indicator dot */
+        .sponsor-live-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #2ed573;
+            margin-right: 6px;
+            animation: fp-live-dot 1.2s ease-in-out infinite;
+            vertical-align: middle;
+        }
+
+        /* ── Dual grid layout ── */
+        .sponsor-dual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .sponsor-dual-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Section header ── */
+        .sponsor-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #0A291A;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
+        .sponsor-slots-label {
+            margin-left: auto;
+            font-size: 0.7rem;
+            background: rgba(245,166,35,0.15);
+            color: #b87800;
+            border: 1px solid rgba(245,166,35,0.4);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-weight: 700;
+        }
+
+        /* ── Countdown timer ── */
+        @keyframes countdown-pop {
+            0%   { transform: scale(0.8); opacity: 0; }
+            60%  { transform: scale(1.08); }
+            100% { transform: scale(1);   opacity: 1; }
+        }
+        @keyframes progress-fill-in {
+            from { width: 0% !important; }
+        }
+        .sponsor-countdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #e53935;
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 20px;
+            padding: 3px 10px;
+            margin: 6px 0 6px;
+            animation: countdown-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+            transition: color 0.4s, background 0.4s, border-color 0.4s;
+        }
+        .sponsor-countdown.urgent {
+            background: #e53935;
+            color: white;
+            border-color: #e53935;
+            animation: countdown-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s both,
+                       fp-live-dot 0.8s ease-in-out infinite;
+        }
+        /* ── Duration progress bar ── */
+        .sponsor-progress-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(0,0,0,0.07);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .sponsor-progress-fill {
+            height: 100%;
+            background: #2ed573;
+            border-radius: 4px;
+            width: 100%;
+            transition: width 1s linear, background 0.5s;
+            animation: progress-fill-in 1s ease-out 0.5s both;
+        }
+
+        /* ── Slot 2 color variant (green theme) ── */
+        .sponsor-card-2::before {
+            background: linear-gradient(90deg, #0A291A, #2ed573, #0A291A, #2ed573);
+            background-size: 300% 300%;
+            animation: fp-border-rotate 4s linear infinite;
+        }
+        .sponsor-badge-2 {
+            background: #0A291A;
+            color: #F5A623;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           DESCRIPTION & SPEC — Scroll + Zoom Animations
+        ═══════════════════════════════════════════════════════ */
+
+        /* Scroll marquee for long description text */
+        @keyframes desc-scroll {
+            0%        { transform: translateY(0); }
+            10%       { transform: translateY(0); }
+            85%       { transform: translateY(var(--scroll-dist, -60%)); }
+            95%, 100% { transform: translateY(var(--scroll-dist, -60%)); }
+        }
+
+        /* Zoom-in entrance for spec cells */
+        @keyframes spec-zoom-in {
+            from { opacity: 0; transform: scale(0.75); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* Shimmer sweep on spec value */
+        @keyframes spec-shimmer {
+            0%   { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        /* Fade-slide-up entrance for description */
+        @keyframes desc-fade-up {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Wrapper that clips and scrolls */
+        .anim-desc-wrap {
+            overflow: hidden;
+            max-height: 90px;
+            position: relative;
+            cursor: default;
+        }
+        .anim-desc-wrap:hover { max-height: none; }
+
+        .anim-desc-inner {
+            animation: desc-fade-up 0.5s ease both,
+                       desc-scroll 9s ease-in-out 1.2s infinite;
+            --scroll-dist: -55%;
+        }
+        /* Fade mask at bottom */
+        .anim-desc-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 28px;
+            background: linear-gradient(transparent, rgba(255,255,255,0.95));
+            pointer-events: none;
+        }
+        /* Dark version for electronics modal */
+        .anim-desc-wrap.dark::after {
+            background: linear-gradient(transparent, rgba(15,22,35,0.97));
+        }
+        .anim-desc-wrap:hover::after { display: none; }
+
+        /* Spec cell zoom-in with staggered delay */
+        .anim-spec-cell {
+            animation: spec-zoom-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .anim-spec-cell:nth-child(1)  { animation-delay: 0.05s; }
+        .anim-spec-cell:nth-child(2)  { animation-delay: 0.10s; }
+        .anim-spec-cell:nth-child(3)  { animation-delay: 0.15s; }
+        .anim-spec-cell:nth-child(4)  { animation-delay: 0.20s; }
+        .anim-spec-cell:nth-child(5)  { animation-delay: 0.25s; }
+        .anim-spec-cell:nth-child(6)  { animation-delay: 0.30s; }
+        .anim-spec-cell:nth-child(7)  { animation-delay: 0.35s; }
+        .anim-spec-cell:nth-child(8)  { animation-delay: 0.40s; }
+        .anim-spec-cell:nth-child(9)  { animation-delay: 0.45s; }
+
+        /* Shimmer on spec value text */
+        .anim-spec-value {
+            background: linear-gradient(90deg, currentColor 30%, rgba(255,255,255,0.6) 50%, currentColor 70%);
+            background-size: 200px 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: spec-shimmer 2.5s linear 0.6s 2;
+            /* Falls back gracefully if clip not supported */
+        }
+
+        /* jc-spec-cell (Jobs/Services modal) gets zoom too */
+        .jc-spec-cell {
+            animation: spec-zoom-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .jc-spec-cell:nth-child(1) { animation-delay: 0.05s; }
+        .jc-spec-cell:nth-child(2) { animation-delay: 0.12s; }
+        .jc-spec-cell:nth-child(3) { animation-delay: 0.19s; }
+        .jc-spec-cell:nth-child(4) { animation-delay: 0.26s; }
+
+        /* jc-desc-area scroll */
+        .jc-desc-area {
+            overflow: hidden;
+            max-height: 80px;
+            position: relative;
+        }
+        .jc-desc-area:hover { max-height: none; overflow: visible; }
+        .jc-desc-area .anim-desc-inner {
+            animation: desc-fade-up 0.5s ease both,
+                       desc-scroll 9s ease-in-out 1.2s infinite;
+        }
+        .jc-desc-area::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 24px;
+            background: linear-gradient(transparent, rgba(255,255,255,0.95));
+            pointer-events: none;
+        }
+        .jc-desc-area:hover::after { display: none; }
 </style>
-
-<style id="wana-ethiopian-romantic-background">
-/* Ethiopian romantic photography for the public welcome hero */
-.gate-hero {
-  background-image:
-    linear-gradient(90deg,
-      rgba(255,255,255,.96) 0%,
-      rgba(255,255,255,.88) 38%,
-      rgba(255,255,255,.30) 72%,
-      rgba(255,255,255,.12) 100%),
-    url("images/gate-hero.webp");
-  background-size: auto 100%;
-  background-position: right center;
-  background-repeat: no-repeat;
-  border-radius: 24px;
-  overflow: hidden;
-}
-/* Keep the signed-in home banner visually consistent */
-.wana-hero {
-  background-image:
-    linear-gradient(90deg,
-      rgba(255,255,255,.94) 0%,
-      rgba(255,255,255,.82) 42%,
-      rgba(255,255,255,.22) 100%),
-    url("images/wana-dating-banner.webp");
-  background-size: cover;
-  background-position: right center;
-  background-repeat: no-repeat;
-}
-/* Readable text on the photo banner: dark plum on the light overlay, rose action chips */
-.wana-hero { color: #2a1033; box-shadow: 0 16px 40px rgba(184,41,79,.16); }
-.wana-hero .eyebrow { color: #b8294f; opacity: 1; }
-.wana-hero h1 { color: #2a1033; }
-.wana-hero p { color: #4a2a55; }
-.wana-hero:after { border-color: rgba(224,66,111,.10); }
-.wana-quick-actions button { background: #e0426f !important; color: #fff !important; border: 0 !important; box-shadow: 0 6px 16px rgba(224,66,111,.28); }
-.wana-quick-actions button:hover { background: #b8294f !important; }
-@media (max-width: 700px) {
-  .gate-hero, .wana-hero {
-    background-position: 58% center;
-  }
-}
-</style>
-
 </head>
+
 <body>
-<!-- Mobile bottom navigation (phones only, signed-in only) -->
-<nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Main navigation">
-  <button class="mnav-item active" data-tab="home" onclick="switchTab('home')" type="button">
-    <span class="mnav-icon">🏠</span><span class="mnav-label">Home</span>
-  </button>
-  <button class="mnav-item" data-tab="browse" onclick="switchTab('browse')" type="button">
-    <span class="mnav-icon">🔍</span><span class="mnav-label">Browse</span>
-  </button>
-  <button class="mnav-item" data-tab="messages" onclick="switchTab('messages')" type="button">
-    <span class="mnav-icon">💬</span><span class="mnav-label">Messages</span>
-    <span class="mnav-badge" id="mnavUnreadBadge" style="display:none;"></span>
-  </button>
-  <button class="mnav-item" data-tab="likes" onclick="switchTab('likes')" type="button">
-    <span class="mnav-icon">💛</span><span class="mnav-label">Likes</span>
-    <span class="mnav-badge" id="mnavLikesBadge" style="display:none;"></span>
-  </button>
-  <button class="mnav-item" data-tab="myprofile" onclick="switchTab('myprofile')" type="button">
-    <span class="mnav-icon">👤</span><span class="mnav-label">Me</span>
-  </button>
-  <button class="mnav-item" id="mnavMore" onclick="openMoreSheet()" type="button" aria-haspopup="dialog">
-    <span class="mnav-icon">☰</span><span class="mnav-label">More</span>
-    <span class="mnav-badge" id="mnavMoreBadge" style="display:none;"></span>
-  </button>
-</nav>
-<div class="more-sheet-backdrop" id="moreSheetBackdrop" onclick="closeMoreSheet()"></div>
-<div class="more-sheet" id="moreSheet" role="dialog" aria-label="More">
-  <div class="more-sheet-grip"></div>
-  <button class="more-item" onclick="switchTab('newmembers')" type="button"><span>🆕</span> New Members</button>
-  <button class="more-item" onclick="switchTab('post')" type="button"><span>✍️</span> <span class="post-tab-label">Setup Profile</span></button>
-  <button class="more-item" onclick="switchTab('calls')" type="button"><span>📞</span> Calls <span id="callsMoreBadge"></span></button>
-  <button class="more-item" onclick="switchTab('visitors')" type="button"><span>👣</span> Visitors</button>
-  <button class="more-item" onclick="switchTab('compatibility')" type="button"><span>❤️</span> Compatibility</button>
-  <button class="more-item" onclick="switchTab('dateplans')" type="button"><span>📅</span> Date Plans</button>
-  <button class="more-item" onclick="switchTab('safety')" type="button"><span>🛡️</span> Safety Center</button>
-  <button class="more-item" onclick="closeMoreSheet();if(window.WanaSupport)WanaSupport.open()" type="button"><span>🛟</span> Contact Support <span id="supportMoreBadge" class="sup-badge"></span></button>
-  <button class="more-item" onclick="switchTab('settings')" type="button"><span>⚙️</span> Privacy Settings</button>
-  <button class="more-item danger" onclick="closeMoreSheet();signOut()" type="button"><span>🚪</span> Sign out</button>
-</div>
-<header>
-<div class="brand">Wana <span>Dating</span></div>
-<nav style="display: flex; align-items: center;">
-<button class="lang" id="langBtn" onclick="toggleLang()" style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px;">EN</button>
+    <!-- ======================= HEADER ======================= -->
+  <!-- ======================= PREMIUM HEADER ======================= -->
+    <header class="golem-header">
+        <div class="header-container">
+            
+            <!-- TOP ROW: Logo & Quick Actions -->
+            <div class="header-top">
+                <!-- Premium Logo -->
+                <a href="index.html" class="logo-block">
+                <img src="W3.png" alt="WanaGebya Logo" style="width:42px; height:42px; border-radius:50%; object-fit:cover;">
+                    <div class="logo-text-wrapper">
+                        <div class="logo-title">Wana<span>Gebya</span></div>
+                        <div class="logo-subtitle">ዋና ገበያ</div>
+                    </div>
+                </a>
 
-  
-<button class="signin-pill" id="headerAuthBtn" onclick="openAuthModal('signin')">👤 Sign In</button>
-<button class="signout-pill" id="headerSignOutBtn" onclick="signOut()" style="display:none;" type="button">Sign out</button>
-<div class="notif-wrap" id="notifWrap" style="display:none;">
-<button class="notif-bell" id="giftBellBtn" type="button" onclick="openReceivedGifts()" title="Gifts you've received" aria-label="Gifts you've received">🎁<span class="notif-count" id="giftCount" style="display:none;"></span></button>
-<button class="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-count" id="notifCount" style="display:none;"></span></button>
-<div class="notif-panel" id="notifPanel">
-<div class="head">
-<strong>Notifications <span id="notifUnreadLabel" style="color:var(--green);font-weight:700;"></span></strong>
-<button onclick="markAllNotificationsRead()">Mark all read</button>
-</div>
-<div id="notifList"></div>
-</div>
-</div>
-</nav>
-</header>
-<div class="app-shell">
-<aside class="sidebar">
-<nav class="side-nav">
-<div class="tab active" data-tab="home" onclick="switchTab('home')"><span class="side-icon">🏠</span> Home</div>
-<div class="tab" data-tab="browse" onclick="switchTab('browse')"><span class="side-icon">🔍</span> Browse Matches</div>
-<div class="tab" data-tab="newmembers" onclick="switchTab('newmembers')"><span class="side-icon">🆕</span> New Members</div>
-<div class="tab" data-tab="post" onclick="switchTab('post')"><span class="side-icon">✍️</span> <span class="post-tab-label">Setup Profile</span></div>
-<div class="tab" data-tab="messages" onclick="switchTab('messages')"><span class="side-icon">💬</span> Messages <span id="unreadBadge"></span></div>
-<div class="tab" data-tab="calls" onclick="switchTab('calls')"><span class="side-icon">📞</span> Calls <span id="callsBadge"></span></div>
-<div class="tab" data-tab="likes" onclick="switchTab('likes')"><span class="side-icon">💛</span> Likes <span id="likesBadge"></span></div>
-<div class="tab" data-tab="visitors" onclick="switchTab('visitors')"><span class="side-icon">👣</span> Visitors <span id="visitorsBadge"></span></div>
-<div class="tab" data-tab="compatibility" onclick="switchTab('compatibility')"><span class="side-icon">❤️</span> Compatibility</div><div class="tab" data-tab="dateplans" onclick="switchTab('dateplans')"><span class="side-icon">📅</span> Date Plans <span class="tab-badge" id="datePlansBadge"></span></div>
-<div class="tab" data-tab="safety" onclick="switchTab('safety')"><span class="side-icon">🛡️</span> Safety Center</div>
-<div class="tab" data-tab="myprofile" onclick="switchTab('myprofile')"><span class="side-icon">👤</span> My Account <span id="profileCompleteBadge"></span></div>
-<div class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="side-icon">⚙️</span> Privacy Settings</div>
-</nav>
-<div class="sidebar-account" id="accountBox" style="display:none;">
-<div class="who">
-<span id="menuAvatar"></span>
-<div class="name" id="menuName"></div>
-</div>
-<div class="account-links">
-<button onclick="switchTab('myprofile');">Edit Profile</button>
-<button onclick="switchTab('settings');">Privacy Settings</button>
-<button class="danger" onclick="signOut()">Sign out</button>
-</div>
-</div>
-</aside>
-<main>
-<!-- GATEKEEPER -->
-<div class="welcome-container" id="gate" style="display:none;">
-<div class="gate-hero">
-<div class="gate-logo-row">
-<svg aria-hidden="true" class="gate-heart-logo" fill="none" height="60" viewBox="0 0 64 64" width="60" xmlns="http://www.w3.org/2000/svg">
-<path d="M26 46C12 36 5 27 5 18 C5 10 11 4 18 4 C22 4 25 6 26 9 C27 6 30 4 34 4 C41 4 47 10 47 18 C47 27 40 36 26 46 Z" fill="#078930"></path>
-<path d="M38 46C24 36 17 27 17 18 C17 10 23 4 30 4 C34 4 37 6 38 9 C39 6 42 4 46 4 C53 4 59 10 59 18 C59 27 52 36 38 46 Z" fill="#DA121A"></path>
-<path d="M32 24C27 20 24 16 24 12 C24 8.5 27 6 30 6 C31.2 6 32.1 6.7 32 7.8 C31.9 6.7 32.8 6 34 6 C37 6 40 8.5 40 12 C40 16 37 20 32 24 Z" fill="#FCDD09"></path>
-</svg>
-<div class="gate-logo-text">
-<div class="gate-logo-title">Wana <span class="dating-script">Dating</span></div>
-<div class="gate-logo-amharic">ፍቅር አጋር</div>
-<div class="gate-logo-sub">Worldwide</div>
-</div>
-</div>
-<div class="gate-tagline">Real People <span class="tagline-heart">❤</span> Genuine Connections <span class="tagline-heart">❤</span> A Better Tomorrow</div>
-<p class="gate-hero-desc">Connect with singles anywhere in the world looking for friendship, dating or marriage — with verified profiles, smart compatibility matching, and tools to meet safely.</p>
-<div class="gate-hero-cta">
-<button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
-  
-<a href="#gateAbout" style="font-size:.85rem;color:#5c2e0a;">Learn more about Wana Dating ↓</a>
-<a href="../index.html" style="font-size:.82rem;color:#7a4a1f;">← Back to marketplace</a>
-</div>
-</div>
+                <!-- Right Actions: Help, Lang, Auth -->
+                <div class="header-top-right">
+                    <a href="#" id="helpBtn" class="help-link hide-mobile">
+                        <i class="fas fa-question-circle"></i> Help
+                    </a>
+                    
+                    <button id="langToggleBtn" class="lang-btn">
+                        <i class="fas fa-globe"></i> <span id="langText">አማርኛ</span>
+                    </button>
+                    
+                    <div class="nav-auth-controls">
+                        <button id="signInBtn" class="sign-in-btn">
+                            <i class="fas fa-user"></i> <span class="hide-mobile" data-am="ይግቡ/ ተመዝገብ">Sign In/Register</span>
+                        </button>
+                        <div id="userWelcome" style="display:none; align-items:center; gap:8px;">
+                            <span id="userNameLink" style="cursor:pointer; font-size:0.85rem; font-weight:600;"><strong id="userName"></strong></span>
+                            <button id="signOutBtn" class="signout-btn" style="padding:6px 10px; border-radius:6px;"><i class="fas fa-sign-out-alt"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<section class="gate-section">
-<span class="gate-eyebrow">Why Wana Dating</span>
-<h2>Built for genuine connections, not endless swiping</h2>
-<p class="gate-lede">Every part of Wana Dating is designed around one goal: helping you meet someone real, safely, and at your own pace.</p>
-<div class="gate-features-grid">
-<div class="gate-feature-card"><span class="icon">🛡️</span><h3>Verified profiles</h3><p>Members can submit a selfie for review and earn a verified badge, so you know who you're really talking to.</p></div>
-<div class="gate-feature-card"><span class="icon">❤️</span><h3>Smart compatibility</h3><p>Matching that looks at your preferences, lifestyle and relationship goals — not just a photo.</p></div>
-<div class="gate-feature-card"><span class="icon">📅</span><h3>Guided date planning</h3><p>Plan a real-world meetup with built-in details and reminders, right inside the app.</p></div>
-<div class="gate-feature-card"><span class="icon">🔒</span><h3>Privacy on your terms</h3><p>Choose who sees your posts and photos — everyone, or only your matches.</p></div>
-<div class="gate-feature-card"><span class="icon">🚩</span><h3>Report &amp; block tools</h3><p>Our safety team reviews every report, so problem behavior doesn't stay on the platform.</p></div>
-<div class="gate-feature-card"><span class="icon">🌍</span><h3>English &amp; Amharic</h3><p>Use Wana Dating in the language you're most comfortable with.</p></div>
-</div>
-</section>
+            <!-- BOTTOM ROW: Navigation & Search Filters -->
+            <div class="header-bottom">
+                
+                <!-- Desktop Navigation (Hidden on Mobile) -->
+                <nav class="desktop-main-nav">
+                    <a href="index.html" class="nav-item-box"><i class="fas fa-home"></i><p data-am="መነሻ">Home</p></a>
+                    <a href="sell.html" id="sellBtn" class="nav-item-box bg-sell"><i class="fas fa-plus-circle"></i><p data-am="ይሽጡ">Sell Item</p></a>
+                    <a href="my-items.html" class="nav-item-box"><i class="fas fa-box-open"></i><p data-am="እቃዎቼ">My Items</p></a>
+                    <a href="saved.html" class="nav-item-box" style="position:relative;">
+                        <i class="fas fa-shopping-cart"></i><p data-am="ጋሪ">Cart</p>
+                        <span id="cartBadge" class="cart-badge">0</span>
+                    </a>
+                    <a href="dating/index.html" class="nav-item-box nav-dating"><i class="fas fa-heart"></i><p data-am="ዳቲንግ">Dating</p></a>
+                    <a href="admin.html" id="adminNavLink" class="nav-item-box" style="display:none; color:#ff4757;"><i class="fas fa-user-shield"></i><p data-am="አስተዳዳሪ">Admin</p></a>
+                </nav>
 
-<section class="gate-section" style="padding-top:0;">
-<span class="gate-eyebrow">How it works</span>
-<h2>Three steps to your first conversation</h2>
-<p class="gate-lede">No gimmicks — just a straightforward path from creating a profile to meeting someone in person, when you're ready.</p>
-<div class="gate-steps">
-<div class="gate-step"><h3>Create your profile</h3><p>Add photos, write a short bio, and tell us what you're looking for — friendship, dating or marriage.</p></div>
-<div class="gate-step"><h3>Get matched</h3><p>Browse singles near you, or let compatibility scoring highlight the people most worth saying hello to.</p></div>
-<div class="gate-step"><h3>Meet safely</h3><p>Chat, then plan a date using our built-in tools — on your terms, when you're ready.</p></div>
-</div>
-</section>
+                <!-- Search & Sort Bar -->
+                <div class="header-search-row">
+                    <!-- Search Input -->
+                    <div class="search-input-group">
+                        <i class="fas fa-search" style="color:#94a3b8;"></i>
+                        <input type="text" id="headerSearch" placeholder="Search items, categories, or locations..." data-am-placeholder="እቃዎችን፣ ምድቦችን ወይም ቦታዎችን ይፈልጉ...">
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="header-filters">
+                        <select id="sortSelect" class="header-select">
+                            <option value="newest" data-am="🆕 አዲስ መጀመሪያ">🆕 Newest First</option>
+                            <option value="price_low" data-am="💰 ዋጋ፡ ከዝቅ ወደ ከፍ">💰 Price: Low to High</option>
+                            <option value="price_high" data-am="💎 ዋጋ፡ ከከፍ ወደ ዝቅ">💎 Price: High to Low</option>
+                        </select>
+                        <select id="locationSelect" class="header-select">
+                            <option value="all" data-am="🌍 ሁሉም ቦታዎች">🌍 All Locations</option>
+                            <option value="Addis Ababa" data-am="አዲስ አበባ">Addis Ababa</option>
+                            <option value="Adama" data-am="አዳማ (ናዝሬት)">Adama (Nazret)</option>
+                            <option value="Bahir Dar" data-am="ባህር ዳር">Bahir Dar</option>
+                            <option value="Dire Dawa" data-am="ድሬ ዳዋ">Dire Dawa</option>
+                            <option value="Mekele" data-am="መቀሌ">Mekele</option>
+                            <option value="Shashamane" data-am="ሻሸመኔ">Shashamane</option>
+                            <option value="Hawassa" data-am="ሀዋሳ">Hawassa</option>
+                            <option value="Bishoftu" data-am="ቢሾፍቱ (ደብረ ዘይት)">Bishoftu (Debre Zeit)</option>
+                            <option value="Jigjiga" data-am="ጅግጅጋ">Jigjiga</option>
+                            <option value="Gondar" data-am="ጎንደር">Gondar</option>
+                            <option value="Dilla" data-am="ድላ">Dilla</option>
+                        </select>
+                    </div>
+                </div>
 
-<section class="gate-section gate-about" id="gateAbout">
-<div class="gate-about-inner">
-<div class="gate-about-copy">
-<span class="gate-eyebrow">About us</span>
-<h2>Part of the WanaGebya platform</h2>
-<p>Wana Dating is the dating space inside WanaGebya, built for people anywhere in the world looking for a genuine connection. We believe good matchmaking starts with trust — which is why profile verification, flexible privacy controls and a dedicated safety team are built into the product, not bolted on afterward.</p>
-<p>Whether you're here to make a new friend, find someone to date, or look for a life partner, Wana Dating is built to help you do it on your own terms — at your own pace, with your privacy respected throughout.</p>
-<div class="gate-about-badges">
-<span class="gate-about-badge">🌍 Open to singles worldwide</span>
-<span class="gate-about-badge">🛡️ Safety-first design</span>
-<span class="gate-about-badge">🔒 Privacy controls</span>
-<span class="gate-about-badge">💬 English &amp; Amharic</span>
-</div>
-</div>
-<div class="gate-about-panel">
-<div class="stat"><span>Profile verification</span><strong>Selfie review</strong></div>
-<div class="stat"><span>Who sees your posts</span><strong>Your choice</strong></div>
-<div class="stat"><span>Reports &amp; blocks</span><strong>Team-reviewed</strong></div>
-<div class="stat"><span>Date planning</span><strong>Built-in</strong></div>
-<div class="stat"><span>Languages</span><strong>English, Amharic</strong></div>
-</div>
-</div>
-</section>
+            </div>
+        </div>
+    </header>
 
-<div class="gate-cta-band">
-<h2>Ready to meet someone real?</h2>
-<p>It takes a minute to create your profile — and you control what you share.</p>
-<button class="btn-signin" onclick="openAuthModal('signin')" type="button">Sign In / Register Now</button>
-</div>
+    <!-- ── Mobile bottom tab bar (only visible on mobile) ── -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="index.html"><i class="fas fa-home"></i><span data-am="መነሻ">Home</span></a>
+       <a href="sell.html" id="mobileSellBtn" class="sell-tab"><i class="fas fa-plus-circle"></i><span data-am="ይሽጡ">Sell</span></a>
+        <a href="my-items.html"><i class="fas fa-box-open"></i><span data-am="እቃዎቼ">Items</span></a>
+        <a href="saved.html" style="position:relative;">
+            <i class="fas fa-shopping-cart"></i><span data-am="ጋሪ">Cart</span>
+            <span id="mobileCartBadge" style="display:none; position:absolute; top:0; right:10px; background:#ff4757; color:white; border-radius:50%; width:16px; height:16px; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center;"></span>
+        </a>
+        <a href="dating/index.html" class="dating-tab"><i class="fas fa-heart"></i><span data-am="ዳቲንግ">Dating</span></a>
+        <a href="admin.html" id="mobileAdminLink" class="admin-tab" style="display:none;"><i class="fas fa-user-shield"></i><span>Admin</span></a>
+    </nav>
 
-<div class="gate-footer">
-Part of <a href="../index.html">WanaGebya</a> · <a href="../index.html">← Back to marketplace</a> · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a>
-</div>
-</div>
-<!-- HOME FEED -->
-<div class="panel" id="homePanel" style="display:none;">
-<div class="wana-hero">
-<div class="eyebrow">Wana Dating</div>
-<h1>Meet someone who feels right. ❤️</h1>
-<p>Discover genuine connections based on your preferences, lifestyle and relationship goals.</p>
-<div class="wana-quick-actions">
-<button onclick="switchTab('browse')">🔎 Discover matches</button>
-<button onclick="switchTab('newmembers')">✨ New members</button>
-<button onclick="switchTab('myprofile')">✦ Improve my profile</button>
-</div>
-</div>
-<div class="wana-home-layout">
-<div class="wana-feed-column">
-<div class="wana-composer">
-<div style="display:flex;gap:12px;align-items:flex-start;">
-<div id="composerAvatar" style="width:46px;height:46px;border-radius:50%;flex-shrink:0;background:var(--paper);display:flex;align-items:center;justify-content:center;color:#aaa; font-size: 1.5rem;">👤</div>
-<div class="composer-body" style="flex:1;">
-<div id="profileGateNotice" style="display:none;background:#FFF9EE;color:#8A6D1F;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:.88rem;">
-            Set up your profile to post and send messages.
-            <a href="#" onclick="switchTab('post');return false;" style="color:var(--green);font-weight:700;">Set up now</a>
-</div>
-<textarea id="postBody" maxlength="1000" placeholder="Share how you're feeling, or what you are looking for..." style="width:100%;min-height:70px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:.95rem;resize:vertical; outline:none;"></textarea>
-<div id="postImagePreview" style="margin-top:8px;"></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px; flex-wrap:wrap; gap: 10px;">
-<label style="display:flex;align-items:center;gap:6px;font-size:.9rem;color:#444;cursor:pointer; font-weight:600; background: var(--paper); padding: 8px 14px; border-radius: 20px;">
-              🖼️ Add Photo
-              <input accept="image/*" id="postImage" onchange="previewPostImage()" style="display:none;" type="file"/>
-</label>
-<div class="composer-actions" style="display: flex; gap: 10px; align-items:center;">
-<select id="postVisibility" style="border:1px solid var(--line);border-radius:20px;padding:8px 12px;font-size:.85rem;color:#555; outline:none;">
-<option value="public">🌍 Public (Everyone)</option>
-<option value="matches">👥 Only My Matches</option>
-</select>
-<button id="postSubmitBtn" onclick="submitPost()" style="background:var(--green);color:#fff;border:none;border-radius:20px;padding:8px 24px;font-weight:700;cursor:pointer;">Post</button>
-</div>
-</div>
-<div id="postMsg"></div>
-</div>
-</div>
-</div>
-<div id="feed"></div>
-<div class="empty" id="feedEmpty" style="display:none;">No posts yet — be the first to share something!</div>
-</div>
-<!-- BROWSE MATCHES -->
-</div>
-</div>
-<div class="panel" id="browsePanel" style="display:none;">
-<div class="browse-header">
-<h2>Find Singles <span>Online</span></h2>
-<p>Browse people near you looking for friendship, dating, or marriage. Like a profile to start chatting.</p>
-</div>
-<div class="filters">
-<select id="filterSeeking">
-<option value="">Show: Everyone</option>
-<option value="Male">Men</option>
-<option value="Female">Women</option>
-</select>
-<select id="filterType">
-<option value="">Any Purpose</option>
-<option value="Friendship">Friendship</option>
-<option value="Dating">Dating</option>
-<option value="Marriage">Marriage</option>
-</select>
-<select id="filterCountry" aria-label="Country"><option value="">All countries</option></select><input id="filterCity" list="cityList" aria-label="City" placeholder="Any city" type="text" autocomplete="off"/>
-<input id="filterAgeMin" max="99" min="18" placeholder="Min age" style="width:90px;" type="number"/>
-<input id="filterAgeMax" max="99" min="18" placeholder="Max age" style="width:90px;" type="number"/>
-<select id="filterReligion">
-<option value="">Any Religion</option>
-<option>Orthodox Christian</option>
-<option>Protestant</option>
-<option>Muslim</option>
-<option>Catholic</option>
-<option>Traditional</option>
-<option>Other</option>
-</select>
-<select id="filterLifestyle">
-<option value="">Any Lifestyle</option>
-<option>Active &amp; Outdoorsy</option>
-<option>Homebody</option>
-<option>Social &amp; Outgoing</option>
-<option>Balanced</option>
-<option>Career-focused</option>
-<option>Family-oriented</option>
-<option>Other</option>
-</select>
-<select id="filterHasKids">
-<option value="">Has kids: Any</option>
-<option value="Yes">Yes</option>
-<option value="No">No</option>
-</select>
-<select id="filterWantsKids">
-<option value="">Wants kids: Any</option>
-<option value="Yes">Yes</option>
-<option value="No">No</option>
-<option value="Maybe">Maybe</option>
-</select>
-<label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
-<input id="filterOnline" style="width:18px; height:18px;" type="checkbox"/> Online now
-      </label>
-<label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:#444;padding:0 8px; font-weight:600;">
-<input id="filterVerified" style="width:18px; height:18px;" type="checkbox"/> Verified only
-      </label>
-<button onclick="loadProfiles()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer; font-weight:bold;">Filter Results</button>
-<button onclick="clearBrowseFilters()" style="background:none;border:1px solid var(--line);color:#666;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.85rem;">Clear filters</button>
-</div>
-<div id="onlineSummary" style="font-size:.85rem;color:#1E8E4F;font-weight:600;margin-bottom:16px;"></div>
-<div class="grid" id="grid"></div>
-<div class="empty" id="emptyState" style="display:none;">No profiles match your filters yet — check back soon.</div>
-<div class="more-wrap" id="moreWrap" style="display:none;">
-<button class="more-btn" id="moreBtn" onclick="showMoreProfiles()">Load More Profiles</button>
-</div>
-</div><div class="panel" id="newMembersPanel" style="display:none;">
-<div class="browse-header">
-<h2>New <span>Members</span></h2>
-<p>People who've just joined, newest first.</p>
-</div>
-<div class="grid" id="newMembersGrid"></div>
-<div class="empty" id="newMembersEmpty" style="display:none;">No new members to show right now.</div>
-</div><div class="panel" id="postPanel" style="display:none;">
-<div class="browse-header">
-<h2 id="postHeading">Create Your <span>Dating Profile</span></h2>
-<p id="postSubheading">Fill out the details below to start matching with people.</p>
-</div>
-<form class="post-form" id="postForm">
-<div>
-<label>First Name (Shown Publicly)</label>
-<input id="fName" maxlength="30" placeholder="Your name" required="" type="text"/>
-</div>
-<div class="row2">
-<div>
-<label>Age</label>
-<input id="fAge" max="99" min="18" placeholder="18+" required="" type="number"/>
-</div>
-<div>
-<label>City</label>
-<input id="fCity" list="cityList" placeholder="Your city" required="" type="text" autocomplete="off"/><datalist id="cityList"><option value="Addis Ababa"><option value="Nairobi"><option value="Lagos"><option value="Accra"><option value="Johannesburg"><option value="Cairo"><option value="London"><option value="Paris"><option value="Berlin"><option value="New York"><option value="Los Angeles"><option value="Toronto"><option value="Dubai"><option value="Riyadh"><option value="Istanbul"><option value="Mumbai"><option value="Delhi"><option value="Manila"><option value="Singapore"><option value="Sydney"><option value="São Paulo"><option value="Mexico City"><option value="Washington, DC"><option value="Minneapolis"><option value="Seattle"><option value="Stockholm"><option value="Amsterdam"><option value="Rome"></datalist>
-</div>
-</div>
-<div>
-<label>Country</label>
-<select id="fCountry" required=""><option value="">Select country</option></select>
-</div>
-<div class="row2">
-<div>
-<label>I Am A</label>
-<select id="fGender" required="">
-<option value="">Select Gender</option>
-<option>Male</option>
-<option>Female</option>
-</select>
-</div>
-<div>
-<label>Looking For</label>
-<select id="fSeeking" required="">
-<option value="">Select Gender</option>
-<option>Male</option>
-<option>Female</option>
-<option>Any</option>
-</select>
-</div>
-</div>
-<div>
-<label>My Goal / Purpose</label>
-<select id="fType" required="">
-<option value="">Select Goal</option>
-<option>Friendship</option>
-<option>Dating</option>
-<option>Marriage</option>
-</select>
-</div>
-<div>
-<label>What I'm Looking For Details</label>
-<select id="fLookingFor" required="">
-<option value="">Select Details</option>
-<option>Long-term relationship</option>
-<option>Something casual</option>
-<option>Marriage</option>
-<option>New friends</option>
-<option>Not sure yet</option>
-</select>
-</div>
-<div class="row2">
-<div>
-<label>Interested In Ages (Min)</label>
-<input id="fAgeMin" max="99" min="18" placeholder="Min Age" required="" type="number"/>
-</div>
-<div>
-<label>Interested In Ages (Max)</label>
-<input id="fAgeMax" max="99" min="18" placeholder="Max Age" required="" type="number"/>
-</div>
-</div>
-<div>
-<label>My Lifestyle</label>
-<select id="fLifestyle" required="">
-<option value="">Select Lifestyle</option>
-<option>Active &amp; Outdoorsy</option>
-<option>Homebody</option>
-<option>Social &amp; Outgoing</option>
-<option>Balanced</option>
-<option>Career-focused</option>
-<option>Family-oriented</option>
-<option>Other</option>
-</select>
-</div>
-<div class="row2">
-<div>
-<label>Have Kids?</label>
-<select id="fHasKids" required="">
-<option value="">Select</option>
-<option>Yes</option>
-<option>No</option>
-</select>
-</div>
-<div>
-<label>Want Kids?</label>
-<select id="fWantsKids" required="">
-<option value="">Select</option>
-<option>Yes</option>
-<option>No</option>
-<option>Maybe</option>
-</select>
-</div>
-</div>
-<div>
-<label>Religion</label>
-<select id="fReligion" required="">
-<option value="">Select Religion</option>
-<option>Orthodox Christian</option>
-<option>Protestant</option>
-<option>Muslim</option>
-<option>Catholic</option>
-<option>Traditional</option>
-<option>Other</option>
-<option>Prefer not to say</option>
-</select>
-</div>
-<div class="row2">
-<div>
-<label>Occupation (Optional)</label>
-<input id="fOccupation" maxlength="60" placeholder="e.g. Engineer" type="text"/>
-</div>
-<div>
-<label>Income (Optional)</label>
-<select id="fIncome">
-<option selected="">Prefer not to say</option>
-<option>Lower income</option>
-<option>Middle income</option>
-<option>Upper-middle income</option>
-<option>High income</option>
-</select>
-</div>
-</div>
-<div>
-<label>About You (Max 500 chars)</label>
-<textarea id="fBio" maxlength="500" placeholder="Tell people a bit about your hobbies, interests, and what makes you unique..." required=""></textarea>
-</div>
-<div>
-<label id="fPhotoLabel">Upload Photos (Up to 3)</label>
-<div id="postPhotoNote" style="display:none;font-size:.82rem;color:var(--muted);margin:2px 0 6px;"></div>
-<input accept="image/*" id="fPhoto" multiple="" style="padding: 6px; background: #fff;" type="file"/>
-</div>
-<div class="checkbox-line" style="background: #fff9ee; padding: 12px; border-radius: 8px; border: 1px solid #fce3b4;">
-<input id="fAgeConfirm" required="" type="checkbox"/>
-<label for="fAgeConfirm" style="margin:0;font-weight:600; color: #8a6d1f;">I confirm I am 18 years or older and this information is accurate.</label>
-</div>
-<button class="submit-btn" id="submitBtn" type="submit">Publish My Profile</button>
-<div id="formMsg"></div>
-</form>
-</div><div class="panel" id="messagesPanel" style="display:none;">
-<div class="browse-header">
-<h2>Your <span>Messages</span></h2>
-</div>
-<div class="msg-split">
-<div class="msg-list-col">
-<div id="threadList"></div>
-<div class="empty" id="messagesEmpty" style="display:none;">No messages yet. Match with someone from Browse to start a conversation!</div>
-</div>
-<div class="msg-chat-col" id="chatPane" aria-live="off"></div>
-</div>
-</div><div class="panel" id="callsPanel" style="display:none;">
-<div class="browse-header">
-<h2>Call <span>History</span> 📞</h2>
-<p>Calls you made, received and missed. Tap the phone to call back.</p>
-</div>
-<div class="calls-toolbar">
-<button class="calls-chip active" data-f="all" onclick="setCallsFilter('all')" type="button">All</button>
-<button class="calls-chip" data-f="missed" onclick="setCallsFilter('missed')" type="button">Missed</button>
-</div>
-<div class="calls-list" id="callsList"></div>
-<p class="calls-note">Only you and the other person can see a call. Voice calls are a Platinum feature.</p>
-</div><div class="panel" id="likesPanel" style="display:none;">
-<div class="browse-header">
-<h2>People Who <span>Liked You</span></h2>
-<p>Like them back to match and start chatting.</p>
-</div>
-<div class="grid" id="likesGrid"></div>
-<div class="empty" id="likesEmpty" style="display:none;">No one has liked your profile yet. Make sure you have a great photo!</div>
-</div><div class="panel" id="visitorsPanel" style="display:none;">
-<div class="browse-header">
-<h2>Who <span>Viewed You</span></h2>
-<p>People who've recently looked at your profile, most recent first.</p>
-</div>
-<div class="grid" id="visitorsGrid"></div>
-<div class="empty" id="visitorsEmpty" style="display:none;">No one has viewed your profile yet.</div>
-</div>
-<div class="panel" id="compatibilityPanel" style="display:none;">
-<div class="browse-header">
-<h2>Your <span>Compatibility</span> ❤️</h2>
-<p>Recommendations respect your gender preference and the other member’s preference first, then rank compatible goals, lifestyle, family plans and preferences.</p>
-</div>
-<div class="compat-summary" id="compatibilitySummary"></div>
-<div class="grid" id="compatibilityGrid"></div>
-<div class="empty" id="compatibilityEmpty" style="display:none;">Complete your dating profile to unlock personalized compatibility scores.</div>
-</div>
-<div class="panel" id="dateplansPanel" style="display:none;">
-<div class="browse-header">
-<h2>Your <span>Date Plans</span> 📅</h2>
-<p>Plan a safe meetup with a mutual match, respond to invitations, and keep the details in one place.</p>
-</div>
-<div class="date-plan-summary" id="datePlanSummary"></div>
-<div class="smart-match-controls">
-<button class="active" data-date-filter="upcoming" onclick="filterDatePlans('upcoming',this)" type="button">Upcoming</button>
-<button data-date-filter="pending" onclick="filterDatePlans('pending',this)" type="button">Needs response</button>
-<button data-date-filter="all" onclick="filterDatePlans('all',this)" type="button">All plans</button>
-</div>
-<div class="date-plan-grid" id="datePlansList"></div>
-</div>
+    <!-- ═══════════════════════════════════════════════════════
+         RESPONSIVE LAYOUT STYLES
+    ═══════════════════════════════════════════════════════ -->
+    <style>
+        /* ── Subcategory dropdown ── */
+        #subcatDropdown {
+            display: none;
+            position: fixed;
+            z-index: 9000;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 10px 12px;
+            min-width: 220px;
+            max-width: 340px;
+        }
+        #subcatDropdown.visible { display: block; }
+        #subcatDropdownInner { display: flex; flex-wrap: wrap; gap: 7px; }
 
-<div class="panel" id="safetyPanel" style="display:none;">
-<div class="browse-header">
-<h2>Safety &amp; <span>Trust Center</span> 🛡️</h2>
-<p>Verify your profile, control notifications, report concerns and keep your dating experience safer.</p>
+        .subcat-filter-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1.5px solid #c8e6c9;
+            background: white; color: #0A291A;
+            font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            white-space: nowrap; transition: all 0.15s;
+        }
+        .subcat-filter-btn:hover  { background: #f0f7f4; border-color: #0A291A; }
+        .subcat-filter-btn.active { background:#F5A623; color:#1a1a1a; border-color: #0A291A; }
+
+        #subcatDropdown::before {
+            content: '';
+            position: absolute;
+            top: -7px;
+            left: var(--arrow-left, 20px);
+            width: 13px; height: 13px;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
+            transform: rotate(45deg);
+        }
+
+        /* ══════════════════════════════════════════════
+           PAGE WRAPPER: Full-width, no horizontal scroll
+        ══════════════════════════════════════════════ */
+        .wg-page {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        /* ══════════════════════════════════════════════
+           MARKETPLACE LAYOUT: Sidebar + Content
+        ══════════════════════════════════════════════ */
+        .wg-layout {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+            padding: 16px 16px 16px 16px;
+            box-sizing: border-box;
+            gap: 16px;
+            min-height: 100vh;
+        }
+
+        /* ── LEFT SIDEBAR ── */
+        .wg-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #eef0ed;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            overflow: visible;
+        }
+
+        .wg-sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 16px 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid #f0f2f0;
+        }
+        .wg-sidebar-header i { color: #0A291A; font-size: 0.85rem; }
+
+        /* Vertical filter bar inside sidebar */
+        .wg-sidebar .filter-bar {
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: visible !important;
+            padding: 8px 0 12px !important;
+            gap: 1px !important;
+            white-space: normal !important;
+        }
+
+        .wg-sidebar .filter-btn {
+            display: flex !important;
+            align-items: center !important;
+            gap: 9px !important;
+            width: 100% !important;
+            padding: 9px 16px !important;
+            border-radius: 0 !important;
+            border: none !important;
+            border-left: 3px solid transparent !important;
+            background: transparent !important;
+            color: #374151 !important;
+            font-size: 0.92rem !important;
+            font-weight: 500 !important;
+            text-align: left !important;
+            white-space: normal !important;
+            justify-content: flex-start !important;
+            transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+        }
+        .wg-sidebar .filter-btn .chip-emoji,
+        .wg-sidebar .filter-btn i:first-child {
+            width: 20px;
+            text-align: center;
+            font-size: 0.92rem;
+            flex-shrink: 0;
+            color: #9ca3af;
+        }
+        .wg-sidebar .filter-btn:hover {
+            background: #f4f8f5 !important;
+            color: #0A291A !important;
+            border-left-color: #c8e6c9 !important;
+        }
+        .wg-sidebar .filter-btn.active {
+            background: #f0f7f4 !important;
+            color: #0A291A !important;
+            font-weight: 700 !important;
+            border-left-color: #0A291A !important;
+        }
+        .wg-sidebar .filter-btn.active .chip-emoji,
+        .wg-sidebar .filter-btn.active i:first-child { color: #0A291A !important; }
+
+        /* Hide the chevron arrow icons in sidebar */
+        .wg-sidebar .filter-btn .fa-chevron-down { display: none !important; }
+
+        /* ── RIGHT CONTENT AREA ── */
+        .wg-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* Sponsored banner inside content */
+        .wg-content .sponsored-section {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 0 16px 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Main grid inside content */
+        .wg-content main.container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .wg-content .masonry-wrapper {
+            /* Responsive columns: fill available width */
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        /* ══════════════════════════════════════════════
+           LARGE DESKTOP (≥1400px): wider sidebar, more columns
+        ══════════════════════════════════════════════ */
+        @media (min-width: 1400px) {
+            .wg-layout { padding: 20px 40px; gap: 20px; }
+            .wg-sidebar { width: 240px; }
+            .wg-content .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        }
+
+        /* ══════════════════════════════════════════════
+           TABLET (769px–1100px): narrower sidebar
+        ══════════════════════════════════════════════ */
+        @media (max-width: 1100px) and (min-width: 769px) {
+            .wg-layout { padding: 12px 12px; gap: 12px; }
+            .wg-sidebar { width: 190px; }
+            .wg-sidebar .filter-btn { font-size: 0.88rem !important; padding: 8px 12px !important; }
+            .wg-content .masonry-wrapper { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+        }
+
+        /* ══════════════════════════════════════════════
+           MOBILE (≤768px): sidebar → top horizontal strip
+        ══════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .wg-layout {
+                flex-direction: column;
+                padding: 0;
+                gap: 0;
+            }
+
+            .wg-sidebar {
+                width: 100%;
+                position: static;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-top: none;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            }
+            .wg-sidebar-header { display: none; }
+
+            /* Horizontal scrollable pill row */
+            .wg-sidebar .filter-bar {
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                padding: 10px 12px !important;
+                gap: 8px !important;
+                white-space: nowrap !important;
+                scrollbar-width: none !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .wg-sidebar .filter-bar::-webkit-scrollbar { display: none; }
+
+            .wg-sidebar .filter-btn {
+                width: auto !important;
+                flex-shrink: 0 !important;
+                padding: 7px 14px !important;
+                border-radius: 20px !important;
+                border: 1.5px solid #e2e8f0 !important;
+                border-left: 1.5px solid #e2e8f0 !important;
+                background: white !important;
+                color: #374151 !important;
+                font-size: 0.78rem !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+            }
+            .wg-sidebar .filter-btn.active {
+                background: #0A291A !important;
+                color: #fff !important;
+                border-color: #0A291A !important;
+                border-left-color: #0A291A !important;
+            }
+            .wg-sidebar .filter-btn:hover:not(.active) {
+                background: #f0f7f4 !important;
+                border-color: #0A291A !important;
+            }
+            .wg-sidebar .filter-btn .fa-chevron-down { display: none !important; }
+
+            /* Subcategory dropdown: full width strip on mobile */
+            #subcatDropdown {
+                position: fixed;
+                left: 0 !important;
+                width: 100vw;
+                max-width: 100vw;
+                border-radius: 0;
+                border-left: none; border-right: none; border-top: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+                padding: 8px 12px;
+                z-index: 9000;
+            }
+            #subcatDropdown::before { display: none; }
+            #subcatDropdownInner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+            #subcatDropdownInner::-webkit-scrollbar { display: none; }
+
+            .wg-content {
+                padding: 12px;
+            }
+            .wg-content .masonry-wrapper {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+        }
+
+        /* ══════════════════════════════════════════════
+           VERY SMALL PHONES (≤400px): single column
+        ══════════════════════════════════════════════ */
+        @media (max-width: 400px) {
+            .wg-content .masonry-wrapper {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+            }
+            .wg-content { padding: 8px; }
+        }
+
+        /* Override global .container max-width within content area */
+        .wg-content .container,
+        .wg-content main {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin: 0 !important;
+        }
+    </style>
+
+    <!-- ══════════════════════════════════════════════
+         FULL PAGE WRAPPER
+    ══════════════════════════════════════════════ -->
+    <div class="wg-page">
+
+    <!-- ══════════════════════════════════════════════
+         TWO-COLUMN LAYOUT
+    ══════════════════════════════════════════════ -->
+    <div class="wg-layout">
+
+        <!-- ── LEFT: Category Sidebar ── -->
+        <aside class="wg-sidebar">
+            <div class="wg-sidebar-header">
+                <i class="fas fa-th-list"></i>
+                <span>Categories</span>
+            </div>
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" data-category="All" data-am="ሁሉም" onclick="window.filterCategory('All', this)">
+                    <span class="chip-emoji">🏠</span> <span>All</span>
+                </button>
+                <button class="filter-btn sponsor-filter" id="featuredFilterBtn" data-am="ልዩ ዕቃዎች" onclick="window.filterSponsored()">
+                    <i class="fas fa-star" style="color:#f1c40f;"></i>
+                    <span data-am="ልዩ">Featured</span>
+                </button>
+                <!-- Dynamic categories injected here -->
+            </div>
+        </aside>
+
+        <!-- ── RIGHT: Content ── -->
+        <div class="wg-content">
+
+            <!-- Sponsored Banner -->
+            <section class="sponsored-section" id="mainSponsor" style="display:none;">
+                <!-- Section header -->
+                <div class="sponsor-section-header">
+                    <span class="sponsor-live-dot"></span>
+                    <span data-am="ልዩ አጋሮች">Featured Partners</span>
+                    <span class="sponsor-slots-label">2 Slots Active</span>
+                </div>
+
+                <!-- Dual product grid -->
+                <div class="sponsor-dual-grid">
+
+                    <!-- Slot 1 -->
+                    <div class="sponsor-card" id="sponsorCard1" style="display:none;cursor:pointer;" onclick="window._sponsorClick(1)">
+                        <div class="sponsor-badge" data-am="ልዩ አጋር"><span class="sponsor-live-dot"></span>Featured Partner</div>
+                        <div class="sponsor-content">
+                            <div class="sponsor-image">
+                                <img id="sponsorImg1" src="" alt="Featured product" loading="lazy">
+                            </div>
+                            <div class="sponsor-details">
+                                <h2 id="sponsorTitle1">Loading...</h2>
+                                <p id="sponsorDesc1"></p>
+                                <div class="sponsor-countdown" id="sponsorCountdown1">
+                                    <i class="fas fa-clock"></i> <span></span>
+                                </div>
+                                <div class="sponsor-progress-track">
+                                    <div class="sponsor-progress-fill" id="sponsorProgress1"></div>
+                                </div>
+                                <div class="sponsor-actions">
+                                    <a href="#" id="sponsorLink1" class="buy-btn" onclick="event.stopPropagation()">View Item</a>
+                                    <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank" onclick="event.stopPropagation()">Become a Sponsor &rarr;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slot 2 -->
+                    <div class="sponsor-card sponsor-card-2" id="sponsorCard2" style="display:none;cursor:pointer;" onclick="window._sponsorClick(2)">
+                        <div class="sponsor-badge sponsor-badge-2" data-am="ልዩ አጋር"><span class="sponsor-live-dot"></span>Featured Partner</div>
+                        <div class="sponsor-content">
+                            <div class="sponsor-image">
+                                <img id="sponsorImg2" src="" alt="Featured product" loading="lazy">
+                            </div>
+                            <div class="sponsor-details">
+                                <h2 id="sponsorTitle2">Loading...</h2>
+                                <p id="sponsorDesc2"></p>
+                                <div class="sponsor-countdown" id="sponsorCountdown2">
+                                    <i class="fas fa-clock"></i> <span></span>
+                                </div>
+                                <div class="sponsor-progress-track">
+                                    <div class="sponsor-progress-fill" id="sponsorProgress2"></div>
+                                </div>
+                                <div class="sponsor-actions">
+                                    <a href="#" id="sponsorLink2" class="buy-btn" onclick="event.stopPropagation()">View Item</a>
+                                    <a href="https://t.me/allInOneEthiopia1" class="sponsor-link" style="margin-left:15px;" target="_blank" onclick="event.stopPropagation()">Become a Sponsor &rarr;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+    <!-- ======================= WANA DATING PROMO ======================= -->
+    <section class="container dating-promo-section" aria-label="Wana Dating">
+        <a href="dating/index.html" class="dating-promo">
+            <div class="dp-text">
+                <span class="dp-tag"><i class="fas fa-heart"></i> <span data-am="አዲስ">New</span> · Wana Dating</span>
+                <h2 data-am="ልዩ የሆነውን ሰው ያግኙ">Meet someone special</h2>
+                <p data-am="የዋና ገበያ ቤተሰብ የሆነው ዋና ዳቲንግ፤ ለትክክለኛ ግንኙነት የተዘጋጀ ደህንነቱ የተጠበቀ የፍቅር ጓደኝነት ማህበረሰብ።">From the WanaGebya family: a safe, respectful place in Ethiopia to find real connections, friendship and love.</p>
+                <ul>
+                    <li><i class="fas fa-circle-check"></i> <span data-am="ነጻ መመዝገብ">Free to join</span></li>
+                    <li><i class="fas fa-circle-check"></i> <span data-am="የተረጋገጡ መገለጫዎች">Verified profiles</span></li>
+                    <li><i class="fas fa-circle-check"></i> <span data-am="ግላዊ መልዕክት እና የድምጽ ጥሪ">Private chat &amp; voice calls</span></li>
+                </ul>
+                <span class="dp-btn"><span data-am="ዳቲንግን ይጎብኙ">Join Wana Dating</span> <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="dp-photo"><img src="dating/images/wana-dating-hero.webp" alt="A smiling couple watching the sunset together" loading="lazy" width="1672" height="941"></div>
+        </a>
+    </section>
+
+    <!-- ======================= MAIN GRID ======================= -->
+    <main class="container">
+        <div id="productGrid" class="masonry-wrapper">
+            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading items...</div>
+        </div>
+
+        <!-- Invite / Share -->
+        <div class="invite-container" style="background:white; border-radius:16px; padding:2rem; text-align:center; border:1px solid #f0f0f0; margin:20px 0;">
+            <div style="width:56px; height:56px; border-radius:50%; background:#f0f7f4; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
+                <i class="fas fa-users" style="color:#0088cc; font-size:22px;"></i>
+            </div>
+            <h3 style="margin:0 0 6px; font-size:16px; color:#222;">Help WanaGebya Grow By Sharing!</h3>
+            <p style="color:#888; font-size:13px; margin:0 0 20px;">"Do you know anyone looking to buy or sell?" Invite them to WanaGebya.</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:420px; margin:0 auto;">
+                <button id="shareWhatsAppBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#25d366; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                    Share on WhatsApp
+                </button>
+                <button id="shareTelegramBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#0088cc; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Share on Telegram
+                </button>
+                <button id="shareFacebookBtn" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; border:none; background:#1877F2; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Share on Facebook
+                </button>
+                <a href="https://t.me/WanaGebyaet" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:9px; padding:13px 10px; border-radius:12px; background:#f0f7f4; color:#0088cc; border:1.5px solid #b3d9f5; font-size:13px; font-weight:600; text-decoration:none; font-family:inherit;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    Join Telegram Channel
+                </a>
+            </div>
+        </div>
+    </main>
+
+        </div><!-- /.wg-content -->
+    </div><!-- /.wg-layout -->
+    </div><!-- /.wg-page -->
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="golem-footer" style="padding-bottom:80px;">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h2 class="footer-logo">WanaGebya</h2>
+                <p>The premium marketplace for electronics, fashion, and furniture in Ethiopia.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <p><i class="fas fa-phone"></i> +251707022845</p>
+                <div class="social-links">
+                    <a href="https://t.me/WanaGebya" class="social-btn telegram" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="https://facebook.com/WanaGebya" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://instagram.com/WanaGebya" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://tiktok.com/@WanaGebya" class="social-btn tiktok" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Language / ቋንቋ</h4>
+                <button id="footerLangBtn" class="lang-btn-footer">English / አማርኛ</button>
+            </div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 WanaGebya Marketplace. All rights reserved.</p></div>
+    </footer>
+
+    <button id="backToTop" aria-label="Scroll to top" class="back-to-top" style="bottom:85px;">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- ======================= FLOATING CHAT ======================= -->
+    <div class="floating-chat">
+        <div id="chatToast" class="chat-toast" style="display:none;">
+            <span id="closeToastBtn" class="close-toast">&times;</span>
+            <p data-am="👋 ሰላም! እንኳን ደህና መጡ! ለመግዛት ወይም ለመሸጥ እርዳታ ይፈልጋሉ?">👋 Hello! Welcome! Need help with buying or selling?</p>
+            <div class="toast-arrow"></div>
+        </div>
+        <div id="chatMenu" class="chat-menu" style="display:none;">
+            <a href="tel:+251707022845" class="menu-item call"><i class="fas fa-phone"></i> <span data-am="አሁን ይደውሉ">Call Now</span></a>
+            <a href="https://t.me/allInOneEthiopia1" target="_blank" class="menu-item telegram"><i class="fab fa-telegram-plane"></i> <span>Telegram</span></a>
+            <a href="https://wa.me/251707022845" target="_blank" class="menu-item whatsapp"><i class="fab fa-whatsapp"></i> <span>WhatsApp</span></a>
+        </div>
+        <button id="chatToggleBtn" class="chat-btn">
+            <div class="status-dot-container">
+                <i class="fas fa-comment-dots"></i>
+                <span class="online-dot"></span>
+            </div>
+            <span class="chat-label" data-am="ያግኙን">Contact Us</span>
+        </button>
+    </div>
+
+    <!-- ======================= MODALS ======================= -->
+    <div id="supportModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="max-width:400px;">
+            <button id="closeSupportModal" class="close-modal-btn">&times;</button>
+            <h2 data-am="የWanaGebya ድጋፍ ያግኙ">Contact WanaGebya Support</h2>
+            <form id="supportForm">
+                <input type="email" id="supportEmail" placeholder="Your Email" data-am-placeholder="ኢሜይልዎ" required class="modal-input">
+                <input type="text" id="supportSubject" placeholder="Subject" data-am-placeholder="ርዕስ" required class="modal-input">
+                <textarea id="supportMessage" placeholder="How can we help?" data-am-placeholder="እንዴት ልንረዳዎ እንችላለን?" required class="modal-input" style="height:100px;"></textarea>
+                <button type="submit" class="auth-submit" style="width:100%;" data-am="መልእክት ይላኩ">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================= AUTH MODAL (REDESIGNED) ======================= -->
+    <div id="authModal" class="modal-overlay" style="display:none;">
+        <div id="authModalInner" style="background:#fff; border-radius:20px; overflow:hidden; width:100%; max-width:430px; box-shadow:0 8px 40px rgba(0,0,0,0.18); margin:auto; position:relative; max-height:90vh; overflow-y:auto;">
+
+            <!-- Close button -->
+            <button type="button" id="closeAuthModal" style="position:absolute; top:14px; right:14px; z-index:10; background:rgba(255,255,255,0.15); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; line-height:1; backdrop-filter:blur(4px);">&times;</button>
+
+            <!-- Brand header -->
+            <div style="background:#0A291A; padding:28px 32px 22px; text-align:center;">
+                <div style="font-family:'Poppins',sans-serif; font-size:22px; font-weight:700; color:#F5A623; letter-spacing:-0.5px; margin-bottom:4px;">WanaGebya</div>
+                <div style="font-size:12px; color:rgba(255,255,255,0.5); letter-spacing:0.5px;" data-am="የኢትዮጵያ ምርጥ ገበያ">Ethiopia's trusted marketplace</div>
+            </div>
+
+            <!-- Tabs -->
+            <div style="display:flex; border-bottom:1px solid #eef0ed;">
+                <button id="authTabLogin" style="flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; border:none; background:transparent; color:#0A291A; border-bottom:2.5px solid #F5A623; cursor:pointer;" data-am="ይግቡ">Sign In</button>
+                <button id="authTabSignup" style="flex:1; padding:14px 10px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; border:none; background:transparent; color:#9ca3af; border-bottom:2.5px solid transparent; cursor:pointer;" data-am="ይመዝገቡ">Create Account</button>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:24px 28px 28px;">
+
+                <!-- Google button -->
+                <button type="button" id="googleSignInBtn" onclick="window.signInWithGoogle()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; margin-bottom:18px; background:#fff; border:1.5px solid #e2e8f0; border-radius:10px; font-size:13.5px; font-weight:600; color:#374151; cursor:pointer; font-family:'Poppins',inherit; transition:background 0.2s,box-shadow 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <!-- Divider -->
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                    <div style="flex:1; height:1px; background:#eef0ed;"></div>
+                    <span style="font-size:11.5px; color:#9ca3af; font-weight:600; white-space:nowrap;">or continue with</span>
+                    <div style="flex:1; height:1px; background:#eef0ed;"></div>
+                </div>
+
+                <!-- EMAIL / PHONE METHOD TOGGLE -->
+                <div style="display:flex; gap:8px; margin-bottom:14px; background:#f3f4f6; padding:4px; border-radius:10px;">
+                    <button type="button" id="authMethodEmail" onclick="window.switchAuthMethod('email')" style="flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; border:none; border-radius:8px; cursor:pointer; background:#fff; color:#0A291A; box-shadow:0 1px 3px rgba(0,0,0,0.08); transition:all 0.15s;">
+                        <i class="fas fa-envelope" style="margin-right:6px;"></i>Email
+                    </button>
+                    <button type="button" id="authMethodPhone" onclick="window.switchAuthMethod('phone')" style="flex:1; padding:9px 6px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; border:none; border-radius:8px; cursor:pointer; background:transparent; color:#6b7280; transition:all 0.15s;">
+                        <i class="fas fa-phone" style="margin-right:6px;"></i>Phone
+                    </button>
+                </div>
+
+                <!-- SIGN IN PANEL -->
+                <div id="authPanelLogin">
+                    <form id="authForm">
+                        <div style="margin-bottom:14px;">
+                            <label id="authIdentifierLabel" style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Email Address</label>
+                            <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px; transition:border-color 0.2s;" onfocusin="this.style.borderColor='#0A291A'" onfocusout="this.style.borderColor='#e5e7eb'">
+                                <i id="authIdentifierIcon" class="fas fa-envelope" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
+                                <input type="email" id="authEmail" placeholder="you@example.com" required style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
+                            </div>
+                            <div id="authPhoneHint" style="display:none; font-size:11px; color:#9ca3af; margin-top:5px;">Enter your Ethiopian mobile number, e.g. 0912345678 or 0712345678</div>
+                        </div>
+                        <div style="margin-bottom:8px;">
+                            <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Password</label>
+                            <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px; transition:border-color 0.2s;" onfocusin="this.style.borderColor='#0A291A'" onfocusout="this.style.borderColor='#e5e7eb'">
+                                <i class="fas fa-lock" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
+                                <input type="password" id="authPassword" placeholder="••••••••" required style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
+                            </div>
+                        </div>
+                        <div id="forgotPwdWrap" style="text-align:right; margin-bottom:18px;">
+                            <a href="#" id="forgotPwdLink" style="font-size:12px; color:#0A291A; opacity:0.65; text-decoration:none;">Forgot Password?</a>
+                        </div>
+                        <div id="phoneResetHint" style="display:none; text-align:right; margin-bottom:18px; font-size:12px; color:#9ca3af;">Forgot your password? Message us on Telegram to reset it.</div>
+                    </form>
+
+                    <!-- SIGN UP PANEL (hidden by default, shown inside same form area) -->
+                    <div id="registerFields" style="display:none;">
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Full Name</label>
+                            <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px;">
+                                <i class="fas fa-user" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
+                                <input type="text" id="regName" placeholder="Abebe Bekele" style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
+                            </div>
+                        </div>
+                        <div id="regPhoneField" style="margin-bottom:14px;">
+                            <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Phone Number</label>
+                            <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px;">
+                                <i class="fas fa-phone" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
+                                <input type="text" id="regPhone" placeholder="+251 9XX XXX XXX" style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
+                            </div>
+                        </div>
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Location</label>
+                            <div style="display:flex; align-items:center; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:0 12px;">
+                                <i class="fas fa-map-marker-alt" style="color:#9ca3af; font-size:13px; margin-right:8px;"></i>
+                                <input type="text" id="regLocation" placeholder="e.g. Bole, Addis Ababa" style="border:none; background:transparent; outline:none; width:100%; padding:11px 0; font-size:13.5px; font-family:inherit; color:#111;">
+                            </div>
+                        </div>
+                        <div style="margin-bottom:18px;">
+                            <label style="display:block; font-size:11px; font-weight:700; color:#6b7280; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px;">Short Bio <span style="font-weight:400; text-transform:none;">(optional)</span></label>
+                            <textarea id="regBio" placeholder="Tell buyers a little about yourself..." style="width:100%; border:1.5px solid #e5e7eb; border-radius:10px; padding:10px 12px; font-size:13px; font-family:inherit; color:#111; background:#f9fafb; outline:none; resize:vertical; min-height:72px; box-sizing:border-box;"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" form="authForm" id="authSubmitBtn" style="width:100%; padding:13px; background:#F5A623; color:#0A291A; border:none; border-radius:10px; font-size:14px; font-weight:700; font-family:'Poppins',inherit; cursor:pointer; transition:background 0.2s;" data-am="ይግቡ">Sign In to WanaGebya</button>
+                </div>
+
+                <!-- Toast inside modal -->
+                <div id="authToast" style="display:none; margin-top:12px; padding:10px 14px; border-radius:8px; font-size:13px; font-weight:500; text-align:center;"></div>
+
+                <p id="toggleText" style="text-align:center; font-size:12.5px; color:#6b7280; margin-top:16px; display:none;">
+                    Don't have an account? <a href="#" id="toggleAuthModeLink" onclick="window.switchAuthTab('signup'); return false;" style="color:#0A291A; font-weight:600;">Sign Up</a>
+                </p>
+                <p id="forgotPwdRow" style="display:none;"></p>
+            </div>
+        </div>
+    </div>
+<!-- Telegram Popup Structure -->
+<!-- The Popup Structure (Keep this at the bottom of your body) -->
+<div id="tg-popup" class="tg-popup-hidden">
+    <div class="tg-popup-content">
+        <span class="tg-close" onclick="closeTGPopup()">&times;</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" width="50">
+        <h3>WanaGebya Market</h3>
+        <p>Stay updated with our latest electronics and offers!</p>
+        <a href="https://t.me/WanaGebyaet" target="_blank" class="tg-btn">Join Now</a>
+    </div>
 </div>
-<div class="feature-cards">
-<div class="feature-card">
-<div class="feature-card-icon">🛡️</div>
-<div><h3>Profile verification</h3><p>Submit a private selfie for moderator review and show a verified badge on your profile.</p></div>
-<button class="feature-action" onclick="openVerificationModal()">Verify profile</button>
-</div>
-<div class="feature-card">
-<div class="feature-card-icon">🚩</div>
-<div><h3>Report &amp; block</h3><p>If someone behaves abusively, scams, harasses or violates community rules, report the profile and block them.</p></div>
-<button class="feature-action danger" onclick="openSafetyReportGuide()">Report a concern</button>
-</div>
-<div class="feature-card">
-<div class="feature-card-icon">🔔</div>
-<div><h3>Push notifications</h3><p>Get browser notifications for important dating activity. Permission is always controlled by you.</p></div>
-<button class="feature-action" id="pushEnableBtn" onclick="enableWanaNotifications()">Enable notifications</button>
-<div class="feature-status" id="pushStatus"></div>
-</div>
-<div class="feature-card">
-<div class="feature-card-icon">🌍</div>
-<div><h3>Amharic</h3><p>Switch the Wana Dating interface between English and Amharic from the language control above.</p></div>
-<button class="feature-action" onclick="toggleLang()">አማ / EN</button>
-</div>
-</div>
-<div class="safety-tips">
-<strong>Dating safety reminders</strong>
-<span>Never send passwords, verification codes or money to another member. Meet in a public place and tell someone you trust where you are going.</span>
-</div>
-</div>
-<div class="panel" id="myProfilePanel" style="display:none;">
-<div id="myProfileContent"></div>
-</div><div class="panel" id="settingsPanel" style="display:none;">
-<div class="browse-header">
-<h2>Privacy <span>Settings</span></h2>
-<p>Manage your account security and blocked contacts.</p>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-<h3 style="margin-top:0;">Who Can Contact You</h3>
-<p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Control who can call you and who can see when you were last active.</p>
-<div class="row2">
-<div>
-<label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can call you</label>
-<select id="setCallPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
-<option value="everybody">Everybody</option>
-<option value="verified">Verified profiles only</option>
-<option value="matches">My matches only</option>
-<option value="nobody">Nobody</option>
-</select>
-</div>
-<div>
-<label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Who can see your last seen time</label>
-<select id="setLastSeenPrivacy" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;">
-<option value="everybody">Everybody</option>
-<option value="verified">Verified profiles only</option>
-<option value="matches">My matches only</option>
-<option value="nobody">Nobody</option>
-</select>
-</div>
-</div>
-<button class="submit-btn" onclick="updateContactPrivacy()" style="width:auto;padding:10px 24px;margin-top:14px;">Save Preferences</button>
-<div id="contactPrivacyMsg" style="margin-top:10px;"></div>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-<h3 style="margin-top:0;">Change Password</h3>
-<div class="row2">
-<div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">New Password</label><input id="setNewPwd" placeholder="Min 6 characters" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" type="password"/></div>
-<div><label style="font-size:.85rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Confirm Password</label><input id="setNewPwdConf" placeholder="Confirm new password" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-family:inherit; outline: none;" type="password"/></div>
-</div>
-<button class="submit-btn" onclick="updateAccountPassword()" style="width:auto;padding:10px 24px;margin-top:14px;">Update Password</button>
-<div id="pwdMsg" style="margin-top:10px;"></div>
-</div>
-<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-<h3 style="margin-top:0;">Blocked Users</h3>
-<p style="font-size:0.85rem; color:#666; margin-bottom: 15px;">Users you have blocked cannot see your profile or message you.</p>
-<div id="blockedUsersList">Loading...</div>
-</div>
-</div></main>
-<aside class="wana-right-match-rail" id="rightMatchRail">
-<div class="wana-right-match-card">
-<div class="wana-right-match-head">
-<h3>New matches <span id="matchRailCountry"></span></h3>
-</div>
-<div class="wana-right-match-list" id="homeRecommendedList">
-<div class="wana-right-match-empty">Finding your best matches…</div>
-</div>
-<div class="wana-right-match-footer">
-<button onclick="switchTab('browse')" type="button">SEE ALL YOUR MATCHES</button>
-</div>
-</div>
-</aside>
-</div>
-<!-- NEW MEMBERS -->
-<!-- SETUP PROFILE -->
-<!-- MESSAGES -->
-<!-- LIKES -->
-<!-- MY PROFILE -->
-<!-- PRIVACY SETTINGS (NEW) -->
-<footer class="site-legal" style="text-align:center;font-size:.8rem;color:#777;padding:18px 12px;">
-<a href="terms.html" style="color:inherit;">Terms of Use</a> · <a href="privacy.html" style="color:inherit;">Privacy Policy</a> · © WanaGebya
-</footer>
-<!-- ROOT CONTAINERS -->
-<div id="modalRoot"></div>
-<div id="callRoot"></div>
-<audio autoplay="" id="remoteAudio"></audio>
-<!-- SCRIPTS -->
-<script src="js/vendor/supabase.js"></script>
-<script src="../config.js"></script>
-<script src="js/countries.js"></script>
-<script src="js/app.js"></script>
-<script src="js/visit-log.js"></script>
-<script src="js/pro.js"></script>
-<script src="js/safety.js"></script>
-<script src="js/date-planning.js"></script>
-<script src="js/calls.js"></script>
-  <script src="js/support.js"></script>
-  <script src="js/account.js"></script>
-  <script src="js/notify.js"></script>
-  <script src="js/invite.js"></script>
-  <script src="js/pro-ui.js"></script>
-  <script src="js/home-discover.js"></script>
-  <script src="js/assistant-faq.js"></script>
-  <script src="js/assistant.js"></script>
-  <script src="js/geez-input.js"></script>
-  <script src="js/call-history.js"></script>
-  <script src="js/chat-live.js"></script>
-  <script src="js/skeleton.js"></script>
-  <script src="js/prompts.js"></script>
-  <script src="js/safety-tips.js"></script>
-  <script src="js/one-tap.js"></script>
-  <script src="js/i18n.js"></script>
+    
+    <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle" style="display:none;">
+        <div class="modal-content">
+            <button id="closeProductModal" class="close-modal-btn">&times;</button>
+            <div class="modal-img-wrapper"><img id="modalProductImg" src="" alt="Product" style="border-radius:10px;"></div>
+            <div class="modal-body">
+                <h2 id="modalProductTitle" style="font-size:1.2rem; margin-bottom:5px;"></h2>
+                <div class="seller-details-wrapper" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:12px; display:flex; align-items:center; gap:10px; border:1px solid #eee;">
+                    <img id="modalSellerAvatar"
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e0e0e0'/%3E%3Ccircle cx='25' cy='20' r='10' fill='%23bdbdbd'/%3E%3Cellipse cx='25' cy='45' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E"
+                        alt="Seller avatar" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #0A291A;">
+                    <div style="flex:1;">
+                        <h4 id="modalSellerName" style="margin:0; color:#333; font-size:0.95rem; font-weight:600;">Seller: Loading...</h4>
+                        <div id="sellerBadgeContainer"></div>
+                    </div>
+                </div>
+                <div id="modalProductPrice" class="modal-price" style="font-size:1.3rem;"></div>
+                <p id="modalProductDesc" class="modal-description" style="font-size:0.9rem; line-height:1.5;"></p>
+                <div class="modal-flex-actions">
+                    <a id="callContact" href="#" class="contact-btn"><i class="fas fa-phone"></i> Call</a>
+                    <a id="telegramOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-telegram-plane"></i> Message</a>
+                    <a id="whatsappOrder" href="#" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button id="saveToWishlistBtn" class="contact-btn save-btn" style="width:100%;"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+        <div class="spinner"></div><p>Sending your order to WanaGebya ...</p>
+    </div>
+
+    <div id="successModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content success-modal-inner">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 style="margin-bottom:10px;">Listing Received!</h2>
+            <p style="color:#666; line-height:1.5;">Your item <strong id="postedItemName" style="color:#333;"></strong> has been sent to our team for review.</p>
+            <p style="font-size:0.85rem; color:#999; margin-top:10px;">It usually takes less than 2 hours to go live.</p>
+            <button id="closeSuccessModal" class="success-back-btn">Back to Marketplace</button>
+        </div>
+    </div>
+
+    <!-- ======================= SCRIPTS ======================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        window.signInWithGoogle = async function() {
+            const btn = document.getElementById('googleSignInBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Redirecting to Google...';
+            }
+            const { error } = await _supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/index.html' }
+            });
+            if (error) {
+                alert('Google sign-in failed: ' + error.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Continue with Google';
+                }
+            }
+        };
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════
+         JOBS & SERVICES CARD RENDERER
+    ══════════════════════════════════════════════════════════════ -->
+   <script>
+    (function () {
+        'use strict';
+
+        /* ── helpers ── */
+        function esc(str) {
+            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function phone(p) { return String(p || '').replace(/\s/g,''); }
+
+        function parseSpecs(desc) {
+            const specs = {};
+            if (!desc) return specs;
+            const block = desc.split('--- Specs ---')[1] || '';
+            block.split('\n').forEach(line => {
+                const m = line.match(/^[-\s]*([^:]+):\s*(.+)$/);
+                if (m) specs[m[1].trim().toLowerCase()] = m[2].trim();
+            });
+            return specs;
+        }
+
+        function cleanDesc(desc) {
+            if (!desc) return '';
+            return desc.split('--- Specs ---')[0].trim();
+        }
+
+        const svcEmoji = {
+            'plumbing':'🔧','electrical work':'⚡','painting':'🎨',
+            'tiling & flooring':'🪵','carpentry & woodwork':'🪚',
+            'cleaning service':'🧹','moving & packing':'📦',
+            'air conditioning':'❄️','welding & metal work':'⚙️',
+            'web design':'💻','graphic design':'🖼','computer repair':'🖥',
+            'phone repair':'📱','network setup':'🌐','cctv installation':'📷',
+            'software development':'👨‍💻','private tutoring':'📚',
+            'language classes':'🗣','music lessons':'🎵',
+            'driving instruction':'🚗','skills training':'🏆',
+            'accounting / bookkeeping':'📊','legal consultation':'⚖️',
+            'translation':'🌍','photography / videography':'📸',
+            'event planning':'🎉','security service':'🛡',
+            'hair salon / barbershop':'💈','makeup & styling':'💄',
+            'massage / spa':'💆','laundry service':'👕',
+            'childcare / babysitting':'👶','elder care':'🧓',
+        };
+
+        function svcIcon(cat) {
+            if (!cat) return '🛠';
+            return svcEmoji[cat.toLowerCase()] || '🛠';
+        }
+
+        /* ══════════════════════════════
+           JOB CARD HTML
+        ══════════════════════════════ */
+        function buildJobCard(item) {
+            // FIX: Securely encode the JSON object so quotes don't break the HTML
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
+
+            const jobType  = sp['job type']  || 'Full-Time';
+            const industry = sp['industry']  || '';
+            const exp      = sp['experience required'] || '';
+            const edu      = sp['education level'] || '';
+            const location = sp['work location'] || item.location || '';
+            const company  = sp['company'] || '';
+            const positions= sp['positions available'] || '';
+            const deadline = sp['deadline'] || '';
+            const salMin   = sp['salary min'] || '';
+            const salMax   = sp['salary max'] || '';
+            const skills   = sp['key skills'] || '';
+
+            let salaryStr = 'Negotiable';
+            if (salMin && salMax) salaryStr = `${Number(salMin).toLocaleString()} – ${Number(salMax).toLocaleString()} ETB`;
+            else if (salMin) salaryStr = `From ${Number(salMin).toLocaleString()} ETB`;
+            else if (item.price && item.price > 0) salaryStr = `${Number(item.price).toLocaleString()} ETB`;
+
+            const typeColor = { 'Full-Time':'blue','Part-Time':'orange','Contract':'purple','Internship':'green','Freelance':'red' };
+            const badgeColor = typeColor[jobType] || 'blue';
+
+            const skillTags = skills ? skills.split(',').slice(0,4).map(s =>
+                `<span class="job-tag purple"><i class="fas fa-check" style="font-size:8px;"></i>${esc(s.trim())}</span>`
+            ).join('') : '';
+
+            const deadlineBadge = deadline
+                ? `<span class="deadline-badge"><i class="fas fa-clock"></i> Deadline: ${esc(deadline)}</span>` : '';
+
+            // Check if saved
+            let saved =[];
+            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+            const isSaved = saved.includes(item.id);
+
+            return `
+            <div class="job-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
+
+                <div class="job-card-header">
+                    <div class="job-type-badge"><i class="fas fa-briefcase" style="font-size:9px;"></i> ${esc(jobType)}</div>
+                    <button class="job-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                        <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
+                    </button>
+                    <div class="job-title">${esc(item.name)}</div>
+                    ${company ? `<div class="job-company"><i class="fas fa-building"></i>${esc(company)}</div>` : ''}
+                </div>
+
+                <div class="job-tags">
+                    ${industry ? `<span class="job-tag blue"><i class="fas fa-layer-group" style="font-size:8px;"></i>${esc(industry)}</span>` : ''}
+                    ${exp ? `<span class="job-tag green"><i class="fas fa-star" style="font-size:8px;"></i>${esc(exp)}</span>` : ''}
+                    ${edu ? `<span class="job-tag purple"><i class="fas fa-graduation-cap" style="font-size:8px;"></i>${esc(edu)}</span>` : ''}
+                    ${positions ? `<span class="job-tag orange"><i class="fas fa-users" style="font-size:8px;"></i>${esc(positions)} position${positions>1?'s':''}</span>` : ''}
+                    ${skillTags}
+                </div>
+
+                <div class="job-meta-row">
+                    <div>
+                        <div class="job-salary">${salaryStr}</div>
+                        ${deadlineBadge}
+                    </div>
+                    <div class="job-location"><i class="fas fa-map-marker-alt"></i>${esc(location || item.location || 'Ethiopia')}</div>
+                </div>
+
+                ${desc ? `<p class="job-snippet">${esc(desc)}</p>` : ''}
+
+                <div class="job-actions">
+                    <a href="tel:${ph}" class="job-btn job-btn-primary" onclick="event.stopPropagation()">
+                        <i class="fas fa-phone"></i> Call / Apply
+                    </a>
+                    <a href="https://t.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-tg" onclick="event.stopPropagation()">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                    <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="job-btn job-btn-wa" onclick="event.stopPropagation()">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        /* ══════════════════════════════
+           SERVICE CARD HTML
+        ══════════════════════════════ */
+        function buildServiceCard(item) {
+            // FIX: Securely encode the JSON object
+            const safeData = encodeURIComponent(JSON.stringify(item)).replace(/'/g, "%27");
+            
+            const sp = parseSpecs(item.description);
+            const desc = cleanDesc(item.description);
+            const ph = phone(item.seller_phone);
+
+            const svcCat     = sp['service category'] || '';
+            const provider   = sp['provider name'] || '';
+            const experience = sp['experience'] || '';
+            const response   = sp['response time'] || '';
+            const pricing    = sp['pricing model'] || '';
+            const area       = sp['service area'] || '';
+            const avail      = sp['availability'] || '';
+            const highlights = sp['service highlights'] || '';
+            const payment    = sp['payment methods'] || '';
+
+            const priceStr = item.price && item.price > 0
+                ? `${Number(item.price).toLocaleString()} ETB`
+                : 'On Request';
+
+            const pricingLabel = pricing || 'Per Project';
+
+            const hlTags = highlights ? highlights.split(',').slice(0,4).map(h =>
+                `<span class="svc-tag purple"><i class="fas fa-check-circle" style="font-size:9px;"></i>${esc(h.trim())}</span>`
+            ).join('') : '';
+
+            const payTags = payment ? payment.split(',').slice(0,3).map(p =>
+                `<span class="svc-tag teal">${esc(p.trim())}</span>`
+            ).join('') : '';
+
+            const icon = svcIcon(svcCat);
+
+            // Check if saved
+            let saved =[];
+            try { saved = JSON.parse(localStorage.getItem('golem_saved') || '[]'); } catch(e) {}
+            const isSaved = saved.includes(item.id);
+
+            return `
+            <div class="service-card" data-id="${esc(item.id)}" onclick="window.openProductDetailsSafe('${safeData}')">
+
+                <div class="service-card-header">
+                    <div class="service-banner">
+                        ${item.image
+                            ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">`
+                            : `<span class="service-banner-fallback">${icon}</span>`}
+                        <span class="service-type-badge"><i class="fas fa-tools" style="font-size:9px;"></i>${esc(svcCat || 'Service')}</span>
+                        ${experience ? `<span class="service-rating"><i class="fas fa-star"></i>${esc(experience)}</span>` : ''}
+                        <button class="service-wishlist-btn ${isSaved ? 'active' : ''}" onclick="event.stopPropagation(); window.toggleWishlist('${item.id}', this)">
+                            <i class="${isSaved ? 'fas' : 'far'} fa-shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-name">${esc(item.name)}</div>
+                    ${provider ? `<div class="service-provider"><i class="fas fa-user-circle"></i>${esc(provider)}</div>` : ''}
+
+                    <div class="service-highlights">
+                        ${response   ? `<span class="svc-tag pink"><i class="fas fa-bolt" style="font-size:9px;"></i>${esc(response)}</span>` : ''}
+                        ${area       ? `<span class="svc-tag teal"><i class="fas fa-map-pin" style="font-size:9px;"></i>${esc(area)}</span>` : ''}
+                        ${avail      ? `<span class="svc-tag amber"><i class="fas fa-calendar" style="font-size:9px;"></i>${esc(avail)}</span>` : ''}
+                        ${hlTags}
+                        ${payTags}
+                    </div>
+
+                    ${desc ? `<p class="service-snippet">${esc(desc)}</p>` : ''}
+                </div>
+
+                <div class="service-footer">
+                    <div>
+                        <div class="service-price">${priceStr}</div>
+                        <div class="service-price-label">${esc(pricingLabel)}</div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="tel:${ph}" class="svc-btn svc-btn-primary" onclick="event.stopPropagation()">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a href="https://wa.me/${ph.replace('+','')}" target="_blank" class="svc-btn svc-btn-outline" onclick="event.stopPropagation()">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        /* ══════════════════════════════
+           PATCH: intercept renderProduct
+           called from script.js
+        ══════════════════════════════ */
+        const _orig = window.renderProduct;
+
+        window.renderProduct = function (item) {
+            if (item.category === 'Jobs') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildJobCard(item);
+                return wrapper.firstElementChild;
+            }
+            if (item.category === 'Services') {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildServiceCard(item);
+                return wrapper.firstElementChild;
+            }
+            // all other categories fall through to original renderer
+            if (typeof _orig === 'function') return _orig(item);
+        };
+
+        /* ══════════════════════════════════════════════════════
+           FALLBACK
+        ══════════════════════════════════════════════════════ */
+        let _itemCache = {};
+
+        const _origFetch = window.fetchProducts;
+        window.fetchProducts = async function (category) {
+            // Pass category explicitly so the default parameter in script.js works correctly
+            const result = typeof _origFetch === 'function' ? await _origFetch.call(this, category) : undefined;
+            setTimeout(reRenderSpecialCards, 300);
+            return result;
+        };
+
+        const _origOpen = window.openProductModal;
+        window.openProductModal = function (item) {
+            if (item && item.id) {
+                _itemCache[item.id] = item;
+
+                // Track this view
+                (async () => {
+                    const pid = item.id;
+                    const { error: rpcErr } = await _supabase.rpc('increment_view_count', { product_id: pid });
+                    if (rpcErr) {
+                        console.warn('RPC failed, trying direct update:', rpcErr.message);
+                        const { data: row } = await _supabase
+                            .from('products').select('view_count').eq('id', pid).single();
+                        const { error: upErr } = await _supabase
+                            .from('products')
+                            .update({ view_count: (row?.view_count || 0) + 1 })
+                            .eq('id', pid);
+                        if (upErr) console.warn('View count update failed:', upErr.message);
+                        else console.log('View counted (direct):', (row?.view_count || 0) + 1);
+                    } else {
+                        console.log('View counted via RPC');
+                    }
+                })();
+            }
+            if (typeof _origOpen === 'function') return _origOpen.apply(this, arguments);
+        };
+
+        function reRenderSpecialCards() { }
+
+    })();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════
+         CENTRALISED EVENT LISTENERS
+    ══════════════════════════════════════════════════════ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('helpBtn').addEventListener('click', function (e) { e.preventDefault(); window.toggleSupportModal(); });
+            document.getElementById('langToggleBtn').addEventListener('click', window.toggleLanguage);
+            if (window.applyStoredLanguage) window.applyStoredLanguage();
+            document.getElementById('footerLangBtn').addEventListener('click', window.toggleLanguage);
+            document.getElementById('signInBtn').addEventListener('click', window.toggleModal);
+            document.getElementById('signOutBtn').addEventListener('click', window.handleSignOut);
+            document.getElementById('userNameLink').addEventListener('click', function () { location.href = 'profile.html'; });
+            document.getElementById('sellBtn').addEventListener('click', function (e) { window.checkAuthToSell(e); });
+            document.getElementById('sortSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
+            document.getElementById('locationSelect').addEventListener('change', () => window.fetchProducts(window.currentCategory));
+            // Static filter buttons wired after dynamic categories are loaded
+            document.getElementById('featuredFilterBtn').addEventListener('click', window.filterSponsored);
+            // Load dynamic category filter buttons from Supabase
+            loadFilterCategories();
+            document.getElementById('shareTelegramBtn').addEventListener('click', window.shareToTelegram);
+            document.getElementById('shareWhatsAppBtn').addEventListener('click', window.shareToWhatsApp);
+            document.getElementById('shareFacebookBtn').addEventListener('click', window.shareToFacebook);
+            document.getElementById('closeSupportModal').addEventListener('click', window.toggleSupportModal);
+            document.getElementById('supportModal').addEventListener('click', function (e) { if (e.target === this) window.toggleSupportModal(); });
+            document.getElementById('supportForm').addEventListener('submit', window.handleSupportSubmit);
+            document.getElementById('closeAuthModal').addEventListener('click', window.toggleModal);
+            document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) window.toggleModal(); });
+            document.getElementById('authForm').addEventListener('submit', window.handleAuth);
+            document.getElementById('authTabLogin')?.addEventListener('click', function() { window.switchAuthTab('login'); });
+            document.getElementById('authTabSignup')?.addEventListener('click', function() { window.switchAuthTab('signup'); });
+            document.getElementById('switchToLoginLink')?.addEventListener('click', function(e) { e.preventDefault(); window.switchAuthTab('login'); });
+            document.getElementById('closeProductModal').addEventListener('click', window.closeProductModal);
+            document.getElementById('productModal').addEventListener('click', function (e) { if (e.target === this) window.closeProductModal(); });
+            document.getElementById('callContact').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Call on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('telegramOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked Telegram on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('whatsappOrder').addEventListener('click', function () { window.logBuyerAction(null, 'Clicked WhatsApp on item: ' + document.getElementById('modalProductTitle').innerText); });
+            document.getElementById('saveToWishlistBtn').addEventListener('click', function () { window.addToCartFromModal(); window.logBuyerAction(null, 'Saved item: ' + document.getElementById('modalProductTitle').innerText); });
+            ['sponsorLink1','sponsorLink2'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', function () {
+                    const slot = id.replace('sponsorLink','');
+                    const title = document.getElementById('sponsorTitle' + slot);
+                    window.logBuyerAction(null, 'Clicked Sponsored Item: ' + (title ? title.innerText : ''));
+                });
+            });
+            document.getElementById('closeSuccessModal').addEventListener('click', function () { document.getElementById('successModal').style.display = 'none'; });
+            document.getElementById('chatToggleBtn').addEventListener('click', toggleChatMenu);
+            document.getElementById('closeToastBtn').addEventListener('click', function (e) { e.stopPropagation(); closeToast(); });
+            document.addEventListener('click', function (event) {
+                const menu = document.getElementById('chatMenu');
+                const btn  = document.getElementById('chatToggleBtn');
+                if (menu && btn && !btn.contains(event.target) && !menu.contains(event.target)) menu.style.display = 'none';
+            });
+            checkPostStatus();
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmSource = urlParams.get('utm_source');
+            if (utmSource && !sessionStorage.getItem('utm_logged')) {
+                window.logBuyerAction(null, `Source: ${utmSource} | Campaign: ${urlParams.get('utm_campaign') || 'General'}`);
+                sessionStorage.setItem('utm_logged', 'true');
+            }
+            loadAdminStatus();
+            setInterval(loadAdminStatus, 120000);
+        });
+
+        function closeToast() { const t = document.getElementById('chatToast'); if (t) t.style.display = 'none'; }
+        function toggleChatMenu() { const m = document.getElementById('chatMenu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
+
+        // ── Dynamic Filter Bar + Hover Subcategory Dropdown ──────
+        let _catData = [];
+        let _subcatHideTimer = null;
+
+        async function loadFilterCategories() {
+            const bar = document.getElementById('filterBar');
+
+            if (typeof _supabase === 'undefined') {
+                setTimeout(loadFilterCategories, 150);
+                return;
+            }
+
+            try {
+                const { data: cats, error } = await _supabase
+                    .from('categories')
+                    .select('id, name, amharic_name, icon, subcategories(id, name, amharic_name)')
+                    .order('sort_order', { ascending: true });
+
+                if (error || !cats || cats.length === 0) {
+                    _injectDefaultFilters(bar);
+                    return;
+                }
+
+                _catData = cats;
+                bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
+
+                cats.forEach(cat => {
+                    const rawIcon  = (cat.icon || '').trim();
+                    const iconHtml = rawIcon
+                        ? (rawIcon.startsWith('fa')
+                            ? `<i class="${rawIcon}" style="font-size:11px;"></i> `
+                            : `${rawIcon} `)
+                        : '';
+
+                    const btn = document.createElement('button');
+                    btn.className            = 'filter-btn filter-btn-dynamic';
+                    btn.dataset.category     = cat.name;
+                    btn.dataset.am           = cat.amharic_name || cat.name;
+                    btn.innerHTML            = iconHtml + cat.name;
+
+                    const hasSubs = (cat.subcategories || []).length > 0;
+
+                    // ── Hover: show dropdown ──────────────────────
+                    if (hasSubs) {
+                        btn.addEventListener('mouseenter', function () {
+                            clearTimeout(_subcatHideTimer);
+                            _positionAndShowDropdown(cat, btn);
+                        });
+                        btn.addEventListener('mouseleave', function () {
+                            _subcatHideTimer = setTimeout(_hideSubcatDropdown, 180);
+                        });
+                        // Small chevron hint
+                        btn.innerHTML += ' <i class="fas fa-chevron-down" style="font-size:8px;opacity:0.6;margin-left:2px;"></i>';
+                    }
+
+                    // ── Click: filter products ────────────────────
+                    btn.addEventListener('click', function () {
+                        if (typeof window.filterCategory === 'function') window.filterCategory(cat.name, this);
+                        // On mobile (touch), also show dropdown on click
+                        if (hasSubs && window.matchMedia('(max-width:640px)').matches) {
+                            _positionAndShowDropdown(cat, btn);
+                        }
+                    });
+
+                    bar.appendChild(btn);
+                });
+
+                // All button: hide dropdown, reset filter
+                bar.querySelector('[data-category="All"]').addEventListener('click', function () {
+                    if (typeof window.filterCategory === 'function') window.filterCategory('All', this);
+                    _hideSubcatDropdown();
+                });
+
+                // Keep dropdown open when mouse moves into it
+                const dropdown = document.getElementById('subcatDropdown');
+                dropdown.addEventListener('mouseenter', () => clearTimeout(_subcatHideTimer));
+                dropdown.addEventListener('mouseleave', () => {
+                    _subcatHideTimer = setTimeout(_hideSubcatDropdown, 180);
+                });
+
+            } catch (e) {
+                console.warn('Category load failed, using defaults:', e);
+                _injectDefaultFilters(bar);
+            }
+        }
+
+        // ── Position dropdown under the hovered button ────────────
+        function _positionAndShowDropdown(cat, btn) {
+            const dropdown = document.getElementById('subcatDropdown');
+            const inner    = document.getElementById('subcatDropdownInner');
+            const subs     = cat.subcategories || [];
+
+            if (subs.length === 0) return;
+
+            // Build chips
+            inner.innerHTML = '';
+
+            // "All [Category]" chip
+            const allChip = document.createElement('button');
+            allChip.className   = 'subcat-filter-btn active';
+            allChip.textContent = 'All ' + cat.name;
+            allChip.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    window.currentCategory    = cat.name;
+                    window.currentSubcategory = null;
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    const parentBtn = document.querySelector(`.filter-btn[data-category="${cat.name}"]`);
+                    if (parentBtn) parentBtn.classList.add('active');
+                    window.fetchProducts(cat.name);
+                });
+            inner.appendChild(allChip);
+
+            subs.forEach(sub => {
+                const rawIcon  = (sub.icon || '').trim();
+                const iconHtml = rawIcon
+                    ? (rawIcon.startsWith('fa')
+                        ? `<i class="${rawIcon}" style="font-size:10px;"></i> `
+                        : `${rawIcon} `)
+                    : '';
+
+                const chip = document.createElement('button');
+                chip.className = 'subcat-filter-btn';
+                chip.innerHTML = iconHtml + sub.name;
+                chip.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    inner.querySelectorAll('.subcat-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Always set currentCategory from the cat this dropdown belongs to,
+                    // not window.currentCategory which may still be 'All' on hover-only
+                    window.currentCategory    = cat.name;
+                    window.currentSubcategory = sub.name;
+
+                    // Highlight the parent category filter button
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    const parentBtn = document.querySelector(`.filter-btn[data-category="${cat.name}"]`);
+                    if (parentBtn) parentBtn.classList.add('active');
+
+                    window.fetchProductsBySubcat(cat.name, sub.name);
+
+                    // Close on mobile after selecting
+                    if (window.matchMedia('(max-width:640px)').matches) {
+                        setTimeout(_hideSubcatDropdown, 300);
+                    }
+                });
+                inner.appendChild(chip);
+            });
+
+            // Position the dropdown using fixed coordinates (viewport-relative)
+            const btnRect = btn.getBoundingClientRect();
+
+            // Place dropdown just below the button
+            const dropTop  = btnRect.bottom + 6;
+            // Align dropdown left edge to button center minus a small offset, clamped to viewport
+            const dropLeft = Math.max(8, Math.min(
+                btnRect.left + btnRect.width / 2 - 26,
+                window.innerWidth - 348
+            ));
+
+            dropdown.style.top  = dropTop  + 'px';
+            dropdown.style.left = dropLeft + 'px';
+
+            // Move arrow tip to align with button center relative to dropdown left
+            const arrowLeft = Math.min(
+                Math.max(14, btnRect.left + btnRect.width / 2 - dropLeft - 7),
+                200
+            );
+            dropdown.style.setProperty('--arrow-left', arrowLeft + 'px');
+
+            dropdown.classList.add('visible');
+        }
+
+        function _hideSubcatDropdown() {
+            const dropdown = document.getElementById('subcatDropdown');
+            if (dropdown) dropdown.classList.remove('visible');
+            window.currentSubcategory = null;
+        }
+
+        function _injectDefaultFilters(bar) {
+            const defaults = [
+                { name: 'Electronics',   am: 'ኤሌክትሮኒክስ' },
+                { name: 'Furniture',     am: 'የቤት ዕቃዎች' },
+                { name: 'Fashion',       am: 'አልባሳት' },
+                { name: 'Vehicles',      am: 'ተሽከርካሪዎች' },
+                { name: 'Property',      am: 'ንብረት' },
+                { name: 'Home Supplies', am: 'የቤት ቁሳቁሶች' },
+                { name: 'Services',      am: 'አገልግሎቶች' },
+                { name: 'Jobs',          am: 'ስራዎች' },
+            ];
+            bar.querySelectorAll('.filter-btn-dynamic').forEach(b => b.remove());
+            defaults.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className        = 'filter-btn filter-btn-dynamic';
+                btn.dataset.category = d.name;
+                btn.dataset.am       = d.am;
+                btn.textContent      = d.name;
+                btn.addEventListener('click', function () {
+                    if (typeof window.filterCategory === 'function') window.filterCategory(d.name, this);
+                    _hideSubcatDropdown();
+                });
+                bar.appendChild(btn);
+            });
+        }
+
+        // ── Subcategory product fetch ─────────────────────────────
+        window.currentSubcategory = null;
+
+        window.fetchProductsBySubcat = async (category, subcategory) => {
+            const grid = document.getElementById('productGrid');
+            if (grid) grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
+
+            window.currentSubcategory = subcategory;
+            const sortOrder      = document.getElementById('sortSelect')?.value      || 'newest';
+            const locationFilter = document.getElementById('locationSelect')?.value  || 'all';
+
+            let query = _supabase
+                .from('products')
+                .select(`*, profiles:user_id (is_verified, full_name, avatar_url)`)
+                .eq('status', 'approved')
+                .eq('category', category)
+                .eq('subcategory', subcategory);
+
+            if (locationFilter !== 'all') query = query.ilike('location', `%${locationFilter}%`);
+            if (sortOrder === 'price_low')       query = query.order('price', { ascending: true });
+            else if (sortOrder === 'price_high') query = query.order('price', { ascending: false });
+            else                                 query = query.order('created_at', { ascending: false });
+
+            const { data, error } = await query;
+            if (!error) window.renderProducts(data);
+            else console.error('Subcategory fetch error:', error.message);
+        };
+
+        function checkPostStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('posted')) {
+                document.getElementById('postedItemName').innerText = urlParams.get('item') || 'Listing';
+                document.getElementById('successModal').style.display = 'flex';
+                window.history.replaceState({}, document.title, 'index.html');
+            }
+        }
+
+        async function loadAdminStatus() {
+            if (typeof _supabase === 'undefined') return;
+            const { data, error } = await _supabase.from('profiles').select('last_seen').eq('is_owner', true).maybeSingle();
+            if (error) { console.error('Error fetching admin status:', error); return; }
+            if (data && data.last_seen) {
+                const diff = Math.floor((new Date() - new Date(data.last_seen)) / 60000);
+                const dot = document.querySelector('.online-dot');
+                const label = document.querySelector('.chat-label');
+                if (!dot || !label) return;
+                if (diff < 5)       { dot.style.background = '#2ed573'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Online Now</small>`; }
+                else if (diff < 60) { dot.style.background = '#f1c40f'; label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Active ${diff}m ago</small>`; }
+                else                { dot.style.background = '#ccc';    label.innerHTML = `Contact Us <br><small style="font-size:10px;opacity:0.8;">Offline</small>`; }
+            }
+        }
+
+        window.logBuyerAction = async function (buyerEmail, actionDescription) {
+            try {
+                if (typeof _supabase === 'undefined') return;
+                let userEmail = buyerEmail;
+                if (!userEmail) {
+                    const { data: { user } } = await _supabase.auth.getUser();
+                    userEmail = user ? (user.email || user.user_metadata?.full_name || 'Logged-In User') : 'Guest/Unknown';
+                }
+                await _supabase.from('audit_logs').insert([{ actor: userEmail, action: '[BUYER] Interaction', details: actionDescription }]);
+            } catch (err) { console.log('Audit log recording skipped:', err); }
+        };
+
+
+
+
+
+
+        // ══════════════════════════════════════════════
+        // PASSWORD RECOVERY HANDLER
+        // Intercepts Supabase reset links (type=recovery in URL hash)
+        // and shows a Set New Password modal directly on this page.
+        // ══════════════════════════════════════════════
+        (async function handleRecovery() {
+            const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+            if (params.get('type') !== 'recovery') return;
+
+            // Clear the hash so it looks clean
+            history.replaceState(null, '', window.location.pathname);
+
+            // Get the active recovery session Supabase injected via the link
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) return;
+
+            const userEmail = session.user.email;
+            const savedPwd = sessionStorage.getItem('wg_gen_pwd');
+
+            if (savedPwd) {
+                // Admin pre-generated a password — apply it automatically
+                const { error } = await _supabase.auth.updateUser({ password: savedPwd });
+                sessionStorage.removeItem('wg_gen_pwd');
+                if (!error) {
+                    showRecoverySuccessModal(userEmail, savedPwd);
+                } else {
+                    showSetPasswordModal(userEmail, 'Auto-apply failed. Please set a new password manually.');
+                }
+            } else {
+                // No pre-generated password — show manual entry form
+                showSetPasswordModal(userEmail, '');
+            }
+        })();
+
+        function showSetPasswordModal(email, errorMsg) {
+            const existing = document.getElementById('recoveryModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'recoveryModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
+                    <div style="font-size:2.5rem;margin-bottom:10px;">&#128272;</div>
+                    <h2 style="margin:0 0 6px;color:#333;">Set New Password</h2>
+                    <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Account: <strong>${email}</strong></p>
+                    ${errorMsg ? `<p style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;">${errorMsg}</p>` : ''}
+                    <input type="password" id="recPwdInput" placeholder="New password (min 6 chars)"
+                        style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:10px;"
+                        oninput="this.style.borderColor='#0A291A'"/>
+                    <input type="password" id="recPwdConfirm" placeholder="Confirm new password"
+                        style="width:100%;padding:14px;border-radius:10px;border:2px solid #ddd;font-size:1rem;outline:none;box-sizing:border-box;margin-bottom:8px;"
+                        oninput="this.style.borderColor='#0A291A'"/>
+                    <p id="recPwdError" style="color:#ff4757;font-size:0.8rem;min-height:18px;margin-bottom:14px;"></p>
+                    <button onclick="applyRecoveryPassword()"
+                        style="width:100%;background:#F5A623; color:#1a1a1a;border:none;padding:14px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
+                        &#10003; Update Password
+                    </button>
+                </div>`;
+            document.body.appendChild(modal);
+            setTimeout(() => document.getElementById('recPwdInput')?.focus(), 100);
+        }
+
+        window.applyRecoveryPassword = async () => {
+            const pwd = document.getElementById('recPwdInput').value;
+            const conf = document.getElementById('recPwdConfirm').value;
+            const errEl = document.getElementById('recPwdError');
+            if (pwd.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+            if (pwd !== conf)   { errEl.textContent = 'Passwords do not match.'; return; }
+            errEl.textContent = '';
+            const btn = document.querySelector('#recoveryModal button');
+            btn.textContent = 'Updating...'; btn.disabled = true;
+            const { error } = await _supabase.auth.updateUser({ password: pwd });
+            if (error) {
+                errEl.textContent = 'Error: ' + error.message;
+                btn.textContent = '✓ Update Password'; btn.disabled = false;
+            } else {
+                document.getElementById('recoveryModal').remove();
+                await _supabase.auth.signOut();
+                showToast('Password updated! Please sign in with your new password.', 'success');
+            }
+        };
+
+        function showRecoverySuccessModal(email, password) {
+            const existing = document.getElementById('recoveryModal');
+            if (existing) existing.remove();
+            const modal = document.createElement('div');
+            modal.id = 'recoveryModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
+                    <div style="font-size:3rem;margin-bottom:10px;color:#2ed573;">&#10003;</div>
+                    <h2 style="margin:0 0 6px;color:#333;">Password Updated!</h2>
+                    <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Account: <strong>${email}</strong></p>
+                    <div style="background:#f7f8f6;border:2px dashed #2ed573;border-radius:10px;padding:18px;margin-bottom:20px;">
+                        <p style="font-size:0.8rem;color:#888;margin:0 0 6px;">Your new password:</p>
+                        <code style="font-size:1.3rem;font-weight:bold;color:#1a1a1a;letter-spacing:2px;">${password}</code>
+                    </div>
+                    <button onclick="navigator.clipboard.writeText('${password}').then(()=>{this.textContent='Copied!';this.style.background='#2ed573';})"
+                        style="width:100%;background:#F5A623; color:#1a1a1a;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;margin-bottom:10px;">
+                        Copy Password
+                    </button>
+                    <button onclick="document.getElementById('recoveryModal').remove(); _supabase.auth.signOut();"
+                        style="width:100%;background:#eee;color:#333;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;">
+                        Done — Sign In Now
+                    </button>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+
+        function showToast(message, type) {
+            let toast = document.getElementById('recoveryToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'recoveryToast';
+                document.body.appendChild(toast);
+            }
+            toast.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:${type==='success'?'#2ed573':'#ff4757'};color:white;padding:14px 28px;border-radius:12px;font-weight:700;font-size:1rem;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 0.4s;`;
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 4000);
+        }
+
+        // ── FORGOT PASSWORD link handler (inside Sign In modal) ──
+        document.addEventListener('DOMContentLoaded', function () {
+            const forgotLink = document.getElementById('forgotPwdLink');
+            if (!forgotLink) return;
+            forgotLink.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const email = document.getElementById('authEmail').value.trim();
+                if (!email) {
+                    alert('Please enter your email address in the field above first.');
+                    document.getElementById('authEmail').focus();
+                    return;
+                }
+                this.textContent = 'Sending...';
+                const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.href.split('#')[0]
+                });
+                if (error) {
+                    this.textContent = 'Forgot Password?';
+                    alert('Error: ' + error.message);
+                } else {
+                    this.textContent = 'Forgot Password?';
+                    if (window.toggleModal) window.toggleModal();
+                    showToast('Reset email sent! Check your inbox.', 'success');
+                }
+            });
+        });
+        
+    </script>
+ 
+    <!-- Subcategory dropdown — direct child of body so transform on filter-controls doesn't trap fixed positioning -->
+    <div id="subcatDropdown">
+        <div id="subcatDropdownInner"></div>
+    </div>
+
+<script>
+/* Show/hide the Wana Dating banner and menu link as set in the admin dashboard (table site_settings, key dating_promo). Default = visible. */
+(function () {
+    var done = false;
+    function ready(v) {
+        if (done) return; done = true;
+        var b = document.body;
+        if (v && v.banner === false) b.classList.add('dp-no-banner');
+        if (v && v.menu === false) b.classList.add('dp-no-menu');
+        b.classList.add('dp-ready');
+    }
+    setTimeout(function () { ready(null); }, 4000);   /* if the setting can't be fetched, keep today's behaviour (visible) */
+    function fetchIt() {
+        if (typeof _supabase === 'undefined') return setTimeout(fetchIt, 200);
+        _supabase.from('site_settings').select('value').eq('key', 'dating_promo').maybeSingle()
+            .then(function (r) { ready(r && r.data ? r.data.value : null); }, function () { ready(null); });
+    }
+    fetchIt();
+})();
+</script>
 </body>
 </html>
+
