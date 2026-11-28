@@ -68,7 +68,7 @@
 }
 #gate .gate-cta-band::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: 7px;
-  background: repeating-linear-gradient(90deg, #e0426f 0 14px, #f5a623 14px 28px, #2f6fdb 28px 42px, #078930 42px 56px);
+  background: repeating-linear-gradient(90deg, #e0426f 0 14px, #f5a623 14px 28px, #9a6330 28px 42px, #078930 42px 56px);
 }
 #gate .gate-band-tag { margin: 0 0 12px; font-family: "Dancing Script", cursive; font-size: 1.35rem; color: #f6c978; }
 #gate .gate-cta-band h2 { color: #fff; font-size: clamp(1.7rem, 3vw, 2.4rem); margin: 0 0 10px; }
