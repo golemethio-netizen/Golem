@@ -1,0 +1,158 @@
+/* Wana Dating: public page shown before sign-in. Scoped to #gate so the signed-in app is untouched. */
+#gate {
+  --lp-plum: #2a1033; --lp-rose: #d63a69; --lp-rose-dark: #b8294f; --lp-gold: #e8a33a;
+  --lp-ink: #22112b; --lp-muted: #5d4a66; --lp-line: #eadfe6; --lp-cream: #fffaf8;
+  color: var(--lp-ink);
+}
+#gate .lp-ic { width: 22px; height: 22px; flex: none; }
+
+/* ---- Hero ---- */
+#gate .gate-headline {
+  margin: 20px 0 14px; max-width: 560px;
+  font-family: "Fraunces", Georgia, serif; font-weight: 800; letter-spacing: -.025em;
+  font-size: clamp(2.3rem, 4.4vw, 3.8rem); line-height: 1.05; color: var(--lp-plum);
+}
+#gate .gate-hero-desc { max-width: 500px; font-size: 1.06rem; line-height: 1.6; color: var(--lp-muted); margin: 0 0 24px; }
+#gate .gate-hero-cta { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin: 0 0 26px; }
+#gate .gate-hero-cta .btn-signin {
+  padding: 15px 30px; border-radius: 14px; font-size: 1.02rem; font-weight: 700; letter-spacing: 0;
+  background: linear-gradient(135deg, #e0426f, var(--lp-rose-dark)); color: #fff; border: 0;
+  box-shadow: 0 12px 28px rgba(184,41,79,.32); transition: transform .15s ease, box-shadow .15s ease;
+}
+#gate .gate-hero-cta .btn-signin:hover { transform: translateY(-1px); box-shadow: 0 16px 34px rgba(184,41,79,.38); }
+#gate .gate-link { color: var(--lp-plum) !important; font-weight: 600; font-size: .95rem !important; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(42,16,51,.3); }
+#gate .gate-link:hover { text-decoration-color: var(--lp-rose); }
+#gate .gate-trust { display: flex; flex-wrap: wrap; gap: 10px 24px; list-style: none; margin: 0; padding: 0; }
+#gate .gate-trust li { display: flex; align-items: center; gap: 8px; font-size: .88rem; font-weight: 600; color: var(--lp-plum); }
+#gate .gate-trust .lp-ic { color: var(--lp-rose-dark); width: 20px; height: 20px; }
+
+/* ---- Sections ---- */
+#gate .gate-section h2 { font-family: "Fraunces", Georgia, serif; font-weight: 700; letter-spacing: -.02em; color: var(--lp-plum); }
+#gate .gate-lede { color: var(--lp-muted); line-height: 1.65; }
+
+/* Why: heading on the left, a divided list on the right */
+#gate .gate-why { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; align-items: start; max-width: 1080px; margin-left: auto; margin-right: auto; }
+#gate .gate-why-head { position: sticky; top: 96px; }
+#gate .gate-why-head h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); line-height: 1.12; margin: 0 0 14px; }
+#gate .gate-why-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--lp-line); }
+#gate .gate-why-list li { display: flex; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--lp-line); }
+#gate .gate-why-list .lp-ic { width: 46px; height: 46px; padding: 12px; border-radius: 14px; background: #fdeaf0; color: var(--lp-rose-dark); }
+#gate .gate-why-list h3 { margin: 2px 0 6px; font-size: 1.06rem; font-weight: 700; color: var(--lp-plum); }
+#gate .gate-why-list p { margin: 0; color: var(--lp-muted); line-height: 1.6; font-size: .95rem; }
+
+/* How it works: a real sequence, so numbered */
+#gate .gate-how { max-width: 1080px; margin-left: auto; margin-right: auto; }
+#gate .gate-how h2 { font-size: clamp(1.7rem, 2.8vw, 2.3rem); margin: 0 0 10px; }
+#gate .gate-steps { counter-reset: lpstep; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 30px; }
+#gate .gate-step { counter-increment: lpstep; position: relative; padding: 4px 0 0; background: none; border: 0; box-shadow: none; }
+#gate .gate-step::before {
+  content: counter(lpstep); display: block; font-family: "Fraunces", Georgia, serif; font-weight: 800; font-size: 3.4rem; line-height: 1; color: var(--lp-rose);
+  padding-bottom: 14px; margin-bottom: 14px; border-bottom: 2px solid var(--lp-plum);
+}
+#gate .gate-step h3 { margin: 0 0 8px; font-size: 1.08rem; color: var(--lp-plum); }
+#gate .gate-step p { margin: 0; color: var(--lp-muted); line-height: 1.6; font-size: .95rem; }
+
+/* About */
+#gate .gate-about h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
+#gate .gate-about-panel { border-radius: 18px; border: 1px solid var(--lp-line); background: #fff; box-shadow: 0 14px 34px rgba(42,16,51,.06); }
+#gate .gate-about-badge { background: #fff; border: 1px solid var(--lp-line); color: var(--lp-plum); font-weight: 600; }
+
+/* Closing call to action */
+#gate .gate-cta-band {
+  max-width: 1080px; margin: 24px auto 40px; padding: 54px 28px 50px; text-align: center; border-radius: 26px; color: #fff;
+  background: radial-gradient(120% 140% at 85% 0%, #5a1d52 0%, var(--lp-plum) 60%);
+  border-top: 6px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 0 0 1px rgba(42,16,51,.4), 0 20px 44px rgba(42,16,51,.25);
+  position: relative; overflow: hidden;
+}
+#gate .gate-cta-band::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 7px;
+  background: repeating-linear-gradient(90deg, #e0426f 0 14px, #f5a623 14px 28px, #2f6fdb 28px 42px, #078930 42px 56px);
+}
+#gate .gate-band-tag { margin: 0 0 12px; font-family: "Dancing Script", cursive; font-size: 1.35rem; color: #f6c978; }
+#gate .gate-cta-band h2 { color: #fff; font-size: clamp(1.7rem, 3vw, 2.4rem); margin: 0 0 10px; }
+#gate .gate-cta-band p { color: #e9dcef; max-width: 520px; margin: 0 auto 24px; line-height: 1.6; }
+#gate .gate-cta-band .btn-signin { padding: 15px 32px; border-radius: 14px; font-weight: 700; background: #fff; color: var(--lp-rose-dark); border: 0; box-shadow: 0 12px 28px rgba(0,0,0,.25); }
+#gate .gate-cta-band .btn-signin:hover { background: #ffeef3; }
+
+#gate a:focus-visible, #gate button:focus-visible { outline: 3px solid #f5a623; outline-offset: 3px; }
+
+@media (max-width: 900px) {
+  #gate .gate-why { grid-template-columns: 1fr; gap: 24px; padding-left: 20px; padding-right: 20px; }
+  #gate .gate-why-head { position: static; }
+  #gate .gate-how { padding-left: 20px; padding-right: 20px; }
+  #gate .gate-steps { grid-template-columns: 1fr; gap: 26px; }
+  #gate .gate-cta-band { margin: 20px 14px 32px; padding: 46px 20px 40px; }
+}
+@media (max-width: 700px) {
+  #gate .gate-headline { margin-top: 12px; }
+  #gate .gate-hero-cta { gap: 14px; }
+  #gate .gate-hero-cta .btn-signin { width: 100%; text-align: center; }
+  #gate .gate-trust { gap: 8px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { #gate .btn-signin { transition: none; } }
+
+/* Hero buttons sit in one row; the trust list gets room to stay on one line */
+#gate .gate-hero-cta { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; }
+#gate .gate-hero-cta .gate-link { text-align: left; margin: 0 !important; }
+#gate .gate-trust { max-width: 640px; }
+
+/* The page is a fixed-height column: never let sections be squeezed */
+#gate > * { flex-shrink: 0; }
+
+/* Steps: replace the old round number badge with a large numeral above a rule */
+#gate .gate-step { padding-left: 0 !important; }
+#gate .gate-step::before {
+  position: static !important; width: auto !important; height: auto !important; border-radius: 0 !important;
+  background: none !important; display: block !important; text-align: left !important; justify-content: flex-start !important;
+  color: var(--lp-rose) !important; font-weight: 800 !important;
+}
+#gate > .gate-cta-band { width: calc(100% - 40px); box-sizing: border-box; }
+
+/* ===== Sign-in page, version 2: cards, pills, clearer hierarchy ===== */
+#gate .gate-headline em { font-style: normal; color: var(--lp-rose-dark, #c0305a); position: relative; white-space: nowrap; }
+#gate .gate-headline em::after { content: ""; position: absolute; left: 0; right: 0; bottom: .08em; height: .14em; border-radius: 99px; background: linear-gradient(90deg, #ff6b8f, #fcdd09 55%, #078930); opacity: .55; z-index: -1; }
+
+/* trust row as soft pills */
+#gate .gate-trust { gap: 10px; }
+#gate .gate-trust li { padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.82); border: 1px solid rgba(192,48,90,.14); box-shadow: 0 4px 14px rgba(42,16,51,.06); font-size: .84rem; backdrop-filter: blur(6px); }
+
+/* why: centred heading and a 3 x 2 grid of cards */
+#gate .gate-why { display: block; max-width: 1120px; margin-left: auto; margin-right: auto; }
+#gate .gate-why-head { position: static; text-align: center; max-width: 640px; margin: 0 auto 34px; }
+#gate .gate-why-head h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+#gate .gate-why-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; border-top: 0; }
+#gate .gate-why-list li { display: block; padding: 22px 22px 24px; border: 1px solid #ece6ea; border-radius: 18px; background: #fff; box-shadow: 0 8px 26px rgba(42,16,51,.05); transition: transform .18s ease, box-shadow .18s ease; }
+#gate .gate-why-list li:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(42,16,51,.10); }
+#gate .gate-why-list .lp-ic { margin-bottom: 14px; }
+#gate .gate-why-list h3 { margin-top: 0; }
+
+/* steps: three cards with a round number */
+#gate .gate-how { max-width: 1120px; margin-left: auto; margin-right: auto; text-align: center; }
+#gate .gate-steps { gap: 18px; text-align: left; margin-top: 30px; }
+#gate .gate-step { padding: 26px 24px; border: 1px solid #ece6ea; border-radius: 18px; background: #fff; box-shadow: 0 8px 26px rgba(42,16,51,.05); }
+#gate .gate-step::before { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; margin-bottom: 14px; color: #fff; font-size: 1.15rem; background: linear-gradient(135deg, #ff6b8f, #c0305a); border: 0; }
+
+/* about band + final call to action: a little more breathing room */
+#gate .gate-about { max-width: 1120px; margin-left: auto; margin-right: auto; border-radius: 24px; }
+#gate .gate-cta-band { max-width: 1120px; margin-left: auto; margin-right: auto; }
+
+@media (max-width: 960px) { #gate .gate-why-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  #gate .gate-why-list { grid-template-columns: 1fr; gap: 12px; }
+  #gate .gate-why-head { text-align: left; margin-bottom: 22px; }
+  #gate .gate-how { text-align: left; }
+  #gate .gate-trust li { font-size: .8rem; padding: 7px 11px; }
+}
+
+/* v2 fixes: round number badges win over the older numeral style; centred intro lines */
+#gate .gate-step::before {
+  display: grid !important; place-items: center !important; justify-content: center !important; text-align: center !important;
+  width: 44px !important; height: 44px !important; border-radius: 50% !important; border-bottom: 0 !important; padding: 0 !important;
+  margin: 0 0 14px !important; font-family: "Inter", system-ui, sans-serif; font-size: 1.1rem !important; line-height: 1;
+  color: #fff !important; background: linear-gradient(135deg, #ff6b8f, #c0305a) !important;
+}
+#gate .gate-how .gate-lede, #gate .gate-why-head .gate-lede { max-width: 620px; margin-left: auto; margin-right: auto; }
+@media (max-width: 600px) { #gate .gate-how .gate-lede, #gate .gate-why-head .gate-lede { margin-left: 0; } }
+#gate .gate-step { padding: 26px 24px !important; }
